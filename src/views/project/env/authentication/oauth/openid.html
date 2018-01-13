@@ -1,0 +1,38 @@
+<upgrade-warning ng-if="!minPlan('commercial') && projectSettingsVisible()" warning="Upgrade your project to a paid plan to access OAuth settings."></upgrade-warning>
+<div class="well">
+  <h4>OpenID must use Authorization code flow</h4>
+  <p>OpenID Connect is a single sign on (SSO) framework for OAuth 2. In order to use OpenID Connect you must have a auth provider that supports OpenID Connect and set up an APP within that provider. Then use the settings from your provider to configure the connection here. See <a href="http://openid.net/connect/" target="_blank">OpenID Connect</a> for detailed information.</p>
+  <p>Fill in the application details. The <strong>Authorization (or login redirect) callback URL</strong> MUST be set to the domain name of your application (ex: <code>https://mydomain.com</code>.</p>
+  <p>Popular OpenID Connect services include <a href="https://auth0.com/" target="_blank">Auth0</a> and <a href="https://www.okta.com/" target="_blank">Okta</a>.</p>
+</div>
+<div class="form-group">
+  <label for="openidauthURI">Authorize URI</label>
+  <input ng-model="currentProject.settings.oauth.openid.authURI" type="text" class="form-control" id="openidauthURI" name="openidauthURI" placeholder="Enter Server Auth URI">
+</div>
+<div class="form-group">
+  <label for="openidtokenURI">Token URI</label>
+  <input ng-model="currentProject.settings.oauth.openid.tokenURI" type="text" class="form-control" id="openidtokenURI" name="openidtokenURI" placeholder="Enter Server URI to request a token">
+</div>
+<div class="form-group">
+  <label for="openidClientId">Client ID</label>
+  <input ng-model="currentProject.settings.oauth.openid.clientId" type="text" class="form-control" id="openidClientId" name="openidClientId" placeholder="Enter OpenID Connect Application Client ID">
+</div>
+<div class="form-group">
+  <label for="openidClientSecret">Client Secret</label>
+  <input ng-model="currentProject.settings.oauth.openid.clientSecret" type="text" class="form-control" id="openidClientSecret" name="openidClientSecret" placeholder="Enter OpenID Connect Application Client Secret">
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>OpenID Connect</h4>
+  </div>
+  <div class="panel-body">
+    <div class="form-group">
+      <label for="openiduserInfoURI">User Info (claims) URI</label>
+      <input ng-model="currentProject.settings.oauth.openid.userInfoURI" type="text" class="form-control" id="openiduserInfoURI" name="openiduserInfoURI" placeholder="Enter Server URI to request user info">
+    </div>
+    <div class="form-group">
+      <label for="openidscope">Scope</label>
+      <input ng-model="currentProject.settings.oauth.openid.scope" type="text" class="form-control" id="openidscope" name="openidscope" placeholder="Enter Request Scope (optional)">
+    </div>
+  </div>
+</div>
