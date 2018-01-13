@@ -53,6 +53,10 @@ module.exports = function(app) {
             $scope.files.splice(index, 1);
           };
 
+          $scope.isReadOnly = function() {
+            return $scope.$parent.readOnly
+          };
+
           $scope.fileSize = function(a, b, c, d, e) {
             return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2) + ' ' + (e ? 'kMGTPEZY'[--e] + 'B' : 'Bytes');
           };
