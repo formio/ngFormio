@@ -45,6 +45,7 @@
     "opn": "^5.1.0",
     "protractor-helpers": "^1.1.472",
     "require-dir": "^0.3.0",
+    "run-sequence": "^2.2.1",
     "selenium-server-standalone-jar": "^3.6.0",
     "ternary-stream": "^2.0.0",
     "vinyl-paths": "^2.1.0",
