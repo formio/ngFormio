@@ -2131,6 +2131,12 @@ li.step-info {
   animation: buttonblink 6s infinite;  /* IE 10+, Fx 29+ */
 }
 
+.existing-title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
 @keyframes buttonblink {
   0%, 100% {
     color: #fff;
