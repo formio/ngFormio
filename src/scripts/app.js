@@ -707,7 +707,6 @@ angular
         })
         .then(function(projects) {
           $scope.projectsLoaded = true;
-          document.getElementById('projects-loader').style.display = 'none';
           $scope.projects = projects;
           $scope.teamsEnabled = _.some(projects, function(project) {
             project.plan = project.plan || '';
