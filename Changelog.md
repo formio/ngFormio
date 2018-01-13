@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.27.2
+### Fixed
+ - Issue with the file upload component where it would not show errors.
+ - Issue with file upload in read-only allowing you to delete files from the grid.
+
+### Changed
+ - Upgraded formio.js to 2.27.6
+
+### Added
+ - Datagrid's add another position logic
+
 ## 2.27.1
 ### Fixed
  - Issue where when files are removed, required validation no longer works correctly.

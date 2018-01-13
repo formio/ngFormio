@@ -201,7 +201,37 @@ module.exports = function(app) {
         }
       }, true)
 
-      $scope.upload = function(files) {
+      $scope.invalidFiles = [];
+      $scope.currentErrors = [];
+      $scope.upload = function(files, invalidFiles) {
+        if (invalidFiles.length) {
+          angular.forEach(invalidFiles, function(fileError) {
+            if (fileError.$error === 'pattern') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File extension does not match the pattern ' + $scope.component.filePattern;
+            }
+            if (fileError.$error === 'maxSize') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File size is larger than the allowed ' + $scope.component.fileMaxSize;
+            }
+            if (fileError.$error === 'minSize') {
+              fileError.$error = 'custom';
+              $scope.component.customError = 'File size is smaller than the allowed ' + $scope.component.fileMinSize;
+            }
+
+            $scope.currentErrors.push(fileError.$error);
+            $scope.formioForm[$scope.componentId].$setValidity(fileError.$error, false);
+            $scope.formioForm[$scope.componentId].$setDirty();
+          });
+          return;
+        }
+        else {
+          angular.forEach($scope.currentErrors, function(err) {
+            $scope.formioForm[$scope.componentId].$setValidity(err, true);
+          });
+          $scope.currentErrors = [];
+        }
+
         if ($scope.component.storage && files && files.length) {
           angular.forEach(files, function(file) {
             // Get a unique name for this file to keep file collisions from occurring.
