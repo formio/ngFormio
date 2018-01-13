@@ -919,9 +919,7 @@ app.controller('FormEditController', [
     $scope.saveForm = function() {
       contentLoaded = false;
       $scope.dirty = false;
-      return parentSave().then(function() {
-        $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
-      });
+      return parentSave();
     };
 
     $scope.saveFormDraft = function() {
