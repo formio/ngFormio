@@ -2,6 +2,8 @@
 'use strict';
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
+var del = require('del');
+var runSequence = require('run-sequence');
 plugins.browserSync = require('browser-sync');
 gulp.task('styles', ['wiredep'], require('./gulp/styles')(gulp, plugins));
 gulp.task('jshint', require('./gulp/jshint')(gulp, plugins));
@@ -12,9 +14,14 @@ gulp.task('fonts', require('./gulp/fonts')(gulp, plugins));
 gulp.task('extras', require('./gulp/extras')(gulp, plugins));
 gulp.task('views', require('./gulp/views')(gulp, plugins));
 gulp.task('img-cache', function(done) {
-  plugins.cache.clearAll(done);
+  return plugins.cache.clearAll(done);
 });
-gulp.task('clean', ['img-cache'], require('del').bind(null, ['.tmp', 'dist']));
+gulp.task('clean-dirs', function() {
+  return del(['.tmp', 'dist']);
+});
+gulp.task('clean', function(done) {
+  runSequence('img-cache', 'clean-dirs', done);
+});
 gulp.task('wiredep', require('./gulp/wiredep')(gulp, plugins));
 gulp.task('watch', require('./gulp/watch')(gulp, plugins));
 gulp.task('serve', ['wiredep', 'styles', 'fonts', 'libraries', 'watch']);
@@ -55,6 +62,6 @@ gulp.task('deploy:beta:develop', function () {
   return gulp.src(['./dist/**/*', '!./dist/lib/**/*']).pipe(s3(settings));
 });
 
-gulp.task('default', ['clean'], function() {
-  gulp.start('build');
+gulp.task('default', function (done) {
+  runSequence('clean', 'build', done);
 });

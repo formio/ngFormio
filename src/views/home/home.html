@@ -57,6 +57,7 @@
           </div>
         </div>
       </div>
+      <i ng-if="!projectsLoaded" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
       <div class="row" ng-if="projectsLoaded" ng-cloak>
         <div class="col-sm-4" ng-repeat="project in projects | filter:projectSearch">
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
