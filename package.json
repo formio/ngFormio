@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "2.27.1",
+  "version": "2.27.2",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/formio.min.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "babel-preset-env": "^1.6.1",
     "babelify": "^8.0.0",
     "brfs": "^1.4.3",
-    "browserify": "^14.5.0",
+    "browserify": "^15.1.0",
     "del": "^3.0.0",
     "eslint": "^4.10.0",
     "eslint-config-formio": "^1.1.0",
@@ -30,13 +30,13 @@
     "gulp-streamify": "^1.0.2",
     "gulp-uglify": "^3.0.0",
     "gulp-wrap": "^0.13.0",
-    "karma": "^1.7.1",
+    "karma": "^2.0.0",
     "main-bower-files": "^2.11.1",
-    "node-qunit-phantomjs": "^1.2.1",
+    "node-qunit-phantomjs": "^2.0.0",
     "run-sequence": "^2.2.0",
     "strictify": "^0.2.0",
     "uglifyify": "^4.0.4",
-    "vinyl-source-stream": "^1.1.0",
+    "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.4.0"
   },
   "optionalDependencies": {
@@ -52,7 +52,7 @@
     "angular-ui-bootstrap": "^2.5.6",
     "bootstrap": "^3.3.7",
     "bootstrap-ui-datetime-picker": "^2.5.4",
-    "formiojs": "^2.27.3",
+    "formiojs": "^2.27.6",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
