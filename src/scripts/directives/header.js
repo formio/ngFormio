@@ -2,7 +2,7 @@
 
 angular
   .module('formioApp')
-  .directive('formioHeaderWrapper', function($window) {
+  .directive('formioHeaderWrapper', ['$window', function($window) {
     var stickies = [];
     var npos = '';
     var scroll = function scroll() {
@@ -54,4 +54,4 @@ angular
       template: '<formio-header ng-transclude></formio-header>',
       link: link
     };
-  });
+  }]);
