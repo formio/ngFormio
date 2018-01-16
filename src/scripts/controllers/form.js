@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, jQuery: false, document: false, Promise: false */
+/* global _: false, document: false, Promise: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -919,9 +919,7 @@ app.controller('FormEditController', [
     $scope.saveForm = function() {
       contentLoaded = false;
       $scope.dirty = false;
-      return parentSave().then(function() {
-        $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
-      });
+      return parentSave();
     };
 
     $scope.saveFormDraft = function() {
@@ -1151,12 +1149,14 @@ app.controller('FormShareController', ['$scope', function($scope) {
     if ($scope.options.auth) {
       $scope.previewUrl += '&auth=1';
     }
-    jQuery('#form-preview').html(jQuery(document.createElement('iframe')).attr({
-      style: 'width: 100%;',
-      id: 'share-preview',
-      src: $scope.previewUrl
-    }));
-    jQuery('#share-preview').seamless({
+    var formPreview = document.getElementById('form-preview');
+    formPreview.innerHTML = '';
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('style', 'width: 100%');
+    iframe.setAttribute('id', 'share-preview');
+    iframe.setAttribute('src', $scope.previewUrl);
+    formPreview.appendChild(iframe);
+    window.seamless(document.getElementById('share-preview'), {
       spinner: '',
       loading: 'Loading ...'
     });
@@ -1561,94 +1561,12 @@ app.controller('FormActionEditController', [
           });
         }
 
-        // Hide role settings component as needed
-        var toggleVisible = function(association) {
-          if(!association) {
-            return;
-          }
-
-          angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
-          angular.element('#form-group-resource').css('display', (association === 'link' ? 'none' : ''));
-        };
-
-        // Find the role settings component, and require it as needed.
-        var toggleRequired = function(association, formComponents) {
-          if(!formComponents || !association) {
-            return;
-          }
-
-          var roleComponent = FormioUtils.getComponent(formComponents, 'role');
-          var resourceComponent = FormioUtils.getComponent(formComponents, 'resource');
-          // Update the validation settings.
-          if (roleComponent) {
-            roleComponent.validate = roleComponent.validate || {};
-            roleComponent.validate.required = (association === 'new' ? true : false);
-          }
-          if (resourceComponent) {
-            resourceComponent.validate = resourceComponent.validate || {};
-            resourceComponent.validate.required = (association === 'link' ? false : true);
-          }
-        };
-
-        // Auth action validation changes for new resource missing role assignment.
-        if(actionInfo && actionInfo.name === 'auth') {
-          // Force the validation to be run on page load.
-          $timeout(function() {
-            var action = $scope.action.data.settings || {};
-            toggleVisible(action.association);
-            toggleRequired(action.association, actionInfo.settingsForm.components);
-          });
-
-          // Watch for changes to the action settings.
-          $scope.$watch('action.data.settings', function(current, old) {
-            // Make the role setting required if this is for new resource associations.
-            if(current.association !== old.association) {
-              toggleVisible(current.association);
-              toggleRequired(current.association, actionInfo.settingsForm.components);
-
-              // Dont save the old role settings if this is an existing association.
-              current.role = (current.role && (current.association === 'new')) || '';
-            }
-          }, true);
-        }
-
-        var showProviderFields = function(association, provider) {
-          angular.element('[id^=form-group-autofill-]').css('display', 'none');
-          if(association === 'new' && provider) {
-            angular.element('[id^=form-group-autofill-' + provider + ']').css('display', '');
-          }
-        };
-
         if(actionInfo && actionInfo.name === 'oauth') {
           // Show warning if button component has no options
           var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
           if(JSON.parse(buttonComponent.data.json).length === 0) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
           }
-          // Force the validation to be run on page load.
-          $timeout(function() {
-            var action = $scope.action.data.settings || {};
-            toggleVisible(action.association);
-            toggleRequired(action.association, actionInfo.settingsForm.components);
-            showProviderFields(action.association, action.provider);
-          });
-
-          // Watch for changes to the action settings.
-          $scope.$watch('action.data.settings', function(current, old) {
-            // Make the role setting required if this is for new resource associations.
-            if(current.association !== old.association) {
-              toggleVisible(current.association);
-              toggleRequired(current.association, actionInfo.settingsForm.components);
-              showProviderFields(current.association, current.provider);
-
-              // Dont save the old role settings if this is an existing association.
-              current.role = (current.role && (current.association === 'new')) || '';
-            }
-
-            if(current.provider !== old.provider) {
-              showProviderFields(current.association, current.provider);
-            }
-          }, true);
         }
 
         // Check for, and warn about premium actions being present.

@@ -404,10 +404,30 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/integrations/data/index.html'
         })
-        .state('project.env.integrations.oauth', {
-          url: '/integrations/oauth',
+        .state('project.env.authentication', {
+          url: '/authentication',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.authentication.info', {
+          url: '/authentication/info',
           parent: 'project.env',
-          templateUrl: 'views/project/env/integrations/oauth/index.html'
+          templateUrl: 'views/project/env/authentication/index.html'
+        })
+        .state('project.env.authentication.oauth', {
+          url: '/authentication/oauth',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/oauth/index.html'
+        })
+        .state('project.env.authentication.formio', {
+          url: '/authentication/formio',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/formio.html'
+        })
+        .state('project.env.authentication.saml', {
+          url: '/authentication/saml',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/saml.html'
         })
         .state('project.access', {
           url: '/access',
@@ -673,6 +693,7 @@ angular
       };
 
       $scope.projects = {};
+      $scope.projectSearch = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
       var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified&project__exists=false')
@@ -686,7 +707,6 @@ angular
         })
         .then(function(projects) {
           $scope.projectsLoaded = true;
-          angular.element('#projects-loader').hide();
           $scope.projects = projects;
           $scope.teamsEnabled = _.some(projects, function(project) {
             project.plan = project.plan || '';

@@ -46,15 +46,18 @@
 <div class="container projects">
   <div class="row">
     <div class="col-md-9 existing-projects-section">
-      <h2><span ng-if="projectsLoaded" ng-cloak>Existing Projects</span></h2>
-      <div class="form-inline" style="margin-bottom: 20px;">
-        <div class="form-group">
-          <div class="input-group">
-            <div class="input-group-addon">Search</div>
-            <input id="project-search" type="text" class="form-control" ng-model="projectSearch.title" placeholder="Find a project...">
+      <div class="existing-title">
+        <h2><span ng-if="projectsLoaded" ng-cloak>Existing Projects</span></h2>
+        <div class="form-inline" style="margin: 21px 0 10px;">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">Search</div>
+              <input id="project-search" type="text" class="form-control" ng-model="projectSearch.title" placeholder="Find a project...">
+            </div>
           </div>
         </div>
       </div>
+      <i ng-if="!projectsLoaded" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
       <div class="row" ng-if="projectsLoaded" ng-cloak>
         <div class="col-sm-4" ng-repeat="project in projects | filter:projectSearch">
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">

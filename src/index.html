@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/styles/base.css" />
     <!-- bower:css -->
     <link rel="stylesheet" href="/bower_components/ng-sortable/dist/ng-sortable.css" />
-    <link rel="stylesheet" href="/bower_components/chartist/dist/chartist.min.css" />
+    <link rel="stylesheet" href="/bower_components/chartist/dist/chartist.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog.css" />
     <link rel="stylesheet" href="/bower_components/ng-dialog/css/ngDialog-theme-default.css" />
     <link rel="stylesheet" href="/bower_components/angular-swagger-ui/dist/css/swagger-ui.min.css" />
@@ -61,7 +61,7 @@
       <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
     <div id="content">
-      <nav class="navbar navbar-fixed-top navbar-inverse">
+      <nav class="navbar navbar-inverse">
         <div ng-class="{container: !isActive('project')}" ng-cloak>
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -214,7 +214,7 @@
     <script src="/bower_components/angular-moment/angular-moment.min.js"></script>
     <script src="/bower_components/ng-sortable/dist/ng-sortable.min.js"></script>
     <script src="/bower_components/angular-base64/angular-base64.min.js"></script>
-    <script src="/bower_components/chartist/dist/chartist.min.js"></script>
+    <script src="/bower_components/chartist/dist/chartist.js"></script>
     <script src="/bower_components/angular-chartist.js/dist/angular-chartist.min.js"></script>
     <script src="/bower_components/angular-paginate-anything/dist/paginate-anything-tpls.min.js"></script>
     <script src="/bower_components/lodash/dist/lodash.min.js"></script>
@@ -283,6 +283,7 @@
     <script src="scripts/controllers/role.js"></script>
     <script src="scripts/controllers/team.js"></script>
     <script src="scripts/controllers/user.js"></script>
+    <script src="scripts/directives/header.js"></script>
     <script src="scripts/directives/stepFlow.js"></script>
     <script src="scripts/providers/ProjectFrameworkSteps.js"></script>
     <script src="scripts/providers/ProjectFrameworks.js"></script>
