@@ -3,7 +3,8 @@
 var app = angular.module('formioApp');
 
 app.factory('SubmissionExport', [
-  '$http', 'FileSaver',
+  '$http',
+  'FileSaver',
   function($http, FileSaver) {
     return {
       export: function(formio, form, type) {

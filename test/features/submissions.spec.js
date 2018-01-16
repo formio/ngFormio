@@ -41,7 +41,7 @@ module.exports = function (actions) {
       actions.clickOnLink('Use');
       actions.enterTextInField('#textField', '${random-title}');
       actions.clickOnButton('Submit');
-      actions.clickOnLink('.form-nave Data');
+      actions.clickOnClass('.form-nav .form-submissions');
       actions.clickOnLink('Export JSON');
       actions.clickOnLink('Export CSV');
     });
