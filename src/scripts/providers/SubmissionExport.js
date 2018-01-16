@@ -14,7 +14,7 @@ app.factory('SubmissionExport', [
           method: 'GET',
           responseType: 'blob'
         }).then(function(response) {
-          FileSaver.saveAs(response.data, form.name + '.' + type);
+          FileSaver.saveAs(response.data, form.name.toLowerCase() + '.' + type);
         });
       }
     };

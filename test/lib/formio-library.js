@@ -490,6 +490,24 @@ module.exports = function (config) {
     });
   };
 
+  this.goToUrl = function (url) {
+    it('I go to ' + url, function (next) {
+      browser.get(url).then(next).catch(next);
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.indexOf(url) !== -1;
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
+
   this.waitForActionToComplete = function (time) {
     it('I wait for ' + (time / 1000) + ' seconds', function (next) {
       browser.sleep(time).then(next).catch(next);
@@ -614,7 +632,7 @@ module.exports = function (config) {
 
   this.clickOnButton = function (text) {
     it('I click on the ' + text + ' button', function (next) {
-      var ele =  element(by.partialButtonText(replacements(text.toString())));
+      var ele = element(by.partialButtonText(replacements(text.toString())));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -628,15 +646,13 @@ module.exports = function (config) {
 
   this.clickOnClass = function (className) {
     it('I click on the ' + className + ' class', function (next) {
-      var ele =  element(by.css(replacements(className.toString())));
-      browser.wait(function () {
-        return ele.isPresent();
-      }, timeout).then(function (res) {
-        scrollTo(ele)
-          .then(function() {
-            ele.click().then(next).catch(next);
-          });
-      });
+      getElement(by.css(replacements(className.toString())))
+        .then(function(ele) {
+          scrollTo(ele)
+            .then(function() {
+              ele.click().then(next).catch(next);
+            });
+        });
     });
   };
 
@@ -826,6 +842,16 @@ module.exports = function (config) {
     });
   };
 
+  this.linkExists = function(text) {
+    it('Link Exists ' + text, function (next) {
+      getElement(by.linkText(replacements(text)))
+        .then(function () {
+          next();
+        })
+        .catch(next)
+    });
+  };
+
   this.iAmLoggedIn = function () {
     it('I have been logged in', function (next) {
       var tries = 0;
@@ -888,7 +914,7 @@ module.exports = function (config) {
       browser.getAllWindowHandles().then(function (handles) {
         browser.ignoreSynchronization = true;
         browser.switchTo().window(handles[1]);
-        config.expect(handles.length).to.equal(2);
+        // config.expect(handles.length).to.equal(2);
         next();
       })
         .catch(next);

@@ -20,8 +20,7 @@ module.exports = function (actions) {
       actions.clickOnLink('New Form');
       actions.clickOnElementWithText('API Web Form');
       actions.iSeeText('New Form');
-      actions.enterTextInField('#title', '${random-title>form1.title}');
-      actions.enterTextInField('#path', '${random-title>form1.path}');
+      actions.enterTextInField('#title', '${random-name>downloadform.name}');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
       actions.enterTextInField('#label', 'textField');
@@ -44,6 +43,16 @@ module.exports = function (actions) {
       actions.clickOnClass('.form-nav .form-submissions');
       actions.clickOnLink('Export JSON');
       actions.clickOnLink('Export CSV');
+      // Can only verify downloads in chrome right now. Other browsers aren't supported by selenium.
+      // TODO: Find way to verify downloads in other browsers.
+
+      // This doesn't work yet.
+      // actions.waitForActionToComplete(100);
+      // actions.newWindow();
+      // actions.goToUrl('chrome://downloads');
+      // actions.linkExists('${downloadform.name}.json');
+      // actions.linkExists('${downloadform.name}.csv');
+      // actions.closeWindow();
     });
   });
 };
