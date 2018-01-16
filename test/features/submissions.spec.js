@@ -41,12 +41,13 @@ module.exports = function (actions) {
       actions.enterTextInField('#textField', '${random-title}');
       actions.clickOnButton('Submit');
       actions.clickOnClass('.form-nav .form-submissions');
-      actions.clickOnLink('Export JSON');
-      actions.clickOnLink('Export CSV');
       // Can only verify downloads in chrome right now. Other browsers aren't supported by selenium.
       // TODO: Find way to verify downloads in other browsers.
 
-      // This doesn't work yet.
+      // This doesn't work on circle.ci. Could be too old of a browser.
+
+      // actions.clickOnLink('Export JSON');
+      // actions.clickOnLink('Export CSV');
       // actions.waitForActionToComplete(100);
       // actions.newWindow();
       // actions.goToUrl('chrome://downloads');
