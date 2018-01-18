@@ -90,6 +90,7 @@ module.exports = function(app) {
           hidden: false,
           wysiwyg: false,
           clearOnHide: true,
+          spellCheck: true,
           validate: {
             required: false,
             minLength: '',

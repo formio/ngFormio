@@ -25,6 +25,7 @@ module.exports = function(app) {
           persistent: true,
           hidden: false,
           clearOnHide: true,
+          spellCheck: true,
           validate: {
             required: false,
             minLength: '',
