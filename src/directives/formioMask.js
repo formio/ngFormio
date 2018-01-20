@@ -66,42 +66,6 @@ module.exports = function() {
       }
 
       /**
-       * Returns an input mask that is compatible with the input mask library.
-       * @param {string} mask - The Form.io input mask.
-       * @returns {Array} - The input mask for the mask library.
-       */
-      var getInputMask = function(mask) {
-        if (mask instanceof Array) {
-          return mask;
-        }
-        var maskArray = [];
-        maskArray.numeric = true;
-        for (var i=0; i < mask.length; i++) {
-          switch (mask[i]) {
-            case '9':
-              maskArray.push(/\d/);
-              break;
-            case 'A':
-              maskArray.numeric = false;
-              maskArray.push(/[a-zA-Z]/);
-              break;
-            case 'a':
-              maskArray.numeric = false;
-              maskArray.push(/[a-z]/);
-              break;
-            case '*':
-              maskArray.numeric = false;
-              maskArray.push(/[a-zA-Z0-9]/);
-              break;
-            default:
-              maskArray.push(mask[i]);
-              break;
-          }
-        }
-        return maskArray;
-      };
-
-      /**
        * Sets the input mask for an input.
        * @param {HTMLElement} input - The html input to apply the mask to.
        */
@@ -114,7 +78,7 @@ module.exports = function() {
         var mask;
         if (scope.component.inputMask) {
           // Text or other input mask, including number with inputMask.
-          mask = getInputMask(scope.component.inputMask);
+          mask = formioUtils.getInputMask(scope.component.inputMask);
         }
         else if (format === 'currency') {
           // Currency mask.
