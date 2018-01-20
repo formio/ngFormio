@@ -9,9 +9,10 @@
     formioForm[componentId].$error.max ||
     formioForm[componentId].$error.custom ||
     formioForm[componentId].$error.pattern ||
-    formioForm[componentId].$error.day
+    formioForm[componentId].$error.day ||
+    formioForm[componentId].$error.mask
   )">
-      <p class="help-block">{{ component.validate.customMessage | formioTranslate:null:options.building }}</p>
+    <p class="help-block">{{ component.validate.customMessage | formioTranslate:null:options.building }}</p>
   </div>
   <div ng-hide="component.validate.customMessage">
     <p class="help-block" ng-show="formioForm[componentId].$error.email">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid email' | formioTranslate:null:options.building}}.</p>
@@ -24,5 +25,6 @@
     <p class="help-block" ng-show="formioForm[componentId].$error.custom">{{ component.customError | formioTranslate }}</p>
     <p class="help-block" ng-show="formioForm[componentId].$error.pattern">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the pattern' | formioTranslate:null:options.building}} {{ component.validate.pattern }}</p>
     <p class="help-block" ng-show="formioForm[componentId].$error.day">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'must be a valid date' | formioTranslate:null:options.building}}.</p>
+    <p class="help-block" ng-show="formioForm[componentId].$error.mask">{{ component.errorLabel || component.label || component.placeholder || component.key }} {{'does not match the mask' | formioTranslate:null:options.building}}.</p>
   </div>
 </div>
