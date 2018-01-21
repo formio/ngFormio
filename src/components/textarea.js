@@ -1,5 +1,18 @@
 var fs = require('fs');
 module.exports = function(app) {
+  app.directive('ckeditor', function() {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function($scope, element, attr, ngModel) {
+
+        // FOR-975 - overwrite CKEditor default values
+        ngModel.$viewValue = undefined;
+        ngModel.$$lastCommittedViewValue = undefined;
+        ngModel.$setPristine(true);
+      }
+    };
+  });
   app.config([
     'formioComponentsProvider',
     function(formioComponentsProvider) {
@@ -23,16 +36,23 @@ module.exports = function(app) {
                 {name: 'tools', groups: ['tools']}
               ],
               extraPlugins: 'justify,font',
+              disableNativeSpellChecker: false,
               removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
               uiColor: '#eeeeee',
               height: '400px',
               width: '100%'
             };
+
             if ($scope.component.wysiwyg === true) {
               $scope.component.wysiwyg = defaults;
             }
             else {
               $scope.component.wysiwyg = angular.extend(defaults, $scope.component.wysiwyg);
+            }
+
+            // FOR-929 - Remove spell check attribute
+            if (!$scope.component.spellcheck){
+              delete $scope.component.wysiwyg.disableNativeSpellChecker;
             }
             return 'formio/components/texteditor.html';
           }
@@ -90,6 +110,7 @@ module.exports = function(app) {
           hidden: false,
           wysiwyg: false,
           clearOnHide: true,
+          spellcheck: true,
           validate: {
             required: false,
             minLength: '',
