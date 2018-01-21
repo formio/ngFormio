@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Added
+ - Mask validator for Phone Number.
+
+### Fixed
+ - Default value for component with input mask.
+
 ## 2.27.2
 ### Fixed
  - Issue with the file upload component where it would not show errors.

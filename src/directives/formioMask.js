@@ -1,21 +1,22 @@
-var maskInput = require('text-mask-all/vanilla').maskInput;
-var createNumberMask = require('text-mask-all/addons/dist/createNumberMask').default;
+var maskInput = require('vanilla-text-mask').default;
+var createNumberMask = require('text-mask-addons').createNumberMask;
+var formioUtils = require('formiojs/utils');
 
 module.exports = function() {
   return {
     restrict: 'A',
     require: 'ngModel',
-    link: function(scope, element, attrs, controller, transcludeFn) {
+    link: function(scope, element, attrs, controller) {
       var format = attrs.formioMask;
       var inputElement;
-      var inputMask;
 
       if (element[0].tagName === 'INPUT') {
         // `textMask` directive is used directly on an input element
-        inputElement = element[0]
-      } else {
+        inputElement = element[0];
+      }
+      else {
         // `textMask` directive is used on an abstracted input element
-        inputElement = element[0].getElementsByTagName('INPUT')[0]
+        inputElement = element[0].getElementsByTagName('INPUT')[0];
       }
 
       var getFormatOptions = function() {
@@ -32,14 +33,16 @@ module.exports = function() {
           useGrouping: true,
           maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
         };
-      }
+      };
 
-      scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator || (12345.6789).toLocaleString(scope.options.language).match(/345(.*)67/)[1];
-      scope.thousandsSeparator = scope.options.thousandsSeparator = scope.options.thousandsSeparator || (12345.6789).toLocaleString(scope.options.language).match(/12(.*)345/)[1];
+      scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
+        (12345.6789).toLocaleString(scope.options.language).match(/345(.*)67/)[1];
+      scope.thousandsSeparator = scope.options.thousandsSeparator = scope.options.thousandsSeparator ||
+        (12345.6789).toLocaleString(scope.options.language).match(/12(.*)345/)[1];
 
       if (format === 'currency') {
         scope.currency = scope.component.currency || 'USD';
-        scope.decimalLimit = scope.component.decimalLimit || 2
+        scope.decimalLimit = scope.component.decimalLimit || 2;
 
         // Get the prefix and suffix from the localized string.
         var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{' + scope.decimalLimit + '})?(.*)?';
@@ -63,42 +66,6 @@ module.exports = function() {
       }
 
       /**
-       * Returns an input mask that is compatible with the input mask library.
-       * @param {string} mask - The Form.io input mask.
-       * @returns {Array} - The input mask for the mask library.
-       */
-      var getInputMask = function(mask) {
-        if (mask instanceof Array) {
-          return mask;
-        }
-        var maskArray = [];
-        maskArray.numeric = true;
-        for (var i=0; i < mask.length; i++) {
-          switch (mask[i]) {
-            case '9':
-              maskArray.push(/\d/);
-              break;
-            case 'A':
-              maskArray.numeric = false;
-              maskArray.push(/[a-zA-Z]/);
-              break;
-            case 'a':
-              maskArray.numeric = false;
-              maskArray.push(/[a-z]/);
-              break;
-            case '*':
-              maskArray.numeric = false;
-              maskArray.push(/[a-zA-Z0-9]/);
-              break;
-            default:
-              maskArray.push(mask[i]);
-              break;
-          }
-        }
-        return maskArray;
-      }
-
-      /**
        * Sets the input mask for an input.
        * @param {HTMLElement} input - The html input to apply the mask to.
        */
@@ -111,7 +78,7 @@ module.exports = function() {
         var mask;
         if (scope.component.inputMask) {
           // Text or other input mask, including number with inputMask.
-          mask= getInputMask(scope.component.inputMask);
+          mask = formioUtils.getInputMask(scope.component.inputMask);
         }
         else if (format === 'currency') {
           // Currency mask.
@@ -134,13 +101,15 @@ module.exports = function() {
             decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
             decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
             allowNegative: _.get(scope.component, 'allowNegative', true),
-            allowDecimal: _.get(scope.component, 'allowDecimal', !(scope.component.validate && scope.component.validate.integer))
-          })
+            allowDecimal: _.get(scope.component, 'allowDecimal',
+              !(scope.component.validate && scope.component.validate.integer))
+          });
         }
 
         // Set the mask on the input element.
         if (mask) {
-          inputMask = maskInput({
+          scope.inputMask = mask;
+          maskInput({
             inputElement: input,
             mask: mask,
             showMask: true,
@@ -149,9 +118,18 @@ module.exports = function() {
             placeholderChar: '_'
           });
         }
-      }
+      };
 
       setInputMask(inputElement);
+
+      controller.$validators.mask = function(modelValue, viewValue) {
+        var input = modelValue || viewValue;
+        if (input) {
+          return formioUtils.matchInputMask(input, scope.inputMask);
+        }
+
+        return true;
+      };
 
       // Only use for currency or number formats.
       if (format) {

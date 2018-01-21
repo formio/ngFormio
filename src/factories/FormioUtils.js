@@ -1,4 +1,5 @@
 var formioUtils = require('formiojs/utils');
+var conformToMask = require('vanilla-text-mask').conformToMask;
 var _filter = require('lodash/filter');
 var _get = require('lodash/get');
 
@@ -257,6 +258,16 @@ module.exports = function() {
           }, function() {
             done(true);
           });
+        }
+        // FOR-949 - Default value for componenets with input mask.
+        else if (component.inputMask) {
+          var inputMask = formioUtils.getInputMask(component.inputMask);
+          value = conformToMask(value, inputMask).conformedValue;
+          if (!formioUtils.matchInputMask(value, inputMask)) {
+            value = '';
+          }
+          data[component.key] = value;
+          return done(true);
         }
         else {
           if (!component.multiple) {
