@@ -91,7 +91,7 @@ module.exports = function(app) {
         }
       }
       // If more than maxLength, remove extra rows.
-      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length < $scope.component.validate.maxLength) {
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length > $scope.component.validate.maxLength) {
         $scope.rows = $scope.rows.slice(0, $scope.component.validate.maxLength);
       }
       $scope.cols = $scope.component.components;
