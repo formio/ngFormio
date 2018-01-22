@@ -2183,7 +2183,7 @@ app.controller('ProjectRemoteController', [
                 disableJWT: true
               })
                 .then(function(result) {
-                  if (result && result.data && result.data.version && semver.satisfies(result.data.version, '>=5.0.0-beta.1')) {
+                  if (result && result.data && result.data.version && semver.satisfies(result.data.version.split('-')[0], '>=5.0.0', true)) {
                     $http({
                       method: 'GET',
                       url: $scope.remote.url + '/project',
