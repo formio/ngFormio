@@ -1,6 +1,6 @@
 var fs = require('fs');
 module.exports = function(app) {
-  app.directive('ckeditor', function() {
+  app.directive('formioCkeditor', function() {
     return {
       restrict: 'A',
       require: 'ngModel',
