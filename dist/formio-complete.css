@@ -858,9 +858,6 @@ input[type="password"][draggable="true"] {
 .input-group {
   width: 100%;
 }
-.form-field-type-datagrid .input-group {
-  width: auto;
-}
 
 .form-field-type-datagrid .form-group {
   margin-bottom: 0;
