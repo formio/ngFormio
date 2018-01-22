@@ -1695,13 +1695,15 @@ app.controller('FormSubmissionsController', [
 
     $scope.export = function(form, type) {
       $scope.isBusy = true;
-      SubmissionExport.export($scope.formio, form, type).then(function() {
-        $scope.isBusy = false;
-      }).catch(function(err) {
-        $scope.isBusy = false;
-        console.warn(err);
-        FormioAlerts.onError(err);
-      });
+      SubmissionExport.export($scope.formio, form, type)
+        .then(function() {
+          $scope.isBusy = false;
+        })
+        .catch(function(err) {
+          $scope.isBusy = false;
+          console.warn(err);
+          FormioAlerts.onError(err);
+        });
     };
 
     // Creates resourcejs sort query from kendo datasource read options
@@ -1855,9 +1857,9 @@ app.controller('FormSubmissionsController', [
 
     // When form is loaded, create the columns
     $scope.loadFormPromise.then(function(form) {
-      var currentForm = _.clone(form);
+      var currentForm = _.clone(form) || {};
       var loadRevisionsPromise = new Promise(function(resolve, reject) {
-        if (form.revisions === 'original' && !isNaN(parseInt($stateParams._vid))) {
+        if (form && form.revisions === 'original' && !isNaN(parseInt($stateParams._vid))) {
           (new Formio($scope.formUrl + '/v/' + $stateParams._vid)).loadForm()
             .then(function(revisionForm) {
               currentForm.components = revisionForm.components;
@@ -2029,7 +2031,7 @@ app.controller('FormSubmissionsController', [
             columns.push(getKendoCell(component));
           }, true);
 
-          if (form.revisions) {
+          if (currentForm.revisions) {
             columns.push({
               field: '_fvid',
               title: 'Form Version',

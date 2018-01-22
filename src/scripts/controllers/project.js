@@ -2774,9 +2774,11 @@ app.controller('ProjectBilling', [
 app.controller('ProjectExportController', [
   '$scope',
   '$http',
+  'FileSaver',
   function(
     $scope,
-    $http
+    $http,
+    FileSaver
   ) {
     $scope.isBusy = false;
     $scope.downloadTemplate = function() {
@@ -2787,11 +2789,7 @@ app.controller('ProjectExportController', [
         responseType: 'blob'
       }).then(function(response) {
         $scope.isBusy = false;
-        var a = document.createElement('a');
-        a.href = window.URL.createObjectURL(response.data);
-        a.download = $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json';
-        a.click();
-        window.URL.revokeObjectURL(a.href);
+        FileSaver.saveAs(response.data, $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json');
       }).catch(function(error) {
         $scope.isBusy = false;
         console.error(error);
