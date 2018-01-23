@@ -184,6 +184,7 @@ module.exports = function(app) {
         }],
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           label: 'Resource Field',

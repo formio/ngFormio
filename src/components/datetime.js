@@ -60,6 +60,7 @@ module.exports = function(app) {
           };
         }],
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           label: 'Date Time Field',

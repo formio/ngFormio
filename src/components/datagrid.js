@@ -48,6 +48,7 @@ module.exports = function(app) {
           return view;
         },
         settings: {
+          autofocus: false,
           input: true,
           tree: true,
           components: [],

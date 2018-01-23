@@ -9,6 +9,7 @@ module.exports = function(app) {
         template: 'formio/components/textfield.html',
         icon: 'fa fa-terminal',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'text',

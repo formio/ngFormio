@@ -75,6 +75,7 @@ module.exports = function(app) {
           }
         ],
         settings: {
+          autofocus: true,
           input: true,
           tableView: true,
           label: 'Text Area Field',

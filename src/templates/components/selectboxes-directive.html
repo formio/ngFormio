@@ -7,7 +7,7 @@
         name="{{ componentId }}-{{ v.value }}"
         value="{{ v.value }}"
         tabindex="{{ component.tabindex || 0 }}"
-        ng-disabled="readOnly"
+        ng-disabled="readOnly" auto-focus
         ng-click="toggleCheckbox(v.value)"
         ng-checked="model[v.value]"
          aria-labelledby="{{ componentId+'-'+v.value +'Label'}}"

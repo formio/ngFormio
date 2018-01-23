@@ -90,6 +90,7 @@ module.exports = function(app) {
           .join(', ');
         },
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           label: 'Select Boxes Field',

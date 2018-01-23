@@ -16,6 +16,7 @@ module.exports = function(app) {
           return data;
         },
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'radio',

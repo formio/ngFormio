@@ -11,6 +11,7 @@
         aria-labelledby="{{ componentId }}-dayLabel"
         ng-change="onChange()"
         style="padding-right: 10px;"
+        auto-focus
         ng-attr-placeholder="{{component.fields.day.placeholder}}"
         day-part
         characters="2"
@@ -31,6 +32,7 @@
         id="{{componentId}}-month"
         aria-labelledby="{{ componentId }}-monthLabel"
         ng-model="date.month"
+        auto-focus
         ng-change="onChange()"
         ng-disabled="readOnly"
         ng-options="month.value as month.label | formioTranslate:null:options.building for month in months"
@@ -53,6 +55,7 @@
         ng-attr-placeholder="{{component.fields.day.placeholder}}"
         day-part
         characters="2"
+        auto-focus
         min="1"
         max="{{maxDay}}"
         ng-disabled="readOnly"
@@ -74,6 +77,7 @@
         ng-attr-placeholder="{{component.fields.year.placeholder}}"
         characters="4"
         min="0"
+        auto-focus
         max="2100"
         ng-disabled="readOnly"
       />

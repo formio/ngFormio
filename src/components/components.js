@@ -38,6 +38,20 @@ module.exports = function(app) {
       }
     };
   });
+  app.directive('autoFocus', [function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function($scope, el) {
+        console.log($scope.component);
+        if (!$scope.component.autofocus) {
+          return;
+        }
+        el.removeAttr('auto-focus');
+        el.attr('autofocus',true);
+      }
+    };
+  }]);
 
   app.directive('safeMultipleToSingle', [function() {
     return {

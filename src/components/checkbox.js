@@ -48,6 +48,7 @@ module.exports = function(app) {
           $scope.getOptionInputStyles = FormioUtils.labelPositionWrapper(FormioUtils.getOptionInputStyles);
         }],
         settings: {
+          autofocus: false,
           input: true,
           inputType: 'checkbox',
           tableView: true,

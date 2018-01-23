@@ -9,6 +9,7 @@ module.exports = function(app) {
         template: 'formio/components/currency.html',
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'text',
