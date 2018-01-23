@@ -43,7 +43,6 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function($scope, el) {
-        console.log($scope.component);
         if (!$scope.component.autofocus) {
           return;
         }
