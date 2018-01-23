@@ -775,6 +775,14 @@ app.controller('FormController', [
       $scope.form.components = form.components;
     });
 
+    // Called when the form permissions is updated.
+    $scope.$on('updateFormPermissions', function(event, form) {
+      event.stopPropagation();
+      $scope.updateCurrentFormResources(form);
+      $scope.form = form;
+    });
+
+
     $rootScope.currentForm = $scope.form;
   }
 ]);
@@ -2245,7 +2253,8 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     $scope.$on('permissionsChange', function() {
-      $scope.formio.saveForm(angular.copy($scope.form)).then(function() {
+      $scope.formio.saveForm(angular.copy($scope.form)).then(function(form) {
+        $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Permissions Saved'
