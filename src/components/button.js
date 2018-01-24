@@ -68,8 +68,6 @@ module.exports = function(app) {
           };
 
           var onUrl = function() {
-            try {
-              /* eslint-disable no-unused-vars */
               var API_URL  = $scope.component.url;
               var settings = {
                 method: 'POST',
@@ -99,18 +97,18 @@ module.exports = function(app) {
                   }
                 });
               }
-              /* eslint-enable no-unused-vars */
-            }
-            catch (e) {
+            else {
               /* eslint-disable no-console */
-              console.warn('An error occurred connecting the url for ' + $scope.component.key, e);
+              console.warn('You should add an URL to this button action');
               /* eslint-enable no-console */
             }
           };
 
 
-          var onClick = function () {
+          var onClick = function() {
             clicked = true;
+
+            $scope.data[$scope.component.key] = true;
             switch (settings.action) {
               case 'submit':
                 return;
@@ -151,7 +149,6 @@ module.exports = function(app) {
             if (componentId !== $scope.componentId) {
               return;
             }
-            $scope.data[$scope.component.key] = $scope.component.key;
             onClick();
           });
 
