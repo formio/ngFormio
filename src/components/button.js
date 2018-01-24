@@ -32,6 +32,7 @@ module.exports = function(app) {
               case 'event':
               case 'custom':
               case 'oauth':
+              case 'url':
               default:
                 return 'button';
             }
@@ -66,6 +67,48 @@ module.exports = function(app) {
             }
           };
 
+          var onUrl = function() {
+            try {
+              /* eslint-disable no-unused-vars */
+              var API_URL  = $scope.component.url;
+              var settings = {
+                method: 'POST',
+                headers: {},
+                body: JSON.stringify($scope.data)
+              };
+              if ($scope.component.headers && $scope.component.headers.length > 0) {
+                $scope.component.headers.forEach(function(e) {
+                  if (e.header !== '' && e.value !== '') {
+                    settings.headers[e.header] = e.value;
+                  }
+                });
+              }
+              if (API_URL) {
+                fetch(API_URL,settings).then(function(res) {
+                  if (!res.ok) {
+                    $scope.showAlerts({
+                      type: 'danger',
+                      message: 'Request Denied '+ res.status + ' ' + res.statusText
+                    });
+                  }
+                  else {
+                    $scope.showAlerts({
+                      type: 'success',
+                      message: 'Request Success'
+                    });
+                  }
+                });
+              }
+              /* eslint-enable no-unused-vars */
+            }
+            catch (e) {
+              /* eslint-disable no-console */
+              console.warn('An error occurred connecting the url for ' + $scope.component.key, e);
+              /* eslint-enable no-console */
+            }
+          };
+
+
           var onClick = function () {
             clicked = true;
             switch (settings.action) {
@@ -76,6 +119,9 @@ module.exports = function(app) {
                 break;
               case 'custom':
                 onCustom();
+                break;
+              case 'url':
+                onUrl();
                 break;
               case 'reset':
                 $scope.resetForm();
@@ -105,6 +151,7 @@ module.exports = function(app) {
             if (componentId !== $scope.componentId) {
               return;
             }
+            $scope.data[$scope.component.key] = $scope.component.key;
             onClick();
           });
 
