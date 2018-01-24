@@ -1,15 +1,17 @@
 var fs = require('fs');
 module.exports = function(app) {
-  app.directive('formioCkeditor', function() {
+  app.directive('formioCkeditor', function($parse, $timeout) {
     return {
       restrict: 'A',
-      require: 'ngModel',
-      link: function($scope, element, attr, ngModel) {
+      require: ['ckeditor', 'ngModel'],
+      link: function(scope, element, attr, ctrl) {
+        var ckeditor = ctrl[0];
+        var ngModelCtrl= ctrl[1];
 
         // FOR-975 - overwrite CKEditor default values
-        ngModel.$viewValue = undefined;
-        ngModel.$$lastCommittedViewValue = undefined;
-        ngModel.$setPristine(true);
+        ngModelCtrl.$viewValue = undefined;
+        ngModelCtrl.$$lastCommittedViewValue = undefined;
+        ngModelCtrl.$setPristine(true);
       }
     };
   });
@@ -35,7 +37,7 @@ module.exports = function(app) {
                 {name: 'others', groups: ['others']},
                 {name: 'tools', groups: ['tools']}
               ],
-              extraPlugins: 'justify,font',
+              extraPlugins: 'justify,font,confighelper',
               disableNativeSpellChecker: false,
               removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
               uiColor: '#eeeeee',
