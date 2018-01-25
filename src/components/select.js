@@ -48,12 +48,16 @@ module.exports = function(app) {
       link: function($scope, el, attrs, uiSelect) {
         if ($scope.options && $scope.options.building) return;
         var focuscount = -1;
-
         angular.element(uiSelect.focusser).on('focus', function() {
           if (focuscount-- < 0) {
             uiSelect.activate();
           }
         });
+        angular.element(el).on('blur keydown', function(e) {
+            if(e.keyCode === 9 || e.key === "Tab") {
+              uiSelect.clear(e);
+            }
+        })
 
         // Disable the auto open when this select element has been activated.
         $scope.$on('uis:activate', function() {
