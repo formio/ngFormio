@@ -1,4 +1,4 @@
-/*! ng-formio v2.27.4 | https://unpkg.com/ng-formio@2.27.4/LICENSE.txt */
+/*! ng-formio v2.27.5 | https://unpkg.com/ng-formio@2.27.5/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -93109,6 +93109,7 @@ module.exports = function() {
 var maskInput = _dereq_('vanilla-text-mask').default;
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
 var formioUtils = _dereq_('formiojs/utils');
+var _get = _dereq_('lodash/get');
 
 module.exports = function() {
   return {
@@ -93133,13 +93134,13 @@ module.exports = function() {
             style: 'currency',
             currency: scope.currency,
             useGrouping: true,
-            maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
+            maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
           };
         }
         return {
           style: 'decimal',
           useGrouping: true,
-          maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
+          maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
         };
       };
 
@@ -93193,11 +93194,11 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: scope.prefix,
             suffix: scope.suffix,
-            thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
-            decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _.get(scope.component, 'allowNegative', true),
-            allowDecimal: _.get(scope.component, 'allowDecimal', true)
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
+            allowNegative: _get(scope.component, 'allowNegative', true),
+            allowDecimal: _get(scope.component, 'allowDecimal', true)
           });
         }
         else if (format === 'number') {
@@ -93205,11 +93206,11 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: '',
             suffix: '',
-            thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
-            decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _.get(scope.component, 'allowNegative', true),
-            allowDecimal: _.get(scope.component, 'allowDecimal',
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
+            allowNegative: _get(scope.component, 'allowNegative', true),
+            allowDecimal: _get(scope.component, 'allowDecimal',
               !(scope.component.validate && scope.component.validate.integer))
           });
         }
@@ -93296,7 +93297,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":38,"text-mask-addons":269,"vanilla-text-mask":271}],319:[function(_dereq_,module,exports){
+},{"formiojs/utils":38,"lodash/get":215,"text-mask-addons":269,"vanilla-text-mask":271}],319:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {

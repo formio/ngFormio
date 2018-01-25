@@ -1,6 +1,7 @@
 var maskInput = require('vanilla-text-mask').default;
 var createNumberMask = require('text-mask-addons').createNumberMask;
 var formioUtils = require('formiojs/utils');
+var _get = require('lodash/get');
 
 module.exports = function() {
   return {
@@ -25,13 +26,13 @@ module.exports = function() {
             style: 'currency',
             currency: scope.currency,
             useGrouping: true,
-            maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
+            maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
           };
         }
         return {
           style: 'decimal',
           useGrouping: true,
-          maximumFractionDigits: _.get(scope.component, 'decimalLimit', scope.decimalLimit)
+          maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
         };
       };
 
@@ -85,11 +86,11 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: scope.prefix,
             suffix: scope.suffix,
-            thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
-            decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _.get(scope.component, 'allowNegative', true),
-            allowDecimal: _.get(scope.component, 'allowDecimal', true)
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
+            allowNegative: _get(scope.component, 'allowNegative', true),
+            allowDecimal: _get(scope.component, 'allowDecimal', true)
           });
         }
         else if (format === 'number') {
@@ -97,11 +98,11 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: '',
             suffix: '',
-            thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
-            decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _.get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _.get(scope.component, 'allowNegative', true),
-            allowDecimal: _.get(scope.component, 'allowDecimal',
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
+            allowNegative: _get(scope.component, 'allowNegative', true),
+            allowDecimal: _get(scope.component, 'allowDecimal',
               !(scope.component.validate && scope.component.validate.integer))
           });
         }

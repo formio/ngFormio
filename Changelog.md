@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.27.5
+### Fixed
+ - Problem where "_" is undefined for number and currency components.
+
 ## 2.27.4
 ### Changed
  - Upgrade formiojs to latest to fix inputMask issue.
