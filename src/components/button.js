@@ -33,6 +33,7 @@ module.exports = function(app) {
               case 'custom':
               case 'oauth':
               case 'url':
+                return;
               default:
                 return 'button';
             }
@@ -41,7 +42,7 @@ module.exports = function(app) {
           $scope.hasError = function() {
             if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
               $scope.disableBtn = true;
-              return true
+              return true;
             } else {
               clicked = false;
               $scope.disableBtn = false;
@@ -67,44 +68,6 @@ module.exports = function(app) {
             }
           };
 
-          var onUrl = function() {
-              var API_URL  = $scope.component.url;
-              var settings = {
-                method: 'POST',
-                headers: {},
-                body: JSON.stringify($scope.data)
-              };
-              if ($scope.component.headers && $scope.component.headers.length > 0) {
-                $scope.component.headers.forEach(function(e) {
-                  if (e.header !== '' && e.value !== '') {
-                    settings.headers[e.header] = e.value;
-                  }
-                });
-              }
-              if (API_URL) {
-                fetch(API_URL,settings).then(function(res) {
-                  if (!res.ok) {
-                    $scope.showAlerts({
-                      type: 'danger',
-                      message: 'Request Denied '+ res.status + ' ' + res.statusText
-                    });
-                  }
-                  else {
-                    $scope.showAlerts({
-                      type: 'success',
-                      message: 'Request Success'
-                    });
-                  }
-                });
-              }
-            else {
-              /* eslint-disable no-console */
-              console.warn('You should add an URL to this button action');
-              /* eslint-enable no-console */
-            }
-          };
-
-
           var onClick = function() {
             clicked = true;
 
@@ -119,7 +82,7 @@ module.exports = function(app) {
                 onCustom();
                 break;
               case 'url':
-                onUrl();
+                $scope.$emit('submitUrl',{url:$scope.component.url, component: $scope.component});
                 break;
               case 'reset':
                 $scope.resetForm();
