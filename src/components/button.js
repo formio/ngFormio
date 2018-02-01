@@ -1,4 +1,5 @@
 var fs = require('fs');
+var _ = require('lodash');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
