@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.28.1
+### Changed
+ - The logic to the button to use new Function instead of eval.
+
+### Added
+ - The _merge method from lodash to be accessible to the custom action on Buttons.
+
 ## 2.28.0
 ### Changed
  - Upgrade formiojs to 2.27.0
