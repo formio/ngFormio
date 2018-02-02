@@ -34,6 +34,7 @@ module.exports = function(app) {
         template: 'formio/components/time.html',
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'time',

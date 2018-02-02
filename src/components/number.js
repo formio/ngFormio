@@ -11,6 +11,7 @@ module.exports = function(app) {
         title: 'Number',
         template: 'formio/components/number.html',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'number',

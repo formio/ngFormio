@@ -7,6 +7,7 @@ module.exports = function(app) {
         title: 'Button',
         template: 'formio/components/button.html',
         settings: {
+          autofocus: false,
           input: true,
           label: 'Submit',
           tableView: false,

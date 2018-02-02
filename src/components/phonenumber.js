@@ -7,6 +7,7 @@ module.exports = function(app) {
         template: 'formio/components/textfield.html',
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'tel',

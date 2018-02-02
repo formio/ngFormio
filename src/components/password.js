@@ -9,6 +9,7 @@ module.exports = function(app) {
           return '--- PROTECTED ---';
         },
         settings: {
+          autofocus: false,
           input: true,
           tableView: false,
           inputType: 'password',

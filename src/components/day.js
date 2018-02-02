@@ -200,6 +200,7 @@ module.exports = function(app) {
         template: 'formio/components/day.html',
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           label: 'Day Field',

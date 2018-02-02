@@ -8,6 +8,7 @@ module.exports = function(app) {
         template: 'formio/components/file.html',
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           label: '',
