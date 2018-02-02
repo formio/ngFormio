@@ -51,14 +51,14 @@ module.exports = function(app) {
 
           var onCustom = function() {
             try {
-              /* eslint-disable no-unused-vars */
               var parent = $scope.$parent;
               while (!parent.form) {
                 parent = parent.$parent;
               }
-              var components = FormioUtils.flattenComponents(parent.form.components, true);
-              /* eslint-enable no-unused-vars */
-              eval('(function(data) { ' + $scope.component.custom + ' })($scope.data)');
+              var flattened = FormioUtils.flattenComponents(parent.form.components, true);
+              var components = flattened;
+              (new Function('form', 'flattened', 'components', '_merge', 'data', $scope.component.custom.toString()))
+              (parent.form, flattened, components, _merge, $scope.data);
             }
             catch (e) {
               /* eslint-disable no-console */
