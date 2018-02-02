@@ -1,4 +1,5 @@
 var fs = require('fs');
+var _merge = require('lodash/merge');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
