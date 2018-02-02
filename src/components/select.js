@@ -215,6 +215,10 @@ module.exports = function(app) {
               else {
                 refreshing = false;
                 $scope.$emit('selectLoaded', $scope.component);
+                var index = $scope.selectItems.indexOf(tempData);
+                if (index !== -1) {
+                  $scope.selectItems.splice(index, 1);
+                }
               }
             };
 
@@ -517,7 +521,7 @@ module.exports = function(app) {
                         $scope.selectItems = $scope.selectItems.concat(data);
                       }
                       else {
-                        $scope.selectItems = data;
+                        $scope.selectItems = _cloneDeep(data);
                       }
 
                       // Ensure the value is set to what it should be set to.

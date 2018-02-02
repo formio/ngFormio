@@ -40,7 +40,6 @@ module.exports = function(app) {
   });
   app.directive('autoFocus', [function() {
     return {
-      require: 'ngModel',
       restrict: 'A',
       link: function($scope, el) {
         if (!$scope.component.autofocus) {
