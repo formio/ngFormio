@@ -44,7 +44,6 @@ module.exports = function(app) {
               height: '400px',
               width: '100%'
             };
-
             if ($scope.component.wysiwyg === true) {
               $scope.component.wysiwyg = defaults;
             }
