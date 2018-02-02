@@ -27,7 +27,6 @@
     "angular-ui-select": "^0.19.8",
     "angular-bootstrap": "^2.5.0",
     "angular-ckeditor": "^1.0.3",
-    "ckeditor": "^4.8.0"
   },
   "license": "MIT",
   "ignore": [

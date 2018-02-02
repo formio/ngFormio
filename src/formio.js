@@ -53,8 +53,6 @@ app.directive('formioElement', require('./directives/formioElement'));
 
 app.directive('formioWizard', require('./directives/formioWizard'));
 
-app.directive('formioPlaceholder', require('./directives/formioPlaceholder'));
-
 app.directive('formioBindHtml', require('./directives/formioBindHtml.js'));
 
 app.directive('formioScriptEditor', require('./directives/formioScriptEditor'));

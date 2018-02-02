@@ -37,7 +37,7 @@ module.exports = function(app) {
                 {name: 'others', groups: ['others']},
                 {name: 'tools', groups: ['tools']}
               ],
-              extraPlugins: 'justify,font,confighelper',
+              extraPlugins: 'justify,font',
               disableNativeSpellChecker: false,
               removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
               uiColor: '#eeeeee',
