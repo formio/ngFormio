@@ -33,6 +33,8 @@ module.exports = function(app) {
               case 'event':
               case 'custom':
               case 'oauth':
+              case 'url':
+                return;
               default:
                 return 'button';
             }
@@ -41,7 +43,7 @@ module.exports = function(app) {
           $scope.hasError = function() {
             if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
               $scope.disableBtn = true;
-              return true
+              return true;
             } else {
               clicked = false;
               $scope.disableBtn = false;
@@ -67,8 +69,10 @@ module.exports = function(app) {
             }
           };
 
-          var onClick = function () {
+          var onClick = function() {
             clicked = true;
+
+            $scope.data[$scope.component.key] = true;
             switch (settings.action) {
               case 'submit':
                 return;
@@ -77,6 +81,9 @@ module.exports = function(app) {
                 break;
               case 'custom':
                 onCustom();
+                break;
+              case 'url':
+                $scope.$emit('submitUrl',{url:$scope.component.url, component: $scope.component});
                 break;
               case 'reset':
                 $scope.resetForm();
