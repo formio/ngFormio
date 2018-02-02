@@ -12,6 +12,7 @@
   aria-labelledby="{{ componentId +'Label'}}"
   aria-describedby="{{componentId + 'Desc'}}"
   ng-required="isRequired(component)"
+  spellcheck="{{ component.spellcheck }}"
   ng-minlength="component.validate.minLength"
   ng-maxlength="component.validate.maxLength"
   ng-pattern="component.validate.pattern"
