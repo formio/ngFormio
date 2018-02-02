@@ -51132,7 +51132,7 @@ var FormioUtils = {
 module.exports = global.FormioUtils = FormioUtils;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./jsonlogic/operators":36,"json-logic-js":38,"lodash":249,"lodash/chunk":210,"lodash/clone":211,"lodash/forOwn":217,"lodash/get":218,"lodash/has":219,"lodash/isArray":223,"lodash/isBoolean":226,"lodash/isDate":228,"lodash/isNaN":236,"lodash/isNil":237,"lodash/isObject":239,"lodash/isPlainObject":241,"lodash/isRegExp":242,"lodash/isString":243,"lodash/last":248,"lodash/pad":254,"lodash/round":256,"lodash/set":257,"lodash/template":260,"moment":267}],36:[function(_dereq_,module,exports){
+},{"./jsonlogic/operators":36,"json-logic-js":37,"lodash":249,"lodash/chunk":210,"lodash/clone":211,"lodash/forOwn":217,"lodash/get":218,"lodash/has":219,"lodash/isArray":223,"lodash/isBoolean":226,"lodash/isDate":228,"lodash/isNaN":236,"lodash/isNil":237,"lodash/isObject":239,"lodash/isPlainObject":241,"lodash/isRegExp":242,"lodash/isString":243,"lodash/last":248,"lodash/pad":254,"lodash/round":256,"lodash/set":257,"lodash/template":260,"moment":267}],36:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51163,11 +51163,6 @@ var lodashOperators = exports.lodashOperators = [
 'cond', 'conforms', 'constant', 'defaultTo', 'flow', 'flowRight', 'identity', 'iteratee', 'matches', 'matchesProperty', 'method', 'methodOf', 'nthArg', 'over', 'overEvery', 'overSome', 'property', 'propertyOf', 'range', 'rangeRight', 'stubArray', 'stubFalse', 'stubObject', 'stubString', 'stubTrue', 'times', 'toPath', 'uniqueId'];
 
 },{}],37:[function(_dereq_,module,exports){
-'use strict';
-
-module.exports = _dereq_('./build/utils');
-
-},{"./build/utils":35}],38:[function(_dereq_,module,exports){
 /* globals define,module */
 /*
 Using a Universal Module Loader that should be browser, require, and AMD friendly
@@ -51633,7 +51628,12 @@ http://ricostacruz.com/cheatsheets/umdjs.html
   return jsonLogic;
 }));
 
-},{}],39:[function(_dereq_,module,exports){
+},{}],38:[function(_dereq_,module,exports){
+'use strict';
+
+module.exports = _dereq_('./build/utils');
+
+},{"./build/utils":35}],39:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -89146,7 +89146,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":37}],289:[function(_dereq_,module,exports){
+},{"formiojs/utils":38}],289:[function(_dereq_,module,exports){
 "use strict";
 
 var _get = _dereq_('lodash/get');
@@ -89901,7 +89901,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":37}],292:[function(_dereq_,module,exports){
+},{"formiojs/utils":38}],292:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -91394,6 +91394,10 @@ module.exports = function(app) {
               else {
                 refreshing = false;
                 $scope.$emit('selectLoaded', $scope.component);
+                var index = $scope.selectItems.indexOf(tempData);
+                if (index !== -1) {
+                  $scope.selectItems.splice(index, 1);
+                }
               }
             };
 
@@ -91696,7 +91700,7 @@ module.exports = function(app) {
                         $scope.selectItems = $scope.selectItems.concat(data);
                       }
                       else {
-                        $scope.selectItems = data;
+                        $scope.selectItems = _cloneDeep(data);
                       }
 
                       // Ensure the value is set to what it should be set to.
@@ -93941,7 +93945,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":37,"lodash/get":218,"text-mask-addons":275,"vanilla-text-mask":277}],325:[function(_dereq_,module,exports){
+},{"formiojs/utils":38,"lodash/get":218,"text-mask-addons":275,"vanilla-text-mask":277}],325:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -95439,7 +95443,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":37,"lodash/filter":216,"lodash/get":218,"vanilla-text-mask":277}],333:[function(_dereq_,module,exports){
+},{"formiojs/utils":38,"lodash/filter":216,"lodash/get":218,"vanilla-text-mask":277}],333:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, component) {
