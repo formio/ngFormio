@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.28.2
 ### Fixed
  - Issue with the logic around the Checkbox hidelabel setting.
+ - Problem with ngModel dependency on buttons.
 
 ## 2.28.1
 ### Changed
