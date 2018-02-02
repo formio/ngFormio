@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Issue with the logic around the Checkbox hidelabel setting.
  - Problem with ngModel dependency on buttons.
+ - Fix issue where old values stayed in option for "clearOnRefresh"
 
 ## 2.28.1
 ### Changed
