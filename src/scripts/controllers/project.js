@@ -2149,6 +2149,7 @@ app.controller('ProjectRemoteController', [
   '$stateParams',
   'AppConfig',
   function($http, $scope, $state, $stateParams, AppConfig) {
+    $scope.loading = false;
     $scope.remote = {
       type: 'Subdirectories'
     };
@@ -2159,10 +2160,14 @@ app.controller('ProjectRemoteController', [
       if (url) {
         $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
       }
+      $scope.loading = false;
     });
 
     $scope.check = function() {
+      $scope.loading = true;
       if (!$scope.remote.url || !$scope.remote.secret) {
+        $scope.remoteError = 'Server URL or Secret not provided.';
+        $scope.loading = false;
         return;
       }
       $scope.localProject.settings.remoteSecret = $scope.remote.secret;
@@ -2204,6 +2209,7 @@ app.controller('ProjectRemoteController', [
                             name: 'new'
                           });
                         }
+                        $scope.loading = false;
                       })
                       .catch(function(err) {
                         if (err.status === -1) {
@@ -2215,14 +2221,17 @@ app.controller('ProjectRemoteController', [
                             $scope.remoteError += '. Please check your access key';
                           }
                         }
+                        $scope.loading = false;
                       });
                   }
                   else {
                     $scope.remoteError = 'Environment too old of a version. Please upgrade.';
                   }
+                  $scope.loading = false;
                 })
                 .catch(function(err) {
                   $scope.remoteError = 'Environment did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
+                  $scope.loading = false;
                 });
 
             });
@@ -2230,12 +2239,14 @@ app.controller('ProjectRemoteController', [
         .catch(function(err) {
           if (err) {
             $scope.remoteError = 'Unable to save Portal Key. Please check your permissions.';
+            $scope.loading = false;
           }
         });
       return;
     };
 
     $scope.connect = function() {
+      $scope.loading = true;
       if ($scope.remote.project.name === 'new') {
         $http({
           method: 'GET',
@@ -2261,14 +2272,17 @@ app.controller('ProjectRemoteController', [
                 $scope.localProject.remote = angular.copy($scope.remote);
                 delete $scope.localProject.remote.secret;
                 $scope.saveLocalProject().then(function() {
+                  $scope.loading = false;
                   $state.reload();
                 });
               })
               .catch(function(err) {
+                $scope.loading = false;
                 $scope.remoteError = 'Error importing environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
               });
         })
         .catch(function(err) {
+          $scope.loading = false;
           $scope.remoteError = 'Error exporting environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
         });
       }
@@ -2278,6 +2292,7 @@ app.controller('ProjectRemoteController', [
         delete $scope.localProject.remote.secret;
         $scope.saveLocalProject()
           .then(function() {
+            $scope.loading = false;
             $state.reload();
           });
       }
