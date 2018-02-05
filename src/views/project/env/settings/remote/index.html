@@ -26,7 +26,7 @@
               Subdirectory is https://example.com/myproject. <br />
             </p>
           </div>
-          <div class="btn btn-primary" ng-click="check()">Continue</div>
+          <div class="btn btn-primary" ng-class="{'btn-disable': loading}" ng-click="check()">Continue <i ng-if="loading" class="glyphicon glyphicon-refresh glyphicon-spin"></i></div>
           <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
         </div>
         <div ng-if="remoteProjects">
@@ -37,7 +37,7 @@
               {{project.title}} ({{project.name}})
             </ui-select-choices>
           </ui-select>
-          <div class="btn btn-primary" ng-click="connect()">Connect Stage</div>
+          <div class="btn btn-primary" ng-class="{'btn-disable': loading}" ng-click="connect()">Connect Stage <i ng-if="loading" class="glyphicon glyphicon-refresh glyphicon-spin"></i></div>
           <div ng-if="remoteError" class="text-danger">{{remoteError}}</div>
         </div>
       </div>
