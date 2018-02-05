@@ -53,7 +53,7 @@ module.exports = function (actions) {
     describe('Dont Delete PreProd Stage', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Delete PreProd Stage');
       actions.clickOnButton('No');
       actions.iSeeEnv('PreProd');
@@ -62,7 +62,7 @@ module.exports = function (actions) {
     describe('Delete PreProd Stage', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
-      actions.clickOnLink('Delete PreProd Stage');
+      actions.clickOnElementWithText('Delete PreProd Stage');
       actions.clickOnButton('Yes');
       actions.iDontSeeEnv('PreProd');
       actions.iSeeText('+ New Stage');
@@ -74,13 +74,12 @@ module.exports = function (actions) {
       actions.clickOnLink('Staging');
       actions.clickOnLink('Create Version Tag');
       actions.enterTextInField('#tag', '0.0.1');
-      actions.clickOnElementWithText('Create version tag');
+      actions.clickOnElementWithText(' Create version tag');
       actions.envHasTag('Dev', '0.0.1');
     });
 
     describe('Deploys a form', function() {
       actions.iGoToEnv('Dev');
-      // Create a form.
       actions.clickOnLink('Forms');
       actions.clickOnLink('New Form');
       actions.clickOnElementWithText('API Web Form');
@@ -101,7 +100,7 @@ module.exports = function (actions) {
      actions.clickOnLink('Staging');
      actions.clickOnLink('Create Version Tag');
      actions.enterTextInField('#tag', '0.0.2');
-     actions.clickOnElementWithText('Create version tag');
+     actions.clickOnElementWithText(' Create version tag');
      actions.envHasTag('Dev', '0.0.2');
     });
 

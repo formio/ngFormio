@@ -393,7 +393,7 @@ module.exports = function (config) {
   this.iSeeElement = function (ele) {
     it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
-      var elt = element(by.css(ele));
+      var elt = element.all(by.css(ele)).first();
       browser.wait(EC.visibilityOf(elt), timeout);
       next();
     });
@@ -571,7 +571,7 @@ module.exports = function (config) {
 
   this.clickOnButton = function (text) {
     it('I click on the ' + text + ' button', function (next) {
-      var ele =  element(by.partialButtonText(replacements(text.toString())));
+      var ele =  element.all(by.partialButtonText(replacements(text.toString()))).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -1030,7 +1030,7 @@ module.exports = function (config) {
   this.clickOnElementIn = function (ele, text) {
     text = replacements(text.toString());
     it('I click on the ' + text + ' in' + ele + ' element', function (next) {
-      var ele = element(by.xpath('//*[text()=\'' + name + '\']//..//..//..//*[contains(@class,\'' + button + '\')]'));
+      var ele = element(by.xpath('//*[text()=\'' + text + '\']//..//..//..//*[contains(@class,\'' + ele + '\')]'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1158,8 +1158,8 @@ module.exports = function (config) {
     });
   };
 
-  this.creatingFormWithComponents = function (comps) {
-    it('creating form', function (next) {
+  this.creatingFormWithComponents = function () {
+    it('Creating form', function (next) {
       var formData = {
         display: "form"
         , components: []
@@ -1171,16 +1171,12 @@ module.exports = function (config) {
       formData.name = "sampletestname";
       //components.textfield.label = "textfield";
       formData.components.push(components.number);
-      //formData.components.push(components.password);
-       //formData.components.push(components.textarea);
-      //formData.components.push(components.checkbox);
+      formData.components.push(components.password);
+      formData.components.push(components.textarea);
+      formData.components.push(components.checkbox);
       formData.components.push(components.selectboxes);
-      //formData.components.push(components.select);
-     // formData.components.push(components.radio);
-      //formData.components.push(components.htmlelement);
-      //formData.components.push(components.htmlelement);
-
-      formData.components.push(components.button);
+      formData.components.push(components.select);
+      formData.components.push(components.radio);
       browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
         createForm(formData, res, function (err, user) {
           if (err || user == "Bad Token") {
