@@ -1,7 +1,10 @@
 <div class="row">
   <div class="col-sm-12">
-    <h4>To begin development of your application you will need to set up a local development environment. There are three ways to do this. You can start with our StarterKit, start with another application framework or roll your own.</h4>
-    <p>Your options are:</p>
+    <p>To begin development of your application you will need to set up a local development environment. There are three ways to do this. You can start with our StarterKit, start with another application framework or roll your own.</p>
+    <p>With either option, you will need to make sure that you first install the <a href="https://cli.angular.io/" target="_blank">Angular CLI</a> tool by typing the following within your terminal prompt.</p>
+    <p><pre>npm install -g @angular/cli</pre></p>
+
+    <p>Now that you have the CLI tool enabled, you can do either of the following.</p>
     <ul class="list-group steps">
       <li class="list-group-item">
         <div class="list-group-item-title">
@@ -11,49 +14,39 @@
         <p>Our Angular StarterKit comes set up with Angular Router, ngFormio and lots of Providers that make it easy to set up and use our forms within Angular. This is the easiest route to getting a running application.</p>
         <p>In order to clone the github repo you must have git installed on your computer. If you don't already have it, you can get it at <a href="https://git-scm.com/" target="_blank">https://git-scm.com/</a>.</p>
         <p>Once you have git, go to your terminal and type</p>
-        <p><pre>git clone git@github.com:formio/angular-app-starterkit.git
+        <p><pre>git clone https://github.com/formio/angular-app-starterkit.git
 cd angular-app-starterkit</pre>
         </p>
         <p>If you do no have git installed, you can go to <a href="https://github.com/formio/angular-app-starterkit" target="_blank">https://github.com/formio/angular-app-starterkit</a> and click the <strong>Download Zip</strong> button and unzip it on your computer.</p>
         <p>Finally, be sure to install all the dependencies to get everything set up. From within the application root directory type</p>
-        <p><pre>npm install</pre>
+        <p>
+          <pre>npm install
+ng serve</pre>
         </p>
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
           <span class="count-badge">B</span>
-          <h5>Use a Fountain.js Generator</h5>
+          <h5>Use Angular CLI</h5>
         </div>
-        <p><a href="http://fountainjs.io/" target="_blank">Fountain.js</a> is a yeoman generator that will build the framework of an application for you and has a lot of sane defaults. It is a good way to get started but does not come pre-configured with the Form.io libraries installed.</p>
+        <p>The <a href="https://cli.angular.io/" target="_blank">Angular CLI</a> tool allows you to easily create a new Angular application and rapidly add new modules and components.</p>
         <p>To set it up, go to your terminal and type</p>
-        <p><pre>npm install -g yo generator-fountain-webapp</pre></p>
-        <p>Once the dependencies installed, simply launch the generator and answer the questions.</p>
-        <p><pre>mkdir myapp
-cd myapp
-yo fountain-webapp</pre></p>
-        <p>You can choose whatever you want for the options but we recommend the following</p>
-        <p><pre>
-? Which JavaScript framework do you want? Angular 2
-? Which module management do you want? Webpack with NPM
-? Which JS preprocessor do you want? TypeScript
-? Which CSS preprocessor do you want? SASS
-? Which Continuous Integration platform do you want?
-? Do you want a sample app? A working landing page
-? Would you like a router? @angular/router</pre></p>
-        <p>Be sure to install all the dependencies to get everything set up. From within the application root directory, type these commands</p>
-        <p><pre>npm install</pre>
-        </p>
-        <p>Finally, add in the Angular Form.io library.</p>
-        <ul>
-          <li>
-            <a href="https://github.com/formio/angular-formio">angular-formio</a> - The main Angular form renderer.
-          </li>
-        </ul>
-        <br />
-        <p>To add it to your application, type the following</p>
-        <p><pre>npm install --save angular-formio</pre><p>
+        <p><pre>ng new my-application --style=scss</pre></p>
+        <p>This will create a new application and then install all the depdencies. After it is done, you can then launch the application using.</p>
+        <p><pre>cd my-application
+ng serve</pre></p>
+
+        <hr />
+        <h4>Next, add Bootstrap to your application.</h4>
+        <p><pre>npm install --save bootstrap</pre></p>
+        <strong>src/styles.scss</strong>
+        <pre><code>@import "~bootstrap/scss/bootstrap.scss";</code></pre>
+
+        <hr />
+        <h4>Now, add <a href="https://github.com/formio/angular-formio">angular-formio</a>.</h4>
+        <p><pre>npm install --save angular-formio</pre></p>
         <p>Then add the angular-formio module to your application by ensuring they are added to your module dependencies.</p>
-        <strong>app.module.ts</strong>
+        <strong>src/app/app.module.ts</strong>
     <pre><code>import { NgModule } from '@angular/core';
       import { FormioModule } from 'angular-formio';
       import { BrowserModule } from '@angular/platform-browser';
@@ -72,41 +65,6 @@ yo fountain-webapp</pre></p>
       &nbsp;&nbsp;&nbsp;]
       })
       export class AppModule {}</code></pre>
-      </li>
-      <li class="list-group-item">
-        <div class="list-group-item-title">
-          <span class="count-badge">C</span>
-          <h5>Roll your own application</h5>
-        </div>
-        <p>If you are have experience with and are comfortable setting up your own Angular application you can, of course, do so. This works best for teams that already have an application or have a different set of build tools or dependent libraries than the starterkits use.</p>
-        <p>To add Form.io forms to your application, use one of the package managers and include the angular-formio library to your application.</p>
-        <ul>
-          <li>
-            <a href="https://github.com/formio/angular-formio">angular-formio</a> - The main Angular form renderer.
-          </li>
-        </ul>
-        <br />
-        <p>Then add the angular-formio module to your application by ensuring they are added to your module dependencies.</p>
-        <strong>app.module.ts</strong>
-    <pre><code>import { NgModule } from '@angular/core';
-      import { FormioModule } from 'angular-formio';
-      import { BrowserModule } from '@angular/platform-browser';
-      import { MainComponent } from './main.component.ts';
-
-      @NgModule({
-      &nbsp;&nbsp;&nbsp;imports: [
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BrowserModule,
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FormioModule
-      &nbsp;&nbsp;&nbsp;],
-      &nbsp;&nbsp;&nbsp;declarations: [
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
-      &nbsp;&nbsp;&nbsp;],
-      &nbsp;&nbsp;&nbsp;bootstrap: [
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MainComponent
-      &nbsp;&nbsp;&nbsp;]
-      })
-      export class AppModule {}</code></pre>
-
       </li>
     </ul>
   </div>
