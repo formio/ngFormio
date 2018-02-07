@@ -47,9 +47,6 @@ module.exports = function(app) {
             if ($scope.component.wysiwyg === true) {
               $scope.component.wysiwyg = defaults;
             }
-            else {
-              $scope.component.wysiwyg = angular.extend(defaults, $scope.component.wysiwyg);
-            }
 
             // FOR-929 - Remove spell check attribute
             if (!$scope.component.spellcheck){
