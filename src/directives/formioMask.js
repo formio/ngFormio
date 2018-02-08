@@ -36,10 +36,21 @@ module.exports = function() {
         };
       };
 
+      var formattedNumberString = (12345.6789).toLocaleString(scope.options.language || 'en');
+
       scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
-        (12345.6789).toLocaleString(scope.options.language).match(/345(.*)67/)[1];
-      scope.thousandsSeparator = scope.options.thousandsSeparator = scope.options.thousandsSeparator ||
-        (12345.6789).toLocaleString(scope.options.language).match(/12(.*)345/)[1];
+        formattedNumberString.match(/345(.*)67/)[1];
+
+      if (scope.component.delimiter) {
+        if (scope.options.hasOwnProperty('thousandsSeparator')) {
+          console.warn("Property 'thousandsSeparator' is deprecated. Please use i18n to specify delimiter.");
+        }
+
+        scope.delimiter = scope.options.thousandsSeparator || formattedNumberString.match(/12(.*)345/)[1];
+      }
+      else {
+        scope.delimiter = '';
+      }
 
       if (format === 'currency') {
         scope.currency = scope.component.currency || 'USD';
@@ -86,7 +97,7 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: scope.prefix,
             suffix: scope.suffix,
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
             decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
             decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
             allowNegative: _get(scope.component, 'allowNegative', true),
@@ -98,7 +109,7 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: '',
             suffix: '',
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
             decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
             decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
             allowNegative: _get(scope.component, 'allowNegative', true),
@@ -144,7 +155,7 @@ module.exports = function() {
           value = value.replace(scope.prefix, '').replace(scope.suffix, '');
 
           // Remove thousands separators and convert decimal separator to dot.
-          value = value.split(scope.thousandsSeparator).join('').replace(scope.decimalSeparator, '.');
+          value = value.split(scope.delimiter).join('').replace(scope.decimalSeparator, '.');
 
           if (scope.component.validate && scope.component.validate.integer) {
             return parseInt(value, 10);
