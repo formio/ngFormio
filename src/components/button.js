@@ -60,8 +60,8 @@ module.exports = function(app) {
               }
               var flattened = FormioUtils.flattenComponents(parent.form.components, true);
               var components = flattened;
-              (new Function('form', 'flattened', 'components', '_merge', 'data', $scope.component.custom.toString()))
-              (parent.form, flattened, components, _merge, $scope.data);
+              (new Function('form', 'flattened', 'components', '_merge', 'data', 'scope', $scope.component.custom.toString()))
+              (parent.form, flattened, components, _merge, $scope.data, $scope);
             }
             catch (e) {
               /* eslint-disable no-console */
