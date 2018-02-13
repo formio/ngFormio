@@ -4,12 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.28.3
 ### Added
  - 'delimiter' property for Number component.
+ -  scope variable to custom buttons
 
 ### Fixed
  - Error messages in console for Survey and EditGrid components.
+ - Prevent WYSIWYG settings from merging unintentionally
 
 ## 2.28.2
 ### Fixed

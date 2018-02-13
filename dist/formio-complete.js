@@ -1,4 +1,4 @@
-/*! ng-formio v2.28.2 | https://unpkg.com/ng-formio@2.28.2/LICENSE.txt */
+/*! ng-formio v2.28.3 | https://unpkg.com/ng-formio@2.28.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -88414,7 +88414,6 @@ module.exports = function(app) {
               case 'custom':
               case 'oauth':
               case 'url':
-                return;
               default:
                 return 'button';
             }
@@ -88439,8 +88438,8 @@ module.exports = function(app) {
               }
               var flattened = FormioUtils.flattenComponents(parent.form.components, true);
               var components = flattened;
-              (new Function('form', 'flattened', 'components', '_merge', 'data', $scope.component.custom.toString()))
-              (parent.form, flattened, components, _merge, $scope.data);
+              (new Function('form', 'flattened', 'components', '_merge', '$scope', 'data', $scope.component.custom.toString()))
+              (parent.form, flattened, components, _merge, $scope, $scope.data);
             }
             catch (e) {
               /* eslint-disable no-console */
@@ -89617,7 +89616,7 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        if (scope.options && scope.options.building) return;
+        if (scope.options && scope.options.building || !scope.formioForm) return;
 
         // Add the control to the main form.
         scope.formioForm.$addControl(ctrl);
@@ -92274,9 +92273,6 @@ module.exports = function(app) {
             if ($scope.component.wysiwyg === true) {
               $scope.component.wysiwyg = defaults;
             }
-            else {
-              $scope.component.wysiwyg = angular.extend(defaults, $scope.component.wysiwyg);
-            }
 
             // FOR-929 - Remove spell check attribute
             if (!$scope.component.spellcheck){
@@ -93360,7 +93356,7 @@ module.exports = [
 
           $scope.getInputGroupStyles = function(component) {
             var labelPosition = _get(component, 'labelPosition');
-            
+
             if (labelOnTheLeftOrRight(labelPosition)) {
               var totalLabelWidth = getComponentLabelWidth(component) + getComponentLabelMargin(component);
               var styles = {
@@ -93390,6 +93386,10 @@ module.exports = [
           // class to the survey component.
           // Note: Chek that this method is used in the template.
           $scope.invalidQuestions = function(formioForm) {
+            if (!formioForm) {
+              return false;
+            }
+
             var errorInQuestions = false;
             if (!$scope.component.questions) {
               errorInQuestions = false;
@@ -93792,10 +93792,21 @@ module.exports = function() {
         };
       };
 
+      var formattedNumberString = (12345.6789).toLocaleString(scope.options.language || 'en');
+
       scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
-        (12345.6789).toLocaleString(scope.options.language).match(/345(.*)67/)[1];
-      scope.thousandsSeparator = scope.options.thousandsSeparator = scope.options.thousandsSeparator ||
-        (12345.6789).toLocaleString(scope.options.language).match(/12(.*)345/)[1];
+        formattedNumberString.match(/345(.*)67/)[1];
+
+      if (scope.component.delimiter) {
+        if (scope.options.hasOwnProperty('thousandsSeparator')) {
+          console.warn("Property 'thousandsSeparator' is deprecated. Please use i18n to specify delimiter.");
+        }
+
+        scope.delimiter = scope.options.thousandsSeparator || formattedNumberString.match(/12(.*)345/)[1];
+      }
+      else {
+        scope.delimiter = '';
+      }
 
       if (format === 'currency') {
         scope.currency = scope.component.currency || 'USD';
@@ -93842,7 +93853,7 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: scope.prefix,
             suffix: scope.suffix,
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
             decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
             decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
             allowNegative: _get(scope.component, 'allowNegative', true),
@@ -93854,7 +93865,7 @@ module.exports = function() {
           mask = createNumberMask({
             prefix: '',
             suffix: '',
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.thousandsSeparator),
+            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
             decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
             decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
             allowNegative: _get(scope.component, 'allowNegative', true),
@@ -93900,7 +93911,7 @@ module.exports = function() {
           value = value.replace(scope.prefix, '').replace(scope.suffix, '');
 
           // Remove thousands separators and convert decimal separator to dot.
-          value = value.split(scope.thousandsSeparator).join('').replace(scope.decimalSeparator, '.');
+          value = value.split(scope.delimiter).join('').replace(scope.decimalSeparator, '.');
 
           if (scope.component.validate && scope.component.validate.integer) {
             return parseInt(value, 10);
