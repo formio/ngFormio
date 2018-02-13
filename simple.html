@@ -1,0 +1,19 @@
+<!doctype html>
+<html class='no-js'>
+<head>
+  <meta charset='utf-8'>
+  <title>Form.io Form Renderer</title>
+  <meta name='viewport' content='width=device-width'>
+  <link rel='stylesheet' href='https://unpkg.com/bootswatch@3.3.7/yeti/bootstrap.min.css' />
+  <link rel='stylesheet' href='dist/formio-full.css' />
+</head>
+<body>
+<div class="container" ng-app="formRenderer">
+  <formio src="'https://examples.form.io/example'"></formio>
+</div>
+<script src='dist/formio-full.js'></script>
+<script type='text/javascript'>
+  angular.module('formRenderer', ['formio']);
+</script>
+</body>
+</html>
