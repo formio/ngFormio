@@ -98,7 +98,7 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        if (scope.options && scope.options.building) return;
+        if (scope.options && scope.options.building || !scope.formioForm) return;
 
         // Add the control to the main form.
         scope.formioForm.$addControl(ctrl);

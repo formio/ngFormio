@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - 'delimiter' property for Number component.
 
+### Fixed
+ - Error messages in console for Survey and EditGrid components.
+
 ## 2.28.2
 ### Fixed
  - Issue with the logic around the Checkbox hidelabel setting.
