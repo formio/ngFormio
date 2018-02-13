@@ -35,7 +35,6 @@ module.exports = function(app) {
               case 'custom':
               case 'oauth':
               case 'url':
-                return;
               default:
                 return 'button';
             }
@@ -60,8 +59,8 @@ module.exports = function(app) {
               }
               var flattened = FormioUtils.flattenComponents(parent.form.components, true);
               var components = flattened;
-              (new Function('form', 'flattened', 'components', '_merge', 'data', $scope.component.custom.toString()))
-              (parent.form, flattened, components, _merge, $scope.data);
+              (new Function('form', 'flattened', 'components', '_merge', '$scope', 'data', $scope.component.custom.toString()))
+              (parent.form, flattened, components, _merge, $scope, $scope.data);
             }
             catch (e) {
               /* eslint-disable no-console */
