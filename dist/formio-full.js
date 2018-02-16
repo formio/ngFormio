@@ -100678,6 +100678,7 @@ module.exports = function(app) {
 },{}],296:[function(_dereq_,module,exports){
 "use strict";
 
+var isEmpty = _dereq_('lodash/isEmpty');
 var GridUtils = _dereq_('../factories/GridUtils')();
 
 module.exports = function(app) {
@@ -100770,7 +100771,7 @@ module.exports = function(app) {
                 $scope.submissionFormio.submissionId &&
                 $scope.data[$scope.component.key] &&
                 $scope.data[$scope.component.key]._id &&
-                !$scope.data[$scope.component.key].data
+                isEmpty($scope.data[$scope.component.key].data)
               ) {
                 $scope.submissionFormio.loadSubmission().then(function(submission) {
                   if (!submission) {
@@ -100862,7 +100863,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":334}],297:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":334,"lodash/isEmpty":230}],297:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
