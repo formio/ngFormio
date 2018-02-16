@@ -366,8 +366,9 @@ module.exports = function(app) {
                       var value = $interpolate($scope.component.template)({item: item}).replace(/<(?:.|\n)*?>/gm, '');
                       switch ($scope.component.filter) {
                         case 'startsWith':
-                          return value.toLowerCase().indexOf(input.toLowerCase()) !== -1;
+                          return value.toLowerCase().lastIndexOf(input.toLowerCase(), 0) === 0;
                         case 'contains':
+                          return value.toLowerCase().indexOf(input.toLowerCase()) !== -1;
                         default:
                           return value.toLowerCase().lastIndexOf(input.toLowerCase(), 0) === 0;
                       }
