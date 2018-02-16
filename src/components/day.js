@@ -56,11 +56,11 @@ module.exports = function(app) {
             case 2:     // February
               return isLeapYear(year) ? 29 : 28;
             default:
-              return 0;
+              return 31;
           }
         }
 
-        $scope.maxDay = 0;
+        $scope.maxDay = 31;
         $scope.$watch(function() {
           return $scope.date.month + '/' + $scope.date.year;
         }, function() {
