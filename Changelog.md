@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
  - Search Filter setting not working correctly for Select Component with Raw JSON Data Source Type
+ - Arrow keys in Day component.
 
 ## 2.28.3
 ### Added
