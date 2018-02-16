@@ -439,6 +439,7 @@ module.exports = function() {
         $scope.next = function() {
           var errors = $scope.checkErrors();
           if (errors) {
+            $scope.$emit('formError');
             $scope.pageHasErrors[$scope.currentPage] = true;
             if (!$scope.formioOptions.wizardFreeNavigation) {
               return;
