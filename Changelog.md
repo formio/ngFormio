@@ -4,10 +4,18 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 2.28.4
+### Added
+ - Emit of 'formError' event on next page for Wizard.
+
 ### Fixed
  - Search Filter setting not working correctly for Select Component with Raw JSON Data Source Type
  - Arrow keys in Day component.
+ - Formio library to use the "default" export of formiojs.
+ - Issue with subform submissions not loading due to check for empty data.
+
+### Changed
+ - Upgraded formiojs to latest version.
 
 ## 2.28.3
 ### Added
