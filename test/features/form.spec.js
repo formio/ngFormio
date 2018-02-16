@@ -25,7 +25,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#label', 'textField');
       actions.clickOnButton('Save');
       actions.waitForClassRemoval('ngdialog-overlay');
-      actions.iSeeTextIn('#textFieldLabel', 'textField');
+      actions.iSeeText('textField');
       actions.clickOnButton('Create Form');
     });
   });
