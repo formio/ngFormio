@@ -1,10 +1,17 @@
 module.exports = function (actions) {
   describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
-      actions.iAmLoggedInFor('profileuser1');
+      // actions.iAmLoggedInFor('profileuser1');
+      // actions.waitForActionToComplete(2000);
+      // actions.enableAngular(false);
+      actions.logout();
+      actions.enterTextInField('.login-container #email', 'admin@example.com');
+      actions.enterTextInField('.login-container #password', 'password');
+      actions.clickOnElementWithText('LOG IN');
       actions.waitForActionToComplete(2000);
+      //actions.iAmLoggedIn();
       actions.goToPage('#/profile/payment/view');
-      actions.clickOnElementWithText('Add Credit Card');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -86,8 +93,8 @@ module.exports = function (actions) {
       actions.iSeeText('Upgrade your project to a paid plan to access file storage settings.');
       actions.clickOnElementWithText('Data Connections');
       actions.iSeeText('Upgrade your project to a paid plan to access data connection settings.');
-      actions.clickOnElementWithText('OAuth');
-      actions.iSeeText('Upgrade your project to a paid plan to access OAuth settings.');
+      // actions.clickOnElementWithText('OAuth');
+      // actions.iSeeText('Upgrade your project to a paid plan to access OAuth settings.');
     });
     describe('Deleting basicProject',function(){
       actions.clickOnClass('.fa.fa-cog');

@@ -10,7 +10,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/view');
     });
     describe('Navigating to the Credit Card input page',function(){
-      actions.clickOnElementWithText('Change Credit Card');
+      actions.clickOnElementWithText('Add Credit Card');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Adding valid Credit Card to profile',function(){

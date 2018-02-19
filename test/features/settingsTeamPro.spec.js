@@ -2,7 +2,12 @@ module.exports = function (actions) {
   describe('Team Pro Plan Settings',function(){
     describe('Team Pro Plan > Environment Settings',function(){
       actions.logout();
-      actions.iAmLoggedInFor('profileuser1');
+      //actions.iAmLoggedInFor('profileuser1');
+      actions.logout();
+      actions.enterTextInField('.login-container #email', 'admin@example.com');
+      actions.enterTextInField('.login-container #password', 'password');
+      actions.clickOnElementWithText('LOG IN');
+      actions.iAmLoggedIn();
       actions.waitForActionToComplete(1000);
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
@@ -76,7 +81,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iDonotSeeText('test');
       actions.enterTextInField('#serverURL','https://remote.form.io');
-      actions.enterTextInField('#portalSecret','jeriahrocks');
+      actions.enterTextInField('#portalSecret','remotesecret');
       actions.clickOnElementWithText('Continue');
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnClass('.ui-select-match.ng-scope');
@@ -174,7 +179,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('File Storage');
       actions.clickOnElementWithText('Data Connections');
-      actions.clickOnElementWithText('OAuth');
+      // actions.clickOnElementWithText('OAuth');
     });
     describe('Deleting teamProProject',function(){
       actions.clickOnClass('.fa.fa-cog');

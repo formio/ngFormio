@@ -2,7 +2,12 @@ module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
-      actions.iAmLoggedInFor('profileuser1');
+      //actions.iAmLoggedInFor('profileuser1');
+      actions.logout();
+      actions.enterTextInField('.login-container #email', 'admin@example.com');
+      actions.enterTextInField('.login-container #password', 'password');
+      actions.clickOnElementWithText('LOG IN');
+      actions.iAmLoggedIn();
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
@@ -157,7 +162,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('File Storage');
       actions.iSeeText('Upgrade your project to a paid plan to access file storage settings.');
       actions.clickOnElementWithText('Data Connections');
-      actions.clickOnElementWithText('OAuth');
+      // actions.clickOnElementWithText('OAuth');
     });
     describe('Deleting independentProject',function(){
       actions.clickOnClass('.fa.fa-cog');

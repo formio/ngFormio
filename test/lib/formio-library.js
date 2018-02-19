@@ -400,7 +400,7 @@ module.exports = function (config) {
   };
 
   this.enterTextInField = function (field, text) {
-    it('I enter ' + text + ' in ' + field + ' field', function (next) {
+    it('I enter ' + text + ' in ' + field + ' field', function (done) {
       text = replacements(text.toString());
       //console.log(text);
       //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
@@ -409,7 +409,7 @@ module.exports = function (config) {
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
-        ele.clear().sendKeys(text).then(next).catch(next);
+        ele.clear().sendKeys(text).then(done).catch(done);
       });
     });
   };

@@ -15,7 +15,6 @@ var expect = chai.expect;
 var url = (port === 80)
   ? protocol + '://' + domain
   : protocol + '://' + domain + ':' + port;
-// url = "http://portal.test-form.io";
 var config = {
   protocol: protocol,
   baseUrl: url,
@@ -27,9 +26,7 @@ var custom = require('./lib/formio-library');
 var actions = new custom(config);
 
 before(function (next) {
-  var width = 1920;
-  var height = 1080;
-  browser.driver.manage().window().setSize(width, height);
+  browser.driver.manage().window().maximize();
   browser.get(url).then(next).catch(next);
 });
 
@@ -55,10 +52,9 @@ describe("Formio Tests", function () {
   // require('./features/projectUpgradePayment.spec')(actions);
   // require('./features/creditCard.spec')(actions);
   // require('./features/versioning.spec')(actions);
-  // require('./features/environmentWorkflow.spec')(actions);
+  require('./features/environmentWorkflow.spec')(actions);
 
 });
-
 afterEach(function () {
   if (this.currentTest.state !== 'passed') {
     var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
@@ -79,4 +75,5 @@ afterEach(function () {
     // Clears the logs for the next run.
     //browser.manage().logs().get('browser');
   }
-});
+}
+);
