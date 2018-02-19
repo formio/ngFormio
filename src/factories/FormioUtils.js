@@ -262,9 +262,14 @@ module.exports = function() {
         // FOR-949 - Default value for componenets with input mask.
         else if (component.inputMask) {
           var inputMask = formioUtils.getInputMask(component.inputMask);
-          value = conformToMask(value, inputMask).conformedValue;
-          if (!formioUtils.matchInputMask(value, inputMask)) {
-            value = '';
+          var self = this;
+          if (component.multiple) {
+            value = value.map(function(item) {
+              return self.verifyMaskedInput(item, inputMask);
+            });
+          }
+          else {
+            value = this.verifyMaskedInput(value, inputMask);
           }
           data[component.key] = value;
           return done(true);
@@ -287,6 +292,13 @@ module.exports = function() {
         }
       }
       /* eslint-enable max-depth */
+    },
+    verifyMaskedInput: function(input, mask) {
+      input = conformToMask(input, mask).conformedValue;
+      if (!formioUtils.matchInputMask(input, mask)) {
+        return '';
+      }
+      return input;
     },
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,

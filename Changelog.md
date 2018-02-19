@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - Components with input mask when they have multiple values.
+
 ## 2.28.4
 ### Added
  - Emit of 'formError' event on next page for Wizard.
