@@ -21,7 +21,7 @@ module.exports = function(app) {
           disableOnInvalid: false,
           theme: 'primary'
         },
-        controller: ['$scope', 'FormioUtils', function($scope, FormioUtils) {
+        controller: ['$scope', '$location', 'FormioUtils', function($scope, $location, FormioUtils) {
           if ($scope.options && $scope.options.building) return;
           var clicked = false;
           var settings = $scope.component;
@@ -198,6 +198,11 @@ module.exports = function(app) {
               }
             }, 100);
           };
+
+          // If this is an OpenID Provider initiated login, perform the click event immediately
+          if (settings.action === 'oauth' && settings.oauth.authURI.indexOf($location.search().iss) === 0) {
+            $scope.openOAuth(settings.oauth);
+          }
         }],
         viewTemplate: 'formio/componentsView/button.html'
       });
