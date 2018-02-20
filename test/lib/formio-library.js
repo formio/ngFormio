@@ -1352,7 +1352,7 @@ module.exports = function (config) {
           .then(function() {
             ele.click().then(next).catch(next);
           });
-      });
+      }).catch(next);
     });
   };
   this.checkingUrlIamOn = function (url) {
@@ -1366,7 +1366,7 @@ module.exports = function (config) {
         return browser.getCurrentUrl().then(function (cUrl) {
           return cUrl.toLowerCase() == url.toLowerCase()
             || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
-        });
+        }).catch(next);
       }, timeout).then(function (value) {
         try {
           assert.equal(value, true);
@@ -1374,7 +1374,7 @@ module.exports = function (config) {
         } catch (err) {
           next(err);
         }
-      });
+      }).catch(next);
     });
   };
 
