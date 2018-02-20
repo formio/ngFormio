@@ -24,6 +24,7 @@ module.exports = function(app) {
           persistent: true,
           hidden: false,
           clearOnHide: true,
+          delimiter: true,
           validate: {
             required: false,
             multiple: '',

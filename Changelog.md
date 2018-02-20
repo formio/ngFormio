@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.28.5
 ### Fixed
+ - Currency component to default with delimiter set.
  - Components with input mask when they have multiple values.
+
+### Added
+ - OAuth initiated logins.
 
 ## 2.28.4
 ### Added
