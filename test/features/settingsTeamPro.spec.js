@@ -2,13 +2,8 @@ module.exports = function (actions) {
   describe('Team Pro Plan Settings',function(){
     describe('Team Pro Plan > Environment Settings',function(){
       actions.logout();
-      //actions.iAmLoggedInFor('profileuser1');
-      actions.logout();
-      actions.enterTextInField('.login-container #email', 'admin@example.com');
-      actions.enterTextInField('.login-container #password', 'password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.iAmLoggedIn();
-      actions.waitForActionToComplete(1000);
+      actions.iAmLoggedInFor('profileuser1');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
       actions.enterTextInField('#cardholderName','Test');
@@ -24,18 +19,20 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamProProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.waitForActionToComplete(1000);
+      actions.enableAngular(true);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Team Pro");
       actions.clickOnElementWithText(' Confirm Billing Change');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-success","Team Pro");
+      actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','testteamproauto');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(500);
       actions.iSeeValueIn('#name','testteamproauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
@@ -47,7 +44,7 @@ module.exports = function (actions) {
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
@@ -58,19 +55,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Data');
       actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
       actions.checkElementWithTextIsNotDisabled(' Export CSV');
-      actions.clickOnElementWithText('Resources');
-      actions.checkElementWithTextIsDisabled(' New Resource');
-      actions.checkElementWithTextIsDisabled(' Edit');
-      actions.checkElementWithTextIsDisabled(' Actions');
-      actions.checkElementWithTextIsDisabled(' Access');
-      actions.checkElementWithTextIsNotDisabled(' Use');
-      actions.clickOnElementWithText(' Data');
-      actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
-      actions.checkElementWithTextIsNotDisabled(' Export CSV');
       actions.clickOnElementWithText('Settings');
-      actions.checkElement('//*[@id="protect"]');
-      actions.clickOnElementWithText(' Save Stage');
-      actions.pageReload();
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iSeeText('Subdirectories');
       actions.enterTextInField('#serverURL','test');
@@ -81,17 +66,19 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iDonotSeeText('test');
       actions.enterTextInField('#serverURL','https://remote.form.io');
-      actions.enterTextInField('#portalSecret','remotesecret');
+      actions.enterTextInField('#portalSecret','jeriahrocks');
       actions.clickOnElementWithText('Continue');
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnClass('.ui-select-match.ng-scope');
       actions.clickOnClass('#ui-select-choices-row-0-3');
       actions.clickOnElementWithText('Connect Stage');
       actions.iSeeText('https://remote.form.io');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Disconnect');
-      actions.waitForActionToComplete(1000);
       actions.iSeeText('Connect to an On-Premise Environment');
+      actions.enableAngular(true);
+      actions.waitForActionToComplete(2000);
+      actions.enableAngular(false);
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
       actions.clickOnClass('.fa.fa-trash');
@@ -101,7 +88,9 @@ module.exports = function (actions) {
     });
     describe('Team Pro Plan > Deployment Settings',function(){
         actions.clickOnElementWithText('Settings');
-      actions.waitForActionToComplete(1000);
+        actions.checkElement('//*[@id="protect"]');
+        actions.clickOnElementWithText(' Save Stage');
+        actions.waitForActionToComplete(2000);
         actions.clickOnElementWithText('Staging');
         actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
         actions.clickOnElementWithText('Create Version Tag');
@@ -113,6 +102,8 @@ module.exports = function (actions) {
     });
     describe('Team Pro Plan > Integrations Settings',function(){
       actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('PDF Management');
+      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Integrations');
       actions.checkingUrlEndsWith('env/integrations/info');
       actions.clickOnElementWithText('Email Providers');
@@ -179,7 +170,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('File Storage');
       actions.clickOnElementWithText('Data Connections');
-      // actions.clickOnElementWithText('OAuth');
+      actions.clickOnElementWithText('OAuth');
     });
     describe('Deleting teamProProject',function(){
       actions.clickOnClass('.fa.fa-cog');

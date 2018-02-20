@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('envuser1');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
+      actions.clickOnClass('new-project-custom');
       actions.iSeeText('Project Title');
       actions.iSeeText('Description');
       actions.enterTextInField('#title', '${random-title>primaryproject1.title}');
@@ -42,6 +42,11 @@ module.exports = function (actions) {
       actions.waitForClassRemoval('project-env-create');
       actions.iSeeEnv('PreProd');
     });
+
+    describe('Can only create 3 stages', function () {
+      actions.iDonotSeeText('+ New Stage');
+    });
+
     describe('Rename Test Stage to Stage', function () {
       actions.iGoToEnv('Test');
       actions.clickOnLink('Settings');
@@ -53,8 +58,7 @@ module.exports = function (actions) {
     describe('Dont Delete PreProd Stage', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
-      actions.waitForActionToComplete(2000);
-      actions.clickOnElementWithText('Delete PreProd Stage');
+      actions.clickOnLink('Delete PreProd Stage');
       actions.clickOnButton('No');
       actions.iSeeEnv('PreProd');
     });
@@ -62,7 +66,7 @@ module.exports = function (actions) {
     describe('Delete PreProd Stage', function () {
       actions.iGoToEnv('PreProd');
       actions.clickOnLink('Settings');
-      actions.clickOnElementWithText('Delete PreProd Stage');
+      actions.clickOnLink('Delete PreProd Stage');
       actions.clickOnButton('Yes');
       actions.iDontSeeEnv('PreProd');
       actions.iSeeText('+ New Stage');
@@ -74,51 +78,57 @@ module.exports = function (actions) {
       actions.clickOnLink('Staging');
       actions.clickOnLink('Create Version Tag');
       actions.enterTextInField('#tag', '0.0.1');
-      actions.clickOnElementWithText(' Create version tag');
+      actions.clickOnElementWithText('Create version tag');
       actions.envHasTag('Dev', '0.0.1');
     });
 
     describe('Deploys a form', function() {
       actions.iGoToEnv('Dev');
+      // Create a form.
       actions.clickOnLink('Forms');
       actions.clickOnLink('New Form');
       actions.clickOnElementWithText('API Web Form');
       actions.iSeeText('New Form');
-      actions.enterTextInField('#title', 'testForm');
+      actions.enterTextInField('#title', '${random-title>depform1.title}');
       actions.enterTextInField('#path', '${random-title>depform1.path}');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
-      actions.enterTextInField('#label', 'textField');
+      actions.enterTextInField('#label', '${random-title>textfield1.label}');
       actions.clickOnButton('Save');
       actions.waitForClassRemoval('ngdialog-overlay');
-      actions.iSeeTextIn('label.control-label.ng-binding.ng-scope', 'textField');
+      actions.iSeeTextIn('.control-label', '${textfield1.label}');
       actions.clickOnButton('Create Form');
     });
 
-    describe('Tag the release', function() {
-     actions.clickOnLink('Settings');
-     actions.clickOnLink('Staging');
-     actions.clickOnLink('Create Version Tag');
-     actions.enterTextInField('#tag', '0.0.2');
-     actions.clickOnElementWithText(' Create version tag');
-     actions.envHasTag('Dev', '0.0.2');
-    });
+    //describe('Tag the release', function() {
+    //  actions.clickOnLink('Settings');
+    //  actions.clickOnLink('Deployment');
+    //  actions.clickOnLink('Create Version Tag');
+    //  actions.enterTextInField('#tag', '0.0.2');
+    //  actions.clickOnElementWithText('Create version tag');
+    //  actions.envHasTag('Dev', '0.0.2');
+    //});
 
-    describe('Ensure form doesnt exist on Stage', function() {
-     actions.iGoToEnv('Stage');
-     actions.clickOnLink('Forms');
-     actions.iDonotSeeText('testForm');
-    });
+    //describe('Ensure form doesnt exist on Stage', function() {
+    //  actions.iGoToEnv('Stage');
+    //  actions.clickOnLink('Forms');
+    //  actions.iDonotSeeText('${depform1.title}');
+    //});
+    //
+    //describe('Deploy the tag to stage', function() {
+    //  actions.clickOnLink('Settings');
+    //  actions.clickOnLink('Deployment');
+    //  actions.selectOption('tags', '0.0.2');
+    //  actions.clickOnElementWithText('Deploy version tag to Stage');
+    //  actions.envHasTag('Stage', '0.0.2');
+    //  actions.clickOnLink('Forms');
+    //  actions.iSeeText('${depform1.title}');
+    //});
 
-    describe('Deploy the tag to stage', function() {
-     actions.clickOnLink('Settings');
-     actions.clickOnLink('Staging');
-     actions.selectOption('tags', '0.0.2');
-     actions.clickOnElementWithText(' Deploy version tag to Stage');
-     actions.envHasTag('Stage', '0.0.2');
-     actions.clickOnLink('Forms');
-     actions.pageReload();
-     actions.iSeeText('testForm');
-    });
+    // Deploy update to form
+
+    // Protected Mode
+
+    // Settings
   });
 };

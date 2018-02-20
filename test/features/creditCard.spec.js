@@ -108,7 +108,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('26');
       actions.enterTextInField('#securityCode','422');
       actions.clickOnButton('Submit');
-      // actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
+      actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
     });
     describe('Submitting Credit Card with expiration date that has already expired',function(){
       actions.goToPage('#/profile/payment/edit');
@@ -122,18 +122,18 @@ module.exports = function (actions) {
       actions.clickOnButton('Submit');
       actions.iSeeText('Invalid Expiration Date');
     });
-    // describe('Submitting Credit Card with invalid security code value',function(){
-    //   actions.goToPage('#/profile/payment/edit');
-    //   actions.enterTextInField('#cardholderName','Another Creditcard');
-    //   actions.enterTextInField('#ccNumber','4111111111111111');
-    //   actions.enterTextInField('#securityCode','000');
-    //   actions.clickOnClass('#form-group-ccExpiryMonth');
-    //   actions.clickOnElementWithText('02');
-    //   actions.clickOnClass('#form-group-ccExpiryYear');
-    //   actions.clickOnElementWithText('26');
-    //   actions.clickOnButton('Submit');
-    //   actions.iSeeText('Invalid CC number');
-    // });
+    describe('Submitting Credit Card with invalid security code value',function(){
+      actions.goToPage('#/profile/payment/edit');
+      actions.enterTextInField('#cardholderName','Another Creditcard');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','000');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('02');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('26');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Invalid CC number');
+    });
     describe('Viewing Credit Card Info on Upgrade Window',function(){
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');

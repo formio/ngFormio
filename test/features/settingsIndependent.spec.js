@@ -2,12 +2,7 @@ module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
-      //actions.iAmLoggedInFor('profileuser1');
-      actions.logout();
-      actions.enterTextInField('.login-container #email', 'admin@example.com');
-      actions.enterTextInField('.login-container #password', 'password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.iAmLoggedIn();
+      actions.iAmLoggedInFor('profileuser1');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
@@ -24,18 +19,20 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','independentProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.waitForActionToComplete(1000);
+      actions.enableAngular(true);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Independent");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-warning","Independent");
+      actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="name"]');
       actions.enterTextInField('#name','independentauto');
-      actions.clickOnElementWithText(' Save Stage');
       actions.waitForActionToComplete(2000);
+      actions.clickOnElementWithText(' Save Stage');
+      actions.waitForActionToComplete(500);
       actions.iSeeValueIn('#name','independentauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
@@ -47,7 +44,7 @@ module.exports = function (actions) {
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
       actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(1000);
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkElementWithTextIsDisabled(' New Form');
       actions.checkElementWithTextIsDisabled(' Edit');
@@ -58,19 +55,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Data');
       actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
       actions.checkElementWithTextIsNotDisabled(' Export CSV');
-      actions.clickOnElementWithText('Resources');
-      actions.checkElementWithTextIsDisabled(' New Resource');
-      actions.checkElementWithTextIsDisabled(' Edit');
-      actions.checkElementWithTextIsDisabled(' Actions');
-      actions.checkElementWithTextIsDisabled(' Access');
-      actions.checkElementWithTextIsNotDisabled(' Use');
-      actions.clickOnElementWithText(' Data');
-      actions.checkElementWithTextIsNotDisabled('{...} Export JSON');
-      actions.checkElementWithTextIsNotDisabled(' Export CSV');
       actions.clickOnElementWithText('Settings');
-      actions.checkElement('//*[@id="protect"]');
-      actions.clickOnElementWithText(' Save Stage');
-      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('On-Premise Environment');
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable On-Premise Environments.');
       actions.clickOnElementWithText('API Keys');
@@ -83,7 +68,9 @@ module.exports = function (actions) {
     });
     describe('Independent  Plan > Deployment Settings',function(){
       actions.clickOnElementWithText('Settings');
-      actions.waitForActionToComplete(1000);
+      actions.checkElement('//*[@id="protect"]');
+      actions.clickOnElementWithText(' Save Stage');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Staging');
       actions.iSeeText('Upgrade your project to Enterprise to enable deploying to stages.');
       actions.clickOnElementWithText('Create Version Tag');
@@ -95,6 +82,8 @@ module.exports = function (actions) {
     });
     describe('Independent  Plan > Integrations Settings',function(){
       actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('PDF Management');
+      actions.checkingUrlEndsWith('env/pdf');
       actions.clickOnElementWithText('Integrations');
       actions.checkingUrlEndsWith('env/integrations/info');
       actions.clickOnElementWithText('Email Providers');
@@ -162,7 +151,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('File Storage');
       actions.iSeeText('Upgrade your project to a paid plan to access file storage settings.');
       actions.clickOnElementWithText('Data Connections');
-      // actions.clickOnElementWithText('OAuth');
+      actions.clickOnElementWithText('OAuth');
     });
     describe('Deleting independentProject',function(){
       actions.clickOnClass('.fa.fa-cog');
