@@ -311,10 +311,10 @@ app.directive('formList', function() {
 
         $scope.$watch('search.title', function(input) {
           if (input.length > 0) {
-            query.params['title__regex'] = '/' + input + '/i';
+            query.params.title__regex = '/' + input + '/i';
           }
           else {
-            delete query.params['title__regex'];
+            delete query.params.title__regex;
           }
           $scope.setPage();
         });
