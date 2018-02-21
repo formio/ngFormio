@@ -96,7 +96,10 @@ app.controller('RoleController', [
 
       $scope.role = _.cloneDeep($scope.originalRole);
       // Load forms that assign this role permissions
-      $scope.formio.loadForms().then(function(result) {
+      $scope.formio.loadForms({params: {
+        select: '_id,title,type,submissionAccess',
+        limit: 10000
+      }}).then(function(result) {
         if (!result) {
           $scope.assignedForms = [];
           return;
