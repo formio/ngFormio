@@ -6,6 +6,7 @@ var app = angular.module('formioApp.controllers.form', [
   'ui.bootstrap.tabs',
   'ui.bootstrap.tpls',
   'ui.bootstrap.accordion',
+  'ui.bootstrap.pagination',
   'ngFormBuilder',
   'formio',
   'bgf.paginateAnything',
@@ -246,12 +247,9 @@ app.directive('formList', function() {
       formioReady: '=',
       projectUrl: '=',
       formType: '=',
-      numPerPage: '=',
+      numPerPage: '=?',
       listMode: '=',
       protected: '=?'
-    },
-    compile: function(element, attrs) {
-      if (!attrs.numPerPage) { attrs.numPerPage = 25; }
     },
     controller: [
       '$scope',
@@ -273,22 +271,54 @@ app.directive('formList', function() {
         $rootScope.activeSideBar = 'projects';
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
-        $scope.search = {};
+        if (!$scope.numPerPage) {
+          $scope.numPerPage = 25;
+        }
+        $scope.totalItems = 0;
+        $scope.currentPage = 1;
+        $scope.search = {title: ''};
         $scope.forms = [];
-        $scope.formioReady.then(function(formio) {
-          var query = {
-            params: {
-              limit: 9999999
-            }
-          };
-          if ($scope.formType) {
-            query.params.type = $scope.formType;
-          }
-          formio.loadForms(query).then(function(forms) {
+
+        var query = {params: {
+          select: '_id,title,type,path,modified',
+          limit: $scope.numPerPage,
+          skip: 0
+        }};
+        if ($scope.formType) {
+          query.params.type = $scope.formType;
+        }
+
+        var getItems = function(formio) {
+          $scope.formsLoading = true;
+          formio.loadForms(query).then(function (forms) {
+            $scope.totalItems = forms.serverCount;
             $scope.forms = forms;
-            $scope.formsFinished = true;
+            $scope.formsLoading = false;
           });
+        };
+
+        var formio = null;
+        $scope.setPage = function() {
+          query.params.skip = ($scope.currentPage - 1) * query.params.limit;
+          if (formio) {
+            return getItems(formio);
+          }
+          $scope.formioReady.then(function(instance) {
+            formio = instance;
+            getItems(instance);
+          });
+        };
+
+        $scope.$watch('search.title', function(input) {
+          if (input.length > 0) {
+            query.params.title__regex = '/' + input + '/i';
+          }
+          else {
+            delete query.params.title__regex;
+          }
+          $scope.setPage();
         });
+
         $scope.export = function(form, type) {
           $scope.isBusy = true;
           SubmissionExport.export($scope.formio, form, type).then(function() {

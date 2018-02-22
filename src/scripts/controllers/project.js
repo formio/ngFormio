@@ -295,7 +295,6 @@ app.controller('ProjectController', [
       $scope[formType + 'sLoading'] = false;
       angular.element('#' + formType + '-loader').hide();
     });
-    $scope.formsLoading = true;
     $scope.forms = [];
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.localFormio = $scope.formio;
@@ -771,7 +770,8 @@ app.controller('ProjectOverviewController', [
           params: {
             type: 'form',
             modified__gt: projectCreated,
-            sort: '-modified'
+            sort: '-modified',
+            select: 'type,title,_id'
           }
         })
         .then(function(forms) {
@@ -783,7 +783,8 @@ app.controller('ProjectOverviewController', [
           params: {
             type: 'resource',
             modified__gt: projectCreated,
-            sort: '-modified'
+            sort: '-modified',
+            select: 'type,title,_id'
           }
         })
         .then(function(forms) {
