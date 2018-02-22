@@ -311,6 +311,7 @@ app.directive('formList', function() {
 
         $scope.$watch('search.title', function(input) {
           if (input.length > 0) {
+            $scope.currentPage = 1;
             query.skip = 0;
             query.params.title__regex = '/' + input + '/i';
           }
