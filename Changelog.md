@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.29.0
+### Changed
+ - The datagrid to use thead for header and tbody for content.
+
+### Fixed
+ - Many issues with labels and hide label.
+
 ## 2.28.6
 ### Changed
  - Upgraded formio.js to 2.29.3

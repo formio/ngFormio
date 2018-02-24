@@ -55,7 +55,7 @@ module.exports = function(app) {
           // This hides the default label layout so we can use a special inline label
           hideLabel: false,
           label: '',
-          datagridLabel: true,
+          dataGridLabel: false,
           key: 'checkboxField',
           defaultValue: false,
           protected: false,

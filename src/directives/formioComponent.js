@@ -61,6 +61,20 @@ module.exports = [
             silentEvents: ['click', 'focus']
           };
 
+          // Determine if the label should be visible.
+          $scope.labelVisible = function(position) {
+            var visible = $scope.component.inDataGrid ?
+              !!$scope.component.dataGridLabel :
+              $scope.component.label && !$scope.component.hideLabel;
+            if (!position) {
+              return visible;
+            }
+            return visible && (
+              ($scope.component.labelPosition && $scope.component.labelPosition === position) ||
+              (!$scope.component.labelPosition && position === 'top')
+            );
+          };
+
           // See if this component is visible or not.
           $scope.isVisible = function(component, row) {
             if ($scope.options && $scope.options.building) return true;
