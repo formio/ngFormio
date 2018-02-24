@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.29.1
+### Fixed
+ - Issue where if a component shows its label in a datagrid, it would also show up in the header. That is redundant.
+
 ## 2.29.0
 ### Changed
  - The datagrid to use thead for header and tbody for content.
