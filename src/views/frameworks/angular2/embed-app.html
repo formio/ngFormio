@@ -5,47 +5,53 @@
       <li class="list-group-item">
         <div class="list-group-item-title">
           <span class="count-badge">A</span>
-          <h5>Uncontrolled Embed</h5>
+          <h5>Hosted Form Embed</h5>
         </div>
         <p>Include the <strong>&lt;formio&gt;</strong> component within a component</p>
         <strong>main.component.ts</strong>
       <pre><code>import { Component } from '@angular/core';
 
 @Component({
-&nbsp;&nbsp;template: '&lt;formio src="{{ variables.projectUrl }}/demographics" /&gt;'
+&nbsp;&nbsp;template: '&lt;formio src="{{ variables.projectUrl }}/demographics" (submit)="onSubmit($event.value)" /&gt;'
 })
-
-export class MainComponent {}</code></pre>
+export class MainComponent {
+&nbsp;&nbsp;onSubmit(submission) {
+&nbsp;&nbsp;&nbsp;&nbsp;alert(submission);
+&nbsp;&nbsp;}
+}</code></pre>
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
           <span class="count-badge">B</span>
-          <h5>Controlled Embed</h5>
+          <h5>JSON Form Embed</h5>
         </div>
-        <p>This is similar to the uncontrolled embed but we are going to load the form first and then pass it to the formio directive. </p>
+        <p>This is similar to the hosted form embed but we are going to pass the JSON form object directly to the formio directive. </p>
       <pre><code>import { Component } from '@angular/core';
 
-        @Component({
-        &nbsp;&nbsp;template: '&lt;formio form="form" /&gt;'
-        })
-
-        export class MainComponent {}</code></pre>
-        <p>In this case the form scope variable is loaded by a controller using the formio.js library.</p>
+@Component({
+&nbsp;&nbsp;template: '&lt;formio form="{
+&nbsp;&nbsp;&nbsp;&nbsp;components: [
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type: 'textfield',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: 'First Name',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key: 'firstName',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;input: true
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type: 'textfield',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label: 'Last Name',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key: 'lastName',
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;input: true
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+&nbsp;&nbsp;&nbsp;&nbsp;]
+&nbsp;&nbsp;}" (submit)="onSubmit($event.value)" /&gt;'
+})
+export class MainComponent {
+&nbsp;&nbsp;onSubmit(submission) {
+&nbsp;&nbsp;&nbsp;&nbsp;alert(submission);
+&nbsp;&nbsp;}
+}</code></pre>
       </li>
-      <!--<li class="list-group-item">-->
-        <!--<div class="list-group-item-title">-->
-          <!--<span class="count-badge">C</span>-->
-          <!--<h5>As Resource Form with Helper Provider</h5>-->
-        <!--</div>-->
-        <!--<p>If you have installed the ngFormioHelper library, you can use it to automatically set up pages and controllers for you using just the form URL.</p>-->
-        <!--<p>You can do this by registering your resource form in the app.config stage like this</p>-->
-        <!--<p><pre>-->
-<!--app.config(function(config, FormioResourceProvider) {-->
-  <!--FormioResourceProvider.register('demographic', AppConfig.forms.demographicsForm);-->
-<!--});</pre></p>-->
-        <!--<p>This will automatically create several ui-router states, templates and controllers that make it easy to use the form within your application. After loading your app, try going to <strong>/demographic</strong> and see what all is there. </p>-->
-        <!--<p>For more information on the FormioResource Provider, see <a href="https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider" target="_blank">https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider</a> </p>-->
-      <!--</li>-->
     </ul>
   </div>
 </div>
