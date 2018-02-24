@@ -7742,6 +7742,7 @@ var ButtonComponent = exports.ButtonComponent = function (_BaseComponent) {
       this.createElement();
       this.element.appendChild(this.button = this.ce(this.info.type, this.info.attr));
       this.addShortcut(this.button);
+      this.hook('input', this.button, this.element);
 
       if (this.component.label) {
         this.labelElement = this.text(this.addShortcutToLabel());
@@ -9570,6 +9571,7 @@ var DayComponent = exports.DayComponent = function (_BaseComponent) {
         placeholder: _lodash2.default.get(this.component, 'fields.day.placeholder', ''),
         id: id
       });
+      this.hook('input', this.dayInput, dayInputWrapper);
       this.addEventListener(this.dayInput, 'change', function () {
         return _this2.updateValue();
       });
@@ -9607,6 +9609,7 @@ var DayComponent = exports.DayComponent = function (_BaseComponent) {
         class: 'form-control',
         id: id
       });
+      this.hook('input', this.monthInput, monthInputWrapper);
       this.selectOptions(this.monthInput, 'monthOption', this.months);
       var self = this;
 
@@ -9659,6 +9662,8 @@ var DayComponent = exports.DayComponent = function (_BaseComponent) {
         value: new Date().getFullYear(),
         id: id
       });
+
+      this.hook('input', this.yearInput, yearInputWrapper);
       this.addEventListener(this.yearInput, 'change', function () {
         return _this3.updateValue();
       });
@@ -10604,8 +10609,8 @@ var FileComponent = exports.FileComponent = function (_BaseComponent) {
   }, {
     key: 'build',
     value: function build() {
-      // Set default to empty array.
-      this.setValue([]);
+      // Restore the value.
+      this.restoreValue();
 
       var labelAtTheBottom = this.component.labelPosition === 'bottom';
 
@@ -10620,6 +10625,7 @@ var FileComponent = exports.FileComponent = function (_BaseComponent) {
       this.inputsContainer.appendChild(this.listContainer);
       this.uploadContainer = this.buildUpload();
       this.hiddenFileInputElement = this.buildHiddenFileInput();
+      this.hook('input', this.hiddenFileInputElement, this.inputsContainer);
       this.inputsContainer.appendChild(this.hiddenFileInputElement);
       this.inputsContainer.appendChild(this.uploadContainer);
       this.addWarnings(this.inputsContainer);
@@ -11138,7 +11144,8 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
   _createClass(FormComponent, [{
     key: 'loadSubForm',
     value: function loadSubForm() {
-      if (this.subFormLoaded) {
+      // Only load the subform if the subform isn't loaded and the conditions apply.
+      if (this.subFormLoaded || !_get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'checkConditions', this).call(this, this.root ? this.root.data : this.data)) {
         return true;
       }
       this.subFormLoaded = true;
@@ -11203,9 +11210,9 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
     }
   }, {
     key: 'checkValidity',
-    value: function checkValidity() {
+    value: function checkValidity(data, dirty) {
       // Maintain isolated data scope when passing root data for validity checks.
-      return _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'checkValidity', this).call(this, this.subData);
+      return _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'checkValidity', this).call(this, this.subData, dirty);
     }
   }, {
     key: 'checkConditions',
@@ -11233,10 +11240,15 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
   }, {
     key: 'beforeNext',
     value: function beforeNext() {
+      var _this2 = this;
+
       // If we wish to submit the form on next page, then do that here.
       if (this.component.submit) {
         this.submitted = true;
-        return this.submit(true);
+        return this.submit(true).then(function (submission) {
+          // Set data to submission.
+          return _this2.data[_this2.component.key] = submission;
+        });
       } else {
         return _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'beforeNext', this).call(this);
       }
@@ -11249,17 +11261,17 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
   }, {
     key: 'beforeSubmit',
     value: function beforeSubmit() {
-      var _this2 = this;
+      var _this3 = this;
 
       // Ensure we submit the form.
       if (this.component.submit && !this.submitted) {
         return this.submit(true).then(function (submission) {
           // Before we submit, we need to filter out the references.
-          _this2.data[_this2.component.key] = _this2.component.reference ? {
+          _this3.data[_this3.component.key] = _this3.component.reference ? {
             _id: submission._id,
             form: submission.form
           } : submission;
-          return _this2.data[_this2.component.key];
+          return _this3.data[_this3.component.key];
         });
       } else {
         return _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'beforeSubmit', this).call(this);
@@ -11308,10 +11320,10 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
   }, {
     key: 'whenReady',
     value: function whenReady() {
-      var _this3 = this;
+      var _this4 = this;
 
       return this.ready.then(function () {
-        return _this3.readyPromise;
+        return _this4.readyPromise;
       });
     }
   }, {
@@ -11337,7 +11349,7 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
   }, {
     key: 'setValue',
     value: function setValue(submission, flags) {
-      var _this4 = this;
+      var _this5 = this;
 
       flags = this.getFlags.apply(this, arguments);
       if (!submission) {
@@ -11362,11 +11374,11 @@ var FormComponent = exports.FormComponent = function (_FormioForm) {
         this.formio.submissionId = submission._id;
         this.formio.submissionUrl = this.formio.submissionsUrl + '/' + submission._id;
         this.formReady.then(function () {
-          _this4._loading = false;
-          _this4.loading = true;
-          _this4.formio.loadSubmission().then(function (result) {
-            _this4.loading = false;
-            _this4.setValue(result, {
+          _this5._loading = false;
+          _this5.loading = true;
+          _this5.formio.loadSubmission().then(function (result) {
+            _this5.loading = false;
+            _this5.setValue(result, {
               noload: true
             });
           });
@@ -13233,6 +13245,7 @@ var SelectComponent = exports.SelectComponent = function (_BaseComponent) {
         return;
       }
 
+      var useSearch = this.component.hasOwnProperty('searchEnabled') ? this.component.searchEnabled : true;
       var placeholderValue = this.t(this.component.placeholder);
       var choicesOptions = {
         removeItemButton: this.component.removeItemButton || this.component.multiple || false,
@@ -13246,7 +13259,7 @@ var SelectComponent = exports.SelectComponent = function (_BaseComponent) {
         searchPlaceholderValue: placeholderValue,
         shouldSort: false,
         position: this.component.dropdown || 'auto',
-        searchEnabled: this.component.searchEnabled || false
+        searchEnabled: useSearch
       };
 
       var tabIndex = input.tabIndex;
@@ -15691,6 +15704,10 @@ var FormioForm = function (_FormioComponents) {
       // Normalize the error.
       if (typeof error === 'string') {
         error = { message: error };
+      }
+
+      if ('details' in error) {
+        error = error.details;
       }
 
       return this.showErrors(error);

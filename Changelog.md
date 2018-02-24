@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.29.0
 ### Changed
  - The datagrid to use thead for header and tbody for content.
+ - Upgraded formiojs@2.29.6, bootstrap-ui-datetime-picker@2.6.1, eslint@4.18.1, browserify@16.1.0
 
 ### Fixed
  - Many issues with labels and hide label.
