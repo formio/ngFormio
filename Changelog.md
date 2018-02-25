@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.29.4
+### Fixed
+ - Ensure that autofocus is set to false for text areas.
+
 ## 2.29.3
 ### Changed
  - The default labels and keys to be something more practical.

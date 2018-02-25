@@ -93,7 +93,7 @@ module.exports = function(app) {
           }
         ],
         settings: {
-          autofocus: true,
+          autofocus: false,
           input: true,
           tableView: true,
           label: 'Text Area',
