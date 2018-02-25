@@ -64,6 +64,8 @@ module.exports = function(app) {
         viewTemplate: 'formio/components/htmlelement.html',
         settings: {
           key: 'html',
+          label: 'Content',
+          hideLabel: true,
           input: false,
           tag: 'p',
           attrs: [],
