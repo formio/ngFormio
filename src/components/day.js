@@ -203,8 +203,8 @@ module.exports = function(app) {
           autofocus: false,
           input: true,
           tableView: true,
-          label: 'Day Field',
-          key: 'dayField',
+          label: 'Day',
+          key: 'day',
           fields: {
             day: {
               type: 'number',

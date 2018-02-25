@@ -11,6 +11,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           clearOnHide: false,
+          label: 'Columns',
           hideLabel: true,
           input: false,
           tableView: false,

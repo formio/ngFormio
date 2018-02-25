@@ -591,8 +591,8 @@ module.exports = function(app) {
           autofocus: false,
           input: true,
           tableView: true,
-          label: 'Select Field',
-          key: 'selectField',
+          label: 'Select',
+          key: 'select',
           placeholder: '',
           data: {
             values: [],
