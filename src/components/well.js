@@ -11,6 +11,7 @@ module.exports = function(app) {
         group: 'layout',
         settings: {
           clearOnHide: false,
+          hideLabel: true,
           key: 'well',
           input: false,
           components: [],
