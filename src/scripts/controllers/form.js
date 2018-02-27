@@ -2183,11 +2183,13 @@ app.controller('FormSubmissionController', [
   '$state',
   '$stateParams',
   'Formio',
+  'PDFServer',
   function(
     $scope,
     $state,
     $stateParams,
-    Formio
+    Formio,
+    PDFServer
   ) {
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.loadProjectPromise.then(function(project) {
@@ -2207,11 +2209,14 @@ app.controller('FormSubmissionController', [
         });
 
         $scope.loadFormPromise.then(function(form) {
-          $scope.formio.getDownloadUrl(form).then(function(url) {
-            if (primaryProject._id !== project._id) {
-              url += '&project=' + primaryProject._id;
-            }
-            $scope.downloadUrl = url;
+          // Ensure our project in the PDF server.
+          PDFServer.ensureProject($scope.primaryProjectPromise).then(function() {
+            $scope.formio.getDownloadUrl(form).then(function (url) {
+              if (primaryProject._id !== project._id) {
+                url += '&project=' + primaryProject._id;
+              }
+              $scope.downloadUrl = url;
+            });
           });
 
           $scope.formio.loadSubmission().then(function(submission) {
