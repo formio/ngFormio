@@ -3,7 +3,7 @@
     {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
   </label>
-  <div class="formio-data-grid" id="{{ component.key }}">
+  <div class="formio-data-grid" id="formio-editgrid-{{ component.key }}">
     <ul class="list-group">
       <li ng-if="component.templates.header" class="list-group-item list-group-header">
         <render-template template="component.templates.header" data="headerData" />

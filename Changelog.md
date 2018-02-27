@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.30.0
+### Changed
+ - Changed component ID's to not use the component key, but rather formio-{{ component.type }}-{{ component.key }} 
+   in order to keep application style collisions to a minimum.
+
 ## 2.29.6
 ### Fixed
  - Fixed the label positions for left and right.
