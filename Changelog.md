@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.29.6
+### Fixed
+ - Fixed the label positions for left and right.
+
+### Changed
+ - The provided ID for content components so that it does not collide with page components.
+
 ## 2.29.5
 ### Added
  - Default label for HTML component and hide label.

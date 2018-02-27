@@ -1,5 +1,5 @@
 <div ng-if="!component.addResource">
-  <label ng-if="labelVisible('top')" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)"
+  <label ng-if="labelVisible() && (component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}" ng-style="getLabelStyles(component)"
          id="{{ componentId+'Label'}}">
     {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
@@ -15,7 +15,7 @@
       <button ng-if="hasNextPage && ($index == $select.items.length-1)" class="btn btn-success btn-block" ng-click="loadMoreItems($select, $event)" ng-disabled="resourceLoading">Load more...</button>
     </ui-select-choices>
   </ui-select>
-  <label ng-if="labelVisible('bottom')" for="{{ componentId }}" class="control-label control-label--bottom" ng-class="{'field-required': isRequired(component)}"
+  <label ng-if="labelVisible() && (component.labelPosition === 'bottom')" for="{{ componentId }}" class="control-label control-label--bottom" ng-class="{'field-required': isRequired(component)}"
          id="{{ componentId+'Label' }}">
     {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>

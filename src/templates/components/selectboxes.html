@@ -26,7 +26,7 @@
   </div>
 </fieldset>
 <div class="select-boxes" ng-if="!component.fieldSet">
-  <label ng-if="labelVisible('top')" for="{{ componentId }}" class="control-label" id="{{ componentId+'Label' }}" ng-class="{'field-required': isRequired(component)}"
+  <label ng-if="labelVisible() && (component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label" id="{{ componentId+'Label' }}" ng-class="{'field-required': isRequired(component)}"
          ng-style="getLabelStyles(component)">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>
@@ -47,7 +47,7 @@
     options="options"
     ng-style="getInputGroupStyles(component)"
   ></formio-select-boxes>
-  <label ng-if="labelVisible('bottom')" for="{{ componentId }}" class="control-label control-label--bottom" id="{{ componentId +'Desc'}}"
+  <label ng-if="labelVisible() && (component.labelPosition === 'bottom')" for="{{ componentId }}" class="control-label control-label--bottom" id="{{ componentId +'Desc'}}"
          ng-class="{'field-required': isRequired(component)}">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>

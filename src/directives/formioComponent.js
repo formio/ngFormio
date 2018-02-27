@@ -62,17 +62,10 @@ module.exports = [
           };
 
           // Determine if the label should be visible.
-          $scope.labelVisible = function(position) {
-            var visible = $scope.component.inDataGrid ?
+          $scope.labelVisible = function() {
+            return $scope.component.inDataGrid ?
               !!$scope.component.dataGridLabel :
-              $scope.component.label && !$scope.component.hideLabel;
-            if (!position) {
-              return visible;
-            }
-            return visible && (
-              ($scope.component.labelPosition && $scope.component.labelPosition === position) ||
-              (!$scope.component.labelPosition && position === 'top')
-            );
+              ($scope.component.label && !$scope.component.hideLabel);
           };
 
           // See if this component is visible or not.
