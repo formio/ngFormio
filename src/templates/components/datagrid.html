@@ -7,7 +7,7 @@
           ng-repeat="col in cols track by $index"
           ng-class="{'field-required': col.validate.required}"
           ng-if="options.building ? '::true' : anyVisible(col)"
-        ><span ng-if="!col.dataGridLabel && !col.hideLabel">{{ col.label | formioTranslate:null:options.building }}</span></th>
+        ><span ng-if="!col.dataGridLabel && (col.input || !col.hideLabel)">{{ col.label | formioTranslate:null:options.building }}</span></th>
         <th style="padding-left: 9px;">
           <div style="padding: 0; margin-bottom: 0;" class="datagrid-add" ng-if="(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both')">
             <a ng-click="(readOnly || formioForm.submitting)? null: addRow() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary">

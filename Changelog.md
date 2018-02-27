@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.30.1
+### Fixed
+ - Problems where DataGrid would not show labels of input elements in columns.
+
 ## 2.30.0
 ### Changed
  - Changed component ID's to not use the component key, but rather formio-{{ component.type }}-{{ component.key }} 
