@@ -43,6 +43,7 @@
       <ul ng-if="$state.current.name.indexOf('project.env.authentication') !== -1" class="nav nav-pills nav-stacked">
         <li role="presentation" ng-class="{active:($state.includes('project.env.authentication.formio'))}"><a ui-sref="project.env.authentication.formio">Form.io Auth</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.authentication.oauth'))}"><a ui-sref="project.env.authentication.oauth">OAuth</a></li>
+        <li role="presentation" ng-class="{active:($state.includes('project.env.authentication.ldap'))}"><a ui-sref="project.env.authentication.ldap">LDAP</a></li>
         <li role="presentation" ng-class="{active:($state.includes('project.env.authentication.saml'))}"><a ui-sref="project.env.authentication.saml">SAML</a></li>
       </ul>
     </li>
