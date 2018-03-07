@@ -906,7 +906,6 @@ app.controller('ChartController', [
     moment
   ) {
 
-    // Don't load analytics for on premise projects.
     $scope.loadProjectPromise.then(function() {
       // Get the current time.
       var curr = new Date();
