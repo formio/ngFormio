@@ -319,7 +319,6 @@ app.controller('ProjectController', [
     };
 
     $scope._saveProject = function(project, formio) {
-      console.log($scope.primaryProject, $scope.localProject, $scope.currentProject, project);
       if (!project._id) { return FormioAlerts.onError(new Error('No Project found.')); }
       if ($scope.status.save === 'saving') {
         return;
