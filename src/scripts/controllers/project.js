@@ -319,9 +319,20 @@ app.controller('ProjectController', [
     };
 
     $scope._saveProject = function(project, formio) {
+      console.log($scope.primaryProject, $scope.localProject, $scope.currentProject, project);
       if (!project._id) { return FormioAlerts.onError(new Error('No Project found.')); }
       if ($scope.status.save === 'saving') {
         return;
+      }
+
+      // If the remote project name changes, be sure to update the link as well.
+      if (
+        $scope.localProject.hasOwnProperty('remote') &&
+        $scope.localProject._id !== $scope.currentProject._id &&
+        $scope.localProject.remote.name !== project.name
+      ) {
+        $scope.localProject.remote.project.name = project.name;
+        $scope.localFormio.saveProject($scope.localProject);
       }
 
       formio = formio || (new Formio('/project/' + project._id));
@@ -895,187 +906,191 @@ app.controller('ChartController', [
     ProjectAnalytics,
     moment
   ) {
-    // Get the current time.
-    var curr = new Date();
-    $scope.viewDate = {
-      year: curr.getUTCFullYear(),
-      month: (curr.getUTCMonth() + 1),
-      day: curr.getUTCDate()
-    };
-    $scope.label = {
-      year: 'Yearly Submission Requests by Month',
-      month: 'Monthly Submission Requests by Day',
-      day: 'Daily Submission Requests by Hour'
-    };
-    $scope.analyticsOptions = {
-      height: '300px',
-      low: 0,
-      lineSmooth: false,
-      axisY: {
-        onlyInteger: true
-      }
-    };
-    $scope.analyticsEvents = {
-      draw: function(data) {
-        // FOR-163 - ie hack for charts not supporting foreignObject; translate the svg text labels.
-        if (data.type === 'label') {
-          if (typeof SVGForeignObjectElement !== 'function') {
-            data.element.attr({
-              transform: 'rotate(30 ' + data.x + ' ' + data.y + ')'
+
+    // Don't load analytics for on premise projects.
+    $scope.loadProjectPromise.then(function() {
+      // Get the current time.
+      var curr = new Date();
+      $scope.viewDate = {
+        year: curr.getUTCFullYear(),
+        month: (curr.getUTCMonth() + 1),
+        day: curr.getUTCDate()
+      };
+      $scope.label = {
+        year: 'Yearly Submission Requests by Month',
+        month: 'Monthly Submission Requests by Day',
+        day: 'Daily Submission Requests by Hour'
+      };
+      $scope.analyticsOptions = {
+        height: '300px',
+        low: 0,
+        lineSmooth: false,
+        axisY: {
+          onlyInteger: true
+        }
+      };
+      $scope.analyticsEvents = {
+        draw: function(data) {
+          // FOR-163 - ie hack for charts not supporting foreignObject; translate the svg text labels.
+          if (data.type === 'label') {
+            if (typeof SVGForeignObjectElement !== 'function') {
+              data.element.attr({
+                transform: 'rotate(30 ' + data.x + ' ' + data.y + ')'
+              });
+            }
+          }
+
+          // Intercept each chart point and register a click event.
+          if(data.type === 'point') {
+            // Register a click event to modify the graph based on the current view and click location.
+            data.element._node.onclick = function() {
+              if($scope.currentType === 'year') {
+                // Adjust month for non-zero index.
+                $scope.viewDate.month = (data.index + 1);
+                $scope.displayView('month', true);
+              }
+              else if($scope.currentType === 'month') {
+                // Adjust day for non-zero index.
+                $scope.viewDate.day = (data.index + 1);
+                $scope.displayView('day', true);
+              }
+            };
+          }
+        }
+      };
+
+      /**
+       * View switcher utility to graph the data for the current view type.
+       *
+       * @param {String} type
+       *   The type of view to display: year, month, view.
+       * @param {Boolean} [cached]
+       *   If the view should use the the $scope.viewDate time rather than the current time.
+       */
+      $scope.displayView = function(type, cached) {
+        var _y = curr.getUTCFullYear();
+        var _m = curr.getUTCMonth() + 1;
+        var _d = curr.getUTCDate();
+        if(cached) {
+          $scope.graphType = '';
+          _y = $scope.viewDate.year;
+          _m = $scope.viewDate.month;
+          _d = $scope.viewDate.day;
+        }
+        else {
+          // Clear the cache values;
+          $scope.viewDate.year = _y;
+          $scope.viewDate.month = _m;
+          $scope.viewDate.day = _d;
+        }
+
+        if(type === 'year') {
+          $scope.analyticsLoading = true;
+          ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y)
+            .then(function(data) {
+              $scope.currentType = type;
+              $scope.analytics = {
+                labels: _.map(_.map(data, 'month'), function(month) {
+                  return _.add(month, 1);
+                }),
+                series: [
+                  _.map(data, 'submissions')
+                ]
+              };
+
+              $scope.analyticsLoading = false;
             });
-          }
         }
+        else if(type === 'month') {
+          $scope.analyticsLoading = true;
+          ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m)
+            .then(function(data) {
+              $scope.currentType = type;
+              $scope.analytics = {
+                labels: _.map(_.map(data, 'day'), function(day) {
+                  return _.add(day, 1);
+                }),
+                series: [
+                  _.map(data, 'submissions')
+                ]
+              };
 
-        // Intercept each chart point and register a click event.
-        if(data.type === 'point') {
-          // Register a click event to modify the graph based on the current view and click location.
-          data.element._node.onclick = function() {
-            if($scope.currentType === 'year') {
-              // Adjust month for non-zero index.
-              $scope.viewDate.month = (data.index + 1);
-              $scope.displayView('month', true);
+              $scope.analyticsLoading = false;
+            });
+        }
+        else if(type === 'day') {
+          $scope.analyticsLoading = true;
+
+          /**
+           * Get the local hourly timestamps that relate to utc 0-23 to display as labels.
+           *
+           * @param year {Number}
+           *   The current year in question.
+           * @param month {Number}
+           *   The current month in question.
+           * @param day {Number}
+           *   The current day in question.
+           *
+           * @returns {Array}
+           *   The Labels to be associated with utc 0-23 corresponding data.
+           */
+          var calculateLocalTimeLabels = function(year, month, day) {
+            var local = [];
+
+            // Calculate the current utc offset in rounded hours.
+            var start = null;
+            var time = moment(year + ' ' + month + ' ' + day, 'YYYY MM DD');
+            var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
+            if(offset > 0) {
+              // Behind utc by the given amount.
+              start = (24 - offset);
+              time.subtract(1, 'days');
             }
-            else if($scope.currentType === 'month') {
-              // Adjust day for non-zero index.
-              $scope.viewDate.day = (data.index + 1);
-              $scope.displayView('day', true);
+            else {
+              // Current timezone is ahead of utc.
+              start = (0 - offset);
             }
+
+            // Change the am flag based on the start of display labels.
+            var am = (start > 11) ? false : true;
+            for(var i = 0; i < 24; i++) {
+              // Flip the am flag when the clock wraps around.
+              var output = ((start + i) % 12);
+              if(output === 0) {
+                am = !am;
+
+                // When the am flag wraps, set the output to 12 rather than 0.
+                output = 12;
+
+                time.add(1, 'days');
+              }
+
+              // Add each label sequentially in the utc order.
+              local.push('' + output + (am ? 'AM' : 'PM') + ' ' + time.format('M/D/YYYY'));
+            }
+
+            return local;
           };
+
+          ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m, _d)
+            .then(function(data) {
+              $scope.currentType = type;
+              var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
+
+              $scope.analytics = {
+                labels: displayHrs,
+                series: [_.map(data, 'submissions')]
+              };
+
+              $scope.analyticsLoading = false;
+            });
         }
-      }
-    };
-
-    /**
-     * View switcher utility to graph the data for the current view type.
-     *
-     * @param {String} type
-     *   The type of view to display: year, month, view.
-     * @param {Boolean} [cached]
-     *   If the view should use the the $scope.viewDate time rather than the current time.
-     */
-    $scope.displayView = function(type, cached) {
-      var _y = curr.getUTCFullYear();
-      var _m = curr.getUTCMonth() + 1;
-      var _d = curr.getUTCDate();
-      if(cached) {
-        $scope.graphType = '';
-        _y = $scope.viewDate.year;
-        _m = $scope.viewDate.month;
-        _d = $scope.viewDate.day;
-      }
-      else {
-        // Clear the cache values;
-        $scope.viewDate.year = _y;
-        $scope.viewDate.month = _m;
-        $scope.viewDate.day = _d;
-      }
-
-      if(type === 'year') {
-        $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y)
-          .then(function(data) {
-            $scope.currentType = type;
-            $scope.analytics = {
-              labels: _.map(_.map(data, 'month'), function(month) {
-                return _.add(month, 1);
-              }),
-              series: [
-                _.map(data, 'submissions')
-              ]
-            };
-
-            $scope.analyticsLoading = false;
-          });
-      }
-      else if(type === 'month') {
-        $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m)
-          .then(function(data) {
-            $scope.currentType = type;
-            $scope.analytics = {
-              labels: _.map(_.map(data, 'day'), function(day) {
-                return _.add(day, 1);
-              }),
-              series: [
-                _.map(data, 'submissions')
-              ]
-            };
-
-            $scope.analyticsLoading = false;
-          });
-      }
-      else if(type === 'day') {
-        $scope.analyticsLoading = true;
-
-        /**
-         * Get the local hourly timestamps that relate to utc 0-23 to display as labels.
-         *
-         * @param year {Number}
-         *   The current year in question.
-         * @param month {Number}
-         *   The current month in question.
-         * @param day {Number}
-         *   The current day in question.
-         *
-         * @returns {Array}
-         *   The Labels to be associated with utc 0-23 corresponding data.
-         */
-        var calculateLocalTimeLabels = function(year, month, day) {
-          var local = [];
-
-          // Calculate the current utc offset in rounded hours.
-          var start = null;
-          var time = moment(year + ' ' + month + ' ' + day, 'YYYY MM DD');
-          var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
-          if(offset > 0) {
-            // Behind utc by the given amount.
-            start = (24 - offset);
-            time.subtract(1, 'days');
-          }
-          else {
-            // Current timezone is ahead of utc.
-            start = (0 - offset);
-          }
-
-          // Change the am flag based on the start of display labels.
-          var am = (start > 11) ? false : true;
-          for(var i = 0; i < 24; i++) {
-            // Flip the am flag when the clock wraps around.
-            var output = ((start + i) % 12);
-            if(output === 0) {
-              am = !am;
-
-              // When the am flag wraps, set the output to 12 rather than 0.
-              output = 12;
-
-              time.add(1, 'days');
-            }
-
-            // Add each label sequentially in the utc order.
-            local.push('' + output + (am ? 'AM' : 'PM') + ' ' + time.format('M/D/YYYY'));
-          }
-
-          return local;
-        };
-
-        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m, _d)
-          .then(function(data) {
-            $scope.currentType = type;
-            var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
-
-            $scope.analytics = {
-              labels: displayHrs,
-              series: [_.map(data, 'submissions')]
-            };
-
-            $scope.analyticsLoading = false;
-          });
-      }
-    };
-    $scope.types = ['Year', 'Month', 'Day'];
-    $scope.graphChange = function() {
-      $scope.displayView(($scope.graphType || '').toLowerCase());
-    };
+      };
+      $scope.types = ['Year', 'Month', 'Day'];
+      $scope.graphChange = function() {
+        $scope.displayView(($scope.graphType || '').toLowerCase());
+      };
+    });
   }
 ]);
 
