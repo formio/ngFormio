@@ -1,7 +1,7 @@
 <upgrade-warning ng-if="!minPlan('commercial') && projectSettingsVisible()" warning="Upgrade your project to a paid plan to configure LDAP settings."></upgrade-warning>
 <h2>LDAP</h2>
 <div class="well">
-  <p>LDAP Server must be accessible to the form.io server hosting the project. The Admin DN and Password should have sufficient rights to search and validate users.</p>
+  <p>LDAP Server must be accessible to the form.io server hosting the project. The Bind DN and Password should have sufficient rights to search and validate users.</p>
   <p>To complete LDAP integration, be sure to add an LDAP Login action to your user login form.</p>
 </div>
 <div class="form-group">
@@ -9,16 +9,16 @@
   <input ng-model="currentProject.settings.ldap.url" type="text" class="form-control" id="ldapURL" name="ldapURL" placeholder="ldaps://ldap.example.com:636">
 </div>
 <div class="form-group">
-  <label for="ldapAdminDn">Admin DN</label>
-  <input ng-model="currentProject.settings.ldap.adminDn" type="text" class="form-control" id="ldapAdminDn" name="ldapAdminDn" placeholder="uid=myadminusername,ou=users,o=example.com">
+  <label for="ldapBindDn">Bind DN</label>
+  <input ng-model="currentProject.settings.ldap.bindDn" type="text" class="form-control" id="ldapBindDn" name="ldapBindDn" placeholder="dn=mybindusername,ou=users,dc=example,dc=org">
 </div>
 <div class="form-group">
-  <label for="ldapAdminPassword">Admin Password</label>
-  <input ng-model="currentProject.settings.ldap.adminPassword" type="text" class="form-control" id="ldapAdminPassword" name="ldapAdminPassword" placeholder="mypassword">
+  <label for="ldapBindPassword">Bind Password</label>
+  <input ng-model="currentProject.settings.ldap.bindPassword" type="text" class="form-control" id="ldapBindPassword" name="ldapBindPassword" placeholder="mypassword">
 </div>
 <div class="form-group">
   <label for="ldapSearchBase">Search Base</label>
-  <input ng-model="currentProject.settings.ldap.searchBase" type="text" class="form-control" id="ldapSearchBase" name="ldapSearchBase" placeholder="ou=users,o=example.com">
+  <input ng-model="currentProject.settings.ldap.searchBase" type="text" class="form-control" id="ldapSearchBase" name="ldapSearchBase" placeholder="ou=users,dc=example,dc=org">
 </div>
 <div class="form-group">
   <label for="ldapSearchFilter">Search Filter</label>
