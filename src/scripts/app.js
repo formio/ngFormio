@@ -425,6 +425,11 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/authentication/formio.html'
         })
+        .state('project.env.authentication.ldap', {
+          url: '/authentication/ldap',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/ldap.html'
+        })
         .state('project.env.authentication.saml', {
           url: '/authentication/saml',
           parent: 'project.env',
