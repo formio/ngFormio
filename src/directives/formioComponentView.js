@@ -27,7 +27,7 @@ module.exports = [
           FormioUtils
         ) {
           // Set the form url.
-          $scope.formUrl = $scope.form ? Formio.getAppUrl() + '/form/' + $scope.form._id.toString() : '';
+          $scope.formUrl = $scope.form ? Formio.getProjectUrl() + '/form/' + $scope.form._id.toString() : '';
           $scope.isVisible = function(component, row) {
             return FormioUtils.isVisible(
               component,
