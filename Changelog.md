@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.30.2
+### Changed
+ - Upgraded text-mask-addons@3.7.2, moment@2.21.0, formiojs@2.29.11
+
+### Fixed
+ - Removed deprecated setAppUrl.
+ - Problems where hideLabel is not set for other layout components.
+
 ## 2.30.1
 ### Fixed
  - Problems where DataGrid would not show labels of input elements in columns.

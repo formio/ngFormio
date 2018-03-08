@@ -15,6 +15,7 @@ module.exports = function(app) {
           input: false,
           tableView: false,
           legend: '',
+          hideLabel: true,
           components: []
         },
         viewTemplate: 'formio/componentsView/fieldset.html',
