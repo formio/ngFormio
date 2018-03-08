@@ -36,17 +36,20 @@ module.exports = function() {
         };
       };
 
+      if (scope.component.localeString) {
+        scope.component.setDelimiter = ',';
+      }
+      var setDecimalSeparator = scope.component.setDelimiter && scope.component.setDelimiter === ',' ? '.' : ',';
       var formattedNumberString = (12345.6789).toLocaleString(scope.options.language || 'en');
 
-      scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
-        formattedNumberString.match(/345(.*)67/)[1];
+      scope.decimalSeparator = scope.options.decimalSeparator = setDecimalSeparator || scope.options.decimalSeparator || formattedNumberString.match(/345(.*)67/)[1];
 
       if (scope.component.delimiter) {
         if (scope.options.hasOwnProperty('thousandsSeparator')) {
           console.warn("Property 'thousandsSeparator' is deprecated. Please use i18n to specify delimiter.");
         }
 
-        scope.delimiter = scope.options.thousandsSeparator || formattedNumberString.match(/12(.*)345/)[1];
+        scope.delimiter = scope.component.setDelimiter || scope.options.thousandsSeparator || formattedNumberString.match(/12(.*)345/)[1];
       }
       else {
         scope.delimiter = '';
@@ -60,7 +63,7 @@ module.exports = function() {
         var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{' + scope.decimalLimit + '})?(.*)?';
         var parts = (100).toLocaleString(scope.options.language, getFormatOptions()).match(new RegExp(regex));
         scope.prefix = parts[1] || '';
-        scope.suffix = parts[3] || '';
+        scope.suffix = scope.component.localeString? parts[3] : '';
       }
       else if (format ==='number') {
         // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
