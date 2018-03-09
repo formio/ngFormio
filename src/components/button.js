@@ -203,7 +203,7 @@ module.exports = function(app) {
           if (
             settings.action === 'oauth' &&
             settings.oauth &&
-            settings.oauth.authRI && 
+            settings.oauth.authURI &&
             settings.oauth.authURI.indexOf($location.search().iss) === 0
           ) {
             $scope.openOAuth(settings.oauth);
