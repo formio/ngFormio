@@ -165,7 +165,6 @@ module.exports = function(app) {
               if (!submission) {
                 return;
               }
-              loadForm();
               angular.merge($scope.data[$scope.component.key], submission);
             }, true);
           }
