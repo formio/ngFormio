@@ -261,6 +261,7 @@ app.controller('ProjectController', [
   'GoogleAnalytics',
   'RemoteTokens',
   'PrimaryProject',
+  'PDFServer',
   function(
     $scope,
     $rootScope,
@@ -274,7 +275,8 @@ app.controller('ProjectController', [
     $q,
     GoogleAnalytics,
     RemoteTokens,
-    PrimaryProject
+    PrimaryProject,
+    PDFServer
   ) {
     // Load in existing primary project scope.
     $scope.status = {
@@ -356,6 +358,7 @@ app.controller('ProjectController', [
     var formioReady = $q.defer();
     $scope.formioReady = formioReady.promise;
     $scope.primaryProjectPromise = primaryProjectQ.promise;
+    PDFServer.setPrimaryProject(primaryProjectQ.promise);
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.localProject = result;
