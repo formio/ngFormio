@@ -17,7 +17,7 @@
       <li>Next you will need to launch our Docker container within your own environment using the following command.
         <pre>
 docker run -itd \
-  -e "FORMIO_PROJECT=<strong>{{ currentProject._id }}</strong>" \
+  -e "FORMIO_PROJECT=<strong>{{ pdfInfo.data.project }}</strong>" \
   -e "FORMIO_PROJECT_TOKEN=<strong>{{ pdfInfo.data.token }}</strong>" \
   -e "FORMIO_PDF_PROJECT=<strong>[PDF PROJECT API URL]</strong>" \
   -e "FORMIO_PDF_APIKEY=<strong>[PDF PROJECT API KEY]</strong>" \
@@ -40,6 +40,18 @@ docker run -itd \
               <input type="text" class="form-control" id="pdfserver" ng-model="currentProject.settings.pdfserver" placeholder="https://files.form.io" />
             </div>
             <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+          </div>
+        </div>
+      </li>
+      <li ng-if="currentProject.settings.pdfserver">
+        <div class="panel panel-default">
+          <div class="panel-heading">Project PDF Token</div>
+          <div class="panel-body">
+            <div class="form-group">
+              <p>If your Remote server has trouble with Unauthorized requests, then it may be because the following PDF Token does not match the one above. If this is the case, then please send an email to <strong>support@form.io</strong> and we will resolve the issue.</p>
+              <label for="pdfserver">Project PDF Token</label>
+              <input readonly type="text" class="form-control" id="filetoken" ng-model="currentProject.settings.filetoken" />
+            </div>
           </div>
         </div>
       </li>
