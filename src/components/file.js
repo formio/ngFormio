@@ -98,7 +98,7 @@ module.exports = function(app) {
         file: '=',
         form: '='
       },
-      template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.label || file.name }}</a>',
+      template: '<a href="{{ file.url }}" ng-click="getFile($event)" target="_blank">{{ file.originalName || file.name }}</a>',
       controller: [
         '$window',
         '$rootScope',
@@ -143,7 +143,7 @@ module.exports = function(app) {
         form: '=',
         width: '='
       },
-      template: '<img ng-src="{{ file.imageSrc }}" alt="{{ file.label || file.name }}" ng-style="{width: width}" />',
+      template: '<img ng-src="{{ file.imageSrc }}" alt="{{ file.originalName || file.name }}" ng-style="{width: width}" />',
       controller: [
         '$rootScope',
         '$scope',
@@ -238,7 +238,7 @@ module.exports = function(app) {
             // Get a unique name for this file to keep file collisions from occurring.
             var fileName = FormioUtils.uniqueName(file.name);
             $scope.fileUploads[fileName] = {
-              label: file.name,
+              originalName: file.name,
               name: fileName,
               size: file.size,
               status: 'info',
@@ -264,7 +264,7 @@ module.exports = function(app) {
               }, $scope.component.url)
                 .then(function(fileInfo) {
                   // Attach the original file name back to the file info.
-                  fileInfo.label = file.name;
+                  fileInfo.originalName = file.name;
 
                   delete $scope.fileUploads[fileName];
                   // This fixes new fields having an empty space in the array.
