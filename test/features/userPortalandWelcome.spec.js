@@ -41,6 +41,7 @@ module.exports = function (actions) {
       actions.goToPage('#/');
       actions.projectCount(0);
       actions.iSeeText("Want to work collaboratively? Create a team to allow others to help work on your project.");
+      actions.logout();
     });
   });
 };

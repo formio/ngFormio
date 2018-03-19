@@ -14,12 +14,8 @@ machine:
 
 dependencies:
   pre:
-    - curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    - sudo dpkg -i google-chrome.deb
-    - sudo sed -i 's|HERE/chrome\"|HERE/chrome\" --disable-setuid-sandbox|g' /opt/google/chrome/google-chrome
-    - rm google-chrome.deb
-    - wget http://selenium-release.storage.googleapis.com/3.9/selenium-server-standalone-3.9.1.jar
-    - java -jar selenium-server-standalone-3.9.1.jar:
+    - wget http://selenium-release.storage.googleapis.com/3.11/selenium-server-standalone-3.11.0.jar
+    - java -jar selenium-server-standalone-3.11.0.jar:
         background: true
     - pip install awscli
     - npm install -g bower gulp mocha
