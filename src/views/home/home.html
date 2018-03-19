@@ -46,9 +46,20 @@
 <div class="container projects">
   <div class="row">
     <div class="col-md-9 existing-projects-section">
-      <h2><span ng-if="projectsLoaded" ng-cloak>Existing Projects</span></h2>
+      <div class="existing-title">
+        <h2><span ng-if="projectsLoaded" ng-cloak>Existing Projects</span></h2>
+        <div class="form-inline" style="margin: 21px 0 10px;">
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon">Search</div>
+              <input id="project-search" type="text" class="form-control" ng-model="projectSearch.title" placeholder="Find a project...">
+            </div>
+          </div>
+        </div>
+      </div>
+      <i ng-if="!projectsLoaded" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
       <div class="row" ng-if="projectsLoaded" ng-cloak>
-        <div class="col-sm-4" ng-repeat="project in projects">
+        <div class="col-sm-4" ng-repeat="project in projects | filter:projectSearch">
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
             <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
             <h4 class="project-title ellipsis"><a ui-sref="project.overview({projectId: project._id})">{{ project.title }}</a></h4>
@@ -84,12 +95,20 @@
     </div>
     <div class="col-md-3">
       <h2>Teams <small><a href="https://help.form.io/userguide/teams/" target="_blank"><i class="fa fa-info-circle"></i></a></small></h2>
+      <div class="form-inline" style="margin-bottom: 20px;" ng-show="teams.length">
+        <div class="form-group">
+          <div class="input-group">
+            <div class="input-group-addon">Search</div>
+            <input id="team-search" type="text" class="form-control" ng-model="teamSearch.data.name" placeholder="Find a team...">
+          </div>
+        </div>
+      </div>
       <div class="list-group" ng-show="!teamsLoading">
         <div class="well" ng-show="!teams.length">
           <span class="team-upgrade">Want to work collaboratively? Create a team to allow others to help work on your project.</span>
         </div>
-        <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams">
-          <span class="badge"><i class="fa fa-users"></i>&nbsp;{{ team.data.members.length || 0 }}</span>
+        <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams | filter:teamSearch">
+          <span class="badge"><i class="fa fa-users"></i>&nbsp;{{(team.data.members.length + team.data.admins.length) || 0 }}</span>
           <h4 class="list-group-item-heading">{{ team.data.name }}</h4>
           <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
         </a>

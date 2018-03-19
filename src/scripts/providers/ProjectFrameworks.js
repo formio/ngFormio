@@ -21,7 +21,6 @@ app.constant('ProjectFrameworks', [
   {
     title: 'Vue.js',
     name: 'vue',
-    disabled: true,
     img: 'images/platforms/vue.png'
   },
   {

@@ -1,13 +1,13 @@
 <div class="panel panel-primary form-list-panel">
-  <div class="panel-body">
+  <div class="panel-body" ng-if="ready">
     <div class="row">
       <div class="col-sm-6">
         <h2>Forms <small><a href="https://help.form.io/intro/howworks/#formsandresources" target="_blank"><i class="fa fa-info-circle"></i></a></small></h2>
-        <form-list forms="forms" form-name="'Form'" formio="formio" project-url="projectUrl" form-type="'form'" list-mode="'form'" protected="currentProject.protect"></form-list>
+        <form-list forms="forms" form-name="'Form'" formio-ready="formioReady" project-url="projectUrl" form-type="'form'" list-mode="'form'" protected="currentProject.protect"></form-list>
       </div>
       <div class="col-sm-6">
         <h2>Resource Forms</h2>
-        <form-list forms="resources" form-name="'Resource Form'" formio="formio" project-url="projectUrl" form-type="'resource'" list-mode="'form'" protected="currentProject.protect"></form-list>
+        <form-list forms="resources" form-name="'Resource Form'" formio-ready="formioReady" project-url="projectUrl" form-type="'resource'" list-mode="'form'" protected="currentProject.protect"></form-list>
       </div>
     </div>
   </div>

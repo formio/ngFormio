@@ -16,6 +16,7 @@ angular
     'ui.bootstrap.alert',
     'ui.bootstrap.tpls',
     'ui.bootstrap.tooltip',
+    'ui.bootstrap.pagination',
     'ui.select',
     'ui.bootstrap.datetimepicker',
     'angularMoment',
@@ -53,8 +54,9 @@ angular
       formioComponentsProvider,
       COMMON_OPTIONS
     ) {
-      // Change the form builder options for encrypted to be commercial only.
-      COMMON_OPTIONS.encrypted.label = 'Encrypted (Commercial Only)';
+      // Change the form builder options for encrypted to be enterprise only.
+      COMMON_OPTIONS.encrypted.label = 'Encrypted (Enterprise Only)';
+      COMMON_OPTIONS.dbIndex.label = 'Database Index (Enterprise Only)';
 
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
@@ -307,6 +309,11 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/cors/index.html'
         })
+        .state('project.env.settings.security', {
+          url: '/settings/security',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/security/index.html'
+        })
         .state('project.env.database', {
           url: '/database',
           abstract: true,
@@ -398,10 +405,35 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/integrations/data/index.html'
         })
-        .state('project.env.integrations.oauth', {
-          url: '/integrations/oauth',
+        .state('project.env.authentication', {
+          url: '/authentication',
+          abstract: true,
+          parent: 'project.env'
+        })
+        .state('project.env.authentication.info', {
+          url: '/authentication/info',
           parent: 'project.env',
-          templateUrl: 'views/project/env/integrations/oauth/index.html'
+          templateUrl: 'views/project/env/authentication/index.html'
+        })
+        .state('project.env.authentication.oauth', {
+          url: '/authentication/oauth',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/oauth/index.html'
+        })
+        .state('project.env.authentication.formio', {
+          url: '/authentication/formio',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/formio.html'
+        })
+        .state('project.env.authentication.ldap', {
+          url: '/authentication/ldap',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/ldap.html'
+        })
+        .state('project.env.authentication.saml', {
+          url: '/authentication/saml',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/authentication/saml.html'
         })
         .state('project.access', {
           url: '/access',
@@ -667,6 +699,7 @@ angular
       };
 
       $scope.projects = {};
+      $scope.projectSearch = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
       var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified&project__exists=false')
@@ -680,7 +713,6 @@ angular
         })
         .then(function(projects) {
           $scope.projectsLoaded = true;
-          angular.element('#projects-loader').hide();
           $scope.projects = projects;
           $scope.teamsEnabled = _.some(projects, function(project) {
             project.plan = project.plan || '';

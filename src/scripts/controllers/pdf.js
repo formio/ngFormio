@@ -19,8 +19,12 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       var infoCache = {};
       var infoReady = $q.defer();
       var infoPromise = null;
-      return {
-        ensureFileToken: function(project) {
+      var primaryPromise = null;
+      var PDFServer = {
+        setPrimaryProject: function(primary) {
+          primaryPromise = primary;
+        },
+        setFileToken: function(project) {
           if (!project.settings) {
             project.settings = {};
           }
@@ -35,6 +39,24 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
             pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
           });
           return (new Formio('/project/' + project._id)).saveProject(project);
+        },
+        ensureFileToken: function(project) {
+          // First load the primary project.
+          return primaryPromise.then(function(primary) {
+            // If this is the primary, then ensure the token.
+            if (project._id === primary._id) {
+              return PDFServer.setFileToken(project);
+            }
+
+            // Otherwise, make sure that we set this project token to the same as the primary.
+            return PDFServer.ensureFileToken(primary).then(function() {
+              if (!project.settings) {
+                project.settings = {};
+              }
+              project.settings.filetoken = primary.settings.filetoken;
+              return (new Formio('/project/' + project._id)).saveProject(project);
+            });
+          });
         },
         ensureProject: function(projectPromise, cb) {
           return projectPromise.then(this.ensureFileToken.bind(this));
@@ -174,6 +196,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           }.bind(this));
         }
       };
+      return PDFServer;
     }
   ])
   .controller('PDFController', [

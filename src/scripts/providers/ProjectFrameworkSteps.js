@@ -113,7 +113,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       steps[1].template = 'views/frameworks/vue/download.html';
       steps[1].children[0].template = 'views/frameworks/vue/download.html';
       steps[1].children[1].template = 'views/frameworks/vue/configure.html';
-      steps[4].template = 'views/frameworks/vue/embed.html';
+      steps[4].template = 'views/frameworks/vue/embed-app.html';
       break;
     case 'html5':
       break;

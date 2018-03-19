@@ -1,0 +1,56 @@
+<h3 style="margin-top: 0px;">Form Revisions</h3>
+<div class="alert alert-info" ng-if="!minPlan('commercial')"><p>Form Revisions is only available for <strong>Enterprise</strong> level projects. Please <a ui-sref="project.billing()" class="btn btn-default">Upgrade your Project</a> to enable Form Revisions.</p></div>
+<div class="alert alert-warning" ng-if="primaryProject.plan === 'trial'"><p>Form Revisions is only available for <strong>Enterprise</strong> level projects, and will not be available after the trial period. Please <a ui-sref="project.billing()" class="btn btn-default">Upgrade your Project</a> to enable Form Revisions permanently.</p></div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    Form Revisions (Enterprise Only)
+  </div>
+  <div class="panel-body">
+    <div class="well well-sm">
+      Form revisions will save a copy of each form revision and allow matching submissions with the revision of the form it was submitted with.
+    </div>
+    <div id="form-group-versioning" class="form-group">
+      <label class="control-label">
+        <select ng-model="form.revisions" ng-disabled="!minPlan('commercial')" ng-change="saveForm()">
+          <option value="">Disabled</option>
+          <option value="current">Enabled - Use current form version when viewing submissions.</option>
+          <option value="original">Enabled - Use original form version when viewing submissions.</option>
+        </select>
+      </label>
+      <div class="text-muted">When enabled, you can configure whether existing form submissions will be viewed in the latest version of the form or in the original version the submission was submitted with.</div>
+    </div>
+  </div>
+</div>
+<div ng-if="form.revisions && minPlan('commercial')">
+  <ul class="list-group list-group-striped">
+    <li class="list-group-item list-group-heading">
+      <div class="row">
+        <div class="col-md-1"><strong>Vid</strong></div>
+        <div class="col-md-2"><strong>Date/Time</strong></div>
+        <div class="col-md-2"><strong>User</strong></div>
+        <div class="col-md-3"><strong>Note</strong></div>
+        <div class="col-md-3"><strong>Actions</strong></div>
+      </div>
+    </li>
+    <li class="list-group-item" ng-repeat="revision in revisions track by $index">
+      <div class="row">
+        <div class="col-md-1"><a href="{{formUrl}}/v/{{revision._vid}}" target="_blank">{{revision._vid}}</a></div>
+        <div class="col-md-2">{{revision.modified | date: 'medium'}}</div>
+        <div class="col-md-2">{{revision._vuser}}</div>
+        <div class="col-md-3">{{revision._vnote}}</div>
+        <div class="col-md-3" ng-if="revision._vid !== 'draft'">
+          <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.view({revision: revision})">Use</span>
+          <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.submission.index({_vid: revision._vid})">Data</span>
+          <span class="btn btn-default" ui-sref="project.{{ form.type }}.form.edit({components: revision.components})">Restore</span>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <bgf-pagination
+    collection="revisions"
+    url="revisionsUrl"
+    url-params="revisionsParams"
+    per-page="10"
+    template-url="/views/partials/pager.html"
+  />
+</div>

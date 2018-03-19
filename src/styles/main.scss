@@ -14,10 +14,6 @@
   outline: none;
 }
 
-body {
-  padding-top: 45px;
-}
-
 .grow { transition: all .2s ease-in-out; }
 .grow:hover { transform: scale(1.2); }
 
@@ -25,12 +21,14 @@ body {
   display: block;
 }
 
-.form-builder-premium label {
+.form-builder-premium label,
+.project-commercial .form-builder-premium.form-builder-dbindex label {
   color: #aaa;
   pointer-events: none;
 }
 
-.project-commercial .form-builder-premium label {
+.project-commercial .form-builder-premium label,
+.project-commercial.form-has-collection .form-builder-premium.form-builder-dbindex label {
   color: inherit;
   pointer-events: auto;
 }
@@ -733,6 +731,7 @@ ul.project-settings-menu {
       padding: 0;
       &.form-nav {
         a {
+          padding: 6px 12px;
           &:hover {
             background-color: lighten($gray-base, 85%);
           }
@@ -1768,7 +1767,7 @@ footer {
 
 .form-edit {
   .save-buttons {
-    margin-top: 25px;
+    margin-top: 10px;
   }
   .form-line {
     margin-top: 3px;
@@ -2128,6 +2127,12 @@ li.step-info {
   animation: buttonblink 6s infinite;  /* IE 10+, Fx 29+ */
 }
 
+.existing-title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
 @keyframes buttonblink {
   0%, 100% {
     color: #fff;
@@ -2163,4 +2168,31 @@ li.step-info {
     background-color: #58c01a;
     border-color: #4eaa17;
   }
+}
+
+formio-header {
+  display: none;
+}
+formio-header-wrapper {
+  z-index:100000;
+}
+formio-header-wrapper>formio-header {
+  background: #fff;
+  z-index: 1;
+  box-shadow: rgba(0,0,0,0.5) 0 0.5px 3px 0;
+}
+formio-header-wrapper>formio-header.fixed {
+  position: fixed;
+  display: block;
+  top: 0px;
+  left: 70px;
+  width: 100%;
+  z-index: 10000;
+}
+formio-header-wrapper>formio-header.fixed.absolute {
+  position: absolute;
+}
+
+#navbar {
+  position: relative !important;
 }

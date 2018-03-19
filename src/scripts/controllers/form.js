@@ -1,11 +1,12 @@
 'use strict';
 
-/* global _: false, jQuery: false, document: false */
+/* global _: false, document: false, Promise: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
   'ui.bootstrap.tpls',
   'ui.bootstrap.accordion',
+  'ui.bootstrap.pagination',
   'ngFormBuilder',
   'formio',
   'bgf.paginateAnything',
@@ -63,7 +64,15 @@ app.config([
         })
         .state(parentName + '.index', {
           url: '/',
-          templateUrl: 'views/form/' + type + 's.html'
+          templateUrl: 'views/form/' + type + 's.html',
+          controller: [
+            '$scope',
+            function($scope) {
+              $scope.loadProjectPromise.then(function() {
+                $scope.ready = true;
+              });
+            }
+          ]
         })
         .state(parentName + '.new', {
           url: '/new/' + type,
@@ -100,12 +109,24 @@ app.config([
         })
         .state(parentName + '.form.view', {
           url: '/',
-          templateUrl: 'views/form/form-view.html'
+          controller: 'FormViewController',
+          templateUrl: 'views/form/form-view.html',
+          params: {
+            revision: null
+          }
         })
         .state(parentName + '.form.edit', {
           url: '/edit',
           controller: 'FormEditController',
-          templateUrl: 'views/form/form-edit.html'
+          templateUrl: 'views/form/form-edit.html',
+          params: {
+            components: null
+          }
+        })
+        .state(parentName + '.form.revisions', {
+          url: '/revision',
+          controller: 'FormRevisionsController',
+          templateUrl: 'views/form/form-revisions.html'
         })
         .state(parentName + '.form.embed', {
           url: '/embed',
@@ -130,6 +151,23 @@ app.config([
         .state(parentName + '.form.api', {
           url: '/api',
           templateUrl: 'views/form/form-api.html'
+        })
+        .state(parentName + '.form.settings', {
+          url: '/settings',
+          templateUrl: 'views/form/form-settings.html',
+          controller: ['$scope', function($scope) {
+            $scope.disableCollection = function() {
+              if (!$scope.minPlan('commercial')) {
+                return true;
+              }
+
+              if ($scope.primaryProject.plan === 'trial') {
+                return true;
+              }
+
+              return false;
+            };
+          }]
         });
 
       var formStates = {};
@@ -159,7 +197,10 @@ app.config([
           .state(state + '.index', {
             url: '',
             templateUrl: 'views/form' + info.path + '/index.html',
-            controller: info.indexController
+            controller: info.indexController,
+            params: {
+              _vid: null
+            }
           })
           .state(state + '.item', {
             abstract: true,
@@ -203,15 +244,12 @@ app.directive('formList', function() {
     scope: {
       formName: '=',
       forms: '=',
-      formio: '=',
+      formioReady: '=',
       projectUrl: '=',
       formType: '=',
-      numPerPage: '=',
+      numPerPage: '=?',
       listMode: '=',
       protected: '=?'
-    },
-    compile: function(element, attrs) {
-      if (!attrs.numPerPage) { attrs.numPerPage = 25; }
     },
     controller: [
       '$scope',
@@ -219,34 +257,79 @@ app.directive('formList', function() {
       '$http',
       'AppConfig',
       'FormioUtils',
+      'FormioAlerts',
+      'SubmissionExport',
       function(
         $scope,
         $rootScope,
         $http,
         AppConfig,
-        FormioUtils
+        FormioUtils,
+        FormioAlerts,
+        SubmissionExport
       ) {
         $rootScope.activeSideBar = 'projects';
         $rootScope.noBreadcrumb = false;
         $rootScope.currentForm = false;
-        $scope.search = {};
+        if (!$scope.numPerPage) {
+          $scope.numPerPage = 25;
+        }
+        $scope.totalItems = 0;
+        $scope.currentPage = 1;
+        $scope.search = {title: ''};
         $scope.forms = [];
-        $scope.$watch('projectUrl', function() {
-          var query = {
-            params: {
-              limit: 9999999
-            }
-          };
-          if ($scope.formType) {
-            query.params.type = $scope.formType;
-          }
-          $scope.formio.loadForms(query).then(function(forms) {
+
+        var query = {params: {
+          select: '_id,title,type,path,modified',
+          limit: $scope.numPerPage,
+          skip: 0
+        }};
+        if ($scope.formType) {
+          query.params.type = $scope.formType;
+        }
+
+        var getItems = function(formio) {
+          $scope.formsLoading = true;
+          formio.loadForms(query).then(function (forms) {
+            $scope.totalItems = forms.serverCount;
             $scope.forms = forms;
-            $scope.formsFinished = true;
+            $scope.formsLoading = false;
           });
+        };
+
+        var formio = null;
+        $scope.setPage = function() {
+          query.params.skip = ($scope.currentPage - 1) * query.params.limit;
+          if (formio) {
+            return getItems(formio);
+          }
+          $scope.formioReady.then(function(instance) {
+            formio = instance;
+            getItems(instance);
+          });
+        };
+
+        $scope.$watch('search.title', function(input) {
+          if (input.length > 0) {
+            $scope.currentPage = 1;
+            query.skip = 0;
+            query.params.title__regex = '/' + input + '/i';
+          }
+          else {
+            delete query.params.title__regex;
+          }
+          $scope.setPage();
         });
+
         $scope.export = function(form, type) {
-          window.open($scope.projectUrl + '/form/' + form._id + '/export?format=' + type + '&x-jwt-token=' + $rootScope.userToken);
+          $scope.isBusy = true;
+          SubmissionExport.export($scope.formio, form, type).then(function() {
+            $scope.isBusy = false;
+          }).catch(function(err) {
+            $scope.isBusy = false;
+            console.warn(err);
+            FormioAlerts.onError(err);
+          });
         };
         $scope.componentCount = function(components) {
           return _(FormioUtils.flattenComponents(components)).filter(function (o) {
@@ -311,10 +394,10 @@ app.controller('FormController', [
     $scope.upload = function (file) {
       $scope.uploading = true;
       $scope.formReady = false;
-      $scope.primaryProjectPromise.then(function(primaryProject) {
-        var filePath = '/pdf/' + primaryProject._id + '/file';
+      $scope.primaryProjectPromise.then(function(project) {
+        var filePath = '/pdf/' + project._id + '/file';
         var pdfServer = AppConfig.pdfServer;
-        PDFServer.ensureFileToken(primaryProject).then(function(project) {
+        PDFServer.ensureFileToken(project).then(function(project) {
           if (project.settings.pdfserver) {
             pdfServer = project.settings.pdfserver;
           }
@@ -505,8 +588,14 @@ app.controller('FormController', [
       $scope.$broadcast('formDisplay', display);
     });
 
-    $scope.$watch('form', function() {
+    $scope.$watch('form', function(form) {
+      if (!form) {
+        return;
+      }
       $scope.setiframeCode();
+      if (form.settings && form.settings.collection) {
+        document.body.className += ' form-has-collection';
+      }
     });
 
     $scope.$watch('currentProject', function() {
@@ -556,7 +645,10 @@ app.controller('FormController', [
           title: 'PDF'
         }
       ];
-      $scope.formio = new Formio($scope.formUrl, {base: $scope.baseUrl});
+      $scope.formio = new Formio($scope.formUrl, {
+        base: $scope.baseUrl,
+        project: $scope.projectUrl
+      });
       // Load the form.
       if ($scope.formId) {
         loadFormQ.resolve($scope.formio.loadForm()
@@ -630,18 +722,18 @@ app.controller('FormController', [
       return $scope.projectUrl + '/form/' + $scope.formId + '/spec.json';
     };
 
-    // When a submission is made.
-    $scope.$on('formSubmission', function(event, submission) {
-      event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New submission added!'
-      });
-      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
-      if (submission._id) {
-        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
-      }
-    });
+    //// When a submission is made.
+    //$scope.$on('formSubmit', function(event, submission) {
+    //  event.stopPropagation();
+    //  FormioAlerts.addAlert({
+    //    type: 'success',
+    //    message: 'New submission added!'
+    //  });
+    //  GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+    //  if (submission._id) {
+    //    $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+    //  }
+    //});
 
     // Save a form.
     $scope.saveForm = function() {
@@ -715,39 +807,127 @@ app.controller('FormController', [
       $scope.form.components = form.components;
     });
 
+    // Called when the form permissions is updated.
+    $scope.$on('updateFormPermissions', function(event, form) {
+      event.stopPropagation();
+      $scope.updateCurrentFormResources(form);
+      $scope.form = form;
+    });
+
+
     $rootScope.currentForm = $scope.form;
+  }
+]);
+
+app.controller('FormViewController', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  'FormioAlerts',
+  'GoogleAnalytics',
+  function($scope, $state, $stateParams, FormioAlerts, GoogleAnalytics) {
+    $scope.formReady = false;
+
+    $scope.submission = {data: {}};
+
+    $scope.loadFormPromise.then(function() {
+      if ($stateParams.revision) {
+        $scope.form = angular.copy($scope.form);
+        $scope.form.components = $stateParams.revision.components;
+
+        $scope.revision = $stateParams.revision;
+      }
+      $scope.formReady = true;
+    });
+
+    $scope.$on('formSubmission', function(event, submission) {
+      if ($stateParams.revision) {
+        submission._fvid = $stateParams.revision._vid;
+      }
+      $scope.formio.saveSubmission(submission)
+        .then(function(submission) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'New submission added!'
+          });
+          GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+          if (submission._id) {
+            $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+          }
+        })
+        .catch(function(err) {
+          _.each(err.details, function(errDetails) {
+            FormioAlerts.onError.call(FormioAlerts, errDetails);
+          });
+        });
+    });
   }
 ]);
 
 app.controller('FormEditController', [
   '$scope',
+  '$stateParams',
   '$q',
   'ngDialog',
   '$state',
   '$timeout',
+  'Formio',
+  'FormioAlerts',
+  'GoogleAnalytics',
   function(
     $scope,
+    $stateParams,
     $q,
     ngDialog,
     $state,
-    $timeout
+    $timeout,
+    Formio,
+    FormioAlerts,
+    GoogleAnalytics
   ) {
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
     });
+    $scope.dirty = false;
 
-    // Clone original form after it has loaded, or immediately
-    // if we're not loading a form
-    ($scope.loadFormPromise || $q.when()).then(function() {
-      $scope.originalForm = _.cloneDeep($scope.form);
-    });
+    $scope.formReady = false;
+    var checkDraft = function() {
+      if ($scope.form.revisions) {
+        // Load a draft if it is available.
+        Formio.makeStaticRequest($scope.formUrl + '/draft', 'GET', null, {base: $scope.baseUrl})
+          .then(function(form) {
+            $scope.form.components = form.components;
+            if (form._vid === 'draft') {
+              $scope.draft = true;
+            }
+            // Load in components if sent in stateParams.
+            $scope.form.components = $stateParams.components || $scope.form.components;
+            if ($stateParams.components) {
+              $scope.dirty = true;
+            }
+            $scope.originalForm = _.cloneDeep($scope.form);
+            $scope.formReady = true;
+          });
+        $scope.revisionsEnabled = true;
+      }
+      else {
+        // Load in components if sent in stateParams.
+        $scope.form.components = $stateParams.components || $scope.form.components;
+        if ($stateParams.components) {
+          $scope.dirty = true;
+        }
+        $scope.originalForm = _.cloneDeep($scope.form);
+        $scope.formReady = true;
+      }
+    };
+
+    ($scope.loadFormPromise || $q.when()).then(checkDraft);
 
     $scope.copy = function() {
       $state.go('project.' + $scope.formInfo.type + '.create', {components: _.cloneDeep($scope.form.components)});
     };
 
     // Track any modifications for save/cancel prompt on navigation away from the builder.
-    var dirty = false;
     var contentLoaded = false;
     $timeout(function() {
       contentLoaded = true;
@@ -756,30 +936,66 @@ app.controller('FormEditController', [
     $scope.$on('formBuilder:add', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (event.targetScope.formComponent.settings.type === 'content') {
-        dirty = true;
+        $scope.dirty = true;
       }
 
     });
     $scope.$on('formBuilder:update', function(event) {
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
       if (contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
-        dirty = true;
+        $scope.dirty = true;
       }
 
     });
     $scope.$on('formBuilder:remove', function() {
-      dirty = true;
+      $scope.dirty = true;
     });
     $scope.$on('formBuilder:edit', function() {
-      dirty = true;
+      $scope.dirty = true;
     });
 
     // Wrap saveForm in the editor to clear dirty when saved.
     var parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       contentLoaded = false;
-      dirty = false;
+      $scope.dirty = false;
       return parentSave();
+    };
+
+    $scope.saveFormDraft = function() {
+      angular.element('.has-error').removeClass('has-error');
+      $scope.dirty = false;
+
+      // Copy to remove angular $$hashKey
+      return Formio.makeStaticRequest($scope.formUrl + '/draft', 'PUT', angular.copy($scope.form), {base: $scope.baseUrl})
+        .then(function(response) {
+          GoogleAnalytics.sendEvent('FormDraft', 'PUT'.substring(0, 'PUT'.length - 1), null, 1);
+
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Successfully saved form draft!'
+          });
+
+          // Reload page.
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        })
+        .catch(function(err) {
+          if (err) {
+            FormioAlerts.onError.call(FormioAlerts, err);
+          }
+
+          // FOR-128 - if we're editing a form, make note of the components with issues.
+          try {
+            var issues = (/Component keys must be unique: (.*)/.exec(_.get(err, 'errors.components.message'))).slice(1);
+            if (($state.includes('project.form.form.edit') || $state.includes('project.form.create')) && (issues.length > 0)) {
+              issues = (issues.shift()).toString().split(', ');
+              issues.forEach(function(issue) {
+                angular.element('div.dropzone #' + issue).parent().addClass('has-error');
+              });
+            }
+          }
+          catch (e) {}
+        });
     };
 
     /**
@@ -822,7 +1038,7 @@ app.controller('FormEditController', [
     // Listen for events to navigate away from the form builder.
     $scope.$on('$stateChangeStart', function(event, transition) {
       // If the form hasnt been modified, skip this cancel modal logic.
-      if (!dirty) {
+      if (!$scope.dirty) {
         return;
       }
 
@@ -834,7 +1050,7 @@ app.controller('FormEditController', [
       .then(function() {
         // Cancel without save was clicked, revert the form and get out.
         $scope.form = $scope.$parent.form = angular.copy($scope.originalForm);
-        dirty = false;
+        $scope.dirty = false;
         $state.go(transition.name, {notify: false});
       })
       .catch(function(val) {
@@ -847,13 +1063,26 @@ app.controller('FormEditController', [
         // If there was no return the cancel action was rejected, save the form before navigation.
         return $scope.saveForm()
         .then(function(result) {
-          dirty = false;
+          $scope.dirty = false;
           $state.go(transition.name, {reload: true, notify: false});
         })
         .catch(function(err) {
           console.error(err);
         });
       });
+    });
+  }
+]);
+
+app.controller('FormRevisionsController', [
+  '$http',
+  '$scope',
+  function($http, $scope) {
+    $scope.loadFormPromise.then(function() {
+      $scope.revisionsUrl = $scope.formUrl + '/v';
+      $scope.revisionsParams = {
+        sort: '-_vid'
+      };
     });
   }
 ]);
@@ -928,7 +1157,7 @@ app.controller('FormShareController', ['$scope', function($scope) {
   $scope.options = {
     theme: '',
     showHeader: true,
-    showWizard: false
+    auth: false
   };
   $scope.themes = [
     'Cerulean',
@@ -957,15 +1186,17 @@ app.controller('FormShareController', ['$scope', function($scope) {
     if ($scope.options.theme) {
       $scope.previewUrl += '&theme=' + $scope.options.theme.toLowerCase();
     }
-    if ($scope.options.showWizard) {
-      $scope.previewUrl += '&wizard=1';
+    if ($scope.options.auth) {
+      $scope.previewUrl += '&auth=1';
     }
-    jQuery('#form-preview').html(jQuery(document.createElement('iframe')).attr({
-      style: 'width: 100%;',
-      id: 'share-preview',
-      src: $scope.previewUrl
-    }));
-    jQuery('#share-preview').seamless({
+    var formPreview = document.getElementById('form-preview');
+    formPreview.innerHTML = '';
+    var iframe = document.createElement('iframe');
+    iframe.setAttribute('style', 'width: 100%');
+    iframe.setAttribute('id', 'share-preview');
+    iframe.setAttribute('src', $scope.previewUrl);
+    formPreview.appendChild(iframe);
+    window.seamless(document.getElementById('share-preview'), {
       spinner: '',
       loading: 'Loading ...'
     });
@@ -977,15 +1208,22 @@ app.controller('FormShareController', ['$scope', function($scope) {
   // Make a form public.
   $scope.makePublic = function() {
     angular.forEach($scope.form.submissionAccess, function(access, index) {
-      if (access.type === 'create_own') {
+      if (
+        (access.type === 'create_own') &&
+        ($scope.form.submissionAccess[index].roles.indexOf(defaultRole._id) === -1)
+      ) {
         $scope.form.submissionAccess[index].roles.push(defaultRole._id);
       }
-      if(access.type === 'read_all') {
-        if($scope.form.access[index].roles !=  defaultRole._id) {
-          $scope.form.access[index].roles.push(defaultRole._id);
-        }
+    });
+    angular.forEach($scope.form.access, function(access, index) {
+      if (
+        (access.type === 'read_all') &&
+        ($scope.form.access[index].roles.indexOf(defaultRole._id) === -1)
+      ) {
+        $scope.form.access[index].roles.push(defaultRole._id);
       }
     });
+
     $scope.publicForm = true;
     $scope.saveForm();
   };
@@ -996,6 +1234,8 @@ app.controller('FormShareController', ['$scope', function($scope) {
       if (access.type === 'create_own' || access.type === 'create_all') {
         _.pull($scope.form.submissionAccess[index].roles, defaultRole._id);
       }
+    });
+    angular.forEach($scope.form.access, function(access, index) {
       if (access.type === 'read_all') {
         _.pull($scope.form.access[index].roles, defaultRole._id);
       }
@@ -1021,12 +1261,6 @@ app.controller('FormShareController', ['$scope', function($scope) {
               (access.type === 'create_own' || access.type === 'create_all') &&
               (_.indexOf(access.roles, defaultRole._id) !== -1)
             ) {
-              $scope.publicForm = true;
-            }
-          });
-          angular.forEach($scope.form.access, function(access) {
-            if ((access.type === 'read_all') &&
-              (_.indexOf(access.roles, defaultRole._id) !== -1)) {
               $scope.publicForm = true;
             }
           });
@@ -1367,94 +1601,12 @@ app.controller('FormActionEditController', [
           });
         }
 
-        // Hide role settings component as needed
-        var toggleVisible = function(association) {
-          if(!association) {
-            return;
-          }
-
-          angular.element('#form-group-role').css('display', (association === 'new' ? '' : 'none'));
-          angular.element('#form-group-resource').css('display', (association === 'link' ? 'none' : ''));
-        };
-
-        // Find the role settings component, and require it as needed.
-        var toggleRequired = function(association, formComponents) {
-          if(!formComponents || !association) {
-            return;
-          }
-
-          var roleComponent = FormioUtils.getComponent(formComponents, 'role');
-          var resourceComponent = FormioUtils.getComponent(formComponents, 'resource');
-          // Update the validation settings.
-          if (roleComponent) {
-            roleComponent.validate = roleComponent.validate || {};
-            roleComponent.validate.required = (association === 'new' ? true : false);
-          }
-          if (resourceComponent) {
-            resourceComponent.validate = resourceComponent.validate || {};
-            resourceComponent.validate.required = (association === 'link' ? false : true);
-          }
-        };
-
-        // Auth action validation changes for new resource missing role assignment.
-        if(actionInfo && actionInfo.name === 'auth') {
-          // Force the validation to be run on page load.
-          $timeout(function() {
-            var action = $scope.action.data.settings || {};
-            toggleVisible(action.association);
-            toggleRequired(action.association, actionInfo.settingsForm.components);
-          });
-
-          // Watch for changes to the action settings.
-          $scope.$watch('action.data.settings', function(current, old) {
-            // Make the role setting required if this is for new resource associations.
-            if(current.association !== old.association) {
-              toggleVisible(current.association);
-              toggleRequired(current.association, actionInfo.settingsForm.components);
-
-              // Dont save the old role settings if this is an existing association.
-              current.role = (current.role && (current.association === 'new')) || '';
-            }
-          }, true);
-        }
-
-        var showProviderFields = function(association, provider) {
-          angular.element('[id^=form-group-autofill-]').css('display', 'none');
-          if(association === 'new' && provider) {
-            angular.element('[id^=form-group-autofill-' + provider + ']').css('display', '');
-          }
-        };
-
         if(actionInfo && actionInfo.name === 'oauth') {
           // Show warning if button component has no options
           var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
           if(JSON.parse(buttonComponent.data.json).length === 0) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
           }
-          // Force the validation to be run on page load.
-          $timeout(function() {
-            var action = $scope.action.data.settings || {};
-            toggleVisible(action.association);
-            toggleRequired(action.association, actionInfo.settingsForm.components);
-            showProviderFields(action.association, action.provider);
-          });
-
-          // Watch for changes to the action settings.
-          $scope.$watch('action.data.settings', function(current, old) {
-            // Make the role setting required if this is for new resource associations.
-            if(current.association !== old.association) {
-              toggleVisible(current.association);
-              toggleRequired(current.association, actionInfo.settingsForm.components);
-              showProviderFields(current.association, current.provider);
-
-              // Dont save the old role settings if this is an existing association.
-              current.role = (current.role && (current.association === 'new')) || '';
-            }
-
-            if(current.provider !== old.provider) {
-              showProviderFields(current.association, current.provider);
-            }
-          }, true);
         }
 
         // Check for, and warn about premium actions being present.
@@ -1462,11 +1614,16 @@ app.controller('FormActionEditController', [
           actionInfo &&
           actionInfo.hasOwnProperty('premium') &&
           actionInfo.premium === true &&
-          $scope.currentProject &&
-          $scope.currentProject.hasOwnProperty('plan') &&
-          ['basic', 'trial'].indexOf($scope.currentProject.plan) !== -1
+          $scope.primaryProject &&
+          $scope.primaryProject.hasOwnProperty('plan') &&
+          ['basic', 'trial'].indexOf($scope.primaryProject.plan) !== -1
         ) {
-          FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.');
+          $scope.formDisabled = ($scope.primaryProject.plan === 'basic');
+          $scope.premiumNotAvailable = true;
+          $scope.premiumWarning = $scope.formDisabled ?
+            '<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.' :
+            '<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action. This action will not work after your trial period. Upgrade your project <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to make it permanent.';
+          FormioAlerts.warn($scope.premiumWarning);
         }
 
         var component = FormioUtils.getComponent($scope.form.components, _.get($scope, 'action.data.condition.field'));
@@ -1536,6 +1693,7 @@ app.controller('FormActionDeleteController', [
 app.controller('FormSubmissionsController', [
   '$scope',
   '$state',
+  '$stateParams',
   '$http',
   '$timeout',
   '$window',
@@ -1547,9 +1705,11 @@ app.controller('FormSubmissionsController', [
   'GoogleAnalytics',
   'ngDialog',
   '$interpolate',
+  'SubmissionExport',
   function(
     $scope,
     $state,
+    $stateParams,
     $http,
     $timeout,
     $window,
@@ -1560,13 +1720,30 @@ app.controller('FormSubmissionsController', [
     formioComponents,
     GoogleAnalytics,
     ngDialog,
-    $interpolate
+    $interpolate,
+    SubmissionExport
   ) {
+    if ($stateParams._vid) {
+      $scope._vid = $stateParams._vid;
+    }
     // Returns true if component should appear in table
     $scope.tableView = function(component) {
       return !component.protected &&
         (!component.hasOwnProperty('persistent') || component.persistent) &&
         (component.tableView);
+    };
+
+    $scope.export = function(form, type) {
+      $scope.isBusy = true;
+      SubmissionExport.export($scope.formio, form, type)
+        .then(function() {
+          $scope.isBusy = false;
+        })
+        .catch(function(err) {
+          $scope.isBusy = false;
+          console.warn(err);
+          FormioAlerts.onError(err);
+        });
     };
 
     // Creates resourcejs sort query from kendo datasource read options
@@ -1719,256 +1896,283 @@ app.controller('FormSubmissionsController', [
     };
 
     // When form is loaded, create the columns
-    $scope.loadFormPromise.then(function() {
-      // Load the grid on the next digest.
-      $timeout(function() {
-        // Define DataSource
-        var dataSource = new kendo.data.DataSource({
-          page: 1,
-          pageSize: 10,
-          serverPaging: true,
-          serverSorting: true,
-          serverFiltering: true,
-          sort: {
-            dir: 'desc',
-            field: 'created'
-          },
-          schema: {
-            model: {
-              id: '_id',
-              fields: _(FormioUtils.flattenComponents($scope.form.components))
-                .filter(function(component, path) {
-                  // Don't include fields that are nested.
-                  return path.indexOf('.') === -1;
-                })
-                .filter($scope.tableView)
-                .map(function(component) {
-                  var type;
-                  switch(component.type) {
-                    case 'checkbox': type = 'boolean';
-                      break;
-                    case 'datetime': type = 'date';
-                      break;
-                    case 'number': type = 'number';
-                      break;
-                    default: type = 'string';
-                  }
-
-                  // FOR-323 - Escape data to fix keys with - in them, because they are not valid js identifiers.
-                  return ['["data.' + component.key.replace(/\./g, '.data.') + '"]', {type: type}];
-                })
-                .concat([
-                  ['created', {type: 'date'}],
-                  ['modified', {type: 'date'}]
-                ])
-                .fromPairs()
-                .value()
+    $scope.loadFormPromise.then(function(form) {
+      var currentForm = _.clone(form) || {};
+      var loadRevisionsPromise = new Promise(function(resolve, reject) {
+        if (form && form.revisions === 'original' && !isNaN(parseInt($stateParams._vid))) {
+          (new Formio($scope.formUrl + '/v/' + $stateParams._vid)).loadForm()
+            .then(function(revisionForm) {
+              currentForm.components = revisionForm.components;
+              return resolve();
+            });
+        }
+        else {
+          return resolve();
+        }
+      });
+      loadRevisionsPromise.then(function() {
+        // Load the grid on the next digest.
+        $timeout(function() {
+          // Define DataSource
+          var dataSource = new kendo.data.DataSource({
+            page: 1,
+            pageSize: 10,
+            serverPaging: true,
+            serverSorting: true,
+            serverFiltering: true,
+            sort: {
+              dir: 'desc',
+              field: 'created'
             },
-            total: function(result) {
-              var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
-              return (match && match[1]) || 0;
-            },
-            data: 'data'
-          },
-          transport: {
-            read: function(options) {
-              var filters = options.data.filter && options.data.filter.filters;
-              var params = {
-                limit: options.data.take,
-                skip: options.data.skip,
-                sort: getSortQuery(options.data.sort)
-              };
-              _.each(filters, function(filter) {
-                // FOR-395 - Fix query regression with FOR-323
-                filter.field = filter.field.replace(/^\["|"\]$/gi, '');
+            schema: {
+              model: {
+                id: '_id',
+                fields: _(FormioUtils.flattenComponents(currentForm.components))
+                  .filter(function(component, path) {
+                    // Don't include fields that are nested.
+                    return path.indexOf('.') === -1;
+                  })
+                  .filter($scope.tableView)
+                  .map(function(component) {
+                    var type;
+                    switch(component.type) {
+                      case 'checkbox': type = 'boolean';
+                        break;
+                      case 'datetime': type = 'date';
+                        break;
+                      case 'number': type = 'number';
+                        break;
+                      default: type = 'string';
+                    }
 
-                switch(filter.operator) {
-                  case 'eq': params[filter.field] = filter.value;
-                    break;
-                  case 'neq': params[filter.field + '__ne'] = filter.value;
-                    break;
-                  case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
-                    break;
-                  case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
-                    break;
-                  case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
-                    break;
-                  case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
-                    break;
-                  case 'matchesregex': params[filter.field + '__regex'] = filter.value;
-                    break;
-                  case 'gt': params[filter.field + '__gt'] = filter.value;
-                    break;
-                  case 'gte': params[filter.field + '__gte'] = filter.value;
-                    break;
-                  case 'lt': params[filter.field + '__lt'] = filter.value;
-                    break;
-                  case 'lte': params[filter.field + '__lte'] = filter.value;
-                    break;
+                    // FOR-323 - Escape data to fix keys with - in them, because they are not valid js identifiers.
+                    return ['["data.' + component.key.replace(/\./g, '.data.') + '"]', {type: type}];
+                  })
+                  .concat([
+                    ['created', {type: 'date'}],
+                    ['modified', {type: 'date'}]
+                  ])
+                  .fromPairs()
+                  .value()
+              },
+              total: function(result) {
+                var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
+                return (match && match[1]) || 0;
+              },
+              data: 'data'
+            },
+            transport: {
+              read: function(options) {
+                var filters = options.data.filter && options.data.filter.filters;
+                var params = {
+                  limit: options.data.take,
+                  skip: options.data.skip,
+                  sort: getSortQuery(options.data.sort)
+                };
+                // Filter by _vid if provided.
+                if (!isNaN(parseInt($stateParams._vid))) {
+                  params._fvid = $stateParams._vid;
                 }
-              });
+                _.each(filters, function(filter) {
+                  // FOR-395 - Fix query regression with FOR-323
+                  filter.field = filter.field.replace(/^\["|"\]$/gi, '');
 
-              $http.get($scope.formio.submissionsUrl, {
-                params: params
-              })
-                .then(options.success)
-                .catch(function(err) {
-                  FormioAlerts.onError(err);
-                  options.error(err);
+                  switch(filter.operator) {
+                    case 'eq': params[filter.field] = filter.value;
+                      break;
+                    case 'neq': params[filter.field + '__ne'] = filter.value;
+                      break;
+                    case 'startswith': params[filter.field + '__regex'] = '/^' + filter.value + '/i';
+                      break;
+                    case 'endswith': params[filter.field + '__regex'] = '/' + filter.value + '$/i';
+                      break;
+                    case 'contains': params[filter.field + '__regex'] = '/' + _.escapeRegExp(filter.value) + '/i';
+                      break;
+                    case 'doesnotcontain': params[filter.field + '__regex'] = '/^((?!' + _.escapeRegExp(filter.value) + ').)*$/i';
+                      break;
+                    case 'matchesregex': params[filter.field + '__regex'] = filter.value;
+                      break;
+                    case 'gt': params[filter.field + '__gt'] = filter.value;
+                      break;
+                    case 'gte': params[filter.field + '__gte'] = filter.value;
+                      break;
+                    case 'lt': params[filter.field + '__lt'] = filter.value;
+                      break;
+                    case 'lte': params[filter.field + '__lte'] = filter.value;
+                      break;
+                  }
                 });
-            },
-            destroy: function(options) {
-              $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
-                .then(function(result) {
-                  GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
-                  options.success();
-                })
-                .catch(function(err) {
-                  FormioAlerts.onError(err);
-                  options.error(err);
-                }));
-            }
-          }
-        });
 
-        // Track component keys inside objects, so they dont appear in the grid more than once.
-        var componentHistory = [];
-
-        // Generate columns
-        var columns = [];
-        FormioUtils.eachComponent($scope.form.components, function(component, componentPath) {
-          if (component.tableView === false || !component.key) {
-            return;
-          }
-          // FOR-310 - If this component was already added to the grid, dont add it again.
-          if (component.key && componentHistory.indexOf(component.key) !== -1) {
-            return;
-          }
-
-          if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
-            FormioUtils.eachComponent(component.components, function(component) {
-              if (component.key) {
-                componentHistory.push(component.key);
+                $http.get($scope.formio.submissionsUrl, {
+                    params: params
+                  })
+                  .then(options.success)
+                  .catch(function(err) {
+                    FormioAlerts.onError(err);
+                    options.error(err);
+                  });
+              },
+              destroy: function(options) {
+                $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
+                  .then(function(result) {
+                    GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                    options.success();
+                  })
+                  .catch(function(err) {
+                    FormioAlerts.onError(err);
+                    options.error(err);
+                  }));
               }
-            }, true);
-          }
-          else if (['columns'].indexOf(component.type) !== -1) {
-            component.columns.forEach(function(column) {
-              FormioUtils.eachComponent(column.components, function(component) {
+            }
+          });
+
+          // Track component keys inside objects, so they dont appear in the grid more than once.
+          var componentHistory = [];
+
+          // Generate columns
+          var columns = [];
+          FormioUtils.eachComponent(currentForm.components, function(component, componentPath) {
+            if (component.tableView === false || !component.key) {
+              return;
+            }
+            // FOR-310 - If this component was already added to the grid, dont add it again.
+            if (component.key && componentHistory.indexOf(component.key) !== -1) {
+              return;
+            }
+
+            if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
+              FormioUtils.eachComponent(component.components, function(component) {
                 if (component.key) {
                   componentHistory.push(component.key);
                 }
               }, true);
-            });
-          }
-          else if (['table'].indexOf(component.type) !== -1) {
-            component.rows.forEach(function(row) {
-              row.forEach(function(col) {
-                FormioUtils.eachComponent(col.components, function(component) {
+            }
+            else if (['columns'].indexOf(component.type) !== -1) {
+              component.columns.forEach(function(column) {
+                FormioUtils.eachComponent(column.components, function(component) {
                   if (component.key) {
                     componentHistory.push(component.key);
                   }
                 }, true);
               });
+            }
+            else if (['table'].indexOf(component.type) !== -1) {
+              component.rows.forEach(function(row) {
+                row.forEach(function(col) {
+                  FormioUtils.eachComponent(col.components, function(component) {
+                    if (component.key) {
+                      componentHistory.push(component.key);
+                    }
+                  }, true);
+                });
+              });
+            }
+
+            columns.push(getKendoCell(component));
+          }, true);
+
+          if (currentForm.revisions) {
+            columns.push({
+              field: '_fvid',
+              title: 'Form Version',
+              width: '100px',
             });
           }
 
-          columns.push(getKendoCell(component));
-        }, true);
-
-        columns.push(
-          {
-            field: 'created',
-            title: 'Submitted',
-            width: '200px',
-            filterable: {
-              ui: 'datetimepicker'
-            },
-            template: function(dataItem) {
-              return moment(dataItem.created).format('lll');
-            }
-          },
-          {
-            field: 'modified',
-            title: 'Updated',
-            width: '200px',
-            filterable: {
-              ui: 'datetimepicker'
-            },
-            template: function(dataItem) {
-              return moment(dataItem.modified).format('lll');
-            }
-          }
-        );
-
-        // Define grid options
-        $scope.gridOptions = {
-          allowCopy: {
-            delimiter: ','
-          },
-          filterable: {
-            operators: {
-              string: {
-                eq: 'Is equal to',
-                neq: 'Is not equal to',
-                startswith: 'Starts with',
-                contains: 'Contains',
-                doesnotcontain: 'Does not contain',
-                endswith: 'Ends with',
-                matchesregex: 'Matches (RegExp)',
-                gt: 'Greater than',
-                gte: 'Greater than or equal to',
-                lt: 'Less than',
-                lte: 'Less than or equal to'
+          columns.push(
+            {
+              field: 'created',
+              title: 'Submitted',
+              width: '200px',
+              filterable: {
+                ui: 'datetimepicker'
               },
-              date: {
-                gt: 'Is after',
-                lt: 'Is before'
+              template: function(dataItem) {
+                return moment(dataItem.created).format('lll');
               }
             },
-            messages: {
-              isTrue: 'True',
-              isFalse: 'False'
+            {
+              field: 'modified',
+              title: 'Updated',
+              width: '200px',
+              filterable: {
+                ui: 'datetimepicker'
+              },
+              template: function(dataItem) {
+                return moment(dataItem.modified).format('lll');
+              }
+            }
+          );
+
+          // Define grid options
+          $scope.gridOptions = {
+            allowCopy: {
+              delimiter: ','
             },
-            mode: 'menu',
-            extra: false
-          },
-          pageable: {
-            numeric: false,
-            input: true,
-            refresh: true,
-            pageSizes: [5, 10, 25, 50, 100, 'all']
-          },
-          sortable: true,
-          resizable: true,
-          reorderable: true,
-          selectable: 'multiple, row',
-          columnMenu: true,
-          // This defaults to 'data' and screws everything up,
-          // so we set it to something that isn't a property on submissions
-          templateSettings: { paramName: 'notdata' },
-          toolbar:
-          '<div>' +
-          '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-          '<span class="glyphicon glyphicon-eye-open"></span> View' +
-          '</button>&nbsp;' +
-          '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
-          '<span class="glyphicon glyphicon-edit"></span> Edit' +
-          '</button>&nbsp;' +
-          '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
-          '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
-          '</button>' +
-          '</div>',
-          change: $scope.$apply.bind($scope),
-          dataSource: dataSource,
-          columns: columns,
-          columnMenuInit: function(e) {
-            e.container.find('[data-role=dropdownlist]').each(function() {
-              var widget = angular.element(this).data('kendoDropDownList');
-              stopScroll(widget.ul.parent());
-            });
-          }
-        };
+            filterable: {
+              operators: {
+                string: {
+                  eq: 'Is equal to',
+                  neq: 'Is not equal to',
+                  startswith: 'Starts with',
+                  contains: 'Contains',
+                  doesnotcontain: 'Does not contain',
+                  endswith: 'Ends with',
+                  matchesregex: 'Matches (RegExp)',
+                  gt: 'Greater than',
+                  gte: 'Greater than or equal to',
+                  lt: 'Less than',
+                  lte: 'Less than or equal to'
+                },
+                date: {
+                  gt: 'Is after',
+                  lt: 'Is before'
+                }
+              },
+              messages: {
+                isTrue: 'True',
+                isFalse: 'False'
+              },
+              mode: 'menu',
+              extra: false
+            },
+            pageable: {
+              numeric: false,
+              input: true,
+              refresh: true,
+              pageSizes: [5, 10, 25, 50, 100, 'all']
+            },
+            sortable: true,
+            resizable: true,
+            reorderable: true,
+            selectable: 'multiple, row',
+            columnMenu: true,
+            // This defaults to 'data' and screws everything up,
+            // so we set it to something that isn't a property on submissions
+            templateSettings: { paramName: 'notdata' },
+            toolbar:
+            '<div>' +
+            '<button class="btn btn-default btn-xs" ng-click="view()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+            '<span class="glyphicon glyphicon-eye-open"></span> View' +
+            '</button>&nbsp;' +
+            '<button class="btn btn-default btn-xs" ng-click="edit()" ng-disabled="selected().length != 1" ng-class="{\'btn-primary\':selected().length == 1}">' +
+            '<span class="glyphicon glyphicon-edit"></span> Edit' +
+            '</button>&nbsp;' +
+            '<button class="btn btn-default btn-xs" ng-click="delete()" ng-disabled="selected().length < 1" ng-class="{\'btn-danger\':selected().length >= 1}">' +
+            '<span class="glyphicon glyphicon-remove-circle"></span> Delete' +
+            '</button>' +
+            '</div>',
+            change: $scope.$apply.bind($scope),
+            dataSource: dataSource,
+            columns: columns,
+            columnMenuInit: function(e) {
+              e.container.find('[data-role=dropdownlist]').each(function() {
+                var widget = angular.element(this).data('kendoDropDownList');
+                stopScroll(widget.ul.parent());
+              });
+            }
+          };
+        });
       });
     });
   }
@@ -1979,34 +2183,46 @@ app.controller('FormSubmissionController', [
   '$state',
   '$stateParams',
   'Formio',
+  'PDFServer',
   function(
     $scope,
     $state,
     $stateParams,
-    Formio
+    Formio,
+    PDFServer
   ) {
-    // Submission information.
-    $scope.loadProjectPromise.then(function() {
-      $scope.submissionReady = false;
-      $scope.submissionId = $stateParams.subId;
-      $scope.submissionUrl = $scope.formUrl;
-      $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
-      $scope.submissionData = Formio.submissionData;
-      $scope.submission = {};
-      $scope.downloadUrl = '';
-      $scope.pdfImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAAAA3NCSVQICAjb4U/gAAAC9FBMVEX///+HiYuGhomCg4aCgIF6eX12eHokJCQkICAgICAjHSOOj5KJi46DhYd1dnltb3EkICAgICAjHSOVl5qTlZeOj5KHiYt6eX0kICAjHSOZmp2Vl5qGhokkICDOz9G+vsCztbapq66cnqGbnZ6ZmZmTlZckICCbnZ6Zmp2Vl5qTlZeOj5KMioqGhomCg4aCgIGZmp2TlZeCgIGmqauho6aen6KcnqGmqaucnqGbnZ66u76cnqGZmp2Vl5rKISjS0dLR0NHOz9HMzMzHycrHxsfFxMXCwsPCw8W+vsCen6KbnZ7GISjCwsO+v8K+vsCpq66kpqmeoaObnZ7////7+/v5+vr39/j09fXz8/P88PHx8fL37+/u7+/r7O3r6+zp6uvn5+jj5+fz4+P44eLw4eHj5OXi4+Th4uPf4OLf3+Dc3t/b3N7a29z109TY2tvv1NXv0tPX2NrW19jU1tfS09XP0dLOz9Hrx8jxxMbnxsfMzMzkxMXHycrGx8nDxcfqubvCw8XCwsPkuLrutbe/wcO+v8Lftre+vsC7vb+6u763ubu1t7riqqzeqquztbbqpqmxs7bZqKmvsbOtr7Kqra+pq67bnJ7gm56mqavXnJ3nl5ulp6qkpqmjpaeho6aeoaPbj5Gen6KcnqHXjpGbnZ7jiYzfio7SjpDdiYyZmp3LjI6ZmZnahoqVl5rXgoaTlZeSk5bSgIOPkZPOf4Lgen6Oj5LLf4KLjY+Ji46HiYvVcnaGhonNcnWDhYfKcXSCg4bca3DFcXTBcHJ+gIJ9foHRZWl6fH7MZmbOZWnGZGd6eX12eHrBY2bZXGF1dnlydHa4YWNwcXTOV1vKVlvIVlrCVlnPUFW+VVnOTlS3VFe1VFbKS1HGSE3BR0y/R0y7R0zEREq2R0rSP0WzRkmtRUjBOkC4OT6zOD3OMDaqNzrBLTO2KzCzKzCuKi/KISiqKi6lKS2+ICa6HyW7Hya2HySuHiOyHiSrHiKnHSGiHCCeHB+aGx/MBOLyAAAA/HRSTlMAERERERERERERESIiIiIiIiIiMzMzMzMzM0RERERVVVVVVVVVVVVmZmZmZmZmZmZ3d3eIiIiImZmZqqqqqrvMzMzMzMzMzMzMzMzM3d3d3e7u7v////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8PeNL3AAAACXBIWXMAAC37AAAt+wH8h0rnAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAFydJREFUeJzt3Xl8FNd9AHD31K56LfSIaOumTY80aeK06R23TXq5xXV8ZIRhzWEkgkAHKICQZCwpQpZsSSsWRQdeR2hlCWEsXFkHyELmtMEkGBvnMKZ2iV1jW2COGAOSwPzT33tv5s2bY3fn+O2slg8//DFikeT97u94b2Zn5FtuuRk342bcjJtxM8zCl5nhaWRm+lJNJuHP8Psy/H6/z7uA/1oG/CvVfL+P/vJS7qP/uQx4wVOJh9f/93q6u6LRzs0dHZH29ra21taWluZwOBRqbGxsqK+vr6urra2trq6qqqqsrKyoqFhHo5TEWiFKtKE8TD6NfgF8ZUUlfJNq+G519Q2NoVA4/Lek2lJI931algO8HeCqvKGBwOsIvFqBV+jhJXHCFF+9Huj1hN7Scs/vQvZTJ/f9Ppe3mcjVlGsyrsv1mpI1mtDo6QtVyvHV1WBvDIWbW1pb2//G58tMjRwaLvAHXE7hIA9RuVzscsqNGedsHquFf6t+rqd2kndOb2ttn/2p1OQ9w58ZCHxWlbeYyUnKNXAh4cxqEuwFMLVXVpFmh3pvbYP/Zvu9n/Olot+h3AOBzwtyqHXtgNOmXN/ignuVJmQ/56s9D98J0v5YQ2O4pa090gH2jtt/LQV2WNUCgT8Tqp3KhT7n802bcrXSGXqlPrif4tfwzFM7tHsdo3ds7oR+75j9W97LM3wzA1lfUOXNOvn6anFJ0zY5r3UTucznuVfLXrbXQrO3tEU6o13RFrDf9zmv6Zl+fyCQ9cWIblGLKdc2uVLnDFoEUUj/YcH0K9XUq3hS8nUNlN7V0xMh9ujtHtMzCH3WbcqEExY1bbWLcqHS1XxTbKE2OF/Wi3aa9ua2SLS7t6+vmdpn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';
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      $scope.loadProjectPromise.then(function(project) {
+        $scope.submissionReady = false;
+        $scope.submissionId = $stateParams.subId;
+        $scope.submissionUrl = $scope.formUrl;
+        $scope.submissionUrl += $stateParams.subId ? ('/submission/' + $stateParams.subId) : '';
+        $scope.submissionData = Formio.submissionData;
+        $scope.submission = {};
+        $scope.downloadUrl = '';
+        $scope.pdfImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAAAA3NCSVQICAjb4U/gAAAC9FBMVEX///+HiYuGhomCg4aCgIF6eX12eHokJCQkICAgICAjHSOOj5KJi46DhYd1dnltb3EkICAgICAjHSOVl5qTlZeOj5KHiYt6eX0kICAjHSOZmp2Vl5qGhokkICDOz9G+vsCztbapq66cnqGbnZ6ZmZmTlZckICCbnZ6Zmp2Vl5qTlZeOj5KMioqGhomCg4aCgIGZmp2TlZeCgIGmqauho6aen6KcnqGmqaucnqGbnZ66u76cnqGZmp2Vl5rKISjS0dLR0NHOz9HMzMzHycrHxsfFxMXCwsPCw8W+vsCen6KbnZ7GISjCwsO+v8K+vsCpq66kpqmeoaObnZ7////7+/v5+vr39/j09fXz8/P88PHx8fL37+/u7+/r7O3r6+zp6uvn5+jj5+fz4+P44eLw4eHj5OXi4+Th4uPf4OLf3+Dc3t/b3N7a29z109TY2tvv1NXv0tPX2NrW19jU1tfS09XP0dLOz9Hrx8jxxMbnxsfMzMzkxMXHycrGx8nDxcfqubvCw8XCwsPkuLrutbe/wcO+v8Lftre+vsC7vb+6u763ubu1t7riqqzeqquztbbqpqmxs7bZqKmvsbOtr7Kqra+pq67bnJ7gm56mqavXnJ3nl5ulp6qkpqmjpaeho6aeoaPbj5Gen6KcnqHXjpGbnZ7jiYzfio7SjpDdiYyZmp3LjI6ZmZnahoqVl5rXgoaTlZeSk5bSgIOPkZPOf4Lgen6Oj5LLf4KLjY+Ji46HiYvVcnaGhonNcnWDhYfKcXSCg4bca3DFcXTBcHJ+gIJ9foHRZWl6fH7MZmbOZWnGZGd6eX12eHrBY2bZXGF1dnlydHa4YWNwcXTOV1vKVlvIVlrCVlnPUFW+VVnOTlS3VFe1VFbKS1HGSE3BR0y/R0y7R0zEREq2R0rSP0WzRkmtRUjBOkC4OT6zOD3OMDaqNzrBLTO2KzCzKzCuKi/KISiqKi6lKS2+ICa6HyW7Hya2HySuHiOyHiSrHiKnHSGiHCCeHB+aGx/MBOLyAAAA/HRSTlMAERERERERERERESIiIiIiIiIiMzMzMzMzM0RERERVVVVVVVVVVVVmZmZmZmZmZmZ3d3eIiIiImZmZqqqqqrvMzMzMzMzMzMzMzMzM3d3d3e7u7v////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8PeNL3AAAACXBIWXMAAC37AAAt+wH8h0rnAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJld29ya3MgQ1M26LyyjAAAFydJREFUeJzt3Xl8FNd9AHD31K56LfSIaOumTY80aeK06R23TXq5xXV8ZIRhzWEkgkAHKICQZCwpQpZsSSsWRQdeR2hlCWEsXFkHyELmtMEkGBvnMKZ2iV1jW2COGAOSwPzT33tv5s2bY3fn+O2slg8//DFikeT97u94b2Zn5FtuuRk342bcjJtxM8zCl5nhaWRm+lJNJuHP8Psy/H6/z7uA/1oG/CvVfL+P/vJS7qP/uQx4wVOJh9f/93q6u6LRzs0dHZH29ra21taWluZwOBRqbGxsqK+vr6urra2trq6qqqqsrKyoqFhHo5TEWiFKtKE8TD6NfgF8ZUUlfJNq+G519Q2NoVA4/Lek2lJI931algO8HeCqvKGBwOsIvFqBV+jhJXHCFF+9Huj1hN7Scs/vQvZTJ/f9Ppe3mcjVlGsyrsv1mpI1mtDo6QtVyvHV1WBvDIWbW1pb2//G58tMjRwaLvAHXE7hIA9RuVzscsqNGedsHquFf6t+rqd2kndOb2ttn/2p1OQ9w58ZCHxWlbeYyUnKNXAh4cxqEuwFMLVXVpFmh3pvbYP/Zvu9n/Olot+h3AOBzwtyqHXtgNOmXN/ignuVJmQ/56s9D98J0v5YQ2O4pa090gH2jtt/LQV2WNUCgT8Tqp3KhT7n802bcrXSGXqlPrif4tfwzFM7tHsdo3ds7oR+75j9W97LM3wzA1lfUOXNOvn6anFJ0zY5r3UTucznuVfLXrbXQrO3tEU6o13RFrDf9zmv6Zl+fyCQ9cWIblGLKdc2uVLnDFoEUUj/YcH0K9XUq3hS8nUNlN7V0xMh9ujtHtMzCH3WbcqEExY1bbWLcqHS1XxTbKE2OF/Wi3aa9ua2SLS7t6+vmdpn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';
 
-      // Load the form and submissions.
-      $scope.formio = new Formio($scope.submissionUrl, {base: $scope.baseUrl});
-
-      $scope.loadFormPromise.then(function(form) {
-        $scope.formio.getDownloadUrl(form).then(function(url) {
-          $scope.downloadUrl = url;
+        // Load the form and submissions.
+        $scope.formio = new Formio($scope.submissionUrl, {
+          base: $scope.baseUrl,
+          project: $scope.projectUrl
         });
 
-        $scope.formio.loadSubmission().then(function(submission) {
-          $scope.submission = submission;
-          $scope.submissionReady = true;
+        $scope.loadFormPromise.then(function(form) {
+          // Ensure our project in the PDF server.
+          PDFServer.ensureProject($scope.primaryProjectPromise).then(function() {
+            $scope.formio.getDownloadUrl(form).then(function (url) {
+              if (primaryProject._id !== project._id) {
+                url += '&project=' + primaryProject._id;
+              }
+              $scope.downloadUrl = url;
+            });
+          });
+
+          $scope.formio.loadSubmission().then(function(submission) {
+            $scope.submission = submission;
+            $scope.submissionReady = true;
+          });
         });
       });
     });
@@ -2078,7 +2294,8 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     $scope.$on('permissionsChange', function() {
-      $scope.formio.saveForm(angular.copy($scope.currentForm)).then(function() {
+      $scope.formio.saveForm(angular.copy($scope.form)).then(function(form) {
+        $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
           type: 'success',
           message: 'Permissions Saved'

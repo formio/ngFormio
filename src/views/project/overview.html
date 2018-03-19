@@ -3,42 +3,6 @@
     <div class="col-md-8 overview-content">
       <ul class="list-group list-group-striped">
         <li class="list-group-item list-group-heading">
-          <h3>Recent Submissions</h3>
-        </li>
-        <li class="list-group-item list-group-heading">
-          <div class="row">
-            <div class="col-sm-2">
-              <strong>Created</strong>
-            </div>
-            <div class="col-sm-8">
-              <strong>Form</strong>
-            </div>
-            <div class="col-sm-2">
-              <strong class="pull-right">Links</strong>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item" ng-repeat="submission in submissions track by $index">
-          <div class="row">
-            <div class="col-sm-2">
-              {{submission.created | date : 'short'}}
-            </div>
-            <div class="col-sm-8">
-              <strong>{{forms[submission.form].title}}</strong>
-            </div>
-            <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
-              <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item text-center">
-          <a ui-sref="project.data">More...</a>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-4">
-      <ul class="list-group list-group-striped">
-        <li class="list-group-item list-group-heading">
           <h3>Recent Resources</h3>
         </li>
         <li class="list-group-item" ng-repeat="form in recentResources track by $index">
@@ -69,16 +33,43 @@
           <a ui-sref="project.form.index">More...</a>
         </li>
       </ul>
-      <ul class="list-group list-group-striped">
+      <!--<ul class="list-group list-group-striped">
         <li class="list-group-item list-group-heading">
-          <h3>Current Framework</h3>
+          <h3>Recent Submissions</h3>
         </li>
-        <li class="list-group-item">
-          <p><img src="{{currentFramework.img}}" alt="{{currentFramework.title}}" style="width: 50px;"> {{currentFramework.title}} <a ui-sref="project.settings" class="btn btn-default">Change</a></p>
-          <a class="btn btn-primary" ui-sref="project.tour">View Walkthrough</a>
+        <li class="list-group-item list-group-heading">
+          <div class="row">
+            <div class="col-sm-2">
+              <strong>Created</strong>
+            </div>
+            <div class="col-sm-8">
+              <strong>Form</strong>
+            </div>
+            <div class="col-sm-2">
+              <strong class="pull-right">Links</strong>
+            </div>
+          </div>
         </li>
-      </ul>
-      <ul class="list-group list-group-striped">
+        <li class="list-group-item" ng-repeat="submission in submissions track by $index">
+          <div class="row">
+            <div class="col-sm-2">
+              {{submission.created | date : 'short'}}
+            </div>
+            <div class="col-sm-8">
+              <strong>{{forms[submission.form].title}}</strong>
+            </div>
+            <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
+              <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
+            </div>
+          </div>
+        </li>
+        <li class="list-group-item text-center">
+          <a ui-sref="project.data">Coming Soon...</a>
+        </li>
+      </ul>-->
+    </div>
+    <div class="col-md-4">
+      <ul class="list-group list-group-striped" ng-if="currentProject._id === localProject._id">
         <li class="list-group-item list-group-heading">
           <h3>Monthly Submission Requests</h3>
         </li>
@@ -87,6 +78,15 @@
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
           </div>
           <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
+        </li>
+      </ul>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <h3>Current Framework</h3>
+        </li>
+        <li class="list-group-item">
+          <p><img src="{{currentFramework.img}}" alt="{{currentFramework.title}}" style="width: 50px;"> {{currentFramework.title}} <a ui-sref="project.settings" class="btn btn-default">Change</a></p>
+          <a class="btn btn-primary" ui-sref="project.tour">View Walkthrough</a>
         </li>
       </ul>
       <ul class="list-group list-group-striped" ng-if="hasTeams()">
@@ -124,7 +124,7 @@
       </ul>
       <div ng-if="!hasTeams()">
         <div class="well">
-          <h4><a href="" ng-click="showUpgradeDialog(currentProject)">Upgrade Plan</a> to enable teams for this project</h4>
+          <h4><a href="" ui-sref="project.billing({projectId: primaryProject._id})">Upgrade Plan</a> to enable teams for this project</h4>
         </div>
       </div>
     </div>

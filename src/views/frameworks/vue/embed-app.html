@@ -1,0 +1,69 @@
+<div class="row">
+  <div class="col-sm-12">
+    <p>The simplest way to embed a Form.io form inside your app is to use the <strong>formio</strong> directive. There are lots of options for how to do this. Based on what you want to do, use one of the following:</p>
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">A</span>
+          <h5>Uncontrolled Embed</h5>
+        </div>
+        <p>The easiest way to do an embed is to directly embed via the form URL.</p>
+        <p>To embed a form within your vue application, import the Formio library and add it to the render tree.</p>
+    <pre><code>
+      &lt;template&gt;
+      &nbsp;&nbsp;&lt;formio src="{{ variables.projectUrl }}/demographics" v-on:submit="onSubmitMethod" /&gt;
+      &lt;/template&gt;
+      &lt;script&gt;
+      import { Formio } from 'vue-formio';
+
+      export default {
+      &nbsp;&nbsp;components: {
+      &nbsp;&nbsp;&nbsp;&nbsp;formio: Formio
+      &nbsp;&nbsp;},
+      &nbsp;&nbsp;methods: {
+      &nbsp;&nbsp;&nbsp;&nbsp;onSubmitMethod: function(submission) {
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log(submission);
+      &nbsp;&nbsp;&nbsp;&nbsp;}
+      &nbsp;&nbsp;}
+      };
+      &lt;/script&gt;
+      </code></pre>      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">B</span>
+          <h5>Controlled Embed</h5>
+        </div>
+        <p>A controlled embed is where the loading and saving are controlled outside of the actual element. Typically this is done with flux or redux.</p>
+      <pre><code>
+        &lt;template&gt;
+        &nbsp;&nbsp;&lt;formio :form="form" :submission="submission" v-on:change="onChangeMethod" v-on:submit="onSubmitMethod" /&gt;
+        &lt;/template&gt;
+        &lt;script&gt;
+        import { Formio } from 'vue-formio';
+
+        export default {
+        &nbsp;&nbsp;data: function() {
+        &nbsp;&nbsp;&nbsp;&nbsp;// Load these from vuex or some other state store system.
+        &nbsp;&nbsp;&nbsp;&nbsp;return {
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;form: myForm,
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;submission: mySubmission
+        &nbsp;&nbsp;&nbsp;&nbsp;}
+        &nbsp;&nbsp;},
+        &nbsp;&nbsp;components: {
+        &nbsp;&nbsp;&nbsp;&nbsp;formio: Formio
+        &nbsp;&nbsp;},
+        &nbsp;&nbsp;methods: {
+        &nbsp;&nbsp;&nbsp;&nbsp;onSubmitMethod: function(submission) {
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log(submission);
+        &nbsp;&nbsp;&nbsp;&nbsp;},
+        &nbsp;&nbsp;&nbsp;&nbsp;onChangeMethod: function(change) {
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.log(change);
+        &nbsp;&nbsp;&nbsp;&nbsp;}
+        &nbsp;&nbsp;}
+        };
+        &lt;/script&gt;
+      </code></pre>      </li>
+      </li>
+    </ul>
+  </div>
+</div>

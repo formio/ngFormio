@@ -10,7 +10,7 @@ locally as a node server or from gulp. You MUST be running a formio-server and c
 Installation (Manual)
 ------------
 In order to install and run this application, you will first need to install Node.JS, Gulp, and Bower. In addition, you
-you will need to run the formio-server, preferredly on port 3000. See https://github.com/formio/formio-server for
+you will need to run the formio-server, preferably on port 3000. See https://github.com/formio/formio-server for
 instructions on running it.
 
   - ```brew install node```
@@ -39,13 +39,13 @@ Developing
 ------------
 In order to develop against the application, you will need to utilize Gulp.
 
-  - ```cd bower_components/formio```
+  - ```cd bower_components/ng-formio```
   - ```npm install```
   - ```gulp watch```
 
 ... create another terminal ...
 
-  - ```cd bower_components/ngFormBuilder```
+  - ```cd bower_components/ng-formio-builder```
   - ```npm install```
   - ```gulp watch```
 

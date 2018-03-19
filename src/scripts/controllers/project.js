@@ -261,6 +261,7 @@ app.controller('ProjectController', [
   'GoogleAnalytics',
   'RemoteTokens',
   'PrimaryProject',
+  'PDFServer',
   function(
     $scope,
     $rootScope,
@@ -274,7 +275,8 @@ app.controller('ProjectController', [
     $q,
     GoogleAnalytics,
     RemoteTokens,
-    PrimaryProject
+    PrimaryProject,
+    PDFServer
   ) {
     // Load in existing primary project scope.
     $scope.status = {
@@ -295,7 +297,6 @@ app.controller('ProjectController', [
       $scope[formType + 'sLoading'] = false;
       angular.element('#' + formType + '-loader').hide();
     });
-    $scope.formsLoading = true;
     $scope.forms = [];
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.localFormio = $scope.formio;
@@ -313,8 +314,6 @@ app.controller('ProjectController', [
       });
     };
 
-    $scope.loadRoles();
-
     $scope.minPlan = function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'commercial', 'trial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
@@ -325,6 +324,16 @@ app.controller('ProjectController', [
       if (!project._id) { return FormioAlerts.onError(new Error('No Project found.')); }
       if ($scope.status.save === 'saving') {
         return;
+      }
+
+      // If the remote project name changes, be sure to update the link as well.
+      if (
+        $scope.localProject.hasOwnProperty('remote') &&
+        $scope.localProject._id !== $scope.currentProject._id &&
+        $scope.localProject.remote.name !== project.name
+      ) {
+        $scope.localProject.remote.project.name = project.name;
+        $scope.localFormio.saveProject($scope.localProject);
       }
 
       formio = formio || (new Formio('/project/' + project._id));
@@ -356,7 +365,10 @@ app.controller('ProjectController', [
     };
 
     var primaryProjectQ = $q.defer();
+    var formioReady = $q.defer();
+    $scope.formioReady = formioReady.promise;
     $scope.primaryProjectPromise = primaryProjectQ.promise;
+    PDFServer.setPrimaryProject(primaryProjectQ.promise);
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.localProject = result;
@@ -365,12 +377,6 @@ app.controller('ProjectController', [
       // If this is a remote project, load the remote.
 
       $scope.rolesLoading = true;
-      var loadRoles = function() {
-        $http.get($scope.projectUrl + '/role?limit=1000').then(function(result) {
-          $scope.currentProjectRoles = result.data;
-          $scope.rolesLoading = false;
-        });
-      };
 
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
@@ -382,23 +388,25 @@ app.controller('ProjectController', [
         $scope.projectServer = $scope.localProject.remote.url.replace(/(^\w+:|^)\/\//, '');
         $scope.localFormio = $scope.formio;
         $scope.baseUrl = $scope.localProject.remote.url;
-        $scope.formio = new Formio($scope.projectUrl, {  });
+        $scope.formio = new Formio($scope.projectUrl, {
+          base: $scope.localProject.remote.url
+        });
+        formioReady.resolve($scope.formio);
         promiseResult = $http({
           method: 'GET',
           url: $scope.localProjectUrl + '/access/remote'
         })
           .then(function(response) {
             RemoteTokens.setRemoteToken($scope.projectUrl, response.data);
-            $scope.formio = new Formio($scope.projectUrl, {
-              base: $scope.localProject.remote.url
-            });
+            // Set remote token for projectId url as well.
+            RemoteTokens.setRemoteToken($scope.projectUrl.replace($scope.localProject.remote.project.name, 'project/' + $scope.localProject.remote.project._id), response.data);
             return $scope.formio
               .loadProject(null, {
                 ignoreCache: true
               })
               .then(function(currentProject) {
                 $scope.currentProject = currentProject;
-                loadRoles();
+                $scope.loadRoles();
                 return currentProject;
               });
           });
@@ -409,7 +417,8 @@ app.controller('ProjectController', [
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
-        loadRoles();
+        formioReady.resolve($scope.formio);
+        $scope.loadRoles();
       }
       $scope.projectType = 'Stage';
       $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';
@@ -547,6 +556,7 @@ app.controller('ProjectController', [
 app.controller('ProjectDeployController', [
   '$scope',
   '$state',
+  '$stateParams',
   'AppConfig',
   'Formio',
   'FormioAlerts',
@@ -554,6 +564,7 @@ app.controller('ProjectDeployController', [
   function(
     $scope,
     $state,
+    $stateParams,
     AppConfig,
     Formio,
     FormioAlerts,
@@ -587,18 +598,19 @@ app.controller('ProjectDeployController', [
             type: 'success',
             message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
           });
+          Formio.clearCache();
           // If Remote, update the local project as well.
           if ($scope.localProject._id !== $scope.currentProject._id) {
             $scope.localProject.tag = tag.tag;
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.transitionTo($state.current, null, { reload: true, inherit: true, notify: true });
+                $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
               });
           }
           else {
             PrimaryProject.clear();
-            $state.reload();
+            $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts))
@@ -622,6 +634,7 @@ app.controller('ProjectTagCreateController', [
     FormioAlerts,
     PrimaryProject
   ) {
+    $scope.isBusy = false;
     $scope.addTag = function(tag) {
       if (!tag) {
         return FormioAlerts.addAlert({
@@ -629,6 +642,7 @@ app.controller('ProjectTagCreateController', [
           message: 'Please enter a tag identifier.'
         });
       }
+      $scope.isBusy = true;
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
         .then(function(template) {
           Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
@@ -641,12 +655,19 @@ app.controller('ProjectTagCreateController', [
                 type: 'success',
                 message: 'Project Tag was created.'
               });
+              $scope.isBusy = false;
               PrimaryProject.clear();
               $state.reload();
             })
-            .catch(FormioAlerts.onError.bind(FormioAlerts));
+            .catch(function(err) {
+              $scope.isBusy = false;
+              FormioAlerts.onError(err);
+            });
         })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        .catch(function(err) {
+          $scope.isBusy = false;
+          FormioAlerts.onError(err);
+        });
     };
   }
 ]);
@@ -662,24 +683,33 @@ app.controller('ProjectImportController', [
     Formio,
     FormioAlerts
   ) {
+    $scope.isBusy = false;
     $scope.importTemplate = function(template) {
+      $scope.isBusy = true;
       if (!template) {
         return FormioAlerts.addAlert({
           type: 'warning',
           message: 'Please select a file to import.'
         });
       }
+      delete template.title;
+      delete template.name;
+      delete template.description;
       Formio.makeStaticRequest($scope.projectUrl + '/import', 'POST', {
           template: template
         })
         .then(function() {
+          $scope.isBusy = false;
           $scope.importFile = null;
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Project template imported to ' + $scope.currentProject.title + '.'
           });
         })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+        .catch(function(err) {
+          $scope.isBusy = false;
+          FormioAlerts.onError(err);
+        });
     };
   }
 ]);
@@ -753,7 +783,8 @@ app.controller('ProjectOverviewController', [
           params: {
             type: 'form',
             modified__gt: projectCreated,
-            sort: '-modified'
+            sort: '-modified',
+            select: 'type,title,_id'
           }
         })
         .then(function(forms) {
@@ -765,7 +796,8 @@ app.controller('ProjectOverviewController', [
           params: {
             type: 'resource',
             modified__gt: projectCreated,
-            sort: '-modified'
+            sort: '-modified',
+            select: 'type,title,_id'
           }
         })
         .then(function(forms) {
@@ -780,39 +812,39 @@ app.controller('ProjectOverviewController', [
         }
       });
 
-      $http.post($scope.projectUrl + '/report', [
-        {
-          $sort: {
-            created: -1
-          }
-        },
-        {
-          $limit: 10
-        },
-      ])
-        .then(function(result) {
-          $scope.submissions = result.data || [];
-
-          if ($scope.submissions.length) {
-            var formIds = _.uniq($scope.submissions.map(function(submission) {
-              return submission.form;
-            }));
-
-            $scope.formio.loadForms({
-              params: {
-                _id__in: formIds
-              }
-            }).then(function(results) {
-              $scope.forms = {};
-              results.forEach(function(form) {
-                $scope.forms[form._id] = form;
-              });
-            });
-          }
-        })
-        .catch(function(err) {
-          console.warn('Unable to get recent submissions', err);
-        });
+      //$http.post($scope.projectUrl + '/report', [
+      //  {
+      //    $sort: {
+      //      created: -1
+      //    }
+      //  },
+      //  {
+      //    $limit: 10
+      //  },
+      //])
+      //  .then(function(result) {
+      //    $scope.submissions = result.data || [];
+      //
+      //    if ($scope.submissions.length) {
+      //      var formIds = _.uniq($scope.submissions.map(function(submission) {
+      //        return submission.form;
+      //      }));
+      //
+      //      $scope.formio.loadForms({
+      //        params: {
+      //          _id__in: formIds
+      //        }
+      //      }).then(function(results) {
+      //        $scope.forms = {};
+      //        results.forEach(function(form) {
+      //          $scope.forms[form._id] = form;
+      //        });
+      //      });
+      //    }
+      //  })
+      //  .catch(function(err) {
+      //    console.warn('Unable to get recent submissions', err);
+      //  });
     });
   }
 ]);
@@ -876,187 +908,190 @@ app.controller('ChartController', [
     ProjectAnalytics,
     moment
   ) {
-    // Get the current time.
-    var curr = new Date();
-    $scope.viewDate = {
-      year: curr.getUTCFullYear(),
-      month: (curr.getUTCMonth() + 1),
-      day: curr.getUTCDate()
-    };
-    $scope.label = {
-      year: 'Yearly Submission Requests by Month',
-      month: 'Monthly Submission Requests by Day',
-      day: 'Daily Submission Requests by Hour'
-    };
-    $scope.analyticsOptions = {
-      height: '300px',
-      low: 0,
-      lineSmooth: false,
-      axisY: {
-        onlyInteger: true
-      }
-    };
-    $scope.analyticsEvents = {
-      draw: function(data) {
-        // FOR-163 - ie hack for charts not supporting foreignObject; translate the svg text labels.
-        if (data.type === 'label') {
-          if (typeof SVGForeignObjectElement !== 'function') {
-            data.element.attr({
-              transform: 'rotate(30 ' + data.x + ' ' + data.y + ')'
+
+    $scope.loadProjectPromise.then(function() {
+      // Get the current time.
+      var curr = new Date();
+      $scope.viewDate = {
+        year: curr.getUTCFullYear(),
+        month: (curr.getUTCMonth() + 1),
+        day: curr.getUTCDate()
+      };
+      $scope.label = {
+        year: 'Yearly Submission Requests by Month',
+        month: 'Monthly Submission Requests by Day',
+        day: 'Daily Submission Requests by Hour'
+      };
+      $scope.analyticsOptions = {
+        height: '300px',
+        low: 0,
+        lineSmooth: false,
+        axisY: {
+          onlyInteger: true
+        }
+      };
+      $scope.analyticsEvents = {
+        draw: function(data) {
+          // FOR-163 - ie hack for charts not supporting foreignObject; translate the svg text labels.
+          if (data.type === 'label') {
+            if (typeof SVGForeignObjectElement !== 'function') {
+              data.element.attr({
+                transform: 'rotate(30 ' + data.x + ' ' + data.y + ')'
+              });
+            }
+          }
+
+          // Intercept each chart point and register a click event.
+          if(data.type === 'point') {
+            // Register a click event to modify the graph based on the current view and click location.
+            data.element._node.onclick = function() {
+              if($scope.currentType === 'year') {
+                // Adjust month for non-zero index.
+                $scope.viewDate.month = (data.index + 1);
+                $scope.displayView('month', true);
+              }
+              else if($scope.currentType === 'month') {
+                // Adjust day for non-zero index.
+                $scope.viewDate.day = (data.index + 1);
+                $scope.displayView('day', true);
+              }
+            };
+          }
+        }
+      };
+
+      /**
+       * View switcher utility to graph the data for the current view type.
+       *
+       * @param {String} type
+       *   The type of view to display: year, month, view.
+       * @param {Boolean} [cached]
+       *   If the view should use the the $scope.viewDate time rather than the current time.
+       */
+      $scope.displayView = function(type, cached) {
+        var _y = curr.getUTCFullYear();
+        var _m = curr.getUTCMonth() + 1;
+        var _d = curr.getUTCDate();
+        if(cached) {
+          $scope.graphType = '';
+          _y = $scope.viewDate.year;
+          _m = $scope.viewDate.month;
+          _d = $scope.viewDate.day;
+        }
+        else {
+          // Clear the cache values;
+          $scope.viewDate.year = _y;
+          $scope.viewDate.month = _m;
+          $scope.viewDate.day = _d;
+        }
+
+        if(type === 'year') {
+          $scope.analyticsLoading = true;
+          ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y)
+            .then(function(data) {
+              $scope.currentType = type;
+              $scope.analytics = {
+                labels: _.map(_.map(data, 'month'), function(month) {
+                  return _.add(month, 1);
+                }),
+                series: [
+                  _.map(data, 'submissions')
+                ]
+              };
+
+              $scope.analyticsLoading = false;
             });
-          }
         }
+        else if(type === 'month') {
+          $scope.analyticsLoading = true;
+          ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m)
+            .then(function(data) {
+              $scope.currentType = type;
+              $scope.analytics = {
+                labels: _.map(_.map(data, 'day'), function(day) {
+                  return _.add(day, 1);
+                }),
+                series: [
+                  _.map(data, 'submissions')
+                ]
+              };
 
-        // Intercept each chart point and register a click event.
-        if(data.type === 'point') {
-          // Register a click event to modify the graph based on the current view and click location.
-          data.element._node.onclick = function() {
-            if($scope.currentType === 'year') {
-              // Adjust month for non-zero index.
-              $scope.viewDate.month = (data.index + 1);
-              $scope.displayView('month', true);
+              $scope.analyticsLoading = false;
+            });
+        }
+        else if(type === 'day') {
+          $scope.analyticsLoading = true;
+
+          /**
+           * Get the local hourly timestamps that relate to utc 0-23 to display as labels.
+           *
+           * @param year {Number}
+           *   The current year in question.
+           * @param month {Number}
+           *   The current month in question.
+           * @param day {Number}
+           *   The current day in question.
+           *
+           * @returns {Array}
+           *   The Labels to be associated with utc 0-23 corresponding data.
+           */
+          var calculateLocalTimeLabels = function(year, month, day) {
+            var local = [];
+
+            // Calculate the current utc offset in rounded hours.
+            var start = null;
+            var time = moment(year + ' ' + month + ' ' + day, 'YYYY MM DD');
+            var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
+            if(offset > 0) {
+              // Behind utc by the given amount.
+              start = (24 - offset);
+              time.subtract(1, 'days');
             }
-            else if($scope.currentType === 'month') {
-              // Adjust day for non-zero index.
-              $scope.viewDate.day = (data.index + 1);
-              $scope.displayView('day', true);
+            else {
+              // Current timezone is ahead of utc.
+              start = (0 - offset);
             }
+
+            // Change the am flag based on the start of display labels.
+            var am = (start > 11) ? false : true;
+            for(var i = 0; i < 24; i++) {
+              // Flip the am flag when the clock wraps around.
+              var output = ((start + i) % 12);
+              if(output === 0) {
+                am = !am;
+
+                // When the am flag wraps, set the output to 12 rather than 0.
+                output = 12;
+
+                time.add(1, 'days');
+              }
+
+              // Add each label sequentially in the utc order.
+              local.push('' + output + (am ? 'AM' : 'PM') + ' ' + time.format('M/D/YYYY'));
+            }
+
+            return local;
           };
+
+          ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m, _d)
+            .then(function(data) {
+              $scope.currentType = type;
+              var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
+
+              $scope.analytics = {
+                labels: displayHrs,
+                series: [_.map(data, 'submissions')]
+              };
+
+              $scope.analyticsLoading = false;
+            });
         }
-      }
-    };
-
-    /**
-     * View switcher utility to graph the data for the current view type.
-     *
-     * @param {String} type
-     *   The type of view to display: year, month, view.
-     * @param {Boolean} [cached]
-     *   If the view should use the the $scope.viewDate time rather than the current time.
-     */
-    $scope.displayView = function(type, cached) {
-      var _y = curr.getUTCFullYear();
-      var _m = curr.getUTCMonth() + 1;
-      var _d = curr.getUTCDate();
-      if(cached) {
-        $scope.graphType = '';
-        _y = $scope.viewDate.year;
-        _m = $scope.viewDate.month;
-        _d = $scope.viewDate.day;
-      }
-      else {
-        // Clear the cache values;
-        $scope.viewDate.year = _y;
-        $scope.viewDate.month = _m;
-        $scope.viewDate.day = _d;
-      }
-
-      if(type === 'year') {
-        $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y)
-          .then(function(data) {
-            $scope.currentType = type;
-            $scope.analytics = {
-              labels: _.map(_.map(data, 'month'), function(month) {
-                return _.add(month, 1);
-              }),
-              series: [
-                _.map(data, 'submissions')
-              ]
-            };
-
-            $scope.analyticsLoading = false;
-          });
-      }
-      else if(type === 'month') {
-        $scope.analyticsLoading = true;
-        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m)
-          .then(function(data) {
-            $scope.currentType = type;
-            $scope.analytics = {
-              labels: _.map(_.map(data, 'day'), function(day) {
-                return _.add(day, 1);
-              }),
-              series: [
-                _.map(data, 'submissions')
-              ]
-            };
-
-            $scope.analyticsLoading = false;
-          });
-      }
-      else if(type === 'day') {
-        $scope.analyticsLoading = true;
-
-        /**
-         * Get the local hourly timestamps that relate to utc 0-23 to display as labels.
-         *
-         * @param year {Number}
-         *   The current year in question.
-         * @param month {Number}
-         *   The current month in question.
-         * @param day {Number}
-         *   The current day in question.
-         *
-         * @returns {Array}
-         *   The Labels to be associated with utc 0-23 corresponding data.
-         */
-        var calculateLocalTimeLabels = function(year, month, day) {
-          var local = [];
-
-          // Calculate the current utc offset in rounded hours.
-          var start = null;
-          var time = moment(year + ' ' + month + ' ' + day, 'YYYY MM DD');
-          var offset = Math.ceil(((new Date()).getTimezoneOffset() / 60));
-          if(offset > 0) {
-            // Behind utc by the given amount.
-            start = (24 - offset);
-            time.subtract(1, 'days');
-          }
-          else {
-            // Current timezone is ahead of utc.
-            start = (0 - offset);
-          }
-
-          // Change the am flag based on the start of display labels.
-          var am = (start > 11) ? false : true;
-          for(var i = 0; i < 24; i++) {
-            // Flip the am flag when the clock wraps around.
-            var output = ((start + i) % 12);
-            if(output === 0) {
-              am = !am;
-
-              // When the am flag wraps, set the output to 12 rather than 0.
-              output = 12;
-
-              time.add(1, 'days');
-            }
-
-            // Add each label sequentially in the utc order.
-            local.push('' + output + (am ? 'AM' : 'PM') + ' ' + time.format('M/D/YYYY'));
-          }
-
-          return local;
-        };
-
-        ProjectAnalytics.getSubmissionAnalytics($scope.projectUrl, _y, _m, _d)
-          .then(function(data) {
-            $scope.currentType = type;
-            var displayHrs = calculateLocalTimeLabels(_y, _m, _d);
-
-            $scope.analytics = {
-              labels: displayHrs,
-              series: [_.map(data, 'submissions')]
-            };
-
-            $scope.analyticsLoading = false;
-          });
-      }
-    };
-    $scope.types = ['Year', 'Month', 'Day'];
-    $scope.graphChange = function() {
-      $scope.displayView(($scope.graphType || '').toLowerCase());
-    };
+      };
+      $scope.types = ['Year', 'Month', 'Day'];
+      $scope.graphChange = function() {
+        $scope.displayView(($scope.graphType || '').toLowerCase());
+      };
+    });
   }
 ]);
 
@@ -2131,6 +2166,7 @@ app.controller('ProjectRemoteController', [
   '$stateParams',
   'AppConfig',
   function($http, $scope, $state, $stateParams, AppConfig) {
+    $scope.loading = false;
     $scope.remote = {
       type: 'Subdirectories'
     };
@@ -2141,10 +2177,14 @@ app.controller('ProjectRemoteController', [
       if (url) {
         $scope.insecureWarning = url.indexOf('http:') !== -1 && window.location.protocol === 'https:';
       }
+      $scope.loading = false;
     });
 
     $scope.check = function() {
+      $scope.loading = true;
       if (!$scope.remote.url || !$scope.remote.secret) {
+        $scope.remoteError = 'Server URL or Secret not provided.';
+        $scope.loading = false;
         return;
       }
       $scope.localProject.settings.remoteSecret = $scope.remote.secret;
@@ -2165,7 +2205,7 @@ app.controller('ProjectRemoteController', [
                 disableJWT: true
               })
                 .then(function(result) {
-                  if (result && result.data && result.data.version && semver.satisfies(result.data.version, '>=5.0.0-beta.1')) {
+                  if (result && result.data && result.data.version && semver.satisfies(result.data.version.split('-')[0], '>=5.0.0')) {
                     $http({
                       method: 'GET',
                       url: $scope.remote.url + '/project',
@@ -2186,6 +2226,7 @@ app.controller('ProjectRemoteController', [
                             name: 'new'
                           });
                         }
+                        $scope.loading = false;
                       })
                       .catch(function(err) {
                         if (err.status === -1) {
@@ -2197,14 +2238,17 @@ app.controller('ProjectRemoteController', [
                             $scope.remoteError += '. Please check your access key';
                           }
                         }
+                        $scope.loading = false;
                       });
                   }
                   else {
                     $scope.remoteError = 'Environment too old of a version. Please upgrade.';
                   }
+                  $scope.loading = false;
                 })
                 .catch(function(err) {
                   $scope.remoteError = 'Environment did not respond to a CORS request properly. It may not be a properly configured form.io server or does not exist.';
+                  $scope.loading = false;
                 });
 
             });
@@ -2212,12 +2256,14 @@ app.controller('ProjectRemoteController', [
         .catch(function(err) {
           if (err) {
             $scope.remoteError = 'Unable to save Portal Key. Please check your permissions.';
+            $scope.loading = false;
           }
         });
       return;
     };
 
     $scope.connect = function() {
+      $scope.loading = true;
       if ($scope.remote.project.name === 'new') {
         $http({
           method: 'GET',
@@ -2228,6 +2274,7 @@ app.controller('ProjectRemoteController', [
             project.template = result.data;
             delete project.access;
             delete project._id;
+            delete project.project;
             $http({
               method: 'POST',
               url: $scope.remote.url + '/project',
@@ -2242,14 +2289,17 @@ app.controller('ProjectRemoteController', [
                 $scope.localProject.remote = angular.copy($scope.remote);
                 delete $scope.localProject.remote.secret;
                 $scope.saveLocalProject().then(function() {
+                  $scope.loading = false;
                   $state.reload();
                 });
               })
               .catch(function(err) {
+                $scope.loading = false;
                 $scope.remoteError = 'Error importing environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
               });
         })
         .catch(function(err) {
+          $scope.loading = false;
           $scope.remoteError = 'Error exporting environment - ' + err.status + ' - ' + err.statusText + ': ' + err.data;
         });
       }
@@ -2259,6 +2309,7 @@ app.controller('ProjectRemoteController', [
         delete $scope.localProject.remote.secret;
         $scope.saveLocalProject()
           .then(function() {
+            $scope.loading = false;
             $state.reload();
           });
       }
@@ -2555,37 +2606,43 @@ app.controller('ProjectDeleteController', [
   'FormioAlerts',
   'GoogleAnalytics',
   'PrimaryProject',
+  'Formio',
   function(
     $scope,
     $state,
     FormioAlerts,
     GoogleAnalytics,
-    PrimaryProject
+    PrimaryProject,
+    Formio
   ) {
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      var isProject = ($scope.currentProject._id === primaryProject._id);
+      var type = (isProject ? 'Project' : 'Stage');
+      $scope.deleteProject = function() {
+        if (!$scope.currentProject || !$scope.currentProject._id) { return; }
+        $scope.isBusy = true;
+        var localFormio = new Formio('/project/' + $scope.localProject._id);
+        localFormio.deleteProject()
+          .then(function() {
+            FormioAlerts.addAlert({
+              type: 'success',
+              message: type + ' was deleted!'
+            });
+            $scope.isBusy = false;
+            GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+            PrimaryProject.clear();
+            if (isProject) {
+              $state.go('home');
+            }
+            else {
+              $state.go('project.overview', {projectId: primaryProject._id});
+            }
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+      };
+    });
+
     $scope.isBusy = false;
-    var isProject = ($scope.currentProject._id === $scope.primaryProject._id);
-    var type = (isProject ? 'Project' : 'Stage');
-    $scope.deleteProject = function() {
-      if (!$scope.currentProject || !$scope.currentProject._id) { return; }
-      $scope.isBusy = true;
-      $scope.formio.deleteProject()
-        .then(function() {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: type + ' was deleted!'
-          });
-          $scope.isBusy = false;
-          GoogleAnalytics.sendEvent(type, 'delete', null, 1);
-          PrimaryProject.clear();
-          if (isProject) {
-            $state.go('home');
-          }
-          else {
-            $state.go('project.overview', {projectId: $scope.primaryProject._id});
-          }
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-    };
   }
 ]);
 
@@ -2749,22 +2806,24 @@ app.controller('ProjectBilling', [
 app.controller('ProjectExportController', [
   '$scope',
   '$http',
+  'FileSaver',
   function(
     $scope,
-    $http
+    $http,
+    FileSaver
   ) {
+    $scope.isBusy = false;
     $scope.downloadTemplate = function() {
+      $scope.isBusy = true;
       $http({
         url: $scope.projectUrl + '/export',
         method: 'GET',
         responseType: 'blob'
       }).then(function(response) {
-        var a = document.createElement('a');
-        a.href = window.URL.createObjectURL(response.data);
-        a.download = $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json';
-        a.click();
-        window.URL.revokeObjectURL(a.href);
+        $scope.isBusy = false;
+        FileSaver.saveAs(response.data, $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json');
       }).catch(function(error) {
+        $scope.isBusy = false;
         console.error(error);
       });
     };

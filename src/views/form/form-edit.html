@@ -1,8 +1,46 @@
+<formio-header-wrapper ng-if="(isActive('project.form.form.edit') || isActive('project.resource.form.edit'))">
+  <div class="form-nav">
+    <ul class="nav nav-pills">
+      <li role="presentation"><span ng-switch="form.type" class="navbar-text form-title">{{ form.title | characters:25:true}} {{ formInfo.name }} <a href="{{ projectUrl }}/{{ form.path }}" target="_blank"><img src="images/json.png" style="height:0.7em;" /></a> | </span></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.edit'), disabled: currentProject.protect}" ng-if="form.type === formInfo.type"><a class="btn btn-default btn-xs" ui-sref="project.{{ form.type }}.form.edit"><span
+        class="glyphicon glyphicon-edit"></span> <span class="hidden-xs hidden-sm hidden-md">Edit</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.view')}" ng-if="formInfo.type === formInfo.type"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.view"><i class="fa fa-check-square-o"></i> <span
+        class="hidden-xs hidden-sm hidden-md">Use</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.revisions')}"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.revisions"><i class="fa fa-code-fork"></i>
+        <span class="hidden-xs hidden-sm hidden-md">Revisions</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.api')}" ng-if="formInfo.type === 'resource'"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.api"><i class="fa fa-code"></i> <span class="hidden-xs hidden-sm hidden-md">
+        API</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.embed')}" ng-if="formInfo.type === 'form'"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.embed"><i class="fa fa-code"></i> <span
+        class="hidden-xs hidden-sm hidden-md">Embed</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.submission.index')}"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.submission.index"><i class="fa fa-database"></i>
+        <span class="hidden-xs hidden-sm hidden-md">Data</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.action'), disabled: currentProject.protect}" ng-if="form.type === formInfo.type"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.action.index"><i class="fa fa-paper-plane"></i> <span class="hidden-xs hidden-sm hidden-md">Actions</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.permission'), disabled: currentProject.protect}" ng-if="form.type === formInfo.type"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.permission"><i class="fa fa-lock"></i> <span class="hidden-xs hidden-sm hidden-md">Access</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.share')}" ng-if="formInfo.type === 'form'"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.share"><i class="fa fa-rocket"></i> <span
+        class="hidden-xs hidden-sm hidden-md">Launch</span></a></li>
+      <li role="presentation" class="form-nav" ng-class="{active:isActive('project.{{ formInfo.type }}.form.settings')}"><a class="btn btn-default btn-xs" ui-sref="project.{{ formInfo.type }}.form.settings" uib-tooltip="Form Settings"><i class="fa fa-gear"></i></a></li>
+      <li role="presentation" class="form-nav">
+        <span ng-if="!formId || !revisionsEnabled || !minPlan('commercial')">
+          <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary btn-xs" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
+        </span>
+        <span ng-if="formId && revisionsEnabled && minPlan('commercial')">
+          <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success btn-xs" ng-click="saveFormDraft()" ng-disabled="!form.revisions">Save Draft</button>
+          <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary btn-xs" ng-click="saveForm()">Publish</button>
+        </span>
+      </li>
+    </ul>
+  </div>
+</formio-header-wrapper>
 <ul class="nav nav-pills form-nav" ng-if="!formId">
   <li role="presentation" ng-if="!isCopy"><span ng-switch="form.type" class="navbar-text form-title">New {{ capitalize(form.type) }}</span></li>
   <li role="presentation" ng-if="isCopy"><span ng-switch="form.type" class="navbar-text form-title">Copy {{ capitalize(form.type) }}</span></li>
 </ul>
 <div ng-class="{'form-content': !formId}" class="form-edit">
+  <div class="alert alert-warning" ng-if="dirty && !draft">You have unsaved changes.
+    <span ng-if="revisionsEnabled">Save these changes to a draft or publish them to a new revision.</span>
+    <span ng-if="!revisionsEnabled">Be sure to save your changes when done.</span>
+  </div>
+  <div class="alert alert-info" ng-if="draft">You are editing a draft. Publish the changes to see them on your live form.</div>
   <form role="form" novalidate>
     <div class="row">
       <div class="col-lg-2 col-md-4 col-sm-4">
@@ -20,7 +58,7 @@
           </p>
         </div>
       </div>
-      <div class="col-lg-2 col-md-4 col-sm-4">
+      <div class="col-lg-2 col-md-3 col-sm-3">
         <div id="form-group-display" class="form-group">
           <label for="name" class="control-label">Display as</label>
           <div class="input-group">
@@ -39,11 +77,17 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-3 col-md-4 col-sm-4 save-buttons pull-right">
+      <div id="save-buttons" class="col-lg-3 col-md-5 col-sm-5 save-buttons pull-right">
         <div class="form-group pull-right">
           <a class="btn btn-default" ng-click="copy()" ng-if="formId" uib-tooltip="Copy this form" title="Copy this form"><span class="glyphicon glyphicon-copy"></span></a>
-          <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')">Cancel</a>
-          <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
+          <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')" uib-tooltip="Cancel all changes" title="Cancel all changes"><span class="glyphicon glyphicon-ban-circle"></span></a>
+          <span ng-if="!formId || !revisionsEnabled || !minPlan('commercial')">
+            <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
+          </span>
+          <span ng-if="formId && revisionsEnabled && minPlan('commercial')">
+            <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success" ng-click="saveFormDraft()" ng-disabled="!form.revisions">Save Draft</button>
+            <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">Publish</button>
+          </span>
         </div>
       </div>
     </div>
@@ -63,10 +107,20 @@
     <div ng-if="form.display !== 'pdf' || form.settings.pdf">
       <form-builder url="formUrl" form="form" type="form.type" on-save="saveForm" on-cancel="cancel" ng-if="formReady" options="{baseUrl: baseUrl, building: true}"></form-builder>
     </div>
-    <div ng-include="'views/form/form-settings.html'"></div>
+    <div id="form-group-note" class="form-group" ng-if="revisionsEnabled && minPlan('commercial')">
+      <label class="control-label">Revision Note  </label>
+      <textarea class="form-control" ng-model="form._vnote"></textarea>
+      <div class="text-muted">Describe the changes made to this revision.</div>
+    </div>
     <div class="form-group pull-right">
       <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + form.type + '.index')">Cancel</a>
-      <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
+      <span ng-if="!formId || !revisionsEnabled || !minPlan('commercial')">
+        <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">{{formId ? 'Save' : 'Create'}} {{ capitalize(form.type)  }}</button>
+      </span>
+      <span ng-if="formId && revisionsEnabled && minPlan('commercial')">
+        <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-success" ng-click="saveFormDraft()" ng-disabled="!form.revisions">Save Draft</button>
+        <button ng-hide="highestRole === 'team_read'" type="submit" class="btn btn-primary" ng-click="saveForm()">Publish</button>
+      </span>
     </div>
   </form>
 </div>
