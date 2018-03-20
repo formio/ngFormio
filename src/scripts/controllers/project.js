@@ -327,8 +327,8 @@ app.controller('ProjectController', [
       }
 
       // If the remote project name changes, be sure to update the link as well.
-      if (
-        $scope.localProject.hasOwnProperty('remote') &&
+      if(($scope.localProject.hasOwnProperty('remote') &&
+        $scope.localProject.remote.project) &&
         $scope.localProject._id !== $scope.currentProject._id &&
         $scope.localProject.remote.name !== project.name
       ) {
