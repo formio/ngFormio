@@ -3,6 +3,9 @@ module.exports = function (actions) {
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
       actions.iAmLoggedInFor('profileuser1');
+      // actions.enterTextInField('.login-container #email', 'admin@example.com');
+      // actions.enterTextInField('.login-container #password', 'password');
+      // actions.clickOnElementWithText('LOG IN');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
@@ -28,12 +31,12 @@ module.exports = function (actions) {
       actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
-      actions.checkElementIsNotDisabled('//*[@id="name"]');
-      actions.enterTextInField('#name','independentauto');
+      actions.checkElementIsNotDisabled('//*[@id="form-group-name"]/div[1]/input');
+      actions.enterTextInField('#form-group-name>div.input-group.ng-scope>input','independentauto');
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Save Stage');
       actions.waitForActionToComplete(500);
-      actions.iSeeValueIn('#name','independentauto');
+      actions.iSeeValueIn('#form-group-name>div.input-group.ng-scope>input','independentauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
       actions.iSeeValueIn('#form-group-path','independentauto');
@@ -151,6 +154,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('File Storage');
       actions.iSeeText('Upgrade your project to a paid plan to access file storage settings.');
       actions.clickOnElementWithText('Data Connections');
+      actions.clickOnElementWithText('Authentication');
+      actions.checkingUrlEndsWith('env/authentication/info');
       actions.clickOnElementWithText('OAuth');
     });
     describe('Deleting independentProject',function(){
