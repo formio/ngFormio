@@ -100,8 +100,8 @@ module.exports = function (actions) {
 
     describe('Tag the release', function() {
      actions.clickOnLink('Settings');
-     actions.clickOnLink('Staging');
-     actions.clickOnLink('Create Version Tag');
+     actions.clickOnElementWithText('Staging');
+     actions.clickOnElementWithText('Create Version Tag');
      actions.enterTextInField('#tag', '0.0.2');
      actions.clickOnElementWithText(' Create version tag');
      actions.envHasTag('Dev', '0.0.2');
