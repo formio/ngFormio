@@ -1,7 +1,7 @@
 var maskInput = require('vanilla-text-mask').default;
 var createNumberMask = require('text-mask-addons').createNumberMask;
 var formioUtils = require('formiojs/utils');
-var _get = require('lodash/get');
+var _ = require('lodash');
 
 module.exports = function() {
   return {
@@ -21,19 +21,24 @@ module.exports = function() {
       }
 
       var getFormatOptions = function() {
-        if (format === 'currency') {
-          return {
-            style: 'currency',
-            currency: scope.currency,
-            useGrouping: true,
-            maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
-          };
-        }
-        return {
+        var formatOptions = {
           style: 'decimal',
           useGrouping: true,
-          maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
+          // minimumFractionDigits: 0
         };
+        if (scope.component.hasOwnProperty('decimalLimit')) {
+          formatOptions.maximumFractionDigits = _.get(scope.component, 'decimalLimit', 20);
+        }
+        if (format === 'currency') {
+          formatOptions.style = 'currency';
+          formatOptions.currency = scope.currency;
+          formatOptions.maximumFractionDigits = _.get(scope.component, 'decimalLimit', 2);
+        }
+        if (scope.requireDecimal) {
+          formatOptions.minimumFractionDigits = formatOptions.maximumFractionDigits;
+        }
+
+        return formatOptions;
       };
 
       var formattedNumberString = (12345.6789).toLocaleString(scope.options.language || 'en');
@@ -52,19 +57,27 @@ module.exports = function() {
         scope.delimiter = '';
       }
 
+      // Allow override of decimalSeparator and delimiter in options.
+      if (scope.options.languageOverride && scope.options.languageOverride.hasOwnProperty(scope.options.language || 'en')) {
+        scope.decimalSeparator = scope.options.languageOverride[scope.options.language || 'en'].decimalSeparator;
+        scope.delimiter = scope.options.languageOverride[scope.options.language || 'en'].delimiter;
+      }
+
       if (format === 'currency') {
         scope.currency = scope.component.currency || 'USD';
-        scope.decimalLimit = scope.component.decimalLimit || 2;
+        scope.decimalLimit = scope.component.hasOwnProperty('decimalLimit') ? scope.component.decimalLimit : 2;
+        scope.requireDecimal = scope.component.hasOwnProperty('requireDecimal') ? scope.component.requireDecimal : true;
 
         // Get the prefix and suffix from the localized string.
-        var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{' + scope.decimalLimit + '})?(.*)?';
+        var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{2})?(.*)?';
         var parts = (100).toLocaleString(scope.options.language, getFormatOptions()).match(new RegExp(regex));
         scope.prefix = parts[1] || '';
         scope.suffix = parts[3] || '';
       }
       else if (format ==='number') {
         // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
-        scope.decimalLimit = 20;
+        scope.decimalLimit = scope.component.hasOwnProperty('decimalLimit') ? scope.component.decimalLimit : 20;
+        scope.requireDecimal = scope.component.hasOwnProperty('requireDecimal') ? scope.component.requireDecimal : false;
         if (
           scope.component.validate &&
           scope.component.validate.step &&
@@ -83,8 +96,28 @@ module.exports = function() {
        */
       var setInputMask = function(input) {
         if (!input) {
-          console.log('no input');
+          console.warn('no input');
           return;
+        }
+
+        var maskOptions = {
+          prefix: '',
+          suffix: '',
+          thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.delimiter),
+          decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+          allowNegative: _.get(scope.component, 'allowNegative', true)
+        }
+
+        if (_.get(scope.component, 'decimalLimit', scope.decimalLimit) === 0 ||
+          (scope.component.validate && scope.component.validate.integer) ||
+          !_.get(scope.component, 'allowDecimal', true)
+        ) {
+          maskOptions.allowDecimal = false;
+        }
+        else {
+          maskOptions.allowDecimal = true;
+          maskOptions.decimalLimit = _.get(scope.component, 'decimalLimit', scope.decimalLimit);
+          maskOptions.requireDecimal = _.get(scope.component, 'requireDecimal', scope.requireDecimal);
         }
 
         var mask;
@@ -93,29 +126,14 @@ module.exports = function() {
           mask = formioUtils.getInputMask(scope.component.inputMask);
         }
         else if (format === 'currency') {
+          maskOptions.prefix = scope.prefix;
+          maskOptions.suffix = scope.suffix;
           // Currency mask.
-          mask = createNumberMask({
-            prefix: scope.prefix,
-            suffix: scope.suffix,
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
-            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _get(scope.component, 'allowNegative', true),
-            allowDecimal: _get(scope.component, 'allowDecimal', true)
-          });
+          mask = createNumberMask(maskOptions);
         }
         else if (format === 'number') {
           // Numeric input mask.
-          mask = createNumberMask({
-            prefix: '',
-            suffix: '',
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
-            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _get(scope.component, 'allowNegative', true),
-            allowDecimal: _get(scope.component, 'allowDecimal',
-              !(scope.component.validate && scope.component.validate.integer))
-          });
+          mask = createNumberMask(maskOptions);
         }
 
         // Set the mask on the input element.
@@ -124,7 +142,7 @@ module.exports = function() {
           maskInput({
             inputElement: input,
             mask: mask,
-            showMask: true,
+            showMask: (format !== 'number' && format !== 'currency'),
             keepCharPositions: false,
             guide: true,
             placeholderChar: '_'
