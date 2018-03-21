@@ -624,13 +624,13 @@ module.exports = function (config) {
 
   this.selectOption = function(select, option) {
     it('Selects ' + option + ' in ' + select, function(next) {
-      var sel = element(by.xpath('//select[contains(@class, "' + select + '")]'));
+      var sel = element(by.xpath('//select[contains(@id, "' + select + '")]'));
       //var sel = element(by.css(select));
       browser.wait(function() {
         return sel.isPresent();
       }, timeout).then(function() {
         sel.click().then(function() {
-          var opt = element(by.xpath('//select[contains(@class, "' + select + '")]/option[@label="' + option + '"]'));
+          var opt = element(by.xpath('//select[contains(@id, "' + select + '")]/option[@label="' + option + '"]'));
           opt.click().then(next);
         });
       });

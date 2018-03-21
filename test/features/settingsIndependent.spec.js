@@ -103,7 +103,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.clickOnElementWithText('Select an Action');
+      actions.selectOption('action-select','Email');
+      // actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
@@ -116,7 +117,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.clickOnElementWithText('Select an Action');
+      actions.selectOption('action-select','Email');
+      // actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
@@ -130,7 +132,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.clickOnElementWithText('Select an Action');
+      actions.selectOption('action-select','Email');
+      // actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
@@ -144,7 +147,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.clickOnElementWithText('Select an Action');
+      actions.selectOption('action-select','Email');
+      // actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');

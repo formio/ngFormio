@@ -52,7 +52,7 @@ describe("Formio Tests", function () {
   // require('./features/projectUpgradePayment.spec')(actions);
   // require('./features/creditCard.spec')(actions);
   // require('./features/versioning.spec')(actions);
-  // require('./features/environmentWorkflow.spec')(actions);
+  require('./features/environmentWorkflow.spec')(actions);
 
 });
 afterEach(function () {
