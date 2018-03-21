@@ -121,7 +121,7 @@ module.exports = function() {
         // Set the mask on the input element.
         if (mask) {
           scope.inputMask = mask;
-          maskInput({
+          scope.maskedInput = maskInput({
             inputElement: input,
             mask: mask,
             showMask: true,
@@ -188,12 +188,8 @@ module.exports = function() {
             return value;
           }
 
-          if (scope.component.validate && scope.component.validate.integer) {
-            return parseInt(value, 10).toLocaleString(scope.options.language, getFormatOptions());
-          }
-          else {
-            return parseFloat(value).toLocaleString(scope.options.language, getFormatOptions());
-          }
+          scope.maskedInput.textMaskInputElement.update(value);
+          return inputElement.value;
         });
       }
     }
