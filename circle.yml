@@ -29,8 +29,8 @@ dependencies:
 test:
   override:
     - ./bin/sc -u $SAUCE_rakeshForm -k $SAUCE_b40ae5db-3f6a-4aae-a66c-15cf18efda11 -f ~/sc_ready:
-    background: true
-    pwd: sc-*-linux
+      background: true
+      pwd: sc-*-linux
     # Wait for tunnel to be ready
     - while [ ! -e ~/sc_ready ]; do sleep 1; done
   pre:
