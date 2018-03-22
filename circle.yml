@@ -14,6 +14,8 @@ machine:
 
 dependencies:
   pre:
+    - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
+  	- tar -xzf sc-latest-linux.tar.gz
     - wget http://selenium-release.storage.googleapis.com/3.11/selenium-server-standalone-3.11.0.jar
     - java -jar selenium-server-standalone-3.11.0.jar:
         background: true
@@ -25,6 +27,12 @@ dependencies:
     - sed -i "s|APP_VERSION|${TAG}|g" dist/config.js
 
 test:
+  override:
+    - ./bin/sc -u $SAUCE_rakeshForm -k $SAUCE_b40ae5db-3f6a-4aae-a66c-15cf18efda11 -f ~/sc_ready:
+    background: true
+    pwd: sc-*-linux
+    # Wait for tunnel to be ready
+    - while [ ! -e ~/sc_ready ]; do sleep 1; done
   pre:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - mkdir ./test/screenshots

@@ -116,7 +116,7 @@ module.exports = function (actions) {
     describe('Deploy the tag to stage', function() {
      actions.clickOnLink('Settings');
      actions.clickOnLink('Staging');
-     actions.selectOption('tags', '0.0.2');
+     actions.selectOptionWithClass('tags', '0.0.2');
      actions.clickOnElementWithText(" Deploy version tag to Stage");
      actions.envHasTag('Stage', '0.0.2');
      actions.clickOnLink('Forms');

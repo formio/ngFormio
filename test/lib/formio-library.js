@@ -636,6 +636,21 @@ module.exports = function (config) {
       });
     });
   };
+  this.selectOptionWithClass = function(select, option) {
+    it('Selects ' + option + ' in ' + select, function(next) {
+      var sel = element(by.xpath('//select[contains(@class, "' + select + '")]'));
+      //var sel = element(by.css(select));
+      browser.wait(function() {
+        return sel.isPresent();
+      }, timeout).then(function() {
+        sel.click().then(function() {
+          var opt = element(by.xpath('//select[contains(@class, "' + select + '")]/option[@label="' + option + '"]'));
+          opt.click().then(next);
+        });
+      });
+    });
+  };
+
 
   this.iSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
