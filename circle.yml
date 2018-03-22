@@ -37,6 +37,7 @@ test:
     - mkdir ./test/screenshots
     - npm start:
         background: true
+    - npm test
   post:
     - killall --wait sc
     - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
