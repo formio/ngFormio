@@ -33,12 +33,12 @@ test:
       pwd: sc-*-linux
     # Wait for tunnel to be ready
     - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
-  pre:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - mkdir ./test/screenshots
     - npm start:
         background: true
   post:
+    - killall --wait sc
     - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
