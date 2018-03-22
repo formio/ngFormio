@@ -1,4 +1,6 @@
 var fs = require('fs');
+var createNumberMask = require('text-mask-addons').createNumberMask;
+var _get = require('lodash/get');
 
 module.exports = function(app) {
   app.config([
@@ -8,6 +10,26 @@ module.exports = function(app) {
         title: 'Currency',
         template: 'formio/components/currency.html',
         group: 'advanced',
+        tableView: function(data, options) {
+          var separators = options.util.getNumberSeparators();
+          var component = options.component;
+          var decimalLimit = component.decimalLimit || 2;
+          var affix = options.util.getCurrencyPrefixSuffix({
+            decimalSeparator: separators.decimalSeparator,
+            decimalLimit: decimalLimit,
+            currency: component.currency || 'USD'
+          });
+
+          return options.util.formatNumber(data, createNumberMask({
+            prefix: affix.prefix,
+            suffix: affix.suffix,
+            thousandsSeparatorSymbol: _get(component, 'thousandsSeparator', separators.delimiter),
+            decimalSymbol: _get(component, 'decimalSymbol', separators.decimalSeparator),
+            decimalLimit: decimalLimit,
+            allowNegative: _get(component, 'allowNegative', true),
+            allowDecimal: _get(component, 'allowDecimal', true)
+          }));
+        },
         settings: {
           autofocus: false,
           input: true,

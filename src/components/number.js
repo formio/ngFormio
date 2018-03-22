@@ -12,8 +12,13 @@ module.exports = function(app) {
       formioComponentsProvider.register('number', {
         title: 'Number',
         template: 'formio/components/number.html',
-        tableView: function(data, component, _, __, FormioUtils) {
-          var separators = FormioUtils.getNumberSeparators();
+        tableView: function(data, options) {
+          var separators = options.util.getNumberSeparators();
+          var component = options.component;
+
+          if (!component.delimiter) {
+            separators.delimiter = '';
+          }
 
           var decimalLimit = 20;
           if (
@@ -27,7 +32,7 @@ module.exports = function(app) {
             }
           }
 
-          return FormioUtils.formatNumber(data, createNumberMask({
+          return options.util.formatNumber(data, createNumberMask({
             prefix: '',
             suffix: '',
             thousandsSeparatorSymbol: _get(component, 'thousandsSeparator', separators.delimiter),

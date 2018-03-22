@@ -307,8 +307,24 @@ module.exports = function() {
         decimalSeparator: formattedNumberString.match(/345(.*)67/)[1]
       };
     },
+    getCurrencyPrefixSuffix: function(options) {
+      var regex = '(.*)?100(' + (options.decimalSeparator === '.'
+        ? '\.'
+        : options.decimalSeparator) + '0{' + options.decimalLimit + '})?(.*)?';
+      var parts = (100).toLocaleString(options.lang || 'en', {
+        style: 'currency',
+        currency: options.currency,
+        useGrouping: true,
+        maximumFractionDigits: options.decimalLimit
+      }).match(new RegExp(regex));
+
+      return {
+        prefix: parts[1] || '',
+        suffix: parts[3] || ''
+      };
+    },
     formatNumber: function(number, mask) {
-      number = number.toString();
+      number = (number || 0).toString();
       return conformToMask(number, mask(number).filter(function(item) {
         return item !== '[]';
       })).conformedValue;

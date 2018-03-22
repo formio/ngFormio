@@ -54,10 +54,10 @@ module.exports = function(app) {
           }
         });
         angular.element(el).on('blur keydown', function(e) {
-            if(e.keyCode === 9 || e.key === "Tab") {
+            if (e.keyCode === 9 || e.key === 'Tab') {
               uiSelect.clear(e);
             }
-        })
+        });
 
         // Disable the auto open when this select element has been activated.
         $scope.$on('uis:activate', function() {
@@ -81,27 +81,27 @@ module.exports = function(app) {
         template: function($scope) {
           return $scope.component.multiple ? 'formio/components/select-multiple.html' : 'formio/components/select.html';
         },
-        tableView: function(data, component, $interpolate) {
+        tableView: function(data, options) {
           var getItem = function(data) {
-            switch (component.dataSrc) {
+            switch (options.component.dataSrc) {
               case 'values':
-                component.data.values.forEach(function(item) {
+                options.component.data.values.forEach(function(item) {
                   if (item.value === data) {
                     data = item;
                   }
                 });
                 return data;
               case 'json':
-                if (component.valueProperty) {
+                if (options.component.valueProperty) {
                   var selectItems;
                   try {
-                    selectItems = angular.fromJson(component.data.json);
+                    selectItems = angular.fromJson(options.component.data.json);
                   }
                   catch (error) {
                     selectItems = [];
                   }
                   selectItems.forEach(function(item) {
-                    if (item[component.valueProperty] === data) {
+                    if (item[options.component.valueProperty] === data) {
                       data = item;
                     }
                   });
@@ -114,11 +114,11 @@ module.exports = function(app) {
                 return data;
             }
           };
-          if (component.multiple && Array.isArray(data)) {
+          if (options.component.multiple && Array.isArray(data)) {
             return data.map(getItem).reduce(function(prev, item) {
               var value;
               if (typeof item === 'object') {
-                value = $interpolate(component.template)({item: item});
+                value = options.$interpolate(options.component.template)({item: item});
               }
               else {
                 value = item;
@@ -130,7 +130,7 @@ module.exports = function(app) {
             var item = getItem(data);
             var value;
             if (typeof item === 'object') {
-              value = $interpolate(component.template)({item: item});
+              value = options.$interpolate(options.component.template)({item: item});
             }
             else {
               value = item;
