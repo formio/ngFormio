@@ -300,6 +300,19 @@ module.exports = function() {
       }
       return input;
     },
+    getNumberSeparators: function(lang) {
+      var formattedNumberString = (12345.6789).toLocaleString(lang || 'en');
+      return {
+        delimiter: formattedNumberString.match(/12(.*)345/)[1],
+        decimalSeparator: formattedNumberString.match(/345(.*)67/)[1]
+      };
+    },
+    formatNumber: function(number, mask) {
+      number = number.toString();
+      return conformToMask(number, mask(number).filter(function(item) {
+        return item !== '[]';
+      })).conformedValue;
+    },
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,

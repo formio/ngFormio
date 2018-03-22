@@ -3,7 +3,7 @@ var createNumberMask = require('text-mask-addons').createNumberMask;
 var formioUtils = require('formiojs/utils');
 var _get = require('lodash/get');
 
-module.exports = function() {
+module.exports = ['FormioUtils', function(FormioUtils) {
   return {
     restrict: 'A',
     require: 'ngModel',
@@ -36,17 +36,17 @@ module.exports = function() {
         };
       };
 
-      var formattedNumberString = (12345.6789).toLocaleString(scope.options.language || 'en');
+      var separators = FormioUtils.getNumberSeparators(scope.options.language);
 
       scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
-        formattedNumberString.match(/345(.*)67/)[1];
+        separators.decimalSeparator;
 
       if (scope.component.delimiter) {
         if (scope.options.hasOwnProperty('thousandsSeparator')) {
           console.warn("Property 'thousandsSeparator' is deprecated. Please use i18n to specify delimiter.");
         }
 
-        scope.delimiter = scope.options.thousandsSeparator || formattedNumberString.match(/12(.*)345/)[1];
+        scope.delimiter = scope.options.thousandsSeparator || separators.delimiter;
       }
       else {
         scope.delimiter = '';
@@ -121,7 +121,7 @@ module.exports = function() {
         // Set the mask on the input element.
         if (mask) {
           scope.inputMask = mask;
-          scope.maskedInput = maskInput({
+          maskInput({
             inputElement: input,
             mask: mask,
             showMask: true,
@@ -188,10 +188,9 @@ module.exports = function() {
             return value;
           }
 
-          scope.maskedInput.textMaskInputElement.update(value);
-          return inputElement.value;
+          return FormioUtils.formatNumber(value, scope.inputMask);
         });
       }
     }
   };
-};
+}];
