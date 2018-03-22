@@ -15,7 +15,7 @@ machine:
 dependencies:
   pre:
     - wget https://saucelabs.com/downloads/sc-latest-linux.tar.gz
-  	- tar -xzf sc-latest-linux.tar.gz
+    - tar -xzf sc-latest-linux.tar.gz
     - wget http://selenium-release.storage.googleapis.com/3.11/selenium-server-standalone-3.11.0.jar
     - java -jar selenium-server-standalone-3.11.0.jar:
         background: true
