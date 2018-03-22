@@ -32,7 +32,7 @@ test:
       background: true
       pwd: sc-*-linux
     # Wait for tunnel to be ready
-    - while [ ! -e ~/sc_ready ]; do sleep 1; done
+    - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
   pre:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - mkdir ./test/screenshots
