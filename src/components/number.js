@@ -1,4 +1,6 @@
 var fs = require('fs');
+var createNumberMask = require('text-mask-addons').createNumberMask;
+var _get = require('lodash/get');
 
 module.exports = function(app) {
   app.config([
@@ -10,6 +12,31 @@ module.exports = function(app) {
       formioComponentsProvider.register('number', {
         title: 'Number',
         template: 'formio/components/number.html',
+        tableView: function(data, component, _, __, FormioUtils) {
+          var separators = FormioUtils.getNumberSeparators();
+
+          var decimalLimit = 20;
+          if (
+            component.validate &&
+            component.validate.step &&
+            component.validate.step !== 'any'
+          ) {
+            var parts = component.validate.step.toString().split('.');
+            if (parts.length > 1) {
+              decimalLimit = parts[1].length;
+            }
+          }
+
+          return FormioUtils.formatNumber(data, createNumberMask({
+            prefix: '',
+            suffix: '',
+            thousandsSeparatorSymbol: _get(component, 'thousandsSeparator', separators.delimiter),
+            decimalSymbol: _get(component, 'decimalSymbol', separators.decimalSeparator),
+            decimalLimit: _get(component, 'decimalLimit', decimalLimit),
+            allowNegative: _get(component, 'allowNegative', true),
+            allowDecimal: _get(component, 'allowDecimal', !(component.validate && component.validate.integer))
+          }));
+        },
         settings: {
           autofocus: false,
           input: true,
