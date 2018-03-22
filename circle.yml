@@ -29,7 +29,7 @@ dependencies:
 test:
   override:
     - sc-4.3.13-linux/bin/sc --user rakeshForm --api-key b40ae5db-3f6a-4aae-a66c-15cf18efda11 --readyfile ~/sauce_is_ready:
-      background: true
+        background: true
       pwd: sc-*-linux
     # Wait for tunnel to be ready
     - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
