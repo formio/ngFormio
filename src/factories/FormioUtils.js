@@ -300,47 +300,9 @@ module.exports = function() {
       }
       return input;
     },
-    getNumberSeparators: function(lang) {
-      var formattedNumberString = (12345.6789).toLocaleString(lang || 'en');
-      return {
-        delimiter: formattedNumberString.match(/12(.*)345/)[1],
-        decimalSeparator: formattedNumberString.match(/345(.*)67/)[1]
-      };
-    },
-    getNumberDecimalLimit: function(component) {
-      // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
-      var decimalLimit = 20;
-
-      if (
-        component.validate &&
-        component.validate.step &&
-        component.validate.step !== 'any'
-      ) {
-        var parts = component.validate.step.toString().split('.');
-        if (parts.length > 1) {
-          decimalLimit = parts[1].length;
-        }
-      }
-
-      return decimalLimit;
-    },
-    getCurrencyAffixes: function(options) {
-      // Get the prefix and suffix from the localized string.
-      var regex = '(.*)?100('
-        + (options.decimalSeparator === '.' ? '\.' : options.decimalSeparator)
-        + '0{' + options.decimalLimit + '})?(.*)?';
-      var parts = (100).toLocaleString(options.lang || 'en', {
-        style: 'currency',
-        currency: options.currency || 'USD',
-        useGrouping: true,
-        maximumFractionDigits: options.decimalLimit
-      }).match(new RegExp(regex));
-
-      return {
-        prefix: parts[1] || '',
-        suffix: parts[3] || ''
-      };
-    },
+    getNumberSeparators: formioUtils.getNumberSeparators,
+    getNumberDecimalLimit: formioUtils.getNumberDecimalLimit,
+    getCurrencyAffixes: formioUtils.getCurrencyAffixes,
     formatNumber: function(number, mask) {
       number = (number || 0).toString();
       return conformToMask(number, mask(number).filter(function(item) {
