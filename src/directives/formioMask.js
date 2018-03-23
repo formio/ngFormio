@@ -20,22 +20,6 @@ module.exports = ['FormioUtils', function(FormioUtils) {
         inputElement = element[0].getElementsByTagName('INPUT')[0];
       }
 
-      var getFormatOptions = function() {
-        if (format === 'currency') {
-          return {
-            style: 'currency',
-            currency: scope.currency,
-            useGrouping: true,
-            maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
-          };
-        }
-        return {
-          style: 'decimal',
-          useGrouping: true,
-          maximumFractionDigits: _get(scope.component, 'decimalLimit', scope.decimalLimit)
-        };
-      };
-
       var separators = FormioUtils.getNumberSeparators(scope.options.language);
 
       scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
@@ -53,28 +37,19 @@ module.exports = ['FormioUtils', function(FormioUtils) {
       }
 
       if (format === 'currency') {
-        scope.currency = scope.component.currency || 'USD';
         scope.decimalLimit = scope.component.decimalLimit || 2;
 
-        // Get the prefix and suffix from the localized string.
-        var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{' + scope.decimalLimit + '})?(.*)?';
-        var parts = (100).toLocaleString(scope.options.language, getFormatOptions()).match(new RegExp(regex));
-        scope.prefix = parts[1] || '';
-        scope.suffix = parts[3] || '';
+        var affixes = FormioUtils.getCurrencyAffixes({
+          decimalSeparator: scope.decimalSeparator,
+          decimalLimit: scope.decimalLimit,
+          currency: scope.component.currency,
+          lang: scope.options.language
+        });
+        scope.prefix = affixes.prefix;
+        scope.suffix = affixes.suffix;
       }
       else if (format ==='number') {
-        // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
-        scope.decimalLimit = 20;
-        if (
-          scope.component.validate &&
-          scope.component.validate.step &&
-          scope.component.validate.step !== 'any'
-        ) {
-          var parts = scope.component.validate.step.toString().split('.');
-          if (parts.length > 1) {
-            scope.decimalLimit = parts[1].length;
-          }
-        }
+        scope.decimalLimit = FormioUtils.getNumberDecimalLimit(scope.component);
       }
 
       /**

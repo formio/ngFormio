@@ -1,6 +1,7 @@
 var fs = require('fs');
 var createNumberMask = require('text-mask-addons').createNumberMask;
 var _get = require('lodash/get');
+var _isNil = require('lodash/isNil');
 
 module.exports = function(app) {
   app.config([
@@ -13,23 +14,16 @@ module.exports = function(app) {
         title: 'Number',
         template: 'formio/components/number.html',
         tableView: function(data, options) {
+          if (_isNil(data)) {
+            return '';
+          }
+
           var separators = options.util.getNumberSeparators();
           var component = options.component;
+          var decimalLimit = options.util.getNumberDecimalLimit(component);
 
           if (!component.delimiter) {
             separators.delimiter = '';
-          }
-
-          var decimalLimit = 20;
-          if (
-            component.validate &&
-            component.validate.step &&
-            component.validate.step !== 'any'
-          ) {
-            var parts = component.validate.step.toString().split('.');
-            if (parts.length > 1) {
-              decimalLimit = parts[1].length;
-            }
           }
 
           return options.util.formatNumber(data, createNumberMask({

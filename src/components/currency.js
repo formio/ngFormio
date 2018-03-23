@@ -1,6 +1,7 @@
 var fs = require('fs');
 var createNumberMask = require('text-mask-addons').createNumberMask;
 var _get = require('lodash/get');
+var _isNil = require('lodash/isNil');
 
 module.exports = function(app) {
   app.config([
@@ -11,18 +12,26 @@ module.exports = function(app) {
         template: 'formio/components/currency.html',
         group: 'advanced',
         tableView: function(data, options) {
+          if (_isNil(data)) {
+            return '';
+          }
+
           var separators = options.util.getNumberSeparators();
           var component = options.component;
           var decimalLimit = component.decimalLimit || 2;
-          var affix = options.util.getCurrencyPrefixSuffix({
+          var affixes = options.util.getCurrencyAffixes({
             decimalSeparator: separators.decimalSeparator,
             decimalLimit: decimalLimit,
-            currency: component.currency || 'USD'
+            currency: component.currency
           });
 
+          if (!component.delimiter) {
+            separators.delimiter = '';
+          }
+
           return options.util.formatNumber(data, createNumberMask({
-            prefix: affix.prefix,
-            suffix: affix.suffix,
+            prefix: affixes.prefix,
+            suffix: affixes.suffix,
             thousandsSeparatorSymbol: _get(component, 'thousandsSeparator', separators.delimiter),
             decimalSymbol: _get(component, 'decimalSymbol', separators.decimalSeparator),
             decimalLimit: decimalLimit,
