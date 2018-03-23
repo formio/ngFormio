@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Fixed
  - Fixed default value for Number component.
+ - Table view of Number and Currency components.
 
 ## 2.30.2
 ### Changed
