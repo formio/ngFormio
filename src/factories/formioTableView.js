@@ -2,10 +2,12 @@ module.exports = [
   'Formio',
   'formioComponents',
   '$interpolate',
+  'FormioUtils',
   function(
     Formio,
     formioComponents,
-    $interpolate
+    $interpolate,
+    FormioUtils
   ) {
     return function(value, component) {
       if (!value && value !== 0 && value !== false) {
@@ -21,11 +23,21 @@ module.exports = [
       if (component.multiple && (value.length > 0)) {
         var values = [];
         angular.forEach(value, function(arrayValue) {
-          values.push(componentInfo.tableView(arrayValue, component, $interpolate, formioComponents));
+          values.push(componentInfo.tableView(arrayValue, {
+            component: component,
+            $interpolate: $interpolate,
+            componentInfo: formioComponents,
+            util: FormioUtils
+          }));
         });
         return values;
       }
-      return componentInfo.tableView(value, component, $interpolate, formioComponents);
+      return componentInfo.tableView(value, {
+        component: component,
+        $interpolate: $interpolate,
+        componentInfo: formioComponents,
+        util: FormioUtils
+      });
     };
   }
 ];

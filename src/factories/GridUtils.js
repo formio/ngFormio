@@ -71,42 +71,43 @@ module.exports = function() {
   };
 
   // Generate a column for the component.
-  var columnForComponent = function(data, component, $interpolate, componentInfo, tableChild) {
+  var columnForComponent = function(data, options) {
     // If no component is given, generate an empty cell.
-    if (!component) {
+    if (!options.component) {
       return '<td></td>';
     }
 
     // Generate a table for each component with one column to display the key/value for each component.
     var view = '<td>';
-    view += '<table class="table table-striped table-bordered' + (tableChild ? ' table-child' : '') + '">';
+    view += '<table class="table table-striped table-bordered' + (options.tableChild ? ' table-child' : '') + '">';
     view += '<thead><tr>';
-    view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+    view += '<th>' + (options.component.label || '') + ' (' + options.component.key + ')</th>';
     view += '</tr></thead>';
     view += '<tbody>';
 
     // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
-    var info = componentInfo.components.hasOwnProperty(component.type)
-      ? componentInfo.components[component.type]
+    var info = options.componentInfo.components.hasOwnProperty(options.component.type)
+      ? options.componentInfo.components[options.component.type]
       : {};
     if (info.tableView) {
       view += '<td>' +
         info.tableView(
-          data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : data),
-          component,
-          $interpolate,
-          componentInfo,
-          tableChild
+          data && options.component.key && (data.hasOwnProperty(options.component.key)
+            ? data[options.component.key]
+            : data),
+          options
         ) + '</td>';
     }
     else {
       view += '<td>';
-      if (component.prefix) {
-        view += component.prefix;
+      if (options.component.prefix) {
+        view += options.component.prefix;
       }
-      view += data && component.key && (data.hasOwnProperty(component.key) ? data[component.key] : '');
-      if (component.suffix) {
-        view += ' ' + component.suffix;
+      view += data && options.component.key && (data.hasOwnProperty(options.component.key)
+        ? data[options.component.key]
+        : '');
+      if (options.component.suffix) {
+        view += ' ' + options.component.suffix;
       }
       view += '</td>';
     }
