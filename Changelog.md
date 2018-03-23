@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Improved Teams pages
  - Improved access permissions and descriptions
  - Fix for content component's 'unsaved changes' error message
+ - The way `tableView` was used.
 
 ### Fixed
  - Environment Settings menu in IE11.
