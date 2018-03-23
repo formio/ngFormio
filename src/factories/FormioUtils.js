@@ -300,6 +300,15 @@ module.exports = function() {
       }
       return input;
     },
+    getNumberSeparators: formioUtils.getNumberSeparators,
+    getNumberDecimalLimit: formioUtils.getNumberDecimalLimit,
+    getCurrencyAffixes: formioUtils.getCurrencyAffixes,
+    formatNumber: function(number, mask) {
+      number = (number || 0).toString();
+      return conformToMask(number, mask(number).filter(function(item) {
+        return item !== '[]';
+      })).conformedValue;
+    },
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,

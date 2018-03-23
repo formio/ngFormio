@@ -35,32 +35,38 @@ module.exports = function(app) {
           }
         }],
         viewTemplate: 'formio/componentsView/columns.html',
-        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+        tableView: function(data, options) {
           var view = '<table class="table table-striped table-bordered table-child">';
-          if (!tableChild) {
+          if (!options.tableChild) {
             view += '<thead><tr>';
           }
 
           var maxRows = 0;
-          angular.forEach(component.columns, function(column, index) {
+          angular.forEach(options.component.columns, function(column, index) {
             // Get the maximum number of rows based on the number of components.
             maxRows = Math.max(maxRows, (column.components.length || 0));
 
-            if (!tableChild) {
+            if (!options.tableChild) {
               // Add a header for each column.
-              view += '<th>Column ' + (index + 1) + ' (' + component.key + ')</th>';
+              view += '<th>Column ' + (index + 1) + ' (' + options.component.key + ')</th>';
             }
           });
 
-          if (!tableChild) {
+          if (!options.tableChild) {
             view += '</tr></thead>';
           }
 
           view += '<tbody>';
           for (var index = 0; index < maxRows; index++) {
             view += '<tr>';
-            for (var col = 0; col < component.columns.length; col++) {
-              view += GridUtils.columnForComponent(data, component.columns[col].components[index] || undefined, $interpolate, componentInfo, true);
+            for (var col = 0; col < options.component.columns.length; col++) {
+              view += GridUtils.columnForComponent(data, {
+                component: options.component.columns[col].components[index] || undefined,
+                $interpolate: options.$interpolate,
+                componentInfo: options.componentInfo,
+                tableChild: true,
+                util: options.util
+              });
             }
             view += '</tr>';
           }

@@ -72,7 +72,7 @@ module.exports = function(app) {
       formioComponentsProvider.register('selectboxes', {
         title: 'Select Boxes',
         template: 'formio/components/selectboxes.html',
-        tableView: function(data, component) {
+        tableView: function(data, options) {
           if (!data) return '';
 
           return Object.keys(data)
@@ -80,7 +80,7 @@ module.exports = function(app) {
             return data[key];
           })
           .map(function(data) {
-            component.values.forEach(function(item) {
+            options.component.values.forEach(function(item) {
               if (item.value === data) {
                 data = item.label;
               }

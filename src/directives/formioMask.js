@@ -3,7 +3,7 @@ var createNumberMask = require('text-mask-addons').createNumberMask;
 var formioUtils = require('formiojs/utils');
 var _ = require('lodash');
 
-module.exports = function() {
+module.exports = ['FormioUtils', function(FormioUtils) {
   return {
     restrict: 'A',
     require: 'ngModel',
@@ -20,38 +20,17 @@ module.exports = function() {
         inputElement = element[0].getElementsByTagName('INPUT')[0];
       }
 
-      var getFormatOptions = function() {
-        var formatOptions = {
-          style: 'decimal',
-          useGrouping: true,
-          // minimumFractionDigits: 0
-        };
-        if (scope.component.hasOwnProperty('decimalLimit')) {
-          formatOptions.maximumFractionDigits = _.get(scope.component, 'decimalLimit', 20);
-        }
-        if (format === 'currency') {
-          formatOptions.style = 'currency';
-          formatOptions.currency = scope.currency;
-          formatOptions.maximumFractionDigits = _.get(scope.component, 'decimalLimit', 2);
-        }
-        if (scope.requireDecimal) {
-          formatOptions.minimumFractionDigits = formatOptions.maximumFractionDigits;
-        }
-
-        return formatOptions;
-      };
-
-      var formattedNumberString = (12345.6789).toLocaleString(scope.options.language || 'en');
+      var separators = FormioUtils.getNumberSeparators(scope.options.language);
 
       scope.decimalSeparator = scope.options.decimalSeparator = scope.options.decimalSeparator ||
-        formattedNumberString.match(/345(.*)67/)[1];
+        separators.decimalSeparator;
 
       if (scope.component.delimiter) {
         if (scope.options.hasOwnProperty('thousandsSeparator')) {
           console.warn("Property 'thousandsSeparator' is deprecated. Please use i18n to specify delimiter.");
         }
 
-        scope.delimiter = scope.options.thousandsSeparator || formattedNumberString.match(/12(.*)345/)[1];
+        scope.delimiter = scope.options.thousandsSeparator || separators.delimiter;
       }
       else {
         scope.delimiter = '';
@@ -64,30 +43,19 @@ module.exports = function() {
       }
 
       if (format === 'currency') {
-        scope.currency = scope.component.currency || 'USD';
-        scope.decimalLimit = scope.component.hasOwnProperty('decimalLimit') ? scope.component.decimalLimit : 2;
-        scope.requireDecimal = scope.component.hasOwnProperty('requireDecimal') ? scope.component.requireDecimal : true;
+        scope.decimalLimit = scope.component.decimalLimit || 2;
 
-        // Get the prefix and suffix from the localized string.
-        var regex = '(.*)?100(' + (scope.decimalSeparator === '.' ? '\.' : scope.decimalSeparator) + '0{2})?(.*)?';
-        var parts = (100).toLocaleString(scope.options.language, getFormatOptions()).match(new RegExp(regex));
-        scope.prefix = parts[1] || '';
-        scope.suffix = parts[3] || '';
+        var affixes = FormioUtils.getCurrencyAffixes({
+          decimalSeparator: scope.decimalSeparator,
+          decimalLimit: scope.decimalLimit,
+          currency: scope.component.currency,
+          lang: scope.options.language
+        });
+        scope.prefix = affixes.prefix;
+        scope.suffix = affixes.suffix;
       }
       else if (format ==='number') {
-        // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
-        scope.decimalLimit = scope.component.hasOwnProperty('decimalLimit') ? scope.component.decimalLimit : 20;
-        scope.requireDecimal = scope.component.hasOwnProperty('requireDecimal') ? scope.component.requireDecimal : false;
-        if (
-          scope.component.validate &&
-          scope.component.validate.step &&
-          scope.component.validate.step !== 'any'
-        ) {
-          var parts = scope.component.validate.step.toString().split('.');
-          if (parts.length > 1) {
-            scope.decimalLimit = parts[1].length;
-          }
-        }
+        scope.decimalLimit = FormioUtils.getNumberDecimalLimit(scope.component);
       }
 
       /**
@@ -206,14 +174,9 @@ module.exports = function() {
             return value;
           }
 
-          if (scope.component.validate && scope.component.validate.integer) {
-            return parseInt(value, 10).toLocaleString(scope.options.language, getFormatOptions());
-          }
-          else {
-            return parseFloat(value).toLocaleString(scope.options.language, getFormatOptions());
-          }
+          return FormioUtils.formatNumber(value, scope.inputMask);
         });
       }
     }
   };
-};
+}];
