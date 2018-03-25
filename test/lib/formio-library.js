@@ -521,7 +521,7 @@ module.exports = function (config) {
   };
 
   this.clickOnElementWithText = function (text) {
-    it('I click on the ' + text + ' text ', function (next) {
+    it('I click on the ' + replacements(text.toString()) + ' text ', function (next) {
       var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
@@ -535,7 +535,7 @@ module.exports = function (config) {
   };
 
   this.clickOnElementWithTextIndex = function (text,index) {
-    it('I click on the ' + text + ' text ', function (next) {
+    it('I click on the ' + replacements(text.toString()) + ' text ', function (next) {
       var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).get(index);
       browser.wait(function () {
         return ele.isPresent();
@@ -582,7 +582,19 @@ module.exports = function (config) {
       });
     });
   };
-
+  this.clickSave = function (text) {
+    it('I click on the ' + text + ' button', function (next) {
+      var ele =  element.all(by.partialButtonText(replacements(text.toString()))).get(1);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
   this.clickOnClass = function (className) {
     it('I click on the ' + className + ' class', function (next) {
       var ele =  element.all(by.css(replacements(className.toString()))).first();
@@ -624,20 +636,6 @@ module.exports = function (config) {
 
   this.selectOption = function(select, option) {
     it('Selects ' + option + ' in ' + select, function(next) {
-      var sel = element(by.xpath('//select[contains(@id, "' + select + '")]'));
-      //var sel = element(by.css(select));
-      browser.wait(function() {
-        return sel.isPresent();
-      }, timeout).then(function() {
-        sel.click().then(function() {
-          var opt = element(by.xpath('//select[contains(@id, "' + select + '")]/option[@label="' + option + '"]'));
-          opt.click().then(next);
-        });
-      });
-    });
-  };
-  this.selectOptionWithClass = function(select, option) {
-    it('Selects ' + option + ' in ' + select, function(next) {
       var sel = element(by.xpath('//select[contains(@class, "' + select + '")]'));
       //var sel = element(by.css(select));
       browser.wait(function() {
@@ -650,7 +648,6 @@ module.exports = function (config) {
       });
     });
   };
-
 
   this.iSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
@@ -1367,7 +1364,7 @@ module.exports = function (config) {
           .then(function() {
             ele.click().then(next).catch(next);
           });
-      }).catch(next);
+      });
     });
   };
   this.checkingUrlIamOn = function (url) {
@@ -1381,7 +1378,7 @@ module.exports = function (config) {
         return browser.getCurrentUrl().then(function (cUrl) {
           return cUrl.toLowerCase() == url.toLowerCase()
             || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
-        }).catch(next);
+        });
       }, timeout).then(function (value) {
         try {
           assert.equal(value, true);
@@ -1389,7 +1386,7 @@ module.exports = function (config) {
         } catch (err) {
           next(err);
         }
-      }).catch(next);
+      });
     });
   };
 
@@ -1451,6 +1448,24 @@ module.exports = function (config) {
       }, timeout).then(function () {
         ele.clear().sendKeys(text).then(next).catch(next);
       });
+    });
+  };
+  this.clickOnClassWithIndex = function (className,index) {
+    it('I click on the ' + className + ' class', function (next) {
+      var ele =  element.all(by.css(replacements(className.toString()))).get(index);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+  this.goToPageURL = function (url) {
+    it('I go to ' + url, function (next) {
+      browser.get(url).then(next).catch(next);
     });
   };
 };

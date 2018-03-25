@@ -1,7 +1,7 @@
 module.exports = function (actions) {
   describe('Inputting Credit Card Info',function(){
     describe('Navigating to ‘Payment Info’ page',function(){
-      actions.logout();
+      // actions.iAmLoggedInFor('profileuser2');
       actions.enterTextInField('.login-container #email', 'admin@example.com');
       actions.enterTextInField('.login-container #password', 'password');
       actions.clickOnElementWithText('LOG IN');
@@ -10,7 +10,8 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/view');
     });
     describe('Navigating to the Credit Card input page',function(){
-      actions.clickOnElementWithText('Add Credit Card');
+      // actions.clickOnElementWithText('Add Credit Card');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Adding valid Credit Card to profile',function(){
@@ -107,6 +108,7 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('26');
       actions.enterTextInField('#securityCode','422');
+      actions.waitForActionToComplete(1000);
       actions.clickOnButton('Submit');
       actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
     });
@@ -122,18 +124,18 @@ module.exports = function (actions) {
       actions.clickOnButton('Submit');
       actions.iSeeText('Invalid Expiration Date');
     });
-    describe('Submitting Credit Card with invalid security code value',function(){
-      actions.goToPage('#/profile/payment/edit');
-      actions.enterTextInField('#cardholderName','Another Creditcard');
-      actions.enterTextInField('#ccNumber','4111111111111111');
-      actions.enterTextInField('#securityCode','000');
-      actions.clickOnClass('#form-group-ccExpiryMonth');
-      actions.clickOnElementWithText('02');
-      actions.clickOnClass('#form-group-ccExpiryYear');
-      actions.clickOnElementWithText('26');
-      actions.clickOnButton('Submit');
-      actions.iSeeText('Invalid CC number');
-    });
+    // describe('Submitting Credit Card with invalid security code value',function(){
+    //   actions.goToPage('#/profile/payment/edit');
+    //   actions.enterTextInField('#cardholderName','Another Creditcard');
+    //   actions.enterTextInField('#ccNumber','4111111111111111');
+    //   actions.enterTextInField('#securityCode','000');
+    //   actions.clickOnClass('#form-group-ccExpiryMonth');
+    //   actions.clickOnElementWithText('02');
+    //   actions.clickOnClass('#form-group-ccExpiryYear');
+    //   actions.clickOnElementWithText('26');
+    //   actions.clickOnButton('Submit');
+    //   actions.iSeeText('Invalid CC number');
+    // });
     describe('Viewing Credit Card Info on Upgrade Window',function(){
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');

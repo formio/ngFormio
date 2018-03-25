@@ -1,17 +1,16 @@
 module.exports = function(actions){
-
   var formButtons = function(formname, button){
      return 'xpath://*[text()="'+formname+'"]/../../../..//*[text()="'+button+'"]';
   };
   describe('Create Resource', function(){
    /* describe('Background',function(){
-      actions.iAmLoggedInFor('projuser3');
-      actions.projectExisting('${random-title>project3.title}','${random-description>project3.description}');
-      actions.goToPage("/#");
-      actions.clickOnElementWithText('Manage
-      actions.clickOnElementWithText('Resources');
-      actions.iSeeText('Resources');
-    });*/
+     actions.iAmLoggedInFor('projuser3');
+     actions.projectExisting('${random-title>project3.title}','${random-description>project3.description}');
+     actions.goToPage("/#");
+     actions.clickOnElementWithText('Manage
+     actions.clickOnElementWithText('Resources');
+     actions.iSeeText('Resources');
+     });*/
 
     /*describe('Background',function(){
      actions.iAmLoggedInFor('projuser3');

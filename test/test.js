@@ -32,17 +32,18 @@ before(function (next) {
 
 describe("Formio Tests", function () {
   this.retries(3);
-  require('./features/register.spec')(actions);
   require('./features/loginFunctionality.spec')(actions);
-  require('./features/userPortalandWelcome.spec')(actions);
-  require('./features/feedbackrequest.spec')(actions);
+  require('./features/register.spec')(actions);
   require('./features/documentationLinks.spec')(actions);
+  require('./features/supportRequest.spec')(actions);
+  require('./features/feedbackrequest.spec')(actions);
+  require('./features/userPortalandWelcome.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
+  require('./features/creditCard.spec')(actions);
   require('./features/project.spec')(actions);
-  require('./features/projectSettings.spec')(actions);
-  require('./features/form.spec')(actions);
-  require('./features/environments.spec')(actions);
   require('./features/createResource2.spec')(actions);
+  // require('./features/form.spec')(actions);
+  require('./features/environments.spec')(actions);
   // require('./features/createForm.spec')(actions);
   // require('./features/settingsBasic.spec')(actions);
   // require('./features/settingsIndependent.spec')(actions);
@@ -50,9 +51,9 @@ describe("Formio Tests", function () {
   // require('./features/settingsEnterprise.spec')(actions);
   // require('./features/teams.spec')(actions);
   // require('./features/projectUpgradePayment.spec')(actions);
-  // require('./features/creditCard.spec')(actions);
+
   // require('./features/versioning.spec')(actions);
-  require('./features/environmentWorkflow.spec')(actions);
+  // require('./features/environmentWorkflow.spec')(actions);
 
 });
 afterEach(function () {

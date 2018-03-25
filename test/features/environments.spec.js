@@ -100,8 +100,8 @@ module.exports = function (actions) {
 
     describe('Tag the release', function() {
      actions.clickOnLink('Settings');
-     actions.clickOnElementWithText('Staging');
-     actions.clickOnElementWithText('Create Version Tag');
+     actions.clickOnLink('Staging');
+     actions.clickOnLink('Create Version Tag');
      actions.enterTextInField('#tag', '0.0.2');
      actions.clickOnElementWithText(' Create version tag');
      actions.envHasTag('Dev', '0.0.2');
@@ -116,7 +116,7 @@ module.exports = function (actions) {
     describe('Deploy the tag to stage', function() {
      actions.clickOnLink('Settings');
      actions.clickOnLink('Staging');
-     actions.selectOptionWithClass('tags', '0.0.2');
+     actions.selectOption('tags', '0.0.2');
      actions.clickOnElementWithText(" Deploy version tag to Stage");
      actions.envHasTag('Stage', '0.0.2');
      actions.clickOnLink('Forms');

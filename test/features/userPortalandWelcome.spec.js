@@ -1,23 +1,13 @@
 module.exports = function (actions) {
   describe('User Portal Links and Welcome Module ',function(){
     describe('Closing the Welcome Module',function(){
+      actions.goToPage('#/');
       actions.logout();
       actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
       actions.iSeeText('Welcome to ');
       actions.clickOnElement('.fa-close');
       actions.iDonotSeeText('Welcome to ');
-    });
-    describe('Welcome module when Project count is zero',function(){
-      actions.iAmLoggedInFor('profileuser2');
-      actions.goToPage('#/');
-      actions.projectCount(0);
-      actions.iSeeText('Welcome to ');
-      actions.iSeeText(' Getting Started');
-      actions.iSeeText(' How it works');
-      actions.iSeeText(' 30 minute guide');
-      actions.iSeeText(' Developer Info');
-      actions.iSeeText(' Tutorials');
     });
     describe('Using the Welcome Module',function(){
       actions.iAmLoggedInFor('profileuser2');
@@ -36,6 +26,14 @@ module.exports = function (actions) {
         actions.closeWindow();
       });
     });
+    // describe('Teams documentation on Portal',function(){
+    //   actions.iAmLoggedInFor('profileuser2');
+    //   actions.goToPage('#/');
+    //   actions.clickOnClass('.fa-info-circle')
+    //   actions.newWindow();
+    //   actions.checkingUrlIamOn('https://help.form.io/userguide/teams/');
+    //   actions.closeWindow();
+    // });
     describe('Teams messaging on portal',function(){
       actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
