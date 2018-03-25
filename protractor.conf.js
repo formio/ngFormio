@@ -3,15 +3,15 @@
 // An example configuration file.
 exports.config = {
   // The address of a running selenium server.
-  seleniumAddress: 'http://rakeshForm:b40ae5db-3f6a-4aae-a66c-15cf18efda11@ondemand.saucelabs.com:80/wd/hub',
-  // seleniumAddress: 'http://localhost:4444/wd/hub',
+  // seleniumAddress: 'http://rakeshForm:b40ae5db-3f6a-4aae-a66c-15cf18efda11@ondemand.saucelabs.com:80/wd/hub',
+  seleniumAddress: 'http://localhost:4444/wd/hub',
   //seleniumServerJar: deprecated, this should be set on node_modules/protractor/config.json
 
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
-    'browserName': 'chrome',
-    'username':'rakeshForm',
-    'password':'password'
+    'browserName': 'chrome'
+    // 'username':'rakeshForm',
+    // 'password':'password'
   },
   // allScriptSTimeout : 120000,
   // getPageTimeout: 120000,
