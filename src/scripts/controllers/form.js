@@ -1875,7 +1875,12 @@ app.controller('FormSubmissionsController', [
           if (component.multiple && (value.length > 0)) {
             var values = [];
             angular.forEach(value, function(arrayValue) {
-              arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
+              arrayValue = componentInfo.tableView(arrayValue, {
+                component: component,
+                $interpolate: $interpolate,
+                componentInfo: formioComponents,
+                util: FormioUtils
+              });
               if (arrayValue === undefined) {
                 return values.push('');
               }
@@ -1883,7 +1888,12 @@ app.controller('FormSubmissionsController', [
             });
             return values.join(', ');
           }
-          value = componentInfo.tableView(value, component, $interpolate, formioComponents);
+          value = componentInfo.tableView(value, {
+            component: component,
+            $interpolate: $interpolate,
+            componentInfo: formioComponents,
+            util: FormioUtils
+          });
           if (value === undefined) {
             return '';
           }
