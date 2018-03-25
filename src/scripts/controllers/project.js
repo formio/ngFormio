@@ -327,8 +327,9 @@ app.controller('ProjectController', [
       }
 
       // If the remote project name changes, be sure to update the link as well.
-      if (
-        $scope.localProject.hasOwnProperty('remote') &&
+      if(($scope.localProject.hasOwnProperty('remote') &&
+          $scope.localProject.remote &&
+        $scope.localProject.remote.hasOwnProperty('project')) &&
         $scope.localProject._id !== $scope.currentProject._id &&
         $scope.localProject.remote.name !== project.name
       ) {
@@ -2180,6 +2181,17 @@ app.controller('ProjectRemoteController', [
       $scope.loading = false;
     });
 
+    // Remove any unnecessary characters when pasted
+    $scope.checkUrl = function (url)
+    {
+      if (url.substring(url.length-1) === "/" || url.substring(url.length-1) === "?" ||
+        url.substring(url.length-1) === "+")
+      {
+        url = url.substring(0, url.length-1);
+      }
+      return url;
+    };
+
     $scope.check = function() {
       $scope.loading = true;
       if (!$scope.remote.url || !$scope.remote.secret) {
@@ -2187,6 +2199,9 @@ app.controller('ProjectRemoteController', [
         $scope.loading = false;
         return;
       }
+
+      $scope.remote.url = $scope.checkUrl($scope.remote.url);
+
       $scope.localProject.settings.remoteSecret = $scope.remote.secret;
       $scope.saveLocalProject()
         .then(function(project) {
