@@ -31,7 +31,7 @@
   </div>
   <div ng-repeat="fileUpload in fileUploads track by $index" ng-class="{'has-error': fileUpload.status === 'error'}" class="file">
     <div class="row">
-      <div class="fileName control-label col-sm-10">{{ fileUpload.name }} <span ng-click="removeUpload(fileUpload.name)" class="glyphicon glyphicon-remove"></span></div>
+      <div class="fileName control-label col-sm-10">{{ fileUpload.originalName || fileUpload.name }} <span ng-click="removeUpload(fileUpload.name)" class="glyphicon glyphicon-remove"></span></div>
       <div class="fileSize control-label col-sm-2 text-right">{{ fileSize(fileUpload.size) }}</div>
     </div>
     <div class="row">
