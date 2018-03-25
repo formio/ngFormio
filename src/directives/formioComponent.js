@@ -225,7 +225,7 @@ module.exports = [
           // FOR-71 - Dont watch in the builder view.
           // Calculate value when data changes.
           if (!$scope.options.building && ($scope.component.calculateValue || _get($scope.component, 'validate.json'))) {
-            $scope.$watch('data', function() {
+            $scope.$watch('submission.data', function() {
               FormioUtils.checkCalculated($scope.component, $scope.submission, $scope.data);
 
               // Process jsonLogic stuff if present.
