@@ -200,7 +200,12 @@ module.exports = function(app) {
           };
 
           // If this is an OpenID Provider initiated login, perform the click event immediately
-          if (settings.action === 'oauth' && settings.oauth.authURI.indexOf($location.search().iss) === 0) {
+          if (
+            settings.action === 'oauth' &&
+            settings.oauth &&
+            settings.oauth.authURI &&
+            settings.oauth.authURI.indexOf($location.search().iss) === 0
+          ) {
             $scope.openOAuth(settings.oauth);
           }
         }],
