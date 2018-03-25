@@ -2,7 +2,7 @@
   <h4>Twitter OAuth Settings</h4>
 <p>This allows you to use Twitter user accounts to authenticate. To set up Twitter OAuth, go to your <a href="https://apps.twitter.com/">Twitter account settings</a> and register a new application.</p>
 <p>Fill in the application details. The <strong>Authorization callback URL</strong> MUST be set to the domain name of your application (ex: <code>https://mydomain.com</code>. Then save your Client ID and secret below.</p>
-	
+
 </div>
 <div class="form-group">
   <label for="twitterClientId">Client ID</label>
@@ -10,5 +10,5 @@
 </div>
 <div class="form-group">
   <label for="twitterClientSecret">Client Secret</label>
-  <input ng-model="currentProject.settings.oauth.twitter.clientSecret" type="text" class="form-control" id="twitterClientSecret" name="twitterClientSecret" placeholder="Enter Twitter Application Consumer Secret Key">
+  <input ng-model="currentProject.settings.oauth.twitter.clientSecret" type="password" class="form-control" id="twitterClientSecret" name="twitterClientSecret" placeholder="Enter Twitter Application Consumer Secret Key">
 </div>
