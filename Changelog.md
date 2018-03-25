@@ -4,10 +4,22 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.31.0
 ### Fixed
  - Fixed default value for Number component.
  - Table view of Number and Currency components.
+ - Fix issue where editgrid and datagrid don't update when external data is changed.
+ - Removed double loadForm() method from form components.
+ - Fix oauth button crashing when settings aren't set.
+
+### Added
+ - Ability to specify decimalLimit on currency and number (including 0 for integer)
+ - Ability to require decimals
+ - Ability to override decimalSeparator and delimiter per language in options.
+
+### Changed
+ - Preserve original file name and display it if available.
+ - Upgrade formio.js to 2.30.0
 
 ## 2.30.2
 ### Changed
