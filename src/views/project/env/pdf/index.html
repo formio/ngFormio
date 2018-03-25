@@ -5,22 +5,21 @@
 <span class="fa fa-spinner fa-pulse" ng-if="loading" style="font-size: 2em;"></span>
 <div class="row" ng-if="(pdfInfo.data.plan === 'enterprise') && (currentTab === 'enterprise')">
   <div class="col col-sm-12">
-    <p>Our Enterprise PDF solution allows you to deploy our PDF server within your own environment. Please follow these steps to get your own PDF server installed and running.</p>
-    <ul>
-      <li>To get started, create a new default project called <strong>PDF Manager</strong></li>
-      <li>Now import the <strong>PDF</strong> form within that project. Use the Form Import feature to import this <a href="https://files.form.io/view/pdf.json">https://files.form.io/view/pdf.json</a> as a new form. Make sure to give it the path and name of <strong>pdf</strong></li>
-      <li>Next, you will need to create an <strong>API Key</strong> for the form manager project.</li>
-      <li>After that, you will now need to create a <a href="https://hub.docker.com/">Docker Hub</a> account, then then send your username</li>
-      <li>Now you will pull in the latest <code>formio/formio-files-core</code> container into your environment.
-        <pre>docker login<br/>docker pull formio/formio-files-core</pre>
-      </li>
-      <li>Next you will need to launch our Docker container within your own environment using the following command.
+    <p>Our Enterprise PDF solution allows you to deploy our PDF server within your own environment. To setup your server, please click on the following button to go to our online PDF Server deployment instructions.</p>
+    <p><a class="btn btn-primary" href="https://help.form.io/userguide/pdfserver/" target="_blank">PDF Server Deployment Instructions</a></p>
+    <hr/>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Deployment Code</h3>
+      </div>
+      <div class="panel-body">
+        <p>Once your deployment is setup, you can run the following Docker command to spin up your new server</p>
         <pre>
 docker run -itd \
   -e "FORMIO_PROJECT=<strong>{{ pdfInfo.data.project }}</strong>" \
   -e "FORMIO_PROJECT_TOKEN=<strong>{{ pdfInfo.data.token }}</strong>" \
-  -e "FORMIO_PDF_PROJECT=<strong>[PDF PROJECT API URL]</strong>" \
-  -e "FORMIO_PDF_APIKEY=<strong>[PDF PROJECT API KEY]</strong>" \
+  -e "FORMIO_PDF_PROJECT=<strong>{{ projectUrl }}</strong>" \
+  -e "FORMIO_PDF_APIKEY=<strong>{{ currentProject.settings.keys[0].key }}</strong>" \
   -e "FORMIO_S3_BUCKET=[YOUR S3 BUCKET NAME]" \
   -e "FORMIO_S3_REGION=[YOUR S3 REGION]" \
   -e "FORMIO_S3_KEY=[YOUR S3 AUTH KEY]" \
@@ -30,32 +29,29 @@ docker run -itd \
   -p 80:4005 \
   formio/formio-files-core;
         </pre>
-      </li>
-      <li>Now, configure this portal to point to your deployed instance by providing the following setting.
-        <div class="panel panel-default">
-          <div class="panel-heading">Deployment Settings</div>
-          <div class="panel-body">
-            <div class="form-group">
-              <label for="pdfserver">PDF Server URL</label>
-              <input type="text" class="form-control" id="pdfserver" ng-model="currentProject.settings.pdfserver" placeholder="https://files.form.io" />
-            </div>
-            <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
-          </div>
+      </div>
+    </div>
+    <hr />
+    <div class="panel panel-default">
+      <div class="panel-heading">Deployment Settings</div>
+      <div class="panel-body">
+        <div class="form-group">
+          <label for="pdfserver">PDF Server URL</label>
+          <input type="text" class="form-control" id="pdfserver" ng-model="currentProject.settings.pdfserver" placeholder="https://files.form.io" />
         </div>
-      </li>
-      <li ng-if="currentProject.settings.pdfserver">
-        <div class="panel panel-default">
-          <div class="panel-heading">Project PDF Token</div>
-          <div class="panel-body">
-            <div class="form-group">
-              <p>If your Remote server has trouble with Unauthorized requests, then it may be because the following PDF Token does not match the one above. If this is the case, then please send an email to <strong>support@form.io</strong> and we will resolve the issue.</p>
-              <label for="pdfserver">Project PDF Token</label>
-              <input readonly type="text" class="form-control" id="filetoken" ng-model="currentProject.settings.filetoken" />
-            </div>
-          </div>
+        <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+      </div>
+    </div>
+    <div class="panel panel-default" ng-if="currentProject.settings.pdfserver">
+      <div class="panel-heading">Project PDF Token</div>
+      <div class="panel-body">
+        <div class="form-group">
+          <p>If your Remote server has trouble with Unauthorized requests, then it may be because the following PDF Token does not match the one above. If this is the case, then please send an email to <strong>support@form.io</strong> and we will resolve the issue.</p>
+          <label for="pdfserver">Project PDF Token</label>
+          <input readonly type="text" class="form-control" id="filetoken" ng-model="currentProject.settings.filetoken" />
         </div>
-      </li>
-    </ul>
+      </div>
+    </div>
   </div>
 </div>
 <div ng-if="pdfInfo.data && ((pdfInfo.data.plan !== 'enterprise') || (currentTab === 'pdf'))">
