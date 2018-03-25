@@ -1,7 +1,7 @@
 var maskInput = require('vanilla-text-mask').default;
 var createNumberMask = require('text-mask-addons').createNumberMask;
 var formioUtils = require('formiojs/utils');
-var _get = require('lodash/get');
+var _ = require('lodash');
 
 module.exports = ['FormioUtils', function(FormioUtils) {
   return {
@@ -36,6 +36,12 @@ module.exports = ['FormioUtils', function(FormioUtils) {
         scope.delimiter = '';
       }
 
+      // Allow override of decimalSeparator and delimiter in options.
+      if (scope.options.languageOverride && scope.options.languageOverride.hasOwnProperty(scope.options.language || 'en')) {
+        scope.decimalSeparator = scope.options.languageOverride[scope.options.language || 'en'].decimalSeparator;
+        scope.delimiter = scope.options.languageOverride[scope.options.language || 'en'].delimiter;
+      }
+
       if (format === 'currency') {
         scope.decimalLimit = scope.component.decimalLimit || 2;
 
@@ -58,8 +64,28 @@ module.exports = ['FormioUtils', function(FormioUtils) {
        */
       var setInputMask = function(input) {
         if (!input) {
-          console.log('no input');
+          console.warn('no input');
           return;
+        }
+
+        var maskOptions = {
+          prefix: '',
+          suffix: '',
+          thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.delimiter),
+          decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
+          allowNegative: _.get(scope.component, 'allowNegative', true)
+        }
+
+        if (_.get(scope.component, 'decimalLimit', scope.decimalLimit) === 0 ||
+          (scope.component.validate && scope.component.validate.integer) ||
+          !_.get(scope.component, 'allowDecimal', true)
+        ) {
+          maskOptions.allowDecimal = false;
+        }
+        else {
+          maskOptions.allowDecimal = true;
+          maskOptions.decimalLimit = _.get(scope.component, 'decimalLimit', scope.decimalLimit);
+          maskOptions.requireDecimal = _.get(scope.component, 'requireDecimal', scope.requireDecimal);
         }
 
         var mask;
@@ -68,29 +94,14 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           mask = formioUtils.getInputMask(scope.component.inputMask);
         }
         else if (format === 'currency') {
+          maskOptions.prefix = scope.prefix;
+          maskOptions.suffix = scope.suffix;
           // Currency mask.
-          mask = createNumberMask({
-            prefix: scope.prefix,
-            suffix: scope.suffix,
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
-            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _get(scope.component, 'allowNegative', true),
-            allowDecimal: _get(scope.component, 'allowDecimal', true)
-          });
+          mask = createNumberMask(maskOptions);
         }
         else if (format === 'number') {
           // Numeric input mask.
-          mask = createNumberMask({
-            prefix: '',
-            suffix: '',
-            thousandsSeparatorSymbol: _get(scope.component, 'thousandsSeparator', scope.delimiter),
-            decimalSymbol: _get(scope.component, 'decimalSymbol', scope.decimalSeparator),
-            decimalLimit: _get(scope.component, 'decimalLimit', scope.decimalLimit),
-            allowNegative: _get(scope.component, 'allowNegative', true),
-            allowDecimal: _get(scope.component, 'allowDecimal',
-              !(scope.component.validate && scope.component.validate.integer))
-          });
+          mask = createNumberMask(maskOptions);
         }
 
         // Set the mask on the input element.
@@ -99,7 +110,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           maskInput({
             inputElement: input,
             mask: mask,
-            showMask: true,
+            showMask: (format !== 'number' && format !== 'currency'),
             keepCharPositions: false,
             guide: true,
             placeholderChar: '_'
