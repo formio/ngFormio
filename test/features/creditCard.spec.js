@@ -5,6 +5,7 @@ module.exports = function (actions) {
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
+      actions.goToPage('#/');
       actions.waitForActionToComplete(2000);
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');

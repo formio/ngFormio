@@ -4,7 +4,7 @@ module.exports = function (actions) {
       actions.logout();
       actions.iAmLoggedInFor('projuser3');
       actions.projectExisting('${random-title>project3.title}', '${random-description>project3.description}');
-      actions.goToPage("#");
+      actions.goToPage("#/");
       actions.clickOnElementWithText('Manage');
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Resources');
