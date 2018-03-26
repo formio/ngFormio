@@ -6,8 +6,11 @@ module.exports = function (actions) {
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
+      actions.goToPage('#/');
       actions.waitForActionToComplete(2000);
-      actions.goToPage('#/profile/payment/view');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
       // actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');

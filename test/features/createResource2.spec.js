@@ -177,7 +177,6 @@ module.exports = function (actions) {
       actions.iSeeText('The Name must be unique per Project.');
       actions.iSeeText('The Path must be unique per Project.');
       actions.clickOnClass('.toast-message');
-      actions.clickOnClass('.toast-message');
     });
     describe('Attempt to create a new ‘Resource’ with invalid path name', function () {
       var message = 'Form path cannot contain one of the following names: submission, report, version, tag, owner, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token, v, draft';
