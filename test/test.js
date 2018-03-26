@@ -51,7 +51,6 @@ describe("Formio Tests", function () {
   // require('./features/settingsEnterprise.spec')(actions);
   // require('./features/teams.spec')(actions);
   // require('./features/projectUpgradePayment.spec')(actions);
-
   // require('./features/versioning.spec')(actions);
   // require('./features/environmentWorkflow.spec')(actions);
 
