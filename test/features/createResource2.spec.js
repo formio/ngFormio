@@ -152,10 +152,10 @@ module.exports = function (actions) {
       actions.enterTextInField('#path','');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
+      actions.clickOnClass('.toast-message');
       actions.enterTextInField('#path','testresource1');
       actions.enterTextInField('#title','');
       actions.enterTextInField('#name','testResource1');
-      actions.clickOnClass('.toast-message');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
       actions.clickOnClass('.toast-message');

@@ -10,7 +10,8 @@ module.exports = function (actions) {
       actions.enterTextInField('#title', '${random-title>project1.title}');
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
-      actions.waitForActionToComplete(2000);
+      actions.iSeeTextIn('.toast-message', 'New Project created!');
+      actions.clickOnClass('.toast-message');
       // actions.portalIamOn('${project3.title}');
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', '${project1.title}');
@@ -97,6 +98,8 @@ module.exports = function (actions) {
       actions.enterTextInField('#title', '${random-title>project1.title}');
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
+      actions.iSeeTextIn('.toast-message', 'New Project created!');
+      actions.clickOnClass('.toast-message');
       // actions.portalIamOn('${project3.title}');
       actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#title', 'This is a very very very very very very very very very long title');
@@ -113,6 +116,8 @@ module.exports = function (actions) {
       actions.enterTextInField('#title', '${random-title>project1.title}');
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
+      actions.iSeeTextIn('.toast-message', 'New Project created!');
+      actions.clickOnClass('.toast-message');
       // actions.portalIamOn('${project3.title}');
       actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#description', 'This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long description');
