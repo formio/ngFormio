@@ -121,6 +121,7 @@ module.exports = function (actions) {
      actions.envHasTag('Stage', '0.0.2');
      actions.clickOnLink('Forms');
      actions.iSeeText('${depform1.title}');
+     actions.logout();
     });
   });
 };
