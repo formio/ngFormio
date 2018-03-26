@@ -675,7 +675,7 @@ module.exports = function (config) {
 
   this.iSeeTextIn = function (ele, text) {
     text = replacements(text);
-    it('I see text "' + text + '"', function (next) {
+    it('I see text', function (next) {
       ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele.isPresent();
@@ -1019,25 +1019,25 @@ module.exports = function (config) {
     })
   };
 
-  this.portalIamOn = function (title) {
-    title = replacements(title.toString());
-    it('I am on page "' + title + '"', function (next) {
-      try {
-        var xpath = "//*[@class='project-title']";
-        browser.wait(function () {
-          return element(by.xpath(xpath)).isPresent();
-        }, timeout).then(function (result) {
-          var elet = element.all(by.xpath(xpath))
-          elet.getAttribute('value').then(function (value) {
-            config.expect(value === title);
-            next();
-          });
-        });
-      } catch (err) {
-        next(err);
-      }
-    });
-  };
+  // this.portalIamOn = function (title) {
+  //   title = replacements(title.toString());
+  //   it('I am on page "' + title + '"', function (next) {
+  //     try {
+  //       var xpath = "//*[@class='project-title']";
+  //       browser.wait(function () {
+  //         return element(by.xpath(xpath)).isPresent();
+  //       }, timeout).then(function (result) {
+  //         var elet = element.all(by.xpath(xpath))
+  //         elet.getAttribute('value').then(function (value) {
+  //           config.expect(value === title);
+  //           next();
+  //         });
+  //       });
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   });
+  // };
 
   this.clickOnElementIn = function (ele, text) {
     text = replacements(text.toString());
