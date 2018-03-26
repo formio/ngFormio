@@ -26,12 +26,13 @@ var custom = require('./lib/formio-library');
 var actions = new custom(config);
 
 before(function (next) {
+  browser.waitForAngularEnabled(false);
   browser.driver.manage().window().maximize();
   browser.get(url).then(next).catch(next);
 });
 
 describe("Formio Tests", function () {
-  // this.retries(3);
+  this.retries(3);
   require('./features/loginFunctionality.spec')(actions);
   require('./features/register.spec')(actions);
   require('./features/documentationLinks.spec')(actions);
@@ -55,25 +56,25 @@ describe("Formio Tests", function () {
   // require('./features/environmentWorkflow.spec')(actions);
 
 });
-// afterEach(function () {
-//   if (this.currentTest.state !== 'passed') {
-//     var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
-//     browser.manage().logs().get('browser')
-//       .then(function(logs) {
-//         if (logs.length) {
-//           fs.writeFile(path + '.txt', JSON.stringify(logs));
-//         }
-//       });
-//     browser.takeScreenshot().then(function (png) {
-//       var stream = fs.createWriteStream(path + '.png');
-//       stream.write(new Buffer(png, 'base64'));
-//       stream.end();
-//       console.log(path + ' file saved.');
-//     });
-//   }
-//   else {
-//     // Clears the logs for the next run.
-//     //browser.manage().logs().get('browser');
-//   }
-// }
-// );
+afterEach(function () {
+  if (this.currentTest.state !== 'passed') {
+    var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
+    browser.manage().logs().get('browser')
+      .then(function(logs) {
+        if (logs.length) {
+          fs.writeFile(path + '.txt', JSON.stringify(logs));
+        }
+      });
+    browser.takeScreenshot().then(function (png) {
+      var stream = fs.createWriteStream(path + '.png');
+      stream.write(new Buffer(png, 'base64'));
+      stream.end();
+      console.log(path + ' file saved.');
+    });
+  }
+  else {
+    // Clears the logs for the next run.
+    //browser.manage().logs().get('browser');
+  }
+}
+);
