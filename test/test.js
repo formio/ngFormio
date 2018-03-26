@@ -31,7 +31,7 @@ before(function (next) {
 });
 
 describe("Formio Tests", function () {
-  this.retries(3);
+  // this.retries(3);
   require('./features/loginFunctionality.spec')(actions);
   require('./features/register.spec')(actions);
   require('./features/documentationLinks.spec')(actions);
@@ -40,7 +40,7 @@ describe("Formio Tests", function () {
   require('./features/userPortalandWelcome.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
   require('./features/creditCard.spec')(actions);
-  // require('./features/project.spec')(actions);
+  require('./features/project.spec')(actions);
   require('./features/createResource2.spec')(actions);
   // require('./features/form.spec')(actions);
   require('./features/environments.spec')(actions);
@@ -55,25 +55,25 @@ describe("Formio Tests", function () {
   // require('./features/environmentWorkflow.spec')(actions);
 
 });
-afterEach(function () {
-  if (this.currentTest.state !== 'passed') {
-    var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
-    browser.manage().logs().get('browser')
-      .then(function(logs) {
-        if (logs.length) {
-          fs.writeFile(path + '.txt', JSON.stringify(logs));
-        }
-      });
-    browser.takeScreenshot().then(function (png) {
-      var stream = fs.createWriteStream(path + '.png');
-      stream.write(new Buffer(png, 'base64'));
-      stream.end();
-      console.log(path + ' file saved.');
-    });
-  }
-  else {
-    // Clears the logs for the next run.
-    //browser.manage().logs().get('browser');
-  }
-}
-);
+// afterEach(function () {
+//   if (this.currentTest.state !== 'passed') {
+//     var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
+//     browser.manage().logs().get('browser')
+//       .then(function(logs) {
+//         if (logs.length) {
+//           fs.writeFile(path + '.txt', JSON.stringify(logs));
+//         }
+//       });
+//     browser.takeScreenshot().then(function (png) {
+//       var stream = fs.createWriteStream(path + '.png');
+//       stream.write(new Buffer(png, 'base64'));
+//       stream.end();
+//       console.log(path + ' file saved.');
+//     });
+//   }
+//   else {
+//     // Clears the logs for the next run.
+//     //browser.manage().logs().get('browser');
+//   }
+// }
+// );

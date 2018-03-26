@@ -10,10 +10,11 @@ module.exports = function (actions) {
       actions.enterTextInField('#title', '${random-title>project1.title}');
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
+      actions.waitForActionToComplete(2000);
       // actions.portalIamOn('${project3.title}');
       actions.clickOnClass('.fa.fa-cog');
-      actions.iSeeTextIn('#title', '${project1.title}');
-      actions.iSeeTextIn('#description', '${project1.description}');
+      actions.iSeeValueIn('#title', '${project1.title}');
+      actions.iSeeValueIn('#description', '${project1.description}');
       actions.iSeeText('AngularJS');
       actions.iSeeText('Delete Project');
       actions.iSeeText('Plan and Pricing');
@@ -73,14 +74,14 @@ module.exports = function (actions) {
     });
     describe('Deleting a Project', function () {
       actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");
-      actions.iSeeTextIn('.btn.btn-danger.ng-binding', 'Delete Updated Title Project');
+      actions.iSeeValueIn('.btn.btn-danger.ng-binding', 'Delete Updated Title Project');
       actions.clickOnElementWithText('Delete Updated Title Project');
       actions.checkingUrlEndsWith('/delete');
       actions.iSeeText('Are you sure you wish to delete the Project ');
       actions.clickOnElementWithText('No');
       actions.checkingUrlEndsWith('/settings');
       actions.clickOnElementWithText('Delete Updated Title Project');
-      actions.iSeeTextIn('.btn.btn-danger', 'Yes');
+      actions.iSeeValueIn('.btn.btn-danger', 'Yes');
       actions.clickOnElementWithText(' Yes');
       actions.iSeeTextIn('.toast-message', 'Project was deleted!');
       actions.clickOnClass('.toast-message');
