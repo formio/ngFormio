@@ -33,7 +33,6 @@ module.exports = function (actions) {
       actions.enterTextInField('.login-container #email', '${profileuser1.email}');
       actions.enterTextInField('.login-container #password', 'password');
       actions.clickOnElementWithText('LOG IN');
-      actions.iAmLoggedIn();
       actions.logout();
     });
     // describe('Update fullname',function(){
