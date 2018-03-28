@@ -2164,7 +2164,6 @@ app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
   $http.get($scope.formio.projectUrl + '/role')
     .then(function(result) {
       $scope.roles = result.data;
-      console.log(result)
     });
   $scope.$watch('currentProject.settings.oauth.openid', function() {
     if (!$scope.currentProject.settings) {
