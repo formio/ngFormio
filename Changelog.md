@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Validation of nested forms.
  - Nested form table view.
+ - Spell check for WYSIWYG.
+
+### Changed
+ - Removed uiSelectOpenOnFocus directive.
+
+### Added
+ - Table view for File component.
 
 ## 2.31.0
 ### Fixed

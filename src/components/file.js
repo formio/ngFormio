@@ -7,6 +7,14 @@ module.exports = function(app) {
         title: 'File',
         template: 'formio/components/file.html',
         group: 'advanced',
+        tableView: function(data, options) {
+          if (!data) {
+            return '';
+          }
+
+          data = options.component.multiple ? data : data[0];
+          return '<a href="' + data.url + '" target="_blank">' + data.originalName + '</a>';
+        },
         settings: {
           autofocus: false,
           input: true,
