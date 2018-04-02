@@ -40,38 +40,6 @@ module.exports = function(app) {
     };
   });
 
-  // A directive to have ui-select open on focus
-  app.directive('uiSelectOpenOnFocus', [function() {
-    return {
-      require: 'uiSelect',
-      restrict: 'A',
-      link: function($scope, el, attrs, uiSelect) {
-        if ($scope.options && $scope.options.building) return;
-        var focuscount = -1;
-        angular.element(uiSelect.focusser).on('focus', function() {
-          if (focuscount-- < 0) {
-            uiSelect.activate();
-          }
-        });
-        angular.element(el).on('blur keydown', function(e) {
-            if (e.keyCode === 9 || e.key === 'Tab') {
-              uiSelect.clear(e);
-            }
-        });
-
-        // Disable the auto open when this select element has been activated.
-        $scope.$on('uis:activate', function() {
-          focuscount = 1;
-        });
-
-        // Re-enable the auto open after the select element has been closed
-        $scope.$on('uis:close', function() {
-          focuscount = 1;
-        });
-      }
-    };
-  }]);
-
   // Configure the Select component.
   app.config([
     'formioComponentsProvider',

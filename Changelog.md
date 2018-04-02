@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Spell check for WYSIWYG.
 
+### Changed
+ - Removed uiSelectOpenOnFocus directive.
+
+### Added
+ - Table view for File component.
+
 ## 2.31.0
 ### Fixed
  - Fixed default value for Number component.
