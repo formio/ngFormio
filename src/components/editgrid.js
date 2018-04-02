@@ -328,7 +328,8 @@ module.exports = function(app) {
         $scope.headerData = {
           components: $scope.cols,
           value: $scope.data[$scope.component.key],
-          util: formioUtils
+          util: formioUtils,
+          data: $scope.data
         };
       }, true);
 
