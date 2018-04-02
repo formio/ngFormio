@@ -169,7 +169,10 @@ module.exports = function(app) {
             }, true);
           }
         ],
-        tableView: GridUtils.generic
+        tableView: function(data, options) {
+          // Include only form data.
+          return GridUtils.generic(data.data, options);
+        }
       });
     }
   ]);

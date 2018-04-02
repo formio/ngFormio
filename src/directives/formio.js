@@ -162,7 +162,7 @@ module.exports = function() {
           submission: true
         });
 
-        $scope.checkErrors = function(form) {
+        function validateForm(form) {
           if (form.submitting) {
             return true;
           }
@@ -170,11 +170,18 @@ module.exports = function() {
           for (var key in form) {
             if (form[key] && form[key].hasOwnProperty('$pristine')) {
               form[key].$setDirty(true);
+              if (form[key].hasOwnProperty('$$controls') && key !== '$$parentForm') {
+                validateForm(form[key]);
+              }
             }
             if (form[key] && form[key].$validate) {
               form[key].$validate();
             }
           }
+        }
+
+        $scope.checkErrors = function(form) {
+          validateForm(form);
           return !form.$valid;
         };
 

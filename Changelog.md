@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 ### Fixed
+ - Validation of nested forms.
+ - Nested form table view.
  - Spell check for WYSIWYG.
 
 ### Changed

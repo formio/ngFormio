@@ -1,5 +1,5 @@
 module.exports = function() {
-  var generic = function(data, component) {
+  var generic = function(data, options) {
     if (typeof data === 'string') {
       return data;
     }
@@ -54,11 +54,11 @@ module.exports = function() {
     // Create a template
     var view = '';
     var label;
-    if (!label && component && component.label) {
-      label = component.label;
+    if (!label && options.component && options.component.label) {
+      label = options.component.label;
     }
-    else if (!label && component && component.key) {
-      label = component.key;
+    else if (!label && options.component && options.component.key) {
+      label = options.component.key;
     }
     else {
       label = '';
