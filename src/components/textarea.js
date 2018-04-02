@@ -1,11 +1,10 @@
 var fs = require('fs');
 module.exports = function(app) {
-  app.directive('formioCkeditor', function($parse, $timeout) {
+  app.directive('formioCkeditor', function() {
     return {
       restrict: 'A',
       require: ['ckeditor', 'ngModel'],
       link: function(scope, element, attr, ctrl) {
-        var ckeditor = ctrl[0];
         var ngModelCtrl= ctrl[1];
 
         // FOR-975 - overwrite CKEditor default values
@@ -38,7 +37,6 @@ module.exports = function(app) {
                 {name: 'tools', groups: ['tools']}
               ],
               extraPlugins: 'justify,font',
-              disableNativeSpellChecker: false,
               removeButtons: 'Cut,Copy,Paste,Underline,Subscript,Superscript,Scayt,About',
               uiColor: '#eeeeee',
               height: '400px',
@@ -48,10 +46,7 @@ module.exports = function(app) {
               $scope.component.wysiwyg = defaults;
             }
 
-            // FOR-929 - Remove spell check attribute
-            if (!$scope.component.spellcheck){
-              delete $scope.component.wysiwyg.disableNativeSpellChecker;
-            }
+            $scope.component.wysiwyg.disableNativeSpellChecker = !$scope.component.spellcheck;
             return 'formio/components/texteditor.html';
           }
           if ($scope.readOnly && $scope.component.wysiwyg) {
