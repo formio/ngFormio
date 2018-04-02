@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Fixed
  - Validation of nested forms.
+ - Nested form table view.
 
 ## 2.31.0
 ### Fixed
