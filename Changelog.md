@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.31.1
 ### Fixed
  - Validation of nested forms.
  - Nested form table view.
@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Removed uiSelectOpenOnFocus directive.
 
 ### Added
+ - Adding "data" variable exposed to EditGrid templates.
  - Table view for File component.
 
 ## 2.31.0
