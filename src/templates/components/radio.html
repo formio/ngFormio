@@ -16,7 +16,7 @@
           aria-labelledby="{{componentId +'-'+ v.value+'Label'}}"
           ng-required="isRequired(component)"
           custom-validator="component.validate.custom"
-          auto-focus
+          auto-focus="{{ $first }}"
           ng-disabled="readOnly"
           ng-style="getOptionInputStyles(component)"
         >
@@ -35,7 +35,7 @@
         tabindex="{{ component.tabindex || 0 }}"
         aria-labelledby="{{componentId +'-'+ v.value+'Label'}}"
         ng-model="data[component.key]"
-        auto-focus
+        auto-focus="{{ $first }}"
         ng-required="isRequired(component)"
         custom-validator="component.validate.custom"
         ng-disabled="readOnly"

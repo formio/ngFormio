@@ -14,7 +14,7 @@
       aria-labelledby="{{ componentId +'Label'}}"
       aria-describedby="{{componentId + 'Desc'}}"
       ng-disabled="readOnly"
-      auto-focus
+      auto-focus="true"
       ng-model="data[component.name]"
       ng-required="component.validate.required"
       ng-style="getOptionInputStyles(component)"
@@ -26,7 +26,7 @@
       name="{{ componentId }}"
       tabindex="{{ component.tabindex || 0 }}"
       ng-disabled="readOnly"
-      auto-focus
+      auto-focus="true"
       ng-model="data[component.key]"
       aria-labelledby="{{ componentId +'Label'}}"
       aria-describedby="{{componentId + 'Desc'}}"

@@ -19,6 +19,8 @@
       name="{{ componentId }}">
       <span class="glyphicon glyphicon-cloud-upload"></span>Drop files to attach, or
       <a style="cursor: pointer;"
+        ng-keypress="browseKeyPress($event)"
+        ng-attr-id="{{component.key}}-browse"
         ngf-select="upload($files, $invalidFiles)"
         tabindex="{{ component.tabindex || 0 }}"
         ngf-pattern="component.filePattern"

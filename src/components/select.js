@@ -133,6 +133,13 @@ module.exports = function(app) {
             $scope.hasNextPage = false;
             $scope.selectItems = [];
 
+            if (settings.autofocus) {
+              $timeout(function() {
+                var inputs = angular.element('#form-group-' + settings.key).find('input');
+                inputs[settings.multiple ? 0 : 1].focus();
+              });
+            }
+
             var initialized = $q.defer();
             initialized.promise.then(function() {
               $scope.$emit('selectLoaded', $scope.component);

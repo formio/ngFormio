@@ -11,7 +11,7 @@
         aria-labelledby="{{ componentId }}-dayLabel"
         ng-change="onChange()"
         style="padding-right: 10px;"
-        auto-focus
+        auto-focus="true"
         ng-attr-placeholder="{{component.fields.day.placeholder}}"
         day-part
         characters="2"
@@ -32,7 +32,7 @@
         id="{{componentId}}-month"
         aria-labelledby="{{ componentId }}-monthLabel"
         ng-model="date.month"
-        auto-focus
+        auto-focus="{{ !component.dayFirst || component.fields.day.hide }}"
         ng-change="onChange()"
         ng-disabled="readOnly"
         ng-options="month.value as month.label | formioTranslate:null:options.building for month in months"
@@ -40,7 +40,7 @@
     </div>
     <label for="{{componentId}}-month" id="{{componentId}}-monthLabel" ng-if="component.inputsLabelPosition === 'bottom'" ng-class="{'field-required': component.fields.month.required}" class="control-label--bottom">{{ "Month" | formioTranslate:null:options.building }}</label>
   </div>
-  <div class="form-group col-xs-3" ng-if="!component.dayFirst && !component.fields.day.hide">
+  <div class="form-group col-xs-3" ng-if ="!component.dayFirst && !component.fields.day.hide">
     <label for="{{componentId}}-day1" id="{{componentId}}-day1Label" ng-if="component.inputsLabelPosition !== 'bottom'"
            ng-class="{'field-required': component.fields.day.required}" ng-style="getLabelStyles(component)">{{ "Day" | formioTranslate:null:options.building }}</label>
     <div ng-style="getInputStyles(component)">
@@ -52,10 +52,10 @@
         ng-change="onChange()"
         style="padding-right: 10px;"
         aria-labelledby="{{ componentId }}-day1Label"
+        auto-focus="{{ component.fields.month.hide }}"
         ng-attr-placeholder="{{component.fields.day.placeholder}}"
         day-part
         characters="2"
-        auto-focus
         min="1"
         max="{{maxDay}}"
         ng-disabled="readOnly"
@@ -75,9 +75,9 @@
         aria-labelledby="{{ componentId }}-yearLabel"
         style="padding-right: 10px;"
         ng-attr-placeholder="{{component.fields.year.placeholder}}"
+        auto-focus="{{ component.fields.day.hide && component.fields.month.hide }}"
         characters="4"
         min="0"
-        auto-focus
         max="2100"
         ng-disabled="readOnly"
       />

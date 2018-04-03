@@ -38,15 +38,15 @@ module.exports = function(app) {
       }
     };
   });
-  app.directive('autoFocus', [function() {
+  app.directive('autoFocus', ['$timeout', function($timeout) {
     return {
       restrict: 'A',
-      link: function($scope, el) {
-        if (!$scope.component.autofocus) {
-          return;
+      link: function($scope, el, attrs) {
+        if ($scope.component.autofocus && attrs.autoFocus === 'true') {
+          $timeout(function() {
+            el[0].focus();
+          });
         }
-        el.removeAttr('auto-focus');
-        el.attr('autofocus',true);
       }
     };
   }]);
