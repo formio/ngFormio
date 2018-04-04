@@ -11,7 +11,7 @@
     <iframe ng-src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
     <button ng-if="!readOnly && !options.building" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
   </div>
-  <form ng-if="!form.display || (form.display === 'form')" role="form" name="formioForm" class="formio-form" ng-submit="onSubmit(formioForm)" novalidate>
+  <form ng-if="!form.display || (form.display === 'form')" role="form" name="{{ formName }}" class="formio-form" ng-submit="onSubmit(formioForm)" novalidate>
     <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!options.building">
       {{ alert.message | formioTranslate:null:options.building }}
     </div>
@@ -22,7 +22,7 @@
       component="component"
       ng-if="options.building ? '::true' : isVisible(component)"
       data="submission.data"
-      formio-form="formioForm"
+      form-name="formName"
       formio="formio"
       submission="submission"
       hide-components="hideComponents"
