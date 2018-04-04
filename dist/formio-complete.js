@@ -1,4 +1,4 @@
-/*! ng-formio v2.31.1 | https://unpkg.com/ng-formio@2.31.1/LICENSE.txt */
+/*! ng-formio v2.31.2 | https://unpkg.com/ng-formio@2.31.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -111041,7 +111041,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/form.html',
-        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio\n  ng-if=\"componentForm\"\n  form=\"componentForm\"\n  submission=\"data[component.key]\"\n  url=\"url\"\n  read-only=\"readOnly\"\n  hide-components=\"hideComponents\"\n  options=\"options\"\n></formio>\n"
+        "<i style=\"font-size: 2em;\" ng-if=\"!componentForm\" ng-class=\"{'formio-hidden': componentForm}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n<formio\n  ng-if=\"componentForm\"\n  form=\"componentForm\"\n  submission=\"data[component.key]\"\n  url=\"url\"\n  read-only=\"readOnly\"\n  hide-components=\"hideComponents\"\n  options=\"options\"\n  name=\"componentId\"\n></formio>\n"
       );
     }
   ]);
@@ -113216,7 +113216,8 @@ module.exports = function() {
       requireComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
-      options: '<'
+      options: '<',
+      name: '=?'
     },
     controller: [
       '$scope',
@@ -113242,6 +113243,7 @@ module.exports = function() {
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         $scope.iframeReady = false;
+        $scope.formName = $scope.name || 'formioForm';
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           /* eslint-disable no-empty */
@@ -113784,7 +113786,7 @@ module.exports = [
         submission: '=',
         hideComponents: '=',
         formio: '=',
-        formioForm: '=',
+        formName: '=',
         readOnly: '=',
         gridRow: '=',
         gridCol: '=',
@@ -113815,6 +113817,7 @@ module.exports = [
           $timeout
         ) {
           $scope.options = $scope.options || {};
+          $scope.formioForm = $scope.$parent[$scope.formName];
 
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
@@ -116550,7 +116553,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !options.building\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"formioForm\" class=\"formio-form\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"options.building ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      formio-form=\"formioForm\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !options.building\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"{{ formName }}\" class=\"formio-form\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"options.building ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      form-name=\"formName\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
@@ -116571,7 +116574,7 @@ app.run([
 
     // A formio component template.
     $templateCache.put('formio/component.html',
-      "<div class=\"form-group form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\"\n     ng-class=\"{'has-feedback ': (component.hideLabel === true || component.label === '' || !component.label) && component.validate.required,\n             'has-error': (formioForm[componentId].$invalid || invalidQuestions(formioForm)) && !formioForm[componentId].$pristine }\"\n     ng-style=\"component.style\"\n     ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n\n"
+      "<div class=\"form-group form-field-type-{{ component.type }} formio-component-{{ component.key }} {{component.customClass}}\" id=\"form-group-{{ componentId }}\"\n     ng-class=\"{'has-feedback ': (component.hideLabel === true || component.label === '' || !component.label) && component.validate.required,\n             'has-error': (formioForm[componentId].$invalid || invalidQuestions(formioForm)) && !formioForm[componentId].$pristine && component.type !== 'form' }\"\n     ng-style=\"component.style\"\n     ng-hide=\"component.hidden\">\n  <formio-element></formio-element>\n</div>\n\n"
     );
 
     $templateCache.put('formio/component-view.html',
