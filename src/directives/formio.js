@@ -365,10 +365,12 @@ module.exports = function() {
             if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
-            $http[method](action, submissionData).then(function(response) {
-              Formio.clearCache();
-              onSubmitDone(method, response.data, form);
-            }, FormioScope.onError($scope, $element))
+            $http[method](action, submissionData)
+              .then(function(response) {
+                Formio.clearCache();
+                onSubmitDone(method, response.data, form);
+              })
+              .catch(FormioScope.onError($scope, $element))
               .finally(function() {
                 if (form) {
                   form.submitting = false;
