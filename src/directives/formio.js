@@ -13,7 +13,8 @@ module.exports = function() {
       requireComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
-      options: '<'
+      options: '<',
+      name: '=?'
     },
     controller: [
       '$scope',
@@ -39,6 +40,7 @@ module.exports = function() {
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         $scope.iframeReady = false;
+        $scope.formName = $scope.name || 'formioForm';
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           /* eslint-disable no-empty */
