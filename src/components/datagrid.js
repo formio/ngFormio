@@ -82,7 +82,7 @@ module.exports = function(app) {
         ctrl.$name = scope.componentId;
         scope.formioForm.$addControl(ctrl);
         // For some reason the validator deletes the ng-model value if validation fails so make a fake copy since we don't need it anyway.
-        scope.dataValue = _.clone(scope.data);
+        scope.dataValue = angular.copy(scope.data);
 
         var init = true;
 
@@ -91,7 +91,7 @@ module.exports = function(app) {
           init = false;
         }, 300);
         scope.$watch('data', function() {
-          scope.dataValue = _.clone(scope.data);
+          scope.dataValue = angular.copy(scope.data);
           ctrl.$validate();
           if (!init) {
             ctrl.$setDirty(true);
