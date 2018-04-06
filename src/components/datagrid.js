@@ -76,7 +76,6 @@ module.exports = function(app) {
       require: 'ngModel',
       restrict: 'A',
       link: function(scope, elem, attr, ctrl) {
-        console.log(scope.options && scope.options.building, !scope.formioForm, !scope.component.validate, !scope.component.validate.custom);
         if ((scope.options && scope.options.building) || !scope.formioForm || !scope.component.validate || !scope.component.validate.custom) return;
 
         // Add the control to the main form.
