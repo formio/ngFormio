@@ -71,6 +71,36 @@ module.exports = function(app) {
       });
     }
   ]);
+  app.directive('datagridValidation', function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elem, attr, ctrl) {
+        console.log(scope.options && scope.options.building, !scope.formioForm, !scope.component.validate, !scope.component.validate.custom);
+        if ((scope.options && scope.options.building) || !scope.formioForm || !scope.component.validate || !scope.component.validate.custom) return;
+
+        // Add the control to the main form.
+        ctrl.$name = scope.componentId;
+        scope.formioForm.$addControl(ctrl);
+        // For some reason the validator deletes the ng-model value if validation fails so make a fake copy since we don't need it anyway.
+        scope.dataValue = _.clone(scope.data);
+
+        var init = true;
+
+        // Wait 300ms for changes to trigger the datagrid.
+        setTimeout(function() {
+          init = false;
+        }, 300);
+        scope.$watch('data', function() {
+          scope.dataValue = _.clone(scope.data);
+          ctrl.$validate();
+          if (!init) {
+            ctrl.$setDirty(true);
+          }
+        }, true);
+      }
+    }
+  });
   app.controller('formioDataGrid', [
     '$scope',
     'FormioUtils',
