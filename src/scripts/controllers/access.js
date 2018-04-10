@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('formioApp.controllers.access', ['ngFormBuilder']);
+var app = angular.module('formioApp.controllers.access', []);
 
 app.controller('AccessController', ['$scope', function($scope) {
   $scope.permissionLabels = {

@@ -7,7 +7,6 @@ var app = angular.module('formioApp.controllers.form', [
   'ui.bootstrap.tpls',
   'ui.bootstrap.accordion',
   'ui.bootstrap.pagination',
-  'ngFormBuilder',
   'formio',
   'bgf.paginateAnything',
   'ngTagsInput',

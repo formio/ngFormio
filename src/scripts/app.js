@@ -29,7 +29,8 @@ angular
     'ngDialog',
     'swaggerUi',
     'toastr',
-    'bootstrapLightbox'
+    'bootstrapLightbox',
+    'ngFileSaver'
   ])
   .config([
     '$stateProvider',
@@ -41,7 +42,6 @@ angular
     'toastrConfig',
     'RemoteTokensProvider',
     'formioComponentsProvider',
-    'COMMON_OPTIONS',
     function(
       $stateProvider,
       $urlRouterProvider,
@@ -51,13 +51,8 @@ angular
       AppConfig,
       toastrConfig,
       RemoteTokensProvider,
-      formioComponentsProvider,
-      COMMON_OPTIONS
+      formioComponentsProvider
     ) {
-      // Change the form builder options for encrypted to be enterprise only.
-      COMMON_OPTIONS.encrypted.label = 'Encrypted (Enterprise Only)';
-      COMMON_OPTIONS.dbIndex.label = 'Database Index (Enterprise Only)';
-
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
 
