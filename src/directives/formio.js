@@ -369,7 +369,7 @@ module.exports = function() {
               .then(function(response) {
                 Formio.clearCache();
                 onSubmitDone(method, response.data, form);
-              }, FormioScope.onError($scope, $element))
+              })
               .catch(FormioScope.onError($scope, $element))
               .finally(function() {
                 if (form) {
@@ -389,7 +389,7 @@ module.exports = function() {
                   submission.method = submissionMethod;
                 }
                 onSubmitDone(submissionMethod, submission, form);
-              }, FormioScope.onError($scope, $element))
+              })
               .catch(FormioScope.onError($scope, $element))
               .finally(function() {
                 if (form) {

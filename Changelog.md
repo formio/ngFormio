@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Changed
+ - Update submitForm promise handler to be more compatible with other promise libraries.
+
 ### Added
  - Possibility to hide body for Panel and FieldSet.
  - `getView(component, data)` option for EditGrid body template.
