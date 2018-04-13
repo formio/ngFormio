@@ -85,7 +85,7 @@ module.exports = function(app) {
               '<div class="row"> \n' +
               '  {%util.eachComponent(components, function(component) { %} \n' +
               '    <div class="col-sm-2"> \n' +
-              '      {{ row[component.key] }} \n' +
+              '      {{ getView(component, row[component.key]) }} \n' +
               '    </div> \n' +
               '  {% }) %} \n' +
               '  <div class="col-sm-2"> \n' +
@@ -228,15 +228,47 @@ module.exports = function(app) {
       scope: false,
       controller: [
         '$scope',
+        '$interpolate',
+        'formioComponents',
+        'FormioUtils',
         function(
-          $scope
+          $scope,
+          $interpolate,
+          formioComponents,
+          FormioUtils
         ) {
           $scope.$watchCollection('rows', function() {
             $scope.rowData = angular.copy($scope.rows[$scope.rowIndex]);
             $scope.templateData = {
+              data: $scope.submission.data,
               row: $scope.rowData,
               rowIndex: $scope.rowIndex,
               components: $scope.component.components,
+              getView: function(component, data) {
+                var info = formioComponents.components[component.type] || {};
+                if (info.tableView) {
+                  return info.tableView(data || '', {
+                    component: component,
+                    $interpolate: $interpolate,
+                    componentInfo: formioComponents,
+                    tableChild: false,
+                    util: FormioUtils
+                  });
+                }
+                else {
+                  var view = '';
+
+                  if (component.prefix) {
+                    view += component.prefix;
+                  }
+                  view += data || '';
+                  if (component.suffix) {
+                    view += ' ' + component.suffix;
+                  }
+
+                  return view;
+                }
+              },
               util: formioUtils
             };
           });
@@ -291,12 +323,11 @@ module.exports = function(app) {
       '            ng-init="colIndex = $index"' +
       '            component="col"' +
       '            data="rowData"' +
-      '            formio-form="formioForm"' +
       '            formio="formio"' +
       '            submission="submission"' +
       '            hide-components="hideComponents"' +
       '            ng-if="options.building ? \'::true\' : isVisible(col, rowData)"' +
-      '            formio-form="formioForm"' +
+      '            form-name="formName"' +
       '            read-only="isDisabled(col, rowData)"' +
       '            grid-row="rowIndex"' +
       '            grid-col="colIndex"' +
