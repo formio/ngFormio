@@ -1189,6 +1189,10 @@ app.controller('FormShareController', ['$scope', function($scope) {
     if ($scope.options.auth) {
       $scope.previewUrl += '&auth=1';
     }
+    if ($scope.currentProject._id !== $scope.localProject._id && $scope.localProject.hasOwnProperty('remote')) {
+      var parts = $scope.localProject.remote.url.split('://');
+      $scope.previewUrl += '&host=' + parts[1] + '&protocol=' + parts[0];
+    }
     var formPreview = document.getElementById('form-preview');
     formPreview.innerHTML = '';
     var iframe = document.createElement('iframe');
