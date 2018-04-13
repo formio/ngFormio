@@ -6,6 +6,7 @@ var _assign = require('lodash/assign');
 var _set = require('lodash/set');
 var _cloneDeep = require('lodash/cloneDeep');
 var _mapValues = require('lodash/mapValues');
+var _isNil = require('lodash/isNil');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
@@ -199,8 +200,8 @@ module.exports = function(app) {
 
             // Ensures that the value is within the select items.
             var ensureValue = function(value) {
-              value = value || $scope.data[settings.key];
-              if (!value || (Array.isArray(value) && value.length === 0)) {
+              value = _isNil(value) ? $scope.data[settings.key] : value;
+              if (_isNil(value) || (Array.isArray(value) && value.length === 0)) {
                 return;
               }
               if (Array.isArray(value)) {
@@ -209,7 +210,7 @@ module.exports = function(app) {
               }
               // Iterate through the list of items and see if our value exists...
               var found = false;
-              for (var i=0; i < $scope.selectItems.length; i++) {
+              for (var i = 0; i < $scope.selectItems.length; i++) {
                 var item = $scope.selectItems[i];
                 var selectItem = $scope.getSelectItem(item);
                 if (_isEqual(selectItem, value)) {
@@ -276,7 +277,7 @@ module.exports = function(app) {
                 // Set the new result.
                 var setResult = function(data, append) {
                   // coerce the data into an array.
-                  if (!(data instanceof Array)) {
+                  if (!Array.isArray(data)) {
                     data = [data];
                   }
 
@@ -483,7 +484,7 @@ module.exports = function(app) {
                     // Set the new result.
                     var setResult = function(data) {
                       // coerce the data into an array.
-                      if (!(data instanceof Array)) {
+                      if (!Array.isArray(data)) {
                         data = [data];
                       }
 
