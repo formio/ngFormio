@@ -111,7 +111,7 @@ module.exports = function() {
         }
 
         // If the value is an array then we are good.
-        if (data[component.key] instanceof Array) {
+        if (Array.isArray(data[component.key])) {
           return done(false);
         }
 
@@ -209,7 +209,7 @@ module.exports = function() {
 
             component.data.values.forEach(function(item) {
               if (value.indexOf(item.value) !== -1) {
-                temp.push(item);
+                temp.push(item.value);
               }
             });
 
@@ -281,7 +281,7 @@ module.exports = function() {
           }
 
           // If there is a default value and it is an array, assign it to the value.
-          if (component.defaultValue instanceof Array) {
+          if (Array.isArray(component.defaultValue)) {
             data[component.key] = component.defaultValue;
             return done(true);
           }

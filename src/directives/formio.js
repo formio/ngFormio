@@ -365,10 +365,12 @@ module.exports = function() {
             if (method === 'put' && (action.indexOf(submissionData._id) === -1)) {
               action += '/' + submissionData._id;
             }
-            $http[method](action, submissionData).then(function(response) {
-              Formio.clearCache();
-              onSubmitDone(method, response.data, form);
-            }, FormioScope.onError($scope, $element))
+            $http[method](action, submissionData)
+              .then(function(response) {
+                Formio.clearCache();
+                onSubmitDone(method, response.data, form);
+              }, FormioScope.onError($scope, $element))
+              .catch(FormioScope.onError($scope, $element))
               .finally(function() {
                 if (form) {
                   form.submitting = false;
@@ -380,17 +382,20 @@ module.exports = function() {
           else if ($scope.formio && !$scope.formio.noSubmit) {
             // copy to remove angular $$hashKey
             var submissionMethod = submissionData._id ? 'put' : 'post';
-            $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(function(submission) {
-              // If submission saved propagate method to ngFormioHelper for correct message
-              if (typeof submission === 'object') {
-                submission.method = submissionMethod;
-              }
-              onSubmitDone(submissionMethod, submission, form);
-            }, FormioScope.onError($scope, $element)).finally(function() {
-              if (form) {
-                form.submitting = false;
-              }
-            });
+            $scope.formio.saveSubmission(submissionData, $scope.formioOptions)
+              .then(function(submission) {
+                // If submission saved propagate method to ngFormioHelper for correct message
+                if (typeof submission === 'object') {
+                  submission.method = submissionMethod;
+                }
+                onSubmitDone(submissionMethod, submission, form);
+              }, FormioScope.onError($scope, $element))
+              .catch(FormioScope.onError($scope, $element))
+              .finally(function() {
+                if (form) {
+                  form.submitting = false;
+                }
+              });
           }
           else {
             $scope.$emit('formSubmission', submissionData);
@@ -409,6 +414,7 @@ module.exports = function() {
         $scope.onSubmit = function(form) {
 
           $scope.formioAlerts = [];
+          $element.find('.has-error').removeClass('has-error');
           if ($scope.checkErrors(form)) {
             $scope.formioAlerts.push({
               type: 'danger',
@@ -432,7 +438,7 @@ module.exports = function() {
           FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
               form.submitting = false;
-              return this.showAlerts(err.alerts);
+              return FormioScope.onError($scope, $element)(err);
             }
 
             // Create a sanitized submission object.
@@ -525,6 +531,7 @@ module.exports = function() {
             // Allow an error to be thrown externally.
             $scope.$on('submitError', function(event, error) {
               FormioScope.onError($scope, $element)(error);
+              form.submitting = false;
             });
 
             var submitEvent = $scope.$emit('formSubmit', submissionData);

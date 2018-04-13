@@ -8,6 +8,7 @@ module.exports = function(app) {
         title: 'Date / Time',
         template: 'formio/components/datetime.html',
         tableView: function(data, options) {
+          data = _.isDate(data) ? data.toISOString() : data;
           return options.$interpolate('<span>{{ "' + data + '" | date: "' + options.component.format + '" }}</span>')();
         },
         group: 'advanced',
