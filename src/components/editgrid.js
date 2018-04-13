@@ -323,12 +323,11 @@ module.exports = function(app) {
       '            ng-init="colIndex = $index"' +
       '            component="col"' +
       '            data="rowData"' +
-      '            formio-form="formioForm"' +
       '            formio="formio"' +
       '            submission="submission"' +
       '            hide-components="hideComponents"' +
       '            ng-if="options.building ? \'::true\' : isVisible(col, rowData)"' +
-      '            formio-form="formioForm"' +
+      '            form-name="formName"' +
       '            read-only="isDisabled(col, rowData)"' +
       '            grid-row="rowIndex"' +
       '            grid-col="colIndex"' +
