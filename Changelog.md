@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
+### Added
+ - `getView(component, data)` option for EditGrid body template.
+
 ### Fixed
+ - Interpolation inside EditGrid.
  - Select component with multiple values and default value.
  - Front-end indication on unique validation.
 
