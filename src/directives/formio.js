@@ -409,6 +409,7 @@ module.exports = function() {
         $scope.onSubmit = function(form) {
 
           $scope.formioAlerts = [];
+          $element.find('.has-error').removeClass('has-error');
           if ($scope.checkErrors(form)) {
             $scope.formioAlerts.push({
               type: 'danger',
@@ -432,7 +433,7 @@ module.exports = function() {
           FormioUtils.alter('submit', $scope, $scope.submission, function(err) {
             if (err) {
               form.submitting = false;
-              return this.showAlerts(err.alerts);
+              return FormioScope.onError($scope, $element)(err);
             }
 
             // Create a sanitized submission object.
@@ -525,6 +526,7 @@ module.exports = function() {
             // Allow an error to be thrown externally.
             $scope.$on('submitError', function(event, error) {
               FormioScope.onError($scope, $element)(error);
+              form.submitting = false;
             });
 
             var submitEvent = $scope.$emit('formSubmit', submissionData);
