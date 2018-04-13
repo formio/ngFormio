@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [UNRELEASED]
 ### Added
+ - Possibility to hide body for Panel and FieldSet.
  - `getView(component, data)` option for EditGrid body template.
 
 ### Fixed
