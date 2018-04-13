@@ -1,4 +1,5 @@
 var _get = require('lodash/get');
+var moment = require('moment');
 
 module.exports = [
   'Formio',
@@ -254,6 +255,9 @@ module.exports = [
 
                 var valid;
                 try {
+                  if ($scope.component.type === 'datetime') {
+                    $scope.data[$scope.component.key] = moment($scope.data[$scope.component.key]).toISOString();
+                  }
                   valid = FormioUtils.jsonLogic.apply(input, {
                     data: $scope.submission ? $scope.submission.data : $scope.data,
                     row: $scope.data
