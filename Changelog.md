@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Added
+ - `getView(component, data)` option for EditGrid body template.
+
+### Fixed
+ - Components validation inside layout.
+ - Interpolation inside EditGrid.
+ - Select component with multiple values and default value.
+ - Front-end indication on unique validation.
+
 ## 2.31.2
 ### Fixed
  - Issues with nested form validations.
