@@ -12,6 +12,12 @@ module.exports = function(app) {
           tableView: true,
           inputType: 'tel',
           inputMask: '(999) 999-9999',
+          inputMasks: [
+            {
+              label: 'US',
+              mask: '(999) 999-9999'
+            }
+          ],
           label: 'Phone Number',
           key: 'phonenumber',
           placeholder: '',
