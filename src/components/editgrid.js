@@ -240,7 +240,7 @@ module.exports = function(app) {
           $scope.$watchCollection('rows', function() {
             $scope.rowData = angular.copy($scope.rows[$scope.rowIndex]);
             $scope.templateData = {
-              data: $scope.data,
+              data: $scope.submission.data,
               row: $scope.rowData,
               rowIndex: $scope.rowIndex,
               components: $scope.component.components,
