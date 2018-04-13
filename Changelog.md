@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Interpolation inside EditGrid.
+ - Select component with multiple values and default value.
+ - Front-end indication on unique validation.
 
 ## 2.31.2
 ### Fixed
