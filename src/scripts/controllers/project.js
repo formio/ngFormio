@@ -2178,7 +2178,7 @@ app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
 
   $scope.removeRow = function(index) {
     $scope.currentProject.settings.oauth.openid.roles.splice(index, 1);
-  }
+  };
 }]);
 
 app.controller('ProjectRemoteController', [
