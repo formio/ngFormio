@@ -8,7 +8,7 @@
     ng-click="calendarOpen = true"
     ng-init="calendarOpen = false"
     ng-disabled="readOnly"
-    auto-focus
+    auto-focus="true"
     ng-required="isRequired(component)"
     is-open="calendarOpen"
     datetime-picker="{{ component.format }}"
@@ -26,7 +26,7 @@
     timepicker-options="component.timePicker"
   />
   <span class="input-group-btn">
-    <button type="button" ng-disabled="readOnly" class="btn btn-default" ng-click="calendarOpen = true" ng-keydown="calendarOpen = onKeyDown($event)">
+    <button type="button" ng-disabled="readOnly" class="btn btn-default" ng-click="calendarOpen = true" tabindex="-1" ng-keydown="calendarOpen = onKeyDown($event)">
       <i ng-if="component.enableDate" class="glyphicon glyphicon-calendar"></i>
       <i ng-if="!component.enableDate" class="glyphicon glyphicon-time"></i>
     </button>

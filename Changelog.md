@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Interpolation inside EditGrid.
  - Select component with multiple values and default value.
  - Front-end indication on unique validation.
+ - Autofocus feature.
+ - Components navigation using `Tab`.
 
 ## 2.31.2
 ### Fixed

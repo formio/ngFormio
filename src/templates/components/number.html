@@ -11,7 +11,7 @@
   aria-labelledby="{{ componentId +'Label'}}"
   aria-describedby="{{componentId + 'Desc'}}"
   safe-multiple-to-single
-  auto-focus
+  auto-focus="true"
   formio-min="{{ component.validate.min }}"
   formio-max="{{ component.validate.max }}"
   ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"

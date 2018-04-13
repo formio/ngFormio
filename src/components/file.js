@@ -34,6 +34,21 @@ module.exports = function(app) {
           fileMinSize: '0KB',
           fileMaxSize: '1GB'
         },
+        controller: [
+          '$scope',
+          '$timeout',
+          function(
+            $scope,
+            $timeout
+          ) {
+            if ($scope.options && $scope.options.building) return;
+            if ($scope.component.autofocus) {
+              $timeout(function() {
+                angular.element('#' + $scope.component.key + '-browse')[0].focus();
+              });
+            }
+          }
+        ],
         viewTemplate: 'formio/componentsView/file.html'
       });
     }
@@ -208,7 +223,13 @@ module.exports = function(app) {
         if (Array.isArray(value) && value.length === 0) {
           delete $scope.data[$scope.component.key];
         }
-      }, true)
+      }, true);
+
+      $scope.browseKeyPress = function($event) {
+        if ($event.key === 'Enter') {
+          angular.element('#' + $scope.component.key + '-browse').triggerHandler('click');
+        }
+      };
 
       $scope.invalidFiles = [];
       $scope.currentErrors = [];

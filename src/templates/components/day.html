@@ -4,13 +4,11 @@
     component-id="componentId"
     read-only="isDisabled(component, data)"
     component="component"
-    auto-focus
     ng-required="isRequired(component)"
     custom-validator="component.validate.custom"
     aria-labelledby="{{ componentId +'Label'}}"
     aria-describedby="{{componentId + 'Desc'}}"
     ng-model="data[component.key]"
-    tabindex="{{ component.tabindex || 0 }}"
     options="options"
   ></day-input>
 </div>

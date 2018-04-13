@@ -10,7 +10,7 @@
   aria-describedby="{{componentId + 'Desc'}}"
   ng-model="data[component.key]"
   safe-multiple-to-single
-  auto-focus
+  auto-focus="true"
   ng-required="isRequired(component)"
   ng-pattern="component.validate.pattern"
   custom-validator="component.validate.custom"
