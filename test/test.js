@@ -36,35 +36,35 @@ describe("Formio Tests", function () {
   require('./features/loginFunctionality.spec')(actions);
   require('./features/register.spec')(actions);
   require('./features/documentationLinks.spec')(actions);
-  // require('./features/supportRequest.spec')(actions);
   require('./features/feedbackrequest.spec')(actions);
-  require('./features/userPortalandWelcome.spec')(actions);
+  // require('./features/userPortalandWelcome.spec')(actions);
+  require('./features/creatingProjectTemplates.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
-  require('./features/creditCard.spec')(actions);
+  require('./features/creditCard.spec')(actions );
   require('./features/project.spec')(actions);
   require('./features/createResource2.spec')(actions);
   // require('./features/form.spec')(actions);
-  require('./features/environments.spec')(actions);
+  // require('./features/environments.spec')(actions);
   // require('./features/createForm.spec')(actions);
-  // require('./features/settingsBasic.spec')(actions);
-  // require('./features/settingsIndependent.spec')(actions);
-  // require('./features/settingsTeamPro.spec')(actions);
-  // require('./features/settingsEnterprise.spec')(actions);
+  require('./features/settingsBasic.spec')(actions);
+  require('./features/settingsIndependent.spec')(actions);
+  require('./features/settingsTeamPro.spec')(actions);
+  require('./features/settingsEnterprise.spec')(actions);
   // require('./features/teams.spec')(actions);
-  // require('./features/projectUpgradePayment.spec')(actions);
+  require('./features/projectUpgradePayment.spec')(actions);
   // require('./features/versioning.spec')(actions);
-  // require('./features/environmentWorkflow.spec')(actions);
+  require('./features/environmentWorkflow.spec')(actions);
 
 });
 afterEach(function () {
   if (this.currentTest.state !== 'passed') {
     var path = './test/screenshots/' + this.currentTest.title.replace(/\W+/g, '_').toLowerCase();
-    browser.manage().logs().get('browser')
-      .then(function(logs) {
-        if (logs.length) {
-          fs.writeFile(path + '.txt', JSON.stringify(logs));
-        }
-      });
+    // browser.manage().logs().get('browser')
+    //   .then(function(logs) {
+    //     if (logs.length) {
+    //       fs.writeFile(path + '.txt', JSON.stringify(logs));
+    //     }
+    //   });
     browser.takeScreenshot().then(function (png) {
       var stream = fs.createWriteStream(path + '.png');
       stream.write(new Buffer(png, 'base64'));

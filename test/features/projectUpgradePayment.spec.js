@@ -2,14 +2,16 @@ module.exports = function (actions) {
   describe('Project Upgrade/Payment',function(){
     describe('Project Upgrade/Payment',function(){
       actions.logout();
-      actions.enterTextInField('.login-container #email', 'admin@example.com');
-      actions.enterTextInField('.login-container #password', 'password');
-      actions.clickOnElementWithText('LOG IN');
-      actions.iAmLoggedIn();
+      actions.iAmLoggedInFor('profileuser1');
+      // actions.enterTextInField('.login-container #email', 'admin@example.com');
+      // actions.enterTextInField('.login-container #password', 'password');
+      // actions.clickOnElementWithText('LOG IN');
+      // actions.iAmLoggedIn();
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
-      actions.clickOnElementWithText('Change Credit Card');
+      actions.clickOnElementWithText('Add Credit Card');
+      // actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -17,7 +19,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('01');
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
-      actions.clickOnButton('Submit');
+      actions.clickOnClass('#submit');
+      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title', 'projectPayment');

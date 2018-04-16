@@ -2,14 +2,14 @@ module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
-      // actions.iAmLoggedInFor('profileuser1');
-      actions.enterTextInField('.login-container #email', 'admin@example.com');
-      actions.enterTextInField('.login-container #password', 'password');
-      actions.clickOnElementWithText('LOG IN');
+      actions.iAmLoggedInFor('profileuser1');
+      // actions.enterTextInField('.login-container #email', 'admin@example.com');
+      // actions.enterTextInField('.login-container #password', 'password');
+      // actions.clickOnElementWithText('LOG IN');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/profile/payment/view');
-      // actions.clickOnElementWithText('Add Credit Card');
-      actions.clickOnElementWithText('Change Credit Card');
+      actions.clickOnElementWithText('Add Credit Card');
+      // actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -38,10 +38,10 @@ module.exports = function (actions) {
       actions.iSeeValueIn('#form-group-name>div.input-group.ng-scope>input','independentauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
-      actions.iSeeValueIn('#form-group-path','independentauto');
+      actions.iSeeTextIn('#form-group-path','API Path\nhttp://independentauto.localhost:3000/');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' API');
-      actions.iSeeValueIn('.wrap-table-cell','independentauto');
+      actions.iSeeTextIn('.wrap-table-cell','http://independentauto.localhost:3000/user');
       actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
@@ -65,6 +65,8 @@ module.exports = function (actions) {
       actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
       actions.iSeeText('Upgrade your project to a paid plan to enable CORS Settings.');
+      actions.clickOnElementWithText('Security');
+      actions.iSeeText('Upgrade your project to a paid plan to enable security settings.');
       actions.clickOnElementWithText('Custom JS and CSS');
       actions.checkingUrlEndsWith('/env/settings/customjscss');
     });
@@ -102,8 +104,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.selectOption('action-select','Email');
-      // actions.clickOnElementWithText('Select an Action');
+      // actions.selectOption('action-select','Email');
+      actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
@@ -116,8 +118,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.selectOption('action-select','Email');
-      // actions.clickOnElementWithText('Select an Action');
+      // actions.selectOption('action-select','Email');
+      actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
@@ -131,8 +133,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.selectOption('action-select','Email');
-      // actions.clickOnElementWithText('Select an Action');
+      // actions.selectOption('action-select','Email');
+      actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');
@@ -146,8 +148,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
-      actions.selectOption('action-select','Email');
-      // actions.clickOnElementWithText('Select an Action');
+      // actions.selectOption('action-select','Email');
+      actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
       actions.clickOnClass('#transport');

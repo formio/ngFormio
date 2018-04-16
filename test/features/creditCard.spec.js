@@ -1,12 +1,13 @@
 module.exports = function (actions) {
   describe('Inputting Credit Card Info',function(){
     describe('Navigating to ‘Payment Info’ page',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser2');
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
-      actions.goToPage('#/');
       actions.waitForActionToComplete(2000);
+      actions.goToPage('#/');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
@@ -114,18 +115,18 @@ module.exports = function (actions) {
       actions.clickOnButton('Submit');
       actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
     });
-    // describe('Submitting Credit Card with expiration date that has already expired',function(){
-    //   actions.goToPage('#/profile/payment/edit');
-    //   actions.enterTextInField('#cardholderName','Another Creditcard');
-    //   actions.enterTextInField('#ccNumber','4111111111111111');
-    //   actions.enterTextInField('#securityCode','422');
-    //   actions.clickOnClass('#form-group-ccExpiryMonth');
-    //   actions.clickOnElementWithText('02');
-    //   actions.clickOnClass('#form-group-ccExpiryYear');
-    //   actions.clickOnElementWithText('15');
-    //   actions.clickOnButton('Submit');
-    //   actions.iSeeText('Invalid Expiration Date');
-    // });
+    describe('Submitting Credit Card with expiration date that has already expired',function(){
+      actions.goToPage('#/profile/payment/edit');
+      actions.enterTextInField('#cardholderName','Another Creditcard');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','422');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('02');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('15');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Invalid Expiration Date');
+    });
     // describe('Submitting Credit Card with invalid security code value',function(){
     //   actions.goToPage('#/profile/payment/edit');
     //   actions.enterTextInField('#cardholderName','Another Creditcard');
@@ -165,6 +166,12 @@ module.exports = function (actions) {
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
       actions.iSeeText('Name on Card: New Creditcard');
+    });
+    describe('Deleting Test Project',function(){
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnElementWithText('Delete Test Project Project');
+      actions.clickOnElementWithText(' Yes');
+      actions.iDonotSeeText('Test Project');
     });
   });
 };

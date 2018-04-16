@@ -57,10 +57,10 @@ module.exports = function (actions) {
       actions.iSeeText('Key');
       actions.iSeeText('Type');
       actions.iSeeText('Persistent');
-      actions.clickOnElementWithText(' Read full API Documentation');
-      actions.switchTab();
-      actions.checkingUrlIamOn('https://help.form.io/developer/api/postman/');
-      actions.closeWindow();
+      // actions.clickOnElementWithText(' Read full API Documentation');
+      // actions.switchTab();
+      // actions.checkingUrlIamOn('https://help.form.io/developer/api/postman/');
+      // actions.closeWindow();
       var documentLinks = [
         [1,'https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#bacdc-2e3d-b76a-f00e-e67a5755ee0c'],
         [2,'https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#ccda63-404f-4523-0679-96bf8dbbc2b6'],
@@ -180,7 +180,7 @@ module.exports = function (actions) {
     });
     describe('Attempt to create a new ‘Resource’ with invalid path name', function () {
       var message = 'Form path cannot contain one of the following names: submission, report, version, tag, owner, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token, v, draft';
-      var path = ['submission', 'report', 'exists', 'export', 'role', 'current', 'logout', 'import', 'form', 'storage/s3', 'storage/dropbox', 'dropbox/auth', 'upgrade', 'access', 'atlassian/oauth/authorize', 'atlassian/oauth/finalize', 'sqlconnector'];
+      var path = ['submission', 'report', 'exists', 'export', 'role', 'current', 'logout', 'import', 'form', 'storage/s3', 'storage/dropbox', 'dropbox/auth', 'upgrade', 'access', 'atlassian/oauth/authorize', 'atlassian/oauth/finalize', 'sqlconnector','token','v','draft'];
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.iSeeText('New Resource');
@@ -195,7 +195,7 @@ module.exports = function (actions) {
     });
     describe('Attempt to ‘save’ an existing ‘Resource’ with invalid path name', function () {
       var message = 'Form path cannot contain one of the following names: submission, report, version, tag, owner, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token, v, draft';
-      var path = ['submission', 'report', 'exists', 'export', 'role', 'current', 'logout', 'import', 'form', 'storage/s3', 'storage/dropbox', 'dropbox/auth', 'upgrade', 'access', 'atlassian/oauth/authorize', 'atlassian/oauth/finalize', 'sqlconnector'];
+      var path = ['submission', 'report', 'exists', 'export', 'role', 'current', 'logout', 'import', 'form', 'storage/s3', 'storage/dropbox', 'dropbox/auth', 'upgrade', 'access', 'atlassian/oauth/authorize', 'atlassian/oauth/finalize', 'sqlconnector','token','v','draft'];
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText('Test Resource');
       path.forEach(function (value) {
@@ -226,7 +226,7 @@ module.exports = function (actions) {
     });
     // describe('Adding field tags',function(){
     //   actions.clickOnElementWithText(' New Resource');
-    //   actions.checkingUrlEndsWith('/resource/create/resource');
+    //   actions.checkingUrlEndsWith('/resource/create/r esource');
     //   actions.enterTextInField('#title','Test Resource');
     //   actions.iSeeValueIn('#name','testResource');
     //   actions.iSeeValueIn('#path','testresource');

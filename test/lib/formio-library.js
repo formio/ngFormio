@@ -681,7 +681,9 @@ module.exports = function (config) {
         return ele.isPresent();
       }, timeout).then(function () {
         try {
-          config.expect(ele.getText()).to.eventually.equal(text);
+          var temp=ele.getText();
+          var temp1=temp.then(function(tx) {return tx.trim();})
+          config.expect(temp1).to.eventually.equal(text.trim());
           next();
         } catch (err) {
           next(err);
