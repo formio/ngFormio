@@ -3,7 +3,7 @@
 // An example configuration file.
 exports.config = {
   // The address of a running selenium server.
-  seleniumAddress: 'http://rakesh1807:759b16f1-e8d0-48c4-a373-f6aad961836f@ondemand.saucelabs.com:80/wd/hub',
+  seleniumAddress: 'http://1807rakesh:ccfec1e3-05d4-41e8-a9d3-1c09ad66848e@ondemand.saucelabs.com:80/wd/hub',
   // seleniumAddress: 'http://localhost:4444/wd/hub',
   //seleniumServerJar: deprecated, this should be set on node_modules/protractor/config.json
 
