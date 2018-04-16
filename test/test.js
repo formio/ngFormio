@@ -35,7 +35,6 @@ describe("Formio Tests", function () {
   this.retries(3);
   require('./features/loginFunctionality.spec')(actions);
   require('./features/register.spec')(actions);
-  require('./features/documentationLinks.spec')(actions);
   require('./features/feedbackrequest.spec')(actions);
   // require('./features/userPortalandWelcome.spec')(actions);
   require('./features/creatingProjectTemplates.spec')(actions);
