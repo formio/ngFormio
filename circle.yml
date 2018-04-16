@@ -14,6 +14,8 @@ machine:
 
 dependencies:
   pre:
+    - wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate
+    - tar -xzf sc-4.3.13-linux.tar.gz
     - wget http://selenium-release.storage.googleapis.com/3.11/selenium-server-standalone-3.11.0.jar
     - java -jar selenium-server-standalone-3.11.0.jar:
         background: true
@@ -23,14 +25,20 @@ dependencies:
     - ./appSetup.sh
     - echo $TAG > dist/version.txt
     - sed -i "s|APP_VERSION|${TAG}|g" dist/config.js
-
 test:
-  pre:
+  override:
+    - sc-4.3.13-linux/bin/sc -u rakesh1807 -k 759b16f1-e8d0-48c4-a373-f6aad961836f --readyfile ~/sauce_is_ready:
+        background: true
+      pwd: sc-*-linux
+    # Wait for tunnel to be ready
+    - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - mkdir ./test/screenshots
     - npm start:
         background: true
+    - npm test
   post:
+    - killall --wait sc
     - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
