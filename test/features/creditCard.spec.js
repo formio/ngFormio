@@ -123,7 +123,7 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryMonth');
       actions.clickOnElementWithText('02');
       actions.clickOnClass('#form-group-ccExpiryYear');
-      actions.clickOnElementWithText('04');
+      actions.clickOnElementWithText('18');
       actions.clickOnButton('Submit');
       actions.iSeeText('Invalid Expiration Date');
     });
