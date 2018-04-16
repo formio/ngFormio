@@ -14,7 +14,7 @@ machine:
 
 dependencies:
   pre:
-    - wget http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.11.0.jar
+    - wget http://selenium-release.storage.googleapis.com/3.11/selenium-server-standalone-3.11.0.jar
     - java -jar selenium-server-standalone-3.11.0.jar:
         background: true
     - pip install awscli
