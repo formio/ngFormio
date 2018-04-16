@@ -14,9 +14,7 @@ machine:
 
 dependencies:
   pre:
-    - wget https://saucelabs.com/downloads/sc-4.3.13-linux.tar.gz --no-check-certificate
-    - tar -xzf sc-4.3.13-linux.tar.gz
-    - wget http://selenium-release.storage.googleapis.com/3.11/selenium-server-standalone-3.11.0.jar
+    - wget http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.11.0.jar
     - java -jar selenium-server-standalone-3.11.0.jar:
         background: true
     - pip install awscli
@@ -27,19 +25,12 @@ dependencies:
     - sed -i "s|APP_VERSION|${TAG}|g" dist/config.js
 
 test:
-  override:
-    - sc-4.3.13-linux/bin/sc --user rakesh+Form --api-key 27c88b07-b86d-4323-bd60-1d07e350e833 --readyfile ~/sauce_is_ready:
-        background: true
-      pwd: sc-*-linux
-    # Wait for tunnel to be ready
-    - while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
+  pre:
     - sudo bash -c "echo \"127.0.0.1 portal.localhost\" >> /etc/hosts"
     - mkdir ./test/screenshots
     - npm start:
         background: true
-    - npm test
   post:
-    - killall --wait sc
     - mv ./test/screenshots/ $CIRCLE_ARTIFACTS/screenshots
 
 deployment:
