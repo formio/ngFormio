@@ -309,6 +309,8 @@ module.exports = function (actions) {
       actions.iSeeText('You have unsaved changes. Would you like to save these changes before leaving the editor?');
       actions.clickOnButton('Cancel Changes');
       actions.checkingUrlEndsWith('/resource/');
+      actions.goToPage('#/');
+      actions.waitForActionToComplete(2000);
       actions.logout();
     });
   });
