@@ -1424,6 +1424,7 @@ module.exports = function (config) {
 
 
   this.iSeeTextCount = function (text,count) {
+    text = replacements(text);
     it('I see text ' + text +' ' +count + ' times ', function (next) {
       try {
         var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
