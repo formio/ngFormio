@@ -2,11 +2,12 @@ module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
-      actions.iAmLoggedInFor('profileuser1');
+      actions.waitForActionToComplete(2000);
+      actions.iAmLoggedInFor('profileuser4');
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
-      actions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(5000);
       actions.goToPage('#/');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');

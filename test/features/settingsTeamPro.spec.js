@@ -2,11 +2,12 @@ module.exports = function (actions) {
   describe('Team Pro Plan Settings',function(){
     describe('Team Pro Plan > Environment Settings',function(){
       actions.logout();
-      actions.iAmLoggedInFor('profileuser1');
+      actions.waitForActionToComplete(2000);
+      actions.iAmLoggedInFor('profileuser5');
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
-      actions.waitForActionToComplete(2000);
+      actions.waitForActionToComplete(5000);
       actions.goToPage('#/');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
