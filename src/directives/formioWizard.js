@@ -1,4 +1,4 @@
-var isNaN = require('lodash/isNAN');
+var isNaN = require('lodash/isNaN');
 var isFinite = require('lodash/isFinite');
 var isEmpty = require('lodash/isEmpty');
 
