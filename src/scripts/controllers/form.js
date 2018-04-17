@@ -1189,6 +1189,10 @@ app.controller('FormShareController', ['$scope', function($scope) {
     if ($scope.options.auth) {
       $scope.previewUrl += '&auth=1';
     }
+    if ($scope.currentProject._id !== $scope.localProject._id && $scope.localProject.hasOwnProperty('remote')) {
+      var parts = $scope.localProject.remote.url.split('://');
+      $scope.previewUrl += '&host=' + parts[1] + '&protocol=' + parts[0];
+    }
     var formPreview = document.getElementById('form-preview');
     formPreview.innerHTML = '';
     var iframe = document.createElement('iframe');
@@ -1875,7 +1879,12 @@ app.controller('FormSubmissionsController', [
           if (component.multiple && (value.length > 0)) {
             var values = [];
             angular.forEach(value, function(arrayValue) {
-              arrayValue = componentInfo.tableView(arrayValue, component, $interpolate, formioComponents);
+              arrayValue = componentInfo.tableView(arrayValue, {
+                component: component,
+                $interpolate: $interpolate,
+                componentInfo: formioComponents,
+                util: FormioUtils
+              });
               if (arrayValue === undefined) {
                 return values.push('');
               }
@@ -1883,7 +1892,12 @@ app.controller('FormSubmissionsController', [
             });
             return values.join(', ');
           }
-          value = componentInfo.tableView(value, component, $interpolate, formioComponents);
+          value = componentInfo.tableView(value, {
+            component: component,
+            $interpolate: $interpolate,
+            componentInfo: formioComponents,
+            util: FormioUtils
+          });
           if (value === undefined) {
             return '';
           }

@@ -20,6 +20,8 @@ app.factory('PrimaryProject', [
         scope = {};
 
         scope.primaryProject = project;
+        var highestRoleQ = $q.defer();
+        scope.highestRoleLoaded = highestRoleQ.promise;
 
         // Load project environments
         $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function (result) {
@@ -35,7 +37,7 @@ app.factory('PrimaryProject', [
 
 
           // Calculate the users highest role within the project.
-          scope.highestRoleLoaded = $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
+          $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
             var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
             var teams = _($scope.userTeams ? $scope.userTeams : [])
               .map('_id')
@@ -88,6 +90,7 @@ app.factory('PrimaryProject', [
 
             scope.highestRole = highestRole;
             _.assign($scope, scope);
+            highestRoleQ.resolve();
           });
         });
         return _.assign($scope, scope);
