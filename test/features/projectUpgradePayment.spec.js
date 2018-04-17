@@ -2,7 +2,7 @@ module.exports = function (actions) {
   describe('Project Upgrade/Payment',function(){
     describe('Project Upgrade/Payment',function(){
       actions.logout();
-      actions.iAmLoggedInFor('profileuser1');
+      actions.iAmLoggedInFor('profileuser7');
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');

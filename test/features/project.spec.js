@@ -12,7 +12,6 @@ module.exports = function (actions) {
       actions.clickOnButton('Create Project');
       actions.iSeeTextIn('.toast-message', 'New Project created!');
       actions.clickOnClass('.toast-message');
-      actions.waitForActionToComplete(500);
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', '${project1.title}');
       actions.iSeeValueIn('#description', '${project1.description}');
