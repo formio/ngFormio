@@ -2,11 +2,13 @@ module.exports = function (actions) {
   describe('Project Upgrade/Payment',function(){
     describe('Project Upgrade/Payment',function(){
       actions.logout();
+      actions.waitForActionToComplete(2000);
       actions.iAmLoggedInFor('profileuser7');
       // actions.enterTextInField('.login-container #email', 'admin@example.com');
       // actions.enterTextInField('.login-container #password', 'password');
       // actions.clickOnElementWithText('LOG IN');
-      // actions.iAmLoggedIn();
+      actions.waitForActionToComplete(5000);
+      actions.goToPage('#/');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');

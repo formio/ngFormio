@@ -76,7 +76,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Continue ');
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnClass('.ui-select-match.ng-scope');
-      actions.clickOnClass('#ui-select-choices-row-0-5');
+      actions.clickOnClass('#ui-select-choices-row-1-5');
       actions.clickOnElementWithText('Connect Stage ');
       actions.iSeeText('https://remote.form.io');
       actions.waitForActionToComplete(2000);
@@ -85,7 +85,7 @@ module.exports = function (actions) {
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
-      actions.clickOnClass('.fa.fa-trash');
+      // actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
       actions.clickOnElementWithText('Custom JS and CSS');
       actions.checkingUrlEndsWith('env/settings/customjscss');

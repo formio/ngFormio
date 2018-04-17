@@ -66,7 +66,7 @@ module.exports = function (actions) {
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable On-Premise Environments.');
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
-      actions.clickOnClass('.fa.fa-trash');
+      // actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
       actions.iSeeText('Upgrade your project to a paid plan to enable CORS Settings.');
       actions.clickOnElementWithText('Security');

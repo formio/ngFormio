@@ -27,7 +27,7 @@ dependencies:
     - sed -i "s|APP_VERSION|${TAG}|g" dist/config.js
 test:
   override:
-    - sc-4.3.13-linux/bin/sc -u rak1807 -k f13b5330-0cff-4cda-a588-df5baba8b3c9 --readyfile ~/sauce_is_ready:
+    - sc-4.3.13-linux/bin/sc -u raki187 -k 8b8155aa-7c12-4974-91e9-939a719a5dad --readyfile ~/sauce_is_ready:
         background: true
       pwd: sc-*-linux
     # Wait for tunnel to be ready

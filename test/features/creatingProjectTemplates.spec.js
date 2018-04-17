@@ -12,7 +12,7 @@ module.exports = function (actions) {
         actions.enterTextInField('#description', 'This is first ' + framework);
         actions.clickOnElementWithText(' Create Project');
         actions.iSeeText('New Project created!');
-        actions.clickOnClass('.toast-message');
+        // actions.clickOnClass('.toast-message');
         actions.clickOnElement('.fa-home');
         actions.checkingUrlIamOn('#/');
         actions.iSeeText('This is first ' + framework);
@@ -32,7 +32,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#description', 'Test Description');
       actions.clickOnElementWithText(' Create Project');
       actions.iSeeText('New Project created!');
-      actions.clickOnClass('.toast-message');
+      // actions.clickOnClass('.toast-message');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Test Project');

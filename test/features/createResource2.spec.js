@@ -190,7 +190,7 @@ module.exports = function (actions) {
         actions.enterTextInField('#path', value);
         actions.clickOnElementWithText('Create Resource');
         actions.iSeeTextIn(".toast-message", message);
-        actions.clickOnClass('.toast-message');
+        // actions.clickOnClass('.toast-message');
       });
     });
     describe('Attempt to ‘save’ an existing ‘Resource’ with invalid path name', function () {
@@ -202,7 +202,7 @@ module.exports = function (actions) {
         actions.enterTextInField('#path', value);
         actions.clickSave('Save Resource');
         actions.iSeeTextIn(".toast-message", message);
-        actions.clickOnClass('.toast-message');
+        // actions.clickOnClass('.toast-message');
       });
     });
     describe('New Resources are created on ‘Forms’ Page',function(){
