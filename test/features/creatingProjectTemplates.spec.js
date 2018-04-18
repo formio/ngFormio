@@ -59,6 +59,7 @@ module.exports = function (actions) {
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Updated Title');
       actions.iSeeText('Updated Description');
+      actions.logout();
     });
   });
 };
