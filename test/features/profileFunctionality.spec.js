@@ -2,8 +2,7 @@ module.exports = function (actions) {
   describe('User Profile Functionality',function(){
     describe('Profile navigation',function(){
       actions.logout();
-      actions.waitForActionToComplete(2000);
-      actions.iAmLoggedInFor('profileuser1');
+      actions.iAmLoggedInFor('projuser8');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElement('#user-menu');
