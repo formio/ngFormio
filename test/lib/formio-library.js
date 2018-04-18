@@ -400,8 +400,8 @@ module.exports = function (config) {
   };
 
   this.enterTextInField = function (field, text) {
+    text=replacements(text);
     it('I enter ' + text + ' in ' + field + ' field', function (done) {
-      text = replacements(text.toString());
       //console.log(text);
       //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
       var ele = element(by.css(field));
@@ -1424,10 +1424,10 @@ module.exports = function (config) {
 
 
   this.iSeeTextCount = function (text,count) {
-    text = replacements(text);
+    text = replacements(text.toString());
     it('I see text ' + text +' ' +count + ' times ', function (next) {
       try {
-        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
+        var xpath = '//*[contains(text(),"' + text + '")]';
         var ele = element(by.xpath(xpath));
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
