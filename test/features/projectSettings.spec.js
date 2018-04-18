@@ -16,7 +16,7 @@ module.exports = function (actions) {
       val.forEach(function (settings) {
         actions.clickOnButton('Manage');
         actions.portalIamOn('${project3.title}');
-        actions.clickOnClass('fa-cog');
+        actions.clickOnClass('.fa.fa-cog');
         actions.enterTextInField(settings[1], settings[0]);
         actions.clickOnButton('Save Project');
         actions.portalIamOn('${project3.title}');

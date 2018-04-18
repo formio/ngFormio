@@ -393,15 +393,15 @@ module.exports = function (config) {
   this.iSeeElement = function (ele) {
     it('I see the element ' + ele, function (next) {
       var EC = protractor.ExpectedConditions;
-      var elt = element(by.css(ele));
+      var elt = element.all(by.css(ele)).first();
       browser.wait(EC.visibilityOf(elt), timeout);
       next();
     });
   };
 
   this.enterTextInField = function (field, text) {
-    it('I enter ' + text + ' in ' + field + ' field', function (next) {
-      text = replacements(text.toString());
+    text=replacements(text);
+    it('I enter ' + text + ' in ' + field + ' field', function (done) {
       //console.log(text);
       //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
       var ele = element(by.css(field));
@@ -409,7 +409,7 @@ module.exports = function (config) {
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
-        ele.clear().sendKeys(text).then(next).catch(next);
+        ele.clear().sendKeys(text).then(done).catch(done);
       });
     });
   };
@@ -444,69 +444,7 @@ module.exports = function (config) {
   //1. 'https://help.form.io/intro/welcome/'
   //2. 'regex:^#\/project\/[0-9a-z]{24}\/$'
   //3. '#/profile/view'
-  this.checkingUrlIamOn = function (url) {
-    if (!url.toLowerCase().includes('http') && !url.toLowerCase().includes('regex')) {
-      url = config.baseUrl + "/" + url;
-    } else if (url.toLowerCase().includes('regex')) {
-      url = url.split(':')[1];
-    }
-    it('I am on ' + url, function (next) {
-      browser.wait(function () {
-        return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.toLowerCase() == url.toLowerCase()
-            || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
-        });
-      }, timeout).then(function (value) {
-        try {
-          assert.equal(value, true);
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
-    });
-  };
 
-  this.checkingUrlEndsWith = function (url) {
-    it('URL contains ' + url, function (next) {
-      browser.wait(function () {
-        return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.endsWith(url);
-        });
-      }, timeout).then(function (value) {
-        try {
-          assert.equal(value, true);
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
-    });
-  };
-  this.goToPage = function (url) {
-    it('I go to ' + url, function (next) {
-      url = config.baseUrl + "/" + url;
-      browser.get(url).then(next).catch(next);
-    });
-  };
-
-  this.goToUrl = function (url) {
-    it('I go to ' + url, function (next) {
-      browser.get(url).then(next).catch(next);
-      browser.wait(function () {
-        return browser.getCurrentUrl().then(function (cUrl) {
-          return cUrl.indexOf(url) !== -1;
-        });
-      }, timeout).then(function (value) {
-        try {
-          assert.equal(value, true);
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
-    });
-  };
 
   this.waitForActionToComplete = function (time) {
     it('I wait for ' + (time / 1000) + ' seconds', function (next) {
@@ -557,7 +495,7 @@ module.exports = function (config) {
   this.iSeeText = function (text) {
     it('I see text "' + text + '"', function (next) {
       try {
-        var xpath = '//*[contains(text(),\'' + replacements(text) + '\')]';
+        var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
@@ -583,8 +521,8 @@ module.exports = function (config) {
   };
 
   this.clickOnElementWithText = function (text) {
-    it('I click on the ' + text + ' text ', function (next) {
-      var ele =  element(by.xpath('//*[text()=\'' + replacements(text.toString()) + '\']'));
+    it('I click on the ' + replacements(text.toString()) + ' text ', function (next) {
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -596,9 +534,9 @@ module.exports = function (config) {
     });
   };
 
-  this.clickOnElementWithTextLast = function (text) {
-    it('I click on the ' + text + ' text', function (next) {
-      var ele =  element.all(by.xpath('//*[text()=\'' + replacements(text.toString()) + '\']')).last();
+  this.clickOnElementWithTextIndex = function (text,index) {
+    it('I click on the ' + replacements(text.toString()) + ' text ', function (next) {
+      var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).get(index);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -609,6 +547,7 @@ module.exports = function (config) {
       });
     });
   };
+
 
   this.clickOnLink = function (text) {
     it('I click on the ' + text + ' link', function (next) {
@@ -632,7 +571,33 @@ module.exports = function (config) {
 
   this.clickOnButton = function (text) {
     it('I click on the ' + text + ' button', function (next) {
-      var ele = element(by.partialButtonText(replacements(text.toString())));
+      var ele =  element.all(by.partialButtonText(replacements(text.toString()))).first();
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+  this.clickSave = function (text) {
+    it('I click on the ' + text + ' button', function (next) {
+      var ele =  element.all(by.partialButtonText(replacements(text.toString()))).get(1);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+  this.clickOnClass = function (className) {
+    it('I click on the ' + className + ' class', function (next) {
+      var ele =  element.all(by.css(replacements(className.toString()))).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function (res) {
@@ -644,21 +609,9 @@ module.exports = function (config) {
     });
   };
 
-  this.clickOnClass = function (className) {
-    it('I click on the ' + className + ' class', function (next) {
-      getElement(by.css(replacements(className.toString())))
-        .then(function(ele) {
-          scrollTo(ele)
-            .then(function() {
-              ele.click().then(next).catch(next);
-            });
-        });
-    });
-  };
-
   this.iGoToEnv = function (env) {
     it('I go to environment ' + env, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
       browser.wait(function () {
         return envTab.isPresent();
       }, timeout).then(function (res) {
@@ -672,7 +625,7 @@ module.exports = function (config) {
 
   this.envHasTag = function(env, tag) {
     it('Environment ' + env + ' has tag ' + tag, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]/span[text()="' + tag + '"]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]/span[text()="' + tag + '"]'));
       browser.wait(function () {
         return envTab.isPresent();
       }, timeout).then(function() {
@@ -698,7 +651,7 @@ module.exports = function (config) {
 
   this.iSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
       browser.wait(function () {
         return envTab.isPresent();
       }, timeout).then(function () {
@@ -709,7 +662,7 @@ module.exports = function (config) {
 
   this.iDontSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
-      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),\'' + env + '\')]'));
+      var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
       browser.wait(function () {
         return envTab.isPresent().then(function(res) {
           return !res;
@@ -721,13 +674,16 @@ module.exports = function (config) {
   };
 
   this.iSeeTextIn = function (ele, text) {
-    it('I see text "' + text + '"', function (next) {
+    text = replacements(text);
+    it('I see text', function (next) {
       ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
         try {
-          config.expect(ele.getText()).to.eventually.equal(text);
+          var temp=ele.getText();
+          var temp1=temp.then(function(tx) {return tx.trim();})
+          config.expect(temp1).to.eventually.equal(text.trim());
           next();
         } catch (err) {
           next(err);
@@ -773,16 +729,11 @@ module.exports = function (config) {
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
-              return btn.isEnabled().then(function(enabled) {
-                if (!enabled) {
-                  return true;
-                }
-
-                return btn.getAttribute('class').then(function (classes) {
-                  return classes.split(' ').indexOf('btn-disable') !== -1;
-                });
+              return btn.isEnabled().then(function (res) {
+                return !res;
               });
             }
+            return present;
           });
         }, timeout).then(function (value) {
           try {
@@ -801,19 +752,11 @@ module.exports = function (config) {
   this.btnEnabled = function (field) {
     it('I see ' + field + ' button is Enabled', function (next) {
       try {
-        var btn = element.all(by.xpath('//button[text()=\'' + field + '\']')).first();
+        var btn = element.all(by.xpath('//button[text()="' + field + '"]')).first();
         browser.wait(function () {
           return btn.isPresent().then(function (present) {
             if (present) {
-              btn.isEnabled().then(function(enabled) {
-                if (!enabled) {
-                  return false;
-                }
-
-                return btn.getAttribute('class').then(function (classes) {
-                  return classes.split(' ').indexOf('btn-disable') === -1;
-                });
-              });
+              return btn.isEnabled();
             }
             return present;
           });
@@ -839,16 +782,6 @@ module.exports = function (config) {
       }, timeout).then(function () {
         ele.click().then(next).catch(next);
       });
-    });
-  };
-
-  this.linkExists = function(text) {
-    it('Link Exists ' + text, function (next) {
-      getElement(by.linkText(replacements(text)))
-        .then(function () {
-          next();
-        })
-        .catch(next)
     });
   };
 
@@ -914,7 +847,7 @@ module.exports = function (config) {
       browser.getAllWindowHandles().then(function (handles) {
         browser.ignoreSynchronization = true;
         browser.switchTo().window(handles[1]);
-        // config.expect(handles.length).to.equal(2);
+        config.expect(handles.length).to.equal(2);
         next();
       })
         .catch(next);
@@ -1088,30 +1021,30 @@ module.exports = function (config) {
     })
   };
 
-  this.portalIamOn = function (title) {
-    title = replacements(title.toString());
-    it('I am on page "' + title + '"', function (next) {
-      try {
-        var xpath = "//*[@class='project-title']";
-        browser.wait(function () {
-          return element(by.xpath(xpath)).isPresent();
-        }, timeout).then(function (result) {
-          var elet = element.all(by.xpath(xpath))
-          elet.getAttribute('value').then(function (value) {
-            config.expect(value === title);
-            next();
-          });
-        });
-      } catch (err) {
-        next(err);
-      }
-    });
-  };
+  // this.portalIamOn = function (title) {
+  //   title = replacements(title.toString());
+  //   it('I am on page "' + title + '"', function (next) {
+  //     try {
+  //       var xpath = "//*[@class='project-title']";
+  //       browser.wait(function () {
+  //         return element(by.xpath(xpath)).isPresent();
+  //       }, timeout).then(function (result) {
+  //         var elet = element.all(by.xpath(xpath))
+  //         elet.getAttribute('value').then(function (value) {
+  //           config.expect(value === title);
+  //           next();
+  //         });
+  //       });
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   });
+  // };
 
   this.clickOnElementIn = function (ele, text) {
     text = replacements(text.toString());
     it('I click on the ' + text + ' in' + ele + ' element', function (next) {
-      var ele = element(by.xpath('//*[text()=\'' + name + '\']//..//..//..//*[contains(@class,\'' + button + '\')]'));
+      var ele = element(by.xpath('//*[text()=\'' + text + '\']//..//..//..//*[contains(@class,\'' + ele + '\')]'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1239,8 +1172,8 @@ module.exports = function (config) {
     });
   };
 
-  this.creatingFormWithComponents = function (comps) {
-    it('creating form', function (next) {
+  this.creatingFormWithComponents = function () {
+    it('Creating form', function (next) {
       var formData = {
         display: "form"
         , components: []
@@ -1252,16 +1185,12 @@ module.exports = function (config) {
       formData.name = "sampletestname";
       //components.textfield.label = "textfield";
       formData.components.push(components.number);
-      //formData.components.push(components.password);
-       //formData.components.push(components.textarea);
-      //formData.components.push(components.checkbox);
+      formData.components.push(components.password);
+      formData.components.push(components.textarea);
+      formData.components.push(components.checkbox);
       formData.components.push(components.selectboxes);
-      //formData.components.push(components.select);
-     // formData.components.push(components.radio);
-      //formData.components.push(components.htmlelement);
-      //formData.components.push(components.htmlelement);
-
-      formData.components.push(components.button);
+      formData.components.push(components.select);
+      formData.components.push(components.radio);
       browser.executeScript("return localStorage.getItem('formioToken');").then(function (res) {
         createForm(formData, res, function (err, user) {
           if (err || user == "Bad Token") {
@@ -1339,7 +1268,7 @@ module.exports = function (config) {
   };
   this.checkElementWithTextIsDisabled = function (text)   {
     it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element.all(by.xpath('//*[text()=\'' + text + '\']')).first();
+      var ele = element.all(by.xpath('//*[text()="' + text + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1354,10 +1283,26 @@ module.exports = function (config) {
       });
     });
   };
-
+  this.checkElementWithClassIsDisabled = function (text)   {
+    it('I see ' + text + 'is disabled', function (next) {
+      var ele = element(by.css(text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.getAttribute('class').then(function(value){
+          try {
+            config.expect(value.split(" ")).contain('disabled');
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
+      });
+    });
+  };
   this.checkElementWithTextIsNotDisabled = function (text) {
-    it('I see ' + text + ' button is disabled', function (next) {
-      var ele = element(by.xpath('//*[text()=\'' + text + '\']'));
+    it('I see ' + text + ' button is not disabled', function (next) {
+      var ele = element.all(by.xpath('//*[text()="' + text + '"]')).first();
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -1424,5 +1369,106 @@ module.exports = function (config) {
       });
     });
   };
+  this.checkingUrlIamOn = function (url) {
+    if (!url.toLowerCase().includes('http') && !url.toLowerCase().includes('regex')) {
+      url = config.baseUrl + "/" + url;
+    } else if (url.toLowerCase().includes('regex')) {
+      url = url.split(':')[1];
+    }
+    it('I am on ' + url, function (next) {
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.toLowerCase() == url.toLowerCase()
+            || (cUrl.toLowerCase().substring(cUrl.indexOf('#/')).match(url) != null);
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
 
+  this.checkingUrlEndsWith = function (url) {
+    it('URL contains ' + url, function (next) {
+      browser.wait(function () {
+        return browser.getCurrentUrl().then(function (cUrl) {
+          return cUrl.endsWith(url);
+        });
+      }, timeout).then(function (value) {
+        try {
+          assert.equal(value, true);
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
+  this.goToPage = function (url) {
+    it('I go to ' + url, function (next) {
+      url = config.baseUrl + "/" + url;
+      browser.get(url).then(next).catch(next);
+    });
+  };
+  this.pageReload = function () {
+    it('Reload Page', function (next) {
+      browser.getCurrentUrl().then(function (url) {
+        browser.get(url).then(next).catch(next);
+      });
+    });
+  };
+
+
+  this.iSeeTextCount = function (text,count) {
+    text = replacements(text.toString());
+    it('I see text ' + text +' ' +count + ' times ', function (next) {
+      try {
+        var xpath = '//*[contains(text(),"' + text + '")]';
+        var ele = element(by.xpath(xpath));
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          element.all(by.xpath(xpath)).count().then(function (c) {
+              assert.equal(c,count);
+          });
+          next();
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+  this.enterTextInFieldIndex = function (field,index, text) {
+    it('I enter ' + text + ' in ' + field + ' field', function (next) {
+      text = replacements(text.toString());
+      var ele = element.all(by.css(field)).get(index);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        ele.clear().sendKeys(text).then(next).catch(next);
+      });
+    });
+  };
+  this.clickOnClassWithIndex = function (className,index) {
+    it('I click on the ' + className + ' class', function (next) {
+      var ele =  element.all(by.css(replacements(className.toString()))).get(index);
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
+  this.goToPageURL = function (url) {
+    it('I go to ' + url, function (next) {
+      browser.get(url).then(next).catch(next);
+    });
+  };
 };

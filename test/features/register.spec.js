@@ -54,8 +54,9 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #email', '${random-email}');
       actions.enterTextInField('.register-container #password', '${random-password>register2.password}');
       actions.enterTextInField('.register-container #verifyPassword', '${register2.password}');
+      actions.waitForActionToComplete(500);
       actions.clickOnElementWithText('REGISTER');
-      actions.iSeeText('ValidationError: "Username" must be unique.');
+      actions.iSeeText('ValidationError');
     });
     describe('Email unique', function () {
       actions.userExistsWith('${random-name>register2.name}', '${random-email>register2.email}', '${random-password>register2.password}');
@@ -64,8 +65,9 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #email', '${register2.email}');
       actions.enterTextInField('.register-container #password', '${random-password>register3.password}');
       actions.enterTextInField('.register-container #verifyPassword', '${register3.password}');
+      actions.waitForActionToComplete(500);
       actions.clickOnElementWithText('REGISTER');
-      actions.iSeeText('ValidationError: "Email" must be unique.');
+      actions.iSeeText('ValidationError:');
     });
     describe('Successful registration', function () {
       actions.logout();
@@ -75,7 +77,14 @@ module.exports = function (actions) {
       actions.enterTextInField('.register-container #verifyPassword', '${register3.password}');
       actions.btnEnabled('REGISTER');
       actions.clickOnElementWithText('REGISTER');
-      //actions.iAmLoggedIn();
+    });
+    describe(' Terms of Use and Privacy Policy links', function () {
+      actions.logout();
+      actions.clickOnElementWithText('Terms of Service');
+      // actions.checkingUrlIamOn('https://form.io/#/terms');
+      actions.goToPage('#/auth');
+      actions.clickOnElementWithText('Privacy Policy');
+      // actions.checkingUrlIamOn('https://form.io/#/privacy');
     });
   });
 };

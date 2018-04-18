@@ -1,46 +1,45 @@
 module.exports = function (actions) {
   describe('Documentation Links ',function () {
-    describe('Expanding the ‘Documentation’ button',function(){
-     actions.goToPage('#/auth');
-     actions.clickOnElementWithText(' Docs');
-     var listElements = ['.fa-rocket','.fa-info-circle','.fa-rocket','.fa-info-circle','.fa-laptop',
-       '.fa-server','.fa-book','.fa-code','.fa-cloud-upload','.fa-github','.fa-cubes','.fa-terminal',
-       '.fa-check-square-o','.fa-envelope','.fa-file','.fa-user','.fa-amazon','.fa-copy','.fa-cogs',
-       '.fa-wifi','.fa-ship'];
-      listElements.forEach(function(listElement){
-        actions.iSeeElement(listElement);
-      });
-     });
-
+    // describe('Expanding the ‘Documentation’ button',function(){
+    //  actions.goToPage('#/auth');
+    //  actions.clickOnElementWithText(' Docs');
+    //  var listElements = ['.fa-rocket','.fa-info-circle','.fa-laptop',
+    //    '.fa-server','.fa-book','.fa-code','.fa-cloud-upload','.fa-github','.fa-cubes','.fa-terminal',
+    //    '.fa-check-square-o','.fa-envelope','.fa-file','.fa-user','.fa-amazon','.fa-copy','.fa-cogs',
+    //    '.fa-wifi','.fa-exchange','.fa-cloud'];
+    //   listElements.forEach(function(listElement){
+    //     actions.iSeeElement(listElement);
+    //   });
+    //  });
      describe('Collapsing the ‘Documentation’ button',function(){
-     actions.goToPage('#/auth');
-     actions.clickOnElementWithText(' Docs');
-     actions.iSeeElement('.docs-dropdown');
-     actions.clickOnElementWithText(' Docs');
-     actions.iDonotSeeElement('.docs-dropdown');
+        actions.goToPage('#/auth');
+        actions.clickOnElementWithText(' Docs');
+        actions.iSeeElement('.docs-dropdown');
+        actions.clickOnElementWithText(' Docs');
+        actions.iDonotSeeElement('.docs-dropdown');
      });
-
     describe('Navigating to documentation links ', function () {
       var documentLinks = [
-        [' Getting Started','https://help.form.io/intro/welcome/'],
-        [' How it works','https://help.form.io/intro/howworks/'],
-        [' User Guide','https://help.form.io/userguide/introduction/'],
-        [' 30 minute guide','https://help.form.io/intro/guide/'],
-        [' Developer Section','https://help.form.io/developer/info/welcome/'],
-        [' API Docs','https://documenter.getpostman.com/view/684631/formio-api/2Jvuks'],
-        [' Github Projects','https://github.com/formio'],
-        [' App Libraries','https://help.form.io/developer/libraries/angular/'],
-        [' CLI Tool','https://help.form.io/developer/libraries/cli/'],
-        [' Email Providers','https://help.form.io/developer/integrations/email/'],
-        [' Walkthroughs','https://help.form.io/tutorials/walkthroughs/eventmanager/'],
-        [' File Storage Providers','https://help.form.io/developer/integrations/filestorage/'],
-        [' OAuth Providers','https://help.form.io/developer/integrations/oauth/'],
-        [' AWS Lamba','https://help.form.io/developer/info/lambda/'],
-        [' Auth0','https://help.form.io/developer/info/auth0/'],
-        [' Application Cloning','https://help.form.io/developer/info/bootstrap/'],
-        [' Form Actions','https://help.form.io/userguide/actions/'],
-        [' Offline Mode','https://help.form.io/developer/info/offline/'],
-        [' Docker Deployments','https://help.form.io/userguide/docker/']
+        [' Getting Started','https://help.form.io/intro/welcome/','Welcome to <'],
+        [' How it works','https://help.form.io/intro/howworks/','How it works'],
+        [' User Guide','https://help.form.io/userguide/introduction/','Intro'],
+        [' Application Development','https://help.form.io/intro/appdev/','Application Development'],
+        [' 30 minute guide','https://help.form.io/intro/guide/','Up & Running'],
+        [' Developer Section','https://help.form.io/developer/welcome/','Welcome'],
+        [' API Docs','https://documenter.getpostman.com/view/684631/formio-api/2Jvuks','Form.io API'],
+        [' Github Projects','https://github.com/formio','Form.io'],
+        [' App Libraries','https://help.form.io/developer/libraries/','Integration Libraries'],
+        [' CLI Tool','https://github.com/formio/formio-cli/','The Form.io command line interface.'],
+        [' Walkthroughs','https://help.form.io/tutorials/walkthroughs/eventmanager/','Building a Basic Event Management System'],
+        [' Email Providers','https://help.form.io/integrations/email/','Email'],
+        [' File Storage Providers','https://help.form.io/integrations/filestorage/','File Storage'],
+        [' OAuth Providers','https://help.form.io/integrations/oauth/','OAuth Authentication'],
+        [' AWS Lamba','https://help.form.io/developer/lambda/','AWS Lambda'],
+        [' Auth0','https://help.form.io/integrations/oauth/','OAuth Authentication'],
+        [' Form Actions','https://help.form.io/userguide/actions/','Actions'],
+        [' Offline Mode','https://help.form.io/developer/offline/','Offline Plugin'],
+        [' Staging and Deploying','https://help.form.io/userguide/staging/','Staging'],
+        [' On-Premise','https://help.form.io/userguide/environments/','On-Premise Environments']
       ];
       documentLinks.forEach(function(documentLink){
         actions.goToPage('#/auth');
@@ -49,6 +48,7 @@ module.exports = function (actions) {
         actions.clickOnElementWithText(documentLink[0]);
         actions.switchTab();
         actions.checkingUrlIamOn(documentLink[1]);
+        actions.iSeeText(documentLink[2]);
         actions.closeWindow();
       });
     });
