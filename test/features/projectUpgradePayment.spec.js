@@ -82,6 +82,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Basic');
       actions.clickOnElementWithText('Downgrade');
       actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.iSeeTextIn("a.project-plan.label-trial","Trial");
       actions.waitForActionToComplete(2000);
       actions.upgradeToPlan('Basic');
       actions.iDonotSeeText('Payments will be charged to:');
