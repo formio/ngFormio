@@ -1,0 +1,35 @@
+<div class="input-group">
+  <select
+    ng-if="isMultipleMasksField"
+    class="formio-multiple-mask-select form-control"
+    id="{{componentId}}-mask"
+    ng-model="currentMask"
+    ng-change="onMaskChange(currentMask)"
+    ng-disabled="readOnly"
+    ng-options="inputMask.mask as inputMask.label for inputMask in component.inputMasks"
+    ></select>
+  <input
+    type="{{ component.mask ? 'password' : component.inputType }}"
+    class="form-control"
+    ng-class="{'formio-multiple-mask-input': isMultipleMasksField}"
+    id="{{ componentId }}"
+    name="{{ componentId }}"
+    tabindex="{{ component.tabindex || 0 }}"
+    ng-disabled="readOnly"
+    ng-model="phoneNumber"
+    ng-model-options="{ debounce: 500 }"
+    ng-change="onPhoneChange(phoneNumber)"
+    safe-multiple-to-single
+    auto-focus
+    aria-labelledby="{{ componentId +'Label'}}"
+    aria-describedby="{{componentId + 'Desc'}}"
+    spellcheck="{{ component.spellcheck }}"
+    ng-minlength="component.validate.minLength"
+    ng-maxlength="component.validate.maxLength"
+    ng-pattern="component.validate.pattern"
+    custom-validator="component.validate.custom"
+    ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
+    formio-mask
+    ng-required="isRequired(component)"
+    >
+</div>

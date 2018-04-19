@@ -3,13 +3,13 @@ var createNumberMask = require('text-mask-addons').createNumberMask;
 var formioUtils = require('formiojs/utils');
 var _ = require('lodash');
 
-module.exports = ['FormioUtils', function(FormioUtils) {
+module.exports = ['FormioUtils', function (FormioUtils) {
   return {
     restrict: 'A',
     require: 'ngModel',
-    link: function(scope, element, attrs, controller) {
+    link: function (scope, element, attrs, controller) {
       var format = attrs.formioMask;
-      var inputElement;
+      var inputElement, currentMask;
 
       if (element[0].tagName === 'INPUT') {
         // `textMask` directive is used directly on an input element
@@ -54,7 +54,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
         scope.prefix = affixes.prefix;
         scope.suffix = affixes.suffix;
       }
-      else if (format ==='number') {
+      else if (format === 'number') {
         scope.decimalLimit = FormioUtils.getNumberDecimalLimit(scope.component);
       }
 
@@ -62,7 +62,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
        * Sets the input mask for an input.
        * @param {HTMLElement} input - The html input to apply the mask to.
        */
-      var setInputMask = function(input) {
+      var setInputMask = function (input) {
         if (!input) {
           console.warn('no input');
           return;
@@ -77,9 +77,8 @@ module.exports = ['FormioUtils', function(FormioUtils) {
         }
 
         if (_.get(scope.component, 'decimalLimit', scope.decimalLimit) === 0 ||
-          (scope.component.validate && scope.component.validate.integer) ||
-          !_.get(scope.component, 'allowDecimal', true)
-        ) {
+          (scope.component.validate && scope.component.validate.integer) || !_.get(scope.component, 'allowDecimal', true)
+          ) {
           maskOptions.allowDecimal = false;
         }
         else {
@@ -107,7 +106,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
         // Set the mask on the input element.
         if (mask) {
           scope.inputMask = mask;
-          maskInput({
+          currentMask = maskInput({
             inputElement: input,
             mask: mask,
             showMask: (format !== 'number' && format !== 'currency'),
@@ -120,7 +119,16 @@ module.exports = ['FormioUtils', function(FormioUtils) {
 
       setInputMask(inputElement);
 
-      controller.$validators.mask = function(modelValue, viewValue) {
+      if (scope.component.allowMultipleMasks) {
+        scope.$watch('component.inputMask', function (newMask) {
+          if (currentMask) {
+            currentMask.destroy();
+          }
+          setInputMask(inputElement);
+        }, true);
+      }
+
+      controller.$validators.mask = function (modelValue, viewValue) {
         var input = modelValue || viewValue;
         if (input) {
           return formioUtils.matchInputMask(input, scope.inputMask);
@@ -132,7 +140,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
       // Only use for currency or number formats.
       if (format) {
         // Convert from view to model
-        controller.$parsers.push(function(value) {
+        controller.$parsers.push(function (value) {
           if (!value) {
             return value;
           }
@@ -152,7 +160,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
         });
 
         // Convert from model to view
-        controller.$formatters.push(function(value) {
+        controller.$formatters.push(function (value) {
           if (Array.isArray(value)) {
             value = value[0];
           }
