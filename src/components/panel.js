@@ -50,7 +50,9 @@ module.exports = function(app) {
             $scope.collapsed = !!$scope.component.collapsed;
 
             $scope.toggleCollapsed = function() {
-              $scope.collapsed = !$scope.collapsed;
+              if ($scope.component.collapsible) {
+                $scope.collapsed = !$scope.collapsed;
+              }
             };
           }
         ]
