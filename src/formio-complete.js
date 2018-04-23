@@ -1,3 +1,5 @@
+require('angular');
+require('angular-translate');
 require('ui-select/dist/select');
 require('angular-moment');
 require('angular-sanitize');
