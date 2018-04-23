@@ -26,8 +26,7 @@
     "angular-ui-ace": "^0.2.3",
     "angular-ui-select": "^0.19.8",
     "angular-bootstrap": "^2.5.0",
-    "angular-ckeditor": "^1.0.3",
-    "angular-translate": "2.17.1"
+    "angular-ckeditor": "^1.0.3"
   },
   "license": "MIT",
   "ignore": [
