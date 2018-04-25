@@ -41,13 +41,14 @@ module.exports = function(app) {
           };
 
           $scope.hasError = function() {
-            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid && !$scope.formioForm.$pristine) {
+            if (clicked && (settings.action === 'submit') && $scope.formioForm.$invalid) {
               $scope.disableBtn = true;
               return true;
-            } else {
+            }
+            else {
               clicked = false;
               $scope.disableBtn = false;
-              return false
+              return false;
             }
           };
 

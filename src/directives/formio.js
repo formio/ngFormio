@@ -414,7 +414,6 @@ module.exports = function() {
         $scope.onSubmit = function(form) {
 
           $scope.formioAlerts = [];
-          $element.find('.has-error').removeClass('has-error');
           if ($scope.checkErrors(form)) {
             $scope.formioAlerts.push({
               type: 'danger',
