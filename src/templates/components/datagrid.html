@@ -41,7 +41,7 @@
       </tr>
     </tbody>
   </table>
-  <div style="margin-top: 10px" class="datagrid-add" ng-if="(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')">
+  <div style="margin-top: 10px" class="datagrid-add" ng-if="(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || !component.validate.maxLength || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')">
     <a ng-click="(readOnly || formioForm.submitting)? null: addRow() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary">
       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:options.building }}
     </a>
