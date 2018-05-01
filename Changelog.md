@@ -4,11 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.33.0
+### Added
+ - Save as State action to button component
+ - Ability to skip validation if state is draft
+ - Delete action to button component
+
 ### Fixed
  - Validation inside DataGrid.
  - Validation for EditGrid.
  - Handling of unique validation.
+ - Datagrid add button not appearing after maximum rows setting removed
+
+### Changed
+ - Update formio.js version to v2.32.0
 
 ## 2.32.1
 ### Changed
