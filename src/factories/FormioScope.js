@@ -11,11 +11,15 @@ module.exports = [
       onError: function($scope, $element) {
         return function(error) {
           if ((error.name === 'ValidationError') && $element) {
-            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
+            var element = $element.find('#form-group-' + error.details[0].path);
+            element.addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
             $scope.showAlerts({
               type: 'danger',
               message: message
+            });
+            $scope.$on('formSubmit', function() {
+              element.removeClass('has-error');
             });
           }
           else {
