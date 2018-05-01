@@ -98,6 +98,13 @@ module.exports = [
             }
           };
 
+          $scope.deleteSubmission = function() {
+            $scope.formio.deleteSubmission()
+              .then(function() {
+                $scope.$emit('formSubmissionDelete', $scope.submission);
+              });
+          };
+
           $scope.isDisabled = function(component) {
             return $scope.readOnly || (typeof $scope.$parent.isDisabled === 'function' && $scope.$parent.isDisabled(component));
           };
