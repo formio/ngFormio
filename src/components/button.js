@@ -28,6 +28,7 @@ module.exports = function(app) {
           $scope.getButtonType = function() {
             switch (settings.action) {
               case 'submit':
+              case 'saveState':
                 return 'submit';
               case 'reset':
                 return 'reset';
@@ -35,6 +36,7 @@ module.exports = function(app) {
               case 'custom':
               case 'oauth':
               case 'url':
+              case 'delete':
               default:
                 return 'button';
             }
@@ -76,6 +78,10 @@ module.exports = function(app) {
             $scope.data[$scope.component.key] = true;
             switch (settings.action) {
               case 'submit':
+                $scope.submission.state = 'submitted';
+                return;
+              case 'saveState':
+                $scope.submission.state = $scope.component.state;
                 return;
               case 'event':
                 $scope.$emit($scope.component.event, $scope.data);
@@ -88,6 +94,9 @@ module.exports = function(app) {
                 break;
               case 'reset':
                 $scope.resetForm();
+                break;
+              case 'delete':
+                $scope.deleteSubmission();
                 break;
               case 'oauth':
                 if (!settings.oauth) {

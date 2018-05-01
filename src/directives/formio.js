@@ -414,7 +414,7 @@ module.exports = function() {
         $scope.onSubmit = function(form) {
 
           $scope.formioAlerts = [];
-          if ($scope.checkErrors(form)) {
+          if ($scope.submission.state !== 'draft' && $scope.checkErrors(form)) {
             $scope.formioAlerts.push({
               type: 'danger',
               message: 'Please fix the following errors before submitting.'
@@ -447,6 +447,9 @@ module.exports = function() {
             }
             if ($scope.submission.owner) {
               submissionData.owner = $scope.submission.owner;
+            }
+            if ($scope.submission.state) {
+              submissionData.state = $scope.submission.state;
             }
             if ($scope.submission.data._id) {
               submissionData._id = $scope.submission.data._id;
