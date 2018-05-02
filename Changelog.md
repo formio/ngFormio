@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Handling of unique validation.
  - Datagrid add button not appearing after maximum rows setting removed
 
+### Reverted
+ - Collapsible fieldsets and panels. This was causing issues with validation and will be in 3.x branch only.
+
 ### Changed
  - Update formio.js version to v2.32.0
 
