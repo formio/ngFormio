@@ -1,11 +1,11 @@
 <div class="panel panel-{{ component.theme }}" id="formio-panel-{{ component.key }}">
-  <div ng-if="component.title" class="panel-heading" ng-class="{'formio-clickable': component.collapsible}" ng-click="toggleCollapsed()">
+  <div ng-if="component.title" class="panel-heading">
     <h3 class="panel-title">
       {{ component.title | formioTranslate:null:options.building }}
       <formio-component-tooltip></formio-component-tooltip>
     </h3>
   </div>
-  <div class="panel-body" ng-hide="collapsed">
+  <div class="panel-body">
     <formio-component
       ng-repeat="_component in component.components track by $index"
       component="_component"

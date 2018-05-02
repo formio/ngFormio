@@ -41,19 +41,7 @@ module.exports = function(app) {
 
           view += '</tbody></table>';
           return view;
-        },
-        controller: [
-          '$scope',
-          function(
-            $scope
-          ) {
-            $scope.collapsed = !!$scope.component.collapsed;
-
-            $scope.toggleCollapsed = function() {
-              $scope.collapsed = !$scope.collapsed;
-            };
-          }
-        ]
+        }
       });
     }
   ]);

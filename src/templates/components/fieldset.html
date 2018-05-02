@@ -1,22 +1,20 @@
 <fieldset id="formio-fieldset-{{ component.key }}">
-  <legend ng-if="component.legend" ng-class="{'formio-clickable': component.collapsible}" ng-click="toggleCollapsed()">
+  <legend ng-if="component.legend">
     {{ component.legend | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
   </legend>
-  <div class="card-body" ng-hide="collapsed">
-    <formio-component
-      ng-repeat="_component in component.components track by $index"
-      component="_component"
-      data="data"
-      formio="formio"
-      submission="submission"
-      hide-components="hideComponents"
-      ng-if="options.building ? '::true' : isVisible(_component, data)"
-      read-only="isDisabled(_component, data)"
-      form-name="formName"
-      grid-row="gridRow"
-      grid-col="gridCol"
-      options="options"
-    ></formio-component>
-  </div>
+  <formio-component
+    ng-repeat="_component in component.components track by $index"
+    component="_component"
+    data="data"
+    formio="formio"
+    submission="submission"
+    hide-components="hideComponents"
+    ng-if="options.building ? '::true' : isVisible(_component, data)"
+    read-only="isDisabled(_component, data)"
+    form-name="formName"
+    grid-row="gridRow"
+    grid-col="gridCol"
+    options="options"
+  ></formio-component>
 </fieldset>
