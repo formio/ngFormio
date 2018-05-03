@@ -13,7 +13,8 @@ if (parts[0] === 'portal' || parts[0] === 'beta') {
 
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
-var formioBase = apiProtocol + '//formio.' + serverHost;angular.module('formioApp').constant('AppConfig', {
+var formioBase = apiProtocol + '//formio.' + serverHost;
+angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
   pathType: pathType,
@@ -26,7 +27,7 @@ var formioBase = apiProtocol + '//formio.' + serverHost;angular.module('formioAp
   apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
-  pdfServer: 'https://files.form.io',
+  pdfServer: apiProtocol + '//files.' + serverHost,
   pdfHostedPrice: 50,
   pdfHostedForms: 25,
   pdfHostedSubs: 1000,
