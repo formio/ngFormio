@@ -157,6 +157,10 @@ app.config([
           templateUrl: 'views/form/form-settings.html',
           controller: ['$scope', function($scope) {
             $scope.disableCollection = function() {
+              // Don't allow collections for hosted projects
+              if (_.get($scope, 'localProject._id') === _.get($scope, 'currentProject._id')) {
+                return true;
+              }
               if (!$scope.minPlan('commercial')) {
                 return true;
               }
