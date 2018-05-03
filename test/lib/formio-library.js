@@ -23,7 +23,7 @@ module.exports = function (config) {
     options = options || {};
     _.extend(options, {
       length: chance.natural({min: 5, max: 20}),
-      pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+      pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     });
     return this.string(options).toLowerCase();
   };
