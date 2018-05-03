@@ -43,7 +43,10 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Credit Card’ value',function(){
-      actions.goToPage('#/profile/payment/edit');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test Creditcard');
       actions.enterTextInField('#securityCode','411');
       actions.clickOnClass('#form-group-ccExpiryMonth');
@@ -54,7 +57,10 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Exp Month value',function(){
-      actions.goToPage('#/profile/payment/edit');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test Creditcard');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -64,7 +70,10 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Exp Year value',function(){
-      actions.goToPage('#/profile/payment/edit');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test Creditcard');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -74,7 +83,10 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Submitting Credit Card input form with missing ‘Security Code’ value',function(){
-      actions.goToPage('#/profile/payment/edit');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test Creditcard');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.clickOnClass('#form-group-ccExpiryMonth');
@@ -116,7 +128,10 @@ module.exports = function (actions) {
       actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
     });
     describe('Submitting Credit Card with expiration date that has already expired',function(){
-      actions.goToPage('#/profile/payment/edit');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
+      actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Another Creditcard');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','422');
