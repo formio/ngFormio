@@ -18,6 +18,7 @@
     "lodash": "^4.17.4",
     "angular-truncate-2": "^0.4.2",
     "bootstrap-sass": "^3.3.7",
+    "bootstrap-ui-datetime-picker": "2.6.1",
     "ng-dialog": "^1.4.0",
     "angular-swagger-ui": "https://github.com/randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^2.0.0",

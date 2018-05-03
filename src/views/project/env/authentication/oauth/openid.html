@@ -34,5 +34,27 @@
       <label for="openidscope">Scope</label>
       <input ng-model="currentProject.settings.oauth.openid.scope" type="text" class="form-control" id="openidscope" name="openidscope" placeholder="Enter Request Scope (optional)">
     </div>
+    <div class="form-group" ng-controller="oauthRoles">
+      <label>Roles</label>
+      <div class="row">
+        <div class="col-md-4"><strong>Claim</strong></div>
+        <div class="col-md-4"><strong>Value</strong></div>
+        <div class="col-md-4"><strong>Role</strong></div>
+      </div>
+      <div class="row" ng-repeat="row in currentProject.settings.oauth.openid.roles track by $index" style="margin: 10px -15px;">
+        <div class="col-md-4">
+          <input ng-model="row.claim" type="text" class="form-control" placeholder="Leave empty for everyone">
+        </div>
+        <div class="col-md-4">
+          <input ng-model="row.value" type="text" class="form-control">
+        </div>
+        <div class="col-md-3">
+          <select ng-model="row.role" ng-options="role._id as role.title for role in roles track by role._id"></select>
+        </div>
+        <div class="col-md-1"><span class="btn btn-default" ng-click="removeRow($index)"><i class="glyphicon glyphicon-remove-circle"></i></span></div>
+      </div>
+      <span class="btn btn-primary" ng-click="addRow()">Add Role Mapping</span>
+      <p class="text-muted">Map claims values to form.io roles to assign user's to roles.</p>
+    </div>
   </div>
 </div>

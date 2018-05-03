@@ -2160,6 +2160,27 @@ app.controller('ProjectSettingsController', [
   }
 ]);
 
+app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
+  $http.get($scope.formio.projectUrl + '/role')
+    .then(function(result) {
+      $scope.roles = result.data;
+    });
+  $scope.$watch('currentProject.settings.oauth.openid', function() {
+    if (!$scope.currentProject.settings || !$scope.currentProject.settings.oauth || $scope.currentProject.settings.oauth.openid) {
+      return;
+    }
+    $scope.currentProject.settings.oauth.openid.roles = $scope.currentProject.settings.oauth.openid.roles || [{}];
+  }, true);
+
+  $scope.addRow = function() {
+    $scope.currentProject.settings.oauth.openid.roles.push({});
+  };
+
+  $scope.removeRow = function(index) {
+    $scope.currentProject.settings.oauth.openid.roles.splice(index, 1);
+  };
+}]);
+
 app.controller('ProjectRemoteController', [
   '$http',
   '$scope',

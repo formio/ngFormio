@@ -2,10 +2,18 @@ module.exports = function (actions) {
   describe('Independent Plan Settings',function(){
     describe('Independent Plan > Environment Settings',function(){
       actions.logout();
-      actions.iAmLoggedInFor('profileuser1');
       actions.waitForActionToComplete(2000);
-      actions.goToPage('#/profile/payment/view');
+      actions.iAmLoggedInFor('profileuser4');
+      // actions.enterTextInField('.login-container #email', 'admin@example.com');
+      // actions.enterTextInField('.login-container #password', 'password');
+      // actions.clickOnElementWithText('LOG IN');
+      actions.waitForActionToComplete(5000);
+      actions.goToPage('#/');
+      actions.clickOnClass('#user-menu');
+      actions.clickOnElementWithText(' Payment Info');
+      actions.checkingUrlEndsWith('#/profile/payment/view');
       actions.clickOnElementWithText('Add Credit Card');
+      // actions.clickOnElementWithText('Change Credit Card');
       actions.enterTextInField('#cardholderName','Test');
       actions.enterTextInField('#ccNumber','4111111111111111');
       actions.enterTextInField('#securityCode','411');
@@ -19,27 +27,24 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','independentProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.enableAngular(true);
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Independent");
       actions.clickOnElementWithText(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-warning","Independent");
-      actions.enableAngular(false);
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
-      actions.checkElementIsNotDisabled('//*[@id="name"]');
-      actions.enterTextInField('#name','independentauto');
+      actions.checkElementIsNotDisabled('//*[@id="form-group-name"]/div[1]/input');
+      actions.enterTextInField('#form-group-name>div.input-group.ng-scope>input','${random-name>test.name}');
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Save Stage');
       actions.waitForActionToComplete(500);
-      actions.iSeeValueIn('#name','independentauto');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText('User Login');
-      actions.iSeeValueIn('#form-group-path','independentauto');
+      actions.iSeeTextCount('${test.name}',2);
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' API');
-      actions.iSeeValueIn('.wrap-table-cell','independentauto');
+      actions.iSeeTextCount('${test.name}',4);
       actions.clickOnElementWithText('Settings');
       actions.checkElement('//*[@id="protect"]');
       actions.iSeeElement('i.fa.fa-shield.ng-scope');
@@ -60,9 +65,11 @@ module.exports = function (actions) {
       actions.iSeeText('Upgrade your project to a team or commercial plan to enable On-Premise Environments.');
       actions.clickOnElementWithText('API Keys');
       actions.clickOnElementWithText('Add New Key');
-      actions.clickOnClass('.fa.fa-trash');
+      // actions.clickOnClass('.fa.fa-trash');
       actions.clickOnElementWithText('CORS');
       actions.iSeeText('Upgrade your project to a paid plan to enable CORS Settings.');
+      actions.clickOnElementWithText('Security');
+      actions.iSeeText('Upgrade your project to a paid plan to enable security settings.');
       actions.clickOnElementWithText('Custom JS and CSS');
       actions.checkingUrlEndsWith('/env/settings/customjscss');
     });
@@ -100,6 +107,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      // actions.selectOption('action-select','Email');
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -113,6 +121,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      // actions.selectOption('action-select','Email');
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -127,6 +136,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      // actions.selectOption('action-select','Email');
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -141,6 +151,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
+      // actions.selectOption('action-select','Email');
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Email');
       actions.clickOnElementWithText(' Add Action');
@@ -151,6 +162,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('File Storage');
       actions.iSeeText('Upgrade your project to a paid plan to access file storage settings.');
       actions.clickOnElementWithText('Data Connections');
+      actions.clickOnElementWithText('Authentication');
+      actions.checkingUrlEndsWith('env/authentication/info');
       actions.clickOnElementWithText('OAuth');
     });
     describe('Deleting independentProject',function(){

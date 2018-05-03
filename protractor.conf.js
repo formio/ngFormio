@@ -3,13 +3,20 @@
 // An example configuration file.
 exports.config = {
   // The address of a running selenium server.
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: 'http://travist:1c32baf7-f790-4a41-ae31-49c0972e13e7@ondemand.saucelabs.com:80/wd/hub',
+  // seleniumAddress: 'http://localhost:4444/wd/hub',
   //seleniumServerJar: deprecated, this should be set on node_modules/protractor/config.json
 
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
-    'browserName': 'chrome'
+    'browserName': 'chrome',
+    "maxDuration": 5400
   },
+  // multiCapabilities: [{
+  //   'browserName': 'firefox'
+  // }, {
+  //   'browserName': 'chrome'
+  // }],
   // allScriptSTimeout : 120000,
   // getPageTimeout: 120000,
   // Spec patterns are relative to the current working directory when
@@ -25,6 +32,6 @@ exports.config = {
   mochaOpts: {
     reporter: "spec",
     slow: 1000,
-    timeout: 5000
+    timeout: 60000
   }
 };
