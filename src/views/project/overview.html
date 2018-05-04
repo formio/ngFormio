@@ -71,13 +71,19 @@
     <div class="col-md-4">
       <ul class="list-group list-group-striped" ng-if="currentProject._id === localProject._id">
         <li class="list-group-item list-group-heading">
-          <h3>Monthly Submission Requests</h3>
+          <h3>Monthly Limits</h3>
         </li>
         <li class="list-group-item">
+          <h3>Submission Requests</h3>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
           </div>
           <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
+          <h3>Emails</h3>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getEmailCallsPercent(currentProject.apiCalls, primaryProject.plan)}" ng-class="getProgressBarClassPercent(currentProject.apiCalls, primaryProject.plan)"></div>
+          </div>
+          <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.emails | number }} / {{ getEmailCallsLimit(primaryProject.plan) }}</small></p>
         </li>
       </ul>
       <ul class="list-group list-group-striped">
