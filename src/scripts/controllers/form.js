@@ -485,6 +485,109 @@ app.controller('FormController', [
       }
     };
 
+    $scope.builderConfig = {
+      baseUrl: $scope.baseUrl,
+      building: true,
+      sideBarScrollOffset: 60,
+      builder: {
+        basic: {
+          title: 'Basic Components',
+          weight: 0,
+          default: true,
+          components: {
+            textfield: true,
+            number: true,
+            password: true,
+            textarea: true,
+            checkbox: true,
+            selectboxes: true,
+            select: true,
+            radio: true,
+            htmlelement: true,
+            content: true,
+            button: true
+          }
+        },
+        advanced: {
+          title: 'Advanced',
+          weight: 10,
+          components: {
+            email: true,
+            phoneNumber: true,
+            address: true,
+            datetime: true,
+            day: true,
+            time: true,
+            currency: true,
+            resource: true,
+            signature: true,
+            tags: true,
+            survey: true
+          }
+        },
+        layout: {
+          title: 'Layout',
+          weight: 20,
+          components: {
+            columns: true,
+            fieldset: true,
+            panel: true,
+            tabs: true,
+            table: true,
+            well: true
+          }
+        },
+        data: {
+          title: 'Data',
+          weight: 30,
+          components: {
+            hidden: true,
+            container: true,
+            datagrid: true,
+            editgrid: true
+          }
+        },
+        premium: {
+          title: 'Premium',
+          weight: 40,
+          components: {
+            file: true,
+            form: true,
+            custom: true
+          }
+        }
+      }
+    };
+
+    $scope.formio.loadForms({params: {
+      type: 'resource',
+      select: '_id,title,name,components',
+      limit: 100
+    }}).then(function (resources) {
+      $scope.builderConfig.builder.resource = {
+        title: 'Existing Resource Fields',
+        key: 'resource',
+        weight: 50,
+        groups: {}
+      };
+      _.each(resources, function(resource) {
+        $scope.builderConfig.builder.resource.groups[resource.name] = {
+          title: resource.title,
+          key: resource.name,
+          components: {}
+        };
+        var groupInfo = $scope.builderConfig.builder.resource.groups[resource.name];
+        FormioUtils.eachComponent(resource.components, function(component) {
+          groupInfo.components[component.key] = {
+            title: component.label || component.title || component.legend || component.key,
+            key: resource.name + '_' + component.key,
+            schema: component
+          };
+        });
+      });
+      $scope.$broadcast('buildSidebar');
+    });
+
     // The url to goto for embedding.
     $scope.iframeCode = '';
     $scope.embedCode = '';
@@ -582,10 +685,6 @@ app.controller('FormController', [
       selfAccess($scope.selfAccessPermissions);
       $scope.$broadcast('permissionsChange');
     };
-
-    $scope.$watch('form.display', function(display) {
-      $scope.$broadcast('formDisplay', display);
-    });
 
     $scope.$watch('form', function(form) {
       if (!form) {
