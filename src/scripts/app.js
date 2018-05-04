@@ -41,7 +41,6 @@ angular
     'AppConfig',
     'toastrConfig',
     'RemoteTokensProvider',
-    'formioComponentsProvider',
     function(
       $stateProvider,
       $urlRouterProvider,
@@ -50,8 +49,7 @@ angular
       FormioProvider,
       AppConfig,
       toastrConfig,
-      RemoteTokensProvider,
-      formioComponentsProvider
+      RemoteTokensProvider
     ) {
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
@@ -63,26 +61,6 @@ angular
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
-
-      formioComponentsProvider.addGroup('advanced', {
-        title: 'Advanced'
-      });
-      formioComponentsProvider.addGroup('data', {
-        title: 'Data'
-      });
-      formioComponentsProvider.addGroup('layout', {
-        title: 'Layout'
-      });
-      formioComponentsProvider.addGroup('premium', {
-        title: 'Premium'
-      });
-      formioComponentsProvider.register('datagrid', {group: 'data', title: 'Datagrid (Array)'});
-      formioComponentsProvider.register('editgrid', {group: 'data', title: 'Editgrid (Array)'});
-      formioComponentsProvider.register('container', {group: 'data', title: 'Container (Object)'});
-      formioComponentsProvider.register('hidden', {group: 'data'});
-      formioComponentsProvider.register('form', {group: 'premium', title: 'Nested Form'});
-      formioComponentsProvider.register('file', {group: 'premium'});
-      formioComponentsProvider.register('custom', {group: 'premium'});
 
       var RemotePlugin = function() {};
 

@@ -26,7 +26,7 @@ var formioBase = apiProtocol + '//formio.' + serverHost;angular.module('formioAp
   apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
-  pdfServer: 'https://files.form.io',
+  pdfServer: 'http://localhost:4005',
   pdfHostedPrice: 50,
   pdfHostedForms: 25,
   pdfHostedSubs: 1000,

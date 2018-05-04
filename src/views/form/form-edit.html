@@ -105,7 +105,11 @@
       <br/>
     </div>
     <div ng-if="form.display !== 'pdf' || form.settings.pdf">
-      <form-builder url="formUrl" form="form" type="form.type" on-save="saveForm" on-cancel="cancel" ng-if="formReady" options="{baseUrl: baseUrl, building: true}"></form-builder>
+      <form-builder url="formUrl" form="form" type="form.type" ng-if="formReady" options="{
+        baseUrl: baseUrl,
+        building: true,
+        sideBarScrollOffset: 60
+      }"></form-builder>
     </div>
     <div id="form-group-note" class="form-group" ng-if="revisionsEnabled && minPlan('commercial')">
       <label class="control-label">Revision Note  </label>
