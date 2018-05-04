@@ -16,12 +16,13 @@ export default angular.module('formio').directive('formBuilder', function() {
         let builder = null;
         let builderReady = null;
         let builderElement = null;
+        $scope.options = $scope.options || {};
 
         // Initialize the builder.
         $scope.initBuilder = function(element) {
           builderElement = element;
           builderElement.innerHTML = '';
-          builder = new Formio.Builder(builderElement, $scope.form);
+          builder = new Formio.Builder(builderElement, $scope.form, $scope.options);
           builderReady = builder.setDisplay($scope.form.display);
         };
 

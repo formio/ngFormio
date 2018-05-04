@@ -30807,6 +30807,8 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
     });
 
     _this.groups = {};
+    _this.options.sideBarScroll = _lodash2.default.get(_this.options, 'sideBarScroll', true);
+    _this.options.sideBarScrollOffset = _lodash2.default.get(_this.options, 'sideBarScrollOffset', 0);
     _this.options.builder = true;
     _this.options.hooks = _this.options.hooks || {};
     _this.options.hooks.addComponents = function (components) {
@@ -30863,6 +30865,19 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
   }
 
   _createClass(FormioFormBuilder, [{
+    key: 'scrollSidebar',
+    value: function scrollSidebar() {
+      var newTop = window.scrollY - this.sideBarRect.top + this.options.sideBarScrollOffset;
+      var shouldScroll = newTop > 0;
+      if (shouldScroll && newTop + this.sideBarElement.offsetHeight < this.element.offsetHeight) {
+        this.sideBarElement.style.marginTop = newTop + 'px';
+      } else if (shouldScroll && this.sideBarElement.offsetHeight < this.element.offsetHeight) {
+        this.sideBarElement.style.marginTop = this.element.offsetHeight - this.sideBarElement.offsetHeight + 'px';
+      } else {
+        this.sideBarElement.style.marginTop = '0px';
+      }
+    }
+  }, {
     key: 'setBuilderElement',
     value: function setBuilderElement() {
       var _this2 = this;
@@ -30877,6 +30892,10 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
         _this2.element.component = _this2;
         _this2.buildSidebar();
         _this2.builderSidebar.appendChild(_this2.sideBarElement);
+        _this2.sideBarRect = _this2.sideBarElement.getBoundingClientRect();
+        if (_this2.options.sideBarScroll) {
+          _this2.addEventListener(window, 'scroll', _lodash2.default.debounce(_this2.scrollSidebar.bind(_this2), 10));
+        }
       });
     }
   }, {
@@ -31150,6 +31169,7 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
 
           // Match the form builder height to the sidebar.
           _this5.element.style.minHeight = _this5.builderSidebar.offsetHeight + 'px';
+          _this5.scrollSidebar();
         }
       });
 
@@ -69869,12 +69889,13 @@ const app = angular.module('formio');
       let builder = null;
       let builderReady = null;
       let builderElement = null;
+      $scope.options = $scope.options || {};
 
       // Initialize the builder.
       $scope.initBuilder = function (element) {
         builderElement = element;
         builderElement.innerHTML = '';
-        builder = new __WEBPACK_IMPORTED_MODULE_0_formiojs_lib_formio_builder__["Formio"].Builder(builderElement, $scope.form);
+        builder = new __WEBPACK_IMPORTED_MODULE_0_formiojs_lib_formio_builder__["Formio"].Builder(builderElement, $scope.form, $scope.options);
         builderReady = builder.setDisplay($scope.form.display);
       };
 
@@ -74567,20 +74588,27 @@ var FormioPDFBuilder = exports.FormioPDFBuilder = function (_FormioFormBuilder) 
               width: schema.width
             };
             _this6.editComponent(component);
-            _this6.pdfForm.on('iframe-componentUpdate', function (schema) {
-              var component = _this6.getComponentById(schema.id);
-              if (component) {
-                component.component = schema;
-                _this6.emit('updateComponent', component);
-              }
-            });
-            _this6.pdfForm.on('iframe-componentClick', function (schema) {
-              var component = _this6.getComponentById(schema.id);
-              if (component) {
-                _this6.editComponent(component);
-              }
-            });
             _this6.emit('updateComponent', component);
+          }
+          return component;
+        });
+        this.pdfForm.on('iframe-componentUpdate', function (schema) {
+          var component = _this6.getComponentById(schema.id);
+          if (component && component.component) {
+            component.component.overlay = {
+              left: schema.overlay.left,
+              top: schema.overlay.top,
+              height: schema.overlay.height,
+              width: schema.overlay.width
+            };
+            _this6.emit('updateComponent', component);
+          }
+          return component;
+        });
+        this.pdfForm.on('iframe-componentClick', function (schema) {
+          var component = _this6.getComponentById(schema.id);
+          if (component) {
+            _this6.editComponent(component);
           }
         });
       }
