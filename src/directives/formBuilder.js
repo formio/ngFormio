@@ -26,6 +26,12 @@ export default angular.module('formio').directive('formBuilder', function() {
           builderReady = builder.setDisplay($scope.form.display);
         };
 
+        $scope.$on('buildSidebar', () => {
+          if (builder && builder.instance) {
+            builder.instance.buildSidebar();
+          }
+        });
+
         // Detect when the display changes.
         $scope.$watch('form.display', display => {
           if (builderReady && display) {

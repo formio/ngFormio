@@ -30785,8 +30785,8 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
     _this.sidebarContainers = [];
     _this.updateDraggable = _lodash2.default.debounce(_this.refreshDraggable.bind(_this), 200);
 
-    // Setup default groups, but let them be overridden.
-    _this.options.groups = _lodash2.default.defaultsDeep({}, _this.options.groups, {
+    // Setup the builder options.
+    _this.options.builder = _lodash2.default.defaultsDeep({}, _this.options.builder, {
       basic: {
         title: 'Basic Components',
         weight: 0,
@@ -30799,6 +30799,10 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
       layout: {
         title: 'Layout',
         weight: 20
+      },
+      data: {
+        title: 'Data',
+        weight: 30
       }
     });
 
@@ -30809,7 +30813,6 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
     _this.groups = {};
     _this.options.sideBarScroll = _lodash2.default.get(_this.options, 'sideBarScroll', true);
     _this.options.sideBarScrollOffset = _lodash2.default.get(_this.options, 'sideBarScrollOffset', 0);
-    _this.options.builder = true;
     _this.options.hooks = _this.options.hooks || {};
     _this.options.hooks.addComponents = function (components) {
       if (!components || !components.length && !components.nodrop) {
@@ -30891,7 +30894,6 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
         _this2.addClass(_this2.element, 'col-xs-8 col-sm-9 col-md-10 formarea');
         _this2.element.component = _this2;
         _this2.buildSidebar();
-        _this2.builderSidebar.appendChild(_this2.sideBarElement);
         _this2.sideBarRect = _this2.sideBarElement.getBoundingClientRect();
         if (_this2.options.sideBarScroll) {
           _this2.addEventListener(window, 'scroll', _lodash2.default.debounce(_this2.scrollSidebar.bind(_this2), 10));
@@ -31133,14 +31135,18 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
       });
 
       if (before) {
-        container.insertBefore(element, before);
+        try {
+          container.insertBefore(element, before);
+        } catch (err) {
+          container.appendChild(element);
+        }
       } else {
         container.appendChild(element);
       }
     }
   }, {
     key: 'addBuilderGroup',
-    value: function addBuilderGroup(info) {
+    value: function addBuilderGroup(info, container) {
       var _this5 = this;
 
       if (!info || !info.key) {
@@ -31164,6 +31170,11 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
             _this5.removeClass(group.panel, 'in');
             if (groupId === clickedGroupId && !wasIn) {
               _this5.addClass(group.panel, 'in');
+              var parent = group.parent;
+              while (parent) {
+                _this5.addClass(parent.panel, 'in');
+                parent = parent.parent;
+              }
             }
           });
 
@@ -31200,11 +31211,20 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
 
       info.element.appendChild(info.panel);
       this.groups[info.key] = info;
-      this.insertInOrder(info, this.groups, info.element, this.sideBarElement);
+      this.insertInOrder(info, this.groups, info.element, container);
+
+      // Now see if this group has subgroups.
+      if (info.groups) {
+        _lodash2.default.each(info.groups, function (subInfo, subGroup) {
+          subInfo.key = subGroup;
+          subInfo.parent = info;
+          _this5.addBuilderGroup(subInfo, info.body);
+        });
+      }
     }
   }, {
-    key: 'addBuilderComponent',
-    value: function addBuilderComponent(component) {
+    key: 'addBuilderComponentInfo',
+    value: function addBuilderComponentInfo(component) {
       if (!component || !component.group || !this.groups[component.group]) {
         console.warn('Invalid group');
         return;
@@ -31215,9 +31235,23 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
       if (!groupInfo.components) {
         groupInfo.components = {};
       }
-
-      groupInfo.components[component.key] = component;
-
+      if (!groupInfo.components.hasOwnProperty(component.key)) {
+        groupInfo.components[component.key] = component;
+      }
+      return component;
+    }
+  }, {
+    key: 'addBuilderComponent',
+    value: function addBuilderComponent(component, group) {
+      if (!component) {
+        return;
+      }
+      if (!group && component.group && this.groups[component.group]) {
+        group = this.groups[component.group];
+      }
+      if (!group) {
+        return;
+      }
       component.element = this.ce('span', {
         id: 'builder-' + component.key,
         class: 'btn btn-primary btn-xs btn-block formcomponent drag-copy'
@@ -31230,7 +31264,7 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
       }
       component.element.builderInfo = component;
       component.element.appendChild(this.text(component.title));
-      this.insertInOrder(component, groupInfo.components, component.element, groupInfo.body);
+      this.insertInOrder(component, group.components, component.element, group.body);
       return component;
     }
   }, {
@@ -31239,31 +31273,52 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
       var _this6 = this;
 
       this.groups = {};
+      this.sidebarContainers = [];
+      if (this.sideBarElement) {
+        this.removeChildFrom(this.sideBarElement, this.builderSidebar);
+      }
       this.sideBarElement = this.ce('div', {
         class: 'panel-group'
       });
 
       // Add the groups.
-      _lodash2.default.each(this.options.groups, function (info, group) {
-        info.key = group;
-        _this6.addBuilderGroup(info);
+      _lodash2.default.each(this.options.builder, function (info, group) {
+        if (info) {
+          info.key = group;
+          _this6.addBuilderGroup(info, _this6.sideBarElement);
+        }
       });
 
       // Get all of the components builder info grouped and sorted.
-      var components = _lodash2.default.filter(_lodash2.default.map(_lodash2.default.assign(_builder2.default, _Components.FormioComponents.customComponents), function (component, type) {
-        var builderInfo = component.builderInfo;
-        if (!builderInfo) {
+      var components = {};
+      var allComponents = _lodash2.default.filter(_lodash2.default.map(_lodash2.default.assign(_builder2.default, _Components.FormioComponents.customComponents), function (component, type) {
+        if (!component.builderInfo) {
           return null;
         }
-
-        builderInfo.key = type;
-        return builderInfo;
+        component.type = type;
+        return component;
       }));
-
-      // Iterate through every component.
-      _lodash2.default.each(components, function (component) {
-        return _this6.addBuilderComponent(component);
+      _lodash2.default.map(_lodash2.default.sortBy(allComponents, function (component) {
+        return component.builderInfo.weight;
+      }), function (component) {
+        var builderInfo = component.builderInfo;
+        builderInfo.key = component.type;
+        components[builderInfo.key] = builderInfo;
+        _this6.addBuilderComponentInfo(builderInfo);
       });
+
+      // Add the components in each group.
+      _lodash2.default.each(this.groups, function (info) {
+        return _lodash2.default.each(info.components, function (comp, key) {
+          if (comp) {
+            _this6.addBuilderComponent(comp === true ? components[key] : comp, info);
+          }
+        });
+      });
+
+      // Add the new sidebar element.
+      this.builderSidebar.appendChild(this.sideBarElement);
+      this.updateDraggable();
     }
   }, {
     key: 'getParentElement',
@@ -54254,9 +54309,9 @@ var ContainerComponent = exports.ContainerComponent = function (_FormioComponent
       return {
         title: 'Container',
         icon: 'fa fa-folder-open',
-        group: 'advanced',
+        group: 'data',
         documentation: 'http://help.form.io/userguide/#container',
-        weight: 140,
+        weight: 10,
         schema: ContainerComponent.schema()
       };
     }
@@ -54387,9 +54442,9 @@ var DataGridComponent = exports.DataGridComponent = function (_FormioComponents)
       return {
         title: 'Data Grid',
         icon: 'fa fa-th',
-        group: 'advanced',
+        group: 'data',
         documentation: 'http://help.form.io/userguide/#datagrid',
-        weight: 150,
+        weight: 20,
         schema: DataGridComponent.schema()
       };
     }
@@ -57709,9 +57764,9 @@ var EditGridComponent = exports.EditGridComponent = function (_FormioComponents)
       return {
         title: 'Edit Grid',
         icon: 'fa fa-tasks',
-        group: 'advanced',
+        group: 'data',
         documentation: 'http://help.form.io/userguide/#editgrid',
-        weight: 160,
+        weight: 40,
         schema: EditGridComponent.schema()
       };
     }
@@ -58359,9 +58414,9 @@ var HiddenComponent = exports.HiddenComponent = function (_BaseComponent) {
     get: function get() {
       return {
         title: 'Hidden',
-        group: 'advanced',
+        group: 'data',
         icon: 'fa fa-user-secret',
-        weight: 80,
+        weight: 0,
         documentation: 'http://help.form.io/userguide/#hidden',
         schema: HiddenComponent.schema()
       };
@@ -69898,6 +69953,12 @@ const app = angular.module('formio');
         builder = new __WEBPACK_IMPORTED_MODULE_0_formiojs_lib_formio_builder__["Formio"].Builder(builderElement, $scope.form, $scope.options);
         builderReady = builder.setDisplay($scope.form.display);
       };
+
+      $scope.$on('buildSidebar', () => {
+        if (builder && builder.instance) {
+          builder.instance.buildSidebar();
+        }
+      });
 
       // Detect when the display changes.
       $scope.$watch('form.display', display => {
