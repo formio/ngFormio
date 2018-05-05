@@ -4,7 +4,7 @@
     "dist/ng-formio.js",
     "dist/formio.css"
   ],
-  "version": "3.0.0",
+  "version": "3.0.0-rc.4",
   "authors": [
     "Travis Tidwell <travis@form.io>",
     "Randall Knutson <randall@form.io>"
@@ -17,5 +17,8 @@
     "test",
     "tests"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "angular": "^1.5.0",
+    "formiojs": "^3.0.0-alpha.1"
+  }
 }
