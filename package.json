@@ -6,8 +6,8 @@
   "scripts": {
     "test": "node test/test",
     "build": "babel ./src --ignore=*.spec.js --out-dir ./lib --presets es2015,stage-2; webpack",
-    "tag": "VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]');npm run build;git add -A; git commit -m \"Build $Version\";git push origin 3.x;git tag v$VERSION;git push origin --tags",
-    "publish": "npm run tag; npm publish;"
+    "tagbuild": "VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]');npm run build;git add -A; git commit -m \"Build $Version\";git push origin 3.x;git tag v$VERSION;git push origin --tags",
+    "publish": "npm run tagbuild; npm publish;"
   },
   "author": "",
   "license": "ISC",
