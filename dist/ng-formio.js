@@ -21797,9 +21797,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.BaseComponent = undefined;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* globals Quill */
 
-var _vanillaTextMask = __webpack_require__(17);
+
+var _vanillaTextMask = __webpack_require__(18);
 
 var _vanillaTextMask2 = _interopRequireDefault(_vanillaTextMask);
 
@@ -23719,10 +23720,10 @@ var BaseComponent = function () {
       settings = _lodash2.default.isEmpty(settings) ? this.wysiwygDefault : settings;
 
       // Lazy load the quill css.
-      BaseComponent.requireLibrary('quill-css-' + settings.theme, 'Quill', [{ type: 'styles', src: 'https://cdn.quilljs.com/1.3.5/quill.' + settings.theme + '.css' }], true);
+      BaseComponent.requireLibrary('quill-css-' + settings.theme, 'Quill', [{ type: 'styles', src: 'https://cdn.quilljs.com/1.3.6/quill.' + settings.theme + '.css' }], true);
 
       // Lazy load the quill library.
-      return BaseComponent.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.5/quill.min.js', true).then(function () {
+      return BaseComponent.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.6/quill.min.js', true).then(function () {
         _this14.quill = new Quill(element, settings);
 
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
@@ -23733,12 +23734,18 @@ var BaseComponent = function () {
         if (qlSource) {
           qlSource.addEventListener('click', function () {
             if (txtArea.style.display === 'inherit') {
-              _this14.quill.clipboard.dangerouslyPasteHTML(txtArea.value);
+              _this14.quill.setContents(_this14.quill.clipboard.convert(txtArea.value));
             }
             txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
           });
         }
         /** END CODEBLOCK **/
+
+        // Allows users to skip toolbar items when tabbing though form
+        var elm = document.querySelectorAll('.ql-formats > button');
+        for (var i = 0; i < elm.length; i++) {
+          elm[i].setAttribute('tabindex', '-1');
+        }
 
         _this14.quill.on('text-change', function () {
           txtArea.value = _this14.quill.root.innerHTML;
@@ -26559,7 +26566,7 @@ var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
 
 __webpack_require__(175);
 
-var _eventemitter = __webpack_require__(16);
+var _eventemitter = __webpack_require__(17);
 
 var _browserCookies = __webpack_require__(176);
 
@@ -28074,7 +28081,7 @@ var _lodash = __webpack_require__(1);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _eventemitter = __webpack_require__(16);
+var _eventemitter = __webpack_require__(17);
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -29638,6 +29645,124 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.BuilderUtils = undefined;
+
+var _lodash = __webpack_require__(1);
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _index = __webpack_require__(4);
+
+var _index2 = _interopRequireDefault(_index);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var BuilderUtils = exports.BuilderUtils = {
+  /**
+   * Iterate the given key to make it unique.
+   *
+   * @param {String} key
+   *   Modify the component key to be unique.
+   *
+   * @returns {String}
+   *   The new component key.
+   */
+  iterateKey: function iterateKey(key) {
+    if (!key.match(/(\d+)$/)) {
+      return key + '2';
+    }
+
+    return key.replace(/(\d+)$/, function (suffix) {
+      return Number(suffix) + 1;
+    });
+  },
+
+
+  /**
+   * Appends a number to a component.key to keep it unique
+   *
+   * @param {Object} form
+   *   The components parent form.
+   * @param {Object} component
+   *   The component to uniquify
+   */
+  uniquify: function uniquify(form, component) {
+    var _this = this;
+
+    var changed = false;
+    var formKeys = {};
+    _index2.default.eachComponent(form.components, function (comp) {
+      formKeys[comp.key] = true;
+    });
+
+    // Recurse into all child components.
+    _index2.default.eachComponent([component], function (component) {
+      // Skip key uniquification if this component doesn't have a key.
+      if (!component.key) {
+        return;
+      }
+
+      while (formKeys.hasOwnProperty(component.key)) {
+        component.key = _this.iterateKey(component.key);
+        changed = true;
+      }
+    }, true);
+    return changed;
+  },
+
+
+  additionalShortcuts: {
+    button: ['Enter', 'Esc']
+  },
+
+  getAlphaShortcuts: function getAlphaShortcuts() {
+    return _lodash2.default.range('A'.charCodeAt(), 'Z'.charCodeAt() + 1).map(function (charCode) {
+      return String.fromCharCode(charCode);
+    });
+  },
+  getAdditionalShortcuts: function getAdditionalShortcuts(type) {
+    return this.additionalShortcuts[type] || [];
+  },
+  getBindedShortcuts: function getBindedShortcuts(components, input) {
+    var result = [];
+
+    _index2.default.eachComponent(components, function (component) {
+      if (component === input) {
+        return;
+      }
+
+      if (component.shortcut) {
+        result.push(component.shortcut);
+      }
+      if (component.values) {
+        component.values.forEach(function (value) {
+          if (value.shortcut) {
+            result.push(value.shortcut);
+          }
+        });
+      }
+    }, true);
+
+    return result;
+  },
+  getAvailableShortcuts: function getAvailableShortcuts(form, component) {
+    if (!component) {
+      return [];
+    }
+    return [''].concat(_lodash2.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), this.getBindedShortcuts(form.components, component)));
+  }
+};
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function(process) {var __WEBPACK_AMD_DEFINE_RESULT__;/*!
  * EventEmitter2
  * https://github.com/hij1nx/EventEmitter2
@@ -30425,13 +30550,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)))
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 !function(e,r){ true?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.vanillaTextMask=r():e.vanillaTextMask=r()}(this,function(){return function(e){function r(n){if(t[n])return t[n].exports;var o=t[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var t={};return r.m=e,r.c=t,r.p="",r(0)}([function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r=e.inputElement,t=(0,u.default)(e),n=function(e){var r=e.target.value;return t.update(r)};return r.addEventListener("input",n),t.update(r.value),{textMaskInputElement:t,destroy:function(){r.removeEventListener("input",n)}}}Object.defineProperty(r,"__esModule",{value:!0}),r.conformToMask=void 0,r.maskInput=o;var i=t(2);Object.defineProperty(r,"conformToMask",{enumerable:!0,get:function(){return n(i).default}});var a=t(5),u=n(a);r.default=o},function(e,r){"use strict";Object.defineProperty(r,"__esModule",{value:!0}),r.placeholderChar="_",r.strFunction="function"},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:l,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:u,t=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};if(!(0,i.isArray)(r)){if(("undefined"==typeof r?"undefined":o(r))!==a.strFunction)throw new Error("Text-mask:conformToMask; The mask property must be an array.");r=r(e,t),r=(0,i.processCaretTraps)(r).maskWithoutCaretTraps}var n=t.guide,s=void 0===n||n,f=t.previousConformedValue,d=void 0===f?l:f,c=t.placeholderChar,p=void 0===c?a.placeholderChar:c,v=t.placeholder,h=void 0===v?(0,i.convertMaskToPlaceholder)(r,p):v,m=t.currentCaretPosition,y=t.keepCharPositions,g=s===!1&&void 0!==d,b=e.length,C=d.length,k=h.length,x=r.length,P=b-C,T=P>0,O=m+(T?-P:0),M=O+Math.abs(P);if(y===!0&&!T){for(var w=l,S=O;S<M;S++)h[S]===p&&(w+=p);e=e.slice(0,O)+w+e.slice(O,b)}for(var _=e.split(l).map(function(e,r){return{char:e,isNew:r>=O&&r<M}}),j=b-1;j>=0;j--){var V=_[j].char;if(V!==p){var A=j>=O&&C===x;V===h[A?j-P:j]&&_.splice(j,1)}}var E=l,N=!1;e:for(var F=0;F<k;F++){var I=h[F];if(I===p){if(_.length>0)for(;_.length>0;){var L=_.shift(),R=L.char,J=L.isNew;if(R===p&&g!==!0){E+=p;continue e}if(r[F].test(R)){if(y===!0&&J!==!1&&d!==l&&s!==!1&&T){for(var W=_.length,q=null,z=0;z<W;z++){var B=_[z];if(B.char!==p&&B.isNew===!1)break;if(B.char===p){q=z;break}}null!==q?(E+=R,_.splice(q,1)):F--}else E+=R;continue e}N=!0}g===!1&&(E+=h.substr(F,k));break}E+=I}if(g&&T===!1){for(var D=null,G=0;G<E.length;G++)h[G]===p&&(D=G);E=null!==D?E.substr(0,D+1):l}return{conformedValue:E,meta:{someCharsRejected:N}}}Object.defineProperty(r,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=n;var i=t(3),a=t(1),u=[],l=""},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:s,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:l.placeholderChar;if(!o(e))throw new Error("Text-mask:convertMaskToPlaceholder; The mask property must be an array.");if(e.indexOf(r)!==-1)throw new Error("Placeholder character must not be used as part of the mask. Please specify a character that is not present in your mask as your placeholder character.\n\n"+("The placeholder character that was received is: "+JSON.stringify(r)+"\n\n")+("The mask that was received is: "+JSON.stringify(e)));return e.map(function(e){return e instanceof RegExp?r:e}).join("")}function o(e){return Array.isArray&&Array.isArray(e)||e instanceof Array}function i(e){return"string"==typeof e||e instanceof String}function a(e){return"number"==typeof e&&void 0===e.length&&!isNaN(e)}function u(e){for(var r=[],t=void 0;t=e.indexOf(f),t!==-1;)r.push(t),e.splice(t,1);return{maskWithoutCaretTraps:e,indexes:r}}Object.defineProperty(r,"__esModule",{value:!0}),r.convertMaskToPlaceholder=n,r.isArray=o,r.isString=i,r.isNumber=a,r.processCaretTraps=u;var l=t(1),s=[],f="[]"},function(e,r){"use strict";function t(e){var r=e.previousConformedValue,t=void 0===r?o:r,i=e.previousPlaceholder,a=void 0===i?o:i,u=e.currentCaretPosition,l=void 0===u?0:u,s=e.conformedValue,f=e.rawValue,d=e.placeholderChar,c=e.placeholder,p=e.indexesOfPipedChars,v=void 0===p?n:p,h=e.caretTrapIndexes,m=void 0===h?n:h;if(0===l||!f.length)return 0;var y=f.length,g=t.length,b=c.length,C=s.length,k=y-g,x=k>0,P=0===g,T=k>1&&!x&&!P;if(T)return l;var O=x&&(t===s||s===c),M=0,w=void 0,S=void 0;if(O)M=l-k;else{var _=s.toLowerCase(),j=f.toLowerCase(),V=j.substr(0,l).split(o),A=V.filter(function(e){return _.indexOf(e)!==-1});S=A[A.length-1];var E=a.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,N=c.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,F=N!==E,I=void 0!==a[A.length-1]&&void 0!==c[A.length-2]&&a[A.length-1]!==d&&a[A.length-1]!==c[A.length-1]&&a[A.length-1]===c[A.length-2];!x&&(F||I)&&E>0&&c.indexOf(S)>-1&&void 0!==f[l]&&(w=!0,S=f[l]);for(var L=v.map(function(e){return _[e]}),R=L.filter(function(e){return e===S}).length,J=A.filter(function(e){return e===S}).length,W=c.substr(0,c.indexOf(d)).split(o).filter(function(e,r){return e===S&&f[r]!==e}).length,q=W+J+R+(w?1:0),z=0,B=0;B<C;B++){var D=_[B];if(M=B+1,D===S&&z++,z>=q)break}}if(x){for(var G=M,H=M;H<=b;H++)if(c[H]===d&&(G=H),c[H]===d||m.indexOf(H)!==-1||H===b)return G}else if(w){for(var K=M-1;K>=0;K--)if(s[K]===S||m.indexOf(K)!==-1||0===K)return K}else for(var Q=M;Q>=0;Q--)if(c[Q-1]===d||m.indexOf(Q)!==-1||0===Q)return Q}Object.defineProperty(r,"__esModule",{value:!0}),r.default=t;var n=[],o=""},function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r={previousConformedValue:void 0,previousPlaceholder:void 0};return{state:r,update:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:e,o=n.inputElement,s=n.mask,d=n.guide,m=n.pipe,g=n.placeholderChar,b=void 0===g?v.placeholderChar:g,C=n.keepCharPositions,k=void 0!==C&&C,x=n.showMask,P=void 0!==x&&x;if("undefined"==typeof t&&(t=o.value),t!==r.previousConformedValue){("undefined"==typeof s?"undefined":l(s))===y&&void 0!==s.pipe&&void 0!==s.mask&&(m=s.pipe,s=s.mask);var T=void 0,O=void 0;if(s instanceof Array&&(T=(0,p.convertMaskToPlaceholder)(s,b)),s!==!1){var M=a(t),w=o.selectionEnd,S=r.previousConformedValue,_=r.previousPlaceholder,j=void 0;if(("undefined"==typeof s?"undefined":l(s))===v.strFunction){if(O=s(M,{currentCaretPosition:w,previousConformedValue:S,placeholderChar:b}),O===!1)return;var V=(0,p.processCaretTraps)(O),A=V.maskWithoutCaretTraps,E=V.indexes;O=A,j=E,T=(0,p.convertMaskToPlaceholder)(O,b)}else O=s;var N={previousConformedValue:S,guide:d,placeholderChar:b,pipe:m,placeholder:T,currentCaretPosition:w,keepCharPositions:k},F=(0,c.default)(M,O,N),I=F.conformedValue,L=("undefined"==typeof m?"undefined":l(m))===v.strFunction,R={};L&&(R=m(I,u({rawValue:M},N)),R===!1?R={value:S,rejected:!0}:(0,p.isString)(R)&&(R={value:R}));var J=L?R.value:I,W=(0,f.default)({previousConformedValue:S,previousPlaceholder:_,conformedValue:J,placeholder:T,rawValue:M,currentCaretPosition:w,placeholderChar:b,indexesOfPipedChars:R.indexesOfPipedChars,caretTrapIndexes:j}),q=J===T&&0===W,z=P?T:h,B=q?z:J;r.previousConformedValue=B,r.previousPlaceholder=T,o.value!==B&&(o.value=B,i(o,W))}}}}}function i(e,r){document.activeElement===e&&(g?b(function(){return e.setSelectionRange(r,r,m)},0):e.setSelectionRange(r,r,m))}function a(e){if((0,p.isString)(e))return e;if((0,p.isNumber)(e))return String(e);if(void 0===e||null===e)return h;throw new Error("The 'value' provided to Text Mask needs to be a string or a number. The value received was:\n\n "+JSON.stringify(e))}Object.defineProperty(r,"__esModule",{value:!0});var u=Object.assign||function(e){for(var r=1;r<arguments.length;r++){var t=arguments[r];for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&(e[n]=t[n])}return e},l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=o;var s=t(4),f=n(s),d=t(2),c=n(d),p=t(3),v=t(1),h="",m="none",y="object",g="undefined"!=typeof navigator&&/Android/i.test(navigator.userAgent),b="undefined"!=typeof requestAnimationFrame?requestAnimationFrame:setTimeout}])});
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30445,7 +30570,7 @@ var _formio = __webpack_require__(24);
 
 var _formio2 = _interopRequireDefault(_formio);
 
-var _formio3 = __webpack_require__(19);
+var _formio3 = __webpack_require__(20);
 
 var _formio4 = _interopRequireDefault(_formio3);
 
@@ -30479,7 +30604,7 @@ exports.default = function (element, form, options) {
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30719,7 +30844,7 @@ window.addEventListener('message', function (event) {
 });
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30748,13 +30873,13 @@ var _builder2 = _interopRequireDefault(_builder);
 
 var _Components = __webpack_require__(7);
 
-var _builder3 = __webpack_require__(21);
+var _builder3 = __webpack_require__(16);
 
 var _utils = __webpack_require__(4);
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _eventemitter = __webpack_require__(16);
+var _eventemitter = __webpack_require__(17);
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -31046,7 +31171,7 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
           }
 
           // Set the component JSON to the new data.
-          componentCopy.component = event.data;
+          componentCopy.component = _this4.editForm.getValue().data;
 
           // Update the component.
           _this4.updateComponent(componentCopy);
@@ -31504,124 +31629,6 @@ var FormioFormBuilder = exports.FormioFormBuilder = function (_FormioForm) {
 }(_formio2.default);
 
 /***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.BuilderUtils = undefined;
-
-var _lodash = __webpack_require__(1);
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _index = __webpack_require__(4);
-
-var _index2 = _interopRequireDefault(_index);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var BuilderUtils = exports.BuilderUtils = {
-  /**
-   * Iterate the given key to make it unique.
-   *
-   * @param {String} key
-   *   Modify the component key to be unique.
-   *
-   * @returns {String}
-   *   The new component key.
-   */
-  iterateKey: function iterateKey(key) {
-    if (!key.match(/(\d+)$/)) {
-      return key + '2';
-    }
-
-    return key.replace(/(\d+)$/, function (suffix) {
-      return Number(suffix) + 1;
-    });
-  },
-
-
-  /**
-   * Appends a number to a component.key to keep it unique
-   *
-   * @param {Object} form
-   *   The components parent form.
-   * @param {Object} component
-   *   The component to uniquify
-   */
-  uniquify: function uniquify(form, component) {
-    var _this = this;
-
-    var changed = false;
-    var formKeys = {};
-    _index2.default.eachComponent(form.components, function (comp) {
-      formKeys[comp.key] = true;
-    });
-
-    // Recurse into all child components.
-    _index2.default.eachComponent([component], function (component) {
-      // Skip key uniquification if this component doesn't have a key.
-      if (!component.key) {
-        return;
-      }
-
-      while (formKeys.hasOwnProperty(component.key)) {
-        component.key = _this.iterateKey(component.key);
-        changed = true;
-      }
-    }, true);
-    return changed;
-  },
-
-
-  additionalShortcuts: {
-    button: ['Enter', 'Esc']
-  },
-
-  getAlphaShortcuts: function getAlphaShortcuts() {
-    return _lodash2.default.range('A'.charCodeAt(), 'Z'.charCodeAt() + 1).map(function (charCode) {
-      return String.fromCharCode(charCode);
-    });
-  },
-  getAdditionalShortcuts: function getAdditionalShortcuts(type) {
-    return this.additionalShortcuts[type] || [];
-  },
-  getBindedShortcuts: function getBindedShortcuts(components, input) {
-    var result = [];
-
-    _index2.default.eachComponent(components, function (component) {
-      if (component === input) {
-        return;
-      }
-
-      if (component.shortcut) {
-        result.push(component.shortcut);
-      }
-      if (component.values) {
-        component.values.forEach(function (value) {
-          if (value.shortcut) {
-            result.push(value.shortcut);
-          }
-        });
-      }
-    }, true);
-
-    return result;
-  },
-  getAvailableShortcuts: function getAvailableShortcuts(form, component) {
-    if (!component) {
-      return [];
-    }
-    return [''].concat(_lodash2.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), this.getBindedShortcuts(form.components, component)));
-  }
-};
-
-/***/ }),
 /* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -31664,7 +31671,7 @@ var _formio2 = __webpack_require__(24);
 
 var _formio3 = _interopRequireDefault(_formio2);
 
-var _formio4 = __webpack_require__(19);
+var _formio4 = __webpack_require__(20);
 
 var _formio5 = _interopRequireDefault(_formio4);
 
@@ -31682,7 +31689,7 @@ var _createForm = __webpack_require__(229);
 
 var _createForm2 = _interopRequireDefault(_createForm);
 
-var _formFactory = __webpack_require__(18);
+var _formFactory = __webpack_require__(19);
 
 var _formFactory2 = _interopRequireDefault(_formFactory);
 
@@ -44813,7 +44820,7 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _vanillaTextMask = __webpack_require__(17);
+var _vanillaTextMask = __webpack_require__(18);
 
 var _vanillaTextMask2 = _interopRequireDefault(_vanillaTextMask);
 
@@ -45896,9 +45903,6 @@ var RadioComponent = exports.RadioComponent = function (_BaseComponent) {
 
         _this2.addShortcut(label, value.shortcut);
 
-        // Create the SPAN around the textNode for better style hooks
-        var labelSpan = _this2.ce('span');
-
         // Determine the attributes for this input.
         var inputId = '' + _this2.id + _this2.row + '-' + value.value;
         _this2.info.attr.id = inputId;
@@ -45911,7 +45915,8 @@ var RadioComponent = exports.RadioComponent = function (_BaseComponent) {
           input.setAttribute(key, value);
         });
 
-        if (labelOnTheTopOrOnTheLeft) {
+        var labelSpan = _this2.ce('span');
+        if (value.label && labelOnTheTopOrOnTheLeft) {
           label.appendChild(labelSpan);
         }
 
@@ -45920,8 +45925,11 @@ var RadioComponent = exports.RadioComponent = function (_BaseComponent) {
 
         _this2.addInput(input, label);
 
-        labelSpan.appendChild(_this2.text(_this2.addShortcutToLabel(value.label, value.shortcut)));
-        if (!labelOnTheTopOrOnTheLeft) {
+        if (value.label) {
+          labelSpan.appendChild(_this2.text(_this2.addShortcutToLabel(value.label, value.shortcut)));
+        }
+
+        if (value.label && !labelOnTheTopOrOnTheLeft) {
           label.appendChild(labelSpan);
         }
         labelWrapper.appendChild(label);
@@ -46253,7 +46261,7 @@ exports.default = function () {
         dataSrc: 'custom',
         data: {
           custom: function custom(values, component, data, row, utils, instance, form) {
-            return BuilderUtils.getAvailableShortcuts(form, component);
+            return _builder.BuilderUtils.getAvailableShortcuts(form, component);
           }
         }
       }]
@@ -46271,6 +46279,8 @@ exports.default = function () {
 var _Base = __webpack_require__(2);
 
 var _Base2 = _interopRequireDefault(_Base);
+
+var _builder = __webpack_require__(16);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54233,7 +54243,7 @@ var ContentComponent = exports.ContentComponent = function (_BaseComponent) {
         this.addQuill(editorElement, this.wysiwygDefault, function (element) {
           _this2.component.html = element.value;
         }).then(function (editor) {
-          editor.clipboard.dangerouslyPasteHTML(_this2.component.html);
+          editor.setContents(editor.clipboard.convert(_this2.component.html));
         });
         this.element.appendChild(editorElement);
       } else {
@@ -54527,7 +54537,7 @@ var DataGridComponent = exports.DataGridComponent = function (_FormioComponents)
       }
       this.visibleColumns = true;
       this.errorContainer = this.element;
-      this.buildRows();
+      this.restoreValue();
       this.createDescription(this.element);
     }
   }, {
@@ -54555,29 +54565,11 @@ var DataGridComponent = exports.DataGridComponent = function (_FormioComponents)
       this.numColumns += this.visibleComponents.length;
     }
   }, {
-    key: 'needsRebuild',
-    value: function needsRebuild() {
-      var previousNumColumns = this.numColumns;
-      var previousNumRows = this.numRows;
-      this.setVisibleComponents();
-
-      if (!this.tableBuilt || this.numRows !== previousNumRows || this.numColumns !== previousNumColumns) {
-        this.tableBuilt = true;
-        return true;
-      }
-
-      // No need to rebuild since rows and columns are the same.
-      return false;
-    }
-  }, {
     key: 'buildRows',
     value: function buildRows() {
       var _this3 = this;
 
-      if (!this.needsRebuild()) {
-        return;
-      }
-
+      this.setVisibleComponents();
       this.clear();
       this.createLabel(this.element);
       var tableClass = 'table datagrid-table table-bordered form-group formio-data-grid ';
@@ -54719,7 +54711,6 @@ var DataGridComponent = exports.DataGridComponent = function (_FormioComponents)
 
       // If a rebuild is needed, then rebuild the table.
       if (rebuild) {
-        this.buildRows();
         this.restoreValue();
       }
 
@@ -54731,12 +54722,14 @@ var DataGridComponent = exports.DataGridComponent = function (_FormioComponents)
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
       if (!value) {
+        this.buildRows();
         return;
       }
       if (!Array.isArray(value)) {
         if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
           value = [value];
         } else {
+          this.buildRows();
           return;
         }
       }
@@ -58524,7 +58517,7 @@ var _formio = __webpack_require__(8);
 
 var _formio2 = _interopRequireDefault(_formio);
 
-var _formFactory = __webpack_require__(18);
+var _formFactory = __webpack_require__(19);
 
 var _formFactory2 = _interopRequireDefault(_formFactory);
 
@@ -59405,7 +59398,7 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _vanillaTextMask = __webpack_require__(17);
+var _vanillaTextMask = __webpack_require__(18);
 
 var _vanillaTextMask2 = _interopRequireDefault(_vanillaTextMask);
 
@@ -66902,8 +66895,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* globals Quill */
-
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var TextAreaComponent = exports.TextAreaComponent = function (_TextFieldComponent) {
   _inherits(TextAreaComponent, _TextFieldComponent);
@@ -67002,43 +66994,6 @@ var TextAreaComponent = exports.TextAreaComponent = function (_TextFieldComponen
         return this.input;
       }
 
-      // Lazy load the quill css.
-      _Base.BaseComponent.requireLibrary('quill-css-' + this.component.wysiwyg.theme, 'Quill', [{ type: 'styles', src: 'https://cdn.quilljs.com/1.3.5/quill.' + this.component.wysiwyg.theme + '.css' }], true);
-
-      // Lazy load the quill library.
-      this.quillReady = _Base.BaseComponent.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.5/quill.min.js', true).then(function () {
-        _this2.quill = new Quill(_this2.input, _this2.component.wysiwyg);
-        _this2.quill.root.spellcheck = _this2.component.spellcheck;
-
-        /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
-        var txtArea = document.createElement('textarea');
-        txtArea.setAttribute('class', 'quill-source-code');
-        _this2.quill.addContainer('ql-custom').appendChild(txtArea);
-
-        // Allows users to skip toolbar items when tabbing though form
-        var elm = document.querySelectorAll('.ql-formats > button');
-        for (var i = 0; i < elm.length; i++) {
-          elm[i].setAttribute('tabindex', '-1');
-        }
-
-        var qlSource = document.querySelector('.ql-source');
-        if (qlSource) {
-          qlSource.addEventListener('click', function () {
-            if (txtArea.style.display === 'inherit') {
-              _this2.quill.clipboard.dangerouslyPasteHTML(txtArea.value);
-            }
-            txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
-          });
-        }
-        /** END CODEBLOCK **/
-
-        _this2.quill.on('text-change', function () {
-          txtArea.value = _this2.quill.root.innerHTML;
-          _this2.updateValue(true);
-        });
-        return _this2.input;
-      });
-
       // Normalize the configurations.
       if (this.component.wysiwyg && this.component.wysiwyg.toolbarGroups) {
         console.warn('The WYSIWYG settings are configured for CKEditor. For this renderer, you will need to use configurations for the Quill Editor. See https://quilljs.com/docs/configuration for more information.');
@@ -67055,13 +67010,6 @@ var TextAreaComponent = exports.TextAreaComponent = function (_TextFieldComponen
         return _this2.updateValue({ noUpdateEvent: true });
       }).then(function (quill) {
         quill.root.spellcheck = _this2.component.spellcheck;
-
-        // Allows users to skip toolbar items when tabbing though form
-        var elm = document.querySelectorAll('.ql-formats > button');
-        for (var i = 0; i < elm.length; i++) {
-          elm[i].setAttribute('tabindex', '-1');
-        }
-
         if (_this2.options.readOnly || _this2.component.disabled) {
           quill.disable();
         }
@@ -67107,7 +67055,7 @@ var TextAreaComponent = exports.TextAreaComponent = function (_TextFieldComponen
         if (_this3.component.editor === 'ace') {
           editor.setValue(_this3.setConvertedValue(value));
         } else {
-          editor.clipboard.dangerouslyPasteHTML(_this3.setConvertedValue(value));
+          editor.setContents(editor.clipboard.convert(_this3.setConvertedValue(value)));
           _this3.updateValue(flags);
         }
       });
@@ -69668,7 +69616,7 @@ var _formio = __webpack_require__(8);
 
 var _formio2 = _interopRequireDefault(_formio);
 
-var _formFactory = __webpack_require__(18);
+var _formFactory = __webpack_require__(19);
 
 var _formFactory2 = _interopRequireDefault(_formFactory);
 
@@ -70052,7 +70000,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _formio = __webpack_require__(23);
 
-var _formioForm = __webpack_require__(20);
+var _formioForm = __webpack_require__(21);
 
 var _formioWizard = __webpack_require__(289);
 
@@ -72880,7 +72828,7 @@ var _Base = __webpack_require__(2);
 
 var _Base2 = _interopRequireDefault(_Base);
 
-var _builder = __webpack_require__(21);
+var _builder = __webpack_require__(16);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -73709,7 +73657,7 @@ var _Base = __webpack_require__(2);
 
 var _Base2 = _interopRequireDefault(_Base);
 
-var _builder = __webpack_require__(21);
+var _builder = __webpack_require__(16);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -74300,7 +74248,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _formioForm = __webpack_require__(20);
+var _formioForm = __webpack_require__(21);
 
 var _lodash = __webpack_require__(1);
 
@@ -74486,13 +74434,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-var _formioForm = __webpack_require__(20);
+var _formioForm = __webpack_require__(21);
 
 var _utils = __webpack_require__(4);
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _formio = __webpack_require__(19);
+var _formio = __webpack_require__(20);
 
 var _formio2 = _interopRequireDefault(_formio);
 
