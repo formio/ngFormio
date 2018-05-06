@@ -4,7 +4,6 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const autoprefixer = require('autoprefixer');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   entry: './lib/index.js',
@@ -62,7 +61,6 @@ module.exports = {
       'moment': 'moment'
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    new UglifyJSPlugin(),
     new ExtractTextPlugin('formio.css')
   ],
   //externals: [nodeExternals()],
