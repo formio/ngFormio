@@ -4,9 +4,10 @@ const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const autoprefixer = require('autoprefixer');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './lib/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'ng-formio.js',
@@ -61,12 +62,7 @@ module.exports = {
       'moment': 'moment'
     }),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    //new webpack.LoaderOptionsPlugin({
-    //  options: {
-    //    postcss: () => [autoprefixer]
-    //  },
-    //  debug: true
-    //}),
+    new UglifyJSPlugin(),
     new ExtractTextPlugin('formio.css')
   ],
   //externals: [nodeExternals()],
