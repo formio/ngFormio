@@ -71714,8 +71714,9 @@ var BaseEditConditional = exports.BaseEditConditional = [{
     label: 'When the form component:',
     key: 'conditional.when',
     dataSrc: 'custom',
+    valueProperty: 'value',
     data: {
-      custom: '\n            utils.eachComponent(instance.root.editForm.components, function(component, path) {\n              if (component.key !== data.key) {\n                values.push({\n                  label: component.label || component.key,\n                  value: path\n                });\n              }\n            });\n          '
+      custom: '\n            utils.eachComponent(instance.root.editForm.components, function(component, path) {\n              if (component.key !== data.key) {\n                values.push({\n                  label: component.label || component.key,\n                  value: component.key\n                });\n              }\n            });\n          '
     }
   }, {
     type: 'textfield',
