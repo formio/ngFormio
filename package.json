@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "angular": "^1.5.0",
-    "formiojs": "^3.0.0-alpha.5"
+    "formiojs": "^3.0.0-alpha.7"
   },
   "browserify": {
     "transform": [

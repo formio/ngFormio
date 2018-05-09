@@ -1,5 +1,4 @@
-import {Formio} from 'formiojs/full';
-
+import {Formio} from 'formiojs';
 const app = angular.module('formio');
 export default app.directive('formio', function() {
   return {

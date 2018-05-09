@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs/formio.builder';
+import {Formio} from 'formiojs';
 export default angular.module('formio').directive('formBuilder', function() {
   return {
     restrict: 'E',
@@ -22,7 +22,7 @@ export default angular.module('formio').directive('formBuilder', function() {
         $scope.initBuilder = function(element) {
           builderElement = element;
           builderElement.innerHTML = '';
-          builder = new Formio.Builder(builderElement, $scope.form, $scope.options);
+          builder = new Formio.FormBuilder(builderElement, $scope.form, $scope.options);
           builderReady = builder.setDisplay($scope.form.display);
         };
 

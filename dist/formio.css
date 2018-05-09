@@ -1,5 +1,5 @@
 .flatpickr-calendar {
-  background: transparent;
+  background: 0 0;
   opacity: 0;
   display: none;
   text-align: center;
@@ -22,7 +22,7 @@
   -webkit-box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0, 0, 0, 0.08);
   box-shadow: 1px 0 0 #e6e6e6, -1px 0 0 #e6e6e6, 0 1px 0 #e6e6e6, 0 -1px 0 #e6e6e6, 0 3px 13px rgba(0, 0, 0, 0.08); }
 
-.flatpickr-calendar.open, .flatpickr-calendar.inline {
+.flatpickr-calendar.inline, .flatpickr-calendar.open {
   opacity: 1;
   max-height: 640px;
   visibility: visible; }
@@ -32,8 +32,8 @@
   z-index: 99999; }
 
 .flatpickr-calendar.animate.open {
-  -webkit-animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1);
-  animation: fpFadeInDown 300ms cubic-bezier(0.23, 1, 0.32, 1); }
+  -webkit-animation: fpFadeInDown 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: fpFadeInDown 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
 
 .flatpickr-calendar.inline {
   display: block;
@@ -56,7 +56,7 @@
   -webkit-box-shadow: -2px 0 0 #e6e6e6,5px 0 0 #e6e6e6;
   box-shadow: -2px 0 0 #e6e6e6,5px 0 0 #e6e6e6; }
 
-.flatpickr-calendar .hasWeeks .dayContainer, .flatpickr-calendar .hasTime .dayContainer {
+.flatpickr-calendar .hasTime .dayContainer, .flatpickr-calendar .hasWeeks .dayContainer {
   border-bottom: 0;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0; }
@@ -71,7 +71,7 @@
 .flatpickr-calendar.noCalendar.hasTime .flatpickr-time {
   height: auto; }
 
-.flatpickr-calendar:before, .flatpickr-calendar:after {
+.flatpickr-calendar:after, .flatpickr-calendar:before {
   position: absolute;
   display: block;
   pointer-events: none;
@@ -81,7 +81,7 @@
   width: 0;
   left: 22px; }
 
-.flatpickr-calendar.rightMost:before, .flatpickr-calendar.rightMost:after {
+.flatpickr-calendar.rightMost:after, .flatpickr-calendar.rightMost:before {
   left: auto;
   right: 22px; }
 
@@ -93,7 +93,7 @@
   border-width: 4px;
   margin: 0 -4px; }
 
-.flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after {
+.flatpickr-calendar.arrowTop:after, .flatpickr-calendar.arrowTop:before {
   bottom: 100%; }
 
 .flatpickr-calendar.arrowTop:before {
@@ -102,7 +102,7 @@
 .flatpickr-calendar.arrowTop:after {
   border-bottom-color: #fff; }
 
-.flatpickr-calendar.arrowBottom:before, .flatpickr-calendar.arrowBottom:after {
+.flatpickr-calendar.arrowBottom:after, .flatpickr-calendar.arrowBottom:before {
   top: 100%; }
 
 .flatpickr-calendar.arrowBottom:before {
@@ -124,7 +124,7 @@
   display: flex; }
 
 .flatpickr-months .flatpickr-month {
-  background: transparent;
+  background: 0 0;
   color: rgba(0, 0, 0, 0.9);
   fill: rgba(0, 0, 0, 0.9);
   height: 28px;
@@ -140,7 +140,7 @@
   -ms-flex: 1;
   flex: 1; }
 
-.flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month {
+.flatpickr-months .flatpickr-next-month, .flatpickr-months .flatpickr-prev-month {
   text-decoration: none;
   cursor: pointer;
   position: absolute;
@@ -150,45 +150,29 @@
   padding: 10px;
   z-index: 3; }
 
-.flatpickr-months .flatpickr-prev-month.disabled, .flatpickr-months .flatpickr-next-month.disabled {
+.flatpickr-months .flatpickr-next-month.disabled, .flatpickr-months .flatpickr-prev-month.disabled {
   display: none; }
 
-.flatpickr-months .flatpickr-prev-month i, .flatpickr-months .flatpickr-next-month i {
+.flatpickr-months .flatpickr-next-month i, .flatpickr-months .flatpickr-prev-month i {
   position: relative; }
 
-.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month, .flatpickr-months .flatpickr-next-month.flatpickr-prev-month {
-  /*
-      /*rtl:begin:ignore*/
-  left: 0;
-  /*
-      /*rtl:end:ignore*/ }
+.flatpickr-months .flatpickr-next-month.flatpickr-prev-month, .flatpickr-months .flatpickr-prev-month.flatpickr-prev-month {
+  left: 0; }
 
-/*
-      /*rtl:begin:ignore*/
-/*
-      /*rtl:end:ignore*/
-.flatpickr-months .flatpickr-prev-month.flatpickr-next-month, .flatpickr-months .flatpickr-next-month.flatpickr-next-month {
-  /*
-      /*rtl:begin:ignore*/
-  right: 0;
-  /*
-      /*rtl:end:ignore*/ }
+.flatpickr-months .flatpickr-next-month.flatpickr-next-month, .flatpickr-months .flatpickr-prev-month.flatpickr-next-month {
+  right: 0; }
 
-/*
-      /*rtl:begin:ignore*/
-/*
-      /*rtl:end:ignore*/
-.flatpickr-months .flatpickr-prev-month:hover, .flatpickr-months .flatpickr-next-month:hover {
+.flatpickr-months .flatpickr-next-month:hover, .flatpickr-months .flatpickr-prev-month:hover {
   color: #959ea9; }
 
-.flatpickr-months .flatpickr-prev-month:hover svg, .flatpickr-months .flatpickr-next-month:hover svg {
+.flatpickr-months .flatpickr-next-month:hover svg, .flatpickr-months .flatpickr-prev-month:hover svg {
   fill: #f64747; }
 
-.flatpickr-months .flatpickr-prev-month svg, .flatpickr-months .flatpickr-next-month svg {
+.flatpickr-months .flatpickr-next-month svg, .flatpickr-months .flatpickr-prev-month svg {
   width: 14px;
   height: 14px; }
 
-.flatpickr-months .flatpickr-prev-month svg path, .flatpickr-months .flatpickr-next-month svg path {
+.flatpickr-months .flatpickr-next-month svg path, .flatpickr-months .flatpickr-prev-month svg path {
   -webkit-transition: fill .1s;
   transition: fill .1s;
   fill: inherit; }
@@ -301,7 +285,7 @@
   border-top-color: rgba(0, 0, 0, 0.9); }
 
 .flatpickr-current-month input.cur-year {
-  background: transparent;
+  background: 0 0;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   color: inherit;
@@ -324,11 +308,11 @@
 .flatpickr-current-month input.cur-year[disabled], .flatpickr-current-month input.cur-year[disabled]:hover {
   font-size: 100%;
   color: rgba(0, 0, 0, 0.5);
-  background: transparent;
+  background: 0 0;
   pointer-events: none; }
 
 .flatpickr-weekdays {
-  background: transparent;
+  background: 0 0;
   text-align: center;
   overflow: hidden;
   width: 100%;
@@ -351,7 +335,7 @@
 span.flatpickr-weekday {
   cursor: default;
   font-size: 90%;
-  background: transparent;
+  background: 0 0;
   color: rgba(0, 0, 0, 0.54);
   line-height: 1;
   margin: 0;
@@ -405,7 +389,7 @@ span.flatpickr-weekday {
   box-shadow: -1px 0 0 #e6e6e6; }
 
 .flatpickr-day {
-  background: none;
+  background: 0 0;
   border: 1px solid transparent;
   border-radius: 150px;
   -webkit-box-sizing: border-box;
@@ -427,7 +411,7 @@ span.flatpickr-weekday {
   justify-content: center;
   text-align: center; }
 
-.flatpickr-day.inRange, .flatpickr-day.prevMonthDay.inRange, .flatpickr-day.nextMonthDay.inRange, .flatpickr-day.today.inRange, .flatpickr-day.prevMonthDay.today.inRange, .flatpickr-day.nextMonthDay.today.inRange, .flatpickr-day:hover, .flatpickr-day.prevMonthDay:hover, .flatpickr-day.nextMonthDay:hover, .flatpickr-day:focus, .flatpickr-day.prevMonthDay:focus, .flatpickr-day.nextMonthDay:focus {
+.flatpickr-day.inRange, .flatpickr-day.nextMonthDay.inRange, .flatpickr-day.nextMonthDay.today.inRange, .flatpickr-day.nextMonthDay:focus, .flatpickr-day.nextMonthDay:hover, .flatpickr-day.prevMonthDay.inRange, .flatpickr-day.prevMonthDay.today.inRange, .flatpickr-day.prevMonthDay:focus, .flatpickr-day.prevMonthDay:hover, .flatpickr-day.today.inRange, .flatpickr-day:focus, .flatpickr-day:hover {
   cursor: pointer;
   outline: 0;
   background: #e6e6e6;
@@ -436,29 +420,29 @@ span.flatpickr-weekday {
 .flatpickr-day.today {
   border-color: #959ea9; }
 
-.flatpickr-day.today:hover, .flatpickr-day.today:focus {
+.flatpickr-day.today:focus, .flatpickr-day.today:hover {
   border-color: #959ea9;
   background: #959ea9;
   color: #fff; }
 
-.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay {
+.flatpickr-day.endRange, .flatpickr-day.endRange.inRange, .flatpickr-day.endRange.nextMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.endRange:focus, .flatpickr-day.endRange:hover, .flatpickr-day.selected, .flatpickr-day.selected.inRange, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.selected:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange, .flatpickr-day.startRange.inRange, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.startRange:focus, .flatpickr-day.startRange:hover {
   background: #569ff7;
   -webkit-box-shadow: none;
   box-shadow: none;
   color: #fff;
   border-color: #569ff7; }
 
-.flatpickr-day.selected.startRange, .flatpickr-day.startRange.startRange, .flatpickr-day.endRange.startRange {
+.flatpickr-day.endRange.startRange, .flatpickr-day.selected.startRange, .flatpickr-day.startRange.startRange {
   border-radius: 50px 0 0 50px; }
 
-.flatpickr-day.selected.endRange, .flatpickr-day.startRange.endRange, .flatpickr-day.endRange.endRange {
+.flatpickr-day.endRange.endRange, .flatpickr-day.selected.endRange, .flatpickr-day.startRange.endRange {
   border-radius: 0 50px 50px 0; }
 
-.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)), .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)), .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n+1)), .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n+1)), .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n+1)) {
   -webkit-box-shadow: -10px 0 0 #569ff7;
   box-shadow: -10px 0 0 #569ff7; }
 
-.flatpickr-day.selected.startRange.endRange, .flatpickr-day.startRange.startRange.endRange, .flatpickr-day.endRange.startRange.endRange {
+.flatpickr-day.endRange.startRange.endRange, .flatpickr-day.selected.startRange.endRange, .flatpickr-day.startRange.startRange.endRange {
   border-radius: 50px; }
 
 .flatpickr-day.inRange {
@@ -466,9 +450,9 @@ span.flatpickr-weekday {
   -webkit-box-shadow: -5px 0 0 #e6e6e6,5px 0 0 #e6e6e6;
   box-shadow: -5px 0 0 #e6e6e6,5px 0 0 #e6e6e6; }
 
-.flatpickr-day.disabled, .flatpickr-day.disabled:hover, .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay, .flatpickr-day.notAllowed, .flatpickr-day.notAllowed.prevMonthDay, .flatpickr-day.notAllowed.nextMonthDay {
+.flatpickr-day.disabled, .flatpickr-day.disabled:hover, .flatpickr-day.nextMonthDay, .flatpickr-day.notAllowed, .flatpickr-day.notAllowed.nextMonthDay, .flatpickr-day.notAllowed.prevMonthDay, .flatpickr-day.prevMonthDay {
   color: rgba(57, 57, 57, 0.3);
-  background: transparent;
+  background: 0 0;
   border-color: transparent;
   cursor: default; }
 
@@ -506,7 +490,7 @@ span.flatpickr-weekday {
   width: 100%;
   max-width: none;
   color: rgba(57, 57, 57, 0.3);
-  background: transparent;
+  background: 0 0;
   cursor: default;
   border: none; }
 
@@ -565,7 +549,7 @@ span.flatpickr-weekday {
   width: 49%; }
 
 .flatpickr-time input {
-  background: transparent;
+  background: 0 0;
   -webkit-box-shadow: none;
   box-shadow: none;
   border: 0;
@@ -583,7 +567,7 @@ span.flatpickr-weekday {
   box-sizing: border-box; }
 
 .flatpickr-time input.flatpickr-hour {
-  font-weight: bold; }
+  font-weight: 700; }
 
 .flatpickr-time input.flatpickr-minute, .flatpickr-time input.flatpickr-second {
   font-weight: 400; }
@@ -592,13 +576,13 @@ span.flatpickr-weekday {
   outline: 0;
   border: 0; }
 
-.flatpickr-time .flatpickr-time-separator, .flatpickr-time .flatpickr-am-pm {
+.flatpickr-time .flatpickr-am-pm, .flatpickr-time .flatpickr-time-separator {
   height: inherit;
   display: inline-block;
   float: left;
   line-height: inherit;
   color: #393939;
-  font-weight: bold;
+  font-weight: 700;
   width: 2%;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -615,7 +599,7 @@ span.flatpickr-weekday {
   text-align: center;
   font-weight: 400; }
 
-.flatpickr-time .flatpickr-am-pm:hover, .flatpickr-time .flatpickr-am-pm:focus {
+.flatpickr-time .flatpickr-am-pm:focus, .flatpickr-time .flatpickr-am-pm:hover {
   background: #f0f0f0; }
 
 .flatpickr-input[readonly] {
@@ -647,7 +631,7 @@ span.flatpickr-weekday {
   font-size: 16px; }
 
 .choices:focus {
-  outline: none; }
+  outline: 0; }
 
 .choices:last-child {
   margin-bottom: 0; }
@@ -914,7 +898,7 @@ span.flatpickr-weekday {
   cursor: pointer; }
 
 .choices__button:focus {
-  outline: none; }
+  outline: 0; }
 
 .choices__input {
   display: inline-block;
@@ -950,8 +934,8 @@ dialog {
   margin: auto;
   border: solid;
   padding: 1em;
-  background: white;
-  color: black;
+  background: #fff;
+  color: #000;
   display: block; }
 
 dialog:not([open]) {
@@ -982,7 +966,7 @@ dialog.fixed {
   position: fixed !important;
   margin: 0 !important;
   z-index: 9999 !important;
-  opacity: 0.8;
+  opacity: .8;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
   filter: alpha(opacity=80); }
 
@@ -996,7 +980,7 @@ dialog.fixed {
   user-select: none !important; }
 
 .gu-transit {
-  opacity: 0.2;
+  opacity: .2;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
   filter: alpha(opacity=20); }
 
@@ -1004,13 +988,11 @@ dialog.fixed {
  *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
-/* FONT PATH
- * -------------------------- */
 @font-face {
-  font-family: 'FontAwesome';
+  font-family: FontAwesome;
   src: url(fonts/fontawesome-webfont.eot);
   src: url(fonts/fontawesome-webfont.eot?#iefix&v=4.7.0) format("embedded-opentype"), url(fonts/fontawesome-webfont.woff2) format("woff2"), url(fonts/fontawesome-webfont.woff) format("woff"), url(fonts/fontawesome-webfont.ttf) format("truetype"), url(fonts/fontawesome-webfont.svg#fontawesomeregular) format("svg");
-  font-weight: normal;
+  font-weight: 400;
   font-style: normal; }
 
 .fa {
@@ -1021,10 +1003,9 @@ dialog.fixed {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-/* makes the font 33% larger relative to the icon container */
 .fa-lg {
   font-size: 1.33333333em;
-  line-height: 0.75em;
+  line-height: .75em;
   vertical-align: -15%; }
 
 .fa-2x {
@@ -1055,7 +1036,7 @@ dialog.fixed {
   position: absolute;
   left: -2.14285714em;
   width: 2.14285714em;
-  top: 0.14285714em;
+  top: .14285714em;
   text-align: center; }
 
 .fa-li.fa-lg {
@@ -1063,7 +1044,7 @@ dialog.fixed {
 
 .fa-border {
   padding: .2em .25em .15em;
-  border: solid 0.08em #eeeeee;
+  border: solid .08em #eee;
   border-radius: .1em; }
 
 .fa-pull-left {
@@ -1078,7 +1059,6 @@ dialog.fixed {
 .fa.fa-pull-right {
   margin-left: .3em; }
 
-/* Deprecated as of 4.4.0 */
 .pull-right {
   float: right; }
 
@@ -1101,16 +1081,16 @@ dialog.fixed {
 
 @-webkit-keyframes fa-spin {
   0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0);
+    transform: rotate(0); }
   100% {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg); } }
 
 @keyframes fa-spin {
   0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0);
+    transform: rotate(0); }
   100% {
     -webkit-transform: rotate(359deg);
     transform: rotate(359deg); } }
@@ -1140,11 +1120,7 @@ dialog.fixed {
   -webkit-transform: scale(1, -1);
   transform: scale(1, -1); }
 
-:root .fa-rotate-90,
-:root .fa-rotate-180,
-:root .fa-rotate-270,
-:root .fa-flip-horizontal,
-:root .fa-flip-vertical {
+:root .fa-flip-horizontal, :root .fa-flip-vertical, :root .fa-rotate-180, :root .fa-rotate-270, :root .fa-rotate-90 {
   -webkit-filter: none;
   filter: none; }
 
@@ -1156,8 +1132,7 @@ dialog.fixed {
   line-height: 2em;
   vertical-align: middle; }
 
-.fa-stack-1x,
-.fa-stack-2x {
+.fa-stack-1x, .fa-stack-2x {
   position: absolute;
   left: 0;
   width: 100%;
@@ -1170,10 +1145,8 @@ dialog.fixed {
   font-size: 2em; }
 
 .fa-inverse {
-  color: #ffffff; }
+  color: #fff; }
 
-/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen
-   readers do not read off random characters that represent icons */
 .fa-glass:before {
   content: "\F000"; }
 
@@ -1213,9 +1186,7 @@ dialog.fixed {
 .fa-check:before {
   content: "\F00C"; }
 
-.fa-remove:before,
-.fa-close:before,
-.fa-times:before {
+.fa-close:before, .fa-remove:before, .fa-times:before {
   content: "\F00D"; }
 
 .fa-search-plus:before {
@@ -1230,8 +1201,7 @@ dialog.fixed {
 .fa-signal:before {
   content: "\F012"; }
 
-.fa-gear:before,
-.fa-cog:before {
+.fa-cog:before, .fa-gear:before {
   content: "\F013"; }
 
 .fa-trash-o:before {
@@ -1264,8 +1234,7 @@ dialog.fixed {
 .fa-play-circle-o:before {
   content: "\F01D"; }
 
-.fa-rotate-right:before,
-.fa-repeat:before {
+.fa-repeat:before, .fa-rotate-right:before {
   content: "\F01E"; }
 
 .fa-refresh:before {
@@ -1346,8 +1315,7 @@ dialog.fixed {
 .fa-list:before {
   content: "\F03A"; }
 
-.fa-dedent:before,
-.fa-outdent:before {
+.fa-dedent:before, .fa-outdent:before {
   content: "\F03B"; }
 
 .fa-indent:before {
@@ -1356,9 +1324,7 @@ dialog.fixed {
 .fa-video-camera:before {
   content: "\F03D"; }
 
-.fa-photo:before,
-.fa-image:before,
-.fa-picture-o:before {
+.fa-image:before, .fa-photo:before, .fa-picture-o:before {
   content: "\F03E"; }
 
 .fa-pencil:before {
@@ -1373,8 +1339,7 @@ dialog.fixed {
 .fa-tint:before {
   content: "\F043"; }
 
-.fa-edit:before,
-.fa-pencil-square-o:before {
+.fa-edit:before, .fa-pencil-square-o:before {
   content: "\F044"; }
 
 .fa-share-square-o:before {
@@ -1464,8 +1429,7 @@ dialog.fixed {
 .fa-arrow-down:before {
   content: "\F063"; }
 
-.fa-mail-forward:before,
-.fa-share:before {
+.fa-mail-forward:before, .fa-share:before {
   content: "\F064"; }
 
 .fa-expand:before {
@@ -1501,8 +1465,7 @@ dialog.fixed {
 .fa-eye-slash:before {
   content: "\F070"; }
 
-.fa-warning:before,
-.fa-exclamation-triangle:before {
+.fa-exclamation-triangle:before, .fa-warning:before {
   content: "\F071"; }
 
 .fa-plane:before {
@@ -1544,8 +1507,7 @@ dialog.fixed {
 .fa-arrows-h:before {
   content: "\F07E"; }
 
-.fa-bar-chart-o:before,
-.fa-bar-chart:before {
+.fa-bar-chart-o:before, .fa-bar-chart:before {
   content: "\F080"; }
 
 .fa-twitter-square:before {
@@ -1560,8 +1522,7 @@ dialog.fixed {
 .fa-key:before {
   content: "\F084"; }
 
-.fa-gears:before,
-.fa-cogs:before {
+.fa-cogs:before, .fa-gears:before {
   content: "\F085"; }
 
 .fa-comments:before {
@@ -1621,8 +1582,7 @@ dialog.fixed {
 .fa-twitter:before {
   content: "\F099"; }
 
-.fa-facebook-f:before,
-.fa-facebook:before {
+.fa-facebook-f:before, .fa-facebook:before {
   content: "\F09A"; }
 
 .fa-github:before {
@@ -1634,8 +1594,7 @@ dialog.fixed {
 .fa-credit-card:before {
   content: "\F09D"; }
 
-.fa-feed:before,
-.fa-rss:before {
+.fa-feed:before, .fa-rss:before {
   content: "\F09E"; }
 
 .fa-hdd-o:before {
@@ -1692,12 +1651,10 @@ dialog.fixed {
 .fa-arrows-alt:before {
   content: "\F0B2"; }
 
-.fa-group:before,
-.fa-users:before {
+.fa-group:before, .fa-users:before {
   content: "\F0C0"; }
 
-.fa-chain:before,
-.fa-link:before {
+.fa-chain:before, .fa-link:before {
   content: "\F0C1"; }
 
 .fa-cloud:before {
@@ -1706,27 +1663,22 @@ dialog.fixed {
 .fa-flask:before {
   content: "\F0C3"; }
 
-.fa-cut:before,
-.fa-scissors:before {
+.fa-cut:before, .fa-scissors:before {
   content: "\F0C4"; }
 
-.fa-copy:before,
-.fa-files-o:before {
+.fa-copy:before, .fa-files-o:before {
   content: "\F0C5"; }
 
 .fa-paperclip:before {
   content: "\F0C6"; }
 
-.fa-save:before,
-.fa-floppy-o:before {
+.fa-floppy-o:before, .fa-save:before {
   content: "\F0C7"; }
 
 .fa-square:before {
   content: "\F0C8"; }
 
-.fa-navicon:before,
-.fa-reorder:before,
-.fa-bars:before {
+.fa-bars:before, .fa-navicon:before, .fa-reorder:before {
   content: "\F0C9"; }
 
 .fa-list-ul:before {
@@ -1780,16 +1732,13 @@ dialog.fixed {
 .fa-columns:before {
   content: "\F0DB"; }
 
-.fa-unsorted:before,
-.fa-sort:before {
+.fa-sort:before, .fa-unsorted:before {
   content: "\F0DC"; }
 
-.fa-sort-down:before,
-.fa-sort-desc:before {
+.fa-sort-desc:before, .fa-sort-down:before {
   content: "\F0DD"; }
 
-.fa-sort-up:before,
-.fa-sort-asc:before {
+.fa-sort-asc:before, .fa-sort-up:before {
   content: "\F0DE"; }
 
 .fa-envelope:before {
@@ -1798,16 +1747,13 @@ dialog.fixed {
 .fa-linkedin:before {
   content: "\F0E1"; }
 
-.fa-rotate-left:before,
-.fa-undo:before {
+.fa-rotate-left:before, .fa-undo:before {
   content: "\F0E2"; }
 
-.fa-legal:before,
-.fa-gavel:before {
+.fa-gavel:before, .fa-legal:before {
   content: "\F0E3"; }
 
-.fa-dashboard:before,
-.fa-tachometer:before {
+.fa-dashboard:before, .fa-tachometer:before {
   content: "\F0E4"; }
 
 .fa-comment-o:before {
@@ -1816,8 +1762,7 @@ dialog.fixed {
 .fa-comments-o:before {
   content: "\F0E6"; }
 
-.fa-flash:before,
-.fa-bolt:before {
+.fa-bolt:before, .fa-flash:before {
   content: "\F0E7"; }
 
 .fa-sitemap:before {
@@ -1826,8 +1771,7 @@ dialog.fixed {
 .fa-umbrella:before {
   content: "\F0E9"; }
 
-.fa-paste:before,
-.fa-clipboard:before {
+.fa-clipboard:before, .fa-paste:before {
   content: "\F0EA"; }
 
 .fa-lightbulb-o:before {
@@ -1920,8 +1864,7 @@ dialog.fixed {
 .fa-tablet:before {
   content: "\F10A"; }
 
-.fa-mobile-phone:before,
-.fa-mobile:before {
+.fa-mobile-phone:before, .fa-mobile:before {
   content: "\F10B"; }
 
 .fa-circle-o:before {
@@ -1939,8 +1882,7 @@ dialog.fixed {
 .fa-circle:before {
   content: "\F111"; }
 
-.fa-mail-reply:before,
-.fa-reply:before {
+.fa-mail-reply:before, .fa-reply:before {
   content: "\F112"; }
 
 .fa-github-alt:before {
@@ -1979,13 +1921,10 @@ dialog.fixed {
 .fa-code:before {
   content: "\F121"; }
 
-.fa-mail-reply-all:before,
-.fa-reply-all:before {
+.fa-mail-reply-all:before, .fa-reply-all:before {
   content: "\F122"; }
 
-.fa-star-half-empty:before,
-.fa-star-half-full:before,
-.fa-star-half-o:before {
+.fa-star-half-empty:before, .fa-star-half-full:before, .fa-star-half-o:before {
   content: "\F123"; }
 
 .fa-location-arrow:before {
@@ -1997,8 +1936,7 @@ dialog.fixed {
 .fa-code-fork:before {
   content: "\F126"; }
 
-.fa-unlink:before,
-.fa-chain-broken:before {
+.fa-chain-broken:before, .fa-unlink:before {
   content: "\F127"; }
 
 .fa-question:before {
@@ -2112,50 +2050,37 @@ dialog.fixed {
 .fa-compass:before {
   content: "\F14E"; }
 
-.fa-toggle-down:before,
-.fa-caret-square-o-down:before {
+.fa-caret-square-o-down:before, .fa-toggle-down:before {
   content: "\F150"; }
 
-.fa-toggle-up:before,
-.fa-caret-square-o-up:before {
+.fa-caret-square-o-up:before, .fa-toggle-up:before {
   content: "\F151"; }
 
-.fa-toggle-right:before,
-.fa-caret-square-o-right:before {
+.fa-caret-square-o-right:before, .fa-toggle-right:before {
   content: "\F152"; }
 
-.fa-euro:before,
-.fa-eur:before {
+.fa-eur:before, .fa-euro:before {
   content: "\F153"; }
 
 .fa-gbp:before {
   content: "\F154"; }
 
-.fa-dollar:before,
-.fa-usd:before {
+.fa-dollar:before, .fa-usd:before {
   content: "\F155"; }
 
-.fa-rupee:before,
-.fa-inr:before {
+.fa-inr:before, .fa-rupee:before {
   content: "\F156"; }
 
-.fa-cny:before,
-.fa-rmb:before,
-.fa-yen:before,
-.fa-jpy:before {
+.fa-cny:before, .fa-jpy:before, .fa-rmb:before, .fa-yen:before {
   content: "\F157"; }
 
-.fa-ruble:before,
-.fa-rouble:before,
-.fa-rub:before {
+.fa-rouble:before, .fa-rub:before, .fa-ruble:before {
   content: "\F158"; }
 
-.fa-won:before,
-.fa-krw:before {
+.fa-krw:before, .fa-won:before {
   content: "\F159"; }
 
-.fa-bitcoin:before,
-.fa-btc:before {
+.fa-bitcoin:before, .fa-btc:before {
   content: "\F15A"; }
 
 .fa-file:before {
@@ -2272,8 +2197,7 @@ dialog.fixed {
 .fa-male:before {
   content: "\F183"; }
 
-.fa-gittip:before,
-.fa-gratipay:before {
+.fa-gittip:before, .fa-gratipay:before {
   content: "\F184"; }
 
 .fa-sun-o:before {
@@ -2309,8 +2233,7 @@ dialog.fixed {
 .fa-arrow-circle-o-left:before {
   content: "\F190"; }
 
-.fa-toggle-left:before,
-.fa-caret-square-o-left:before {
+.fa-caret-square-o-left:before, .fa-toggle-left:before {
   content: "\F191"; }
 
 .fa-dot-circle-o:before {
@@ -2322,8 +2245,7 @@ dialog.fixed {
 .fa-vimeo-square:before {
   content: "\F194"; }
 
-.fa-turkish-lira:before,
-.fa-try:before {
+.fa-try:before, .fa-turkish-lira:before {
   content: "\F195"; }
 
 .fa-plus-square-o:before {
@@ -2344,13 +2266,10 @@ dialog.fixed {
 .fa-openid:before {
   content: "\F19B"; }
 
-.fa-institution:before,
-.fa-bank:before,
-.fa-university:before {
+.fa-bank:before, .fa-institution:before, .fa-university:before {
   content: "\F19C"; }
 
-.fa-mortar-board:before,
-.fa-graduation-cap:before {
+.fa-graduation-cap:before, .fa-mortar-board:before {
   content: "\F19D"; }
 
 .fa-yahoo:before {
@@ -2428,12 +2347,10 @@ dialog.fixed {
 .fa-recycle:before {
   content: "\F1B8"; }
 
-.fa-automobile:before,
-.fa-car:before {
+.fa-automobile:before, .fa-car:before {
   content: "\F1B9"; }
 
-.fa-cab:before,
-.fa-taxi:before {
+.fa-cab:before, .fa-taxi:before {
   content: "\F1BA"; }
 
 .fa-tree:before {
@@ -2463,21 +2380,16 @@ dialog.fixed {
 .fa-file-powerpoint-o:before {
   content: "\F1C4"; }
 
-.fa-file-photo-o:before,
-.fa-file-picture-o:before,
-.fa-file-image-o:before {
+.fa-file-image-o:before, .fa-file-photo-o:before, .fa-file-picture-o:before {
   content: "\F1C5"; }
 
-.fa-file-zip-o:before,
-.fa-file-archive-o:before {
+.fa-file-archive-o:before, .fa-file-zip-o:before {
   content: "\F1C6"; }
 
-.fa-file-sound-o:before,
-.fa-file-audio-o:before {
+.fa-file-audio-o:before, .fa-file-sound-o:before {
   content: "\F1C7"; }
 
-.fa-file-movie-o:before,
-.fa-file-video-o:before {
+.fa-file-movie-o:before, .fa-file-video-o:before {
   content: "\F1C8"; }
 
 .fa-file-code-o:before {
@@ -2492,23 +2404,16 @@ dialog.fixed {
 .fa-jsfiddle:before {
   content: "\F1CC"; }
 
-.fa-life-bouy:before,
-.fa-life-buoy:before,
-.fa-life-saver:before,
-.fa-support:before,
-.fa-life-ring:before {
+.fa-life-bouy:before, .fa-life-buoy:before, .fa-life-ring:before, .fa-life-saver:before, .fa-support:before {
   content: "\F1CD"; }
 
 .fa-circle-o-notch:before {
   content: "\F1CE"; }
 
-.fa-ra:before,
-.fa-resistance:before,
-.fa-rebel:before {
+.fa-ra:before, .fa-rebel:before, .fa-resistance:before {
   content: "\F1D0"; }
 
-.fa-ge:before,
-.fa-empire:before {
+.fa-empire:before, .fa-ge:before {
   content: "\F1D1"; }
 
 .fa-git-square:before {
@@ -2517,9 +2422,7 @@ dialog.fixed {
 .fa-git:before {
   content: "\F1D3"; }
 
-.fa-y-combinator-square:before,
-.fa-yc-square:before,
-.fa-hacker-news:before {
+.fa-hacker-news:before, .fa-y-combinator-square:before, .fa-yc-square:before {
   content: "\F1D4"; }
 
 .fa-tencent-weibo:before {
@@ -2528,16 +2431,13 @@ dialog.fixed {
 .fa-qq:before {
   content: "\F1D6"; }
 
-.fa-wechat:before,
-.fa-weixin:before {
+.fa-wechat:before, .fa-weixin:before {
   content: "\F1D7"; }
 
-.fa-send:before,
-.fa-paper-plane:before {
+.fa-paper-plane:before, .fa-send:before {
   content: "\F1D8"; }
 
-.fa-send-o:before,
-.fa-paper-plane-o:before {
+.fa-paper-plane-o:before, .fa-send-o:before {
   content: "\F1D9"; }
 
 .fa-history:before {
@@ -2564,8 +2464,7 @@ dialog.fixed {
 .fa-bomb:before {
   content: "\F1E2"; }
 
-.fa-soccer-ball-o:before,
-.fa-futbol-o:before {
+.fa-futbol-o:before, .fa-soccer-ball-o:before {
   content: "\F1E3"; }
 
 .fa-tty:before {
@@ -2679,9 +2578,7 @@ dialog.fixed {
 .fa-cc:before {
   content: "\F20A"; }
 
-.fa-shekel:before,
-.fa-sheqel:before,
-.fa-ils:before {
+.fa-ils:before, .fa-shekel:before, .fa-sheqel:before {
   content: "\F20B"; }
 
 .fa-meanpath:before {
@@ -2747,8 +2644,7 @@ dialog.fixed {
 .fa-mercury:before {
   content: "\F223"; }
 
-.fa-intersex:before,
-.fa-transgender:before {
+.fa-intersex:before, .fa-transgender:before {
   content: "\F224"; }
 
 .fa-transgender-alt:before {
@@ -2796,8 +2692,7 @@ dialog.fixed {
 .fa-user-times:before {
   content: "\F235"; }
 
-.fa-hotel:before,
-.fa-bed:before {
+.fa-bed:before, .fa-hotel:before {
   content: "\F236"; }
 
 .fa-viacoin:before {
@@ -2812,8 +2707,7 @@ dialog.fixed {
 .fa-medium:before {
   content: "\F23A"; }
 
-.fa-yc:before,
-.fa-y-combinator:before {
+.fa-y-combinator:before, .fa-yc:before {
   content: "\F23B"; }
 
 .fa-optin-monster:before {
@@ -2825,25 +2719,19 @@ dialog.fixed {
 .fa-expeditedssl:before {
   content: "\F23E"; }
 
-.fa-battery-4:before,
-.fa-battery:before,
-.fa-battery-full:before {
+.fa-battery-4:before, .fa-battery-full:before, .fa-battery:before {
   content: "\F240"; }
 
-.fa-battery-3:before,
-.fa-battery-three-quarters:before {
+.fa-battery-3:before, .fa-battery-three-quarters:before {
   content: "\F241"; }
 
-.fa-battery-2:before,
-.fa-battery-half:before {
+.fa-battery-2:before, .fa-battery-half:before {
   content: "\F242"; }
 
-.fa-battery-1:before,
-.fa-battery-quarter:before {
+.fa-battery-1:before, .fa-battery-quarter:before {
   content: "\F243"; }
 
-.fa-battery-0:before,
-.fa-battery-empty:before {
+.fa-battery-0:before, .fa-battery-empty:before {
   content: "\F244"; }
 
 .fa-mouse-pointer:before {
@@ -2879,27 +2767,22 @@ dialog.fixed {
 .fa-hourglass-o:before {
   content: "\F250"; }
 
-.fa-hourglass-1:before,
-.fa-hourglass-start:before {
+.fa-hourglass-1:before, .fa-hourglass-start:before {
   content: "\F251"; }
 
-.fa-hourglass-2:before,
-.fa-hourglass-half:before {
+.fa-hourglass-2:before, .fa-hourglass-half:before {
   content: "\F252"; }
 
-.fa-hourglass-3:before,
-.fa-hourglass-end:before {
+.fa-hourglass-3:before, .fa-hourglass-end:before {
   content: "\F253"; }
 
 .fa-hourglass:before {
   content: "\F254"; }
 
-.fa-hand-grab-o:before,
-.fa-hand-rock-o:before {
+.fa-hand-grab-o:before, .fa-hand-rock-o:before {
   content: "\F255"; }
 
-.fa-hand-stop-o:before,
-.fa-hand-paper-o:before {
+.fa-hand-paper-o:before, .fa-hand-stop-o:before {
   content: "\F256"; }
 
 .fa-hand-scissors-o:before {
@@ -2962,8 +2845,7 @@ dialog.fixed {
 .fa-internet-explorer:before {
   content: "\F26B"; }
 
-.fa-tv:before,
-.fa-television:before {
+.fa-television:before, .fa-tv:before {
   content: "\F26C"; }
 
 .fa-contao:before {
@@ -3116,13 +2998,10 @@ dialog.fixed {
 .fa-assistive-listening-systems:before {
   content: "\F2A2"; }
 
-.fa-asl-interpreting:before,
-.fa-american-sign-language-interpreting:before {
+.fa-american-sign-language-interpreting:before, .fa-asl-interpreting:before {
   content: "\F2A3"; }
 
-.fa-deafness:before,
-.fa-hard-of-hearing:before,
-.fa-deaf:before {
+.fa-deaf:before, .fa-deafness:before, .fa-hard-of-hearing:before {
   content: "\F2A4"; }
 
 .fa-glide:before {
@@ -3131,8 +3010,7 @@ dialog.fixed {
 .fa-glide-g:before {
   content: "\F2A6"; }
 
-.fa-signing:before,
-.fa-sign-language:before {
+.fa-sign-language:before, .fa-signing:before {
   content: "\F2A7"; }
 
 .fa-low-vision:before {
@@ -3165,12 +3043,10 @@ dialog.fixed {
 .fa-themeisle:before {
   content: "\F2B2"; }
 
-.fa-google-plus-circle:before,
-.fa-google-plus-official:before {
+.fa-google-plus-circle:before, .fa-google-plus-official:before {
   content: "\F2B3"; }
 
-.fa-fa:before,
-.fa-font-awesome:before {
+.fa-fa:before, .fa-font-awesome:before {
   content: "\F2B4"; }
 
 .fa-handshake-o:before {
@@ -3191,12 +3067,10 @@ dialog.fixed {
 .fa-address-book-o:before {
   content: "\F2BA"; }
 
-.fa-vcard:before,
-.fa-address-card:before {
+.fa-address-card:before, .fa-vcard:before {
   content: "\F2BB"; }
 
-.fa-vcard-o:before,
-.fa-address-card-o:before {
+.fa-address-card-o:before, .fa-vcard-o:before {
   content: "\F2BC"; }
 
 .fa-user-circle:before {
@@ -3211,12 +3085,10 @@ dialog.fixed {
 .fa-id-badge:before {
   content: "\F2C1"; }
 
-.fa-drivers-license:before,
-.fa-id-card:before {
+.fa-drivers-license:before, .fa-id-card:before {
   content: "\F2C2"; }
 
-.fa-drivers-license-o:before,
-.fa-id-card-o:before {
+.fa-drivers-license-o:before, .fa-id-card-o:before {
   content: "\F2C3"; }
 
 .fa-quora:before {
@@ -3228,33 +3100,25 @@ dialog.fixed {
 .fa-telegram:before {
   content: "\F2C6"; }
 
-.fa-thermometer-4:before,
-.fa-thermometer:before,
-.fa-thermometer-full:before {
+.fa-thermometer-4:before, .fa-thermometer-full:before, .fa-thermometer:before {
   content: "\F2C7"; }
 
-.fa-thermometer-3:before,
-.fa-thermometer-three-quarters:before {
+.fa-thermometer-3:before, .fa-thermometer-three-quarters:before {
   content: "\F2C8"; }
 
-.fa-thermometer-2:before,
-.fa-thermometer-half:before {
+.fa-thermometer-2:before, .fa-thermometer-half:before {
   content: "\F2C9"; }
 
-.fa-thermometer-1:before,
-.fa-thermometer-quarter:before {
+.fa-thermometer-1:before, .fa-thermometer-quarter:before {
   content: "\F2CA"; }
 
-.fa-thermometer-0:before,
-.fa-thermometer-empty:before {
+.fa-thermometer-0:before, .fa-thermometer-empty:before {
   content: "\F2CB"; }
 
 .fa-shower:before {
   content: "\F2CC"; }
 
-.fa-bathtub:before,
-.fa-s15:before,
-.fa-bath:before {
+.fa-bath:before, .fa-bathtub:before, .fa-s15:before {
   content: "\F2CD"; }
 
 .fa-podcast:before {
@@ -3269,12 +3133,10 @@ dialog.fixed {
 .fa-window-restore:before {
   content: "\F2D2"; }
 
-.fa-times-rectangle:before,
-.fa-window-close:before {
+.fa-times-rectangle:before, .fa-window-close:before {
   content: "\F2D3"; }
 
-.fa-times-rectangle-o:before,
-.fa-window-close-o:before {
+.fa-times-rectangle-o:before, .fa-window-close-o:before {
   content: "\F2D4"; }
 
 .fa-bandcamp:before {
@@ -3320,8 +3182,7 @@ dialog.fixed {
   clip: rect(0, 0, 0, 0);
   border: 0; }
 
-.sr-only-focusable:active,
-.sr-only-focusable:focus {
+.sr-only-focusable:active, .sr-only-focusable:focus {
   position: static;
   width: auto;
   height: auto;
@@ -3351,16 +3212,16 @@ dialog.fixed {
 
 .quill-source-code {
   width: 100%;
-  margin: 0px;
+  margin: 0;
   background: #1d1d1d;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  color: #cccccc;
+  color: #ccc;
   font-size: 15px;
-  outline: none;
+  outline: 0;
   padding: 20px;
   line-height: 24px;
-  font-family: Consolas, Menlo, Monaco, "Courier New", monospace;
+  font-family: Consolas,Menlo,Monaco,"Courier New",monospace;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -3380,14 +3241,14 @@ dialog.fixed {
 
 @-webkit-keyframes formio-spin {
   from {
-    -webkit-transform: rotate(0deg); }
+    -webkit-transform: rotate(0); }
   to {
     -webkit-transform: rotate(360deg); } }
 
 @keyframes formio-spin {
   from {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0);
+    transform: rotate(0); }
   to {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg); } }
@@ -3422,22 +3283,22 @@ td > .form-group {
   line-height: 0; }
 
 .choices__list--dropdown .choices__item--selectable {
-  padding-right: 0px; }
+  padding-right: 0; }
 
 .signature-pad-refresh img {
   height: 1.2em; }
 
 .signature-pad-footer {
   text-align: center;
-  color: #C3C3C3; }
+  color: #c3c3c3; }
 
 .loader-wrapper {
   z-index: 1000;
   position: absolute;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   background-color: rgba(0, 0, 0, 0.1); }
 
 .loader {
@@ -3449,9 +3310,7 @@ td > .form-group {
   z-index: 10000;
   display: inline-block;
   border: 6px solid #f3f3f3;
-  /* Light grey */
   border-top: 6px solid #3498db;
-  /* Blue */
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -3460,16 +3319,16 @@ td > .form-group {
 
 @-webkit-keyframes spin {
   0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0);
+    transform: rotate(0); }
   100% {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg); } }
 
 @keyframes spin {
   0% {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0);
+    transform: rotate(0); }
   100% {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg); } }
@@ -3497,7 +3356,7 @@ td > .form-group {
 .formio-component-file .fileSelector.fileDragOver {
   border-color: #127abe; }
 
-.formio-component-file .fileSelector .glyphicon, .formio-component-file .fileSelector .fa {
+.formio-component-file .fileSelector .fa, .formio-component-file .fileSelector .glyphicon {
   font-size: 20px;
   margin-right: 5px; }
 
@@ -3531,12 +3390,10 @@ td > .form-group {
 .formio-dialog {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  font-size: 0.8em;
+  font-size: .8em;
   color: #666; }
 
-.formio-dialog *,
-.formio-dialog *:before,
-.formio-dialog *:after {
+.formio-dialog *, .formio-dialog :after, .formio-dialog :before {
   -webkit-box-sizing: inherit;
   box-sizing: inherit; }
 
@@ -3549,15 +3406,11 @@ td > .form-group {
   right: 0;
   bottom: 0;
   left: 0;
-  /* fix for Scrollbars not clickable on overflow #552 */
   background: rgba(0, 0, 0, 0.4);
-  -webkit-animation: formio-dialog-fadein 0.5s;
-  animation: formio-dialog-fadein 0.5s;
-  /* end fix for Scrollbars not clickable on overflow #552 */ }
+  -webkit-animation: formio-dialog-fadein .5s;
+  animation: formio-dialog-fadein .5s; }
 
-.formio-dialog.formio-dialog-disabled-animation,
-.formio-dialog.formio-dialog-disabled-animation .formio-dialog-overlay,
-.formio-dialog.formio-dialog-disabled-animation .formio-dialog-content {
+.formio-dialog.formio-dialog-disabled-animation, .formio-dialog.formio-dialog-disabled-animation .formio-dialog-content, .formio-dialog.formio-dialog-disabled-animation .formio-dialog-overlay {
   -webkit-animation: none !important;
   animation: none !important; }
 
@@ -3568,40 +3421,37 @@ td > .form-group {
   bottom: 0;
   left: 0;
   -webkit-backface-visibility: hidden;
-  -webkit-animation: formio-dialog-fadein 0.5s;
-  animation: formio-dialog-fadein 0.5s;
-  /* fix for Scrollbars not clickable on overflow #552 */
+  -webkit-animation: formio-dialog-fadein .5s;
+  animation: formio-dialog-fadein .5s;
   margin-right: 15px;
-  background: transparent;
-  /* end fix for Scrollbars not clickable on overflow #552 */ }
+  background: 0 0; }
 
 .formio-dialog-no-overlay {
   pointer-events: none; }
 
 .formio-dialog.formio-dialog-closing .formio-dialog-overlay {
   -webkit-backface-visibility: hidden;
-  -webkit-animation: formio-dialog-fadeout 0.5s;
-  animation: formio-dialog-fadeout 0.5s; }
+  -webkit-animation: formio-dialog-fadeout .5s;
+  animation: formio-dialog-fadeout .5s; }
 
 .formio-dialog-content {
-  background: white;
+  background: #fff;
   -webkit-backface-visibility: hidden;
-  -webkit-animation: formio-dialog-fadein 0.5s;
-  animation: formio-dialog-fadein 0.5s;
+  -webkit-animation: formio-dialog-fadein .5s;
+  animation: formio-dialog-fadein .5s;
   pointer-events: all; }
 
 .formio-dialog.formio-dialog-closing .formio-dialog-content {
   -webkit-backface-visibility: hidden;
-  -webkit-animation: formio-dialog-fadeout 0.5s;
-  animation: formio-dialog-fadeout 0.5s; }
+  -webkit-animation: formio-dialog-fadeout .5s;
+  animation: formio-dialog-fadeout .5s; }
 
 .formio-dialog-close:before {
-  font-family: 'Helvetica', Arial, sans-serif;
+  font-family: Helvetica,Arial,sans-serif;
   content: '\D7';
   cursor: pointer; }
 
-html.formio-dialog-open,
-body.formio-dialog-open {
+body.formio-dialog-open, html.formio-dialog-open {
   overflow: hidden; }
 
 @-webkit-keyframes formio-dialog-flyin {
@@ -3657,7 +3507,7 @@ body.formio-dialog-open {
   animation: formio-dialog-flyin .5s;
   background: #f0f0f0;
   border-radius: 5px;
-  font-family: 'Helvetica',sans-serif;
+  font-family: Helvetica,sans-serif;
   font-size: 1.1em;
   line-height: 1.5em;
   margin: 0 auto;
@@ -3668,7 +3518,7 @@ body.formio-dialog-open {
 
 .formio-dialog.formio-dialog-theme-default .formio-dialog-close {
   border: none;
-  background: transparent;
+  background: 0 0;
   cursor: pointer;
   position: absolute;
   right: 0;
@@ -3683,7 +3533,7 @@ body.formio-dialog-open {
 .formio-dialog.formio-dialog-theme-default .formio-dialog-close:before {
   display: block;
   padding: 3px;
-  background: transparent;
+  background: 0 0;
   color: #bbb;
   content: '\D7';
   font-size: 26px;
@@ -3691,8 +3541,7 @@ body.formio-dialog-open {
   line-height: 26px;
   text-align: center; }
 
-.formio-dialog.formio-dialog-theme-default .formio-dialog-close:hover:before,
-.formio-dialog.formio-dialog-theme-default .formio-dialog-close:active:before {
+.formio-dialog.formio-dialog-theme-default .formio-dialog-close:active:before, .formio-dialog.formio-dialog-theme-default .formio-dialog-close:hover:before {
   color: #777; }
 
 .formio-dialog.formio-dialog-theme-default .formio-dialog-message {
@@ -3701,11 +3550,7 @@ body.formio-dialog-open {
 .formio-dialog.formio-dialog-theme-default .formio-dialog-input {
   margin-bottom: 1em; }
 
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input textarea,
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="text"],
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="password"],
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="email"],
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="url"] {
+.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=email], .formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=password], .formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=text], .formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=url], .formio-dialog.formio-dialog-theme-default .formio-dialog-input textarea {
   background: #fff;
   border: 0;
   border-radius: 3px;
@@ -3717,14 +3562,10 @@ body.formio-dialog-open {
   padding: .25em .67em;
   width: 100%; }
 
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input textarea:focus,
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="text"]:focus,
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="password"]:focus,
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="email"]:focus,
-.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type="url"]:focus {
+.formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=email]:focus, .formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=password]:focus, .formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=text]:focus, .formio-dialog.formio-dialog-theme-default .formio-dialog-input input[type=url]:focus, .formio-dialog.formio-dialog-theme-default .formio-dialog-input textarea:focus {
   -webkit-box-shadow: inset 0 0 0 2px #8dbdf1;
   box-shadow: inset 0 0 0 2px #8dbdf1;
-  outline: none; }
+  outline: 0; }
 
 .formio-dialog.formio-dialog-theme-default .formio-dialog-buttons {
   *zoom: 1; }
@@ -3750,7 +3591,7 @@ body.formio-dialog-open {
 .formio-dialog.formio-dialog-theme-default .formio-dialog-button:focus {
   -webkit-animation: formio-dialog-pulse 1.1s infinite;
   animation: formio-dialog-pulse 1.1s infinite;
-  outline: none; }
+  outline: 0; }
 
 @media (max-width: 568px) {
   .formio-dialog.formio-dialog-theme-default .formio-dialog-button:focus {
@@ -3786,18 +3627,17 @@ body.formio-dialog-open {
 .tooltip {
   opacity: 1; }
 
-.tooltip[x-placement="right"] .tooltip-arrow {
-  border-right: 5px solid black; }
+.tooltip[x-placement=right] .tooltip-arrow {
+  border-right: 5px solid #000; }
 
-.tooltip[x-placement="right"] .tooltip-inner {
+.tooltip[x-placement=right] .tooltip-inner {
   margin-left: 8px; }
 
 .control-label--bottom {
   margin-bottom: 0;
   margin-top: 5px; }
 
-.checkbox-inline label,
-.radio-inline label {
+.checkbox-inline label, .radio-inline label {
   font-weight: 400;
   cursor: pointer; }
 
@@ -3812,6 +3652,18 @@ body.formio-dialog-open {
 
 .formio-choices.form-group {
   margin-bottom: 0; }
+
+.form-control.formio-multiple-mask-select {
+  width: 70px;
+  z-index: 4; }
+
+.form-control.formio-multiple-mask-input {
+  width: 100%;
+  margin-left: -70px;
+  padding-left: 80px; }
+
+.input-group.formio-multiple-mask-container {
+  width: 100%; }
 
 .formio-component .table {
   margin-bottom: 0; }
@@ -3844,23 +3696,23 @@ body.formio-dialog-open {
   z-index: 1001;
   margin: 4px 4px 0 0;
   z-index: 1001;
-  -webkit-box-shadow: 0px 0px 10px 1px rgba(48, 113, 169, 0.6);
-  box-shadow: 0px 0px 10px 1px rgba(48, 113, 169, 0.6); }
+  -webkit-box-shadow: 0 0 10px 1px rgba(48, 113, 169, 0.6);
+  box-shadow: 0 0 10px 1px rgba(48, 113, 169, 0.6); }
 
-.formbuilder .formio-component-hidden, .formbuilder .formio-component-form {
+.formbuilder .formio-component-form, .formbuilder .formio-component-hidden {
   border: 2px dashed #ddd; }
 
 .formbuilder .formio-component-hidden {
   height: 3em;
   text-align: center;
   color: #aaa;
-  padding-top: 0.5em; }
+  padding-top: .5em; }
 
 .formbuilder .row.formio-component-columns {
   margin-left: 0;
   margin-right: 0; }
 
-.btn-xxs, .btn-group-xxs > .btn, .component-btn-group .component-settings-button {
+.btn-group-xxs > .btn, .btn-xxs, .component-btn-group .component-settings-button {
   padding: 2px 2px;
   font-size: 10px;
   line-height: 1.2em;
