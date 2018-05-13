@@ -61307,10 +61307,6 @@ var SignatureComponent = function (_BaseComponent) {
     value: function build() {
       var _this2 = this;
 
-      if (this.viewOnly) {
-        return this.viewOnlyBuild();
-      }
-
       this.element = this.createElement();
       this.element.component = this;
       var classNames = this.element.getAttribute('class');
@@ -61396,7 +61392,8 @@ var SignatureComponent = function (_BaseComponent) {
       // Restore values.
       this.restoreValue();
 
-      if (this.shouldDisable) {
+      // disable the signature pad if the form in ViewOnly mode
+      if (this.shouldDisable || this.viewOnly) {
         this.disabled = true;
       }
 
@@ -71090,7 +71087,16 @@ var FileComponent = function (_BaseComponent) {
       }
       fileService.downloadFile(fileInfo).then(function (file) {
         if (file) {
-          window.open(file.url, '_blank');
+          if (file.storage === 'base64') {
+            // this is a workaround to render base64 files in Chrome. Still not working on IE/Edge
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:' + file.type + ';base64,' + encodeURI(file.data);
+            hiddenElement.target = '_blank';
+            hiddenElement.download = file.originalName;
+            hiddenElement.click();
+          } else {
+            window.open(file.url, '_blank');
+          }
         }
       }).catch(function (response) {
         // Is alert the best way to do this?
@@ -71123,7 +71129,13 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'fileService',
     get: function get() {
-      return this.options.fileService || this.options.formio;
+      if (this.options.fileService) {
+        return this.options.fileService;
+      }
+      if (this.options.formio) {
+        return this.options.formio;
+      }
+      return new Formio();
     }
   }]);
 
