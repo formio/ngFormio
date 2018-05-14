@@ -108,6 +108,7 @@ app.controller('ProjectCreateController', [
   'Formio',
   'FormioProject',
   'ProjectFrameworks',
+  'ngDialog',
   function(
     $scope,
     $rootScope,
@@ -115,7 +116,8 @@ app.controller('ProjectCreateController', [
     FormioAlerts,
     Formio,
     FormioProject,
-    ProjectFrameworks
+    ProjectFrameworks,
+    ngDialog
   ) {
     $rootScope.noBreadcrumb = false;
     $scope.isBusy = false;
@@ -180,6 +182,7 @@ app.controller('ProjectCreateController', [
         // Reset tour and go directly to it.
         localStorage.removeItem('stepFlowCurrentParentStep');
         localStorage.removeItem('stepFlowCurrentChildStep');
+        ngDialog.close();
         $state.go('project.tour', {projectId: project._id});
       });
     };
