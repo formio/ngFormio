@@ -402,10 +402,8 @@ module.exports = function (config) {
   this.enterTextInField = function (field, text) {
     text=replacements(text);
     it('I enter ' + text + ' in ' + field + ' field', function (done) {
-      //console.log(text);
-      //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
-      var ele = element(by.css(field));
-      //console.log(ele);
+      var ele = field.startsWith("xpath:") ? element(by.xpath(field.substring(field.indexOf(':') + 1))) : element(by.css(field));
+      //var ele = element(by.css(field));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -937,6 +935,21 @@ module.exports = function (config) {
       });
     });
   };
+  this.iSeeValueInIndex = function (field,index, text) {
+    text = replacements(text.toString());
+    it('I see text ' + text + ' in ' + field, function (next) {
+      var ele1 = field.startsWith("xpath:") ? element.all(by.xpath(field.substring(field.indexOf(':') + 1))).get(index) : element.all(by.css(field)).get(index);
+      browser.wait(function () {
+        return ele1.isPresent();
+      }, timeout).then(function () {
+        ele1.getAttribute('value').then(function (value) {
+          config.expect(value === text);
+          next();
+        })
+          .catch(next);
+      });
+    });
+  };
 
   this.checkIfLoggedOut = function () {
     it('I am logged Out', function (next) {
@@ -1102,11 +1115,11 @@ module.exports = function (config) {
 
   this.dragTo = function (field, dropZone) {
     it("Drag " + field + " to " + dropZone, function(next) {
-      const ele = element(by.xpath('//span[@title="' + field + '"]'));
+      const ele = element(by.xpath('//span[@id="' + field + '"]'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
-        const drop = element(by.xpath('//*[contains(@class, "' + dropZone + '")]//ul[contains(@class, "component-list")]'));
+        const drop = element(by.xpath('//*[contains(@class, "' + dropZone + '")]'));
         browser.executeScript(dragAndDrop, ele, drop, 0, 0)
           .then(next);
       });
@@ -1445,7 +1458,8 @@ module.exports = function (config) {
   this.enterTextInFieldIndex = function (field,index, text) {
     it('I enter ' + text + ' in ' + field + ' field', function (next) {
       text = replacements(text.toString());
-      var ele = element.all(by.css(field)).get(index);
+      var ele = field.startsWith("xpath:") ? element.all(by.xpath(field.substring(field.indexOf(':') + 1))).get(index) : element.all(by.css(field)).get(index);
+      //var ele = element.all(by.css(field)).get(index);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {

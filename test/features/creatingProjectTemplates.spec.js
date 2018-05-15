@@ -11,8 +11,7 @@ module.exports = function (actions) {
         actions.enterTextInField('#title', framework);
         actions.enterTextInField('#description', 'This is first ' + framework);
         actions.clickOnElementWithText(' Create Project');
-        actions.iSeeText('New Project created!');
-        // actions.clickOnClass('.toast-message');
+        actions.clickOnClass('.toast-message');
         actions.clickOnElement('.fa-home');
         actions.checkingUrlIamOn('#/');
         actions.iSeeText('This is first ' + framework);
@@ -31,8 +30,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#title', 'Test Project');
       actions.enterTextInField('#description', 'Test Description');
       actions.clickOnElementWithText(' Create Project');
-      actions.iSeeText('New Project created!');
-      // actions.clickOnClass('.toast-message');
+      actions.clickOnClass('.toast-message');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Test Project');
@@ -41,7 +39,6 @@ module.exports = function (actions) {
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', 'Test Project');
       actions.iSeeValueIn('#description', 'Test Description');
-
     });
     describe('Editing Project Title and Description', function () {
       actions.enterTextInField('#title','Updated Title');
@@ -49,6 +46,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('AngularJS');
       actions.clickOnElementWithText('React.js');
       actions.clickOnButton(' Save Project');
+      actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
       actions.iSeeText(' React.js ');
       actions.clickOnClass('.fa.fa-cog');
