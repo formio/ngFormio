@@ -10,25 +10,33 @@ module.exports = function(app) {
         template: 'formio/components/panel.html',
         group: 'layout',
         settings: {
+          clearOnHide: false,
           key: 'panel',
           input: false,
           title: '',
           theme: 'default',
           tableView: false,
+          hideLabel: true,
           components: []
         },
         viewTemplate: 'formio/componentsView/panel.html',
-        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+        tableView: function(data, options) {
           var view = '<table class="table table-striped table-bordered table-child">';
 
-          if (!tableChild) {
+          if (!options.tableChild) {
             view += '<thead><tr>';
-            view += '<th>Panel (' + component.key + ')</th>';
+            view += '<th>Panel (' + options.component.key + ')</th>';
             view += '</tr></thead>';
           }
           view += '<tbody>';
-          angular.forEach(component.components, function(component) {
-            view += '<tr>' + GridUtils.columnForComponent(data, component, $interpolate, componentInfo, true) + '</tr>';
+          angular.forEach(options.component.components, function(component) {
+            view += '<tr>' + GridUtils.columnForComponent(data, {
+              component: component,
+              $interpolate: options.$interpolate,
+              componentInfo: options.componentInfo,
+              tableChild: true,
+              util: options.util
+            }) + '</tr>';
           });
 
           view += '</tbody></table>';

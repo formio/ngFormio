@@ -4,8 +4,559 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.33.0
 ### Added
+ - Save as State action to button component
+ - Ability to skip validation if state is draft
+ - Delete action to button component
+
+### Fixed
+ - Validation inside DataGrid.
+ - Validation for EditGrid.
+ - Handling of unique validation.
+ - Datagrid add button not appearing after maximum rows setting removed
+
+### Reverted
+ - Collapsible fieldsets and panels. This was causing issues with validation and will be in 3.x branch only.
+
+### Changed
+ - Update formio.js version to v2.32.0
+
+## 2.32.1
+### Changed
+ - Increased formio.js version to fix issue with throwing errors.
+
+## 2.32.0
+### Changed
+ - Update submitForm promise handler to be more compatible with other promise libraries.
+
+### Added
+ - Possibility to hide body for Panel and FieldSet.
+ - `getView(component, data)` option for EditGrid body template.
+ - Add data as a variable to editgrid row template.
+ - Add custom validator logic to datagrid.
+
+### Fixed
+ - Components validation inside layout.
+ - Interpolation inside EditGrid.
+ - Select component with multiple values and default value.
+ - Front-end indication on unique validation.
+ - Autofocus feature.
+ - Components navigation using `Tab`.
+ - Select, Address, Resource Disable
+
+## 2.31.2
+### Fixed
+ - Issues with nested form validations.
+
+## 2.31.1
+### Fixed
+ - Validation of nested forms.
+ - Nested form table view.
+ - Spell check for WYSIWYG.
+
+### Changed
+ - Removed uiSelectOpenOnFocus directive.
+
+### Added
+ - Adding "data" variable exposed to EditGrid templates.
+ - Table view for File component.
+
+## 2.31.0
+### Fixed
+ - Fixed default value for Number component.
+ - Table view of Number and Currency components.
+ - Fix issue where editgrid and datagrid don't update when external data is changed.
+ - Removed double loadForm() method from form components.
+ - Fix oauth button crashing when settings aren't set.
+
+### Added
+ - Ability to specify decimalLimit on currency and number (including 0 for integer)
+ - Ability to require decimals
+ - Ability to override decimalSeparator and delimiter per language in options.
+
+### Changed
+ - Preserve original file name and display it if available.
+ - Upgrade formio.js to 2.30.0
+
+## 2.30.2
+### Changed
+ - Upgraded text-mask-addons@3.7.2, moment@2.21.0, formiojs@2.29.11
+
+### Fixed
+ - Removed deprecated setAppUrl.
+ - Problems where hideLabel is not set for other layout components.
+
+## 2.30.1
+### Fixed
+ - Problems where DataGrid would not show labels of input elements in columns.
+
+## 2.30.0
+### Changed
+ - Changed component ID's to not use the component key, but rather formio-{{ component.type }}-{{ component.key }}
+   in order to keep application style collisions to a minimum.
+
+## 2.29.6
+### Fixed
+ - Fixed the label positions for left and right.
+
+### Changed
+ - The provided ID for content components so that it does not collide with page components.
+
+## 2.29.5
+### Added
+ - Default label for HTML component and hide label.
+
+## 2.29.4
+### Fixed
+ - Ensure that autofocus is set to false for text areas.
+
+## 2.29.3
+### Changed
+ - The default labels and keys to be something more practical.
+
+## 2.29.2
+### Fixed
+ - How labels are shown (or not) within the DataGrid.
+
+## 2.29.1
+### Fixed
+ - Issue where if a component shows its label in a datagrid, it would also show up in the header. That is redundant.
+
+## 2.29.0
+### Changed
+ - The datagrid to use thead for header and tbody for content.
+ - Upgraded formiojs@2.29.6, bootstrap-ui-datetime-picker@2.6.1, eslint@4.18.1, browserify@16.1.0
+
+### Fixed
+ - Many issues with labels and hide label.
+
+## 2.28.6
+### Changed
+ - Upgraded formio.js to 2.29.3
+
+## 2.28.5
+### Fixed
+ - Currency component to default with delimiter set.
+ - Components with input mask when they have multiple values.
+
+### Added
+ - OAuth initiated logins.
+
+## 2.28.4
+### Added
+ - Emit of 'formError' event on next page for Wizard.
+
+### Fixed
+ - Search Filter setting not working correctly for Select Component with Raw JSON Data Source Type
+ - Arrow keys in Day component.
+ - Formio library to use the "default" export of formiojs.
+ - Issue with subform submissions not loading due to check for empty data.
+
+### Changed
+ - Upgraded formiojs to latest version.
+
+## 2.28.3
+### Added
+ - 'delimiter' property for Number component.
+ -  scope variable to custom buttons
+
+### Fixed
+ - Error messages in console for Survey and EditGrid components.
+ - Prevent WYSIWYG settings from merging unintentionally
+
+## 2.28.2
+### Fixed
+ - Issue with the logic around the Checkbox hidelabel setting.
+ - Problem with ngModel dependency on buttons.
+ - Fix issue where old values stayed in option for "clearOnRefresh"
+
+## 2.28.1
+### Changed
+ - The logic to the button to use new Function instead of eval.
+
+### Added
+ - The _merge method from lodash to be accessible to the custom action on Buttons.
+
+## 2.28.0
+### Changed
+ - Upgrade formiojs to 2.27.0
+
+### Added
+ - Need to introduce a new "action" for buttons that will allow you to provide your own url, where it submits the data to that url. Add on submit button and optional URL to post the data to the url
+ - Need to include in the submission which button was pressed
+ - Autofocus configuration for fields.
+ - Way to disable spellcheck of wysiwyg.
+
+### Fixed
+ - Issue when pressing tab key the data in select persist
+ - Fix datagrids improperly slicing when maxlength set.
+
+## 2.27.5
+### Fixed
+ - Problem where "_" is undefined for number and currency components.
+
+## 2.27.4
+### Changed
+ - Upgrade formiojs to latest to fix inputMask issue.
+
+## 2.27.3
+### Added
+ - Mask validator for Phone Number.
+
+### Fixed
+ - Default value for component with input mask.
+
+## 2.27.2
+### Fixed
+ - Issue with the file upload component where it would not show errors.
+ - Issue with file upload in read-only allowing you to delete files from the grid.
+
+### Changed
+ - Upgraded formio.js to 2.27.6
+
+### Added
+ - Datagrid's add another position logic
+
+## 2.27.1
+### Fixed
+ - Issue where when files are removed, required validation no longer works correctly.
+
+### Changed
+ - Upgraded formiojs to 2.27.3 to fix checkCalculated issue.
+
+## 2.27.0
+### Chagned
+ - Upgraded formiojs dependency.
+ - Changed the clearOnHide option for forms to true.
+
+## 2.26.5
+### Added
+ - Confirmation to cancel a wizard.
+
+### Fixed
+ - Bugfix/button disable
+
+### Changed
+ - Upgraded formiojs to version 2.25.8
+ - Show mask by default on masked fields.
+
+## 2.26.4
+### Fixed
+ - Other regressions with the disabled submit buttons.
+
+## 2.26.3
+### Fixed
+ - Issue with disableOnInvalid flag with pristine forms.
+
+## 2.26.2
+### Fixed
+ - Problems with the disableOnInvalid flag not working with buttons.
+
+## 2.26.1
+### Fixed
+ - Fix nesting forms multiple levvels deep
+ - ng-disabled dynamic update issue
+ - Fix number, currency, and time components issues with new input mask
+
+## 2.26.0
+### Changed
+ - Replaced the ui-mask library and replaced with the core renderer masking system.
+
+## 2.25.9
+### Fixed
+ - Issue with getDownloadUrl by upgrading formio.js
+
+## 2.25.8
+### Fixed
+ - Reverted https://github.com/formio/ngFormio/commit/d7bf526a6d581680d156561972821b63ce65a4b5 which was breaking Select components to resources.
+ - Datagrid not rendering properly in submission view.
+
+### Added
+ - Proper check of Select component project configuration to add /project if it is a mongoId.
+
+## 2.25.7
+### Fixed
+ - Problem with select dropdowns loading within a nested form.
+
+### Added
+ - Possibility to include 'owner' property in submission.
+
+## 2.25.6
+### Fixed
+ - Issue where the Number component with multiple checked would not render form correctly.
+
+## 2.25.5
+### Removed
+ - The multiple flag from editgrid component since it is not needed.
+
+## 2.25.4
+### Changed
+ - Upgraded dependencies.
+
+## 2.25.3
+### Fixed
+ - Issue with loading submissions in a form without revisions enabled. (Upgrade formio.js to 2.24.2)
+
+## 2.25.2
+### Fixed
+ - Fixed error message on EditGrid row save.
+ - Select resource not properly instanciating with base URL.
+### Added
+ - Possibility to use moment APIs to set min/max date for DateTime component.
+ - Alerts to PDF.
+### Changed
+ - Min/Max date for DateTime component doesn't transform to UTC.
+ - Load submissions before forms so form versions can be found from submissions.
+
+## 2.25.1
+### Fixed
+ - Issue where the label placement was getting messed up on form builder views.
+
+## 2.25.0
+### Added
+ - Min and Max size options for file uploads.
+ - Possibility to specify label position for component and for options for Checkboxes and Radio components.
+ - Possibility to add shortcuts.
+ - Display custom validation error message.
+
+### Fixed
+ - Issue with navigating backward with wizards and validating the current page.
+
+## 2.24.2
+### Fixed
+ - Removed the css for overflow on formio forms.
+
+## 2.24.1
+### Fixed
+ - Scroll bars for form appearing every time.
+ - Fix ensure value on select component when it is a multiple field.
+ - Issue with validation not working with selectboxes. Also how form is submitted.
+ - Fixed Wizard Progress Bar on Mobile
+
+## 2.24.0
+### Changed
+ - Upgraded all dependencies.
+
+### Fixed
+ - Make sure to always show labels within a form builder.
+
+## 2.23.12
+### Fixed
+ - Empty disabled signature component.
+ - Editing nested forms mapped to another resource with save as another resource returns 404.
+ - Min and max date for Datetime component.
+ - Issues with using the renderer without Lodash installed globally.
+
+## 2.23.10
+### Fixed
+ - The tooltip to be below the input controls for multiple inputs.
+
+### Changed
+ - Upgrade formio.js to 2.19.2
+
+### Added
+ - Tooltip for button component.
+
+## 2.23.9
+### Fixed
+ - Wizard refresh losing data
+ - Field descriptions not translatable.
+
+## 2.23.8
+### Fixed
+ - Fix typo on-click should be ng-click for Edit Grid
+ - Fixed an issue with multi-form workflows where next page would not execute.
+ - Fixed multi-line tooltips.
+
+### Added
+ - Add tooltip for resource component with Add button checked
+
+## 2.23.7
+### Changed
+ - Make formioTranslate filter stateful
+ - Upgrade angular-moment to 1.1.0
+
+### Fixed
+ - The form component to pass along the form options and readOnly states.
+
+## 2.23.6
+### Changed
+ - Pass along the building flag through the options.
+
+## 2.23.5
+### Added
+ - Mask textfields if input should be hidden.
+ - Tooltips to components
+
+### Fixed
+ - Issue where the form component would not refresh when new submission data was presented.
+
+## 2.23.4
+### Fixed
+ - Columns show logic in formio-submission directive.
+
+## 2.23.3
+### Fixed
+ - Issue where the button error would show up if they did not click the button.
+ - Misspelling in one of the templates.
+
+## 2.23.2
+### Fixed
+ - Issue where the urls for the Resource and Select options could get in bad state.
+
+## 2.23.1
+### Fixed
+ - Issue with the form component for certain option configurations.
+
+## 2.23.0
+### Added
+ - EditGrid component
+
+## 2.22.6
+### Fixed
+ - Form component
+
+### Added
+ - Validation feedback on the submit button for a form with errors.
+
+## 2.22.5
+### Fixed
+ - Default values for multi value fields no longer defaulted to have one field already open.
+
+## 2.22.4
+### Fixed
+ - Submission handler crashes if no save submission action on form.
+
+## 2.22.3
+### Fixed
+ - Re-enable fix for select component.
+
+## 2.22.2
+### Fixed
+ - TextArea component in FormioSubmission directive.
+ - Clearing value of the component which conditionally displayed from a Select component.
+
+## 2.22.1
+### Changed
+ - Upgraded formio.js to 2.16.0
+
+## 2.22.0
+### Fixed
+ - Fix submission message on update.
+
+### Changed
+ - Default phone number fields to have input type of "tel"
+ - Upgraded formio.js to 2.16.0 to add cookie fallback in old browsers.
+
+## 2.21.5
+### Changed
+ - Upgraded formio.js to 2.15.2
+
+## 2.21.3
+### Fixed
+ - The download url for pdf to use the core javascript library.
+ - Fixed crash in FormioUtils each error handling assigning property to a string
+ - Search and filter for Select component.
+
+## 2.21.2
+### Fixed
+ - Issues with number/floats not parsing correctly.
+ - The PDF download button to hit the correct api.
+
+### Added
+ - Support submission of form components which are not in wizard panels
+ - Submit subforms on the page when wizard's Previous button is clicked
+
+## 2.21.1
+### Added
+ - Error labels to show when an error has occured.
+
+### Fixed
+ - Errors with required file uploads.
+ - The file upload not showing the error messages.
+ - File uploads not working within wizards that pass the url to the directive.
+ - Issue with clearOnHide flag not setting properly on container components.
+
+## 2.20.18
+### Changed
+ - Upgraded formio.js to 2.13.2
+
+## 2.20.17
+### Fixed
+ - Some select urls were being double encoded.
+
+## 2.20.16
+### Changed
+ - Upgraded all dependencies.
+
+## 2.20.15
+### Fixed
+ - An issue where the Signature component would send an undefined URL request.
+ - Issue where FormioUtils.hasCondition was not defined for wizard forms.
+
+## 2.20.14
+### Added
+ - A way to change the submit message with a form json configuration.
+
+### Changed
+ - Upgrade formiojs to 2.13.1
+
+### Fixed
+ - Issue with custom code execution for buttons within other components.
+
+## 2.20.13
+
+### Fixed
+ - Problem where if you would change the source of Select to resource it would crash the preview.
+ - Issue where checkbox validation errors would not highlight the checkbox field.
+ - An issue where JSON Logic conditionals were not getting triggered for multi-page forms.
+
+## 2.20.12
+## 2.20.11
+## 2.20.10
+## 2.20.9
+## 2.20.8
+
+ - No release to synchronize versions with form builder library.
+
+## 2.20.7
+## 2.20.6
+## 2.20.5
+
+### Fixed
+ - Columns components hiding if width is not set.
+ - Hide form alert on valid form.
+ - Fixed issue with required file uploads not enforcing a file upload.
+ - Display issue for the survey component.
+ - Removed the $hashKey from the form submission.
+
+### Added
+ - Custom javascript logic to execute on button click.
+ - Take initial values for resource component search from URL
+ - Emit events on File component upload success or failure
+
+## 2.20.4
+### Fixed
+ - An error that would show up if $scope.options was not defined.
+
+## 2.20.3
+### Fixed
+ - The submission view for text area with wysiwyg.
+
+## 2.20.2
+--- SAME AS 2.19.7: Released to sync with form builder library. ---
+
+## 2.19.7
+### Fixed
+ - Day component.
+ - Dependencies for the wysiwyg component.
+ - Issue where a reset form would not set the form to pristine again.
+ - Fixed the readOnly display of wysiwyg text areas to show the html content.
+
+## 2.19.6
+### Added
+ - Allow passing in a baseUrl for forms on a different path.
  - Time component.
 
 ## 2.19.5
@@ -53,7 +604,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.18.5
 ### Added
  - Add headers to Select Urls if specified.
- 
+
 ### Fixed
  - Fields inside a panel inside a wizard didn't highlight properly if validation failed.
  - Survey components didn't hightlight validations properly.
@@ -67,13 +618,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Changed Object.assign to lodash assign for compatibility.
 
-## 2.18.2 
+## 2.18.2
 ### Added
  -  Allow interpolation of file directories for uploads.
 
 ### Changed
  - Select resource components use Formio provider instead of $http.get to allow offline compatibility.
- 
+
 ### Fixed
  - Fixed false value for checkbox.
 
@@ -85,7 +636,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 2.18.0
 ### Fixed
  - An empty array was being appended to select data values when editing fields.
-  
+
 ### Added
  - Ability to specify width, offset, push and pull on columns.
 
@@ -121,7 +672,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade formio.js to 2.7.3
  - Changed the jsonLogic to use both row and data for logic.
  - No longer use "jsonConditionals" in favor of "conditions.json" property.
- 
+
 ## Removed
  - jsonLogic from conditionals since that is now handled within the formio.js library.
 

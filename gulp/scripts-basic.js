@@ -14,7 +14,7 @@ module.exports = function(gulp, plugins, bundle) {
       .pipe(plugins.derequire())
       .pipe(gulp.dest('dist/'))
       .pipe(plugins.rename('formio.min.js'))
-      .pipe(plugins.streamify(plugins.uglify({preserveComments: 'license'})))
+      .pipe(plugins.streamify(plugins.uglify({output: {comments: '/^!/'}})))
       .pipe(gulp.dest('dist/'))
       .on('error', function(err){
         console.log(err);

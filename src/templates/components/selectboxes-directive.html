@@ -1,18 +1,22 @@
 <div class="select-boxes">
   <div ng-class="component.inline ? 'checkbox-inline' : 'checkbox'" ng-repeat="v in component.values track by $index">
-    <label class="control-label" for="{{ componentId }}-{{ v.value }}">
+    <label class="control-label" for="{{ componentId }}-{{ v.value }}" id="{{ componentId+'-'+v.value +'Label'}}" ng-style="getOptionLabelStyles(component)">
+      <span ng-if="topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building }}</span>
       <input type="checkbox"
         id="{{ componentId }}-{{ v.value }}"
         name="{{ componentId }}-{{ v.value }}"
         value="{{ v.value }}"
         tabindex="{{ component.tabindex || 0 }}"
         ng-disabled="readOnly"
+        auto-focus="{{ $first }}"
         ng-click="toggleCheckbox(v.value)"
         ng-checked="model[v.value]"
+         aria-labelledby="{{ componentId+'-'+v.value +'Label'}}"
         grid-row="gridRow"
         grid-col="gridCol"
+        ng-style="getOptionInputStyles(component)"
       >
-      {{ v.label | formioTranslate:null:builder }}
+      <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>
     </label>
   </div>
 </div>

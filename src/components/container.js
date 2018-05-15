@@ -11,20 +11,26 @@ module.exports = function(app) {
         viewTemplate: 'formio/componentsView/container.html',
         group: 'advanced',
         icon: 'fa fa-folder-open',
-        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+        tableView: function(data, options) {
           var view = '<table class="table table-striped table-bordered table-child">';
 
-          if (!tableChild) {
+          if (!options.tableChild) {
             view += '<thead><tr>';
-            view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            view += '<th>' + (options.component.label || '') + ' (' + options.component.key + ')</th>';
             view += '</tr></thead>';
           }
 
           view += '<tbody>';
 
           // Render a value for each column item.
-          angular.forEach(component.components, function(component) {
-            view += '<tr>' + GridUtils.columnForComponent(data, component, $interpolate, componentInfo, true) + '</tr>';
+          angular.forEach(options.component.components, function(component) {
+            view += '<tr>' + GridUtils.columnForComponent(data, {
+              component: component,
+              $interpolate: options.$interpolate,
+              componentInfo: options.componentInfo,
+              tableChild: true,
+              util: options.util
+            }) + '</tr>';
           });
 
           view += '</tbody></table>';

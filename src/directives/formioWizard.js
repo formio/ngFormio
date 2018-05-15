@@ -1,5 +1,6 @@
-var isNaN = require('lodash/isNAN');
+var isNaN = require('lodash/isNaN');
 var isFinite = require('lodash/isFinite');
+var isEmpty = require('lodash/isEmpty');
 
 module.exports = function() {
   return {
@@ -16,6 +17,7 @@ module.exports = function() {
       hideComponents: '=?',
       disableComponents: '=?',
       formioOptions: '=?',
+      options: '=?',
       storage: '=?'
     },
     link: function(scope, element) {
@@ -67,6 +69,8 @@ module.exports = function() {
         $http,
         $timeout
       ) {
+        $scope.options = $scope.options || {};
+        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
@@ -113,12 +117,31 @@ module.exports = function() {
               $scope.clear();
             }
 
+            // Handle Local Storage Definition
             if ($scope.storage && !$scope.readOnly) {
-              localStorage.setItem($scope.storage, angular.toJson({
-                page: $scope.currentPage,
-                data: $scope.submission.data
-              }));
+              // If there is no localStorage object - make a new object schema
+              if (!localStorage.getItem($scope.storage)) {
+                localStorage.setItem($scope.storage, angular.toJson({
+                  page: $scope.currentPage,
+                  data: $scope.submission.data
+                }));
+              }
+
+              // if there is a localStorage object && submission.data is blank then bind localStorage to $scope
+              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
+                var storageToScope = JSON.parse(localStorage.getItem($scope.storage));
+                $scope.submission.data = storageToScope.data
+              }
+
+              // if there is a localStorage object | && it is data | merge the two
+              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
+                localStorage.setItem($scope.storage, angular.toJson({
+                  page: $scope.currentPage,
+                  data: $scope.submission.data
+                }));
+              }
             }
+
 
             $scope.page.components = $scope.pages[$scope.currentPage].components;
             $scope.activePage = $scope.pages[$scope.currentPage];
@@ -133,7 +156,7 @@ module.exports = function() {
         };
 
         if (!$scope.form && $scope.src) {
-          (new Formio($scope.src)).loadForm().then(function(form) {
+          (new Formio($scope.src, {base: $scope.baseUrl})).loadForm().then(function(form) {
             $scope.form = form;
             if (!$scope.wizardLoaded) {
               showPage();
@@ -334,14 +357,19 @@ module.exports = function() {
         };
 
         $scope.cancel = function() {
-          $scope.clear();
-          FormioUtils.alter('cancel', $scope, function(err) {
-            if (err) {
-              return this.showAlerts(err.alerts);
-            }
-            showPage(true);
-            $scope.$emit('cancel');
-          }.bind(this));
+          if(confirm('Are you sure you want to cancel?')){
+            $scope.clear();
+            FormioUtils.alter('cancel', $scope, function(err) {
+              if (err) {
+                return this.showAlerts(err.alerts);
+              }
+              showPage(true);
+              $scope.$emit('cancel');
+            }.bind(this));
+          }
+          else {
+            return;
+          }
         };
 
         $scope.pageHasErrors = {};
@@ -411,6 +439,7 @@ module.exports = function() {
         $scope.next = function() {
           var errors = $scope.checkErrors();
           if (errors) {
+            $scope.$emit('formError');
             $scope.pageHasErrors[$scope.currentPage] = true;
             if (!$scope.formioOptions.wizardFreeNavigation) {
               return;
@@ -442,6 +471,8 @@ module.exports = function() {
 
         // Move onto the previous page.
         $scope.prev = function() {
+          // var errors = $scope.checkErrors();
+          $scope.pageHasErrors[$scope.currentPage] = false;
           var prev = $scope.history.pop();
           $scope.currentPage = prev;
           FormioUtils.alter('prevPage', $scope, function(err) {
@@ -495,10 +526,7 @@ module.exports = function() {
               if (!$scope.hasTitles && component.title) {
                 $scope.hasTitles = true;
               }
-              if (component.customConditional) {
-                hasConditionalPages = true;
-              }
-              else if (component.conditional && component.conditional.when) {
+              if (FormioUtils.hasCondition(component)) {
                 hasConditionalPages = true;
               }
               // Make sure this page is not in the hide compoenents array.
@@ -515,7 +543,7 @@ module.exports = function() {
           });
 
           // FOR-71
-          if (!$scope.builder) {
+          if (!$scope.options.building) {
             $scope.$watch('submission.data', function(data) {
               if (hasConditionalPages) {
                 var newPages = [];
@@ -547,7 +575,7 @@ module.exports = function() {
         };
 
         // FOR-71
-        if (!$scope.builder) {
+        if (!$scope.options.building) {
           $scope.$watch('form', function(form) {
             if (
               $scope.src ||
@@ -560,7 +588,7 @@ module.exports = function() {
             }
             var formUrl = form.project ? '/project/' + form.project : '';
             formUrl += '/form/' + form._id;
-            $scope.formio = new Formio(formUrl);
+            $scope.formio = new Formio(formUrl, {base: $scope.baseUrl});
             setForm(form);
           });
         }
@@ -570,14 +598,14 @@ module.exports = function() {
 
         // Load the form.
         if ($scope.src) {
-          $scope.formio = new Formio($scope.src);
+          $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
           $scope.formio.loadForm().then(function(form) {
             setForm(form);
           });
         }
         else {
           $scope.src = '';
-          $scope.formio = new Formio($scope.src);
+          $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
         }
       }
     ]

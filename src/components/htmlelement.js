@@ -12,7 +12,7 @@ module.exports = function(app) {
         },
         templateUrl: 'formio/components/htmlelement-directive.html',
         link: function($scope) {
-          if ($scope.builder) return;
+          if ($scope.options && $scope.options.building) return;
           var displayError = function(msg) {
             $scope.parseError = 'Invalid HTML: ' + msg.toString();
           };
@@ -64,6 +64,8 @@ module.exports = function(app) {
         viewTemplate: 'formio/components/htmlelement.html',
         settings: {
           key: 'html',
+          label: 'Content',
+          hideLabel: true,
           input: false,
           tag: 'p',
           attrs: [],

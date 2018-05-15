@@ -1,64 +1,9 @@
 var fs = require('fs');
+var createNumberMask = require('text-mask-addons').createNumberMask;
+var _get = require('lodash/get');
+var _isNil = require('lodash/isNil');
 
 module.exports = function(app) {
-  app.directive('currencyInput', function() {
-    // May be better way than adding to prototype.
-    var splice = function(string, idx, rem, s) {
-      return (string.slice(0, idx) + s + string.slice(idx + Math.abs(rem)));
-    };
-    return {
-      restrict: 'A',
-      link: function(scope, element) {
-        if (scope.builder) return;
-        element.bind('keyup', function() {
-          var data = scope.data[scope.component.key];
-
-          //clearing left side zeros
-          while (data.charAt(0) === '0') {
-            data = data.substr(1);
-          }
-
-          data = data.replace(/[^\d.\',']/g, '');
-
-          var point = data.indexOf('.');
-          if (point >= 0) {
-            data = data.slice(0, point + 3);
-          }
-
-          var decimalSplit = data.split('.');
-          var intPart = decimalSplit[0];
-          var decPart = decimalSplit[1];
-
-          intPart = intPart.replace(/[^\d]/g, '');
-          if (intPart.length > 3) {
-            var intDiv = Math.floor(intPart.length / 3);
-            while (intDiv > 0) {
-              var lastComma = intPart.indexOf(',');
-              if (lastComma < 0) {
-                lastComma = intPart.length;
-              }
-
-              if (lastComma - 3 > 0) {
-                intPart = splice(intPart, lastComma - 3, 0, ',');
-              }
-              intDiv--;
-            }
-          }
-
-          if (decPart === undefined) {
-            decPart = '';
-          }
-          else {
-            decPart = '.' + decPart;
-          }
-          var res = intPart + decPart;
-          scope.$apply(function() {
-            scope.data[scope.component.key] = res;
-          });
-        });
-      }
-    };
-  });
   app.config([
     'formioComponentsProvider',
     function(formioComponentsProvider) {
@@ -66,13 +11,42 @@ module.exports = function(app) {
         title: 'Currency',
         template: 'formio/components/currency.html',
         group: 'advanced',
+        tableView: function(data, options) {
+          if (_isNil(data)) {
+            return '';
+          }
+
+          var separators = options.util.getNumberSeparators();
+          var component = options.component;
+          var decimalLimit = component.decimalLimit || 2;
+          var affixes = options.util.getCurrencyAffixes({
+            decimalSeparator: separators.decimalSeparator,
+            decimalLimit: decimalLimit,
+            currency: component.currency
+          });
+
+          if (!component.delimiter) {
+            separators.delimiter = '';
+          }
+
+          return options.util.formatNumber(data, createNumberMask({
+            prefix: affixes.prefix,
+            suffix: affixes.suffix,
+            thousandsSeparatorSymbol: _get(component, 'thousandsSeparator', separators.delimiter),
+            decimalSymbol: _get(component, 'decimalSymbol', separators.decimalSeparator),
+            decimalLimit: decimalLimit,
+            allowNegative: _get(component, 'allowNegative', true),
+            allowDecimal: _get(component, 'allowDecimal', true)
+          }));
+        },
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'text',
           inputMask: '',
-          label: '',
-          key: 'currencyField',
+          label: 'Currency',
+          key: 'currency',
           placeholder: '',
           prefix: '',
           suffix: '',
@@ -81,6 +55,9 @@ module.exports = function(app) {
           persistent: true,
           hidden: false,
           clearOnHide: true,
+          delimiter: true,
+          decimalLimit: 2,
+          requireDecimals: true,
           validate: {
             required: false,
             multiple: '',

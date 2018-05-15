@@ -9,12 +9,13 @@ module.exports = function(app) {
         template: 'formio/components/textfield.html',
         icon: 'fa fa-terminal',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'text',
           inputMask: '',
-          label: '',
-          key: 'textField',
+          label: 'Text',
+          key: 'text',
           placeholder: '',
           prefix: '',
           suffix: '',
@@ -25,6 +26,7 @@ module.exports = function(app) {
           persistent: true,
           hidden: false,
           clearOnHide: true,
+          spellcheck: true,
           validate: {
             required: false,
             minLength: '',

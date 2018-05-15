@@ -1,4 +1,4 @@
-{{data[component.key]}}<input
+<input
   time-format
   type="{{ component.inputType }}"
   class="form-control"
@@ -6,15 +6,13 @@
   name="{{ componentId }}"
   tabindex="{{ component.tabindex || 0 }}"
   ng-disabled="readOnly"
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   ng-model="data[component.key]"
   safe-multiple-to-single
+  auto-focus="true"
   ng-required="isRequired(component)"
-  ng-minlength="component.validate.minLength"
-  ng-maxlength="component.validate.maxLength"
   ng-pattern="component.validate.pattern"
   custom-validator="component.validate.custom"
-  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
-  ui-mask="{{ component.inputMask }}"
-  ui-mask-placeholder=""
-  ui-options="uiMaskOptions"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
 >

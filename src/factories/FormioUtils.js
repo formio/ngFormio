@@ -1,9 +1,18 @@
 var formioUtils = require('formiojs/utils');
+var conformToMask = require('vanilla-text-mask').conformToMask;
 var _filter = require('lodash/filter');
 var _get = require('lodash/get');
 
 module.exports = function() {
   var hooks = {};
+
+  function optionsLabelOnTheTopOrBottom(position) {
+    return [
+      'top',
+      'bottom'
+    ].indexOf(position) !== -1;
+  }
+
   return {
     // Asynchronously iterate through a map.
     each: function(items, each, done) {
@@ -15,6 +24,9 @@ module.exports = function() {
 
       (function next(err, previous) {
         if (err) {
+          if (typeof err === 'string') {
+            err = {alerts: {type: 'danger', message: '{"data": "' + err + '"}'}};
+          }
           err.item = previous;
           return done ? done(err) : null;
         }
@@ -99,7 +111,7 @@ module.exports = function() {
         }
 
         // If the value is an array then we are good.
-        if (data[component.key] instanceof Array) {
+        if (Array.isArray(data[component.key])) {
           return done(false);
         }
 
@@ -141,9 +153,8 @@ module.exports = function() {
         if (component.type === 'selectboxes') {
           return done(false);
         }
-
         // If there is a default value and it is not an array, wrap the value.
-        if (component.multiple && typeof component.defaultValue === 'string') {
+        if (component.multiple && component.type !== 'file' && typeof component.defaultValue === 'string') {
           value = component.defaultValue.split(',');
         }
         else {
@@ -198,7 +209,7 @@ module.exports = function() {
 
             component.data.values.forEach(function(item) {
               if (value.indexOf(item.value) !== -1) {
-                temp.push(item);
+                temp.push(item.value);
               }
             });
 
@@ -248,6 +259,21 @@ module.exports = function() {
             done(true);
           });
         }
+        // FOR-949 - Default value for componenets with input mask.
+        else if (component.inputMask) {
+          var inputMask = formioUtils.getInputMask(component.inputMask);
+          var self = this;
+          if (component.multiple) {
+            value = value.map(function(item) {
+              return self.verifyMaskedInput(item, inputMask);
+            });
+          }
+          else {
+            value = this.verifyMaskedInput(value, inputMask);
+          }
+          data[component.key] = value;
+          return done(true);
+        }
         else {
           if (!component.multiple) {
             data[component.key] = component.defaultValue;
@@ -255,7 +281,7 @@ module.exports = function() {
           }
 
           // If there is a default value and it is an array, assign it to the value.
-          if (component.defaultValue instanceof Array) {
+          if (Array.isArray(component.defaultValue)) {
             data[component.key] = component.defaultValue;
             return done(true);
           }
@@ -267,34 +293,26 @@ module.exports = function() {
       }
       /* eslint-enable max-depth */
     },
-    checkCalculated: function(component, submission, data) {
-      // Process calculated value stuff if present.
-      if (component.calculateValue) {
-        if (typeof component.calculateValue === 'string') {
-          try {
-            data[component.key] = eval('(function(data) { var value = [];' + component.calculateValue.toString() + '; return value; })(data)');
-          }
-          catch (e) {
-            /* eslint-disable no-console */
-            console.warn('An error occurred calculating a value for ' + component.key, e);
-            /* eslint-enable no-console */
-          }
-        }
-        else {
-          try {
-            data[component.key] = formioUtils.jsonLogic.apply(component.calculateValue, {
-              data: submission ? submission.data : data,
-              row: data
-            });
-          }
-          catch (e) {
-            /* eslint-disable no-console */
-            console.warn('An error occurred calculating a value for ' + component.key, e);
-            /* eslint-enable no-console */
-          }
-        }
+    verifyMaskedInput: function(input, mask) {
+      input = conformToMask(input, mask).conformedValue;
+      if (!formioUtils.matchInputMask(input, mask)) {
+        return '';
       }
+      return input;
     },
+    getNumberSeparators: formioUtils.getNumberSeparators,
+    getNumberDecimalLimit: formioUtils.getNumberDecimalLimit,
+    getCurrencyAffixes: formioUtils.getCurrencyAffixes,
+    formatNumber: function(number, mask) {
+      number = (number || 0).toString();
+      return conformToMask(number, mask(number).filter(function(item) {
+        return item !== '[]';
+      })).conformedValue;
+    },
+    parseFloat: formioUtils.parseFloat,
+    formatAsCurrency: formioUtils.formatAsCurrency,
+    checkCalculated: formioUtils.checkCalculated,
+    escapeRegExCharacters: formioUtils.escapeRegExCharacters,
     checkVisible: function(component, row, data) {
       var visible = formioUtils.checkCondition(component, row, data);
       if (!visible) {
@@ -323,6 +341,8 @@ module.exports = function() {
     getComponent: formioUtils.getComponent,
     getValue: formioUtils.getValue,
     jsonLogic: formioUtils.jsonLogic,
+    hasCondition: formioUtils.hasCondition,
+    getDateSetting: formioUtils.getDateSetting,
     hideFields: function(form, components) {
       this.eachComponent(form.components, function(component) {
         for (var i in components) {
@@ -349,44 +369,57 @@ module.exports = function() {
     },
     fieldWrap: function(input) {
       var multiInput = input.replace('data[component.key]', 'data[component.key][$index]');
-      var inputLabel = '<label ng-if="component.label && !component.hideLabel" for="{{ component.key }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}">{{ component.label | formioTranslate:null:builder }}</label>';
+      var inputTopLabel = '<label ng-if="labelVisible() && (component.labelPosition !== \'bottom\')" for="{{ component.key }}"  id="{{ component.key+\'Label\' }}" class="control-label" ng-class="{\'field-required\': isRequired(component)}" ng-style="getLabelStyles(component)">' +
+        '{{ component.label | formioTranslate:null:options.building }} ' +
+        '<formio-component-tooltip></formio-component-tooltip>' +
+        '</label>';
+      var inputBottomLabel = '<label ng-if="labelVisible() && (component.labelPosition === \'bottom\')" id="{{ component.key+\'Label\' }}" for="{{ component.key }}" class="control-label control-label--bottom" ng-class="{\'field-required\': isRequired(component)}">' +
+        '{{ component.label | formioTranslate:null:options.building }} ' +
+        '<formio-component-tooltip></formio-component-tooltip>' +
+        '</label>';
       var requiredInline = '<span ng-if="(component.hideLabel === true || component.label === \'\' || !component.label) && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>';
       var template =
         '<div ng-if="!component.multiple">' +
-          inputLabel +
-          '<div class="input-group">' +
+          inputTopLabel +
+          '<div class="input-group" ng-style="getInputGroupStyles(component)">' +
             '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
             input +
             requiredInline +
             '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
           '</div>' +
+          inputBottomLabel +
           '<div class="formio-errors">' +
-            '<formio-errors ng-if="::!builder"></formio-errors>' +
+            '<formio-errors ng-if="::!options.building"></formio-errors>' +
           '</div>' +
         '</div>' +
-        '<div ng-if="!!component.description" class="help-block">' +
-          '<span>{{ component.description }}</span>' +
+        '<div ng-if="component.multiple">' +
+          inputTopLabel +
+          '<table class="table table-bordered" ng-style="getInputGroupStyles(component)">' +
+            '<tr ng-repeat="value in data[component.key] track by $index">' +
+              '<td>' +
+                '<div class="input-group">' +
+                  '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
+                    multiInput +
+                    requiredInline +
+                  '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
+                '</div>' +
+                '<div class="formio-errors">' +
+                  '<formio-errors ng-if="::!options.building"></formio-errors>' +
+                '</div>' +
+              '</td>' +
+              '<td><a ng-click="(readOnly || formioForm.submitting)? null:removeFieldValue($index) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td colspan="2"><a ng-click="(readOnly || formioForm.submitting)? null: addFieldValue() " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:options.building }}</a></td>' +
+            '</tr>' +
+          '</table>' +
+          inputBottomLabel +
         '</div>' +
-        '<div ng-if="component.multiple"><table class="table table-bordered">' +
-          inputLabel +
-          '<tr ng-repeat="value in data[component.key] track by $index">' +
-            '<td>' +
-              '<div class="input-group">' +
-                '<div class="input-group-addon" ng-if="!!component.prefix">{{ component.prefix }}</div>' +
-                  multiInput +
-                  requiredInline +
-                '<div class="input-group-addon" ng-if="!!component.suffix">{{ component.suffix }}</div>' +
-              '</div>' +
-              '<div class="formio-errors">' +
-                '<formio-errors ng-if="::!builder"></formio-errors>' +
-              '</div>' +
-            '</td>' +
-            '<td><a ng-click="removeFieldValue($index)" class="btn btn-default"><span class="glyphicon glyphicon-remove-circle"></span></a></td>' +
-          '</tr>' +
-          '<tr>' +
-            '<td colspan="2"><a ng-click="addFieldValue()" class="btn btn-primary"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {{ component.addAnother || "Add Another" | formioTranslate:null:builder }}</a></td>' +
-          '</tr>' +
-        '</table></div>';
+        '<div ng-if="!!component.description" class="help-block">' +
+          '<span  id="{{component.key + \'Desc\'}}">{{ component.description |' +
+        ' formioTranslate:null:options.building' +
+        ' }}</span>' +
+        '</div>';
       return template;
     },
 
@@ -398,6 +431,58 @@ module.exports = function() {
      */
     isRequired: function(component, componentsToRequire) {
       return (component.validate && component.validate.required) || (Array.isArray(componentsToRequire) && componentsToRequire.indexOf(component.key) !== -1);
+    },
+    topOrLeftOptionLabel: function(position) {
+      return [
+        'top',
+        'left'
+      ].indexOf(position) !== -1;
+    },
+    getOptionLabelStyles: function(position) {
+      if (position === 'left') {
+        return {
+          'text-align': 'center',
+          'padding-left': 0
+        };
+      }
+
+      if (optionsLabelOnTheTopOrBottom(position)) {
+        return {
+          display: 'block',
+          'text-align': 'center',
+          'padding-left': 0
+        };
+      }
+
+      return null;
+    },
+    getOptionInputStyles: function(position) {
+      if (position === 'left') {
+        return {
+          position: 'initial',
+          'margin-left': 0
+        };
+      }
+
+      if (optionsLabelOnTheTopOrBottom(position)) {
+        return {
+          width: '100%',
+          position: 'initial',
+          'margin-left': 0
+        };
+      }
+
+      return null;
+    },
+    labelPositionWrapper: function(fn) {
+      return function(component) {
+        return fn(component.labelPosition);
+      };
+    },
+    optionsLabelPositionWrapper: function(fn) {
+      return function(component) {
+        return fn(component.optionsLabelPosition);
+      };
     }
   };
 };

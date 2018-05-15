@@ -8,7 +8,7 @@ module.exports = function(app) {
       require: 'ngModel',
       link: function(scope, element, attr, ngModel) {
         ngModel.$parsers.push(function(utcDate) {
-          if (!utcDate) return;
+          if (!utcDate) return '';
           return moment(utcDate).format(scope.component.format);
         });
 
@@ -34,12 +34,13 @@ module.exports = function(app) {
         template: 'formio/components/time.html',
         group: 'advanced',
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
           inputType: 'time',
           format: 'HH:mm',
-          label: '',
-          key: 'timeField',
+          label: 'Time',
+          key: 'time',
           placeholder: '',
           prefix: '',
           suffix: '',

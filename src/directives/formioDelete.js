@@ -8,7 +8,8 @@ module.exports = function() {
       src: '=?',
       formAction: '=?',
       resourceName: '=?',
-      message: '=?'
+      message: '=?',
+      options: '=?'
     },
     templateUrl: 'formio-delete.html',
     controller: [
@@ -24,6 +25,7 @@ module.exports = function() {
         Formio,
         $http
       ) {
+        $scope.options = $scope.options || {};
         $scope._src = $scope.src || '';
         $scope.formioAlerts = [];
         // Shows the given alerts (single or array), and dismisses old alerts

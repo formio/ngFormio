@@ -11,11 +11,15 @@ module.exports = [
       onError: function($scope, $element) {
         return function(error) {
           if ((error.name === 'ValidationError') && $element) {
-            $element.find('#form-group-' + error.details[0].path).addClass('has-error');
+            var element = $element.find('#form-group-' + error.details[0].path);
+            element.addClass('has-error');
             var message = 'ValidationError: ' + error.details[0].message;
             $scope.showAlerts({
               type: 'danger',
               message: message
+            });
+            $scope.$on('formSubmit', function() {
+              element.removeClass('has-error');
             });
           }
           else {
@@ -111,39 +115,49 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
+        var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
         if ($scope._src) {
-          loader = new Formio($scope._src);
+          loader = new Formio($scope._src, {base: baseUrl});
+          var submissionPromise = new Promise(function(resolve, reject) {
+            if (options.submission && loader.submissionId) {
+              $scope.setLoading(true);
+
+              // If a submission is already provided, then skip the load.
+              if ($scope.submission && Object.keys($scope.submission.data).length) {
+                $scope.setLoading(false);
+                $scope.$emit('submissionLoad', $scope.submission);
+                return resolve();
+              }
+              else {
+                loader.loadSubmission().then(function(submission) {
+                  angular.merge($scope.submission, angular.copy(submission));
+                  $scope.setLoading(false);
+                  $scope.$emit('submissionLoad', submission);
+                  return resolve();
+                }, this.onError($scope));
+              }
+            }
+            else {
+              return resolve();
+            }
+          }.bind(this));
           if (options.form) {
             $scope.setLoading(true);
-
-            // If a form is already provided, then skip the load.
-            if ($scope.form && Object.keys($scope.form).length) {
-              $scope.setLoading(false);
-              $scope.$emit('formLoad', $scope.form);
-            }
-            else {
-              loader.loadForm().then(function(form) {
-                angular.merge($scope.form, angular.copy(form));
+            // Wait for submission to load first so that it can set the form revision if necessary.
+            submissionPromise.then(function() {
+              // If a form is already provided, then skip the load.
+              if ($scope.form && Object.keys($scope.form).length) {
                 $scope.setLoading(false);
                 $scope.$emit('formLoad', $scope.form);
-              }, this.onError($scope));
-            }
-          }
-          if (options.submission && loader.submissionId) {
-            $scope.setLoading(true);
-
-            // If a submission is already provided, then skip the load.
-            if ($scope.submission && Object.keys($scope.submission.data).length) {
-              $scope.setLoading(false);
-              $scope.$emit('submissionLoad', $scope.submission);
-            }
-            else {
-              loader.loadSubmission().then(function(submission) {
-                angular.merge($scope.submission, angular.copy(submission));
-                $scope.setLoading(false);
-                $scope.$emit('submissionLoad', submission);
-              }, this.onError($scope));
-            }
+              }
+              else {
+                loader.loadForm().then(function(form) {
+                  angular.merge($scope.form, angular.copy(form));
+                  $scope.setLoading(false);
+                  $scope.$emit('formLoad', $scope.form);
+                }, this.onError($scope));
+              }
+            }.bind(this));
           }
           if (options.submissions) {
             $scope.updateSubmissions();
@@ -152,7 +166,7 @@ module.exports = [
         else {
           // If they provide a url to the form, we still need to create it but tell it to not submit.
           if ($scope.url) {
-            loader = new Formio($scope.url);
+            loader = new Formio($scope.url, {base: baseUrl});
             loader.noSubmit = true;
           }
 

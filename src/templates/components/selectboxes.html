@@ -1,6 +1,35 @@
-<div class="select-boxes">
-  <label ng-if="component.label && !component.hideLabel" for="{{ componentId }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
+<fieldset ng-if="component.fieldSet">
+  <legend ng-if="component.label">
     {{ component.label }}
+    <formio-component-tooltip></formio-component-tooltip>
+  </legend>
+  <div class="select-boxes">
+    <formio-select-boxes
+      name="{{componentId}}"
+      ng-model="data[component.key]"
+      ng-model-options="{allowInvalid: true}"
+      component="component"
+      component-id="componentId"
+      read-only="readOnly"
+      aria-describedby="{{componentId + 'Desc'}}"
+      ng-required="isRequired(component)"
+      custom-validator="component.validate.custom"
+      grid-row="gridRow"
+      grid-col="gridCol"
+      options="options"
+      ng-style="getInputGroupStyles(component)"
+    ></formio-select-boxes>
+    <div ng-if="!!component.description" class="help-block">
+      <span id="{{ componentId+'Desc'  }}">{{ component.description }}</span>
+    </div>
+    <formio-errors ng-if="::!options.building"></formio-errors>
+  </div>
+</fieldset>
+<div class="select-boxes" ng-if="!component.fieldSet">
+  <label ng-if="labelVisible() && (component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label" id="{{ componentId+'Label' }}" ng-class="{'field-required': isRequired(component)}"
+         ng-style="getLabelStyles(component)">
+    {{ component.label }}
+    <formio-component-tooltip></formio-component-tooltip>
   </label>
   <formio-select-boxes
     name="{{componentId}}"
@@ -11,12 +40,20 @@
     read-only="readOnly"
     ng-required="isRequired(component)"
     custom-validator="component.validate.custom"
+    aria-labelledby="{{ componentId +'Label'}}"
+    aria-describedby="{{componentId + 'Desc'}}"
     grid-row="gridRow"
     grid-col="gridCol"
-    builder="builder"
+    options="options"
+    ng-style="getInputGroupStyles(component)"
   ></formio-select-boxes>
+  <label ng-if="labelVisible() && (component.labelPosition === 'bottom')" for="{{ componentId }}" class="control-label control-label--bottom" id="{{ componentId +'Desc'}}"
+         ng-class="{'field-required': isRequired(component)}">
+    {{ component.label }}
+    <formio-component-tooltip></formio-component-tooltip>
+  </label>
   <div ng-if="!!component.description" class="help-block">
-    <span>{{ component.description }}</span>
+    <span id="{{ componentId+'Desc' }}">{{ component.description }}</span>
   </div>
-  <formio-errors ng-if="::!builder"></formio-errors>
+  <formio-errors ng-if="::!options.building"></formio-errors>
 </div>

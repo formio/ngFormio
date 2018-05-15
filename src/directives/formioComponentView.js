@@ -12,20 +12,22 @@ module.exports = [
         form: '=',
         submission: '=',
         ignore: '=?',
-        builder: '=?'
+        options: '=?'
       },
       templateUrl: 'formio/component-view.html',
       controller: [
         '$scope',
+        '$controller',
         'Formio',
         'FormioUtils',
         function(
           $scope,
+          $controller,
           Formio,
           FormioUtils
         ) {
           // Set the form url.
-          $scope.formUrl = $scope.form ? Formio.getAppUrl() + '/form/' + $scope.form._id.toString() : '';
+          $scope.formUrl = $scope.form ? Formio.getProjectUrl() + '/form/' + $scope.form._id.toString() : '';
           $scope.isVisible = function(component, row) {
             return FormioUtils.isVisible(
               component,
@@ -47,6 +49,10 @@ module.exports = [
           }
           else {
             $scope.template = component.viewTemplate;
+          }
+
+          if (component.viewController) {
+            $controller(component.viewController, {$scope: $scope});
           }
 
           // Set the component name.

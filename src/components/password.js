@@ -9,11 +9,12 @@ module.exports = function(app) {
           return '--- PROTECTED ---';
         },
         settings: {
+          autofocus: false,
           input: true,
           tableView: false,
           inputType: 'password',
-          label: '',
-          key: 'passwordField',
+          label: 'Password',
+          key: 'password',
           placeholder: '',
           prefix: '',
           suffix: '',

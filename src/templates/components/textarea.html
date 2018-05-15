@@ -3,11 +3,15 @@
   ng-model="data[component.key]"
   ng-disabled="readOnly"
   ng-required="isRequired(component)"
+  spellcheck="{{ component.spellcheck }}"
   safe-multiple-to-single
+  auto-focus="true"
   id="{{ componentId }}"
   name="{{ componentId }}"
+  aria-labelledby="{{ componentId +'Label'}}"
+  aria-describedby="{{componentId + 'Desc'}}"
   tabindex="{{ component.tabindex || 0 }}"
-  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:builder }}"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
   custom-validator="component.validate.custom"
   rows="{{ component.rows }}"
 ></textarea>

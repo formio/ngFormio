@@ -6,8 +6,9 @@
     component="component"
     ng-required="isRequired(component)"
     custom-validator="component.validate.custom"
+    aria-labelledby="{{ componentId +'Label'}}"
+    aria-describedby="{{componentId + 'Desc'}}"
     ng-model="data[component.key]"
-    tabindex="{{ component.tabindex || 0 }}"
-    builder="builder"
+    options="options"
   ></day-input>
 </div>

@@ -1,4 +1,5 @@
 var fs = require('fs');
+var _get = require('lodash/get');
 module.exports = function(app) {
   app.config([
     'formioComponentsProvider',
@@ -6,13 +7,12 @@ module.exports = function(app) {
       formioComponentsProvider.register('datetime', {
         title: 'Date / Time',
         template: 'formio/components/datetime.html',
-        tableView: function(data, component, $interpolate) {
-          return $interpolate('<span>{{ "' + data + '" | date: "' + component.format + '" }}</span>')();
+        tableView: function(data, options) {
+          data = _.isDate(data) ? data.toISOString() : data;
+          return options.$interpolate('<span>{{ "' + data + '" | date: "' + options.component.format + '" }}</span>')();
         },
         group: 'advanced',
-        /* eslint-disable no-unused-vars */
-        // NOTE: Do not delete the "moment" variable here. That is needed to make moment() work in default dates.
-        controller: ['$scope', '$timeout', 'moment', function($scope, $timeout, moment) {
+        controller: ['$scope', '$timeout', 'FormioUtils', function($scope, $timeout, FormioUtils) {
         /* eslint-enable no-unused-vars */
           // Close calendar pop up when tabbing off button
           $scope.onKeyDown = function(event) {
@@ -25,25 +25,7 @@ module.exports = function(app) {
               return ($scope.data[$scope.component.key] instanceof Date) ? $scope.data[$scope.component.key] : new Date($scope.data[$scope.component.key]);
             }
 
-            // See if a default date is set.
-            if ($scope.component.defaultDate) {
-              var defaultDate = new Date($scope.component.defaultDate);
-              if (!defaultDate || isNaN(defaultDate.getDate())) {
-                try {
-                  defaultDate = new Date(eval($scope.component.defaultDate));
-                }
-                catch (e) {
-                  defaultDate = '';
-                }
-              }
-
-              if (defaultDate && !isNaN(defaultDate.getDate())) {
-                return defaultDate;
-              }
-            }
-
-            // Default to empty.
-            return '';
+            return FormioUtils.getDateSetting($scope.component.defaultDate);
           };
 
           // Ensure the date value is always a date object when loaded, then unbind the watch.
@@ -67,38 +49,8 @@ module.exports = function(app) {
               $scope.component.format += ' a';
             }
           });
-
-          if (!$scope.component.datePicker.maxDate) {
-            delete $scope.component.datePicker.maxDate;
-          }
-          else {
-            var maxDate = new Date($scope.component.datePicker.maxDate);
-            $scope.component.datePicker.maxDate = new Date(
-              maxDate.getUTCFullYear(),
-              maxDate.getUTCMonth(),
-              maxDate.getUTCDate(),
-              23,
-              59,
-              59,
-              999
-            );
-          }
-
-          if (!$scope.component.datePicker.minDate) {
-            delete $scope.component.datePicker.minDate;
-          }
-          else {
-            var minDate = new Date($scope.component.datePicker.minDate);
-            $scope.component.datePicker.minDate = new Date(
-              minDate.getUTCFullYear(),
-              minDate.getUTCMonth(),
-              minDate.getUTCDate(),
-              0,
-              0,
-              0,
-              0
-            );
-          }
+          $scope.component.datePicker.minDate = FormioUtils.getDateSetting(_get($scope.component, 'datePicker.minDate'));
+          $scope.component.datePicker.maxDate = FormioUtils.getDateSetting(_get($scope.component, 'datePicker.maxDate'));
 
           $scope.autoOpen = true;
           $scope.onClosed = function() {
@@ -109,10 +61,11 @@ module.exports = function(app) {
           };
         }],
         settings: {
+          autofocus: false,
           input: true,
           tableView: true,
-          label: '',
-          key: 'datetimeField',
+          label: 'Date Time',
+          key: 'datetime',
           placeholder: '',
           format: 'yyyy-MM-dd HH:mm a',
           enableDate: true,

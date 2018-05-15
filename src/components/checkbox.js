@@ -9,8 +9,8 @@ module.exports = function(app) {
         tableView: function(data) {
           return data ? 'Yes' : 'No';
         },
-        controller: ['$scope', '$timeout', function($scope, $timeout) {
-          if ($scope.builder) return;
+        controller: ['$scope', '$timeout', 'FormioUtils', function($scope, $timeout, FormioUtils) {
+          if ($scope.options && $scope.options.building) return;
           var boolean = {
             true: true,
             false: false
@@ -42,15 +42,20 @@ module.exports = function(app) {
               }
             });
           }
+
+          $scope.topOrLeftOptionLabel = FormioUtils.labelPositionWrapper(FormioUtils.topOrLeftOptionLabel);
+          $scope.getOptionLabelStyles = FormioUtils.labelPositionWrapper(FormioUtils.getOptionLabelStyles);
+          $scope.getOptionInputStyles = FormioUtils.labelPositionWrapper(FormioUtils.getOptionInputStyles);
         }],
         settings: {
+          autofocus: false,
           input: true,
           inputType: 'checkbox',
           tableView: true,
           // This hides the default label layout so we can use a special inline label
-          hideLabel: true,
+          hideLabel: false,
           label: '',
-          datagridLabel: true,
+          dataGridLabel: false,
           key: 'checkboxField',
           defaultValue: false,
           protected: false,

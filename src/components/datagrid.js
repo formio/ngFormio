@@ -9,13 +9,13 @@ module.exports = function(app) {
         title: 'Data Grid',
         template: 'formio/components/datagrid.html',
         group: 'advanced',
-        tableView: function(data, component, $interpolate, componentInfo, tableChild) {
+        tableView: function(data, options) {
           var view = '<table class="table table-striped table-bordered table-child">';
 
-          if (!tableChild) {
+          if (!options.tableChild) {
             view += '<thead><tr>';
-            angular.forEach(component.components, function(component) {
-              view += '<th>' + (component.label || '') + ' (' + component.key + ')</th>';
+            angular.forEach(options.component.components, function(component) {
+              view += '<th>' + (component.label || '( '+component.key+')')+'</th>';
             });
             view += '</tr></thead>';
           }
@@ -23,17 +23,20 @@ module.exports = function(app) {
           view += '<tbody>';
           angular.forEach(data, function(row) {
             view += '<tr>';
-            formioUtils.eachComponent(component.components, function(component) {
-              // Don't render disabled fields, or fields with undefined data.
-              if (!component.tableView || row[component.key] === undefined) {
-                return;
-              }
-
+            formioUtils.eachComponent(options.component.components, function(component) {
               // If the component has a defined tableView, use that, otherwise try and use the raw data as a string.
-              var info = componentInfo.components.hasOwnProperty(component.type) ? componentInfo.components[component.type] : {};
+              var info = options.componentInfo.components.hasOwnProperty(component.type)
+                ? options.componentInfo.components[component.type]
+                : {};
               if (info.tableView) {
                 // Reset the tableChild value for datagrids, so that components have headers.
-                view += '<td>' + info.tableView(row[component.key] || '', component, $interpolate, componentInfo, false) + '</td>';
+                view += '<td>' + info.tableView(row[component.key] || '', {
+                  component: component,
+                  $interpolate: options.$interpolate,
+                  componentInfo: options.componentInfo,
+                  tableChild: false,
+                  util: options.util
+                }) + '</td>';
               }
               else {
                 view += '<td>';
@@ -53,11 +56,12 @@ module.exports = function(app) {
           return view;
         },
         settings: {
+          autofocus: false,
           input: true,
           tree: true,
           components: [],
           tableView: true,
-          label: '',
+          label: 'Data Grid',
           key: 'datagrid',
           protected: false,
           persistent: true,
@@ -67,11 +71,40 @@ module.exports = function(app) {
       });
     }
   ]);
+  app.directive('datagridValidation', function() {
+    return {
+      require: 'ngModel',
+      restrict: 'A',
+      link: function(scope, elem, attr, ctrl) {
+        if ((scope.options && scope.options.building) || !scope.formioForm || !scope.component.validate || !scope.component.validate.custom) return;
+
+        // Add the control to the main form.
+        ctrl.$name = scope.componentId;
+        scope.formioForm.$addControl(ctrl);
+        // For some reason the validator deletes the ng-model value if validation fails so make a fake copy since we don't need it anyway.
+        scope.dataValue = angular.copy(scope.data);
+
+        var init = true;
+
+        // Wait 300ms for changes to trigger the datagrid.
+        setTimeout(function() {
+          init = false;
+        }, 300);
+        scope.$watch('data', function() {
+          scope.dataValue = angular.copy(scope.data);
+          ctrl.$validate();
+          if (!init) {
+            ctrl.$setDirty(true);
+          }
+        }, true);
+      }
+    }
+  });
   app.controller('formioDataGrid', [
     '$scope',
     'FormioUtils',
     function($scope, FormioUtils) {
-      if ($scope.builder) return;
+      if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
       $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
@@ -96,8 +129,8 @@ module.exports = function(app) {
         }
       }
       // If more than maxLength, remove extra rows.
-      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length < $scope.component.validate.maxLength) {
-        $scope.rows = $scope.rows.slice(0, $scope.component.validate.maxLength);
+      if ($scope.component.validate && $scope.component.validate.hasOwnProperty('maxLength') && $scope.rows.length > $scope.component.validate.maxLength) {
+        $scope.rows.splice($scope.component.validate.maxLength);
       }
       $scope.cols = $scope.component.components;
       $scope.localKeys = $scope.component.components.map(function(component) {
