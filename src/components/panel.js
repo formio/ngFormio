@@ -16,7 +16,7 @@ module.exports = function(app) {
           title: '',
           theme: 'default',
           tableView: false,
-          hideLabel: true,
+          hideLabel: false,
           components: []
         },
         viewTemplate: 'formio/componentsView/panel.html',
