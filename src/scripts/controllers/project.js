@@ -331,7 +331,8 @@ app.controller('ProjectController', [
           $scope.localProject.remote &&
         $scope.localProject.remote.hasOwnProperty('project')) &&
         $scope.localProject._id !== $scope.currentProject._id &&
-        $scope.localProject.remote.name !== project.name
+        $scope.localProject.remote.project._id === project._id &&
+        $scope.localProject.remote.project.name !== project.name
       ) {
         $scope.localProject.remote.project.name = project.name;
         $scope.localFormio.saveProject($scope.localProject);
