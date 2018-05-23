@@ -14,11 +14,10 @@ export default app.directive('formio', function() {
     },
     link: function (scope, element) {
       scope.element = element[0];
-
-      scope.initializeForm()
-        .then((formio) => {
-          scope.setupForm(formio);
-        })
+      scope.formioReady = false;
+      scope.initializing = false;
+      scope.onFormio = scope.initializeForm()
+        .then((formio) => scope.setupForm(formio))
         .catch((err) => {
           console.warn(err);
         });
@@ -35,15 +34,9 @@ export default app.directive('formio', function() {
           }
 
           return new Promise((resolve, reject) => {
-            if ($scope.src) {
-              resolve(Formio.createForm($scope.element, $scope.src, $scope.options)
-                .then(formio => {
-                  $scope.formio = formio;
-                  return formio;
-                }));
-            }
-            else if ($scope.form) {
-              resolve(Formio.createForm($scope.element, $scope.form, $scope.options)
+            if ($scope.src || $scope.form) {
+              $scope.initializing = true;
+              resolve(Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options)
                 .then(formio => {
                   $scope.formio = formio;
                   return formio;
@@ -62,6 +55,7 @@ export default app.directive('formio', function() {
           }
           if ($scope.url) {
             $scope.formio.url = $scope.url
+            $scope.formio.nosubmit = false;
           }
           $scope.formio.events.onAny(function() {
             // Keep backwards compatibility by firing old events as well.
@@ -76,58 +70,76 @@ export default app.directive('formio', function() {
 
             // Remove formio. from event.
             args[0] = eventParts[1];
-
-            $scope.$emit.apply($scope, args);
-
             switch(eventParts[1]) {
               case 'error':
                 args[0] = 'formError';
-                $scope.$emit.apply($scope, args);
                 break;
               case 'submit':
                 args[0] = 'formSubmit';
-                $scope.$emit.apply($scope, args);
                 break;
               case 'submitDone':
                 args[0] = 'formSubmission';
-                $scope.$emit.apply($scope, args);
                 break;
               case 'prevPage':
                 args[0] = 'wizardPrev';
-                $scope.$emit.apply($scope, args);
                 break;
               case 'nextPage':
                 args[0] = 'wizardNext';
-                $scope.$emit.apply($scope, args);
                 break;
               case 'customEvent':
                 args[0] = args[1].type;
-                $scope.$emit.apply($scope, args);
                 break;
             }
+
+            $scope.$emit.apply($scope, args);
           });
+
+          $scope.formioReady = true;
+          return $scope.formio;
         };
 
         $scope.$watch('src', src => {
-          if ($scope.formio) {
+          if (!src) {
+            return;
+          }
+          if ($scope.formioReady) {
             $scope.formio.src = src;
+          }
+          else if (!$scope.initializing) {
+            $scope.initializeForm();
           }
         });
 
         $scope.$watch('url', url => {
-          if ($scope.formio) {
+          if (!url) {
+            return;
+          }
+          if ($scope.formioReady) {
             $scope.formio.url = url;
+            $scope.formio.nosubmit = false;
+          }
+          else if (!$scope.initializing) {
+            $scope.initializeForm();
           }
         });
 
         $scope.$watch('form', form => {
-          if ($scope.formio) {
+          if (!form || !form.components) {
+            return;
+          }
+          if ($scope.formioReady) {
             $scope.formio.form = form;
+          }
+          else if (!$scope.initializing) {
+            $scope.initializeForm();
           }
         });
 
         $scope.$watch('submission', submission => {
-          if ($scope.formio) {
+          if (!submission) {
+            return;
+          }
+          if ($scope.formioReady) {
             $scope.formio.submission = submission;
           }
         });

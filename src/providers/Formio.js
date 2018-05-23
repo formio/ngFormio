@@ -1,6 +1,34 @@
 import {Formio} from 'formiojs';
 
 const app = angular.module('formio');
+
+// Configure the formioInterceptor. to be used.
+app.config([
+  '$httpProvider',
+  '$injector',
+  function(
+    $httpProvider,
+    $injector
+  ) {
+    if (!$httpProvider.defaults.headers.get) {
+      $httpProvider.defaults.headers.get = {};
+    }
+
+    // Make sure that ngAnimate doesn't mess up loader.
+    try {
+      $injector.get('$animateProvider').classNameFilter(/^((?!(fa-spinner|glyphicon-spin)).)*$/);
+    }
+      /* eslint-disable no-empty */
+    catch (err) {}
+    /* eslint-enable no-empty */
+
+    // Disable IE caching for GET requests.
+    $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
+    $httpProvider.defaults.headers.get.Pragma = 'no-cache';
+    $httpProvider.interceptors.push('formioInterceptor');
+  }
+]);
+
 export default app.provider('Formio', function() {
   // Return the provider interface.
   return {

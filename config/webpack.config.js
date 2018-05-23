@@ -1,32 +1,17 @@
 const webpack = require('webpack');
 const path = require('path');
-
-const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const autoprefixer = require('autoprefixer');
-
 module.exports = {
+  performance: { hints: false },
   entry: './lib/index.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '../dist'),
     filename: 'ng-formio.js',
     libraryTarget: 'umd',
     library: 'ngformio'
   },
   module: {
-    loaders: [
-      {
-        test: /\.json$/,
-        loaders: [
-          'json-loader'
-        ]
-      },
-      //{
-      //  test: /\.js$/,
-      //  exclude: /node_modules/,
-      //  loader: 'eslint-loader',
-      //  enforce: 'pre'
-      //},
+    rules: [
       {
         test: /\.(html)$/,
         use: {
@@ -38,7 +23,10 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract({ fallback: 'style-loader', use: ['css-loader', 'sass-loader', 'postcss-loader']})
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader', 'postcss-loader']
+        })
       },
       {
         test: /\.(woff2?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -63,7 +51,6 @@ module.exports = {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new ExtractTextPlugin('formio.css')
   ],
-  //externals: [nodeExternals()],
   externals: {
     jquery: 'jQuery',
     angular: 'angular'

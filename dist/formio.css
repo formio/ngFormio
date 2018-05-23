@@ -1,3 +1,4 @@
+/*! ng-formio v3.0.0-rc.19 | https://unpkg.com/ngFormio@3.0.0-rc.19/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -149,7 +150,9 @@
   line-height: 16px;
   height: 28px;
   padding: 10px;
-  z-index: 3; }
+  z-index: 3;
+  color: rgba(0, 0, 0, 0.9);
+  fill: rgba(0, 0, 0, 0.9); }
 
 .flatpickr-months .flatpickr-next-month.disabled, .flatpickr-months .flatpickr-prev-month.disabled {
   display: none; }
@@ -560,7 +563,6 @@ span.flatpickr-weekday {
   padding: 0;
   height: inherit;
   line-height: inherit;
-  cursor: pointer;
   color: #393939;
   font-size: 14px;
   position: relative;
@@ -600,8 +602,8 @@ span.flatpickr-weekday {
   text-align: center;
   font-weight: 400; }
 
-.flatpickr-time .flatpickr-am-pm:focus, .flatpickr-time .flatpickr-am-pm:hover {
-  background: #f0f0f0; }
+.flatpickr-time .flatpickr-am-pm:focus, .flatpickr-time .flatpickr-am-pm:hover, .flatpickr-time input:focus, .flatpickr-time input:hover {
+  background: #f3f3f3; }
 
 .flatpickr-input[readonly] {
   cursor: pointer; }
@@ -3674,6 +3676,16 @@ body.formio-dialog-open, html.formio-dialog-open {
 
 .formio-component .table {
   margin-bottom: 0; }
+
+.formio-hide-label-panel-tooltip {
+  margin-top: -10px;
+  margin-left: -10px; }
+
+.is-disabled .choices__list--multiple .choices__item {
+  padding: 5px 10px; }
+
+.is-disabled .choices__list--multiple .choices__item .choices__button {
+  display: none; }
 
 .formbuilder {
   position: relative; }
