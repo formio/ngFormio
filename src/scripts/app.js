@@ -613,22 +613,20 @@ angular
         }
       });
 
-      Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
-        $scope.userTeams  = results;
-      });
-
       $scope.teamSupport = function(project) {
         return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
       };
 
       $scope.teamAdmin = function(project, user) {
-        user = user || $rootScope.user;
-        var userTeams = _($scope.userTeams ? $scope.userTeams : [])
-          .map('_id')
-          .filter()
-          .value();
+        return _teamsPromise.then(function() {
+          user = user || $rootScope.user;
+          var userTeams = _($scope.teams ? $scope.teams : [])
+            .map('_id')
+            .filter()
+            .value();
 
-        return project.owner === user._id || _.intersection(userTeams, project.adminTeams).length > 0;
+          return project.owner === user._id || _.intersection(userTeams, project.adminTeams).length > 0;
+        });
       };
 
       $scope.frameworks = ProjectFrameworks;
