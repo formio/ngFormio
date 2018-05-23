@@ -2311,6 +2311,7 @@ app.controller('ProjectRemoteController', [
             delete project.access;
             delete project._id;
             delete project.project;
+            delete project.plan;
             $http({
               method: 'POST',
               url: $scope.remote.url + '/project',
