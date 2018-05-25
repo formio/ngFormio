@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.33.1
+### Changed
+ - Update formio.js to v3.0.0-alpha19 to fix issue with file uploads losing returned data for urls.
+
 ## 2.33.0
 ### Added
  - Save as State action to button component
