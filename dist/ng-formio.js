@@ -8242,14 +8242,14 @@ var WebformBuilder = function (_Webform) {
 
         var removeButton = this.ce('div', {
           class: 'btn btn-xxs btn-danger component-settings-button component-settings-button-remove'
-        }, this.ce('span', { class: 'glyphicon glyphicon-remove' }));
+        }, this.getIcon('remove'));
         this.addEventListener(removeButton, 'click', function () {
           return self.deleteComponent(comp);
         });
 
         var editButton = this.ce('div', {
           class: 'btn btn-xxs btn-default component-settings-button component-settings-button-edit'
-        }, this.ce('span', { class: 'glyphicon glyphicon-cog' }));
+        }, this.getIcon('cog'));
         this.addEventListener(editButton, 'click', function () {
           return self.editComponent(comp);
         });
@@ -8410,7 +8410,7 @@ var WebformBuilder = function (_Webform) {
         href: componentInfo.documentation || '#',
         target: '_blank'
       }, this.ce('i', {
-        class: 'glyphicon glyphicon-new-window'
+        class: this.iconClass('new-window')
       }, ' ' + this.t('Help'))))])]), this.ce('div', {
         class: 'row'
       }, [this.ce('div', {
@@ -8418,13 +8418,13 @@ var WebformBuilder = function (_Webform) {
       }, formioForm), this.ce('div', {
         class: 'col col-sm-6'
       }, [this.ce('div', {
-        class: 'panel panel-default preview-panel'
+        class: 'card panel panel-default preview-panel'
       }, [this.ce('div', {
-        class: 'panel-heading'
+        class: 'card-header panel-heading'
       }, this.ce('h3', {
-        class: 'panel-title'
+        class: 'card-title panel-title'
       }, this.t('Preview'))), this.ce('div', {
-        class: 'panel-body'
+        class: 'card-body panel-body'
       }, this.componentPreview)]), this.ce('div', {
         style: 'margin-top: 10px;'
       }, [saveButton, cancelButton, removeButton])])])]);
@@ -8559,24 +8559,29 @@ var WebformBuilder = function (_Webform) {
       }
 
       info = _lodash2.default.clone(info);
-      var groupAnchor = this.ce('a', {
-        href: '#group-' + info.key
+      var groupAnchor = this.ce('button', {
+        class: 'btn btn-block builder-group-button',
+        'data-toggle': 'collapse',
+        'data-target': '#group-' + info.key
       }, this.text(info.title));
 
       // Add a listener when it is clicked.
       this.addEventListener(groupAnchor, 'click', function (event) {
         event.preventDefault();
-        var clickedGroupId = event.target.getAttribute('href').replace('#group-', '');
+        var clickedGroupId = event.target.getAttribute('data-target').replace('#group-', '');
         if (_this5.groups[clickedGroupId]) {
           var clickedGroup = _this5.groups[clickedGroupId];
           var wasIn = _this5.hasClass(clickedGroup.panel, 'in');
           _lodash2.default.each(_this5.groups, function (group, groupId) {
             _this5.removeClass(group.panel, 'in');
+            _this5.removeClass(group.panel, 'show');
             if (groupId === clickedGroupId && !wasIn) {
               _this5.addClass(group.panel, 'in');
+              _this5.addClass(group.panel, 'show');
               var parent = group.parent;
               while (parent) {
                 _this5.addClass(parent.panel, 'in');
+                _this5.addClass(parent.panel, 'show');
                 parent = parent.parent;
               }
             }
@@ -8589,15 +8594,15 @@ var WebformBuilder = function (_Webform) {
       });
 
       info.element = this.ce('div', {
-        class: 'panel panel-default form-builder-panel',
+        class: 'card panel panel-default form-builder-panel',
         id: 'group-panel-' + info.key
       }, [this.ce('div', {
-        class: 'panel-heading'
-      }, [this.ce('h4', {
-        class: 'panel-title'
+        class: 'card-header panel-heading form-builder-group-header'
+      }, [this.ce('h5', {
+        class: 'mb-0 panel-title'
       }, groupAnchor)])]);
       info.body = this.ce('div', {
-        class: 'panel-body no-drop'
+        class: 'card-body panel-body no-drop'
       });
 
       // Add this group body to the drag containers.
@@ -8605,7 +8610,7 @@ var WebformBuilder = function (_Webform) {
 
       var groupBodyClass = 'panel-collapse collapse';
       if (info.default) {
-        groupBodyClass += ' in';
+        groupBodyClass += ' in show';
       }
 
       info.panel = this.ce('div', {
@@ -8681,7 +8686,7 @@ var WebformBuilder = function (_Webform) {
         this.removeChildFrom(this.sideBarElement, this.builderSidebar);
       }
       this.sideBarElement = this.ce('div', {
-        class: 'panel-group'
+        class: 'accordion panel-group'
       });
 
       // Add the groups.
@@ -11775,6 +11780,8 @@ var BaseComponent = function () {
           return 'fa fa-question-circle';
         case 'remove-circle':
           return 'fa fa-times-circle-o';
+        case 'new-window':
+          return 'fa fa-window-restore';
         default:
           return spinning ? 'fa fa-' + name + ' fa-spin' : 'fa fa-' + name;
       }
@@ -22240,8 +22247,8 @@ var PanelComponent = function (_NestedComponent) {
         var heading = this.ce('div', {
           class: 'card-header panel-heading'
         });
-        var title = this.ce('h3', {
-          class: 'card-title panel-title'
+        var title = this.ce('h4', {
+          class: 'mb-0 card-title panel-title'
         });
         title.appendChild(this.text(this.component.title));
         this.createTooltip(title);
@@ -25798,6 +25805,7 @@ var TabsComponent = function (_NestedComponent) {
           id: tab.key
         });
         var tabLink = _this2.ce('a', {
+          class: 'nav-link',
           href: '#' + tab.key
         }, tab.label);
         _this2.addEventListener(tabLink, 'click', function (event) {
@@ -25805,8 +25813,10 @@ var TabsComponent = function (_NestedComponent) {
           _this2.setTab(index);
         });
         var tabElement = _this2.ce('li', {
+          class: 'nav-item',
           role: 'presentation'
         }, tabLink);
+        tabElement.tabLink = tabLink;
         _this2.tabLinks.push(tabElement);
         _this2.tabs.push(tabPanel);
         _this2.tabBar.appendChild(tabElement);
@@ -25855,8 +25865,10 @@ var TabsComponent = function (_NestedComponent) {
 
       _lodash2.default.each(this.tabLinks, function (tabLink) {
         _this3.removeClass(tabLink, 'active');
+        _this3.removeClass(tabLink.tabLink, 'active');
       });
       this.addClass(this.tabLinks[index], 'active');
+      this.addClass(this.tabLinks[index].tabLink, 'active');
       _lodash2.default.each(this.tabs, function (tab) {
         _this3.removeClass(tab, 'active');
       });
