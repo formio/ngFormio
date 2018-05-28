@@ -6652,6 +6652,7 @@ var PDFBuilder = function (_WebformBuilder) {
     key: 'addComponentTo',
     value: function addComponentTo(parent, schema, element, sibling) {
       var comp = _get(PDFBuilder.prototype.__proto__ || Object.getPrototypeOf(PDFBuilder.prototype), 'addComponentTo', this).call(this, parent, schema, element, sibling);
+      comp.isNew = true;
       if (this.pdfForm && schema.overlay) {
         this.pdfForm.postMessage({ name: 'addElement', data: schema });
       }
@@ -7782,7 +7783,7 @@ var Webform = function (_NestedComponent) {
     key: 'checkData',
     value: function checkData(data, flags) {
       var valid = _get(Webform.prototype.__proto__ || Object.getPrototypeOf(Webform.prototype), 'checkData', this).call(this, data, flags);
-      if ((!flags || flags.noValidate) && this.submitted) {
+      if ((_lodash2.default.isEmpty(flags) || flags.noValidate) && this.submitted) {
         this.showErrors();
       }
       return valid;
@@ -11224,7 +11225,7 @@ var BaseComponent = function () {
         return schema;
       }
       _lodash2.default.each(schema, function (val, key) {
-        if (_lodash2.default.isObject(val) && defaultSchema.hasOwnProperty(key)) {
+        if (!_lodash2.default.isArray(val) && _lodash2.default.isObject(val) && defaultSchema.hasOwnProperty(key)) {
           var subModified = _this.getModifiedSchema(val, defaultSchema[key]);
           if (!_lodash2.default.isEmpty(subModified)) {
             modified[key] = subModified;
@@ -13091,6 +13092,7 @@ var BaseComponent = function () {
     value: function checkValidity(data, dirty) {
       // Force valid if component is conditionally hidden.
       if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+        this.setCustomValidity('');
         return true;
       }
 
@@ -13593,6 +13595,9 @@ var BaseComponent = function () {
     ,
     set: function set(value) {
       if (!this.key) {
+        return value;
+      }
+      if (value === null) {
         return value;
       }
       _lodash2.default.set(this.data, this.key, value);
@@ -16730,7 +16735,7 @@ var DataGridComponent = function (_NestedComponent) {
     key: 'hasAddButton',
     value: function hasAddButton() {
       var maxLength = _lodash2.default.get(this.component, 'validate.maxLength');
-      return !this.shouldDisable && !this.options.builder && !this.options.preview && (!maxLength || this.dataValue.length < maxLength);
+      return !this.component.disableAddingRemovingRows && !this.shouldDisable && !this.options.builder && !this.options.preview && (!maxLength || this.dataValue.length < maxLength);
     }
   }, {
     key: 'hasExtraColumn',
@@ -16740,7 +16745,7 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'hasRemoveButtons',
     value: function hasRemoveButtons() {
-      return !this.shouldDisable && !this.options.builder && this.dataValue.length > _lodash2.default.get(this.component, 'validate.minLength', 0);
+      return !this.component.disableAddingRemovingRows && !this.shouldDisable && !this.options.builder && this.dataValue.length > _lodash2.default.get(this.component, 'validate.minLength', 0);
     }
   }, {
     key: 'hasTopSubmit',
@@ -16908,7 +16913,7 @@ var DataGridComponent = function (_NestedComponent) {
       container.noDrop = true;
       var column = _lodash2.default.clone(col);
       var options = _lodash2.default.clone(this.options);
-      options.name += '[' + colIndex + ']';
+      options.name += '[' + rowIndex + ']';
       var comp = this.createComponent(_lodash2.default.assign({}, column, {
         label: column.dataGridLabel ? column.label : false,
         row: rowIndex + '-' + colIndex
@@ -17065,13 +17070,21 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = [{
+  type: 'checkbox',
+  label: 'Disable Adding / Removing Rows',
+  key: 'disableAddingRemovingRows',
+  tooltip: 'Check if you want to hide Add Another button and Remove Row button',
+  weight: 405,
+  input: true
+}, {
   type: 'textfield',
   label: 'Add Another Text',
   key: 'addAnother',
   tooltip: 'Set the text of the Add Another button.',
   placeholder: 'Add Another',
   weight: 410,
-  input: true
+  input: true,
+  customConditional: 'show = !data.disableAddingRemovingRows'
 }, {
   type: 'select',
   label: 'Add Another Position',
@@ -17083,7 +17096,8 @@ exports.default = [{
   data: {
     values: [{ label: 'Top', value: 'top' }, { label: 'Bottom', value: 'bottom' }, { label: 'Both', value: 'both' }]
   },
-  weight: 420
+  weight: 420,
+  customConditional: 'show = !data.disableAddingRemovingRows'
 }];
 
 /***/ }),
@@ -17759,9 +17773,6 @@ var DayComponent = function (_BaseComponent) {
     _this.validators.push('date');
     var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(_this.options.language);
     _this.dayFirst = _this.component.useLocaleSettings ? dateFormatInfo.dayFirst : _this.component.dayFirst;
-    _this.hideDay = _lodash2.default.get(_this.component, 'fields.day.hide', false);
-    _this.hideMonth = _lodash2.default.get(_this.component, 'fields.month.hide', false);
-    _this.hideYear = _lodash2.default.get(_this.component, 'fields.year.hide', false);
     return _this;
   }
 
@@ -17933,16 +17944,16 @@ var DayComponent = function (_BaseComponent) {
       // Add the columns to the day select in the right order.
 
 
-      if (this.dayFirst && !this.hideDay) {
+      if (this.dayFirst && this.showDay) {
         inputGroup.appendChild(dayColumn);
       }
-      if (!this.hideMonth) {
+      if (this.showMonth) {
         inputGroup.appendChild(monthColumn);
       }
-      if (!this.dayFirst && !this.hideDay) {
+      if (!this.dayFirst && this.showDay) {
         inputGroup.appendChild(dayColumn);
       }
-      if (!this.hideYear) {
+      if (this.showYear) {
         inputGroup.appendChild(yearColumn);
       }
 
@@ -18009,19 +18020,19 @@ var DayComponent = function (_BaseComponent) {
     key: 'setValueAt',
     value: function setValueAt(index, value) {
       if (!value) {
-        return;
+        return null;
       }
       var parts = value.split('/');
-      if (this.component.dayFirst && !_lodash2.default.get(this.component, 'fields.day.hide', false)) {
+      if (this.component.dayFirst && this.showDay) {
         this.dayInput.value = parseInt(parts.shift(), 10);
       }
-      if (!_lodash2.default.get(this.component, 'fields.month.hide', false)) {
+      if (this.showMonth) {
         this.monthInput.value = parseInt(parts.shift(), 10);
       }
-      if (!this.component.dayFirst && !_lodash2.default.get(this.component, 'fields.day.hide', false)) {
+      if (!this.component.dayFirst && this.showDay) {
         this.dayInput.value = parseInt(parts.shift(), 10);
       }
-      if (!_lodash2.default.get(this.component, 'fields.year.hide', false)) {
+      if (this.showYear) {
         this.yearInput.value = parseInt(parts.shift(), 10);
       }
     }
@@ -18042,25 +18053,49 @@ var DayComponent = function (_BaseComponent) {
      * @returns {*}
      */
     value: function getValueAt(index) {
-      this.inputs[index].value = this.date.format(this.format);
-      return this.inputs[index].value;
+      var date = this.date;
+      if (date) {
+        this.inputs[index].value = date.format(this.format);
+        return this.inputs[index].value;
+      } else {
+        this.inputs[index].value = '';
+        return null;
+      }
     }
   }, {
     key: 'getView',
     value: function getView() {
       var date = this.date;
+      if (!date) {
+        return null;
+      }
       return date.isValid() ? date.format(this.format) : null;
     }
   }, {
     key: 'focus',
     value: function focus() {
-      if (this.dayFirst && !this.hideDay || !this.dayFirst && this.hideMonth && !this.hideDay) {
+      if (this.dayFirst && this.showDay || !this.dayFirst && !this.showMonth && this.showDay) {
         this.dayInput.focus();
-      } else if (this.dayFirst && this.hideDay && !this.hideMonth || !this.dayFirst && !this.hideMonth) {
+      } else if (this.dayFirst && !this.showDay && this.showMonth || !this.dayFirst && this.showMonth) {
         this.monthInput.focus();
-      } else if (this.hideDay && this.hideMonth && !this.hideYear) {
+      } else if (!this.showDay && !this.showDay && this.showYear) {
         this.yearInput.focus();
       }
+    }
+  }, {
+    key: 'showDay',
+    get: function get() {
+      return !_lodash2.default.get(this.component, 'fields.day.hide', false);
+    }
+  }, {
+    key: 'showMonth',
+    get: function get() {
+      return !_lodash2.default.get(this.component, 'fields.month.hide', false);
+    }
+  }, {
+    key: 'showYear',
+    get: function get() {
+      return !_lodash2.default.get(this.component, 'fields.year.hide', false);
     }
   }, {
     key: 'defaultSchema',
@@ -18079,12 +18114,15 @@ var DayComponent = function (_BaseComponent) {
   }, {
     key: 'emptyValue',
     get: function get() {
-      return '';
+      return null;
     }
   }, {
     key: 'disabled',
     set: function set(disabled) {
       _set(DayComponent.prototype.__proto__ || Object.getPrototypeOf(DayComponent.prototype), 'disabled', disabled, this);
+      if (!this.yearInput || !this.monthInput || !this.dayInput) {
+        return;
+      }
       if (disabled) {
         this.yearInput.setAttribute('disabled', 'disabled');
         this.monthInput.setAttribute('disabled', 'disabled');
@@ -18099,16 +18137,16 @@ var DayComponent = function (_BaseComponent) {
     key: 'format',
     get: function get() {
       var format = '';
-      if (this.component.dayFirst && !_lodash2.default.get(this.component, 'fields.day.hide', false)) {
+      if (this.component.dayFirst && this.showDay) {
         format += 'D/';
       }
-      if (!_lodash2.default.get(this.component, 'fields.month.hide', false)) {
+      if (this.showMonth) {
         format += 'M/';
       }
-      if (!this.component.dayFirst && !_lodash2.default.get(this.component, 'fields.day.hide', false)) {
+      if (!this.component.dayFirst && this.showDay) {
         format += 'D/';
       }
-      if (!_lodash2.default.get(this.component, 'fields.year.hide', false)) {
+      if (this.showYear) {
         format += 'YYYY';
       }
       return format;
@@ -18122,10 +18160,22 @@ var DayComponent = function (_BaseComponent) {
   }, {
     key: 'date',
     get: function get() {
-      var day = this.dayInput.value;
-      var month = this.monthInput.value;
-      var year = this.yearInput.value;
-      return (0, _moment2.default)([parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)]);
+      var day = _lodash2.default.isNaN(this.dayInput.value) ? 0 : parseInt(this.dayInput.value, 10);
+      var month = _lodash2.default.isNaN(this.monthInput.value) ? -1 : parseInt(this.monthInput.value, 10) - 1;
+      var year = _lodash2.default.isNaN(this.yearInput.value) ? 0 : parseInt(this.yearInput.value, 10);
+      if (this.showDay && !day) {
+        // Invalid so return null
+        return null;
+      }
+      if (this.showMonth && month < 0) {
+        // Invalid so return null
+        return null;
+      }
+      if (this.showYear && !year) {
+        // Invalid so return null
+        return null;
+      }
+      return (0, _moment2.default)([year, month, day]);
     }
 
     /**
@@ -18137,7 +18187,12 @@ var DayComponent = function (_BaseComponent) {
   }, {
     key: 'validationValue',
     get: function get() {
-      return this.date.format();
+      var date = this.date;
+      if (!date) {
+        return null;
+      }
+
+      return date.format();
     }
   }]);
 
@@ -21954,7 +22009,7 @@ var NumberComponent = function (_BaseComponent) {
       var val = this.inputs[index].value;
 
       if (!val) {
-        return null;
+        return undefined;
       }
 
       return this.parseNumber(val);
@@ -21999,11 +22054,6 @@ var NumberComponent = function (_BaseComponent) {
     key: 'defaultSchema',
     get: function get() {
       return NumberComponent.schema();
-    }
-  }, {
-    key: 'emptyValue',
-    get: function get() {
-      return '';
     }
   }]);
 
@@ -22626,15 +22676,10 @@ var RadioComponent = function (_BaseComponent) {
       var _this2 = this;
 
       var inputGroup = this.ce('div', {
-        class: 'input-group'
+        class: 'form-group'
       });
       var labelOnTheTopOrOnTheLeft = this.optionsLabelOnTheTopOrLeft();
       var wrappers = [];
-
-      if (this.component.inputType === 'radio') {
-        this.info.attr.name += this.id;
-      }
-
       _lodash2.default.each(this.component.values, function (value) {
         var wrapperClass = 'form-check ' + _this2.optionWrapperClass;
         var labelWrapper = _this2.ce('div', {
@@ -22654,8 +22699,11 @@ var RadioComponent = function (_BaseComponent) {
 
         // Create the input.
         var input = _this2.ce('input');
-        _lodash2.default.each(_this2.info.attr, function (value, key) {
-          input.setAttribute(key, value);
+        _lodash2.default.each(_this2.info.attr, function (attrValue, key) {
+          if (key === 'name' && _this2.component.inputType === 'radio') {
+            attrValue += '[' + _this2.id + ']';
+          }
+          input.setAttribute(key, attrValue);
         });
 
         var labelSpan = _this2.ce('span');
@@ -23878,6 +23926,9 @@ var SelectComponent = function (_BaseComponent) {
     key: 'setValue',
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
+      if (this.component.multiple && !Array.isArray(value)) {
+        value = [value];
+      }
       var hasPreviousValue = Array.isArray(this.dataValue) ? this.dataValue.length : this.dataValue;
       var hasValue = Array.isArray(value) ? value.length : value;
       var changed = this.hasChanged(value, this.dataValue);
@@ -25469,11 +25520,13 @@ var TableComponent = function (_NestedComponent) {
   }, {
     key: 'schema',
     get: function get() {
+      var _this5 = this;
+
       var schema = _lodash2.default.omit(_get(TableComponent.prototype.__proto__ || Object.getPrototypeOf(TableComponent.prototype), 'schema', this), 'components');
       schema.rows = [];
       this.eachComponent(function (component) {
         if (!schema.rows || !schema.rows.length) {
-          schema.rows = TableComponent.defaultTable;
+          schema.rows = TableComponent.emptyTable(_this5.component.numRows, _this5.component.numCols);
         }
         if (!schema.rows[component.tableRow]) {
           schema.rows[component.tableRow] = [];
@@ -25484,11 +25537,24 @@ var TableComponent = function (_NestedComponent) {
         schema.rows[component.tableRow][component.tableColumn].components.push(component.schema);
       });
       if (!schema.rows.length) {
-        schema.rows = TableComponent.defaultTable;
+        schema.rows = TableComponent.emptyTable(this.component.numRows, this.component.numCols);
       }
       return schema;
     }
   }], [{
+    key: 'emptyTable',
+    value: function emptyTable(numRows, numCols) {
+      var rows = [];
+      for (var i = 0; i < numRows; i++) {
+        var cols = [];
+        for (var j = 0; j < numCols; j++) {
+          cols.push({ components: [] });
+        }
+        rows.push(cols);
+      }
+      return rows;
+    }
+  }, {
     key: 'schema',
     value: function schema() {
       for (var _len = arguments.length, extend = Array(_len), _key = 0; _key < _len; _key++) {
@@ -25501,7 +25567,7 @@ var TableComponent = function (_NestedComponent) {
         key: 'table',
         numRows: 3,
         numCols: 3,
-        rows: TableComponent.defaultTable,
+        rows: TableComponent.emptyTable(3, 3),
         header: [],
         caption: '',
         striped: false,
@@ -25510,11 +25576,6 @@ var TableComponent = function (_NestedComponent) {
         condensed: false,
         persistent: false
       }].concat(extend));
-    }
-  }, {
-    key: 'defaultTable',
-    get: function get() {
-      return [[{ components: [] }, { components: [] }, { components: [] }], [{ components: [] }, { components: [] }, { components: [] }], [{ components: [] }, { components: [] }, { components: [] }]];
     }
   }, {
     key: 'builderInfo',
@@ -25551,6 +25612,25 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = [{
+  key: 'label',
+  ignore: true
+}, {
+  type: 'number',
+  label: 'Number of Rows',
+  key: 'numRows',
+  input: true,
+  weight: 1,
+  placeholder: 'Number of Rows',
+  tooltip: 'Enter the number or rows that should be displayed by this table.'
+}, {
+  type: 'number',
+  label: 'Number of Columns',
+  key: 'numCols',
+  input: true,
+  weight: 2,
+  placeholder: 'Number of Columns',
+  tooltip: 'Enter the number or columns that should be displayed by this table.'
+}, {
   type: 'checkbox',
   label: 'Striped',
   key: 'striped',
@@ -27938,7 +28018,7 @@ var url = function url(formio) {
             var respData = {};
             try {
               respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
-              respData = respData && respData.data ? respData.data : {};
+              respData = respData && respData.data ? respData.data : respData;
             } catch (err) {
               respData = {};
             }
