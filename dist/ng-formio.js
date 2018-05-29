@@ -8136,7 +8136,7 @@ Webform.setAppUrl = _Formio2.default.setAppUrl;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function($) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -8182,7 +8182,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* global $ */
 
 __webpack_require__(/*! ./components/builder */ "./node_modules/formiojs/components/builder.js");
 
@@ -8562,36 +8562,42 @@ var WebformBuilder = function (_Webform) {
       var groupAnchor = this.ce('button', {
         class: 'btn btn-block builder-group-button',
         'data-toggle': 'collapse',
+        'data-parent': '#' + container.id,
         'data-target': '#group-' + info.key
       }, this.text(info.title));
 
-      // Add a listener when it is clicked.
-      this.addEventListener(groupAnchor, 'click', function (event) {
-        event.preventDefault();
-        var clickedGroupId = event.target.getAttribute('data-target').replace('#group-', '');
-        if (_this5.groups[clickedGroupId]) {
-          var clickedGroup = _this5.groups[clickedGroupId];
-          var wasIn = _this5.hasClass(clickedGroup.panel, 'in');
-          _lodash2.default.each(_this5.groups, function (group, groupId) {
-            _this5.removeClass(group.panel, 'in');
-            _this5.removeClass(group.panel, 'show');
-            if (groupId === clickedGroupId && !wasIn) {
-              _this5.addClass(group.panel, 'in');
-              _this5.addClass(group.panel, 'show');
-              var parent = group.parent;
-              while (parent) {
-                _this5.addClass(parent.panel, 'in');
-                _this5.addClass(parent.panel, 'show');
-                parent = parent.parent;
-              }
-            }
-          });
+      // See if we have bootstrap.js installed.
+      var hasBootstrapJS = typeof $ === 'function' && typeof $().collapse === 'function';
 
-          // Match the form builder height to the sidebar.
-          _this5.element.style.minHeight = _this5.builderSidebar.offsetHeight + 'px';
-          _this5.scrollSidebar();
-        }
-      });
+      // Add a listener when it is clicked.
+      if (!hasBootstrapJS) {
+        this.addEventListener(groupAnchor, 'click', function (event) {
+          event.preventDefault();
+          var clickedGroupId = event.target.getAttribute('data-target').replace('#group-', '');
+          if (_this5.groups[clickedGroupId]) {
+            var clickedGroup = _this5.groups[clickedGroupId];
+            var wasIn = _this5.hasClass(clickedGroup.panel, 'in');
+            _lodash2.default.each(_this5.groups, function (group, groupId) {
+              _this5.removeClass(group.panel, 'in');
+              _this5.removeClass(group.panel, 'show');
+              if (groupId === clickedGroupId && !wasIn) {
+                _this5.addClass(group.panel, 'in');
+                _this5.addClass(group.panel, 'show');
+                var parent = group.parent;
+                while (parent) {
+                  _this5.addClass(parent.panel, 'in');
+                  _this5.addClass(parent.panel, 'show');
+                  parent = parent.parent;
+                }
+              }
+            });
+
+            // Match the form builder height to the sidebar.
+            _this5.element.style.minHeight = _this5.builderSidebar.offsetHeight + 'px';
+            _this5.scrollSidebar();
+          }
+        });
+      }
 
       info.element = this.ce('div', {
         class: 'card panel panel-default form-builder-panel',
@@ -8602,6 +8608,7 @@ var WebformBuilder = function (_Webform) {
         class: 'mb-0 panel-title'
       }, groupAnchor)])]);
       info.body = this.ce('div', {
+        id: 'group-container-' + info.key,
         class: 'card-body panel-body no-drop'
       });
 
@@ -8610,7 +8617,10 @@ var WebformBuilder = function (_Webform) {
 
       var groupBodyClass = 'panel-collapse collapse';
       if (info.default) {
-        groupBodyClass += ' in show';
+        groupBodyClass += ' in';
+        if (!hasBootstrapJS) {
+          groupBodyClass += ' show';
+        }
       }
 
       info.panel = this.ce('div', {
@@ -8686,6 +8696,7 @@ var WebformBuilder = function (_Webform) {
         this.removeChildFrom(this.sideBarElement, this.builderSidebar);
       }
       this.sideBarElement = this.ce('div', {
+        id: 'builder-sidebar-' + this.id,
         class: 'accordion panel-group'
       });
 
@@ -8922,6 +8933,7 @@ var WebformBuilder = function (_Webform) {
 }(_Webform3.default);
 
 exports.default = WebformBuilder;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
 /***/ }),
 
