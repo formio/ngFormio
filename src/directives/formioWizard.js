@@ -76,6 +76,36 @@ module.exports = function() {
           session = angular.fromJson(session);
         }
 
+        var storedData = {};
+        var storage = {
+          getItem: function(key) {
+            if ($scope.options.noStorage) {
+              return storedData[key];
+            }
+            try {
+              var value = localStorage.getItem(key);
+              return value ? JSON.parse(value) : false;
+            }
+            catch (err) {
+              console.warn('error parsing json from localstorage', err);
+            }
+          },
+          setItem: function(key, value) {
+            if ($scope.options.noStorage) {
+              storedData[key] = value;
+              return;
+            }
+            if (typeof value !== 'string') {
+              value = JSON.stringify(value);
+            }
+            localStorage.setItem(key, value);
+          }
+        };
+
+        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
+        var session = ($scope.storage && !$scope.readOnly) ? storage.getItem($scope.storage) : false;
+>>>>>>> d1888757344071015bf76a853f35f78f8f9430a6
+
         $scope.formio = null;
         $scope.url = $scope.url || $scope.src;
         $scope.page = {};
@@ -120,25 +150,24 @@ module.exports = function() {
             // Handle Local Storage Definition
             if ($scope.storage && !$scope.readOnly) {
               // If there is no localStorage object - make a new object schema
-              if (!localStorage.getItem($scope.storage)) {
-                localStorage.setItem($scope.storage, angular.toJson({
+              if (!storage.getItem($scope.storage)) {
+                storage.setItem($scope.storage, {
                   page: $scope.currentPage,
                   data: $scope.submission.data
-                }));
+                });
               }
 
               // if there is a localStorage object && submission.data is blank then bind localStorage to $scope
-              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
-                var storageToScope = JSON.parse(localStorage.getItem($scope.storage));
-                $scope.submission.data = storageToScope.data
+              if(storage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
+                $scope.submission.data = storage.getItem($scope.storage).data;
               }
 
               // if there is a localStorage object | && it is data | merge the two
-              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
-                localStorage.setItem($scope.storage, angular.toJson({
+              if(storage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
+                storage.setItem($scope.storage, {
                   page: $scope.currentPage,
                   data: $scope.submission.data
-                }));
+                });
               }
             }
 
@@ -183,7 +212,7 @@ module.exports = function() {
 
         $scope.clear = function() {
           if ($scope.storage && !$scope.readOnly) {
-            localStorage.setItem($scope.storage, '');
+            storage.setItem($scope.storage, '');
           }
           $scope.submission = {data: {}};
           $scope.currentPage = 0;
@@ -330,7 +359,7 @@ module.exports = function() {
 
             var onDone = function(submission) {
               if ($scope.storage && !$scope.readOnly) {
-                localStorage.setItem($scope.storage, '');
+                storage.setItem($scope.storage, '');
               }
               $scope.showAlerts({
                 type: 'success',
