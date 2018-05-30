@@ -102,10 +102,7 @@ module.exports = function() {
           }
         };
 
-        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
         var session = ($scope.storage && !$scope.readOnly) ? storage.getItem($scope.storage) : false;
->>>>>>> d1888757344071015bf76a853f35f78f8f9430a6
-
         $scope.formio = null;
         $scope.url = $scope.url || $scope.src;
         $scope.page = {};

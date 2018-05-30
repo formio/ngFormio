@@ -1,4 +1,4 @@
-/*! ng-formio v2.33.1 | https://unpkg.com/ng-formio@2.33.1/LICENSE.txt */
+/*! ng-formio v2.33.2 | https://unpkg.com/ng-formio@2.33.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -32820,8 +32820,8 @@ module.exports = function(app) {
               }
               var flattened = FormioUtils.flattenComponents(parent.form.components, true);
               var components = flattened;
-              (new Function('form', 'flattened', 'components', '_merge', '$scope', 'data', $scope.component.custom.toString()))
-              (parent.form, flattened, components, _merge, $scope, $scope.data);
+              (new Function('form', 'flattened', 'components', '_merge', '$scope', 'data', 'row', $scope.component.custom.toString()))
+              (parent.form, flattened, components, _merge, $scope, $scope.data, $scope.data);
             }
             catch (e) {
               /* eslint-disable no-console */
@@ -33014,18 +33014,19 @@ module.exports = function(app) {
             true: true,
             false: false
           };
+
           var defaultValue = $scope.component.hasOwnProperty('defaultValue')
             ? boolean[$scope.component.defaultValue] || false
             : false;
 
-          // FOR-440 - Only use the default value if the data isn't defined.
-          // On the first load, attempt to set the default value.
-          $scope.data[$scope.component.key] = $scope.data.hasOwnProperty($scope.component.key) && boolean.hasOwnProperty($scope.data[$scope.component.key])
-            ? boolean[$scope.data[$scope.component.key]]
-            : defaultValue;
-
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
           if ($scope.component.inputType === 'checkbox') {
+            // FOR-440 - Only use the default value if the data isn't defined.
+            // On the first load, attempt to set the default value.
+            $scope.data[$scope.component.key] = $scope.data.hasOwnProperty($scope.component.key) && boolean.hasOwnProperty($scope.data[$scope.component.key])
+              ? boolean[$scope.data[$scope.component.key]]
+              : defaultValue;
+
             $scope.$watch('data.' + $scope.component.key, function() {
               if (!$scope.data || !$scope.component.key) return;
 
@@ -33033,11 +33034,9 @@ module.exports = function(app) {
               if (
                 $scope.component.validate
                 && $scope.component.validate.required
-                && (boolean[$scope.data[$scope.component.key]] || false) === false
+                && boolean[$scope.data[$scope.component.key]] === false
               ) {
-                $timeout(function() {
-                  delete $scope.data[$scope.component.key];
-                });
+                delete $scope.data[$scope.component.key];
               }
             });
           }
@@ -33408,7 +33407,7 @@ module.exports = function(app) {
           clearOnHide: true,
           delimiter: true,
           decimalLimit: 2,
-          requireDecimals: true,
+          requireDecimal: true,
           validate: {
             required: false,
             multiple: '',
@@ -34664,7 +34663,7 @@ module.exports = function(app) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
             $scope.options = $scope.options || {};
-            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var baseUrl = Formio.setScopeBase($scope);
             var formio = new Formio($scope.form, {base: baseUrl});
             formio
               .downloadFile($scope.file).then(function(file) {
@@ -34705,7 +34704,7 @@ module.exports = function(app) {
           if ($scope.options && $scope.options.building) return;
           $scope.form = $scope.form || $rootScope.filePath;
           $scope.options = $scope.options || {};
-          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+          var baseUrl = Formio.setScopeBase($scope);
           var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
             .then(function(result) {
@@ -34914,7 +34913,7 @@ module.exports = function(app) {
             $timeout
           ) {
             $scope.options = $scope.options || {};
-            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var baseUrl = Formio.setScopeBase($scope);
             if (!$scope.data[$scope.component.key]) {
               $scope.data[$scope.component.key] = {data: {}};
             }
@@ -35383,7 +35382,7 @@ module.exports = function(app) {
           title: '',
           theme: 'default',
           tableView: false,
-          hideLabel: true,
+          hideLabel: false,
           components: []
         },
         viewTemplate: 'formio/componentsView/panel.html',
@@ -35601,7 +35600,7 @@ module.exports = function(app) {
               settings.defaultValue = [];
             }
             if (settings.resource) {
-              var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+              var baseUrl = Formio.setScopeBase($scope);
               var url = '';
               if ($scope.formio) {
                 url = $scope.formio.formsUrl + '/' + settings.resource;
@@ -36184,8 +36183,7 @@ module.exports = function(app) {
                 }
                 $scope.options = $scope.options || {};
                 var url = '';
-                var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-                //var baseUrl = Formio.getBaseUrl();
+                var baseUrl = Formio.setScopeBase($scope);
                 if (settings.dataSrc === 'url') {
                   url = settings.data.url;
                   if (url.substr(0, 1) === '/') {
@@ -38876,12 +38874,39 @@ module.exports = function() {
         $timeout
       ) {
         $scope.options = $scope.options || {};
-        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
+        Formio.setScopeBase($scope);
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
         }
 
+        var storedData = {};
+        var storage = {
+          getItem: function(key) {
+            if ($scope.options.noStorage) {
+              return storedData[key];
+            }
+            try {
+              var value = localStorage.getItem(key);
+              return value ? JSON.parse(value) : false;
+            }
+            catch (err) {
+              console.warn('error parsing json from localstorage', err);
+            }
+          },
+          setItem: function(key, value) {
+            if ($scope.options.noStorage) {
+              storedData[key] = value;
+              return;
+            }
+            if (typeof value !== 'string') {
+              value = JSON.stringify(value);
+            }
+            localStorage.setItem(key, value);
+          }
+        };
+
+        var session = ($scope.storage && !$scope.readOnly) ? storage.getItem($scope.storage) : false;
         $scope.formio = null;
         $scope.url = $scope.url || $scope.src;
         $scope.page = {};
@@ -38926,25 +38951,24 @@ module.exports = function() {
             // Handle Local Storage Definition
             if ($scope.storage && !$scope.readOnly) {
               // If there is no localStorage object - make a new object schema
-              if (!localStorage.getItem($scope.storage)) {
-                localStorage.setItem($scope.storage, angular.toJson({
+              if (!storage.getItem($scope.storage)) {
+                storage.setItem($scope.storage, {
                   page: $scope.currentPage,
                   data: $scope.submission.data
-                }));
+                });
               }
 
               // if there is a localStorage object && submission.data is blank then bind localStorage to $scope
-              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
-                var storageToScope = JSON.parse(localStorage.getItem($scope.storage));
-                $scope.submission.data = storageToScope.data
+              if(storage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
+                $scope.submission.data = storage.getItem($scope.storage).data;
               }
 
               // if there is a localStorage object | && it is data | merge the two
-              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
-                localStorage.setItem($scope.storage, angular.toJson({
+              if(storage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
+                storage.setItem($scope.storage, {
                   page: $scope.currentPage,
                   data: $scope.submission.data
-                }));
+                });
               }
             }
 
@@ -38989,7 +39013,7 @@ module.exports = function() {
 
         $scope.clear = function() {
           if ($scope.storage && !$scope.readOnly) {
-            localStorage.setItem($scope.storage, '');
+            storage.setItem($scope.storage, '');
           }
           $scope.submission = {data: {}};
           $scope.currentPage = 0;
@@ -39136,7 +39160,7 @@ module.exports = function() {
 
             var onDone = function(submission) {
               if ($scope.storage && !$scope.readOnly) {
-                localStorage.setItem($scope.storage, '');
+                storage.setItem($scope.storage, '');
               }
               $scope.showAlerts({
                 type: 'success',
@@ -39537,7 +39561,7 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
-        var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+        var baseUrl = Formio.setScopeBase($scope);
         if ($scope._src) {
           loader = new Formio($scope._src, {base: baseUrl});
           var submissionPromise = new Promise(function(resolve, reject) {
@@ -40608,7 +40632,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !options.building\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"{{ formName }}\" class=\"formio-form\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"options.building ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      form-name=\"formName\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\" options=\"options\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !options.building\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"{{ formName }}\" class=\"formio-form\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"options.building ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      form-name=\"formName\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
@@ -40693,7 +40717,6 @@ module.exports = function() {
 
   // Return the provider interface.
   return {
-
     // Expose Formio configuration functions
     setBaseUrl: Formio.setBaseUrl,
     getBaseUrl: Formio.getBaseUrl,
@@ -40747,6 +40770,18 @@ module.exports = function() {
             $rootScope.$broadcast.apply($rootScope, args);
           });
         });
+
+        // Add ability to set the scope base url.
+        Formio.setScopeBase = function($scope) {
+          $scope.baseUrl = $scope.options ? $scope.options.baseUrl : '';
+          if (!$scope.baseUrl && $scope.formio && $scope.formio.projectUrl) {
+            $scope.baseUrl = $scope.formio.projectUrl;
+          }
+          if (!$scope.baseUrl) {
+            $scope.baseUrl = Formio.getBaseUrl();
+          }
+          return $scope.baseUrl;
+        };
 
         // Return the formio interface.
         return Formio;
