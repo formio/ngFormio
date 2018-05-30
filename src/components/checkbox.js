@@ -35,11 +35,9 @@ module.exports = function(app) {
               if (
                 $scope.component.validate
                 && $scope.component.validate.required
-                && (boolean[$scope.data[$scope.component.key]] || false) === false
+                && boolean[$scope.data[$scope.component.key]] === false
               ) {
-                $timeout(function() {
-                  delete $scope.data[$scope.component.key];
-                });
+                delete $scope.data[$scope.component.key];
               }
             });
           }
