@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Required Checkbox submission loading.
 
+### Added
+ - `row` value into Button's custom logic.
+
 ## 2.33.0
 ### Added
  - Save as State action to button component
