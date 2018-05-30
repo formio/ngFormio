@@ -57,7 +57,7 @@ module.exports = function(app) {
           clearOnHide: true,
           delimiter: true,
           decimalLimit: 2,
-          requireDecimals: true,
+          requireDecimal: true,
           validate: {
             required: false,
             multiple: '',
