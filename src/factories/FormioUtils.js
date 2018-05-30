@@ -1,4 +1,4 @@
-var formioUtils = require('formiojs/utils');
+var formioUtils = require('formiojs/utils').default;
 var conformToMask = require('vanilla-text-mask').conformToMask;
 var _filter = require('lodash/filter');
 var _get = require('lodash/get');
