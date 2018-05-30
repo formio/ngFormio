@@ -4,12 +4,21 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 2.34.0
 ### Fixed
  - Required Checkbox submission loading.
+ - Problems with the wizard component not keeping the baseUrl configuration.
+ - How the baseUrl is handled within components.
+ - Fixed typo in default settings for requireDecimal
+ - Fix issue where checkbox radios set default to boolean.
 
 ### Added
  - `row` value into Button's custom logic.
+ - Add option to wizard to not use localStorage.
+
+### Changed
+ - Default setting for hideLabel on Panels should be false.
+ - Upgraded dependencies vanilla-text-mask@5.1.1, browserify@16.2.2, gulp-rename@1.2.3, angular@1.7.0, angular-sanitize@1.7.0, babel-preset-env@1.7.0, gulp-debug@4.0.0, uglifyify@5.0.0, gulp-wrap@0.14.0
 
 ## 2.33.2
 ### Fixed
