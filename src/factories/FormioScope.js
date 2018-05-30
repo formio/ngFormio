@@ -115,7 +115,7 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
-        var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+        var baseUrl = Formio.setScopeBase($scope);
         if ($scope._src) {
           loader = new Formio($scope._src, {base: baseUrl});
           var submissionPromise = new Promise(function(resolve, reject) {

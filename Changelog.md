@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - `row` value into Button's custom logic.
 
+## 2.33.2
+### Fixed
+ - Update new syntax for importing from formio.js v3.x
+
+## 2.33.1
+### Changed
+ - Update formio.js to v3.0.0-alpha19 to fix issue with file uploads losing returned data for urls.
+
 ## 2.33.0
 ### Added
  - Save as State action to button component

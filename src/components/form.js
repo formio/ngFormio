@@ -36,7 +36,7 @@ module.exports = function(app) {
             $timeout
           ) {
             $scope.options = $scope.options || {};
-            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var baseUrl = Formio.setScopeBase($scope);
             if (!$scope.data[$scope.component.key]) {
               $scope.data[$scope.component.key] = {data: {}};
             }

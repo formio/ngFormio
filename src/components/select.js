@@ -382,8 +382,7 @@ module.exports = function(app) {
                 }
                 $scope.options = $scope.options || {};
                 var url = '';
-                var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-                //var baseUrl = Formio.getBaseUrl();
+                var baseUrl = Formio.setScopeBase($scope);
                 if (settings.dataSrc === 'url') {
                   url = settings.data.url;
                   if (url.substr(0, 1) === '/') {

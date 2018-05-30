@@ -1,6 +1,6 @@
 <div>
   <i style="font-size: 2em;" ng-if="formLoading" ng-class="{'formio-hidden': !formLoading}" class="formio-loading glyphicon glyphicon-refresh glyphicon-spin"></i>
-  <formio-wizard ng-if="form.display === 'wizard'" src="src" url="url" form="form" submission="submission" form-action="formAction" read-only="readOnly" hide-components="hideComponents" disable-components="disableComponents" formio-options="formioOptions" storage="form.name"></formio-wizard>
+  <formio-wizard ng-if="form.display === 'wizard'" src="src" url="url" form="form" submission="submission" form-action="formAction" read-only="readOnly" hide-components="hideComponents" disable-components="disableComponents" formio-options="formioOptions" storage="form.name" options="options"></formio-wizard>
   <div ng-if="form.display === 'pdf' && form.settings.pdf" style="position:relative;">
     <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!options.building">
       {{ alert.message | formioTranslate:null:options.building }}

@@ -49,7 +49,7 @@ module.exports = function(app) {
               settings.defaultValue = [];
             }
             if (settings.resource) {
-              var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+              var baseUrl = Formio.setScopeBase($scope);
               var url = '';
               if ($scope.formio) {
                 url = $scope.formio.formsUrl + '/' + settings.resource;
