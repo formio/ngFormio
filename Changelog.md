@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.34.1
+### Fixed
+ - Issues with the formData method not being exposed to FormioUtils.
+ - PDF forms to allow for the url context of the form to be passed to the pdf.
+
 ## 2.34.0
 ### Fixed
  - Required Checkbox submission loading.
