@@ -309,6 +309,7 @@ module.exports = function() {
         return item !== '[]';
       })).conformedValue;
     },
+    fieldData: formioUtils.fieldData,
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,
