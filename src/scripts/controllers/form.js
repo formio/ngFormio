@@ -1866,7 +1866,7 @@ app.controller('FormSubmissionsController', [
             val = _.get(val, path);
           }
 
-          var value = Formio.fieldData(val.toJSON(), component);
+          var value = FormioUtils.fieldData(val.toJSON(), component);
           if (!value && ['container', 'datagrid', 'well', 'panel', 'columns', 'fieldset', 'table'].indexOf(component.type) !== -1) {
             value = val.toJSON();
           }
