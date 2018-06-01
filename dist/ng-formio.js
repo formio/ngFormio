@@ -6418,6 +6418,11 @@ var PDF = function (_Webform) {
       var _this3 = this;
 
       return _get(PDF.prototype.__proto__ || Object.getPrototypeOf(PDF.prototype), 'setForm', this).call(this, form).then(function () {
+        if (_this3.formio) {
+          form.projectUrl = _this3.formio.projectUrl;
+          form.url = _this3.formio.formUrl;
+          form.base = _this3.formio.base;
+        }
         _this3.postMessage({ name: 'form', data: form });
       });
     }
@@ -7685,7 +7690,7 @@ var Webform = function (_NestedComponent) {
 
   }, {
     key: 'showErrors',
-    value: function showErrors(error) {
+    value: function showErrors(error, triggerEvent) {
       this.loading = false;
       var errors = this.errors;
       if (error) {
@@ -7708,7 +7713,9 @@ var Webform = function (_NestedComponent) {
       });
       message += '</ul>';
       this.setAlert('danger', message);
-      this.emit('error', errors);
+      if (triggerEvent) {
+        this.emit('error', errors);
+      }
       return errors;
     }
 
@@ -7758,7 +7765,7 @@ var Webform = function (_NestedComponent) {
       }
 
       this.setPristine(false);
-      return this.showErrors(error);
+      return this.showErrors(error, true);
     }
 
     /**
@@ -9042,12 +9049,11 @@ var Wizard = function (_Webform) {
       if (form) {
         var page = ++currentPage;
         if (form.nextPage) {
-          var next = (0, _utils.evaluate)(form.nextPage, {
+          var next = this.evaluate(form.nextPage, {
             next: page,
             data: data,
             page: page,
-            form: form,
-            instance: this
+            form: form
           }, 'next');
           if (next === null) {
             return null;
@@ -9113,7 +9119,7 @@ var Wizard = function (_Webform) {
           });
         });
       } else {
-        return _nativePromiseOnly2.default.reject(this.showErrors());
+        return _nativePromiseOnly2.default.reject(this.showErrors(null, true));
       }
     }
   }, {
@@ -9763,7 +9769,14 @@ exports.default = {
   each: _lodash2.default.each,
   has: _lodash2.default.has,
   checkValidator: function checkValidator(component, validator, setting, value, data) {
-    var result = validator.check.call(this, component, setting, value, data);
+    var result = null;
+
+    // Allow each component to override their own validators by implementing the validator.method
+    if (validator.method && typeof component[validator.method] === 'function') {
+      result = component[validator.method](setting, value, data);
+    } else {
+      result = validator.check.call(this, component, setting, value, data);
+    }
     if (typeof result === 'string') {
       return result;
     }
@@ -9817,6 +9830,7 @@ exports.default = {
   validators: {
     required: {
       key: 'validate.required',
+      method: 'validateRequired',
       message: function message(component) {
         return component.t(component.errorMessage('required'), {
           field: component.errorLabel,
@@ -9951,12 +9965,9 @@ exports.default = {
         if (!setting) {
           return true;
         }
-        var valid = (0, _utils.evaluate)(setting, {
-          row: component.data,
+        var valid = component.evaluate(setting, {
           data: data,
-          component: component.component,
-          input: value,
-          instance: component
+          input: value
         });
         if (valid === null) {
           return true;
@@ -10001,13 +10012,10 @@ exports.default = {
         if (!setting) {
           return true;
         }
-        var valid = (0, _utils.evaluate)(setting, {
+        var valid = component.evaluate(setting, {
           valid: true,
-          row: component.data,
           data: data,
-          component: component.component,
-          input: value,
-          instance: component
+          input: value
         }, 'valid', true);
         if (valid === null) {
           return true;
@@ -10086,8 +10094,6 @@ var _TextField2 = _interopRequireDefault(_TextField);
 var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js");
 
 var _Base2 = _interopRequireDefault(_Base);
-
-var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -10412,7 +10418,7 @@ var AddressComponent = function (_TextFieldComponent) {
   }, {
     key: 'autoCompleteFilterSuggestion',
     value: function autoCompleteFilterSuggestion(data) {
-      var result = (0, _utils.evaluate)(this.component.map.autoCompleteFilter, {
+      var result = this.evaluate(this.component.map.autoCompleteFilter, {
         show: true,
         data: data
       }, 'show');
@@ -10888,6 +10894,8 @@ var _i18next2 = _interopRequireDefault(_i18next);
 
 var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
+var FormioUtils = _interopRequireWildcard(_utils);
+
 var _Validator = __webpack_require__(/*! ../Validator */ "./node_modules/formiojs/components/Validator.js");
 
 var _Validator2 = _interopRequireDefault(_Validator);
@@ -10895,6 +10903,8 @@ var _Validator2 = _interopRequireDefault(_Validator);
 var _moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 
 var _moment2 = _interopRequireDefault(_moment);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -11051,7 +11061,7 @@ var BaseComponent = function () {
      * can also be provided from the component.id value passed into the constructor.
      * @type {string}
      */
-    this.id = component && component.id ? component.id : (0, _utils.getRandomComponentId)();
+    this.id = component && component.id ? component.id : FormioUtils.getRandomComponentId();
 
     /**
      * The options for this component.
@@ -11654,6 +11664,29 @@ var BaseComponent = function () {
         return true;
       }
     }
+
+    /**
+     * Create an evaluation context for all script executions and interpolations.
+     *
+     * @param additional
+     * @return {*}
+     */
+
+  }, {
+    key: 'evalContext',
+    value: function evalContext(additional) {
+      additional = additional || {};
+      return Object.assign({
+        component: this.component,
+        row: this.data,
+        data: this.root ? this.root.data : this.data,
+        _: _lodash2.default,
+        utils: FormioUtils,
+        util: FormioUtils,
+        moment: _moment2.default,
+        instance: this
+      }, additional);
+    }
   }, {
     key: 'setPristine',
 
@@ -12203,7 +12236,7 @@ var BaseComponent = function () {
     key: 'setInputMask',
     value: function setInputMask(input) {
       if (input && this.component.inputMask) {
-        var mask = (0, _utils.getInputMask)(this.component.inputMask);
+        var mask = FormioUtils.getInputMask(this.component.inputMask);
         this._inputMask = mask;
         input.mask = (0, _vanillaTextMask2.default)({
           inputElement: input,
@@ -12338,7 +12371,7 @@ var BaseComponent = function () {
       var div = this.ce('div');
 
       // Interpolate the template and populate
-      div.innerHTML = (0, _utils.interpolate)(template, data);
+      div.innerHTML = this.interpolate(template, data);
 
       // Add actions to matching elements.
       actions.forEach(function (action) {
@@ -12501,7 +12534,7 @@ var BaseComponent = function () {
         return this._hasCondition;
       }
 
-      this._hasCondition = (0, _utils.hasCondition)(this.component);
+      this._hasCondition = FormioUtils.hasCondition(this.component);
       return this._hasCondition;
     }
 
@@ -12520,7 +12553,7 @@ var BaseComponent = function () {
       if (!this.hasCondition()) {
         result = this.show(true);
       } else {
-        result = this.show((0, _utils.checkCondition)(this.component, this.data, data, this.root ? this.root._form : {}, this));
+        result = this.show(FormioUtils.checkCondition(this.component, this.data, data, this.root ? this.root._form : {}, this));
       }
 
       if (this.fieldLogic(data)) {
@@ -12551,24 +12584,22 @@ var BaseComponent = function () {
       var newComponent = _lodash2.default.cloneDeep(this.originalComponent);
 
       var changed = logics.reduce(function (changed, logic) {
-        var result = (0, _utils.checkTrigger)(newComponent, logic.trigger, _this10.data, data, _this10.root ? _this10.root._form : {}, _this10);
+        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this10.data, data, _this10.root ? _this10.root._form : {}, _this10);
 
         if (result) {
           changed |= logic.actions.reduce(function (changed, action) {
             switch (action.type) {
               case 'property':
-                (0, _utils.setActionProperty)(newComponent, action, _this10.data, data, newComponent, result);
+                FormioUtils.setActionProperty(newComponent, action, _this10.data, data, newComponent, result, _this10);
                 break;
               case 'value':
                 {
                   var oldValue = _this10.getValue();
-                  var newValue = (0, _utils.evaluate)(action.value, {
+                  var newValue = _this10.evaluate(action.value, {
                     value: _lodash2.default.clone(oldValue),
-                    row: _this10.data,
                     data: data,
                     component: newComponent,
-                    result: result,
-                    instance: _this10
+                    result: result
                   }, 'value');
                   if (!_lodash2.default.isEqual(oldValue, newValue)) {
                     _this10.setValue(newValue);
@@ -12724,6 +12755,7 @@ var BaseComponent = function () {
 
       // Set the changed variable.
       var changed = {
+        instance: this,
         component: this.component,
         value: this.dataValue,
         flags: flags
@@ -13037,13 +13069,9 @@ var BaseComponent = function () {
 
       flags = flags || {};
       flags.noCheck = true;
-      return this.setValue((0, _utils.evaluate)(this.component.calculateValue, {
+      return this.setValue(this.evaluate(this.component.calculateValue, {
         value: [],
-        component: this.component,
-        data: data,
-        row: this.data,
-        instance: this,
-        moment: _moment2.default
+        data: data
       }, 'value'), flags);
     }
 
@@ -13076,7 +13104,7 @@ var BaseComponent = function () {
     key: 'invalidMessage',
     value: function invalidMessage(data, dirty, ignoreCondition) {
       // Force valid if component is conditionally hidden.
-      if (!ignoreCondition && !(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!ignoreCondition && !FormioUtils.checkCondition(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
         return '';
       }
 
@@ -13110,7 +13138,7 @@ var BaseComponent = function () {
     key: 'checkValidity',
     value: function checkValidity(data, dirty) {
       // Force valid if component is conditionally hidden.
-      if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!FormioUtils.checkCondition(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
         this.setCustomValidity('');
         return true;
       }
@@ -13150,7 +13178,12 @@ var BaseComponent = function () {
   }, {
     key: 'interpolate',
     value: function interpolate(string, data) {
-      return (0, _utils.interpolate)(string, data);
+      return FormioUtils.interpolate(string, this.evalContext(data));
+    }
+  }, {
+    key: 'evaluate',
+    value: function evaluate(func, args, ret, tokenize) {
+      return FormioUtils.evaluate(func, this.evalContext(args), ret, tokenize);
     }
   }, {
     key: 'setCustomValidity',
@@ -13522,19 +13555,12 @@ var BaseComponent = function () {
       if (this.component.defaultValue) {
         defaultValue = this.component.defaultValue;
       } else if (this.component.customDefaultValue) {
-        defaultValue = (0, _utils.evaluate)(this.component.customDefaultValue, {
-          value: '',
-          component: this.component,
-          row: this.data,
-          data: this.root ? this.root.data : this.data,
-          _: _lodash2.default,
-          instance: this
-        }, 'value');
+        defaultValue = this.evaluate(this.component.customDefaultValue, { value: '' }, 'value');
       }
 
       if (this._inputMask) {
         defaultValue = (0, _vanillaTextMask.conformToMask)(defaultValue, this._inputMask).conformedValue;
-        if (!(0, _utils.matchInputMask)(defaultValue, this._inputMask)) {
+        if (!FormioUtils.matchInputMask(defaultValue, this._inputMask)) {
           defaultValue = '';
         }
       }
@@ -15035,14 +15061,10 @@ var ButtonComponent = function (_BaseComponent) {
                 }
               });
 
-              (0, _utils.evaluate)(_this2.component.custom, {
+              _this2.evaluate(_this2.component.custom, {
                 form: form,
                 flattened: flattened,
-                components: components,
-                _: _lodash2.default,
-                data: _this2.data,
-                component: _this2.component,
-                instance: _this2
+                components: components
               });
               break;
             }
@@ -15601,6 +15623,9 @@ var CheckBoxComponent = function (_BaseComponent) {
   }, {
     key: 'setInputStyle',
     value: function setInputStyle(input) {
+      if (!input) {
+        return;
+      }
       if (this.component.labelPosition === 'left') {
         _lodash2.default.assign(input.style, {
           position: 'initial',
@@ -15686,20 +15711,19 @@ var CheckBoxComponent = function (_BaseComponent) {
     value: function getValue() {
       var value = _get(CheckBoxComponent.prototype.__proto__ || Object.getPrototypeOf(CheckBoxComponent.prototype), 'getValue', this).call(this);
       if (this.component.name) {
-        return value ? value : this.dataValue;
+        return value ? this.setCheckedState(value) : this.setCheckedState(this.dataValue);
       } else {
         return value;
       }
     }
   }, {
-    key: 'setValue',
-    value: function setValue(value, flags) {
-      flags = this.getFlags.apply(this, arguments);
+    key: 'setCheckedState',
+    value: function setCheckedState(value) {
       if (!this.input) {
         return;
       }
       if (this.component.name) {
-        this.input.value = value === this.component.value ? 1 : 0;
+        this.input.value = value === this.component.value ? this.component.value : 0;
         this.input.checked = value === this.component.value ? 1 : 0;
       } else if (value === 'on') {
         this.input.value = 1;
@@ -15714,7 +15738,20 @@ var CheckBoxComponent = function (_BaseComponent) {
         this.input.value = 0;
         this.input.checked = 0;
       }
-      return this.updateValue(flags);
+      if (this.input.checked) {
+        this.input.setAttribute('checked', true);
+      } else {
+        this.input.removeAttribute('checked');
+      }
+      return value;
+    }
+  }, {
+    key: 'setValue',
+    value: function setValue(value, flags) {
+      flags = this.getFlags.apply(this, arguments);
+      if (this.setCheckedState(value) !== undefined) {
+        return this.updateValue(flags);
+      }
     }
   }, {
     key: 'getView',
@@ -16404,7 +16441,7 @@ var ContentComponent = function (_BaseComponent) {
         });
         this.element.appendChild(editorElement);
       } else {
-        this.element.innerHTML = this.interpolate(this.component.html, { data: this.data });
+        this.element.innerHTML = this.interpolate(this.component.html);
       }
     }
   }, {
@@ -16933,9 +16970,10 @@ var DataGridComponent = function (_NestedComponent) {
       var column = _lodash2.default.clone(col);
       var options = _lodash2.default.clone(this.options);
       options.name += '[' + rowIndex + ']';
+      options.row = rowIndex + '-' + colIndex;
       var comp = this.createComponent(_lodash2.default.assign({}, column, {
         label: column.dataGridLabel ? column.label : false,
-        row: rowIndex + '-' + colIndex
+        row: options.row
       }), options, row);
       this.hook('addComponent', container, comp);
       container.appendChild(comp.getElement());
@@ -17430,6 +17468,22 @@ var DateTimeComponent = function (_BaseComponent) {
       return DateTimeComponent.schema();
     }
   }, {
+    key: 'defaultValue',
+    get: function get() {
+      var defaultValue = _get(DateTimeComponent.prototype.__proto__ || Object.getPrototypeOf(DateTimeComponent.prototype), 'defaultValue', this);
+      if (defaultValue) {
+        return defaultValue;
+      }
+
+      // Check the default date.
+      var defaultDate = this.defaultDate;
+      if (defaultDate) {
+        return defaultDate.toISOString();
+      }
+
+      return '';
+    }
+  }, {
     key: 'emptyValue',
     get: function get() {
       return '';
@@ -17805,9 +17859,27 @@ var DayComponent = function (_BaseComponent) {
       return info;
     }
   }, {
-    key: 'isEmpty',
-    value: function isEmpty(value) {
-      return _get(DayComponent.prototype.__proto__ || Object.getPrototypeOf(DayComponent.prototype), 'isEmpty', this).call(this, value);
+    key: 'validateRequired',
+    value: function validateRequired(setting, value) {
+      var day = _lodash2.default.isNaN(this.dayInput.value) ? 0 : parseInt(this.dayInput.value, 10);
+      var month = _lodash2.default.isNaN(this.monthInput.value) ? -1 : parseInt(this.monthInput.value, 10) - 1;
+      var year = _lodash2.default.isNaN(this.yearInput.value) ? 0 : parseInt(this.yearInput.value, 10);
+      if (this.dayRequired && !day) {
+        return false;
+      }
+
+      if (this.monthRequired && month < 0) {
+        return false;
+      }
+
+      if (this.yearRequired && !year) {
+        return false;
+      }
+
+      if (!(0, _utils.boolValue)(setting)) {
+        return true;
+      }
+      return !this.isEmpty(value);
     }
   }, {
     key: 'createDayInput',
@@ -18102,14 +18174,29 @@ var DayComponent = function (_BaseComponent) {
       }
     }
   }, {
+    key: 'dayRequired',
+    get: function get() {
+      return this.showDay && _lodash2.default.get(this.component, 'fields.day.required', false);
+    }
+  }, {
     key: 'showDay',
     get: function get() {
       return !_lodash2.default.get(this.component, 'fields.day.hide', false);
     }
   }, {
+    key: 'monthRequired',
+    get: function get() {
+      return this.showMonth && _lodash2.default.get(this.component, 'fields.month.required', false);
+    }
+  }, {
     key: 'showMonth',
     get: function get() {
       return !_lodash2.default.get(this.component, 'fields.month.hide', false);
+    }
+  }, {
+    key: 'yearRequired',
+    get: function get() {
+      return this.showYear && _lodash2.default.get(this.component, 'fields.year.required', false);
     }
   }, {
     key: 'showYear',
@@ -18129,11 +18216,6 @@ var DayComponent = function (_BaseComponent) {
       }
       this._months = [{ value: 0, label: _lodash2.default.get(this.component, 'fields.month.placeholder', '') }, { value: 1, label: this.t('january') }, { value: 2, label: this.t('february') }, { value: 3, label: this.t('march') }, { value: 4, label: this.t('april') }, { value: 5, label: this.t('may') }, { value: 6, label: this.t('june') }, { value: 7, label: this.t('july') }, { value: 8, label: this.t('august') }, { value: 9, label: this.t('september') }, { value: 10, label: this.t('october') }, { value: 11, label: this.t('november') }, { value: 12, label: this.t('december') }];
       return this._months;
-    }
-  }, {
-    key: 'emptyValue',
-    get: function get() {
-      return null;
     }
   }, {
     key: 'disabled',
@@ -18293,9 +18375,7 @@ var _Components = __webpack_require__(/*! ../Components */ "./node_modules/formi
 
 var _Components2 = _interopRequireDefault(_Components);
 
-var _index = __webpack_require__(/*! ../../utils/index */ "./node_modules/formiojs/utils/index.js");
-
-var _index2 = _interopRequireDefault(_index);
+var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -18392,11 +18472,11 @@ var EditGridComponent = function (_NestedComponent) {
       if (!templateHeader) {
         return this.text('');
       }
-      return this.ce('li', { class: 'list-group-item list-group-header' }, this.renderTemplate(templateHeader, {
+      return this.ce('li', {
+        class: 'list-group-item list-group-header'
+      }, this.renderTemplate(templateHeader, {
         components: this.component.components,
-        util: _index2.default,
-        value: this.dataValue,
-        data: this.data
+        value: this.dataValue
       }));
     }
   }, {
@@ -18431,14 +18511,12 @@ var EditGridComponent = function (_NestedComponent) {
         }, this.component.removeRow || 'Cancel') : null])])));
       } else {
         wrapper.appendChild(this.renderTemplate(rowTemplate, {
-          data: this.data,
           row: row,
           rowIndex: rowIndex,
           components: this.component.components,
           getView: function getView(component, data) {
             return _Components2.default.create(component, _this3.options, data, true).getView(data);
-          },
-          util: _index2.default
+          }
         }, [{
           class: 'removeRow',
           event: 'click',
@@ -18460,11 +18538,11 @@ var EditGridComponent = function (_NestedComponent) {
       if (!footerTemplate) {
         return this.text('');
       }
-      return this.ce('li', { class: 'list-group-item list-group-footer' }, this.renderTemplate(footerTemplate, {
+      return this.ce('li', {
+        class: 'list-group-item list-group-footer'
+      }, this.renderTemplate(footerTemplate, {
         components: this.component.components,
-        util: _index2.default,
-        value: this.dataValue,
-        data: this.data
+        value: this.dataValue
       }));
     }
   }, {
@@ -18638,12 +18716,9 @@ var EditGridComponent = function (_NestedComponent) {
       });
 
       if (this.component.validate && this.component.validate.row) {
-        var valid = _index2.default.evaluate(this.component.validate.row, {
+        var valid = this.evaluate(this.component.validate.row, {
           valid: true,
-          row: this.editRows[rowIndex].data,
-          data: this.data,
-          component: this.component,
-          instance: this
+          row: this.editRows[rowIndex].data
         }, 'valid', true);
         if (valid === null) {
           valid = 'Invalid row validation for ' + this.key;
@@ -18663,7 +18738,8 @@ var EditGridComponent = function (_NestedComponent) {
     value: function checkValidity(data, dirty) {
       var _this8 = this;
 
-      if (!_index2.default.checkCondition(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+        this.setCustomValidity('');
         return true;
       }
 
@@ -19342,7 +19418,7 @@ var FileComponent = function (_BaseComponent) {
     value: function buildFileList() {
       var _this2 = this;
 
-      return this.ce('ul', { class: 'list-group list-group-striped' }, [this.ce('li', { class: 'list-group-item list-group-header hidden-xs hidden-sm' }, this.ce('div', { class: 'row' }, [this.ce('div', { class: 'col-md-1' }), this.ce('div', { class: 'col-md-9' }, this.ce('strong', {}, 'File Name')), this.ce('div', { class: 'col-md-2' }, this.ce('strong', {}, 'Size'))])), this.dataValue.map(function (fileInfo, index) {
+      return this.ce('ul', { class: 'list-group list-group-striped' }, [this.ce('li', { class: 'list-group-item list-group-header hidden-xs hidden-sm' }, this.ce('div', { class: 'row' }, [this.ce('div', { class: 'col-md-1' }), this.ce('div', { class: 'col-md-9' }, this.ce('strong', {}, this.text('File Name'))), this.ce('div', { class: 'col-md-2' }, this.ce('strong', {}, this.text('Size')))])), this.dataValue.map(function (fileInfo, index) {
         return _this2.createFileListItem(fileInfo, index);
       })]);
     }
@@ -19466,7 +19542,7 @@ var FileComponent = function (_BaseComponent) {
           }
         },
         class: 'browse'
-      }, 'browse');
+      }, this.text('browse'));
 
       return this.browseLink;
     }
@@ -19667,7 +19743,7 @@ var FileComponent = function (_BaseComponent) {
           }
 
           // Get a unique name for this file to keep file collisions from occurring.
-          var dir = _this9.interpolate(_this9.component.dir || '', { data: _this9.data, row: _this9.row });
+          var dir = _this9.interpolate(_this9.component.dir || '');
           var fileService = _this9.fileService;
           if (!fileService) {
             fileUpload.status = 'error';
@@ -20005,15 +20081,48 @@ var FormComponent = function (_BaseComponent) {
   }
 
   _createClass(FormComponent, [{
-    key: 'loadSubForm',
+    key: 'renderSubForm',
 
+
+    /**
+     * Render a subform.
+     *
+     * @param form
+     * @param options
+     */
+    value: function renderSubForm(form, options) {
+      var _this2 = this;
+
+      // Iterate through every component and hide the submit button.
+      (0, _utils.eachComponent)(form.components, function (component) {
+        if (component.type === 'button' && component.action === 'submit') {
+          component.hidden = true;
+        }
+      });
+
+      new _Form2.default(this.element, form, options).render().then(function (instance) {
+        _this2.subForm = instance;
+        _this2.subForm.on('change', function () {
+          _this2.dataValue = _this2.subForm.getValue();
+          _this2.onChange();
+        });
+        _this2.subForm.url = _this2.formSrc;
+        _this2.subForm.nosubmit = false;
+        _this2.restoreValue();
+        _this2.subFormReadyResolve(_this2.subForm);
+        return _this2.subForm;
+      });
+    }
 
     /**
      * Load the subform.
      */
     /* eslint-disable max-statements */
+
+  }, {
+    key: 'loadSubForm',
     value: function loadSubForm() {
-      var _this2 = this;
+      var _this3 = this;
 
       // Only load the subform if the subform isn't loaded and the conditions apply.
       if (this.subFormLoaded || !_get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'checkConditions', this).call(this, this.root ? this.root.data : this.data)) {
@@ -20026,6 +20135,12 @@ var FormComponent = function (_BaseComponent) {
       }
       if (this.options && this.options.project) {
         srcOptions.project = this.options.project;
+      }
+      if (this.options && this.options.readOnly) {
+        srcOptions.readOnly = this.options.readOnly;
+      }
+      if (this.options && this.options.viewAsHtml) {
+        srcOptions.viewAsHtml = this.options.viewAsHtml;
       }
 
       // Make sure that if reference is provided, the form must submit.
@@ -20067,29 +20182,16 @@ var FormComponent = function (_BaseComponent) {
         }
       }
 
-      new _Formio2.default(this.formSrc).loadForm({ params: { live: 1 } }).then(function (formObj) {
-        // Iterate through every component and hide the submit button.
-        (0, _utils.eachComponent)(formObj.components, function (component) {
-          if (component.type === 'button' && component.action === 'submit') {
-            component.hidden = true;
-          }
+      // Determine if we already have a loaded form object.
+      if (this.component && this.component.components && this.component.components.length) {
+        this.renderSubForm(this.component, srcOptions);
+      } else {
+        new _Formio2.default(this.formSrc).loadForm({ params: { live: 1 } }).then(function (formObj) {
+          return _this3.renderSubForm(formObj, srcOptions);
+        }).catch(function (err) {
+          return _this3.subFormReadyReject(err);
         });
-
-        new _Form2.default(_this2.element, formObj, srcOptions).render().then(function (form) {
-          _this2.subForm = form;
-          _this2.subForm.on('change', function () {
-            _this2.dataValue = _this2.subForm.getValue();
-            _this2.onChange();
-          });
-          _this2.subForm.url = _this2.formSrc;
-          _this2.subForm.nosubmit = false;
-          _this2.restoreValue();
-          _this2.subFormReadyResolve(_this2.subForm);
-          return _this2.subForm;
-        });
-      }).catch(function (err) {
-        return _this2.subFormReadyReject(err);
-      });
+      }
       return this.subFormReady;
     }
     /* eslint-enable max-statements */
@@ -20129,16 +20231,16 @@ var FormComponent = function (_BaseComponent) {
   }, {
     key: 'beforeNext',
     value: function beforeNext() {
-      var _this3 = this;
+      var _this4 = this;
 
       // If we wish to submit the form on next page, then do that here.
       if (this.component.submit) {
         return this.loadSubForm().then(function () {
-          return _this3.subForm.submitForm().then(function (result) {
-            _this3.dataValue = result.submission;
-            return _this3.dataValue;
+          return _this4.subForm.submitForm().then(function (result) {
+            _this4.dataValue = result.submission;
+            return _this4.dataValue;
           }).catch(function (err) {
-            _this3.subForm.onSubmissionError(err);
+            _this4.subForm.onSubmissionError(err);
             return _nativePromiseOnly2.default.reject(err);
           });
         });
@@ -20154,7 +20256,7 @@ var FormComponent = function (_BaseComponent) {
   }, {
     key: 'beforeSubmit',
     value: function beforeSubmit() {
-      var _this4 = this;
+      var _this5 = this;
 
       var submission = this.dataValue;
 
@@ -20170,13 +20272,13 @@ var FormComponent = function (_BaseComponent) {
       // This submission has not been submitted yet.
       if (this.component.submit) {
         return this.loadSubForm().then(function () {
-          return _this4.subForm.submitForm().then(function (result) {
-            _this4.subForm.loading = false;
-            _this4.dataValue = _this4.component.reference ? {
+          return _this5.subForm.submitForm().then(function (result) {
+            _this5.subForm.loading = false;
+            _this5.dataValue = _this5.component.reference ? {
               _id: result.submission._id,
               form: result.submission.form
             } : result.submission;
-            return _this4.dataValue;
+            return _this5.dataValue;
           });
         });
       } else {
@@ -20196,7 +20298,7 @@ var FormComponent = function (_BaseComponent) {
   }, {
     key: 'setValue',
     value: function setValue(submission, flags) {
-      var _this5 = this;
+      var _this6 = this;
 
       var changed = _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'setValue', this).call(this, submission, flags);
       if (this.subForm) {
@@ -20205,7 +20307,7 @@ var FormComponent = function (_BaseComponent) {
         this.loadSubForm().then(function (form) {
           if (submission && submission._id && form.formio && !flags.noload) {
             var submissionUrl = form.formio.formsUrl + '/' + submission.form + '/submission/' + submission._id;
-            form.setUrl(submissionUrl, _this5.options);
+            form.setUrl(submissionUrl, _this6.options);
             form.nosubmit = false;
             form.loadSubmission();
           } else {
@@ -20486,7 +20588,7 @@ var HTMLComponent = function (_BaseComponent) {
   _createClass(HTMLComponent, [{
     key: 'setHTML',
     value: function setHTML() {
-      this.element.innerHTML = this.interpolate(this.component.content, { data: this.data, row: this.row });
+      this.element.innerHTML = this.interpolate(this.component.content);
     }
   }, {
     key: 'build',
@@ -21641,6 +21743,7 @@ var NestedComponent = function (_BaseComponent) {
     key: 'checkValidity',
     value: function checkValidity(data, dirty) {
       if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+        this.setCustomValidity('');
         return true;
       }
 
@@ -21676,6 +21779,14 @@ var NestedComponent = function (_BaseComponent) {
       });
       this.components = [];
       this.hidden = [];
+    }
+  }, {
+    key: 'setCustomValidity',
+    value: function setCustomValidity(message, dirty) {
+      _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'setCustomValidity', this).call(this, message, dirty);
+      _lodash2.default.each(this.getComponents(), function (comp) {
+        return comp.setCustomValidity(message, dirty);
+      });
     }
   }, {
     key: 'setHidden',
@@ -22711,7 +22822,11 @@ var RadioComponent = function (_BaseComponent) {
         _this2.addShortcut(label, value.shortcut);
 
         // Determine the attributes for this input.
-        var inputId = '' + _this2.id + _this2.row + '-' + value.value;
+        var inputId = _this2.id;
+        if (_this2.options.row) {
+          inputId += '-' + _this2.options.row;
+        }
+        inputId += '-' + value.value;
         _this2.info.attr.id = inputId;
         _this2.info.attr.value = value.value;
         label.setAttribute('for', _this2.info.attr.id);
@@ -23330,12 +23445,6 @@ var _Formio = __webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/F
 
 var _Formio2 = _interopRequireDefault(_Formio);
 
-var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
-
-var FormioUtils = _interopRequireWildcard(_utils);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23620,7 +23729,6 @@ var SelectComponent = function (_BaseComponent) {
 
       // Allow for url interpolation.
       url = this.interpolate(url, {
-        data: this.data,
         formioBase: _Formio2.default.getBaseUrl()
       });
 
@@ -23635,7 +23743,7 @@ var SelectComponent = function (_BaseComponent) {
 
       // Add filter capability
       if (this.component.filter) {
-        var filter = this.interpolate(this.component.filter, { data: this.data });
+        var filter = this.interpolate(this.component.filter);
         url += (!(url.indexOf('?') !== -1) ? '?' : '&') + filter;
       }
 
@@ -23671,13 +23779,8 @@ var SelectComponent = function (_BaseComponent) {
   }, {
     key: 'updateCustomItems',
     value: function updateCustomItems() {
-      this.setItems(FormioUtils.evaluate(this.component.data.custom, {
-        values: [],
-        component: this.component,
-        data: _lodash2.default.cloneDeep(this.root ? this.root.data : this.data),
-        row: _lodash2.default.cloneDeep(this.data),
-        utils: FormioUtils,
-        instance: this
+      this.setItems(this.evaluate(this.component.data.custom, {
+        values: []
       }, 'values') || []);
     }
   }, {
@@ -24071,9 +24174,7 @@ var SelectComponent = function (_BaseComponent) {
         try {
           _lodash2.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this7.interpolate(header.value, {
-                data: _this7.data
-              }));
+              headers.set(header.key, _this7.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -26344,7 +26445,7 @@ var TextAreaComponent = function (_TextFieldComponent) {
       var value = this.getValue();
       value = this.isEmpty(value) ? this.defaultViewOnlyValue : this.getView(value);
       if (this.component.wysiwyg) {
-        value = this.interpolate(value, { data: this.data });
+        value = this.interpolate(value);
       }
       element.innerHTML = value;
     }
@@ -26471,7 +26572,7 @@ var TextAreaComponent = function (_TextFieldComponent) {
 
       if (this.htmlView) {
         // For HTML view, just view the contents.
-        this.input.innerHTML = this.interpolate(value, { data: this.data });
+        this.input.innerHTML = this.interpolate(value);
       } else if (this.editorReady) {
         this.editorReady.then(function (editor) {
           if (_this3.component.editor === 'ace') {
@@ -28332,6 +28433,7 @@ exports.matchInputMask = matchInputMask;
 exports.getNumberSeparators = getNumberSeparators;
 exports.getNumberDecimalLimit = getNumberDecimalLimit;
 exports.getCurrencyAffixes = getCurrencyAffixes;
+exports.fieldData = fieldData;
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
@@ -28785,7 +28887,7 @@ function checkCustomConditional(component, custom, row, data, form, variable, on
   if (typeof custom === 'string') {
     custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
   }
-  var value = evaluate(custom, { component: component, row: row, data: data, form: form, instance: instance });
+  var value = instance && instance.evaluate ? instance.evaluate(custom, { row: row, data: data, form: form }) : evaluate(custom, { row: row, data: data, form: form });
   if (value === null) {
     return onError;
   }
@@ -28824,7 +28926,7 @@ function checkCondition(component, row, data, form, instance) {
   } else if (component.conditional && component.conditional.when) {
     return checkSimpleConditional(component, component.conditional, row, data, true);
   } else if (component.conditional && component.conditional.json) {
-    return checkJsonConditional(component, component.conditional.json, row, data, form);
+    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
   }
 
   // Default to show.
@@ -28853,7 +28955,7 @@ function checkTrigger(component, trigger, row, data, form, instance) {
   return false;
 }
 
-function setActionProperty(component, action, row, data, result) {
+function setActionProperty(component, action, row, data, result, instance) {
   switch (action.property.type) {
     case 'boolean':
       if (_lodash2.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
@@ -28862,12 +28964,13 @@ function setActionProperty(component, action, row, data, result) {
       break;
     case 'string':
       {
-        var newValue = interpolate(action.text, {
+        var evalData = {
           data: data,
           row: row,
           component: component,
           result: result
-        });
+        };
+        var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
         if (newValue !== _lodash2.default.get(component, action.property.value, '')) {
           _lodash2.default.set(component, action.property.value, newValue);
         }
@@ -28962,15 +29065,32 @@ function getDateSetting(date) {
     return null;
   }
 
-  var dateSetting = (0, _moment2.default)(date);
-  if (dateSetting.isValid()) {
+  if (date instanceof Date) {
+    return date;
+  } else if (typeof date.toDate === 'function') {
+    return date.isValid() ? date.toDate() : null;
+  }
+
+  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _moment2.default)(date) : null;
+  if (dateSetting && dateSetting.isValid()) {
     return dateSetting.toDate();
   }
 
+  dateSetting = null;
   try {
     var value = new Function('moment', 'return ' + date + ';')(_moment2.default);
-    dateSetting = (0, _moment2.default)(value);
+    if (typeof value === 'string') {
+      dateSetting = (0, _moment2.default)(value);
+    } else if (typeof value.toDate === 'function') {
+      dateSetting = (0, _moment2.default)(value.toDate().toUTCString());
+    } else if (value instanceof Date) {
+      dateSetting = (0, _moment2.default)(value);
+    }
   } catch (e) {
+    return null;
+  }
+
+  if (!dateSetting) {
     return null;
   }
 
@@ -29139,6 +29259,55 @@ function getCurrencyAffixes(_ref) {
     prefix: parts[1] || '',
     suffix: parts[2] || ''
   };
+}
+
+/**
+ * Fetch the field data provided a component.
+ *
+ * @param data
+ * @param component
+ * @return {*}
+ */
+function fieldData(data, component) {
+  if (!data) {
+    return '';
+  }
+  if (!component || !component.key) {
+    return data;
+  }
+  if (component.key.indexOf('.') !== -1) {
+    var value = data;
+    var parts = component.key.split('.');
+    var key = '';
+    for (var i = 0; i < parts.length; i++) {
+      key = parts[i];
+
+      // Handle nested resources
+      if (value.hasOwnProperty('_id')) {
+        value = value.data;
+      }
+
+      // Return if the key is not found on the value.
+      if (!value.hasOwnProperty(key)) {
+        return;
+      }
+
+      // Convert old single field data in submissions to multiple
+      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+        value[key] = [value[key]];
+      }
+
+      // Set the value of this key.
+      value = value[key];
+    }
+    return value;
+  } else {
+    // Convert old single field data in submissions to multiple
+    if (component.multiple && !Array.isArray(data[component.key])) {
+      data[component.key] = [data[component.key]];
+    }
+    return data[component.key];
+  }
 }
 
 /***/ }),
