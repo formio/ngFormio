@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - New Environments
  - 'Not Found' option for team members search.
  - Custom Form properties.
+ - Pagination for action lists
 
 ### Changed
  - Projects are created from platforms, not app templates
