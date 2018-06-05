@@ -34,7 +34,7 @@
           ></formio-component>
         </td>
         <td ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength">
-          <a ng-click="(readOnly || formioForm.submitting)? null: removeRow(rowIndex) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default">
+          <a ng-click="(readOnly || formioForm.submitting)? null: removeRow(rowIndex) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default datagrid-remove">
             <span class="glyphicon glyphicon-remove-circle"></span>
           </a>
         </td>
