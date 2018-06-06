@@ -1,4 +1,4 @@
-<div name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom" editgrid-validation ng-controller="formioEditGrid">
+<div name="{{ componentId }}" ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" custom-validator="component.validate.custom" editgrid-validation ng-controller="formioEditGrid">
   <label ng-if="labelVisible()" for="{{ component.key }}" class="control-label" ng-class="{'field-required': isRequired(component)}">
     {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
@@ -9,7 +9,7 @@
         <render-template template="component.templates.header" data="headerData" />
       </li>
       <li class="list-group-item" ng-repeat="row in rows track by $index" ng-init="rowIndex = $index">
-        <div name="{{ componentId }}-row-{{ $index }}" ng-model="row" editgrid-row-validation>
+        <div name="{{ componentId }}-row-{{ $index }}" ng-model="row" ng-model-options="{allowInvalid: true}" editgrid-row-validation>
           <edit-grid-row />
           <p class="help-block" ng-show="openRows.indexOf($index) !== -1 && formioForm.$error.editgrid">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>
           <p class="help-block" ng-show="formioForm[componentId + '-row-' + $index].$error.editgridrow">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>

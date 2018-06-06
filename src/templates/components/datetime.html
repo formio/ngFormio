@@ -20,6 +20,7 @@
     enable-date="component.enableDate"
     enable-time="component.enableTime"
     ng-model="data[component.key]"
+    ng-model-options="{allowInvalid: true}"
     tabindex="{{ component.tabindex || 0 }}"
     ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
     datepicker-options="component.datePicker"

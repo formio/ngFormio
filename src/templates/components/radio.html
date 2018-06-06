@@ -1,4 +1,4 @@
-<ng-form name="{{ componentId }}" ng-model="data[component.key]" custom-validator="component.validate.custom">
+<ng-form name="{{ componentId }}" ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" custom-validator="component.validate.custom">
   <fieldset ng-if="component.fieldSet">
     <legend ng-if="component.label">
       {{ component.label }}
@@ -13,6 +13,7 @@
           value="{{ v.value }}"
           tabindex="{{ component.tabindex || 0 }}"
           ng-model="data[component.key]"
+          ng-model-options="{allowInvalid: true}"
           aria-labelledby="{{componentId +'-'+ v.value+'Label'}}"
           ng-required="isRequired(component)"
           custom-validator="component.validate.custom"
@@ -35,6 +36,7 @@
         tabindex="{{ component.tabindex || 0 }}"
         aria-labelledby="{{componentId +'-'+ v.value+'Label'}}"
         ng-model="data[component.key]"
+        ng-model-options="{allowInvalid: true}"
         auto-focus="{{ $first }}"
         ng-required="isRequired(component)"
         custom-validator="component.validate.custom"

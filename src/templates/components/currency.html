@@ -6,6 +6,7 @@
   name="{{ componentId }}"
   tabindex="{{ component.tabindex || 0 }}"
   ng-model="data[component.key]"
+  ng-model-options="{allowInvalid: true}"
   ng-required="isRequired(component)"
   ng-disabled="readOnly"
   safe-multiple-to-single

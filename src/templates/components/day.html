@@ -9,6 +9,7 @@
     aria-labelledby="{{ componentId +'Label'}}"
     aria-describedby="{{componentId + 'Desc'}}"
     ng-model="data[component.key]"
+    ng-model-options="{allowInvalid: true}"
     options="options"
   ></day-input>
 </div>

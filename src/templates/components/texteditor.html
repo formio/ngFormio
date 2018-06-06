@@ -1,6 +1,7 @@
 <textarea
   class="form-control"
   ng-model="data[component.key]"
+  ng-model-options="{allowInvalid: true}"
   ng-disabled="readOnly"
   ng-required="isRequired(component)"
   spellcheck="{{ component.spellcheck }}"
