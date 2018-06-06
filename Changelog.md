@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Changed
+ - Inputs store invalid value.
+
 ## 2.34.2
 ### Fixed
  - Upgraded formiojs to 3.0.0-rc.4 which contains formData method.
