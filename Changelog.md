@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Environment Settings menu in IE11.
  - Alerts on Premium actions when project plan is not Basic.
  - Unique validation.
+ - Error message when trying to add role mapping in OpenID authentication.
 
 ## 4.1.5
  - Upgraded ng-formio to 2.20.7
