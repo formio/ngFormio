@@ -37,6 +37,14 @@
       </tbody>
     </table>
   </div>
+  <div class="panel-pagination text-center">
+    <ul ng-hide="totalItems <= numPerPage" uib-pagination
+      total-items="totalItems"
+      ng-model="currentPage"
+      items-per-page="numPerPage"
+      ng-change="setPage($event)"
+    ></ul>
+  </div>
   <div class="panel-footer" ng-hide="highestRole === 'team_read'">
     <form class="form-inline">
       <div class="form-group">

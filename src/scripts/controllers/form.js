@@ -1410,22 +1410,44 @@ app.controller('FormActionIndexController', [
         });
       }
     };
-    $scope.loadProjectPromise.then(function() {
-      $scope.formio.loadActions()
-        .then(function(actions) {
-          $scope.actions = actions;
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-      $scope.formio.availableActions().then(function(available) {
-        if (!available[0].name) {
-          available.shift();
-        }
-        available.unshift($scope.newAction);
-        $scope.availableActions = _.filter(available, function(action) {
-          return action.name !== 'sql';
+
+    if (!$scope.numPerPage) {
+      $scope.numPerPage = 10;
+    }
+    $scope.totalItems = 0;
+    $scope.currentPage = 1;
+
+    var query = {params: {
+      limit: $scope.numPerPage,
+      skip: 0
+    }};
+
+    var getActions = function() {
+      $scope.loadProjectPromise.then(function() {
+        $scope.formio.loadActions(query)
+          .then(function(actions) {
+            $scope.totalItems = actions.serverCount;
+            $scope.actions = actions;
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+        $scope.formio.availableActions().then(function(available) {
+          if (!available[0].name) {
+            available.shift();
+          }
+          available.unshift($scope.newAction);
+          $scope.availableActions = _.filter(available, function(action) {
+            return action.name !== 'sql';
+          });
         });
       });
-    });
+    };
+
+    $scope.setPage = function() {
+      query.params.skip = ($scope.currentPage - 1) * query.params.limit;
+      getActions();
+    };
+
+    getActions();
   }
 ]);
 
