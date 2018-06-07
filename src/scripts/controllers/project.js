@@ -2167,19 +2167,30 @@ app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
       $scope.roles = result.data;
     });
   $scope.$watch('currentProject.settings.oauth.openid', function() {
-    if (!$scope.currentProject.settings || !$scope.currentProject.settings.oauth || $scope.currentProject.settings.oauth.openid) {
+    var openIdData = getOpenIdData();
+    if (!openIdData) {
       return;
     }
-    $scope.currentProject.settings.oauth.openid.roles = $scope.currentProject.settings.oauth.openid.roles || [{}];
+    openIdData.roles = openIdData.roles || [{}];
   }, true);
 
   $scope.addRow = function() {
-    $scope.currentProject.settings.oauth.openid.roles.push({});
+    var openIdData = getOpenIdData();
+    if (openIdData) {
+      openIdData.roles = (openIdData.roles || [{}]).concat({});
+    }
   };
 
   $scope.removeRow = function(index) {
-    $scope.currentProject.settings.oauth.openid.roles.splice(index, 1);
+    var openIdData = getOpenIdData();
+    if (openIdData && openIdData.roles) {
+      openIdData.roles.splice(index, 1);
+    }
   };
+
+  function getOpenIdData() {
+    return $scope.currentProject.settings && $scope.currentProject.settings.oauth && $scope.currentProject.settings.oauth.openid;
+  }
 }]);
 
 app.controller('ProjectRemoteController', [
