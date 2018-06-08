@@ -4921,6 +4921,9 @@ var Form = function () {
       if (typeof formParam === 'string') {
         return new _Formio2.default(formParam).loadForm().then(function (form) {
           _this.form = form;
+          if (_this.instance) {
+            _this.instance.destroy();
+          }
           _this.instance = _this.create();
           _this.instance.url = formParam;
           _this.instance.nosubmit = false;
@@ -4932,6 +4935,9 @@ var Form = function () {
         });
       } else {
         this.form = formParam;
+        if (this.instance) {
+          this.instance.destroy();
+        }
         this.instance = this.create();
         this.instance.form = this.form;
         return this.instance.ready.then(function () {
@@ -5119,9 +5125,6 @@ _Formio2.default.FormBuilder = FormBuilder;
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -5129,7 +5132,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+// duck-punch the global Promise definition which messes up Angular 2 since it
+// also duck-punches the global Promise definition. For now, keep native-promise-only.
+
 
 var _nativePromiseOnly = __webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js");
 
@@ -6356,14 +6362,7 @@ var PDF = function (_Webform) {
     var _this = _possibleConstructorReturn(this, (PDF.__proto__ || Object.getPrototypeOf(PDF)).call(this, element, options));
 
     _this.iframeReady = new _nativePromiseOnly2.default(function (resolve) {
-      return _this.on('iframe-ready', resolve);
-    });
-
-    // Handle an iframe submission.
-    _this.on('iframe-submission', function (submission) {
-      _this.setSubmission(submission).then(function () {
-        return _this.submit();
-      });
+      return _this.iframeReadyResolve = resolve;
     });
     return _this;
   }
@@ -6505,6 +6504,18 @@ var PDF = function (_Webform) {
         class: 'formio-iframe'
       });
 
+      // Handle an iframe submission.
+      this.on('iframe-submission', function (submission) {
+        _this5.setSubmission(submission).then(function () {
+          return _this5.submit();
+        });
+      });
+
+      // Trigger when this form is ready.
+      this.on('iframe-ready', function () {
+        return _this5.iframeReadyResolve();
+      });
+
       this.appendChild(this.element, [this.zoomIn, this.zoomOut, this.iframe]);
 
       if (!this.options.readOnly) {
@@ -6629,7 +6640,7 @@ var PDFBuilder = function (_WebformBuilder) {
         _this3.isBuilt = true;
         _this3.on('resetForm', function () {
           return _this3.resetValue();
-        }, true);
+        });
         _this3.on('refreshData', function () {
           return _this3.updateValue();
         });
@@ -6691,9 +6702,21 @@ var PDFBuilder = function (_WebformBuilder) {
       this.activateDropZone();
     }
   }, {
+    key: 'removeEventListeners',
+    value: function removeEventListeners(all) {
+      var _this4 = this;
+
+      _get(PDFBuilder.prototype.__proto__ || Object.getPrototypeOf(PDFBuilder.prototype), 'removeEventListeners', this).call(this, all);
+      _lodash2.default.each(this.groups, function (group) {
+        _lodash2.default.each(group.components, function (builderComponent) {
+          _this4.removeEventListener(builderComponent, 'dragstart');
+        });
+      });
+    }
+  }, {
     key: 'clear',
     value: function clear() {
-      this.destroyComponents();
+      this.destroy();
     }
   }, {
     key: 'redraw',
@@ -6736,14 +6759,14 @@ var PDFBuilder = function (_WebformBuilder) {
   }, {
     key: 'addBuilderComponent',
     value: function addBuilderComponent(component, group) {
-      var _this4 = this;
+      var _this5 = this;
 
       var builderComponent = _get(PDFBuilder.prototype.__proto__ || Object.getPrototypeOf(PDFBuilder.prototype), 'addBuilderComponent', this).call(this, component, group);
       if (builderComponent) {
         builderComponent.element.draggable = true;
         builderComponent.element.setAttribute('draggable', true);
         this.addEventListener(builderComponent.element, 'dragstart', function (event) {
-          return _this4.dragStart(event, component);
+          return _this5.dragStart(event, component);
         });
       }
       return builderComponent;
@@ -6757,14 +6780,8 @@ var PDFBuilder = function (_WebformBuilder) {
   }, {
     key: 'destroy',
     value: function destroy() {
-      var _this5 = this;
-
-      _get(PDFBuilder.prototype.__proto__ || Object.getPrototypeOf(PDFBuilder.prototype), 'destroy', this).call(this);
-      _lodash2.default.each(this.groups, function (group) {
-        _lodash2.default.each(group.components, function (builderComponent) {
-          _this5.removeEventListener(builderComponent, 'dragstart');
-        });
-      });
+      this.removeEventListeners();
+      this.destroyComponents();
     }
   }, {
     key: 'build',
@@ -6774,42 +6791,45 @@ var PDFBuilder = function (_WebformBuilder) {
       if (!this.pdfForm) {
         this.element.noDrop = true;
         this.pdfForm = new _PDF2.default(this.element, this.options);
-        this.pdfForm.on('iframe-elementUpdate', function (schema) {
-          var component = _this6.getComponentById(schema.id);
-          if (component && component.component) {
-            component.component.overlay = {
-              page: schema.page,
-              left: schema.left,
-              top: schema.top,
-              height: schema.height,
-              width: schema.width
-            };
-            _this6.editComponent(component);
-            _this6.emit('updateComponent', component);
-          }
-          return component;
-        });
-        this.pdfForm.on('iframe-componentUpdate', function (schema) {
-          var component = _this6.getComponentById(schema.id);
-          if (component && component.component) {
-            component.component.overlay = {
-              page: schema.overlay.page,
-              left: schema.overlay.left,
-              top: schema.overlay.top,
-              height: schema.overlay.height,
-              width: schema.overlay.width
-            };
-            _this6.emit('updateComponent', component);
-          }
-          return component;
-        });
-        this.pdfForm.on('iframe-componentClick', function (schema) {
-          var component = _this6.getComponentById(schema.id);
-          if (component) {
-            _this6.editComponent(component);
-          }
-        });
       }
+      this.pdfForm.removeEventListeners(true);
+      this.pdfForm.events.removeAllListeners();
+      this.pdfForm.destroyComponents();
+      this.pdfForm.on('iframe-elementUpdate', function (schema) {
+        var component = _this6.getComponentById(schema.id);
+        if (component && component.component) {
+          component.component.overlay = {
+            page: schema.page,
+            left: schema.left,
+            top: schema.top,
+            height: schema.height,
+            width: schema.width
+          };
+          _this6.editComponent(component);
+          _this6.emit('updateComponent', component);
+        }
+        return component;
+      });
+      this.pdfForm.on('iframe-componentUpdate', function (schema) {
+        var component = _this6.getComponentById(schema.id);
+        if (component && component.component) {
+          component.component.overlay = {
+            page: schema.overlay.page,
+            left: schema.overlay.left,
+            top: schema.overlay.top,
+            height: schema.overlay.height,
+            width: schema.overlay.width
+          };
+          _this6.emit('updateComponent', component);
+        }
+        return component;
+      });
+      this.pdfForm.on('iframe-componentClick', function (schema) {
+        var component = _this6.getComponentById(schema.id);
+        if (component) {
+          _this6.editComponent(component);
+        }
+      });
       this.addComponents();
       this.addDropZone();
       this.updateDraggable();
@@ -6945,7 +6965,7 @@ _Formio2.default.forms = {};
 // Allow people to register components.
 _Formio2.default.registerComponent = _Components2.default.setComponent;
 
-var getOptions = function getOptions(options) {
+function getOptions(options) {
   options = _lodash2.default.defaults(options, {
     submitOnEnter: false,
     i18next: _i18next2.default
@@ -6957,7 +6977,7 @@ var getOptions = function getOptions(options) {
     });
   }
   return options;
-};
+}
 
 /**
  * Renders a Form.io form within the webpage.
@@ -7514,7 +7534,9 @@ var Webform = function (_NestedComponent) {
             noValidate: true
           });
         }
-        _this7.submissionReadyResolve(submission);
+        return _this7.dataReady.then(function () {
+          return _this7.submissionReadyResolve(submission);
+        });
       }, function (err) {
         return _this7.submissionReadyReject(err);
       }).catch(function (err) {
@@ -7604,10 +7626,10 @@ var Webform = function (_NestedComponent) {
         _this9.isBuilt = true;
         _this9.on('resetForm', function () {
           return _this9.resetValue();
-        }, true);
+        });
         _this9.on('deleteSubmission', function () {
           return _this9.deleteSubmission();
-        }, true);
+        });
         _this9.on('refreshData', function () {
           return _this9.updateValue();
         });
@@ -7674,11 +7696,11 @@ var Webform = function (_NestedComponent) {
 
       this.on('submitButton', function (options) {
         return _this10.submit(false, options);
-      }, true);
+      });
       this.addComponents();
       this.on('requestUrl', function (args) {
         return _this10.submitUrl(args.url, args.headers);
-      }, true);
+      });
     }
 
     /**
@@ -8201,7 +8223,6 @@ var WebformBuilder = function (_Webform) {
 
     var _this = _possibleConstructorReturn(this, (WebformBuilder.__proto__ || Object.getPrototypeOf(WebformBuilder)).call(this, element, options));
 
-    var self = _this;
     _this.dragContainers = [];
     _this.sidebarContainers = [];
     _this.updateDraggable = _lodash2.default.debounce(_this.refreshDraggable.bind(_this), 200);
@@ -8232,7 +8253,7 @@ var WebformBuilder = function (_Webform) {
           internal: true,
           tag: 'div',
           className: 'alert alert-info',
-          attrs: [{ attr: 'id', value: this.id + '-placeholder' }, { attr: 'style', value: 'text-align:center; margin-bottom: 0px;' }, { attr: 'role', value: 'alert' }],
+          attrs: [{ attr: 'id', value: _this.id + '-placeholder' }, { attr: 'style', value: 'text-align:center; margin-bottom: 0px;' }, { attr: 'role', value: 'alert' }],
           content: 'Drag and Drop a form component'
         }];
       }
@@ -8247,28 +8268,28 @@ var WebformBuilder = function (_Webform) {
         // Make sure the component position is relative so the buttons align properly.
         comp.getElement().style.position = 'relative';
 
-        var removeButton = this.ce('div', {
+        var removeButton = _this.ce('div', {
           class: 'btn btn-xxs btn-danger component-settings-button component-settings-button-remove'
-        }, this.getIcon('remove'));
-        this.addEventListener(removeButton, 'click', function () {
-          return self.deleteComponent(comp);
+        }, _this.getIcon('remove'));
+        _this.addEventListener(removeButton, 'click', function () {
+          return _this.deleteComponent(comp);
         });
 
-        var editButton = this.ce('div', {
+        var editButton = _this.ce('div', {
           class: 'btn btn-xxs btn-default component-settings-button component-settings-button-edit'
-        }, this.getIcon('cog'));
-        this.addEventListener(editButton, 'click', function () {
-          return self.editComponent(comp);
+        }, _this.getIcon('cog'));
+        _this.addEventListener(editButton, 'click', function () {
+          return _this.editComponent(comp);
         });
 
         // Add the edit buttons to the component.
-        comp.prepend(this.ce('div', {
+        comp.prepend(_this.ce('div', {
           class: 'component-btn-group'
         }, [removeButton, editButton]));
       }
 
       if (!container.noDrop) {
-        self.addDragContainer(container, this);
+        _this.addDragContainer(container, _this);
       }
 
       return container;
@@ -11210,12 +11231,6 @@ var BaseComponent = function () {
     // Determine if the component has been built.
     this.isBuilt = false;
 
-    /**
-     * An array of the event listeners so that the destroy command can deregister them.
-     * @type {Array}
-     */
-    this.eventListeners = [];
-
     if (this.component) {
       this.type = this.component.type;
       if (this.hasInput && this.key) {
@@ -11307,25 +11322,24 @@ var BaseComponent = function () {
      *
      * @param {string} event - The event you wish to register the handler for.
      * @param {function} cb - The callback handler to handle this event.
-     * @param {boolean} internal - This is an internal event handler.
      */
 
   }, {
     key: 'on',
-    value: function on(event, cb, internal) {
+    value: function on(event, cb) {
       if (!this.events) {
         return;
       }
       var type = 'formio.' + event;
-      this.eventListeners.push({
-        type: type,
-        listener: cb,
-        internal: internal
-      });
+
+      // Store the component id in the handler so that we can determine which events are for this component.
+      cb.id = this.id;
+
+      // Register for this event.
       return this.events.on(type, cb);
     }
 
-    /**
+    /**removeEventListeners
      * Removes all listeners for a certain event.
      *
      * @param event
@@ -11333,16 +11347,20 @@ var BaseComponent = function () {
 
   }, {
     key: 'off',
-    value: function off(event, cb) {
+    value: function off(event) {
       var _this2 = this;
 
       if (!this.events) {
         return;
       }
       var type = 'formio.' + event;
-      _lodash2.default.each(this.eventListeners, function (listener) {
-        if (listener.type === type && (!cb || cb === listener.listener)) {
-          _this2.events.off(listener.type, listener.listener);
+
+      // Iterate through all the internal events.
+      _lodash2.default.each(this.events.listeners(type), function (listener) {
+        // Ensure this event is for this component.
+        if (listener && listener.id === _this2.id) {
+          // Turn off this event handler.
+          _this2.events.off(type, listener);
         }
       });
     }
@@ -11552,7 +11570,6 @@ var BaseComponent = function () {
     value: function createModal() {
       var _this3 = this;
 
-      var self = this;
       var modalBody = this.ce('div');
       var modalOverlay = this.ce('div', {
         class: 'formio-dialog-overlay'
@@ -11583,7 +11600,7 @@ var BaseComponent = function () {
       dialog.body = modalBody;
       dialog.close = function () {
         dialog.dispatchEvent(new CustomEvent('close'));
-        self.removeChildFrom(dialog, document.body);
+        _this3.removeChildFrom(dialog, document.body);
       };
       return dialog;
     }
@@ -12276,7 +12293,7 @@ var BaseComponent = function () {
      *
      * @param obj
      *   The DOM element to add the event to.
-     * @param evt
+     * @param type
      *   The event name to add.
      * @param func
      *   The callback function to be executed when the listener is triggered.
@@ -12284,12 +12301,12 @@ var BaseComponent = function () {
 
   }, {
     key: 'addEventListener',
-    value: function addEventListener(obj, evt, func) {
-      this.eventHandlers.push({ type: evt, func: func });
+    value: function addEventListener(obj, type, func) {
+      this.eventHandlers.push({ id: this.id, obj: obj, type: type, func: func });
       if ('addEventListener' in obj) {
-        obj.addEventListener(evt, func, false);
+        obj.addEventListener(type, func, false);
       } else if ('attachEvent' in obj) {
-        obj.attachEvent('on' + evt, func);
+        obj.attachEvent('on' + type, func);
       }
     }
 
@@ -12297,17 +12314,24 @@ var BaseComponent = function () {
      * Remove an event listener from the object.
      *
      * @param obj
-     * @param evt
+     * @param type
      */
 
   }, {
     key: 'removeEventListener',
-    value: function removeEventListener(obj, evt) {
-      _lodash2.default.each(this.eventHandlers, function (handler) {
-        if (obj.removeEventListener && handler.type === evt) {
-          obj.removeEventListener(evt, handler.func);
+    value: function removeEventListener(obj, type) {
+      var _this7 = this;
+
+      var indexes = [];
+      _lodash2.default.each(this.eventHandlers, function (handler, index) {
+        if (handler.id === _this7.id && obj.removeEventListener && handler.type === type) {
+          obj.removeEventListener(type, handler.func);
+          indexes.push(index);
         }
       });
+      if (indexes.length) {
+        _lodash2.default.pullAt(this.eventHandlers, indexes);
+      }
     }
   }, {
     key: 'redraw',
@@ -12319,28 +12343,31 @@ var BaseComponent = function () {
       this.clear();
       this.build();
     }
-
-    /**
-     * Remove all event handlers.
-     */
-
   }, {
-    key: 'destroy',
-    value: function destroy(all) {
-      var _this7 = this;
+    key: 'removeEventListeners',
+    value: function removeEventListeners() {
+      var _this8 = this;
 
-      _lodash2.default.each(this.eventListeners, function (listener) {
-        if (all || listener.internal) {
-          _this7.events.off(listener.type, listener.listener);
-        }
+      _lodash2.default.each(this.events._events, function (events, type) {
+        _lodash2.default.each(events, function (listener) {
+          if (listener && _this8.id === listener.id) {
+            _this8.events.off(type, listener);
+          }
+        });
       });
       _lodash2.default.each(this.eventHandlers, function (handler) {
-        if (handler.event) {
-          window.removeEventListener(handler.event, handler.func);
+        if (_this8.id === handler.id && handler.type && handler.obj && handler.obj.removeEventListener) {
+          handler.obj.removeEventListener(handler.type, handler.func);
         }
       });
+    }
+  }, {
+    key: 'destroyInputs',
+    value: function destroyInputs() {
+      var _this9 = this;
+
       _lodash2.default.each(this.inputs, function (input) {
-        input = _this7.performInputMapping(input);
+        input = _this9.performInputMapping(input);
         if (input.mask) {
           input.mask.destroy();
         }
@@ -12350,6 +12377,17 @@ var BaseComponent = function () {
         this.tooltip = null;
       }
       this.inputs = [];
+    }
+
+    /**
+     * Remove all event handlers.
+     */
+
+  }, {
+    key: 'destroy',
+    value: function destroy(all) {
+      this.removeEventListeners(all);
+      this.destroyInputs();
     }
 
     /**
@@ -12393,11 +12431,11 @@ var BaseComponent = function () {
   }, {
     key: 'appendChild',
     value: function appendChild(element, child) {
-      var _this8 = this;
+      var _this10 = this;
 
       if (Array.isArray(child)) {
         child.forEach(function (oneChild) {
-          _this8.appendChild(element, oneChild);
+          _this10.appendChild(element, oneChild);
         });
       } else if (child instanceof HTMLElement || child instanceof Text) {
         element.appendChild(child);
@@ -12456,13 +12494,13 @@ var BaseComponent = function () {
   }, {
     key: 'attr',
     value: function attr(element, _attr) {
-      var _this9 = this;
+      var _this11 = this;
 
       _lodash2.default.each(_attr, function (value, key) {
         if (typeof value !== 'undefined') {
           if (key.indexOf('on') === 0) {
             // If this is an event, add a listener.
-            _this9.addEventListener(element, key.substr(2).toLowerCase(), value);
+            _this11.addEventListener(element, key.substr(2).toLowerCase(), value);
           } else {
             // Otherwise it is just an attribute.
             element.setAttribute(key, value);
@@ -12572,7 +12610,7 @@ var BaseComponent = function () {
   }, {
     key: 'fieldLogic',
     value: function fieldLogic(data) {
-      var _this10 = this;
+      var _this12 = this;
 
       var logics = this.component.logic || [];
 
@@ -12584,25 +12622,25 @@ var BaseComponent = function () {
       var newComponent = _lodash2.default.cloneDeep(this.originalComponent);
 
       var changed = logics.reduce(function (changed, logic) {
-        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this10.data, data, _this10.root ? _this10.root._form : {}, _this10);
+        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this12.data, data, _this12.root ? _this12.root._form : {}, _this12);
 
         if (result) {
           changed |= logic.actions.reduce(function (changed, action) {
             switch (action.type) {
               case 'property':
-                FormioUtils.setActionProperty(newComponent, action, _this10.data, data, newComponent, result, _this10);
+                FormioUtils.setActionProperty(newComponent, action, _this12.data, data, newComponent, result, _this12);
                 break;
               case 'value':
                 {
-                  var oldValue = _this10.getValue();
-                  var newValue = _this10.evaluate(action.value, {
+                  var oldValue = _this12.getValue();
+                  var newValue = _this12.evaluate(action.value, {
                     value: _lodash2.default.clone(oldValue),
                     data: data,
                     component: newComponent,
                     result: result
                   }, 'value');
                   if (!_lodash2.default.isEqual(oldValue, newValue)) {
-                    _this10.setValue(newValue);
+                    _this12.setValue(newValue);
                     changed = true;
                   }
                   break;
@@ -12636,7 +12674,7 @@ var BaseComponent = function () {
   }, {
     key: 'addInputError',
     value: function addInputError(message, dirty) {
-      var _this11 = this;
+      var _this13 = this;
 
       if (!message) {
         return;
@@ -12653,7 +12691,7 @@ var BaseComponent = function () {
       // Add error classes
       this.addClass(this.element, 'has-error');
       this.inputs.forEach(function (input) {
-        return _this11.addClass(_this11.performInputMapping(input), 'is-invalid');
+        return _this13.addClass(_this13.performInputMapping(input), 'is-invalid');
       });
       if (dirty && this.options.highlightErrors) {
         this.addClass(this.element, 'alert alert-danger');
@@ -12733,11 +12771,11 @@ var BaseComponent = function () {
     key: 'hook',
     value: function hook() {
       var name = arguments[0];
-      var fn = typeof arguments[arguments.length - 1] === 'function' ? arguments[arguments.length - 1] : null;
       if (this.options && this.options.hooks && this.options.hooks[name]) {
         return this.options.hooks[name].apply(this, Array.prototype.slice.call(arguments, 1));
       } else {
         // If this is an async hook instead of a sync.
+        var fn = typeof arguments[arguments.length - 1] === 'function' ? arguments[arguments.length - 1] : null;
         if (fn) {
           return fn(null, arguments[1]);
         } else {
@@ -12772,7 +12810,7 @@ var BaseComponent = function () {
   }, {
     key: 'addInputSubmitListener',
     value: function addInputSubmitListener(input) {
-      var _this12 = this;
+      var _this14 = this;
 
       if (!this.options.submitOnEnter) {
         return;
@@ -12782,7 +12820,7 @@ var BaseComponent = function () {
         if (key === 13) {
           event.preventDefault();
           event.stopPropagation();
-          _this12.emit('submitButton');
+          _this14.emit('submitButton');
         }
       });
     }
@@ -12796,10 +12834,10 @@ var BaseComponent = function () {
   }, {
     key: 'addInputEventListener',
     value: function addInputEventListener(input) {
-      var _this13 = this;
+      var _this15 = this;
 
       this.addEventListener(input, this.info.changeEvent, function () {
-        return _this13.updateValue();
+        return _this15.updateValue();
       });
     }
 
@@ -12829,7 +12867,7 @@ var BaseComponent = function () {
   }, {
     key: 'addQuill',
     value: function addQuill(element, settings, onChange) {
-      var _this14 = this;
+      var _this16 = this;
 
       settings = _lodash2.default.isEmpty(settings) ? this.wysiwygDefault : settings;
 
@@ -12838,18 +12876,18 @@ var BaseComponent = function () {
 
       // Lazy load the quill library.
       return BaseComponent.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.6/quill.min.js', true).then(function () {
-        _this14.quill = new Quill(element, settings);
+        _this16.quill = new Quill(element, settings);
 
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
         var txtArea = document.createElement('textarea');
         txtArea.setAttribute('class', 'quill-source-code');
-        _this14.quill.addContainer('ql-custom').appendChild(txtArea);
+        _this16.quill.addContainer('ql-custom').appendChild(txtArea);
         var qlSource = element.parentNode.querySelector('.ql-source');
         if (qlSource) {
-          _this14.addEventListener(qlSource, 'click', function (event) {
+          _this16.addEventListener(qlSource, 'click', function (event) {
             event.preventDefault();
             if (txtArea.style.display === 'inherit') {
-              _this14.quill.setContents(_this14.quill.clipboard.convert(txtArea.value));
+              _this16.quill.setContents(_this16.quill.clipboard.convert(txtArea.value));
             }
             txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
           });
@@ -12857,8 +12895,8 @@ var BaseComponent = function () {
         /** END CODEBLOCK **/
 
         // Make sure to select cursor when they click on the element.
-        _this14.addEventListener(element, 'click', function () {
-          return _this14.quill.focus();
+        _this16.addEventListener(element, 'click', function () {
+          return _this16.quill.focus();
         });
 
         // Allows users to skip toolbar items when tabbing though form
@@ -12867,12 +12905,12 @@ var BaseComponent = function () {
           elm[i].setAttribute('tabindex', '-1');
         }
 
-        _this14.quill.on('text-change', function () {
-          txtArea.value = _this14.quill.root.innerHTML;
+        _this16.quill.on('text-change', function () {
+          txtArea.value = _this16.quill.root.innerHTML;
           onChange(txtArea);
         });
 
-        return _this14.quill;
+        return _this16.quill;
       });
     }
 
@@ -13188,7 +13226,7 @@ var BaseComponent = function () {
   }, {
     key: 'setCustomValidity',
     value: function setCustomValidity(message, dirty) {
-      var _this15 = this;
+      var _this17 = this;
 
       if (this.errorElement && this.errorContainer) {
         this.errorElement.innerHTML = '';
@@ -13204,7 +13242,7 @@ var BaseComponent = function () {
         this.addInputError(message, dirty);
       } else {
         this.inputs.forEach(function (input) {
-          return _this15.removeClass(_this15.performInputMapping(input), 'is-invalid');
+          return _this17.removeClass(_this17.performInputMapping(input), 'is-invalid');
         });
         if (this.options.highlightErrors) {
           this.removeClass(this.element, 'alert alert-danger');
@@ -13213,7 +13251,7 @@ var BaseComponent = function () {
         this.error = null;
       }
       _lodash2.default.each(this.inputs, function (input) {
-        input = _this15.performInputMapping(input);
+        input = _this17.performInputMapping(input);
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
         }
@@ -13248,11 +13286,18 @@ var BaseComponent = function () {
         noValidate: arguments[2]
       } : arguments[1] || {};
     }
+
+    // Maintain reverse compatibility.
+
   }, {
     key: 'whenReady',
     value: function whenReady() {
-      return _nativePromiseOnly2.default.resolve();
+      console.warn('The whenReady() method has been deprecated. Please use the dataReady property instead.');
+      return this.dataReady;
     }
+  }, {
+    key: 'setValue',
+
 
     /**
      * Set the value of this component.
@@ -13262,9 +13307,6 @@ var BaseComponent = function () {
      *
      * @return {boolean} - If the value changed.
      */
-
-  }, {
-    key: 'setValue',
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
       if (!this.hasInput) {
@@ -13344,7 +13386,7 @@ var BaseComponent = function () {
   }, {
     key: 'selectOptions',
     value: function selectOptions(select, tag, options, defaultValue) {
-      var _this16 = this;
+      var _this18 = this;
 
       _lodash2.default.each(options, function (option) {
         var attrs = {
@@ -13353,8 +13395,8 @@ var BaseComponent = function () {
         if (defaultValue !== undefined && option.value === defaultValue) {
           attrs.selected = 'selected';
         }
-        var optionElement = _this16.ce('option', attrs);
-        optionElement.appendChild(_this16.text(option.label));
+        var optionElement = _this18.ce('option', attrs);
+        optionElement.appendChild(_this18.text(option.label));
         select.appendChild(optionElement);
       });
     }
@@ -13464,12 +13506,12 @@ var BaseComponent = function () {
   }, {
     key: 'autofocus',
     value: function autofocus() {
-      var _this17 = this;
+      var _this19 = this;
 
       if (this.component.autofocus) {
         this.on('render', function () {
-          return _this17.focus();
-        }, true);
+          return _this19.focus();
+        });
       }
     }
   }, {
@@ -13642,7 +13684,8 @@ var BaseComponent = function () {
       if (!this.key) {
         return value;
       }
-      if (value === null) {
+      if (value === null || value === undefined) {
+        _lodash2.default.unset(this.data, this.key);
         return value;
       }
       _lodash2.default.set(this.data, this.key, value);
@@ -13677,6 +13720,11 @@ var BaseComponent = function () {
       return this.error ? [this.error] : [];
     }
   }, {
+    key: 'dataReady',
+    get: function get() {
+      return _nativePromiseOnly2.default.resolve();
+    }
+  }, {
     key: 'disabled',
     get: function get() {
       return this._disabled;
@@ -13689,7 +13737,7 @@ var BaseComponent = function () {
      */
     ,
     set: function set(disabled) {
-      var _this18 = this;
+      var _this20 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable) {
@@ -13707,7 +13755,7 @@ var BaseComponent = function () {
 
       // Disable all inputs.
       _lodash2.default.each(this.inputs, function (input) {
-        return _this18.setDisabled(_this18.performInputMapping(input), disabled);
+        return _this20.setDisabled(_this20.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -13731,8 +13779,8 @@ BaseComponent.requireLibrary = function (name, property, src, polling) {
 
     if (!polling && !window[callbackName]) {
       window[callbackName] = function () {
-        this.resolve();
-      }.bind(BaseComponent.externalLibraries[name]);
+        return BaseComponent.externalLibraries[name].resolve();
+      };
     }
 
     // See if the plugin already exists.
@@ -13779,13 +13827,12 @@ BaseComponent.requireLibrary = function (name, property, src, polling) {
 
       // if no callback is provided, then check periodically for the script.
       if (polling) {
-        setTimeout(function checkLibrary() {
+        var interval = setInterval(function () {
           var plugin = _lodash2.default.get(window, property);
+
           if (plugin) {
+            clearInterval(interval);
             BaseComponent.externalLibraries[name].resolve(plugin);
-          } else {
-            // check again after 200 ms.
-            setTimeout(checkLibrary, 200);
           }
         }, 200);
       }
@@ -14623,9 +14670,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(/*! ./index */ "./node_modules/formiojs/components/index.js");
+var _ = __webpack_require__(/*! . */ "./node_modules/formiojs/components/index.js");
 
-var _index2 = _interopRequireDefault(_index);
+var _2 = _interopRequireDefault(_);
 
 var _Address = __webpack_require__(/*! ./address/Address.form */ "./node_modules/formiojs/components/address/Address.form.js");
 
@@ -14769,43 +14816,43 @@ var _File2 = _interopRequireDefault(_File);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_index2.default.address.editForm = _Address2.default;
-_index2.default.content.editForm = _Content2.default;
-_index2.default.container.editForm = _Container2.default;
-_index2.default.datagrid.editForm = _DataGrid2.default;
-_index2.default.datetime.editForm = _DateTime2.default;
-_index2.default.day.editForm = _Day2.default;
-_index2.default.htmlelement.editForm = _HTML2.default;
-_index2.default.hidden.editForm = _Hidden2.default;
-_index2.default.editgrid.editForm = _EditGrid2.default;
-_index2.default.form.editForm = _Form2.default;
-_index2.default.textfield.editForm = _TextField2.default;
-_index2.default.phoneNumber.editForm = _PhoneNumber2.default;
-_index2.default.location.editForm = _Location2.default;
-_index2.default.email.editForm = _Email2.default;
-_index2.default.time.editForm = _Time2.default;
-_index2.default.checkbox.editForm = _Checkbox2.default;
-_index2.default.currency.editForm = _Currency2.default;
-_index2.default.fieldset.editForm = _Fieldset2.default;
-_index2.default.signature.editForm = _Signature2.default;
-_index2.default.select.editForm = _Select2.default;
-_index2.default.resource.editForm = _Resource2.default;
-_index2.default.textarea.editForm = _TextArea2.default;
-_index2.default.tags.editForm = _Tags2.default;
-_index2.default.button.editForm = _Button2.default;
-_index2.default.number.editForm = _Number2.default;
-_index2.default.password.editForm = _Password2.default;
-_index2.default.panel.editForm = _Panel2.default;
-_index2.default.tabs.editForm = _Tabs2.default;
-_index2.default.columns.editForm = _Columns2.default;
-_index2.default.table.editForm = _Table2.default;
-_index2.default.radio.editForm = _Radio2.default;
-_index2.default.selectboxes.editForm = _SelectBoxes2.default;
-_index2.default.survey.editForm = _Survey2.default;
-_index2.default.well.editForm = _Well2.default;
-_index2.default.file.editForm = _File2.default;
+_2.default.address.editForm = _Address2.default;
+_2.default.content.editForm = _Content2.default;
+_2.default.container.editForm = _Container2.default;
+_2.default.datagrid.editForm = _DataGrid2.default;
+_2.default.datetime.editForm = _DateTime2.default;
+_2.default.day.editForm = _Day2.default;
+_2.default.htmlelement.editForm = _HTML2.default;
+_2.default.hidden.editForm = _Hidden2.default;
+_2.default.editgrid.editForm = _EditGrid2.default;
+_2.default.form.editForm = _Form2.default;
+_2.default.textfield.editForm = _TextField2.default;
+_2.default.phoneNumber.editForm = _PhoneNumber2.default;
+_2.default.location.editForm = _Location2.default;
+_2.default.email.editForm = _Email2.default;
+_2.default.time.editForm = _Time2.default;
+_2.default.checkbox.editForm = _Checkbox2.default;
+_2.default.currency.editForm = _Currency2.default;
+_2.default.fieldset.editForm = _Fieldset2.default;
+_2.default.signature.editForm = _Signature2.default;
+_2.default.select.editForm = _Select2.default;
+_2.default.resource.editForm = _Resource2.default;
+_2.default.textarea.editForm = _TextArea2.default;
+_2.default.tags.editForm = _Tags2.default;
+_2.default.button.editForm = _Button2.default;
+_2.default.number.editForm = _Number2.default;
+_2.default.password.editForm = _Password2.default;
+_2.default.panel.editForm = _Panel2.default;
+_2.default.tabs.editForm = _Tabs2.default;
+_2.default.columns.editForm = _Columns2.default;
+_2.default.table.editForm = _Table2.default;
+_2.default.radio.editForm = _Radio2.default;
+_2.default.selectboxes.editForm = _SelectBoxes2.default;
+_2.default.survey.editForm = _Survey2.default;
+_2.default.well.editForm = _Well2.default;
+_2.default.file.editForm = _File2.default;
 
-exports.default = _index2.default;
+exports.default = _2.default;
 
 /***/ }),
 
@@ -14975,7 +15022,7 @@ var ButtonComponent = function (_BaseComponent) {
         this.on('submitButton', function () {
           _this2.loading = true;
           _this2.disabled = true;
-        }, true);
+        });
         this.on('submitDone', function () {
           _this2.loading = false;
           _this2.disabled = false;
@@ -14984,7 +15031,7 @@ var ButtonComponent = function (_BaseComponent) {
           _this2.removeClass(message, 'has-error');
           message.appendChild(_this2.buttonMessage('complete'));
           _this2.append(message);
-        }, true);
+        });
         this.on('change', function (value) {
           _this2.loading = false;
           var isValid = _this2.root.isValid(value.data, true);
@@ -14996,7 +15043,7 @@ var ButtonComponent = function (_BaseComponent) {
             _this2.removeClass(message, 'has-success');
             _this2.removeClass(message, 'has-error');
           }
-        }, true);
+        });
         this.on('error', function () {
           _this2.loading = false;
           _this2.hasError = true;
@@ -15005,25 +15052,25 @@ var ButtonComponent = function (_BaseComponent) {
           _this2.addClass(message, 'has-error');
           message.appendChild(_this2.buttonMessage(_this2.errorMessage('error')));
           _this2.append(message);
-        }, true);
+        });
       }
 
       if (this.component.action === 'url') {
         this.on('requestButton', function () {
           _this2.loading = true;
           _this2.disabled = true;
-        }, true);
+        });
         this.on('requestDone', function () {
           _this2.loading = false;
           _this2.disabled = false;
-        }, true);
+        });
         this.on('change', function (value) {
           _this2.loading = false;
           _this2.disabled = _this2.component.disableOnInvalid && !_this2.root.isValid(value.data, true);
-        }, true);
+        });
         this.on('error', function () {
           _this2.loading = false;
-        }, true);
+        });
       }
       this.addEventListener(this.buttonElement, 'click', function (event) {
         _this2.dataValue = true;
@@ -16372,12 +16419,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function () {
-  return _Base2.default.apply(undefined, arguments);
+  for (var _len = arguments.length, extend = Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Base2.default.apply(undefined, extend.concat([[{
+    key: 'display',
+    components: _ContentEdit2.default
+  }]]));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
 
 var _Base2 = _interopRequireDefault(_Base);
+
+var _ContentEdit = __webpack_require__(/*! ./editForm/Content.edit.display */ "./node_modules/formiojs/components/content/editForm/Content.edit.display.js");
+
+var _ContentEdit2 = _interopRequireDefault(_ContentEdit);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -16421,6 +16479,11 @@ var ContentComponent = function (_BaseComponent) {
   }
 
   _createClass(ContentComponent, [{
+    key: 'setHTML',
+    value: function setHTML() {
+      this.element.innerHTML = this.interpolate(this.component.html);
+    }
+  }, {
     key: 'build',
     value: function build() {
       var _this2 = this;
@@ -16441,7 +16504,13 @@ var ContentComponent = function (_BaseComponent) {
         });
         this.element.appendChild(editorElement);
       } else {
-        this.element.innerHTML = this.interpolate(this.component.html);
+        this.setHTML();
+      }
+
+      if (this.component.refreshOnChange) {
+        this.on('change', function () {
+          return _this2.setHTML();
+        });
       }
     }
   }, {
@@ -16486,6 +16555,30 @@ var ContentComponent = function (_BaseComponent) {
 }(_Base2.default);
 
 exports.default = ContentComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/content/editForm/Content.edit.display.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/content/editForm/Content.edit.display.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = [{
+  weight: 700,
+  type: 'checkbox',
+  label: 'Refresh On Change',
+  tooltip: 'Rerender the field whenever a value on the form changes.',
+  key: 'refreshOnChange',
+  input: true
+}];
 
 /***/ }),
 
@@ -17458,7 +17551,7 @@ var DateTimeComponent = function (_BaseComponent) {
     key: 'focus',
     value: function focus() {
       var input = this.inputs[0];
-      if (input) {
+      if (input && !this.options.readOnly) {
         input.calendar.altInput.focus();
       }
     }
@@ -17540,6 +17633,7 @@ var DateTimeComponent = function (_BaseComponent) {
           } else {
             calendar._input.removeAttribute('disabled');
           }
+          calendar.close();
           calendar.redraw();
         }
       });
@@ -17735,12 +17829,30 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function () {
-  return _Base2.default.apply(undefined, arguments);
+  for (var _len = arguments.length, extend = Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Base2.default.apply(undefined, extend.concat([[{
+    key: 'display',
+    components: _DayEdit2.default
+  }, {
+    key: 'validation',
+    components: _DayEdit4.default
+  }]]));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
 
 var _Base2 = _interopRequireDefault(_Base);
+
+var _DayEdit = __webpack_require__(/*! ./editForm/Day.edit.display */ "./node_modules/formiojs/components/day/editForm/Day.edit.display.js");
+
+var _DayEdit2 = _interopRequireDefault(_DayEdit);
+
+var _DayEdit3 = __webpack_require__(/*! ./editForm/Day.edit.validation */ "./node_modules/formiojs/components/day/editForm/Day.edit.validation.js");
+
+var _DayEdit4 = _interopRequireDefault(_DayEdit3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -17846,6 +17958,7 @@ var DayComponent = function (_BaseComponent) {
     _this.validators.push('date');
     var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(_this.options.language);
     _this.dayFirst = _this.component.useLocaleSettings ? dateFormatInfo.dayFirst : _this.component.dayFirst;
+    _this.hideInputLabels = _this.component.hideInputLabels;
     return _this;
   }
 
@@ -17892,13 +18005,17 @@ var DayComponent = function (_BaseComponent) {
 
       var id = this.component.key + '-day';
 
-      var dayLabel = this.ce('label', {
+      var dayLabel = !this.hideInputLabels ? this.ce('label', {
         for: id,
         class: _lodash2.default.get(this.component, 'fields.day.required', false) ? 'field-required' : ''
-      });
-      dayLabel.appendChild(this.text(this.t('day')));
-      this.setSubinputLabelStyle(dayLabel);
-      if (!subinputAtTheBottom) {
+      }) : null;
+
+      if (dayLabel) {
+        dayLabel.appendChild(this.text(this.t('day')));
+        this.setSubinputLabelStyle(dayLabel);
+      }
+
+      if (dayLabel && !subinputAtTheBottom) {
         dayColumn.appendChild(dayLabel);
       }
 
@@ -17909,7 +18026,7 @@ var DayComponent = function (_BaseComponent) {
         step: '1',
         min: '1',
         max: '31',
-        placeholder: _lodash2.default.get(this.component, 'fields.day.placeholder', ''),
+        placeholder: _lodash2.default.get(this.component, 'fields.day.placeholder') || (this.hideInputLabels ? this.t('Day') : ''),
         id: id
       });
       this.hook('input', this.dayInput, dayInputWrapper);
@@ -17920,7 +18037,7 @@ var DayComponent = function (_BaseComponent) {
       this.setSubinputStyle(dayInputWrapper);
       dayColumn.appendChild(dayInputWrapper);
 
-      if (subinputAtTheBottom) {
+      if (dayLabel && subinputAtTheBottom) {
         dayColumn.appendChild(dayLabel);
       }
 
@@ -17935,13 +18052,17 @@ var DayComponent = function (_BaseComponent) {
 
       var id = this.component.key + '-month';
 
-      var monthLabel = this.ce('label', {
+      var monthLabel = !this.hideInputLabels ? this.ce('label', {
         for: id,
         class: _lodash2.default.get(this.component, 'fields.month.required', false) ? 'field-required' : ''
-      });
-      monthLabel.appendChild(this.text(this.t('month')));
-      this.setSubinputLabelStyle(monthLabel);
-      if (!subinputAtTheBottom) {
+      }) : null;
+
+      if (monthLabel) {
+        monthLabel.appendChild(this.text(this.t('month')));
+        this.setSubinputLabelStyle(monthLabel);
+      }
+
+      if (monthLabel && !subinputAtTheBottom) {
         monthColumn.appendChild(monthLabel);
       }
 
@@ -17966,7 +18087,7 @@ var DayComponent = function (_BaseComponent) {
       this.setSubinputStyle(monthInputWrapper);
       monthColumn.appendChild(monthInputWrapper);
 
-      if (subinputAtTheBottom) {
+      if (monthLabel && subinputAtTheBottom) {
         monthColumn.appendChild(monthLabel);
       }
 
@@ -17983,13 +18104,17 @@ var DayComponent = function (_BaseComponent) {
 
       var id = this.component.key + '-year';
 
-      var yearLabel = this.ce('label', {
+      var yearLabel = !this.hideInputLabels ? this.ce('label', {
         for: id,
         class: _lodash2.default.get(this.component, 'fields.year.required', false) ? 'field-required' : ''
-      });
-      yearLabel.appendChild(this.text(this.t('year')));
-      this.setSubinputLabelStyle(yearLabel);
-      if (!subinputAtTheBottom) {
+      }) : null;
+
+      if (yearLabel) {
+        yearLabel.appendChild(this.text(this.t('year')));
+        this.setSubinputLabelStyle(yearLabel);
+      }
+
+      if (yearLabel && !subinputAtTheBottom) {
         yearColumn.appendChild(yearLabel);
       }
 
@@ -17999,7 +18124,7 @@ var DayComponent = function (_BaseComponent) {
         type: 'number',
         step: '1',
         min: '1',
-        placeholder: _lodash2.default.get(this.component, 'fields.year.placeholder', ''),
+        placeholder: _lodash2.default.get(this.component, 'fields.year.placeholder') || (this.hideInputLabels ? this.t('Year') : ''),
         id: id
       });
 
@@ -18011,7 +18136,7 @@ var DayComponent = function (_BaseComponent) {
       this.setSubinputStyle(yearInputWrapper);
       yearColumn.appendChild(yearInputWrapper);
 
-      if (subinputAtTheBottom) {
+      if (yearLabel && subinputAtTheBottom) {
         yearColumn.appendChild(yearLabel);
       }
 
@@ -18214,7 +18339,7 @@ var DayComponent = function (_BaseComponent) {
       if (this._months) {
         return this._months;
       }
-      this._months = [{ value: 0, label: _lodash2.default.get(this.component, 'fields.month.placeholder', '') }, { value: 1, label: this.t('january') }, { value: 2, label: this.t('february') }, { value: 3, label: this.t('march') }, { value: 4, label: this.t('april') }, { value: 5, label: this.t('may') }, { value: 6, label: this.t('june') }, { value: 7, label: this.t('july') }, { value: 8, label: this.t('august') }, { value: 9, label: this.t('september') }, { value: 10, label: this.t('october') }, { value: 11, label: this.t('november') }, { value: 12, label: this.t('december') }];
+      this._months = [{ value: 0, label: _lodash2.default.get(this.component, 'fields.month.placeholder') || (this.hideInputLabels ? this.t('Month') : '') }, { value: 1, label: this.t('january') }, { value: 2, label: this.t('february') }, { value: 3, label: this.t('march') }, { value: 4, label: this.t('april') }, { value: 5, label: this.t('may') }, { value: 6, label: this.t('june') }, { value: 7, label: this.t('july') }, { value: 8, label: this.t('august') }, { value: 9, label: this.t('september') }, { value: 10, label: this.t('october') }, { value: 11, label: this.t('november') }, { value: 12, label: this.t('december') }];
       return this._months;
     }
   }, {
@@ -18301,6 +18426,148 @@ var DayComponent = function (_BaseComponent) {
 }(_Base2.default);
 
 exports.default = DayComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/day/editForm/Day.edit.display.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/formiojs/components/day/editForm/Day.edit.display.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = [{
+  weight: 15,
+  type: 'checkbox',
+  label: 'Hide Input Labels',
+  tooltip: 'Hide the labels of component inputs. This allows you to show the labels in the form builder, but not when it is rendered.',
+  key: 'hideInputLabels',
+  input: true
+}, {
+  type: 'select',
+  input: true,
+  key: 'inputsLabelPosition',
+  label: 'Inputs Label Position',
+  tooltip: 'Position for the labels for inputs for this field.',
+  weight: 40,
+  defaultValue: 'top',
+  dataSrc: 'values',
+  data: {
+    values: [{ label: 'Top', value: 'top' }, { label: 'Left', value: 'left' }, { label: 'Right', value: 'right' }, { label: 'Bottom', value: 'bottom' }]
+  }
+}, {
+  key: 'placeholder',
+  ignore: true
+}, {
+  weight: 210,
+  type: 'textfield',
+  input: true,
+  key: 'fields.day.placeholder',
+  label: 'Day Placeholder',
+  placeholder: 'Day Placeholder',
+  tooltip: 'The placeholder text that will appear when Day field is empty.'
+}, {
+  weight: 211,
+  type: 'textfield',
+  input: true,
+  key: 'fields.month.placeholder',
+  label: 'Month Placeholder',
+  placeholder: 'Month Placeholder',
+  tooltip: 'The placeholder text that will appear when Month field is empty.'
+}, {
+  weight: 212,
+  type: 'textfield',
+  input: true,
+  key: 'fields.year.placeholder',
+  label: 'Year Placeholder',
+  placeholder: 'Year Placeholder',
+  tooltip: 'The placeholder text that will appear when Year field is empty.'
+}, {
+  weight: 213,
+  type: 'checkbox',
+  label: 'Use Locale Settings',
+  tooltip: 'Use locale settings to display day.',
+  key: 'useLocaleSettings',
+  input: true
+}, {
+  weight: 214,
+  type: 'checkbox',
+  label: 'Day First',
+  tooltip: 'Display the Day field before the Month field.',
+  key: 'dayFirst',
+  input: true
+}, {
+  weight: 215,
+  type: 'checkbox',
+  label: 'Hide Day',
+  tooltip: 'Hide the Day part of the component.',
+  key: 'fields.day.hide',
+  input: true
+}, {
+  weight: 216,
+  type: 'checkbox',
+  label: 'Hide Month',
+  tooltip: 'Hide the Month part of the component.',
+  key: 'fields.month.hide',
+  input: true
+}, {
+  weight: 217,
+  type: 'checkbox',
+  label: 'Hide Year',
+  tooltip: 'Hide the Year part of the component.',
+  key: 'fields.year.hide',
+  input: true
+}];
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/day/editForm/Day.edit.validation.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/formiojs/components/day/editForm/Day.edit.validation.js ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = [{
+  key: 'validate.required',
+  ignore: true
+}, {
+  key: 'validate.unique',
+  ignore: true
+}, {
+  weight: 0,
+  type: 'checkbox',
+  label: 'Require Day',
+  tooltip: 'A required field must be filled in before the form can be submitted.',
+  key: 'fields.day.required',
+  input: true
+}, {
+  weight: 10,
+  type: 'checkbox',
+  label: 'Require Month',
+  tooltip: 'A required field must be filled in before the form can be submitted.',
+  key: 'fields.month.required',
+  input: true
+}, {
+  weight: 20,
+  type: 'checkbox',
+  label: 'Require Year',
+  tooltip: 'A required field must be filled in before the form can be submitted.',
+  key: 'fields.year.required',
+  input: true
+}];
 
 /***/ }),
 
@@ -19433,7 +19700,7 @@ var FileComponent = function (_BaseComponent) {
         style: 'opacity: 0; position: absolute;',
         tabindex: -1, // prevent focus
         onChange: function onChange() {
-          _this3.upload(_this3.hiddenFileInputElement.files);
+          return _this3.upload(_this3.hiddenFileInputElement.files);
         }
       });
     }
@@ -19442,11 +19709,12 @@ var FileComponent = function (_BaseComponent) {
     value: function createFileListItem(fileInfo, index) {
       var _this4 = this;
 
+      var fileService = this.fileService;
       return this.ce('li', { class: 'list-group-item' }, this.ce('div', { class: 'row' }, [this.ce('div', { class: 'col-md-1' }, !this.disabled && !this.shouldDisable ? this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick(event) {
           if (fileInfo && _this4.component.storage === 'url') {
-            _this4.options.formio.makeRequest('', fileInfo.url, 'delete');
+            fileService.makeRequest('', fileInfo.url, 'delete');
           }
           event.preventDefault();
           _this4.splice(index);
@@ -19492,7 +19760,7 @@ var FileComponent = function (_BaseComponent) {
         class: this.iconClass('remove'),
         onClick: function onClick(event) {
           if (fileInfo && _this6.component.storage === 'url') {
-            _this6.options.formio.makeRequest('', fileInfo.url, 'delete');
+            fileService.makeRequest('', fileInfo.url, 'delete');
           }
           event.preventDefault();
           _this6.splice(index);
@@ -19601,7 +19869,7 @@ var FileComponent = function (_BaseComponent) {
       return container = this.ce('div', { class: 'file' + (fileUpload.status === 'error' ? ' has-error' : '') }, [this.ce('div', { class: 'row' }, [this.ce('div', { class: 'fileName control-label col-sm-10' }, [fileUpload.originalName, this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick() {
-          _this8.removeChildFrom(container, _this8.uploadStatusList);
+          return _this8.removeChildFrom(container, _this8.uploadStatusList);
         }
       })]), this.ce('div', { class: 'fileSize control-label col-sm-2 text-right' }, this.fileSize(fileUpload.size))]), this.ce('div', { class: 'row' }, [this.ce('div', { class: 'col-sm-12' }, [fileUpload.status === 'progress' ? this.ce('div', { class: 'progress' }, this.ce('div', {
         class: 'progress-bar',
@@ -20715,6 +20983,13 @@ exports.default = [{
   defaultValue: '<div class="well">Content</div>',
   key: 'content',
   weight: 80
+}, {
+  weight: 85,
+  type: 'checkbox',
+  label: 'Refresh On Change',
+  tooltip: 'Rerender the field whenever a value on the form changes.',
+  key: 'refreshOnChange',
+  input: true
 }];
 
 /***/ }),
@@ -21824,15 +22099,6 @@ var NestedComponent = function (_BaseComponent) {
       this.setPristine(true);
     }
   }, {
-    key: 'whenReady',
-    value: function whenReady() {
-      var promises = [];
-      _lodash2.default.each(this.getComponents(), function (component) {
-        promises.push(component.whenReady());
-      });
-      return _nativePromiseOnly2.default.all(promises);
-    }
-  }, {
     key: 'setValue',
     value: function setValue(value, flags) {
       if (!value) {
@@ -21934,6 +22200,15 @@ var NestedComponent = function (_BaseComponent) {
     key: 'value',
     get: function get() {
       return this.data;
+    }
+  }, {
+    key: 'dataReady',
+    get: function get() {
+      var promises = [];
+      _lodash2.default.each(this.getComponents(), function (component) {
+        return promises.push(component.dataReady);
+      });
+      return _nativePromiseOnly2.default.all(promises);
     }
   }]);
 
@@ -23515,16 +23790,10 @@ var SelectComponent = function (_BaseComponent) {
     // If this component has been activated.
     _this.activated = false;
 
-    // If they wish to refresh on a value, then add that here.
-    if (_this.component.refreshOn) {
-      _this.on('change', function (event) {
-        if (_this.component.refreshOn === 'data') {
-          _this.refreshItems();
-        } else if (event.changed && event.changed.component && event.changed.component.key === _this.component.refreshOn) {
-          _this.refreshItems();
-        }
-      });
-    }
+    // Determine when the items have been loaded.
+    _this.itemsLoaded = new Promise(function (resolve) {
+      _this.itemsLoadedResolve = resolve;
+    });
     return _this;
   }
 
@@ -23636,6 +23905,9 @@ var SelectComponent = function (_BaseComponent) {
         }
       }
     }
+
+    /* eslint-disable max-statements */
+
   }, {
     key: 'setItems',
     value: function setItems(items, fromSearch) {
@@ -23708,7 +23980,12 @@ var SelectComponent = function (_BaseComponent) {
           this.setValue(defaultValue);
         }
       }
+
+      // Say we are done loading the items.
+      this.itemsLoadedResolve();
     }
+    /* eslint-enable max-statements */
+
   }, {
     key: 'loadItems',
     value: function loadItems(url, search, headers, options, method, body) {
@@ -23764,6 +24041,7 @@ var SelectComponent = function (_BaseComponent) {
         return _this4.setItems(response, !!search);
       }).catch(function (err) {
         _this4.loading = false;
+        _this4.itemsLoadedResolve();
         _this4.emit('componentError', {
           component: _this4.component,
           message: err.toString()
@@ -23887,10 +24165,25 @@ var SelectComponent = function (_BaseComponent) {
     }
   }, {
     key: 'addInput',
+
+
+    /* eslint-disable max-statements */
     value: function addInput(input, container) {
       var _this5 = this;
 
       _get(SelectComponent.prototype.__proto__ || Object.getPrototypeOf(SelectComponent.prototype), 'addInput', this).call(this, input, container);
+
+      // If they wish to refresh on a value, then add that here.
+      if (this.component.refreshOn) {
+        this.on('change', function (event) {
+          if (_this5.component.refreshOn === 'data') {
+            _this5.refreshItems();
+          } else if (event.changed && event.changed.component && event.changed.component.key === _this5.component.refreshOn) {
+            _this5.refreshItems();
+          }
+        });
+      }
+
       if (this.component.multiple) {
         input.setAttribute('multiple', true);
       }
@@ -23955,6 +24248,14 @@ var SelectComponent = function (_BaseComponent) {
 
       // If a search field is provided, then add an event listener to update items on search.
       if (this.component.searchField) {
+        // Make sure to clear the search when no value is provided.
+        if (this.choices && this.choices.input) {
+          this.addEventListener(this.choices.input, 'input', function (event) {
+            if (!event.target.value) {
+              _this5.triggerUpdate();
+            }
+          });
+        }
         this.addEventListener(input, 'search', function (event) {
           return _this5.triggerUpdate(event.detail.value);
         });
@@ -23971,6 +24272,8 @@ var SelectComponent = function (_BaseComponent) {
       this.disabled = this.disabled;
       this.triggerUpdate();
     }
+    /* eslint-enable max-statements */
+
   }, {
     key: 'update',
     value: function update() {
@@ -24047,13 +24350,16 @@ var SelectComponent = function (_BaseComponent) {
   }, {
     key: 'setValue',
     value: function setValue(value, flags) {
+      var _this7 = this;
+
       flags = this.getFlags.apply(this, arguments);
+      var previousValue = this.dataValue;
       if (this.component.multiple && !Array.isArray(value)) {
         value = [value];
       }
-      var hasPreviousValue = Array.isArray(this.dataValue) ? this.dataValue.length : this.dataValue;
+      var hasPreviousValue = Array.isArray(previousValue) ? previousValue.length : previousValue;
       var hasValue = Array.isArray(value) ? value.length : value;
-      var changed = this.hasChanged(value, this.dataValue);
+      var changed = this.hasChanged(value, previousValue);
       this.dataValue = value;
 
       // Do not set the value if we are loading... that will happen after it is done.
@@ -24075,7 +24381,13 @@ var SelectComponent = function (_BaseComponent) {
       if (this.choices) {
         // Now set the value.
         if (hasValue) {
-          this.choices.removeActiveItems().setChoices(this.selectOptions, 'value', 'label', true).setValueByChoice(value);
+          this.choices.removeActiveItems();
+          // Add the currently selected choices if they don't already exist.
+          var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
+          _lodash2.default.each(currentChoices, function (choice) {
+            _this7.addCurrentChoices(choice, _this7.selectOptions);
+          });
+          this.choices.setChoices(this.selectOptions, 'value', 'label', true).setValueByChoice(value);
         } else if (hasPreviousValue) {
           this.choices.removeActiveItems();
         }
@@ -24157,6 +24469,11 @@ var SelectComponent = function (_BaseComponent) {
       this.focusableElement.focus();
     }
   }, {
+    key: 'dataReady',
+    get: function get() {
+      return this.itemsLoaded;
+    }
+  }, {
     key: 'defaultSchema',
     get: function get() {
       return SelectComponent.schema();
@@ -24164,7 +24481,7 @@ var SelectComponent = function (_BaseComponent) {
   }, {
     key: 'requestHeaders',
     get: function get() {
-      var _this7 = this;
+      var _this8 = this;
 
       // Create the headers object.
       var headers = new Headers();
@@ -24174,7 +24491,7 @@ var SelectComponent = function (_BaseComponent) {
         try {
           _lodash2.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this7.interpolate(header.value));
+              headers.set(header.key, _this8.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -24348,6 +24665,7 @@ exports.default = [{
 
     return newItems;
   },
+
   data: {
     url: '/form/{{ data.resource }}'
   },
@@ -25012,13 +25330,12 @@ var SignatureComponent = function (_BaseComponent) {
       this.addEventListener(window, 'resize', _lodash2.default.debounce(function () {
         return _this2.checkSize();
       }, 100));
-      setTimeout(function checkWidth() {
-        if (this.padBody.offsetWidth) {
-          this.checkSize();
-        } else {
-          setTimeout(checkWidth.bind(this), 200);
+      var interval = setInterval(function () {
+        if (_this2.padBody.offsetWidth) {
+          clearInterval(interval);
+          _this2.checkSize();
         }
-      }.bind(this), 200);
+      }, 200);
 
       // Restore values.
       this.restoreValue();
@@ -25202,6 +25519,8 @@ var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/com
 
 var _Base2 = _interopRequireDefault(_Base);
 
+var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -25274,6 +25593,7 @@ var SurveyComponent = function (_BaseComponent) {
         });
         this.table.appendChild(tbody);
         this.element.appendChild(this.table);
+        this.errorContainer = this.element;
         if (labelAtTheBottom) {
           this.createLabel(this.element);
         }
@@ -25323,6 +25643,16 @@ var SurveyComponent = function (_BaseComponent) {
         });
       });
       return value;
+    }
+  }, {
+    key: 'validateRequired',
+    value: function validateRequired(setting, value) {
+      if (!(0, _utils.boolValue)(setting)) {
+        return true;
+      }
+      return this.component.questions.reduce(function (result, question) {
+        return result && Boolean(value[question.value]);
+      }, true);
     }
   }, {
     key: 'getView',
@@ -27728,9 +28058,9 @@ Object.defineProperty(exports, 'Utils', {
   }
 });
 
-var _index = __webpack_require__(/*! ./components/index */ "./node_modules/formiojs/components/index.js");
+var _components = __webpack_require__(/*! ./components */ "./node_modules/formiojs/components/index.js");
 
-var _index2 = _interopRequireDefault(_index);
+var _components2 = _interopRequireDefault(_components);
 
 var _Components = __webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js");
 
@@ -27738,7 +28068,7 @@ var _Components2 = _interopRequireDefault(_Components);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_Components2.default.setComponents(_index2.default);
+_Components2.default.setComponents(_components2.default);
 exports.Components = _Components2.default;
 
 /***/ }),
@@ -27899,9 +28229,7 @@ var dropbox = function dropbox(formio) {
           }
         };
 
-        xhr.onabort = function (err) {
-          reject(err);
-        };
+        xhr.onabort = reject;
 
         xhr.open('POST', formio.formUrl + '/storage/dropbox');
         var token = formio.getToken();
@@ -28003,9 +28331,7 @@ var s3 = function s3(formio) {
           reject(err);
         };
 
-        pre.onabort = function (err) {
-          reject(err);
-        };
+        pre.onabort = reject;
 
         pre.onload = function () {
           if (pre.status >= 200 && pre.status < 300) {
@@ -28050,9 +28376,7 @@ var s3 = function s3(formio) {
               }
             };
 
-            xhr.onabort = function (err) {
-              reject(err);
-            };
+            xhr.onabort = reject;
 
             xhr.open('POST', response.url);
 
@@ -28148,10 +28472,11 @@ var url = function url(formio) {
               respData = {};
             }
 
+            var _url = respData.hasOwnProperty('url') ? respData.url : xhr.responseURL + '/' + fileName;
             resolve({
               storage: 'url',
               name: fileName,
-              url: xhr.responseURL + '/' + fileName,
+              url: _url,
               size: file.size,
               type: file.type,
               data: respData
@@ -28163,11 +28488,11 @@ var url = function url(formio) {
 
         // Fire on network error.
         xhr.onerror = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.onabort = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.open('POST', url);
@@ -28832,7 +29157,7 @@ function checkCalculated(component, submission, rowData) {
   // Process calculated value stuff if present.
   if (component.calculateValue) {
     _lodash2.default.set(rowData, component.key, evaluate(component.calculateValue, {
-      value: [],
+      value: undefined,
       data: submission ? submission.data : rowData,
       row: rowData,
       util: this,
@@ -50152,7 +50477,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         relativeTime : {
             future : '%s sonra',
             past : '%s əvvəl',
-            s : 'birneçə saniyyə',
+            s : 'birneçə saniyə',
             ss : '%d saniyə',
             m : 'bir dəqiqə',
             mm : '%d dəqiqə',
@@ -50251,7 +50576,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         weekdays : {
             format: 'нядзелю_панядзелак_аўторак_сераду_чацвер_пятніцу_суботу'.split('_'),
             standalone: 'нядзеля_панядзелак_аўторак_серада_чацвер_пятніца_субота'.split('_'),
-            isFormat: /\[ ?[Вв] ?(?:мінулую|наступную)? ?\] ?dddd/
+            isFormat: /\[ ?[Ууў] ?(?:мінулую|наступную)? ?\] ?dddd/
         },
         weekdaysShort : 'нд_пн_ат_ср_чц_пт_сб'.split('_'),
         weekdaysMin : 'нд_пн_ат_ср_чц_пт_сб'.split('_'),
@@ -57782,7 +58107,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
         calendar : {
             sameDay : '[ਅਜ] LT',
             nextDay : '[ਕਲ] LT',
-            nextWeek : 'dddd, LT',
+            nextWeek : '[ਅਗਲਾ] dddd, LT',
             lastDay : '[ਕਲ] LT',
             lastWeek : '[ਪਿਛਲੇ] dddd, LT',
             sameElse : 'L'
@@ -63173,9 +63498,9 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
             mom = createUTC([2000, 1]).day(i);
             if (strict && !this._fullWeekdaysParse[i]) {
-                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
-                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
-                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\\.?') + '$', 'i');
             }
             if (!this._weekdaysParse[i]) {
                 regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
@@ -63978,7 +64303,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 
     function preprocessRFC2822(s) {
         // Remove comments and folding whitespace and replace multiple-spaces with a single space
-        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').trim();
+        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     }
 
     function checkWeekday(weekdayStr, parsedInput, config) {
@@ -66157,7 +66482,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
     // Side effect imports
 
 
-    hooks.version = '2.22.1';
+    hooks.version = '2.22.2';
 
     setHookCallback(createLocal);
 
