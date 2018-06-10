@@ -237,7 +237,8 @@ exports.default = app.directive('formio', function () {
               args[0] = 'formError';
               break;
             case 'submit':
-              args[0] = 'formSubmit';
+              var submission = args[1];
+              args[0] = submission.saved ? 'formSubmit' : 'formSubmission';
               break;
             case 'submitDone':
               args[0] = 'formSubmission';
@@ -5581,8 +5582,8 @@ var Formio = function () {
 
   }, {
     key: 'getToken',
-    value: function getToken() {
-      return Formio.getToken();
+    value: function getToken(options) {
+      return Formio.getToken(options);
     }
 
     /**
@@ -5591,8 +5592,8 @@ var Formio = function () {
 
   }, {
     key: 'getTempToken',
-    value: function getTempToken(expire, allowed) {
-      var token = Formio.getToken();
+    value: function getTempToken(expire, allowed, options) {
+      var token = Formio.getToken(options);
       if (!token) {
         return _nativePromiseOnly2.default.reject('You must be authenticated to generate a temporary auth token.');
       }
@@ -5851,6 +5852,8 @@ var Formio = function () {
       }
 
       var requestArgs = Formio.getRequestArgs(formio, type, url, method, data, opts);
+      requestArgs.opts = requestArgs.opts || {};
+      requestArgs.opts.formio = formio;
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
         return Formio.pluginGet('request', requestArgs).then(function (result) {
           if (isNil(result)) {
@@ -5892,7 +5895,7 @@ var Formio = function () {
         'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8'
       });
-      var token = Formio.getToken();
+      var token = Formio.getToken(opts);
       if (token && !opts.noToken) {
         headers.append('x-jwt-token', token);
       }
@@ -5908,6 +5911,9 @@ var Formio = function () {
 
       // Allow plugins to alter the options.
       options = Formio.pluginAlter('requestOptions', options, url);
+      if (options.namespace) {
+        opts.namespace = options.namespace;
+      }
 
       var requestToken = options.headers.get('x-jwt-token');
       return fetch(url, options).then(function (response) {
@@ -5916,7 +5922,7 @@ var Formio = function () {
 
         if (!response.ok) {
           if (response.status === 440) {
-            Formio.setToken(null);
+            Formio.setToken(null, opts);
             Formio.events.emit('formio.sessionExpired', response.body);
           } else if (response.status === 401) {
             Formio.events.emit('formio.unauthorized', response.body);
@@ -5941,7 +5947,7 @@ var Formio = function () {
         }
 
         if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
-          Formio.setToken(token);
+          Formio.setToken(token, opts);
         }
         // 204 is no content. Don't try to .json() it.
         if (response.status === 204) {
@@ -6002,7 +6008,7 @@ var Formio = function () {
         return resultCopy;
       }).catch(function (err) {
         if (err === 'Bad Token') {
-          Formio.setToken(null);
+          Formio.setToken(null, opts);
           Formio.events.emit('formio.badToken', err);
         }
         if (err.message) {
@@ -6014,69 +6020,86 @@ var Formio = function () {
     }
   }, {
     key: 'setToken',
-    value: function setToken(token) {
+    value: function setToken(token, opts) {
       token = token || '';
-      if (token === this.token) {
+      opts = typeof opts === 'string' ? { namespace: opts } : opts || {};
+      var tokenName = (opts.namespace || 'formio') + 'Token';
+      if (!this.tokens) {
+        this.tokens = {};
+      }
+
+      if (this.tokens[tokenName] === token) {
         return;
       }
-      this.token = token;
+
+      this.tokens[tokenName] = token;
       if (!token) {
-        Formio.setUser(null);
+        Formio.setUser(null, opts);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioToken');
+          return localStorage.removeItem(tokenName);
         } catch (err) {
-          return _browserCookies2.default.erase('formioToken', { path: '/' });
+          return _browserCookies2.default.erase(tokenName, { path: '/' });
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioToken', token);
+        localStorage.setItem(tokenName, token);
       } catch (err) {
-        _browserCookies2.default.set('formioToken', token, { path: '/' });
+        _browserCookies2.default.set(tokenName, token, { path: '/' });
       }
-      return Formio.currentUser(); // Run this so user is updated if null
+      return Formio.currentUser(opts.formio, opts); // Run this so user is updated if null
     }
   }, {
     key: 'getToken',
-    value: function getToken() {
-      if (this.token) {
-        return this.token;
+    value: function getToken(options) {
+      options = typeof options === 'string' ? { namespace: options } : options || {};
+      var tokenName = (options.namespace || 'formio') + 'Token';
+      if (!this.tokens) {
+        this.tokens = {};
+      }
+
+      if (this.tokens[tokenName]) {
+        return this.tokens[tokenName];
       }
       try {
-        this.token = localStorage.getItem('formioToken') || '';
-        return this.token;
+        this.tokens[tokenName] = localStorage.getItem(tokenName) || '';
+        return this.tokens[tokenName];
       } catch (e) {
-        this.token = _browserCookies2.default.get('formioToken');
-        return this.token;
+        this.tokens[tokenName] = _browserCookies2.default.get(tokenName);
+        return this.tokens[tokenName];
       }
     }
   }, {
     key: 'setUser',
-    value: function setUser(user) {
+    value: function setUser(user, opts) {
+      opts = opts || {};
+      var userName = (opts.namespace || 'formio') + 'User';
       if (!user) {
-        this.setToken(null);
+        this.setToken(null, opts);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioUser');
+          return localStorage.removeItem(userName);
         } catch (err) {
-          return _browserCookies2.default.erase('formioUser', { path: '/' });
+          return _browserCookies2.default.erase(userName, { path: '/' });
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioUser', JSON.stringify(user));
+        localStorage.setItem(userName, JSON.stringify(user));
       } catch (err) {
-        _browserCookies2.default.set('formioUser', JSON.stringify(user), { path: '/' });
+        _browserCookies2.default.set(userName, JSON.stringify(user), { path: '/' });
       }
     }
   }, {
     key: 'getUser',
-    value: function getUser() {
+    value: function getUser(options) {
+      options = options || {};
+      var userName = (options.namespace || 'formio') + 'User';
       try {
-        return JSON.parse(localStorage.getItem('formioUser') || null);
+        return JSON.parse(localStorage.getItem(userName) || null);
       } catch (e) {
-        return JSON.parse(_browserCookies2.default.get('formioUser'));
+        return JSON.parse(_browserCookies2.default.get(userName));
       }
     }
   }, {
@@ -6256,7 +6279,7 @@ var Formio = function () {
     value: function currentUser(formio, options) {
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
       projectUrl += '/current';
-      var user = this.getUser();
+      var user = this.getUser(options);
       if (user) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(user), {
           url: projectUrl,
@@ -6264,7 +6287,7 @@ var Formio = function () {
           options: options
         });
       }
-      var token = Formio.getToken();
+      var token = Formio.getToken(options);
       if (!token) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
           url: projectUrl,
@@ -6273,15 +6296,16 @@ var Formio = function () {
         });
       }
       return Formio.makeRequest(formio, 'currentUser', projectUrl, 'GET', null, options).then(function (response) {
-        Formio.setUser(response);
+        Formio.setUser(response, options);
         return response;
       });
     }
   }, {
     key: 'logout',
-    value: function logout(formio) {
-      Formio.setToken(null);
-      Formio.setUser(null);
+    value: function logout(formio, options) {
+      options.formio = formio;
+      Formio.setToken(null, options);
+      Formio.setUser(null, options);
       Formio.clearCache();
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
       return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
@@ -7759,6 +7783,9 @@ var Webform = function (_NestedComponent) {
         noCheck: true
       });
       this.setAlert('success', '<p>' + this.t('complete') + '</p>');
+      if (!submission.hasOwnProperty('saved')) {
+        submission.saved = saved;
+      }
       this.emit('submit', submission);
       if (saved) {
         this.emit('submitDone', submission);
