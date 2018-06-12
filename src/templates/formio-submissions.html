@@ -29,6 +29,7 @@
   <pagination
     ng-if="submissions.serverCount > perPage"
     ng-model="currentPage"
+    ng-model-options="{allowInvalid: true}"
     ng-change="pageChanged(currentPage)"
     total-items="submissions.serverCount"
     items-per-page="perPage"
@@ -36,6 +37,6 @@
     boundary-links="true"
     first-text="&laquo;"
     last-text="&raquo;"
-    >
+  >
   </pagination>
 </div>

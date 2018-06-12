@@ -16,6 +16,7 @@
       ng-disabled="readOnly"
       auto-focus="true"
       ng-model="data[component.name]"
+      ng-model-options="{allowInvalid: true}"
       ng-required="component.validate.required"
       ng-style="getOptionInputStyles(component)"
     >
@@ -28,6 +29,7 @@
       ng-disabled="readOnly"
       auto-focus="true"
       ng-model="data[component.key]"
+      ng-model-options="{allowInvalid: true}"
       aria-labelledby="{{ componentId +'Label'}}"
       aria-describedby="{{componentId + 'Desc'}}"
       ng-required="isRequired(component)"
