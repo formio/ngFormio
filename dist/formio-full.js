@@ -99189,35 +99189,6 @@ module.exports = function(app) {
       });
     }
   ]);
-  app.directive('datagridValidation', function() {
-    return {
-      require: 'ngModel',
-      restrict: 'A',
-      link: function(scope, elem, attr, ctrl) {
-        if ((scope.options && scope.options.building) || !scope.formioForm || !scope.component.validate || !scope.component.validate.custom) return;
-
-        // Add the control to the main form.
-        ctrl.$name = scope.componentId;
-        scope.formioForm.$addControl(ctrl);
-        // For some reason the validator deletes the ng-model value if validation fails so make a fake copy since we don't need it anyway.
-        scope.dataValue = angular.copy(scope.data);
-
-        var init = true;
-
-        // Wait 300ms for changes to trigger the datagrid.
-        setTimeout(function() {
-          init = false;
-        }, 300);
-        scope.$watch('data', function() {
-          scope.dataValue = angular.copy(scope.data);
-          ctrl.$validate();
-          if (!init) {
-            ctrl.$setDirty(true);
-          }
-        }, true);
-      }
-    }
-  });
   app.controller('formioDataGrid', [
     '$scope',
     'FormioUtils',
@@ -99225,11 +99196,11 @@ module.exports = function(app) {
       if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
-      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
+      $scope.data[$scope.componentId] = $scope.data[$scope.componentId] || [{}];
 
       // Determine if any component is visible.
       $scope.anyVisible = function(component) {
-        var data = $scope.data[$scope.component.key];
+        var data = $scope.data[$scope.componentId];
         var visible = false;
         angular.forEach(data, function(rowData) {
           visible = (visible || FormioUtils.isVisible(component, rowData, $scope.data, $scope.hideComponents));
@@ -99238,7 +99209,7 @@ module.exports = function(app) {
       };
 
       // Pull out the rows and cols for easy iteration.
-      $scope.rows = $scope.data[$scope.component.key];
+      $scope.rows = $scope.data[$scope.componentId];
       // If less than minLength, add that many rows.
       if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
         var toAdd = $scope.component.validate.minLength - $scope.rows.length;
@@ -99274,7 +99245,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div name=\"{{ componentId }}\" class=\"formio-data-grid\" ng-model=\"dataValue[componentId]\" ng-model-options=\"{allowInvalid: true}\" custom-validator=\"component.validate.custom\" datagrid-validation ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <thead>\n      <tr>\n        <th\n          ng-repeat=\"col in cols track by $index\"\n          ng-class=\"{'field-required': col.validate.required}\"\n          ng-if=\"options.building ? '::true' : anyVisible(col)\"\n        ><span ng-if=\"!col.dataGridLabel && (col.input || !col.hideLabel)\">{{ col.label | formioTranslate:null:options.building }}</span></th>\n        <th style=\"padding-left: 9px;\">\n          <div style=\"padding: 0; margin-bottom: 0;\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both')\">\n            <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n              <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ \"\" | formioTranslate:null:options.building }}\n            </a>\n          </div>\n        </th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.inDataGrid = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"options.building ? '::true' : anyVisible(col)\">\n          <formio-component\n            component=\"col\"\n            data=\"rows[rowIndex]\"\n            form-name=\"formName\"\n            formio=\"formio\"\n            submission=\"submission\"\n            hide-components=\"hideComponents\"\n            ng-if=\"options.building ? '::true' : isVisible(col, row)\"\n            read-only=\"isDisabled(col, row)\"\n            grid-row=\"rowIndex\"\n            grid-col=\"colIndex\"\n            options=\"options\"\n          ></formio-component>\n        </td>\n        <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n          <a ng-click=\"(readOnly || formioForm.submitting)? null: removeRow(rowIndex) \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-default datagrid-remove\">\n            <span class=\"glyphicon glyphicon-remove-circle\"></span>\n          </a>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <div style=\"margin-top: 10px\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || !component.validate.maxLength || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')\">\n    <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n    </a>\n  </div>\n</div>\n\n\n"
+        "<div name=\"{{ componentId }}\" class=\"formio-data-grid\" ng-model=\"data[componentId]\" ng-model-options=\"{allowInvalid: true}\" custom-validator=\"component.validate.custom\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <thead>\n      <tr>\n        <th\n          ng-repeat=\"col in cols track by $index\"\n          ng-class=\"{'field-required': col.validate.required}\"\n          ng-if=\"options.building ? '::true' : anyVisible(col)\"\n        ><span ng-if=\"!col.dataGridLabel && (col.input || !col.hideLabel)\">{{ col.label | formioTranslate:null:options.building }}</span></th>\n        <th style=\"padding-left: 9px;\">\n          <div style=\"padding: 0; margin-bottom: 0;\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both')\">\n            <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n              <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ \"\" | formioTranslate:null:options.building }}\n            </a>\n          </div>\n        </th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.inDataGrid = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"options.building ? '::true' : anyVisible(col)\">\n          <formio-component\n            component=\"col\"\n            data=\"rows[rowIndex]\"\n            form-name=\"formName\"\n            formio=\"formio\"\n            submission=\"submission\"\n            hide-components=\"hideComponents\"\n            ng-if=\"options.building ? '::true' : isVisible(col, row)\"\n            read-only=\"isDisabled(col, row)\"\n            grid-row=\"rowIndex\"\n            grid-col=\"colIndex\"\n            options=\"options\"\n          ></formio-component>\n        </td>\n        <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n          <a ng-click=\"(readOnly || formioForm.submitting)? null: removeRow(rowIndex) \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-default datagrid-remove\">\n            <span class=\"glyphicon glyphicon-remove-circle\"></span>\n          </a>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <div style=\"margin-top: 10px\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || !component.validate.maxLength || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')\">\n    <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n    </a>\n  </div>\n</div>\n\n\n"
       ));
     }
   ]);
