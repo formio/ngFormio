@@ -766,7 +766,9 @@ angular
       $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
       $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
       $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
+      $scope.getEmailCallsLimit = ProjectPlans.getEmailCallsLimit.bind(ProjectPlans);
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
+      $scope.getEmailCallsPercent = ProjectPlans.getEmailCallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
 
       $rootScope.welcomeForceClose = false;
@@ -1173,6 +1175,16 @@ angular
         }
         return $filter('number')(apiCalls.limit);
       },
+      getEmailCallsLimit: function(plan) {
+        switch(plan) {
+          case 'basic':
+            return 100;
+          case 'independent':
+            return 1000;
+          default:
+            return '∞';
+        }
+      },
       getAPICallsPercent: function(apiCalls) {
         if (!apiCalls || !apiCalls.limit) {
           return '0%';
@@ -1180,9 +1192,22 @@ angular
         var percent = apiCalls.used / apiCalls.limit * 100;
         return (percent > 100) ? '100%' : percent + '%';
       },
+      getEmailCallsPercent: function(apiCalls, plan) {
+        if (!apiCalls || !apiCalls.emails) {
+          return '0%';
+        }
+        var percent = apiCalls.emails / this.getEmailCallsLimit(plan) * 100;
+        return (percent > 100) ? '100%' : percent + '%';
+      },
       getProgressBarClass: function(apiCalls) {
         if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
         var percentUsed = apiCalls.used / apiCalls.limit;
+        if (percentUsed >= 0.9) return 'progress-bar-danger';
+        if (percentUsed >= 0.7) return 'progress-bar-warning';
+        return 'progress-bar-success';
+      },
+      getProgressBarClassPercent: function(apiCalls, plan) {
+        var percentUsed = parseFloat(this.getEmailCallsPercent(apiCalls, plan))/100.0;
         if (percentUsed >= 0.9) return 'progress-bar-danger';
         if (percentUsed >= 0.7) return 'progress-bar-warning';
         return 'progress-bar-success';
