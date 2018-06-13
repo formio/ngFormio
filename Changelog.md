@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Inputs store invalid value.
 
+### Fixed
+ - `tableView` for File component.
+
 ## 2.34.2
 ### Fixed
  - Upgraded formiojs to 3.0.0-rc.4 which contains formData method.
