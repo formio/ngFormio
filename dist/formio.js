@@ -883,9 +883,6 @@ exports.all = function() {
 },{"_process":199}],3:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -893,7 +890,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+// duck-punch the global Promise definition which messes up Angular 2 since it
+// also duck-punches the global Promise definition. For now, keep native-promise-only.
+
 
 var _nativePromiseOnly = _dereq_('native-promise-only');
 
@@ -2184,9 +2184,7 @@ var dropbox = function dropbox(formio) {
           }
         };
 
-        xhr.onabort = function (err) {
-          reject(err);
-        };
+        xhr.onabort = reject;
 
         xhr.open('POST', formio.formUrl + '/storage/dropbox');
         var token = formio.getToken();
@@ -2268,9 +2266,7 @@ var s3 = function s3(formio) {
           reject(err);
         };
 
-        pre.onabort = function (err) {
-          reject(err);
-        };
+        pre.onabort = reject;
 
         pre.onload = function () {
           if (pre.status >= 200 && pre.status < 300) {
@@ -2315,9 +2311,7 @@ var s3 = function s3(formio) {
               }
             };
 
-            xhr.onabort = function (err) {
-              reject(err);
-            };
+            xhr.onabort = reject;
 
             xhr.open('POST', response.url);
 
@@ -2403,10 +2397,11 @@ var url = function url(formio) {
               respData = {};
             }
 
+            var _url = respData.hasOwnProperty('url') ? respData.url : xhr.responseURL + '/' + fileName;
             resolve({
               storage: 'url',
               name: fileName,
-              url: xhr.responseURL + '/' + fileName,
+              url: _url,
               size: file.size,
               type: file.type,
               data: respData
@@ -2418,11 +2413,11 @@ var url = function url(formio) {
 
         // Fire on network error.
         xhr.onerror = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.onabort = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.open('POST', url);
@@ -2938,7 +2933,7 @@ function checkCalculated(component, submission, rowData) {
   // Process calculated value stuff if present.
   if (component.calculateValue) {
     _lodash2.default.set(rowData, component.key, evaluate(component.calculateValue, {
-      value: [],
+      value: undefined,
       data: submission ? submission.data : rowData,
       row: rowData,
       util: this,
@@ -2993,7 +2988,7 @@ function checkCustomConditional(component, custom, row, data, form, variable, on
   if (typeof custom === 'string') {
     custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
   }
-  var value = evaluate(custom, { component: component, row: row, data: data, form: form, instance: instance });
+  var value = instance && instance.evaluate ? instance.evaluate(custom, { row: row, data: data, form: form }) : evaluate(custom, { row: row, data: data, form: form });
   if (value === null) {
     return onError;
   }
@@ -3032,7 +3027,7 @@ function checkCondition(component, row, data, form, instance) {
   } else if (component.conditional && component.conditional.when) {
     return checkSimpleConditional(component, component.conditional, row, data, true);
   } else if (component.conditional && component.conditional.json) {
-    return checkJsonConditional(component, component.conditional.json, row, data, form);
+    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
   }
 
   // Default to show.
@@ -3061,7 +3056,7 @@ function checkTrigger(component, trigger, row, data, form, instance) {
   return false;
 }
 
-function setActionProperty(component, action, row, data, result) {
+function setActionProperty(component, action, row, data, result, instance) {
   switch (action.property.type) {
     case 'boolean':
       if (_lodash2.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
@@ -3070,12 +3065,13 @@ function setActionProperty(component, action, row, data, result) {
       break;
     case 'string':
       {
-        var newValue = interpolate(action.text, {
+        var evalData = {
           data: data,
           row: row,
           component: component,
           result: result
-        });
+        };
+        var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
         if (newValue !== _lodash2.default.get(component, action.property.value, '')) {
           _lodash2.default.set(component, action.property.value, newValue);
         }
@@ -27996,9 +27992,9 @@ module.exports = toString;
 
             mom = createUTC([2000, 1]).day(i);
             if (strict && !this._fullWeekdaysParse[i]) {
-                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
-                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
-                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\\.?') + '$', 'i');
             }
             if (!this._weekdaysParse[i]) {
                 regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
@@ -28801,7 +28797,7 @@ module.exports = toString;
 
     function preprocessRFC2822(s) {
         // Remove comments and folding whitespace and replace multiple-spaces with a single space
-        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').trim();
+        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     }
 
     function checkWeekday(weekdayStr, parsedInput, config) {
@@ -30980,7 +30976,7 @@ module.exports = toString;
     // Side effect imports
 
 
-    hooks.version = '2.22.1';
+    hooks.version = '2.22.2';
 
     setHookCallback(createLocal);
 
@@ -34650,7 +34646,7 @@ module.exports = function(app) {
         template: 'formio/components/file.html',
         group: 'advanced',
         tableView: function(data, options) {
-          if (!data) {
+          if (!data || data.length === 0) {
             return '';
           }
 

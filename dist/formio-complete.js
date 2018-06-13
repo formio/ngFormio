@@ -1500,7 +1500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"angular":10,"moment":221}],4:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.7.0
+ * @license AngularJS v1.7.2
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -2212,7 +2212,7 @@ function sanitizeText(chars) {
 // define ngSanitize module and register $sanitize service
 angular.module('ngSanitize', [])
   .provider('$sanitize', $SanitizeProvider)
-  .info({ angularVersion: '1.7.0' });
+  .info({ angularVersion: '1.7.2' });
 
 /**
  * @ngdoc filter
@@ -10558,7 +10558,7 @@ module.exports = 'ui.bootstrap';
 
 },{"./dist/ui-bootstrap-tpls":7}],9:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.7.0
+ * @license AngularJS v1.7.2
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10571,7 +10571,8 @@ module.exports = 'ui.bootstrap';
 */
 
 var minErrConfig = {
-  objectMaxDepth: 5
+  objectMaxDepth: 5,
+  urlErrorParamsEnabled: true
 };
 
 /**
@@ -10594,11 +10595,20 @@ var minErrConfig = {
  * * `objectMaxDepth`  **{Number}** - The max depth for stringifying objects. Setting to a
  *   non-positive or non-numeric value, removes the max depth limit.
  *   Default: 5
+ *
+ * * `urlErrorParamsEnabled`  **{Boolean}** - Specifies wether the generated error url will
+ *   contain the parameters of the thrown error. Disabling the parameters can be useful if the
+ *   generated error url is very long.
+ *
+ *   Default: true. When used without argument, it returns the current value.
  */
 function errorHandlingConfig(config) {
   if (isObject(config)) {
     if (isDefined(config.objectMaxDepth)) {
       minErrConfig.objectMaxDepth = isValidObjectMaxDepth(config.objectMaxDepth) ? config.objectMaxDepth : NaN;
+    }
+    if (isDefined(config.urlErrorParamsEnabled) && isBoolean(config.urlErrorParamsEnabled)) {
+      minErrConfig.urlErrorParamsEnabled = config.urlErrorParamsEnabled;
     }
   } else {
     return minErrConfig;
@@ -10613,6 +10623,7 @@ function errorHandlingConfig(config) {
 function isValidObjectMaxDepth(maxDepth) {
   return isNumber(maxDepth) && maxDepth > 0;
 }
+
 
 /**
  * @description
@@ -10647,7 +10658,7 @@ function isValidObjectMaxDepth(maxDepth) {
 function minErr(module, ErrorConstructor) {
   ErrorConstructor = ErrorConstructor || Error;
 
-  var url = 'https://errors.angularjs.org/1.7.0/';
+  var url = 'https://errors.angularjs.org/1.7.2/';
   var regex = url.replace('.', '\\.') + '[\\s\\S]*';
   var errRegExp = new RegExp(regex, 'g');
 
@@ -10677,8 +10688,10 @@ function minErr(module, ErrorConstructor) {
 
     message += '\n' + url + (module ? module + '/' : '') + code;
 
-    for (i = 0, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
-      message += paramPrefix + 'p' + i + '=' + encodeURIComponent(templateArgs[i]);
+    if (minErrConfig.urlErrorParamsEnabled) {
+      for (i = 0, paramPrefix = '?'; i < templateArgs.length; i++, paramPrefix = '&') {
+        message += paramPrefix + 'p' + i + '=' + encodeURIComponent(templateArgs[i]);
+      }
     }
 
     return new ErrorConstructor(message);
@@ -13236,6 +13249,7 @@ function toDebugString(obj, maxDepth) {
   ngInitDirective,
   ngNonBindableDirective,
   ngPluralizeDirective,
+  ngRefDirective,
   ngRepeatDirective,
   ngShowDirective,
   ngStyleDirective,
@@ -13324,11 +13338,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.7.0',
+  full: '1.7.2',
   major: 1,
   minor: 7,
-  dot: 0,
-  codeName: 'nonexistent-physiology'
+  dot: 2,
+  codeName: 'extreme-compatiplication'
 };
 
 
@@ -13402,6 +13416,7 @@ function publishExternalAPI(angular) {
             ngInit: ngInitDirective,
             ngNonBindable: ngNonBindableDirective,
             ngPluralize: ngPluralizeDirective,
+            ngRef: ngRefDirective,
             ngRepeat: ngRepeatDirective,
             ngShow: ngShowDirective,
             ngStyle: ngStyleDirective,
@@ -13474,7 +13489,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.7.0' });
+  .info({ angularVersion: '1.7.2' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -18096,6 +18111,11 @@ function $TemplateCacheProvider() {
  *   One-way binding is useful if you do not plan to propagate changes to your isolated scope bindings
  *   back to the parent. However, it does not make this completely impossible.
  *
+ *   By default, the {@link ng.$rootScope.Scope#$watch `$watch`}
+ *   method is used for tracking changes, and the equality check is based on object identity.
+ *   It's also possible to watch the evaluated value shallowly with
+ *   {@link ng.$rootScope.Scope#$watchCollection `$watchCollection`}: use `<*` or `<*attr`
+ *
  * * `&` or `&attr` - provides a way to execute an expression in the context of the parent scope. If
  *   no `attr` name is specified then the attribute name is assumed to be the same as the local name.
  *   Given `<my-component my-attr="count = count + value">` and the isolate scope definition `scope: {
@@ -18825,7 +18845,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
   var bindingCache = createMap();
 
   function parseIsolateBindings(scope, directiveName, isController) {
-    var LOCAL_REGEXP = /^([@&<]|=(\*?))(\??)\s*([\w$]*)$/;
+    var LOCAL_REGEXP = /^([@&]|[=<](\*?))(\??)\s*([\w$]*)$/;
 
     var bindings = createMap();
 
@@ -20327,7 +20347,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
               // We have transclusion slots,
               // collect them up, compile them and store their transclusion functions
-              $template = [];
+              $template = window.document.createDocumentFragment();
 
               var slotMap = createMap();
               var filledSlots = createMap();
@@ -20355,10 +20375,10 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
                 var slotName = slotMap[directiveNormalize(nodeName_(node))];
                 if (slotName) {
                   filledSlots[slotName] = true;
-                  slots[slotName] = slots[slotName] || [];
-                  slots[slotName].push(node);
+                  slots[slotName] = slots[slotName] || window.document.createDocumentFragment();
+                  slots[slotName].appendChild(node);
                 } else {
-                  $template.push(node);
+                  $template.appendChild(node);
                 }
               });
 
@@ -20372,9 +20392,11 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               for (var slotName in slots) {
                 if (slots[slotName]) {
                   // Only define a transclusion function if the slot was filled
-                  slots[slotName] = compilationGenerator(mightHaveMultipleTransclusionError, slots[slotName], transcludeFn);
+                  slots[slotName] = compilationGenerator(mightHaveMultipleTransclusionError, slots[slotName].childNodes, transcludeFn);
                 }
               }
+
+              $template = $template.childNodes;
             }
 
             $compileNode.empty(); // clear contents
@@ -21372,7 +21394,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             var initialValue = destination[scopeName] = parentGet(scope);
             initialChanges[scopeName] = new SimpleChange(_UNINITIALIZED_VALUE, destination[scopeName]);
 
-            removeWatch = scope.$watch(parentGet, function parentValueWatchAction(newValue, oldValue) {
+            removeWatch = scope[definition.collection ? '$watchCollection' : '$watch'](parentGet, function parentValueWatchAction(newValue, oldValue) {
               if (oldValue === newValue) {
                 if (oldValue === initialValue || (isLiteral && equals(oldValue, initialValue))) {
                   return;
@@ -35656,7 +35678,11 @@ var inputType = {
    * error docs for more information and an example of how to convert your model if necessary.
    * </div>
    *
-   * ## Issues with HTML5 constraint validation
+   *
+   *
+   * @knownIssue
+   *
+   * ### HTML5 constraint validation and `allowInvalid`
    *
    * In browsers that follow the
    * [HTML5 specification](https://html.spec.whatwg.org/multipage/forms.html#number-state-%28type=number%29),
@@ -35665,6 +35691,17 @@ var inputType = {
    * which means the view / model values in `ngModel` and subsequently the scope value
    * will also be an empty string.
    *
+   * @knownIssue
+   *
+   * ### Large numbers and `step` validation
+   *
+   * The `step` validation will not work correctly for very large numbers (e.g. 9999999999) due to
+   * Javascript's arithmetic limitations. If you need to handle large numbers, purpose-built
+   * libraries (e.g. https://github.com/MikeMcl/big.js/), can be included into AngularJS by
+   * {@link guide/forms#modifying-built-in-validators overwriting the validators}
+   * for `number` and / or `step`, or by {@link guide/forms#custom-validation applying custom validators}
+   * to an `input[text]` element. The source for `input[number]` type can be used as a starting
+   * point for both implementations.
    *
    * @param {string} ngModel Assignable AngularJS expression to data-bind to.
    * @param {string=} name Property name of the form under which the control is published.
@@ -39982,6 +40019,7 @@ function NgModelController($scope, $exceptionHandler, $attr, $element, $parse, $
   this.$$currentValidationRunId = 0;
 
   this.$$scope = $scope;
+  this.$$rootScope = $scope.$root;
   this.$$attr = $attr;
   this.$$element = $element;
   this.$$animate = $animate;
@@ -40559,7 +40597,7 @@ NgModelController.prototype = {
       this.$$pendingDebounce = this.$$timeout(function() {
         that.$commitViewValue();
       }, debounceDelay);
-    } else if (this.$$scope.$root.$$phase) {
+    } else if (this.$$rootScope.$$phase) {
       this.$commitViewValue();
     } else {
       this.$$scope.$apply(function() {
@@ -41115,7 +41153,7 @@ ModelOptions.prototype = {
     options = extend({}, options);
 
     // Inherit options from the parent if specified by the value `"$inherit"`
-    forEach(options, /* @this */ function(option, key) {
+    forEach(options, /** @this */ function(option, key) {
       if (option === '$inherit') {
         if (key === '*') {
           inheritAll = true;
@@ -42559,6 +42597,301 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
       function updateElementText(newText) {
         element.text(newText || '');
       }
+    }
+  };
+}];
+
+/**
+ * @ngdoc directive
+ * @name ngRef
+ * @restrict A
+ *
+ * @description
+ * The `ngRef` attribute tells AngularJS to assign the controller of a component (or a directive)
+ * to the given property in the current scope. It is also possible to add the jqlite-wrapped DOM
+ * element to the scope.
+ *
+ * If the element with `ngRef` is destroyed `null` is assigned to the property.
+ *
+ * Note that if you want to assign from a child into the parent scope, you must initialize the
+ * target property on the parent scope, otherwise `ngRef` will assign on the child scope.
+ * This commonly happens when assigning elements or components wrapped in {@link ngIf} or
+ * {@link ngRepeat}. See the second example below.
+ *
+ *
+ * @element ANY
+ * @param {string} ngRef property name - A valid AngularJS expression identifier to which the
+ *                       controller or jqlite-wrapped DOM element will be bound.
+ * @param {string=} ngRefRead read value - The name of a directive (or component) on this element,
+ *                            or the special string `$element`. If a name is provided, `ngRef` will
+ *                            assign the matching controller. If `$element` is provided, the element
+ *                            itself is assigned (even if a controller is available).
+ *
+ *
+ * @example
+ * ### Simple toggle
+ * This example shows how the controller of the component toggle
+ * is reused in the template through the scope to use its logic.
+ * <example name="ng-ref-component" module="myApp">
+ *   <file name="index.html">
+ *     <my-toggle ng-ref="myToggle"></my-toggle>
+ *     <button ng-click="myToggle.toggle()">Toggle</button>
+ *     <div ng-show="myToggle.isOpen()">
+ *       You are using a component in the same template to show it.
+ *     </div>
+ *   </file>
+ *   <file name="index.js">
+ *     angular.module('myApp', [])
+ *     .component('myToggle', {
+ *       controller: function ToggleController() {
+ *         var opened = false;
+ *         this.isOpen = function() { return opened; };
+ *         this.toggle = function() { opened = !opened; };
+ *       }
+ *     });
+ *   </file>
+ *   <file name="protractor.js" type="protractor">
+ *      it('should publish the toggle into the scope', function() {
+ *        var toggle = element(by.buttonText('Toggle'));
+ *        expect(toggle.evaluate('myToggle.isOpen()')).toEqual(false);
+ *        toggle.click();
+ *        expect(toggle.evaluate('myToggle.isOpen()')).toEqual(true);
+ *      });
+ *   </file>
+ * </example>
+ *
+ * @example
+ * ### ngRef inside scopes
+ * This example shows how `ngRef` works with child scopes. The `ngRepeat`-ed `myWrapper` components
+ * are assigned to the scope of `myRoot`, because the `toggles` property has been initialized.
+ * The repeated `myToggle` components are published to the child scopes created by `ngRepeat`.
+ * `ngIf` behaves similarly - the assignment of `myToggle` happens in the `ngIf` child scope,
+ * because the target property has not been initialized on the `myRoot` component controller.
+ *
+ * <example name="ng-ref-scopes" module="myApp">
+ *   <file name="index.html">
+ *     <my-root></my-root>
+ *   </file>
+ *   <file name="index.js">
+ *     angular.module('myApp', [])
+ *     .component('myRoot', {
+ *       templateUrl: 'root.html',
+ *       controller: function() {
+ *         this.wrappers = []; // initialize the array so that the wrappers are assigned into the parent scope
+ *       }
+ *     })
+ *     .component('myToggle', {
+ *       template: '<strong>myToggle</strong><button ng-click="$ctrl.toggle()" ng-transclude></button>',
+ *       transclude: true,
+ *       controller: function ToggleController() {
+ *         var opened = false;
+ *         this.isOpen = function() { return opened; };
+ *         this.toggle = function() { opened = !opened; };
+ *       }
+ *     })
+ *     .component('myWrapper', {
+ *       transclude: true,
+ *       template: '<strong>myWrapper</strong>' +
+ *         '<div>ngRepeatToggle.isOpen(): {{$ctrl.ngRepeatToggle.isOpen() | json}}</div>' +
+ *         '<my-toggle ng-ref="$ctrl.ngRepeatToggle"><ng-transclude></ng-transclude></my-toggle>'
+ *     });
+ *   </file>
+ *   <file name="root.html">
+ *     <strong>myRoot</strong>
+ *     <my-toggle ng-ref="$ctrl.outerToggle">Outer Toggle</my-toggle>
+ *     <div>outerToggle.isOpen(): {{$ctrl.outerToggle.isOpen() | json}}</div>
+ *     <div><em>wrappers assigned to root</em><br>
+ *     <div ng-repeat="wrapper in $ctrl.wrappers">
+ *       wrapper.ngRepeatToggle.isOpen(): {{wrapper.ngRepeatToggle.isOpen() | json}}
+ *     </div>
+ *
+ *     <ul>
+ *       <li ng-repeat="(index, value) in [1,2,3]">
+ *         <strong>ngRepeat</strong>
+ *         <div>outerToggle.isOpen(): {{$ctrl.outerToggle.isOpen() | json}}</div>
+ *         <my-wrapper ng-ref="$ctrl.wrappers[index]">ngRepeat Toggle {{$index + 1}}</my-wrapper>
+ *       </li>
+ *     </ul>
+ *
+ *     <div>ngIfToggle.isOpen(): {{ngIfToggle.isOpen()}} // This is always undefined because it's
+ *       assigned to the child scope created by ngIf.
+ *     </div>
+ *     <div ng-if="true">
+          <strong>ngIf</strong>
+ *        <my-toggle ng-ref="ngIfToggle">ngIf Toggle</my-toggle>
+ *        <div>ngIfToggle.isOpen(): {{ngIfToggle.isOpen() | json}}</div>
+ *        <div>outerToggle.isOpen(): {{$ctrl.outerToggle.isOpen() | json}}</div>
+ *     </div>
+ *   </file>
+ *   <file name="styles.css">
+ *     ul {
+ *       list-style: none;
+ *       padding-left: 0;
+ *     }
+ *
+ *     li[ng-repeat] {
+ *       background: lightgreen;
+ *       padding: 8px;
+ *       margin: 8px;
+ *     }
+ *
+ *     [ng-if] {
+ *       background: lightgrey;
+ *       padding: 8px;
+ *     }
+ *
+ *     my-root {
+ *       background: lightgoldenrodyellow;
+ *       padding: 8px;
+ *       display: block;
+ *     }
+ *
+ *     my-wrapper {
+ *       background: lightsalmon;
+ *       padding: 8px;
+ *       display: block;
+ *     }
+ *
+ *     my-toggle {
+ *       background: lightblue;
+ *       padding: 8px;
+ *       display: block;
+ *     }
+ *   </file>
+ *   <file name="protractor.js" type="protractor">
+ *      var OuterToggle = function() {
+ *        this.toggle = function() {
+ *          element(by.buttonText('Outer Toggle')).click();
+ *        };
+ *        this.isOpen = function() {
+ *          return element.all(by.binding('outerToggle.isOpen()')).first().getText();
+ *        };
+ *      };
+ *      var NgRepeatToggle = function(i) {
+ *        var parent = element.all(by.repeater('(index, value) in [1,2,3]')).get(i - 1);
+ *        this.toggle = function() {
+ *          element(by.buttonText('ngRepeat Toggle ' + i)).click();
+ *        };
+ *        this.isOpen = function() {
+ *          return parent.element(by.binding('ngRepeatToggle.isOpen() | json')).getText();
+ *        };
+ *        this.isOuterOpen = function() {
+ *          return parent.element(by.binding('outerToggle.isOpen() | json')).getText();
+ *        };
+ *      };
+ *      var NgRepeatToggles = function() {
+ *        var toggles = [1,2,3].map(function(i) { return new NgRepeatToggle(i); });
+ *        this.forEach = function(fn) {
+ *          toggles.forEach(fn);
+ *        };
+ *        this.isOuterOpen = function(i) {
+ *          return toggles[i - 1].isOuterOpen();
+ *        };
+ *      };
+ *      var NgIfToggle = function() {
+ *        var parent = element(by.css('[ng-if]'));
+ *        this.toggle = function() {
+ *          element(by.buttonText('ngIf Toggle')).click();
+ *        };
+ *        this.isOpen = function() {
+ *          return by.binding('ngIfToggle.isOpen() | json').getText();
+ *        };
+ *        this.isOuterOpen = function() {
+ *          return parent.element(by.binding('outerToggle.isOpen() | json')).getText();
+ *        };
+ *      };
+ *
+ *      it('should toggle the outer toggle', function() {
+ *        var outerToggle = new OuterToggle();
+ *        expect(outerToggle.isOpen()).toEqual('outerToggle.isOpen(): false');
+ *        outerToggle.toggle();
+ *        expect(outerToggle.isOpen()).toEqual('outerToggle.isOpen(): true');
+ *      });
+ *
+ *      it('should toggle all outer toggles', function() {
+ *        var outerToggle = new OuterToggle();
+ *        var repeatToggles = new NgRepeatToggles();
+ *        var ifToggle = new NgIfToggle();
+ *        expect(outerToggle.isOpen()).toEqual('outerToggle.isOpen(): false');
+ *        expect(repeatToggles.isOuterOpen(1)).toEqual('outerToggle.isOpen(): false');
+ *        expect(repeatToggles.isOuterOpen(2)).toEqual('outerToggle.isOpen(): false');
+ *        expect(repeatToggles.isOuterOpen(3)).toEqual('outerToggle.isOpen(): false');
+ *        expect(ifToggle.isOuterOpen()).toEqual('outerToggle.isOpen(): false');
+ *        outerToggle.toggle();
+ *        expect(outerToggle.isOpen()).toEqual('outerToggle.isOpen(): true');
+ *        expect(repeatToggles.isOuterOpen(1)).toEqual('outerToggle.isOpen(): true');
+ *        expect(repeatToggles.isOuterOpen(2)).toEqual('outerToggle.isOpen(): true');
+ *        expect(repeatToggles.isOuterOpen(3)).toEqual('outerToggle.isOpen(): true');
+ *        expect(ifToggle.isOuterOpen()).toEqual('outerToggle.isOpen(): true');
+ *      });
+ *
+ *      it('should toggle each repeat iteration separately', function() {
+ *        var repeatToggles = new NgRepeatToggles();
+ *
+ *        repeatToggles.forEach(function(repeatToggle) {
+ *          expect(repeatToggle.isOpen()).toEqual('ngRepeatToggle.isOpen(): false');
+ *          expect(repeatToggle.isOuterOpen()).toEqual('outerToggle.isOpen(): false');
+ *          repeatToggle.toggle();
+ *          expect(repeatToggle.isOpen()).toEqual('ngRepeatToggle.isOpen(): true');
+ *          expect(repeatToggle.isOuterOpen()).toEqual('outerToggle.isOpen(): false');
+ *        });
+ *      });
+ *   </file>
+ * </example>
+ *
+ */
+
+var ngRefMinErr = minErr('ngRef');
+
+var ngRefDirective = ['$parse', function($parse) {
+  return {
+    priority: -1, // Needed for compatibility with element transclusion on the same element
+    restrict: 'A',
+    compile: function(tElement, tAttrs) {
+      // Get the expected controller name, converts <data-some-thing> into "someThing"
+      var controllerName = directiveNormalize(nodeName_(tElement));
+
+      // Get the expression for value binding
+      var getter = $parse(tAttrs.ngRef);
+      var setter = getter.assign || function() {
+        throw ngRefMinErr('nonassign', 'Expression in ngRef="{0}" is non-assignable!', tAttrs.ngRef);
+      };
+
+      return function(scope, element, attrs) {
+        var refValue;
+
+        if (attrs.hasOwnProperty('ngRefRead')) {
+          if (attrs.ngRefRead === '$element') {
+            refValue = element;
+          } else {
+            refValue = element.data('$' + attrs.ngRefRead + 'Controller');
+
+            if (!refValue) {
+              throw ngRefMinErr(
+                'noctrl',
+                'The controller for ngRefRead="{0}" could not be found on ngRef="{1}"',
+                attrs.ngRefRead,
+                tAttrs.ngRef
+              );
+            }
+          }
+        } else {
+          refValue = element.data('$' + controllerName + 'Controller');
+        }
+
+        refValue = refValue || element;
+
+        setter(scope, refValue);
+
+        // when the element is removed, remove it (nullify it)
+        element.on('$destroy', function() {
+          // only remove it if value has not changed,
+          // because animations (and other procedures) may duplicate elements
+          if (getter(scope) === refValue) {
+            setter(scope, null);
+          }
+        });
+      };
     }
   };
 }];
@@ -49737,9 +50070,6 @@ exports.all = function() {
 },{"_process":226}],27:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -49747,7 +50077,10 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+// duck-punch the global Promise definition which messes up Angular 2 since it
+// also duck-punches the global Promise definition. For now, keep native-promise-only.
+
 
 var _nativePromiseOnly = _dereq_('native-promise-only');
 
@@ -51038,9 +51371,7 @@ var dropbox = function dropbox(formio) {
           }
         };
 
-        xhr.onabort = function (err) {
-          reject(err);
-        };
+        xhr.onabort = reject;
 
         xhr.open('POST', formio.formUrl + '/storage/dropbox');
         var token = formio.getToken();
@@ -51122,9 +51453,7 @@ var s3 = function s3(formio) {
           reject(err);
         };
 
-        pre.onabort = function (err) {
-          reject(err);
-        };
+        pre.onabort = reject;
 
         pre.onload = function () {
           if (pre.status >= 200 && pre.status < 300) {
@@ -51169,9 +51498,7 @@ var s3 = function s3(formio) {
               }
             };
 
-            xhr.onabort = function (err) {
-              reject(err);
-            };
+            xhr.onabort = reject;
 
             xhr.open('POST', response.url);
 
@@ -51257,10 +51584,11 @@ var url = function url(formio) {
               respData = {};
             }
 
+            var _url = respData.hasOwnProperty('url') ? respData.url : xhr.responseURL + '/' + fileName;
             resolve({
               storage: 'url',
               name: fileName,
-              url: xhr.responseURL + '/' + fileName,
+              url: _url,
               size: file.size,
               type: file.type,
               data: respData
@@ -51272,11 +51600,11 @@ var url = function url(formio) {
 
         // Fire on network error.
         xhr.onerror = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.onabort = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.open('POST', url);
@@ -51792,7 +52120,7 @@ function checkCalculated(component, submission, rowData) {
   // Process calculated value stuff if present.
   if (component.calculateValue) {
     _lodash2.default.set(rowData, component.key, evaluate(component.calculateValue, {
-      value: [],
+      value: undefined,
       data: submission ? submission.data : rowData,
       row: rowData,
       util: this,
@@ -51847,7 +52175,7 @@ function checkCustomConditional(component, custom, row, data, form, variable, on
   if (typeof custom === 'string') {
     custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
   }
-  var value = evaluate(custom, { component: component, row: row, data: data, form: form, instance: instance });
+  var value = instance && instance.evaluate ? instance.evaluate(custom, { row: row, data: data, form: form }) : evaluate(custom, { row: row, data: data, form: form });
   if (value === null) {
     return onError;
   }
@@ -51886,7 +52214,7 @@ function checkCondition(component, row, data, form, instance) {
   } else if (component.conditional && component.conditional.when) {
     return checkSimpleConditional(component, component.conditional, row, data, true);
   } else if (component.conditional && component.conditional.json) {
-    return checkJsonConditional(component, component.conditional.json, row, data, form);
+    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
   }
 
   // Default to show.
@@ -51915,7 +52243,7 @@ function checkTrigger(component, trigger, row, data, form, instance) {
   return false;
 }
 
-function setActionProperty(component, action, row, data, result) {
+function setActionProperty(component, action, row, data, result, instance) {
   switch (action.property.type) {
     case 'boolean':
       if (_lodash2.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
@@ -51924,12 +52252,13 @@ function setActionProperty(component, action, row, data, result) {
       break;
     case 'string':
       {
-        var newValue = interpolate(action.text, {
+        var evalData = {
           data: data,
           row: row,
           component: component,
           result: result
-        });
+        };
+        var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
         if (newValue !== _lodash2.default.get(component, action.property.value, '')) {
           _lodash2.default.set(component, action.property.value, newValue);
         }
@@ -76850,9 +77179,9 @@ module.exports = toString;
 
             mom = createUTC([2000, 1]).day(i);
             if (strict && !this._fullWeekdaysParse[i]) {
-                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
-                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
-                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\\.?') + '$', 'i');
             }
             if (!this._weekdaysParse[i]) {
                 regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
@@ -77655,7 +77984,7 @@ module.exports = toString;
 
     function preprocessRFC2822(s) {
         // Remove comments and folding whitespace and replace multiple-spaces with a single space
-        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').trim();
+        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     }
 
     function checkWeekday(weekdayStr, parsedInput, config) {
@@ -79834,7 +80163,7 @@ module.exports = toString;
     // Side effect imports
 
 
-    hooks.version = '2.22.1';
+    hooks.version = '2.22.2';
 
     setHookCallback(createLocal);
 
@@ -89790,7 +90119,7 @@ module.exports = function(app) {
         template: 'formio/components/file.html',
         group: 'advanced',
         tableView: function(data, options) {
-          if (!data) {
+          if (!data || data.length === 0) {
             return '';
           }
 
