@@ -1647,9 +1647,9 @@ app.controller('FormActionEditController', [
           actionInfo.premium === true &&
           $scope.primaryProject &&
           $scope.primaryProject.hasOwnProperty('plan') &&
-          ['basic', 'trial'].indexOf($scope.primaryProject.plan) !== -1
+          ['basic', 'trial', 'independent'].indexOf($scope.primaryProject.plan) !== -1
         ) {
-          $scope.formDisabled = ($scope.primaryProject.plan === 'basic');
+          $scope.formDisabled = ['basic', 'independent'].includes($scope.primaryProject.plan);
           $scope.premiumNotAvailable = true;
           $scope.premiumWarning = $scope.formDisabled ?
             '<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.' :
