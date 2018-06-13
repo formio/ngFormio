@@ -50,9 +50,9 @@ describe("Formio Tests", function () {
   require('./features/settingsTeamPro.spec')(actions);
   require('./features/settingsEnterprise.spec')(actions);
   // require('./features/teams.spec')(actions);
-  require('./features/projectUpgradePayment.spec')(actions);
+  // require('./features/projectUpgradePayment.spec')(actions);
   // require('./features/versioning.spec')(actions);
-  require('./features/environmentWorkflow.spec')(actions);
+  // require('./features/environmentWorkflow.spec')(actions);
 
 });
 afterEach(function () {

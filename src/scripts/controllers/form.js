@@ -157,6 +157,10 @@ app.config([
           templateUrl: 'views/form/form-settings.html',
           controller: ['$scope', function($scope) {
             $scope.disableCollection = function() {
+              // Don't allow collections for hosted projects
+              if (_.get($scope, 'localProject._id') === _.get($scope, 'currentProject._id')) {
+                return true;
+              }
               if (!$scope.minPlan('commercial')) {
                 return true;
               }
@@ -1406,22 +1410,44 @@ app.controller('FormActionIndexController', [
         });
       }
     };
-    $scope.loadProjectPromise.then(function() {
-      $scope.formio.loadActions()
-        .then(function(actions) {
-          $scope.actions = actions;
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-      $scope.formio.availableActions().then(function(available) {
-        if (!available[0].name) {
-          available.shift();
-        }
-        available.unshift($scope.newAction);
-        $scope.availableActions = _.filter(available, function(action) {
-          return action.name !== 'sql';
+
+    if (!$scope.numPerPage) {
+      $scope.numPerPage = 10;
+    }
+    $scope.totalItems = 0;
+    $scope.currentPage = 1;
+
+    var query = {params: {
+      limit: $scope.numPerPage,
+      skip: 0
+    }};
+
+    var getActions = function() {
+      $scope.loadProjectPromise.then(function() {
+        $scope.formio.loadActions(query)
+          .then(function(actions) {
+            $scope.totalItems = actions.serverCount;
+            $scope.actions = actions;
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+        $scope.formio.availableActions().then(function(available) {
+          if (!available[0].name) {
+            available.shift();
+          }
+          available.unshift($scope.newAction);
+          $scope.availableActions = _.filter(available, function(action) {
+            return action.name !== 'sql';
+          });
         });
       });
-    });
+    };
+
+    $scope.setPage = function() {
+      query.params.skip = ($scope.currentPage - 1) * query.params.limit;
+      getActions();
+    };
+
+    getActions();
   }
 ]);
 
@@ -1862,7 +1888,7 @@ app.controller('FormSubmissionsController', [
             val = _.get(val, path);
           }
 
-          var value = Formio.fieldData(val.toJSON(), component);
+          var value = FormioUtils.fieldData(val.toJSON(), component);
           if (!value && ['container', 'datagrid', 'well', 'panel', 'columns', 'fieldset', 'table'].indexOf(component.type) !== -1) {
             value = val.toJSON();
           }
