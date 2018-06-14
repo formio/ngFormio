@@ -39,7 +39,7 @@ describe("Formio Tests", function () {
   // require('./features/userPortalandWelcome.spec')(actions);
   require('./features/creatingProjectTemplates.spec')(actions);
   require('./features/profileFunctionality.spec')(actions);
-  require('./features/creditCard.spec')(actions );
+  // require('./features/creditCard.spec')(actions );
   require('./features/project.spec')(actions);
   require('./features/createResource2.spec')(actions);
   // require('./features/form.spec')(actions);
