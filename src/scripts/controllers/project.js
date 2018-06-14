@@ -2570,7 +2570,10 @@ app.controller('ProjectStorageController', [
       }
     });
 
-    $http.get($scope.projectUrl + '/dropbox/auth')
+    $scope.loadProjectPromise
+      .then(function() {
+        return $http.get($scope.projectUrl + '/dropbox/auth');
+      })
       .then(function(response) {
         $scope.dropboxSettings = response.data;
       });
