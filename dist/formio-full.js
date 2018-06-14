@@ -1,4 +1,4 @@
-/*! ng-formio v2.35.0-alpha.1 | https://unpkg.com/ng-formio@2.35.0-alpha.1/LICENSE.txt */
+/*! ng-formio v2.35.1 | https://unpkg.com/ng-formio@2.35.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -50077,7 +50077,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* globals OktaAuth */
+
+// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
 // duck-punch the global Promise definition which messes up Angular 2 since it
 // also duck-punches the global Promise definition. For now, keep native-promise-only.
 
@@ -50101,6 +50103,10 @@ var _shallowCopy2 = _interopRequireDefault(_shallowCopy);
 var _providers = _dereq_('./providers');
 
 var _providers2 = _interopRequireDefault(_providers);
+
+var _get2 = _dereq_('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50178,10 +50184,12 @@ var Formio = function () {
     }
 
     var project = this.projectUrl || Formio.projectUrl;
+    var projectRegEx = /(^|\/)(project)($|\/[^/]+)/;
+    var isProjectUrl = path.search(projectRegEx) !== -1;
 
-    // The baseURL is the same as the projectUrl. This is almost certainly against
-    // the Open Source server.
-    if (project && this.base === project) {
+    // The baseURL is the same as the projectUrl, and does not contain "/project/MONGO_ID" in
+    // its domain. This is almost certainly against the Open Source server.
+    if (project && this.base === project && !isProjectUrl) {
       this.noProject = true;
       this.projectUrl = this.base;
     }
@@ -50235,9 +50243,10 @@ var Formio = function () {
 
     if (!this.noProject) {
       // Determine the projectUrl and projectId
-      if (path.search(/(^|\/)(project)($|\/)/) !== -1) {
+      if (isProjectUrl) {
         // Get project id as project/:projectId.
         registerItems(['project'], hostName);
+        path = path.replace(projectRegEx, '');
       } else if (hostName === this.base) {
         // Get project id as first part of path (subdirectory).
         if (hostparts.length > 3 && path.split('/').length > 1) {
@@ -50258,7 +50267,7 @@ var Formio = function () {
     }
 
     // Configure Form urls and form ids.
-    if (path.search(/(^|\/)(project|form)($|\/)/) !== -1) {
+    if (path.search(/(^|\/)(form)($|\/)/) !== -1) {
       registerItems(['form', ['submission', 'action', 'v']], this.projectUrl);
     } else {
       var subRegEx = new RegExp('/(submission|action|v)($|/.*)');
@@ -50267,7 +50276,7 @@ var Formio = function () {
       path = path.replace(subRegEx, '');
       path = path.replace(/\/$/, '');
       this.formsUrl = this.projectUrl + '/form';
-      this.formUrl = this.projectUrl + path;
+      this.formUrl = path ? this.projectUrl + path : '';
       this.formId = path.replace(/^\/+|\/+$/g, '');
       var items = ['submission', 'action', 'v'];
       for (var i in items) {
@@ -50880,7 +50889,7 @@ var Formio = function () {
         // was introduced with the request, but the response contains a token. This is an Invalid
         // case where we do not send an x-jwt-token and get one in return for any GET request.
         var tokenIntroduced = false;
-        if (method === 'GET' && !requestToken && token && !(url.indexOf('token=') !== -1) && !(url.indexOf('x-jwt-token=') !== -1)) {
+        if (method === 'GET' && !requestToken && token && !opts.external && !(url.indexOf('token=') !== -1) && !(url.indexOf('x-jwt-token=') !== -1)) {
           console.warn('Token was introduced in request.');
           tokenIntroduced = true;
         }
@@ -51199,7 +51208,7 @@ var Formio = function () {
   }, {
     key: 'currentUser',
     value: function currentUser(formio, options) {
-      var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
+      var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
       projectUrl += '/current';
       var user = this.getUser();
       if (user) {
@@ -51209,8 +51218,7 @@ var Formio = function () {
           options: options
         });
       }
-      var token = Formio.getToken();
-      if (!token) {
+      if ((!options || !options.external) && !Formio.getToken()) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
           url: projectUrl,
           method: 'GET',
@@ -51231,6 +51239,147 @@ var Formio = function () {
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
       return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
     }
+  }, {
+    key: 'oAuthCurrentUser',
+    value: function oAuthCurrentUser(formio, token) {
+      return Formio.currentUser(formio, {
+        external: true,
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+    }
+  }, {
+    key: 'oktaInit',
+    value: function oktaInit(options) {
+      options = options || {};
+      if ((typeof OktaAuth === 'undefined' ? 'undefined' : _typeof(OktaAuth)) !== undefined) {
+        options.OktaAuth = OktaAuth;
+      }
+
+      if (_typeof(options.OktaAuth) === undefined) {
+        var errorMessage = 'Cannot find OktaAuth. Please include the Okta JavaScript SDK within your application. See https://developer.okta.com/code/javascript/okta_auth_sdk for an example.';
+        console.warn(errorMessage);
+        return _nativePromiseOnly2.default.reject(errorMessage);
+      }
+      return new _nativePromiseOnly2.default(function (resolve, reject) {
+        var Okta = options.OktaAuth;
+        delete options.OktaAuth;
+        var authClient = new Okta(options);
+        var accessToken = authClient.tokenManager.get('accessToken');
+        if (accessToken) {
+          resolve(Formio.oAuthCurrentUser(options.formio, accessToken.accessToken));
+        } else if (location.hash) {
+          authClient.token.parseFromUrl().then(function (token) {
+            authClient.tokenManager.add('accessToken', token);
+            resolve(Formio.oAuthCurrentUser(options.formio, token.accessToken));
+          }).catch(function (err) {
+            console.warn(err);
+            reject(err);
+          });
+        } else {
+          authClient.token.getWithRedirect({
+            responseType: 'token',
+            scopes: options.scopes
+          });
+          resolve(false);
+        }
+      });
+    }
+  }, {
+    key: 'ssoInit',
+    value: function ssoInit(type, options) {
+      switch (type) {
+        case 'okta':
+          return Formio.oktaInit(options);
+        default:
+          console.warn('Unknown SSO type');
+          return _nativePromiseOnly2.default.reject('Unknown SSO type');
+      }
+    }
+  }, {
+    key: 'requireLibrary',
+    value: function requireLibrary(name, property, src, polling) {
+      if (!Formio.libraries.hasOwnProperty(name)) {
+        Formio.libraries[name] = {};
+        Formio.libraries[name].ready = new _nativePromiseOnly2.default(function (resolve, reject) {
+          Formio.libraries[name].resolve = resolve;
+          Formio.libraries[name].reject = reject;
+        });
+
+        var callbackName = name + 'Callback';
+
+        if (!polling && !window[callbackName]) {
+          window[callbackName] = function () {
+            return Formio.libraries[name].resolve();
+          };
+        }
+
+        // See if the plugin already exists.
+        var plugin = (0, _get3.default)(window, property);
+        if (plugin) {
+          Formio.libraries[name].resolve(plugin);
+        } else {
+          src = Array.isArray(src) ? src : [src];
+          src.forEach(function (lib) {
+            var attrs = {};
+            var elementType = '';
+            if (typeof lib === 'string') {
+              lib = {
+                type: 'script',
+                src: lib
+              };
+            }
+            switch (lib.type) {
+              case 'script':
+                elementType = 'script';
+                attrs = {
+                  src: lib.src,
+                  type: 'text/javascript',
+                  defer: true,
+                  async: true
+                };
+                break;
+              case 'styles':
+                elementType = 'link';
+                attrs = {
+                  href: lib.src,
+                  rel: 'stylesheet'
+                };
+                break;
+            }
+
+            // Add the script to the top page.
+            var script = document.createElement(elementType);
+            for (var attr in attrs) {
+              script.setAttribute(attr, attrs[attr]);
+            }
+            document.getElementsByTagName('head')[0].appendChild(script);
+          });
+
+          // if no callback is provided, then check periodically for the script.
+          if (polling) {
+            var interval = setInterval(function () {
+              var plugin = (0, _get3.default)(window, property);
+              if (plugin) {
+                clearInterval(interval);
+                Formio.libraries[name].resolve(plugin);
+              }
+            }, 200);
+          }
+        }
+      }
+      return Formio.libraries[name].ready;
+    }
+  }, {
+    key: 'libraryReady',
+    value: function libraryReady(name) {
+      if (Formio.libraries.hasOwnProperty(name) && Formio.libraries[name].ready) {
+        return Formio.libraries[name].ready;
+      }
+
+      return _nativePromiseOnly2.default.reject(name + ' library was not required.');
+    }
   }]);
 
   return Formio;
@@ -51240,6 +51389,7 @@ var Formio = function () {
 
 
 exports.default = Formio;
+Formio.libraries = {};
 Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
@@ -51256,7 +51406,7 @@ if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object'
   global.Formio = Formio;
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":28,"browser-cookies":25,"eventemitter2":26,"native-promise-only":223,"shallow-copy":228,"whatwg-fetch":234}],28:[function(_dereq_,module,exports){
+},{"./providers":28,"browser-cookies":25,"eventemitter2":26,"lodash/get":186,"native-promise-only":223,"shallow-copy":228,"whatwg-fetch":234}],28:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

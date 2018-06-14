@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.35.1
+### Changed
+ - Upgraded core renderer which introduces Okta SSO integration.
+
 ## 2.35.0
 ### Fixed
  - File fields where a file was added and removes are crashing data view on portal.
