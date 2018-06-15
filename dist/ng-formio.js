@@ -6954,6 +6954,7 @@ var PDFBuilder = function (_WebformBuilder) {
     value: function build() {
       var _this6 = this;
 
+      this.buildSidebar();
       if (!this.pdfForm) {
         this.element.noDrop = true;
         this.pdfForm = new _PDF2.default(this.element, this.options);
@@ -7862,6 +7863,9 @@ var Webform = function (_NestedComponent) {
 
       this.on('submitButton', function (options) {
         return _this10.submit(false, options);
+      });
+      this.on('checkValidity', function (data) {
+        return _this10.checkValidity(data, true);
       });
       this.addComponents();
       this.on('requestUrl', function (args) {
@@ -8927,6 +8931,10 @@ var WebformBuilder = function (_Webform) {
       // Add the new sidebar element.
       this.builderSidebar.appendChild(this.sideBarElement);
       this.updateDraggable();
+      this.sideBarTop = this.sideBarElement.getBoundingClientRect().top + window.scrollY;
+      if (this.options.sideBarScroll) {
+        this.addEventListener(window, 'scroll', _lodash2.default.throttle(this.scrollSidebar.bind(this), 10));
+      }
     }
   }, {
     key: 'getParentElement',
@@ -9085,11 +9093,6 @@ var WebformBuilder = function (_Webform) {
     key: 'build',
     value: function build() {
       this.buildSidebar();
-      this.sideBarTop = this.sideBarElement.getBoundingClientRect().top + window.scrollY;
-      if (this.options.sideBarScroll) {
-        this.addEventListener(window, 'scroll', _lodash2.default.throttle(this.scrollSidebar.bind(this), 10));
-      }
-
       _get(WebformBuilder.prototype.__proto__ || Object.getPrototypeOf(WebformBuilder.prototype), 'build', this).call(this);
       this.updateDraggable();
       this.formReadyResolve();
@@ -11245,6 +11248,8 @@ var BaseComponent = function () {
   }]);
 
   function BaseComponent(component, options, data) {
+    var _this = this;
+
     _classCallCheck(this, BaseComponent);
 
     this.originalComponent = _lodash2.default.cloneDeep(component);
@@ -11415,6 +11420,21 @@ var BaseComponent = function () {
       this.info = this.elementInfo();
     }
 
+    this.logic.forEach(function (logic) {
+      if (logic.trigger.type === 'event') {
+        _this.root.on(logic.trigger.event, function () {
+          var newComponent = _lodash2.default.cloneDeep(_this.originalComponent);
+          if (_this.applyActions(logic.actions, logic.trigger.event, _this.data, newComponent)) {
+            // If component definition changed, replace it.
+            if (!_lodash2.default.isEqual(_this.component, newComponent)) {
+              _this.component = newComponent;
+            }
+            _this.redraw();
+          }
+        });
+      }
+    });
+
     // Allow anyone to hook into the component creation.
     this.hook('component');
   }
@@ -11431,7 +11451,7 @@ var BaseComponent = function () {
      * @param defaultSchema
      */
     value: function getModifiedSchema(schema, defaultSchema) {
-      var _this = this;
+      var _this2 = this;
 
       var modified = {};
       if (!defaultSchema) {
@@ -11439,7 +11459,7 @@ var BaseComponent = function () {
       }
       _lodash2.default.each(schema, function (val, key) {
         if (!_lodash2.default.isArray(val) && _lodash2.default.isObject(val) && defaultSchema.hasOwnProperty(key)) {
-          var subModified = _this.getModifiedSchema(val, defaultSchema[key]);
+          var subModified = _this2.getModifiedSchema(val, defaultSchema[key]);
           if (!_lodash2.default.isEmpty(subModified)) {
             modified[key] = subModified;
           }
@@ -11519,7 +11539,7 @@ var BaseComponent = function () {
   }, {
     key: 'off',
     value: function off(event) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!this.events) {
         return;
@@ -11529,9 +11549,9 @@ var BaseComponent = function () {
       // Iterate through all the internal events.
       _lodash2.default.each(this.events.listeners(type), function (listener) {
         // Ensure this event is for this component.
-        if (listener && listener.id === _this2.id) {
+        if (listener && listener.id === _this3.id) {
           // Turn off this event handler.
-          _this2.events.off(type, listener);
+          _this3.events.off(type, listener);
         }
       });
     }
@@ -11739,7 +11759,7 @@ var BaseComponent = function () {
   }, {
     key: 'createModal',
     value: function createModal() {
-      var _this3 = this;
+      var _this4 = this;
 
       var modalBody = this.ce('div');
       var modalOverlay = this.ce('div', {
@@ -11765,13 +11785,13 @@ var BaseComponent = function () {
         dialog.close();
       });
       this.addEventListener(dialog, 'close', function () {
-        _this3.removeChildFrom(dialog, document.body);
+        _this4.removeChildFrom(dialog, document.body);
       });
       document.body.appendChild(dialog);
       dialog.body = modalBody;
       dialog.close = function () {
         dialog.dispatchEvent(new CustomEvent('close'));
-        _this3.removeChildFrom(dialog, document.body);
+        _this4.removeChildFrom(dialog, document.body);
       };
       return dialog;
     }
@@ -11867,6 +11887,7 @@ var BaseComponent = function () {
       return Object.assign({
         component: this.component,
         row: this.data,
+        rowIndex: this.rowIndex,
         data: this.root ? this.root.data : this.data,
         _: _lodash2.default,
         utils: FormioUtils,
@@ -11950,7 +11971,7 @@ var BaseComponent = function () {
   }, {
     key: 'buildRows',
     value: function buildRows(values) {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!this.tbody) {
         return;
@@ -11959,18 +11980,18 @@ var BaseComponent = function () {
       this.tbody.innerHTML = '';
       values = values || this.dataValue;
       _lodash2.default.each(values, function (value, index) {
-        var tr = _this4.ce('tr');
-        var td = _this4.ce('td');
-        _this4.buildInput(td, value, index);
+        var tr = _this5.ce('tr');
+        var td = _this5.ce('td');
+        _this5.buildInput(td, value, index);
         tr.appendChild(td);
 
-        if (!_this4.shouldDisable) {
-          var tdAdd = _this4.ce('td');
-          tdAdd.appendChild(_this4.removeButton(index));
+        if (!_this5.shouldDisable) {
+          var tdAdd = _this5.ce('td');
+          tdAdd.appendChild(_this5.removeButton(index));
           tr.appendChild(tdAdd);
         }
 
-        _this4.tbody.appendChild(tr);
+        _this5.tbody.appendChild(tr);
       });
 
       if (!this.shouldDisable) {
@@ -12028,14 +12049,14 @@ var BaseComponent = function () {
   }, {
     key: 'addButton',
     value: function addButton(justIcon) {
-      var _this5 = this;
+      var _this6 = this;
 
       var addButton = this.ce('button', {
         class: 'btn btn-primary'
       });
       this.addEventListener(addButton, 'click', function (event) {
         event.preventDefault();
-        _this5.addValue();
+        _this6.addValue();
       });
 
       var addIcon = this.ce('i', {
@@ -12079,7 +12100,7 @@ var BaseComponent = function () {
   }, {
     key: 'removeButton',
     value: function removeButton(index) {
-      var _this6 = this;
+      var _this7 = this;
 
       var removeButton = this.ce('button', {
         type: 'button',
@@ -12088,7 +12109,7 @@ var BaseComponent = function () {
 
       this.addEventListener(removeButton, 'click', function (event) {
         event.preventDefault();
-        _this6.removeValue(index);
+        _this7.removeValue(index);
       });
 
       var removeIcon = this.ce('i', {
@@ -12491,11 +12512,11 @@ var BaseComponent = function () {
   }, {
     key: 'removeEventListener',
     value: function removeEventListener(obj, type) {
-      var _this7 = this;
+      var _this8 = this;
 
       var indexes = [];
       _lodash2.default.each(this.eventHandlers, function (handler, index) {
-        if (handler.id === _this7.id && obj.removeEventListener && handler.type === type) {
+        if (handler.id === _this8.id && obj.removeEventListener && handler.type === type) {
           obj.removeEventListener(type, handler.func);
           indexes.push(index);
         }
@@ -12517,17 +12538,17 @@ var BaseComponent = function () {
   }, {
     key: 'removeEventListeners',
     value: function removeEventListeners() {
-      var _this8 = this;
+      var _this9 = this;
 
       _lodash2.default.each(this.events._events, function (events, type) {
         _lodash2.default.each(events, function (listener) {
-          if (listener && _this8.id === listener.id) {
-            _this8.events.off(type, listener);
+          if (listener && _this9.id === listener.id) {
+            _this9.events.off(type, listener);
           }
         });
       });
       _lodash2.default.each(this.eventHandlers, function (handler) {
-        if (_this8.id === handler.id && handler.type && handler.obj && handler.obj.removeEventListener) {
+        if (_this9.id === handler.id && handler.type && handler.obj && handler.obj.removeEventListener) {
           handler.obj.removeEventListener(handler.type, handler.func);
         }
       });
@@ -12535,10 +12556,10 @@ var BaseComponent = function () {
   }, {
     key: 'destroyInputs',
     value: function destroyInputs() {
-      var _this9 = this;
+      var _this10 = this;
 
       _lodash2.default.each(this.inputs, function (input) {
-        input = _this9.performInputMapping(input);
+        input = _this10.performInputMapping(input);
         if (input.mask) {
           input.mask.destroy();
         }
@@ -12602,11 +12623,11 @@ var BaseComponent = function () {
   }, {
     key: 'appendChild',
     value: function appendChild(element, child) {
-      var _this10 = this;
+      var _this11 = this;
 
       if (Array.isArray(child)) {
         child.forEach(function (oneChild) {
-          _this10.appendChild(element, oneChild);
+          _this11.appendChild(element, oneChild);
         });
       } else if (child instanceof HTMLElement || child instanceof Text) {
         element.appendChild(child);
@@ -12665,13 +12686,13 @@ var BaseComponent = function () {
   }, {
     key: 'attr',
     value: function attr(element, _attr) {
-      var _this11 = this;
+      var _this12 = this;
 
       _lodash2.default.each(_attr, function (value, key) {
         if (typeof value !== 'undefined') {
           if (key.indexOf('on') === 0) {
             // If this is an event, add a listener.
-            _this11.addEventListener(element, key.substr(2).toLowerCase(), value);
+            _this12.addEventListener(element, key.substr(2).toLowerCase(), value);
           } else {
             // Otherwise it is just an attribute.
             element.setAttribute(key, value);
@@ -12771,19 +12792,19 @@ var BaseComponent = function () {
 
       return result;
     }
+  }, {
+    key: 'fieldLogic',
+
 
     /**
      * Check all triggers and apply necessary actions.
      *
      * @param data
      */
-
-  }, {
-    key: 'fieldLogic',
     value: function fieldLogic(data) {
-      var _this12 = this;
+      var _this13 = this;
 
-      var logics = this.component.logic || [];
+      var logics = this.logic;
 
       // If there aren't logic, don't go further.
       if (logics.length === 0) {
@@ -12793,35 +12814,10 @@ var BaseComponent = function () {
       var newComponent = _lodash2.default.cloneDeep(this.originalComponent);
 
       var changed = logics.reduce(function (changed, logic) {
-        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this12.data, data, _this12.root ? _this12.root._form : {}, _this12);
+        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this13.data, data, _this13.root ? _this13.root._form : {}, _this13);
 
         if (result) {
-          changed |= logic.actions.reduce(function (changed, action) {
-            switch (action.type) {
-              case 'property':
-                FormioUtils.setActionProperty(newComponent, action, _this12.data, data, newComponent, result, _this12);
-                break;
-              case 'value':
-                {
-                  var oldValue = _this12.getValue();
-                  var newValue = _this12.evaluate(action.value, {
-                    value: _lodash2.default.clone(oldValue),
-                    data: data,
-                    component: newComponent,
-                    result: result
-                  }, 'value');
-                  if (!_lodash2.default.isEqual(oldValue, newValue)) {
-                    _this12.setValue(newValue);
-                    changed = true;
-                  }
-                  break;
-                }
-              case 'validation':
-                // TODO
-                break;
-            }
-            return changed;
-          }, false);
+          changed |= _this13.applyActions(logic.actions, result, data, newComponent);
         }
         return changed;
       }, false);
@@ -12834,6 +12830,38 @@ var BaseComponent = function () {
 
       return changed;
     }
+  }, {
+    key: 'applyActions',
+    value: function applyActions(actions, result, data, newComponent) {
+      var _this14 = this;
+
+      return actions.reduce(function (changed, action) {
+        switch (action.type) {
+          case 'property':
+            FormioUtils.setActionProperty(newComponent, action, _this14.data, data, newComponent, result, _this14);
+            break;
+          case 'value':
+            {
+              var oldValue = _this14.getValue();
+              var newValue = _this14.evaluate(action.value, {
+                value: _lodash2.default.clone(oldValue),
+                data: data,
+                component: newComponent,
+                result: result
+              }, 'value');
+              if (!_lodash2.default.isEqual(oldValue, newValue)) {
+                _this14.setValue(newValue);
+                changed = true;
+              }
+              break;
+            }
+          case 'validation':
+            // TODO
+            break;
+        }
+        return changed;
+      }, false);
+    }
 
     /**
      * Add a new input error to this element.
@@ -12845,7 +12873,7 @@ var BaseComponent = function () {
   }, {
     key: 'addInputError',
     value: function addInputError(message, dirty) {
-      var _this13 = this;
+      var _this15 = this;
 
       if (!message) {
         return;
@@ -12862,7 +12890,7 @@ var BaseComponent = function () {
       // Add error classes
       this.addClass(this.element, 'has-error');
       this.inputs.forEach(function (input) {
-        return _this13.addClass(_this13.performInputMapping(input), 'is-invalid');
+        return _this15.addClass(_this15.performInputMapping(input), 'is-invalid');
       });
       if (dirty && this.options.highlightErrors) {
         this.addClass(this.element, 'alert alert-danger');
@@ -12981,7 +13009,7 @@ var BaseComponent = function () {
   }, {
     key: 'addInputSubmitListener',
     value: function addInputSubmitListener(input) {
-      var _this14 = this;
+      var _this16 = this;
 
       if (!this.options.submitOnEnter) {
         return;
@@ -12991,7 +13019,7 @@ var BaseComponent = function () {
         if (key === 13) {
           event.preventDefault();
           event.stopPropagation();
-          _this14.emit('submitButton');
+          _this16.emit('submitButton');
         }
       });
     }
@@ -13005,10 +13033,10 @@ var BaseComponent = function () {
   }, {
     key: 'addInputEventListener',
     value: function addInputEventListener(input) {
-      var _this15 = this;
+      var _this17 = this;
 
       this.addEventListener(input, this.info.changeEvent, function () {
-        return _this15.updateValue();
+        return _this17.updateValue();
       });
     }
 
@@ -13038,7 +13066,7 @@ var BaseComponent = function () {
   }, {
     key: 'addQuill',
     value: function addQuill(element, settings, onChange) {
-      var _this16 = this;
+      var _this18 = this;
 
       settings = _lodash2.default.isEmpty(settings) ? this.wysiwygDefault : settings;
 
@@ -13047,18 +13075,18 @@ var BaseComponent = function () {
 
       // Lazy load the quill library.
       return _Formio2.default.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.6/quill.min.js', true).then(function () {
-        _this16.quill = new Quill(element, settings);
+        _this18.quill = new Quill(element, settings);
 
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
         var txtArea = document.createElement('textarea');
         txtArea.setAttribute('class', 'quill-source-code');
-        _this16.quill.addContainer('ql-custom').appendChild(txtArea);
+        _this18.quill.addContainer('ql-custom').appendChild(txtArea);
         var qlSource = element.parentNode.querySelector('.ql-source');
         if (qlSource) {
-          _this16.addEventListener(qlSource, 'click', function (event) {
+          _this18.addEventListener(qlSource, 'click', function (event) {
             event.preventDefault();
             if (txtArea.style.display === 'inherit') {
-              _this16.quill.setContents(_this16.quill.clipboard.convert(txtArea.value));
+              _this18.quill.setContents(_this18.quill.clipboard.convert(txtArea.value));
             }
             txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
           });
@@ -13066,8 +13094,8 @@ var BaseComponent = function () {
         /** END CODEBLOCK **/
 
         // Make sure to select cursor when they click on the element.
-        _this16.addEventListener(element, 'click', function () {
-          return _this16.quill.focus();
+        _this18.addEventListener(element, 'click', function () {
+          return _this18.quill.focus();
         });
 
         // Allows users to skip toolbar items when tabbing though form
@@ -13076,12 +13104,12 @@ var BaseComponent = function () {
           elm[i].setAttribute('tabindex', '-1');
         }
 
-        _this16.quill.on('text-change', function () {
-          txtArea.value = _this16.quill.root.innerHTML;
+        _this18.quill.on('text-change', function () {
+          txtArea.value = _this18.quill.root.innerHTML;
           onChange(txtArea);
         });
 
-        return _this16.quill;
+        return _this18.quill;
       });
     }
 
@@ -13397,7 +13425,7 @@ var BaseComponent = function () {
   }, {
     key: 'setCustomValidity',
     value: function setCustomValidity(message, dirty) {
-      var _this17 = this;
+      var _this19 = this;
 
       if (this.errorElement && this.errorContainer) {
         this.errorElement.innerHTML = '';
@@ -13413,7 +13441,7 @@ var BaseComponent = function () {
         this.addInputError(message, dirty);
       } else {
         this.inputs.forEach(function (input) {
-          return _this17.removeClass(_this17.performInputMapping(input), 'is-invalid');
+          return _this19.removeClass(_this19.performInputMapping(input), 'is-invalid');
         });
         if (this.options.highlightErrors) {
           this.removeClass(this.element, 'alert alert-danger');
@@ -13422,7 +13450,7 @@ var BaseComponent = function () {
         this.error = null;
       }
       _lodash2.default.each(this.inputs, function (input) {
-        input = _this17.performInputMapping(input);
+        input = _this19.performInputMapping(input);
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
         }
@@ -13557,7 +13585,7 @@ var BaseComponent = function () {
   }, {
     key: 'selectOptions',
     value: function selectOptions(select, tag, options, defaultValue) {
-      var _this18 = this;
+      var _this20 = this;
 
       _lodash2.default.each(options, function (option) {
         var attrs = {
@@ -13566,8 +13594,8 @@ var BaseComponent = function () {
         if (defaultValue !== undefined && option.value === defaultValue) {
           attrs.selected = 'selected';
         }
-        var optionElement = _this18.ce('option', attrs);
-        optionElement.appendChild(_this18.text(option.label));
+        var optionElement = _this20.ce('option', attrs);
+        optionElement.appendChild(_this20.text(option.label));
         select.appendChild(optionElement);
       });
     }
@@ -13677,11 +13705,11 @@ var BaseComponent = function () {
   }, {
     key: 'autofocus',
     value: function autofocus() {
-      var _this19 = this;
+      var _this21 = this;
 
       if (this.component.autofocus) {
         this.on('render', function () {
-          return _this19.focus();
+          return _this21.focus();
         });
       }
     }
@@ -13798,6 +13826,11 @@ var BaseComponent = function () {
       return this.t(this.component.errorLabel || this.component.label || this.component.placeholder || this.key);
     }
   }, {
+    key: 'logic',
+    get: function get() {
+      return this.component.logic || [];
+    }
+  }, {
     key: 'visible',
     set: function set(visible) {
       this.show(visible);
@@ -13908,7 +13941,7 @@ var BaseComponent = function () {
      */
     ,
     set: function set(disabled) {
-      var _this20 = this;
+      var _this22 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable) {
@@ -13926,7 +13959,7 @@ var BaseComponent = function () {
 
       // Disable all inputs.
       _lodash2.default.each(this.inputs, function (input) {
-        return _this20.setDisabled(_this20.performInputMapping(input), disabled);
+        return _this22.setDisabled(_this22.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -14348,6 +14381,9 @@ exports.default = [{
           }, {
             value: 'json',
             label: 'JSON Logic'
+          }, {
+            value: 'event',
+            label: 'Event'
           }]
         },
         dataSrc: 'values',
@@ -14399,6 +14435,13 @@ exports.default = [{
         placeholder: '{ ... }',
         description: '"row", "data", "component" and "_" variables are available. Return the result to be passed to the action if truthy.',
         customConditional: 'show = row.type === "json";'
+      }, {
+        type: 'textfield',
+        key: 'event',
+        label: 'Event Name',
+        placeholder: 'event',
+        description: 'The event that will trigger this logic. You can trigger events externally or via a button.',
+        customConditional: 'show = row.type === "event";'
       }],
       key: 'trigger',
       type: 'container'
@@ -14468,12 +14511,16 @@ exports.default = [{
             value: 'disabled',
             type: 'boolean'
           }, {
-            label: 'label',
+            label: 'Label',
             value: 'label',
             type: 'string'
           }, {
-            label: 'title',
+            label: 'Title',
             value: 'title',
+            type: 'string'
+          }, {
+            label: 'Tooltip',
+            value: 'tooltip',
             type: 'string'
           }, {
             label: 'Decription',
@@ -15161,6 +15208,9 @@ var ButtonComponent = function (_BaseComponent) {
       }
       this.addEventListener(this.buttonElement, 'click', function (event) {
         _this2.dataValue = true;
+        if (_this2.component.action !== 'submit' && _this2.component.showValidations) {
+          _this2.emit('checkValidity', _this2.data);
+        }
         switch (_this2.component.action) {
           case 'saveState':
           case 'submit':
@@ -15467,6 +15517,17 @@ exports.default = [{
   tooltip: 'This is the action to be performed by this button.',
   data: {
     values: [{ label: 'Submit', value: 'submit' }, { label: 'Event', value: 'event' }, { label: 'Custom', value: 'custom' }, { label: 'Reset', value: 'reset' }, { label: 'OAuth', value: 'oauth' }, { label: 'POST to URL', value: 'url' }]
+  }
+}, {
+  type: 'checkbox',
+  input: true,
+  inputType: 'checkbox',
+  key: 'showValidations',
+  label: 'Show Validations',
+  weight: 115,
+  tooltip: 'When the button is pressed, show any validation errors on the form.',
+  conditional: {
+    json: { '!==': [{ var: 'data.action' }, 'submit'] }
   }
 }, {
   type: 'textfield',
@@ -15906,7 +15967,7 @@ var CheckBoxComponent = function (_BaseComponent) {
   }, {
     key: 'defaultValue',
     get: function get() {
-      return this.component.name ? '' : false;
+      return this.component.name ? '' : (this.component.defaultValue || false).toString() === 'true';
     }
   }, {
     key: 'emptyValue',
@@ -17155,6 +17216,7 @@ var DataGridComponent = function (_NestedComponent) {
         label: column.dataGridLabel ? column.label : false,
         row: options.row
       }), options, row);
+      comp.rowIndex = rowIndex;
       this.hook('addComponent', container, comp, this);
       container.appendChild(comp.getElement());
       this.rows[rowIndex][column.key] = comp;
@@ -18864,6 +18926,7 @@ var EditGridComponent = function (_NestedComponent) {
           options.row = _this3.row + '-' + rowIndex;
           options.name += '[' + rowIndex + ']';
           var instance = _this3.createComponent(component, options, _this3.editRows[rowIndex].data);
+          instance.rowIndex = rowIndex;
           _this3.editRows[rowIndex].components.push(instance);
           return instance.element;
         }), this.ce('div', { class: 'editgrid-actions' }, [this.ce('button', {
@@ -26054,7 +26117,7 @@ var TableComponent = function (_NestedComponent) {
 
       this.element = this.ce('div', {
         id: this.id,
-        class: 'table-responsive'
+        class: this.className + '  table-responsive'
       });
       this.element.component = this;
 
@@ -30998,7 +31061,7 @@ var Translator = function (_EventEmitter) {
     var _this3 = this;
 
     if (this.i18nFormat && this.i18nFormat.parse) {
-      res = this.i18nFormat.parse(res, options, resolved.usedLng, resolved.usedNS, resolved.usedKey);
+      res = this.i18nFormat.parse(res, options, resolved.usedLng, resolved.usedNS, resolved.usedKey, { resolved: resolved });
     } else if (!options.skipInterpolation) {
       // i18next.parsing
       if (options.interpolation) this.interpolator.init(_extends({}, options, { interpolation: _extends({}, this.options.interpolation, options.interpolation) }));
