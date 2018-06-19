@@ -1,4032 +1,5 @@
-/*! ng-formio v2.35.1 | https://unpkg.com/ng-formio@2.35.1/LICENSE.txt */
+/*! ng-formio v2.35.2 | https://unpkg.com/ng-formio@2.35.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
-exports.defaults = {};
-
-exports.set = function(name, value, options) {
-  // Retrieve options and defaults
-  var opts = options || {};
-  var defaults = exports.defaults;
-
-  // Apply default value for unspecified options
-  var expires  = opts.expires  || defaults.expires;
-  var domain   = opts.domain   || defaults.domain;
-  var path     = opts.path     !== undefined ? opts.path     : (defaults.path !== undefined ? defaults.path : '/');
-  var secure   = opts.secure   !== undefined ? opts.secure   : defaults.secure;
-  var httponly = opts.httponly !== undefined ? opts.httponly : defaults.httponly;
-  var samesite = opts.samesite !== undefined ? opts.samesite : defaults.samesite;
-
-  // Determine cookie expiration date
-  // If succesful the result will be a valid Date, otherwise it will be an invalid Date or false(ish)
-  var expDate = expires ? new Date(
-      // in case expires is an integer, it should specify the number of days till the cookie expires
-      typeof expires === 'number' ? new Date().getTime() + (expires * 864e5) :
-      // else expires should be either a Date object or in a format recognized by Date.parse()
-      expires
-  ) : 0;
-
-  // Set cookie
-  document.cookie = name.replace(/[^+#$&^`|]/g, encodeURIComponent)                // Encode cookie name
-  .replace('(', '%28')
-  .replace(')', '%29') +
-  '=' + value.replace(/[^+#$&/:<-\[\]-}]/g, encodeURIComponent) +                  // Encode cookie value (RFC6265)
-  (expDate && expDate.getTime() >= 0 ? ';expires=' + expDate.toUTCString() : '') + // Add expiration date
-  (domain   ? ';domain=' + domain     : '') +                                      // Add domain
-  (path     ? ';path='   + path       : '') +                                      // Add path
-  (secure   ? ';secure'               : '') +                                      // Add secure option
-  (httponly ? ';httponly'             : '') +                                      // Add httponly option
-  (samesite ? ';samesite=' + samesite : '');                                       // Add samesite option
-};
-
-exports.get = function(name) {
-  var cookies = document.cookie.split(';');
-  
-  // Iterate all cookies
-  while(cookies.length) {
-    var cookie = cookies.pop();
-
-    // Determine separator index ("name=value")
-    var separatorIndex = cookie.indexOf('=');
-
-    // IE<11 emits the equal sign when the cookie value is empty
-    separatorIndex = separatorIndex < 0 ? cookie.length : separatorIndex;
-
-    var cookie_name = decodeURIComponent(cookie.slice(0, separatorIndex).replace(/^\s+/, ''));
-
-    // Return cookie value if the name matches
-    if (cookie_name === name) {
-      return decodeURIComponent(cookie.slice(separatorIndex + 1));
-    }
-  }
-
-  // Return `null` as the cookie was not found
-  return null;
-};
-
-exports.erase = function(name, options) {
-  exports.set(name, '', {
-    expires:  -1,
-    domain:   options && options.domain,
-    path:     options && options.path,
-    secure:   0,
-    httponly: 0}
-  );
-};
-
-exports.all = function() {
-  var all = {};
-  var cookies = document.cookie.split(';');
-
-  // Iterate all cookies
-  while(cookies.length) {
-    var cookie = cookies.pop();
-
-    // Determine separator index ("name=value")
-    var separatorIndex = cookie.indexOf('=');
-
-    // IE<11 emits the equal sign when the cookie value is empty
-    separatorIndex = separatorIndex < 0 ? cookie.length : separatorIndex;
-
-    // add the cookie name and value to the `all` object
-    var cookie_name = decodeURIComponent(cookie.slice(0, separatorIndex).replace(/^\s+/, ''));
-    all[cookie_name] = decodeURIComponent(cookie.slice(separatorIndex + 1));
-  }
-
-  return all;
-};
-
-},{}],2:[function(_dereq_,module,exports){
-(function (process){
-/*!
- * EventEmitter2
- * https://github.com/hij1nx/EventEmitter2
- *
- * Copyright (c) 2013 hij1nx
- * Licensed under the MIT license.
- */
-;!function(undefined) {
-
-  var isArray = Array.isArray ? Array.isArray : function _isArray(obj) {
-    return Object.prototype.toString.call(obj) === "[object Array]";
-  };
-  var defaultMaxListeners = 10;
-
-  function init() {
-    this._events = {};
-    if (this._conf) {
-      configure.call(this, this._conf);
-    }
-  }
-
-  function configure(conf) {
-    if (conf) {
-      this._conf = conf;
-
-      conf.delimiter && (this.delimiter = conf.delimiter);
-      this._maxListeners = conf.maxListeners !== undefined ? conf.maxListeners : defaultMaxListeners;
-
-      conf.wildcard && (this.wildcard = conf.wildcard);
-      conf.newListener && (this._newListener = conf.newListener);
-      conf.removeListener && (this._removeListener = conf.removeListener);
-      conf.verboseMemoryLeak && (this.verboseMemoryLeak = conf.verboseMemoryLeak);
-
-      if (this.wildcard) {
-        this.listenerTree = {};
-      }
-    } else {
-      this._maxListeners = defaultMaxListeners;
-    }
-  }
-
-  function logPossibleMemoryLeak(count, eventName) {
-    var errorMsg = '(node) warning: possible EventEmitter memory ' +
-        'leak detected. ' + count + ' listeners added. ' +
-        'Use emitter.setMaxListeners() to increase limit.';
-
-    if(this.verboseMemoryLeak){
-      errorMsg += ' Event name: ' + eventName + '.';
-    }
-
-    if(typeof process !== 'undefined' && process.emitWarning){
-      var e = new Error(errorMsg);
-      e.name = 'MaxListenersExceededWarning';
-      e.emitter = this;
-      e.count = count;
-      process.emitWarning(e);
-    } else {
-      console.error(errorMsg);
-
-      if (console.trace){
-        console.trace();
-      }
-    }
-  }
-
-  function EventEmitter(conf) {
-    this._events = {};
-    this._newListener = false;
-    this._removeListener = false;
-    this.verboseMemoryLeak = false;
-    configure.call(this, conf);
-  }
-  EventEmitter.EventEmitter2 = EventEmitter; // backwards compatibility for exporting EventEmitter property
-
-  //
-  // Attention, function return type now is array, always !
-  // It has zero elements if no any matches found and one or more
-  // elements (leafs) if there are matches
-  //
-  function searchListenerTree(handlers, type, tree, i) {
-    if (!tree) {
-      return [];
-    }
-    var listeners=[], leaf, len, branch, xTree, xxTree, isolatedBranch, endReached,
-        typeLength = type.length, currentType = type[i], nextType = type[i+1];
-    if (i === typeLength && tree._listeners) {
-      //
-      // If at the end of the event(s) list and the tree has listeners
-      // invoke those listeners.
-      //
-      if (typeof tree._listeners === 'function') {
-        handlers && handlers.push(tree._listeners);
-        return [tree];
-      } else {
-        for (leaf = 0, len = tree._listeners.length; leaf < len; leaf++) {
-          handlers && handlers.push(tree._listeners[leaf]);
-        }
-        return [tree];
-      }
-    }
-
-    if ((currentType === '*' || currentType === '**') || tree[currentType]) {
-      //
-      // If the event emitted is '*' at this part
-      // or there is a concrete match at this patch
-      //
-      if (currentType === '*') {
-        for (branch in tree) {
-          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
-            listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+1));
-          }
-        }
-        return listeners;
-      } else if(currentType === '**') {
-        endReached = (i+1 === typeLength || (i+2 === typeLength && nextType === '*'));
-        if(endReached && tree._listeners) {
-          // The next element has a _listeners, add it to the handlers.
-          listeners = listeners.concat(searchListenerTree(handlers, type, tree, typeLength));
-        }
-
-        for (branch in tree) {
-          if (branch !== '_listeners' && tree.hasOwnProperty(branch)) {
-            if(branch === '*' || branch === '**') {
-              if(tree[branch]._listeners && !endReached) {
-                listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], typeLength));
-              }
-              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
-            } else if(branch === nextType) {
-              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i+2));
-            } else {
-              // No match on this one, shift into the tree but not in the type array.
-              listeners = listeners.concat(searchListenerTree(handlers, type, tree[branch], i));
-            }
-          }
-        }
-        return listeners;
-      }
-
-      listeners = listeners.concat(searchListenerTree(handlers, type, tree[currentType], i+1));
-    }
-
-    xTree = tree['*'];
-    if (xTree) {
-      //
-      // If the listener tree will allow any match for this part,
-      // then recursively explore all branches of the tree
-      //
-      searchListenerTree(handlers, type, xTree, i+1);
-    }
-
-    xxTree = tree['**'];
-    if(xxTree) {
-      if(i < typeLength) {
-        if(xxTree._listeners) {
-          // If we have a listener on a '**', it will catch all, so add its handler.
-          searchListenerTree(handlers, type, xxTree, typeLength);
-        }
-
-        // Build arrays of matching next branches and others.
-        for(branch in xxTree) {
-          if(branch !== '_listeners' && xxTree.hasOwnProperty(branch)) {
-            if(branch === nextType) {
-              // We know the next element will match, so jump twice.
-              searchListenerTree(handlers, type, xxTree[branch], i+2);
-            } else if(branch === currentType) {
-              // Current node matches, move into the tree.
-              searchListenerTree(handlers, type, xxTree[branch], i+1);
-            } else {
-              isolatedBranch = {};
-              isolatedBranch[branch] = xxTree[branch];
-              searchListenerTree(handlers, type, { '**': isolatedBranch }, i+1);
-            }
-          }
-        }
-      } else if(xxTree._listeners) {
-        // We have reached the end and still on a '**'
-        searchListenerTree(handlers, type, xxTree, typeLength);
-      } else if(xxTree['*'] && xxTree['*']._listeners) {
-        searchListenerTree(handlers, type, xxTree['*'], typeLength);
-      }
-    }
-
-    return listeners;
-  }
-
-  function growListenerTree(type, listener) {
-
-    type = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-
-    //
-    // Looks for two consecutive '**', if so, don't add the event at all.
-    //
-    for(var i = 0, len = type.length; i+1 < len; i++) {
-      if(type[i] === '**' && type[i+1] === '**') {
-        return;
-      }
-    }
-
-    var tree = this.listenerTree;
-    var name = type.shift();
-
-    while (name !== undefined) {
-
-      if (!tree[name]) {
-        tree[name] = {};
-      }
-
-      tree = tree[name];
-
-      if (type.length === 0) {
-
-        if (!tree._listeners) {
-          tree._listeners = listener;
-        }
-        else {
-          if (typeof tree._listeners === 'function') {
-            tree._listeners = [tree._listeners];
-          }
-
-          tree._listeners.push(listener);
-
-          if (
-            !tree._listeners.warned &&
-            this._maxListeners > 0 &&
-            tree._listeners.length > this._maxListeners
-          ) {
-            tree._listeners.warned = true;
-            logPossibleMemoryLeak.call(this, tree._listeners.length, name);
-          }
-        }
-        return true;
-      }
-      name = type.shift();
-    }
-    return true;
-  }
-
-  // By default EventEmitters will print a warning if more than
-  // 10 listeners are added to it. This is a useful default which
-  // helps finding memory leaks.
-  //
-  // Obviously not all Emitters should be limited to 10. This function allows
-  // that to be increased. Set to zero for unlimited.
-
-  EventEmitter.prototype.delimiter = '.';
-
-  EventEmitter.prototype.setMaxListeners = function(n) {
-    if (n !== undefined) {
-      this._maxListeners = n;
-      if (!this._conf) this._conf = {};
-      this._conf.maxListeners = n;
-    }
-  };
-
-  EventEmitter.prototype.event = '';
-
-
-  EventEmitter.prototype.once = function(event, fn) {
-    return this._once(event, fn, false);
-  };
-
-  EventEmitter.prototype.prependOnceListener = function(event, fn) {
-    return this._once(event, fn, true);
-  };
-
-  EventEmitter.prototype._once = function(event, fn, prepend) {
-    this._many(event, 1, fn, prepend);
-    return this;
-  };
-
-  EventEmitter.prototype.many = function(event, ttl, fn) {
-    return this._many(event, ttl, fn, false);
-  }
-
-  EventEmitter.prototype.prependMany = function(event, ttl, fn) {
-    return this._many(event, ttl, fn, true);
-  }
-
-  EventEmitter.prototype._many = function(event, ttl, fn, prepend) {
-    var self = this;
-
-    if (typeof fn !== 'function') {
-      throw new Error('many only accepts instances of Function');
-    }
-
-    function listener() {
-      if (--ttl === 0) {
-        self.off(event, listener);
-      }
-      return fn.apply(this, arguments);
-    }
-
-    listener._origin = fn;
-
-    this._on(event, listener, prepend);
-
-    return self;
-  };
-
-  EventEmitter.prototype.emit = function() {
-
-    this._events || init.call(this);
-
-    var type = arguments[0];
-
-    if (type === 'newListener' && !this._newListener) {
-      if (!this._events.newListener) {
-        return false;
-      }
-    }
-
-    var al = arguments.length;
-    var args,l,i,j;
-    var handler;
-
-    if (this._all && this._all.length) {
-      handler = this._all.slice();
-      if (al > 3) {
-        args = new Array(al);
-        for (j = 0; j < al; j++) args[j] = arguments[j];
-      }
-
-      for (i = 0, l = handler.length; i < l; i++) {
-        this.event = type;
-        switch (al) {
-        case 1:
-          handler[i].call(this, type);
-          break;
-        case 2:
-          handler[i].call(this, type, arguments[1]);
-          break;
-        case 3:
-          handler[i].call(this, type, arguments[1], arguments[2]);
-          break;
-        default:
-          handler[i].apply(this, args);
-        }
-      }
-    }
-
-    if (this.wildcard) {
-      handler = [];
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      searchListenerTree.call(this, handler, ns, this.listenerTree, 0);
-    } else {
-      handler = this._events[type];
-      if (typeof handler === 'function') {
-        this.event = type;
-        switch (al) {
-        case 1:
-          handler.call(this);
-          break;
-        case 2:
-          handler.call(this, arguments[1]);
-          break;
-        case 3:
-          handler.call(this, arguments[1], arguments[2]);
-          break;
-        default:
-          args = new Array(al - 1);
-          for (j = 1; j < al; j++) args[j - 1] = arguments[j];
-          handler.apply(this, args);
-        }
-        return true;
-      } else if (handler) {
-        // need to make copy of handlers because list can change in the middle
-        // of emit call
-        handler = handler.slice();
-      }
-    }
-
-    if (handler && handler.length) {
-      if (al > 3) {
-        args = new Array(al - 1);
-        for (j = 1; j < al; j++) args[j - 1] = arguments[j];
-      }
-      for (i = 0, l = handler.length; i < l; i++) {
-        this.event = type;
-        switch (al) {
-        case 1:
-          handler[i].call(this);
-          break;
-        case 2:
-          handler[i].call(this, arguments[1]);
-          break;
-        case 3:
-          handler[i].call(this, arguments[1], arguments[2]);
-          break;
-        default:
-          handler[i].apply(this, args);
-        }
-      }
-      return true;
-    } else if (!this._all && type === 'error') {
-      if (arguments[1] instanceof Error) {
-        throw arguments[1]; // Unhandled 'error' event
-      } else {
-        throw new Error("Uncaught, unspecified 'error' event.");
-      }
-      return false;
-    }
-
-    return !!this._all;
-  };
-
-  EventEmitter.prototype.emitAsync = function() {
-
-    this._events || init.call(this);
-
-    var type = arguments[0];
-
-    if (type === 'newListener' && !this._newListener) {
-        if (!this._events.newListener) { return Promise.resolve([false]); }
-    }
-
-    var promises= [];
-
-    var al = arguments.length;
-    var args,l,i,j;
-    var handler;
-
-    if (this._all) {
-      if (al > 3) {
-        args = new Array(al);
-        for (j = 1; j < al; j++) args[j] = arguments[j];
-      }
-      for (i = 0, l = this._all.length; i < l; i++) {
-        this.event = type;
-        switch (al) {
-        case 1:
-          promises.push(this._all[i].call(this, type));
-          break;
-        case 2:
-          promises.push(this._all[i].call(this, type, arguments[1]));
-          break;
-        case 3:
-          promises.push(this._all[i].call(this, type, arguments[1], arguments[2]));
-          break;
-        default:
-          promises.push(this._all[i].apply(this, args));
-        }
-      }
-    }
-
-    if (this.wildcard) {
-      handler = [];
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      searchListenerTree.call(this, handler, ns, this.listenerTree, 0);
-    } else {
-      handler = this._events[type];
-    }
-
-    if (typeof handler === 'function') {
-      this.event = type;
-      switch (al) {
-      case 1:
-        promises.push(handler.call(this));
-        break;
-      case 2:
-        promises.push(handler.call(this, arguments[1]));
-        break;
-      case 3:
-        promises.push(handler.call(this, arguments[1], arguments[2]));
-        break;
-      default:
-        args = new Array(al - 1);
-        for (j = 1; j < al; j++) args[j - 1] = arguments[j];
-        promises.push(handler.apply(this, args));
-      }
-    } else if (handler && handler.length) {
-      handler = handler.slice();
-      if (al > 3) {
-        args = new Array(al - 1);
-        for (j = 1; j < al; j++) args[j - 1] = arguments[j];
-      }
-      for (i = 0, l = handler.length; i < l; i++) {
-        this.event = type;
-        switch (al) {
-        case 1:
-          promises.push(handler[i].call(this));
-          break;
-        case 2:
-          promises.push(handler[i].call(this, arguments[1]));
-          break;
-        case 3:
-          promises.push(handler[i].call(this, arguments[1], arguments[2]));
-          break;
-        default:
-          promises.push(handler[i].apply(this, args));
-        }
-      }
-    } else if (!this._all && type === 'error') {
-      if (arguments[1] instanceof Error) {
-        return Promise.reject(arguments[1]); // Unhandled 'error' event
-      } else {
-        return Promise.reject("Uncaught, unspecified 'error' event.");
-      }
-    }
-
-    return Promise.all(promises);
-  };
-
-  EventEmitter.prototype.on = function(type, listener) {
-    return this._on(type, listener, false);
-  };
-
-  EventEmitter.prototype.prependListener = function(type, listener) {
-    return this._on(type, listener, true);
-  };
-
-  EventEmitter.prototype.onAny = function(fn) {
-    return this._onAny(fn, false);
-  };
-
-  EventEmitter.prototype.prependAny = function(fn) {
-    return this._onAny(fn, true);
-  };
-
-  EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-  EventEmitter.prototype._onAny = function(fn, prepend){
-    if (typeof fn !== 'function') {
-      throw new Error('onAny only accepts instances of Function');
-    }
-
-    if (!this._all) {
-      this._all = [];
-    }
-
-    // Add the function to the event listener collection.
-    if(prepend){
-      this._all.unshift(fn);
-    }else{
-      this._all.push(fn);
-    }
-
-    return this;
-  }
-
-  EventEmitter.prototype._on = function(type, listener, prepend) {
-    if (typeof type === 'function') {
-      this._onAny(type, listener);
-      return this;
-    }
-
-    if (typeof listener !== 'function') {
-      throw new Error('on only accepts instances of Function');
-    }
-    this._events || init.call(this);
-
-    // To avoid recursion in the case that type == "newListeners"! Before
-    // adding it to the listeners, first emit "newListeners".
-    if (this._newListener)
-       this.emit('newListener', type, listener);
-
-    if (this.wildcard) {
-      growListenerTree.call(this, type, listener);
-      return this;
-    }
-
-    if (!this._events[type]) {
-      // Optimize the case of one listener. Don't need the extra array object.
-      this._events[type] = listener;
-    }
-    else {
-      if (typeof this._events[type] === 'function') {
-        // Change to array.
-        this._events[type] = [this._events[type]];
-      }
-
-      // If we've already got an array, just add
-      if(prepend){
-        this._events[type].unshift(listener);
-      }else{
-        this._events[type].push(listener);
-      }
-
-      // Check for listener leak
-      if (
-        !this._events[type].warned &&
-        this._maxListeners > 0 &&
-        this._events[type].length > this._maxListeners
-      ) {
-        this._events[type].warned = true;
-        logPossibleMemoryLeak.call(this, this._events[type].length, type);
-      }
-    }
-
-    return this;
-  }
-
-  EventEmitter.prototype.off = function(type, listener) {
-    if (typeof listener !== 'function') {
-      throw new Error('removeListener only takes instances of Function');
-    }
-
-    var handlers,leafs=[];
-
-    if(this.wildcard) {
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
-    }
-    else {
-      // does not use listeners(), so no side effect of creating _events[type]
-      if (!this._events[type]) return this;
-      handlers = this._events[type];
-      leafs.push({_listeners:handlers});
-    }
-
-    for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
-      var leaf = leafs[iLeaf];
-      handlers = leaf._listeners;
-      if (isArray(handlers)) {
-
-        var position = -1;
-
-        for (var i = 0, length = handlers.length; i < length; i++) {
-          if (handlers[i] === listener ||
-            (handlers[i].listener && handlers[i].listener === listener) ||
-            (handlers[i]._origin && handlers[i]._origin === listener)) {
-            position = i;
-            break;
-          }
-        }
-
-        if (position < 0) {
-          continue;
-        }
-
-        if(this.wildcard) {
-          leaf._listeners.splice(position, 1);
-        }
-        else {
-          this._events[type].splice(position, 1);
-        }
-
-        if (handlers.length === 0) {
-          if(this.wildcard) {
-            delete leaf._listeners;
-          }
-          else {
-            delete this._events[type];
-          }
-        }
-        if (this._removeListener)
-          this.emit("removeListener", type, listener);
-
-        return this;
-      }
-      else if (handlers === listener ||
-        (handlers.listener && handlers.listener === listener) ||
-        (handlers._origin && handlers._origin === listener)) {
-        if(this.wildcard) {
-          delete leaf._listeners;
-        }
-        else {
-          delete this._events[type];
-        }
-        if (this._removeListener)
-          this.emit("removeListener", type, listener);
-      }
-    }
-
-    function recursivelyGarbageCollect(root) {
-      if (root === undefined) {
-        return;
-      }
-      var keys = Object.keys(root);
-      for (var i in keys) {
-        var key = keys[i];
-        var obj = root[key];
-        if ((obj instanceof Function) || (typeof obj !== "object") || (obj === null))
-          continue;
-        if (Object.keys(obj).length > 0) {
-          recursivelyGarbageCollect(root[key]);
-        }
-        if (Object.keys(obj).length === 0) {
-          delete root[key];
-        }
-      }
-    }
-    recursivelyGarbageCollect(this.listenerTree);
-
-    return this;
-  };
-
-  EventEmitter.prototype.offAny = function(fn) {
-    var i = 0, l = 0, fns;
-    if (fn && this._all && this._all.length > 0) {
-      fns = this._all;
-      for(i = 0, l = fns.length; i < l; i++) {
-        if(fn === fns[i]) {
-          fns.splice(i, 1);
-          if (this._removeListener)
-            this.emit("removeListenerAny", fn);
-          return this;
-        }
-      }
-    } else {
-      fns = this._all;
-      if (this._removeListener) {
-        for(i = 0, l = fns.length; i < l; i++)
-          this.emit("removeListenerAny", fns[i]);
-      }
-      this._all = [];
-    }
-    return this;
-  };
-
-  EventEmitter.prototype.removeListener = EventEmitter.prototype.off;
-
-  EventEmitter.prototype.removeAllListeners = function(type) {
-    if (type === undefined) {
-      !this._events || init.call(this);
-      return this;
-    }
-
-    if (this.wildcard) {
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      var leafs = searchListenerTree.call(this, null, ns, this.listenerTree, 0);
-
-      for (var iLeaf=0; iLeaf<leafs.length; iLeaf++) {
-        var leaf = leafs[iLeaf];
-        leaf._listeners = null;
-      }
-    }
-    else if (this._events) {
-      this._events[type] = null;
-    }
-    return this;
-  };
-
-  EventEmitter.prototype.listeners = function(type) {
-    if (this.wildcard) {
-      var handlers = [];
-      var ns = typeof type === 'string' ? type.split(this.delimiter) : type.slice();
-      searchListenerTree.call(this, handlers, ns, this.listenerTree, 0);
-      return handlers;
-    }
-
-    this._events || init.call(this);
-
-    if (!this._events[type]) this._events[type] = [];
-    if (!isArray(this._events[type])) {
-      this._events[type] = [this._events[type]];
-    }
-    return this._events[type];
-  };
-
-  EventEmitter.prototype.eventNames = function(){
-    return Object.keys(this._events);
-  }
-
-  EventEmitter.prototype.listenerCount = function(type) {
-    return this.listeners(type).length;
-  };
-
-  EventEmitter.prototype.listenersAny = function() {
-
-    if(this._all) {
-      return this._all;
-    }
-    else {
-      return [];
-    }
-
-  };
-
-  if (typeof define === 'function' && define.amd) {
-     // AMD. Register as an anonymous module.
-    define(function() {
-      return EventEmitter;
-    });
-  } else if (typeof exports === 'object') {
-    // CommonJS
-    module.exports = EventEmitter;
-  }
-  else {
-    // Browser global.
-    window.EventEmitter2 = EventEmitter;
-  }
-}();
-
-}).call(this,_dereq_('_process'))
-},{"_process":199}],3:[function(_dereq_,module,exports){
-(function (global){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* globals OktaAuth */
-
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
-
-
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
-
-_dereq_('whatwg-fetch');
-
-var _eventemitter = _dereq_('eventemitter2');
-
-var _browserCookies = _dereq_('browser-cookies');
-
-var _browserCookies2 = _interopRequireDefault(_browserCookies);
-
-var _shallowCopy = _dereq_('shallow-copy');
-
-var _shallowCopy2 = _interopRequireDefault(_shallowCopy);
-
-var _providers = _dereq_('./providers');
-
-var _providers2 = _interopRequireDefault(_providers);
-
-var _get2 = _dereq_('lodash/get');
-
-var _get3 = _interopRequireDefault(_get2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var isBoolean = function isBoolean(val) {
-  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === _typeof(true);
-};
-var isNil = function isNil(val) {
-  return val === null || val === undefined;
-};
-var isObject = function isObject(val) {
-  return val && (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
-};
-
-/**
- * The Formio interface class.
- *
- *   let formio = new Formio('https://examples.form.io/example');
- */
-
-var Formio = function () {
-  /* eslint-disable max-statements */
-  function Formio(path) {
-    var _this = this;
-
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    _classCallCheck(this, Formio);
-
-    // Ensure we have an instance of Formio.
-    if (!(this instanceof Formio)) {
-      return new Formio(path);
-    }
-
-    // Initialize our variables.
-    this.base = '';
-    this.projectsUrl = '';
-    this.projectUrl = '';
-    this.projectId = '';
-    this.formUrl = '';
-    this.formsUrl = '';
-    this.formId = '';
-    this.submissionsUrl = '';
-    this.submissionUrl = '';
-    this.submissionId = '';
-    this.actionsUrl = '';
-    this.actionId = '';
-    this.actionUrl = '';
-    this.vsUrl = '';
-    this.vId = '';
-    this.vUrl = '';
-    this.query = '';
-
-    if (options.hasOwnProperty('base')) {
-      this.base = options.base;
-    } else if (Formio.baseUrl) {
-      this.base = Formio.baseUrl;
-    } else {
-      this.base = window.location.href.match(/http[s]?:\/\/api./)[0];
-    }
-
-    if (!path) {
-      // Allow user to create new projects if this was instantiated without
-      // a url
-      this.projectUrl = this.base + '/project';
-      this.projectsUrl = this.base + '/project';
-      this.projectId = false;
-      this.query = '';
-      return;
-    }
-
-    if (options.hasOwnProperty('project')) {
-      this.projectUrl = options.project;
-    }
-
-    var project = this.projectUrl || Formio.projectUrl;
-    var projectRegEx = /(^|\/)(project)($|\/[^/]+)/;
-    var isProjectUrl = path.search(projectRegEx) !== -1;
-
-    // The baseURL is the same as the projectUrl, and does not contain "/project/MONGO_ID" in
-    // its domain. This is almost certainly against the Open Source server.
-    if (project && this.base === project && !isProjectUrl) {
-      this.noProject = true;
-      this.projectUrl = this.base;
-    }
-
-    // Normalize to an absolute path.
-    if (path.indexOf('http') !== 0 && path.indexOf('//') !== 0) {
-      path = this.base + path;
-    }
-
-    var hostparts = this.getUrlParts(path);
-    var parts = [];
-    var hostName = hostparts[1] + hostparts[2];
-    path = hostparts.length > 3 ? hostparts[3] : '';
-    var queryparts = path.split('?');
-    if (queryparts.length > 1) {
-      path = queryparts[0];
-      this.query = '?' + queryparts[1];
-    }
-
-    // Register a specific path.
-    var registerPath = function registerPath(name, base) {
-      _this[name + 'sUrl'] = base + '/' + name;
-      var regex = new RegExp('/' + name + '/([^/]+)');
-      if (path.search(regex) !== -1) {
-        parts = path.match(regex);
-        _this[name + 'Url'] = parts ? base + parts[0] : '';
-        _this[name + 'Id'] = parts.length > 1 ? parts[1] : '';
-        base += parts[0];
-      }
-      return base;
-    };
-
-    // Register an array of items.
-    var registerItems = function registerItems(items, base, staticBase) {
-      for (var i in items) {
-        if (items.hasOwnProperty(i)) {
-          var item = items[i];
-          if (Array.isArray(item)) {
-            registerItems(item, base, true);
-          } else {
-            var newBase = registerPath(item, base);
-            base = staticBase ? base : newBase;
-          }
-        }
-      }
-    };
-
-    if (!this.projectUrl || this.projectUrl === this.base) {
-      this.projectUrl = hostName;
-    }
-
-    if (!this.noProject) {
-      // Determine the projectUrl and projectId
-      if (isProjectUrl) {
-        // Get project id as project/:projectId.
-        registerItems(['project'], hostName);
-        path = path.replace(projectRegEx, '');
-      } else if (hostName === this.base) {
-        // Get project id as first part of path (subdirectory).
-        if (hostparts.length > 3 && path.split('/').length > 1) {
-          var pathParts = path.split('/');
-          pathParts.shift(); // Throw away the first /.
-          this.projectId = pathParts.shift();
-          path = '/' + pathParts.join('/');
-          this.projectUrl = hostName + '/' + this.projectId;
-        }
-      } else {
-        // Get project id from subdomain.
-        if (hostparts.length > 2 && (hostparts[2].split('.').length > 2 || hostName.indexOf('localhost') !== -1)) {
-          this.projectUrl = hostName;
-          this.projectId = hostparts[2].split('.')[0];
-        }
-      }
-      this.projectsUrl = this.projectsUrl || this.base + '/project';
-    }
-
-    // Configure Form urls and form ids.
-    if (path.search(/(^|\/)(form)($|\/)/) !== -1) {
-      registerItems(['form', ['submission', 'action', 'v']], this.projectUrl);
-    } else {
-      var subRegEx = new RegExp('/(submission|action|v)($|/.*)');
-      var subs = path.match(subRegEx);
-      this.pathType = subs && subs.length > 1 ? subs[1] : '';
-      path = path.replace(subRegEx, '');
-      path = path.replace(/\/$/, '');
-      this.formsUrl = this.projectUrl + '/form';
-      this.formUrl = path ? this.projectUrl + path : '';
-      this.formId = path.replace(/^\/+|\/+$/g, '');
-      var items = ['submission', 'action', 'v'];
-      for (var i in items) {
-        if (items.hasOwnProperty(i)) {
-          var item = items[i];
-          this[item + 'sUrl'] = this.projectUrl + path + '/' + item;
-          if (this.pathType === item && subs.length > 2 && subs[2]) {
-            this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
-            this[item + 'Url'] = this.projectUrl + path + subs[0];
-          }
-        }
-      }
-    }
-
-    // Set the app url if it is not set.
-    if (!Formio.projectUrlSet) {
-      Formio.projectUrl = this.projectUrl;
-    }
-  }
-  /* eslint-enable max-statements */
-
-  _createClass(Formio, [{
-    key: 'delete',
-    value: function _delete(type, opts) {
-      var _id = type + 'Id';
-      var _url = type + 'Url';
-      if (!this[_id]) {
-        _nativePromiseOnly2.default.reject('Nothing to delete');
-      }
-      Formio.cache = {};
-      return this.makeRequest(type, this[_url], 'delete', null, opts);
-    }
-  }, {
-    key: 'index',
-    value: function index(type, query, opts) {
-      var _url = type + 'Url';
-      query = query || '';
-      if (query && isObject(query)) {
-        query = '?' + Formio.serialize(query.params);
-      }
-      return this.makeRequest(type, this[_url] + query, 'get', null, opts);
-    }
-  }, {
-    key: 'save',
-    value: function save(type, data, opts) {
-      var _id = type + 'Id';
-      var _url = type + 'Url';
-      var method = this[_id] || data._id ? 'put' : 'post';
-      var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-      if (!this[_id] && data._id && method === 'put' && !(reqUrl.indexOf(data._id) !== -1)) {
-        reqUrl += '/' + data._id;
-      }
-      Formio.cache = {};
-      return this.makeRequest(type, reqUrl + this.query, method, data, opts);
-    }
-  }, {
-    key: 'load',
-    value: function load(type, query, opts) {
-      var _id = type + 'Id';
-      var _url = type + 'Url';
-      if (query && isObject(query)) {
-        query = Formio.serialize(query.params);
-      }
-      if (query) {
-        query = this.query ? this.query + '&' + query : '?' + query;
-      } else {
-        query = this.query;
-      }
-      if (!this[_id]) {
-        return _nativePromiseOnly2.default.reject('Missing ' + _id);
-      }
-      return this.makeRequest(type, this[_url] + query, 'get', null, opts);
-    }
-  }, {
-    key: 'makeRequest',
-    value: function makeRequest() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return Formio.makeRequest.apply(Formio, [this].concat(args));
-    }
-  }, {
-    key: 'loadProject',
-    value: function loadProject(query, opts) {
-      return this.load('project', query, opts);
-    }
-  }, {
-    key: 'saveProject',
-    value: function saveProject(data, opts) {
-      return this.save('project', data, opts);
-    }
-  }, {
-    key: 'deleteProject',
-    value: function deleteProject(opts) {
-      return this.delete('project', opts);
-    }
-  }, {
-    key: 'loadForm',
-    value: function loadForm(query, opts) {
-      var _this2 = this;
-
-      return this.load('form', query, opts).then(function (currentForm) {
-        // Check to see if there isn't a number in vId.
-        if (!currentForm.revisions || isNaN(parseInt(_this2.vId))) {
-          return currentForm;
-        }
-        // If a submission already exists but form is marked to load current version of form.
-        if (currentForm.revisions === 'current' && _this2.submissionId) {
-          return currentForm;
-        }
-        // If they specified a revision form, load the revised form components.
-        if (query && isObject(query)) {
-          query = Formio.serialize(query.params);
-        }
-        if (query) {
-          query = _this2.query ? _this2.query + '&' + query : '?' + query;
-        } else {
-          query = _this2.query;
-        }
-        return _this2.makeRequest('form', _this2.vUrl + query, 'get', null, opts).then(function (revisionForm) {
-          currentForm.components = revisionForm.components;
-          // Using object.assign so we don't cross polinate multiple form loads.
-          return Object.assign({}, currentForm);
-        })
-        // If we couldn't load the revision, just return the original form.
-        .catch(function () {
-          return Object.assign({}, currentForm);
-        });
-      });
-    }
-  }, {
-    key: 'saveForm',
-    value: function saveForm(data, opts) {
-      return this.save('form', data, opts);
-    }
-  }, {
-    key: 'deleteForm',
-    value: function deleteForm(opts) {
-      return this.delete('form', opts);
-    }
-  }, {
-    key: 'loadForms',
-    value: function loadForms(query, opts) {
-      return this.index('forms', query, opts);
-    }
-  }, {
-    key: 'loadSubmission',
-    value: function loadSubmission(query, opts) {
-      var _this3 = this;
-
-      return this.load('submission', query, opts).then(function (submission) {
-        _this3.vId = submission._fvid;
-        _this3.vUrl = _this3.formUrl + '/v/' + _this3.vId;
-        return submission;
-      });
-    }
-  }, {
-    key: 'saveSubmission',
-    value: function saveSubmission(data, opts) {
-      if (!isNaN(parseInt(this.vId))) {
-        data._fvid = this.vId;
-      }
-      return this.save('submission', data, opts);
-    }
-  }, {
-    key: 'deleteSubmission',
-    value: function deleteSubmission(opts) {
-      return this.delete('submission', opts);
-    }
-  }, {
-    key: 'loadSubmissions',
-    value: function loadSubmissions(query, opts) {
-      return this.index('submissions', query, opts);
-    }
-  }, {
-    key: 'loadAction',
-    value: function loadAction(query, opts) {
-      return this.load('action', query, opts);
-    }
-  }, {
-    key: 'saveAction',
-    value: function saveAction(data, opts) {
-      return this.save('action', data, opts);
-    }
-  }, {
-    key: 'deleteAction',
-    value: function deleteAction(opts) {
-      return this.delete('action', opts);
-    }
-  }, {
-    key: 'loadActions',
-    value: function loadActions(query, opts) {
-      return this.index('actions', query, opts);
-    }
-  }, {
-    key: 'availableActions',
-    value: function availableActions() {
-      return this.makeRequest('availableActions', this.formUrl + '/actions');
-    }
-  }, {
-    key: 'actionInfo',
-    value: function actionInfo(name) {
-      return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name);
-    }
-  }, {
-    key: 'isObjectId',
-    value: function isObjectId(id) {
-      var checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
-      return checkForHexRegExp.test(id);
-    }
-  }, {
-    key: 'getProjectId',
-    value: function getProjectId() {
-      if (!this.projectId) {
-        return _nativePromiseOnly2.default.resolve('');
-      }
-      if (this.isObjectId(this.projectId)) {
-        return _nativePromiseOnly2.default.resolve(this.projectId);
-      } else {
-        return this.loadProject().then(function (project) {
-          return project._id;
-        });
-      }
-    }
-  }, {
-    key: 'getFormId',
-    value: function getFormId() {
-      if (!this.formId) {
-        return _nativePromiseOnly2.default.resolve('');
-      }
-      if (this.isObjectId(this.formId)) {
-        return _nativePromiseOnly2.default.resolve(this.formId);
-      } else {
-        return this.loadForm().then(function (form) {
-          return form._id;
-        });
-      }
-    }
-  }, {
-    key: 'currentUser',
-    value: function currentUser(options) {
-      return Formio.currentUser(this, options);
-    }
-  }, {
-    key: 'accessInfo',
-    value: function accessInfo() {
-      return Formio.accessInfo(this);
-    }
-
-    /**
-     * Returns the JWT token for this instance.
-     *
-     * @return {*}
-     */
-
-  }, {
-    key: 'getToken',
-    value: function getToken() {
-      return Formio.getToken();
-    }
-
-    /**
-     * Returns a temporary authentication token for single purpose token generation.
-     */
-
-  }, {
-    key: 'getTempToken',
-    value: function getTempToken(expire, allowed) {
-      var token = Formio.getToken();
-      if (!token) {
-        return _nativePromiseOnly2.default.reject('You must be authenticated to generate a temporary auth token.');
-      }
-      return this.makeRequest('tempToken', this.projectUrl + '/token', 'GET', null, {
-        ignoreCache: true,
-        header: new Headers({
-          'x-expire': expire,
-          'x-allow': allowed
-        })
-      });
-    }
-
-    /**
-     * Get a download url for a submission PDF of this submission.
-     *
-     * @return {*}
-     */
-
-  }, {
-    key: 'getDownloadUrl',
-    value: function getDownloadUrl(form) {
-      var _this4 = this;
-
-      if (!this.submissionId) {
-        return _nativePromiseOnly2.default.resolve('');
-      }
-
-      if (!form) {
-        // Make sure to load the form first.
-        return this.loadForm().then(function (_form) {
-          if (!_form) {
-            return '';
-          }
-          return _this4.getDownloadUrl(_form);
-        });
-      }
-
-      var apiUrl = '/project/' + form.project;
-      apiUrl += '/form/' + form._id;
-      apiUrl += '/submission/' + this.submissionId;
-      apiUrl += '/download';
-
-      var download = this.base + apiUrl;
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        _this4.getTempToken(3600, 'GET:' + apiUrl).then(function (tempToken) {
-          download += '?token=' + tempToken.key;
-          resolve(download);
-        }, function () {
-          resolve(download);
-        }).catch(reject);
-      });
-    }
-  }, {
-    key: 'uploadFile',
-    value: function uploadFile(storage, file, fileName, dir, progressCallback, url) {
-      var _this5 = this;
-
-      var requestArgs = {
-        provider: storage,
-        method: 'upload',
-        file: file,
-        fileName: fileName,
-        dir: dir
-      };
-      var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
-        return Formio.pluginGet('fileRequest', requestArgs).then(function (result) {
-          if (storage && isNil(result)) {
-            if (Formio.providers.storage.hasOwnProperty(storage)) {
-              var provider = new Formio.providers.storage[storage](_this5);
-              return provider.uploadFile(file, fileName, dir, progressCallback, url);
-            } else {
-              throw 'Storage provider not found';
-            }
-          }
-          return result || { url: '' };
-        });
-      });
-
-      return Formio.pluginAlter('wrapFileRequestPromise', request, requestArgs);
-    }
-  }, {
-    key: 'downloadFile',
-    value: function downloadFile(file) {
-      var _this6 = this;
-
-      var requestArgs = {
-        method: 'download',
-        file: file
-      };
-
-      var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
-        return Formio.pluginGet('fileRequest', requestArgs).then(function (result) {
-          if (file.storage && isNil(result)) {
-            if (Formio.providers.storage.hasOwnProperty(file.storage)) {
-              var provider = new Formio.providers.storage[file.storage](_this6);
-              return provider.downloadFile(file);
-            } else {
-              throw 'Storage provider not found';
-            }
-          }
-          return result || { url: '' };
-        });
-      });
-
-      return Formio.pluginAlter('wrapFileRequestPromise', request, requestArgs);
-    }
-
-    // Determine if the user can submit the form.
-
-  }, {
-    key: 'canSubmit',
-    value: function canSubmit() {
-      /* eslint-disable max-statements, max-depth */
-      return _nativePromiseOnly2.default.all([this.loadForm(), this.currentUser(), this.accessInfo()]).then(function (results) {
-        var form = results.shift();
-        var user = results.shift();
-        var access = results.shift();
-
-        // Get the anonymous and admin roles.
-        var anonRole = {};
-        var adminRole = {};
-        for (var roleName in access.roles) {
-          if (access.roles.hasOwnProperty(roleName)) {
-            var role = access.roles[roleName];
-            if (role.default) {
-              anonRole = role;
-            }
-            if (role.admin) {
-              adminRole = role;
-            }
-          }
-        }
-
-        var canSubmit = false;
-        var canSubmitAnonymously = false;
-
-        // If the user is an admin, then they can submit this form.
-        if (user && user.roles.indexOf(adminRole._id) !== -1) {
-          return true;
-        }
-
-        for (var i in form.submissionAccess) {
-          if (form.submissionAccess.hasOwnProperty(i)) {
-            var subRole = form.submissionAccess[i];
-            if (subRole.type === 'create_all' || subRole.type === 'create_own') {
-              for (var j in subRole.roles) {
-                if (subRole.roles.hasOwnProperty(j)) {
-                  // Check if anonymous is allowed.
-                  if (anonRole._id === subRole.roles[j]) {
-                    canSubmitAnonymously = true;
-                  }
-                  // Check if the logged in user has the appropriate role.
-                  if (user && user.roles.indexOf(subRole.roles[j]) !== -1) {
-                    canSubmit = true;
-                    break;
-                  }
-                }
-              }
-              if (canSubmit) {
-                break;
-              }
-            }
-          }
-        }
-        // If their user cannot submit, but anonymous can, then delete token and allow submission.
-        if (!canSubmit && canSubmitAnonymously) {
-          canSubmit = true;
-          Formio.setUser(null);
-        }
-        return canSubmit;
-      });
-      /* eslint-enable max-statements, max-depth */
-    }
-  }, {
-    key: 'getUrlParts',
-    value: function getUrlParts(url) {
-      return Formio.getUrlParts(url, this);
-    }
-  }], [{
-    key: 'loadProjects',
-    value: function loadProjects(query, opts) {
-      query = query || '';
-      if (isObject(query)) {
-        query = '?' + Formio.serialize(query.params);
-      }
-      return Formio.makeStaticRequest(Formio.baseUrl + '/project' + query, 'GET', null, opts);
-    }
-  }, {
-    key: 'getUrlParts',
-    value: function getUrlParts(url, formio) {
-      var base = formio && formio.base ? formio.base : Formio.baseUrl;
-      var regex = '^(http[s]?:\\/\\/)';
-      if (base && url.indexOf(base) === 0) {
-        regex += '(' + base.replace(/^http[s]?:\/\//, '') + ')';
-      } else {
-        regex += '([^/]+)';
-      }
-      regex += '($|\\/.*)';
-      return url.match(new RegExp(regex));
-    }
-  }, {
-    key: 'serialize',
-    value: function serialize(obj) {
-      var str = [];
-      for (var p in obj) {
-        if (obj.hasOwnProperty(p)) {
-          str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
-        }
-      }
-      return str.join('&');
-    }
-  }, {
-    key: 'getRequestArgs',
-    value: function getRequestArgs(formio, type, url, method, data, opts) {
-      method = (method || 'GET').toUpperCase();
-      if (!opts || !isObject(opts)) {
-        opts = {};
-      }
-
-      var requestArgs = {
-        url: url,
-        method: method,
-        data: data || null,
-        opts: opts
-      };
-
-      if (type) {
-        requestArgs.type = type;
-      }
-
-      if (formio) {
-        requestArgs.formio = formio;
-      }
-      return requestArgs;
-    }
-  }, {
-    key: 'makeStaticRequest',
-    value: function makeStaticRequest(url, method, data, opts) {
-      var requestArgs = Formio.getRequestArgs(null, '', url, method, data, opts);
-      var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
-        return Formio.pluginGet('staticRequest', requestArgs).then(function (result) {
-          if (isNil(result)) {
-            return Formio.request(url, method, requestArgs.data, requestArgs.opts.header, requestArgs.opts);
-          }
-          return result;
-        });
-      });
-
-      return Formio.pluginAlter('wrapStaticRequestPromise', request, requestArgs);
-    }
-  }, {
-    key: 'makeRequest',
-    value: function makeRequest(formio, type, url, method, data, opts) {
-      if (!formio) {
-        return Formio.makeStaticRequest(url, method, data, opts);
-      }
-
-      var requestArgs = Formio.getRequestArgs(formio, type, url, method, data, opts);
-      var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
-        return Formio.pluginGet('request', requestArgs).then(function (result) {
-          if (isNil(result)) {
-            return Formio.request(url, method, requestArgs.data, requestArgs.opts.header, requestArgs.opts);
-          }
-          return result;
-        });
-      });
-
-      return Formio.pluginAlter('wrapRequestPromise', request, requestArgs);
-    }
-  }, {
-    key: 'request',
-    value: function request(url, method, data, header, opts) {
-      if (!url) {
-        return _nativePromiseOnly2.default.reject('No url provided');
-      }
-      method = (method || 'GET').toUpperCase();
-
-      // For reverse compatibility, if they provided the ignoreCache parameter,
-      // then change it back to the options format where that is a parameter.
-      if (isBoolean(opts)) {
-        opts = { ignoreCache: opts };
-      }
-      if (!opts || !isObject(opts)) {
-        opts = {};
-      }
-
-      // Generate a cachekey.
-      var cacheKey = btoa(url);
-
-      // Get the cached promise to save multiple loads.
-      if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
-        return _nativePromiseOnly2.default.resolve(Formio.cache[cacheKey]);
-      }
-
-      // Set up and fetch request
-      var headers = header || new Headers(opts.headers || {
-        'Accept': 'application/json',
-        'Content-type': 'application/json; charset=UTF-8'
-      });
-      var token = Formio.getToken();
-      if (token && !opts.noToken) {
-        headers.append('x-jwt-token', token);
-      }
-
-      var options = {
-        method: method,
-        headers: headers,
-        mode: 'cors'
-      };
-      if (data) {
-        options.body = JSON.stringify(data);
-      }
-
-      // Allow plugins to alter the options.
-      options = Formio.pluginAlter('requestOptions', options, url);
-
-      var requestToken = options.headers.get('x-jwt-token');
-      return fetch(url, options).then(function (response) {
-        // Allow plugins to respond.
-        response = Formio.pluginAlter('requestResponse', response, Formio);
-
-        if (!response.ok) {
-          if (response.status === 440) {
-            Formio.setToken(null);
-            Formio.events.emit('formio.sessionExpired', response.body);
-          } else if (response.status === 401) {
-            Formio.events.emit('formio.unauthorized', response.body);
-          }
-          // Parse and return the error as a rejected promise to reject this promise
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text()).then(function (error) {
-            return _nativePromiseOnly2.default.reject(error);
-          });
-        }
-
-        // Handle fetch results
-        var token = response.headers.get('x-jwt-token');
-
-        // In some strange cases, the fetch library will return an x-jwt-token without sending
-        // one to the server. This has even been debugged on the server to verify that no token
-        // was introduced with the request, but the response contains a token. This is an Invalid
-        // case where we do not send an x-jwt-token and get one in return for any GET request.
-        var tokenIntroduced = false;
-        if (method === 'GET' && !requestToken && token && !opts.external && !(url.indexOf('token=') !== -1) && !(url.indexOf('x-jwt-token=') !== -1)) {
-          console.warn('Token was introduced in request.');
-          tokenIntroduced = true;
-        }
-
-        if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
-          Formio.setToken(token);
-        }
-        // 204 is no content. Don't try to .json() it.
-        if (response.status === 204) {
-          return {};
-        }
-
-        var getResult = response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text();
-        return getResult.then(function (result) {
-          // Add some content-range metadata to the result here
-          var range = response.headers.get('content-range');
-          if (range && isObject(result)) {
-            range = range.split('/');
-            if (range[0] !== '*') {
-              var skipLimit = range[0].split('-');
-              result.skip = Number(skipLimit[0]);
-              result.limit = skipLimit[1] - skipLimit[0] + 1;
-            }
-            result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
-          }
-
-          if (!opts.getHeaders) {
-            return result;
-          }
-
-          var headers = {};
-          response.headers.forEach(function (item, key) {
-            headers[key] = item;
-          });
-
-          // Return the result with the headers.
-          return {
-            result: result,
-            headers: headers
-          };
-        });
-      }).then(function (result) {
-        if (opts.getHeaders) {
-          return result;
-        }
-
-        var resultCopy = {};
-
-        // Shallow copy result so modifications don't end up in cache
-        if (Array.isArray(result)) {
-          resultCopy = result.map(_shallowCopy2.default);
-          resultCopy.skip = result.skip;
-          resultCopy.limit = result.limit;
-          resultCopy.serverCount = result.serverCount;
-        } else {
-          resultCopy = (0, _shallowCopy2.default)(result);
-        }
-
-        // Cache the response.
-        if (method === 'GET') {
-          Formio.cache[cacheKey] = resultCopy;
-        }
-
-        return resultCopy;
-      }).catch(function (err) {
-        if (err === 'Bad Token') {
-          Formio.setToken(null);
-          Formio.events.emit('formio.badToken', err);
-        }
-        if (err.message) {
-          err.message = 'Could not connect to API server (' + err.message + ')';
-          err.networkError = true;
-        }
-        return _nativePromiseOnly2.default.reject(err);
-      });
-    }
-  }, {
-    key: 'setToken',
-    value: function setToken(token) {
-      token = token || '';
-      if (token === this.token) {
-        return;
-      }
-      this.token = token;
-      if (!token) {
-        Formio.setUser(null);
-        // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-        try {
-          return localStorage.removeItem('formioToken');
-        } catch (err) {
-          return _browserCookies2.default.erase('formioToken', { path: '/' });
-        }
-      }
-      // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-      try {
-        localStorage.setItem('formioToken', token);
-      } catch (err) {
-        _browserCookies2.default.set('formioToken', token, { path: '/' });
-      }
-      return Formio.currentUser(); // Run this so user is updated if null
-    }
-  }, {
-    key: 'getToken',
-    value: function getToken() {
-      if (this.token) {
-        return this.token;
-      }
-      try {
-        this.token = localStorage.getItem('formioToken') || '';
-        return this.token;
-      } catch (e) {
-        this.token = _browserCookies2.default.get('formioToken');
-        return this.token;
-      }
-    }
-  }, {
-    key: 'setUser',
-    value: function setUser(user) {
-      if (!user) {
-        this.setToken(null);
-        // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-        try {
-          return localStorage.removeItem('formioUser');
-        } catch (err) {
-          return _browserCookies2.default.erase('formioUser', { path: '/' });
-        }
-      }
-      // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
-      try {
-        localStorage.setItem('formioUser', JSON.stringify(user));
-      } catch (err) {
-        _browserCookies2.default.set('formioUser', JSON.stringify(user), { path: '/' });
-      }
-    }
-  }, {
-    key: 'getUser',
-    value: function getUser() {
-      try {
-        return JSON.parse(localStorage.getItem('formioUser') || null);
-      } catch (e) {
-        return JSON.parse(_browserCookies2.default.get('formioUser'));
-      }
-    }
-  }, {
-    key: 'setBaseUrl',
-    value: function setBaseUrl(url) {
-      Formio.baseUrl = url;
-      if (!Formio.projectUrlSet) {
-        Formio.projectUrl = url;
-      }
-    }
-  }, {
-    key: 'getBaseUrl',
-    value: function getBaseUrl() {
-      return Formio.baseUrl;
-    }
-  }, {
-    key: 'setApiUrl',
-    value: function setApiUrl(url) {
-      return Formio.setBaseUrl(url);
-    }
-  }, {
-    key: 'getApiUrl',
-    value: function getApiUrl() {
-      return Formio.getBaseUrl();
-    }
-  }, {
-    key: 'setAppUrl',
-    value: function setAppUrl(url) {
-      console.warn('Formio.setAppUrl() is deprecated. Use Formio.setProjectUrl instead.');
-      Formio.projectUrl = url;
-      Formio.projectUrlSet = true;
-    }
-  }, {
-    key: 'setProjectUrl',
-    value: function setProjectUrl(url) {
-      Formio.projectUrl = url;
-      Formio.projectUrlSet = true;
-    }
-  }, {
-    key: 'getAppUrl',
-    value: function getAppUrl() {
-      console.warn('Formio.getAppUrl() is deprecated. Use Formio.getProjectUrl instead.');
-      return Formio.projectUrl;
-    }
-  }, {
-    key: 'getProjectUrl',
-    value: function getProjectUrl() {
-      return Formio.projectUrl;
-    }
-  }, {
-    key: 'clearCache',
-    value: function clearCache() {
-      Formio.cache = {};
-    }
-  }, {
-    key: 'noop',
-    value: function noop() {}
-  }, {
-    key: 'identity',
-    value: function identity(value) {
-      return value;
-    }
-  }, {
-    key: 'deregisterPlugin',
-    value: function deregisterPlugin(plugin) {
-      var beforeLength = Formio.plugins.length;
-      Formio.plugins = Formio.plugins.filter(function (p) {
-        if (p !== plugin && p.__name !== plugin) {
-          return true;
-        }
-
-        (p.deregister || Formio.noop).call(plugin, Formio);
-        return false;
-      });
-      return beforeLength !== Formio.plugins.length;
-    }
-  }, {
-    key: 'registerPlugin',
-    value: function registerPlugin(plugin, name) {
-      Formio.plugins.push(plugin);
-      Formio.plugins.sort(function (a, b) {
-        return (b.priority || 0) - (a.priority || 0);
-      });
-      plugin.__name = name;
-      (plugin.init || Formio.noop).call(plugin, Formio);
-    }
-  }, {
-    key: 'getPlugin',
-    value: function getPlugin(name) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = Formio.plugins[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var plugin = _step.value;
-
-          if (plugin.__name === name) {
-            return plugin;
-          }
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      return null;
-    }
-  }, {
-    key: 'pluginWait',
-    value: function pluginWait(pluginFn) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        args[_key2 - 1] = arguments[_key2];
-      }
-
-      return _nativePromiseOnly2.default.all(Formio.plugins.map(function (plugin) {
-        var _ref;
-
-        return (_ref = plugin[pluginFn] || Formio.noop).call.apply(_ref, [plugin].concat(args));
-      }));
-    }
-  }, {
-    key: 'pluginGet',
-    value: function pluginGet(pluginFn) {
-      for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-        args[_key3 - 1] = arguments[_key3];
-      }
-
-      var callPlugin = function callPlugin(index) {
-        var _ref2;
-
-        var plugin = Formio.plugins[index];
-
-        if (!plugin) {
-          return _nativePromiseOnly2.default.resolve(null);
-        }
-
-        return _nativePromiseOnly2.default.resolve((_ref2 = plugin[pluginFn] || Formio.noop).call.apply(_ref2, [plugin].concat(args))).then(function (result) {
-          if (!isNil(result)) {
-            return result;
-          }
-
-          return callPlugin(index + 1);
-        });
-      };
-      return callPlugin(0);
-    }
-  }, {
-    key: 'pluginAlter',
-    value: function pluginAlter(pluginFn, value) {
-      for (var _len4 = arguments.length, args = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
-        args[_key4 - 2] = arguments[_key4];
-      }
-
-      return Formio.plugins.reduce(function (value, plugin) {
-        return (plugin[pluginFn] || Formio.identity).apply(undefined, [value].concat(args));
-      }, value);
-    }
-  }, {
-    key: 'accessInfo',
-    value: function accessInfo(formio) {
-      var projectUrl = formio ? formio.projectUrl : Formio.projectUrl;
-      return Formio.makeRequest(formio, 'accessInfo', projectUrl + '/access');
-    }
-  }, {
-    key: 'currentUser',
-    value: function currentUser(formio, options) {
-      var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
-      projectUrl += '/current';
-      var user = this.getUser();
-      if (user) {
-        return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(user), {
-          url: projectUrl,
-          method: 'GET',
-          options: options
-        });
-      }
-      if ((!options || !options.external) && !Formio.getToken()) {
-        return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
-          url: projectUrl,
-          method: 'GET',
-          options: options
-        });
-      }
-      return Formio.makeRequest(formio, 'currentUser', projectUrl, 'GET', null, options).then(function (response) {
-        Formio.setUser(response);
-        return response;
-      });
-    }
-  }, {
-    key: 'logout',
-    value: function logout(formio) {
-      Formio.setToken(null);
-      Formio.setUser(null);
-      Formio.clearCache();
-      var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
-      return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
-    }
-  }, {
-    key: 'oAuthCurrentUser',
-    value: function oAuthCurrentUser(formio, token) {
-      return Formio.currentUser(formio, {
-        external: true,
-        headers: {
-          Authorization: 'Bearer ' + token
-        }
-      });
-    }
-  }, {
-    key: 'oktaInit',
-    value: function oktaInit(options) {
-      options = options || {};
-      if ((typeof OktaAuth === 'undefined' ? 'undefined' : _typeof(OktaAuth)) !== undefined) {
-        options.OktaAuth = OktaAuth;
-      }
-
-      if (_typeof(options.OktaAuth) === undefined) {
-        var errorMessage = 'Cannot find OktaAuth. Please include the Okta JavaScript SDK within your application. See https://developer.okta.com/code/javascript/okta_auth_sdk for an example.';
-        console.warn(errorMessage);
-        return _nativePromiseOnly2.default.reject(errorMessage);
-      }
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        var Okta = options.OktaAuth;
-        delete options.OktaAuth;
-        var authClient = new Okta(options);
-        var accessToken = authClient.tokenManager.get('accessToken');
-        if (accessToken) {
-          resolve(Formio.oAuthCurrentUser(options.formio, accessToken.accessToken));
-        } else if (location.hash) {
-          authClient.token.parseFromUrl().then(function (token) {
-            authClient.tokenManager.add('accessToken', token);
-            resolve(Formio.oAuthCurrentUser(options.formio, token.accessToken));
-          }).catch(function (err) {
-            console.warn(err);
-            reject(err);
-          });
-        } else {
-          authClient.token.getWithRedirect({
-            responseType: 'token',
-            scopes: options.scopes
-          });
-          resolve(false);
-        }
-      });
-    }
-  }, {
-    key: 'ssoInit',
-    value: function ssoInit(type, options) {
-      switch (type) {
-        case 'okta':
-          return Formio.oktaInit(options);
-        default:
-          console.warn('Unknown SSO type');
-          return _nativePromiseOnly2.default.reject('Unknown SSO type');
-      }
-    }
-  }, {
-    key: 'requireLibrary',
-    value: function requireLibrary(name, property, src, polling) {
-      if (!Formio.libraries.hasOwnProperty(name)) {
-        Formio.libraries[name] = {};
-        Formio.libraries[name].ready = new _nativePromiseOnly2.default(function (resolve, reject) {
-          Formio.libraries[name].resolve = resolve;
-          Formio.libraries[name].reject = reject;
-        });
-
-        var callbackName = name + 'Callback';
-
-        if (!polling && !window[callbackName]) {
-          window[callbackName] = function () {
-            return Formio.libraries[name].resolve();
-          };
-        }
-
-        // See if the plugin already exists.
-        var plugin = (0, _get3.default)(window, property);
-        if (plugin) {
-          Formio.libraries[name].resolve(plugin);
-        } else {
-          src = Array.isArray(src) ? src : [src];
-          src.forEach(function (lib) {
-            var attrs = {};
-            var elementType = '';
-            if (typeof lib === 'string') {
-              lib = {
-                type: 'script',
-                src: lib
-              };
-            }
-            switch (lib.type) {
-              case 'script':
-                elementType = 'script';
-                attrs = {
-                  src: lib.src,
-                  type: 'text/javascript',
-                  defer: true,
-                  async: true
-                };
-                break;
-              case 'styles':
-                elementType = 'link';
-                attrs = {
-                  href: lib.src,
-                  rel: 'stylesheet'
-                };
-                break;
-            }
-
-            // Add the script to the top page.
-            var script = document.createElement(elementType);
-            for (var attr in attrs) {
-              script.setAttribute(attr, attrs[attr]);
-            }
-            document.getElementsByTagName('head')[0].appendChild(script);
-          });
-
-          // if no callback is provided, then check periodically for the script.
-          if (polling) {
-            var interval = setInterval(function () {
-              var plugin = (0, _get3.default)(window, property);
-              if (plugin) {
-                clearInterval(interval);
-                Formio.libraries[name].resolve(plugin);
-              }
-            }, 200);
-          }
-        }
-      }
-      return Formio.libraries[name].ready;
-    }
-  }, {
-    key: 'libraryReady',
-    value: function libraryReady(name) {
-      if (Formio.libraries.hasOwnProperty(name) && Formio.libraries[name].ready) {
-        return Formio.libraries[name].ready;
-      }
-
-      return _nativePromiseOnly2.default.reject(name + ' library was not required.');
-    }
-  }]);
-
-  return Formio;
-}();
-
-// Define all the static properties.
-
-
-exports.default = Formio;
-Formio.libraries = {};
-Formio.Headers = Headers;
-Formio.baseUrl = 'https://api.form.io';
-Formio.projectUrl = Formio.baseUrl;
-Formio.projectUrlSet = false;
-Formio.plugins = [];
-Formio.cache = {};
-Formio.providers = _providers2.default;
-Formio.events = new _eventemitter.EventEmitter2({
-  wildcard: false,
-  maxListeners: 0
-});
-
-if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object' && !global.Formio) {
-  global.Formio = Formio;
-}
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":4,"browser-cookies":1,"eventemitter2":2,"lodash/get":161,"native-promise-only":198,"shallow-copy":200,"whatwg-fetch":205}],4:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _storage = _dereq_('./storage');
-
-var _storage2 = _interopRequireDefault(_storage);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-  storage: _storage2.default
-};
-},{"./storage":7}],5:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var base64 = function base64() {
-  return {
-    title: 'Base64',
-    name: 'base64',
-    uploadFile: function uploadFile(file, fileName) {
-      var _this = this;
-
-      var reader = new FileReader();
-
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        reader.onload = function (event) {
-          var url = event.target.result;
-          resolve({
-            storage: 'base64',
-            name: fileName,
-            url: url,
-            size: file.size,
-            type: file.type,
-            data: url.replace('data:' + file.type + ';base64,', '')
-          });
-        };
-
-        reader.onerror = function () {
-          return reject(_this);
-        };
-
-        reader.readAsDataURL(file);
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      // Return the original as there is nothing to do.
-      return _nativePromiseOnly2.default.resolve(file);
-    }
-  };
-};
-
-base64.title = 'Base64';
-exports.default = base64;
-},{"native-promise-only":198}],6:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var dropbox = function dropbox(formio) {
-  return {
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        // Send the file with data.
-        var xhr = new XMLHttpRequest();
-
-        if (typeof progressCallback === 'function') {
-          xhr.upload.onprogress = progressCallback;
-        }
-
-        var fd = new FormData();
-        fd.append('name', fileName);
-        fd.append('dir', dir);
-        fd.append('file', file);
-
-        // Fire on network error.
-        xhr.onerror = function (err) {
-          err.networkError = true;
-          reject(err);
-        };
-
-        xhr.onload = function () {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            var response = JSON.parse(xhr.response);
-            response.storage = 'dropbox';
-            response.size = file.size;
-            response.type = file.type;
-            response.url = response.path_lower;
-            resolve(response);
-          } else {
-            reject(xhr.response || 'Unable to upload file');
-          }
-        };
-
-        xhr.onabort = reject;
-
-        xhr.open('POST', formio.formUrl + '/storage/dropbox');
-        var token = formio.getToken();
-        if (token) {
-          xhr.setRequestHeader('x-jwt-token', token);
-        }
-        xhr.send(fd);
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      var token = formio.getToken();
-      file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + (token ? '&x-jwt-token=' + token : '');
-      return _nativePromiseOnly2.default.resolve(file);
-    }
-  };
-};
-
-dropbox.title = 'Dropbox';
-exports.default = dropbox;
-},{"native-promise-only":198}],7:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _base = _dereq_('./base64');
-
-var _base2 = _interopRequireDefault(_base);
-
-var _dropbox = _dereq_('./dropbox');
-
-var _dropbox2 = _interopRequireDefault(_dropbox);
-
-var _s = _dereq_('./s3');
-
-var _s2 = _interopRequireDefault(_s);
-
-var _url = _dereq_('./url');
-
-var _url2 = _interopRequireDefault(_url);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-  base64: _base2.default,
-  dropbox: _dropbox2.default,
-  s3: _s2.default,
-  url: _url2.default
-};
-},{"./base64":5,"./dropbox":6,"./s3":8,"./url":9}],8:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var s3 = function s3(formio) {
-  return {
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        // Send the pre response to sign the upload.
-        var pre = new XMLHttpRequest();
-
-        var prefd = new FormData();
-        prefd.append('name', fileName);
-        prefd.append('size', file.size);
-        prefd.append('type', file.type);
-
-        // This only fires on a network error.
-        pre.onerror = function (err) {
-          err.networkError = true;
-          reject(err);
-        };
-
-        pre.onabort = reject;
-
-        pre.onload = function () {
-          if (pre.status >= 200 && pre.status < 300) {
-            var response = JSON.parse(pre.response);
-
-            // Send the file with data.
-            var xhr = new XMLHttpRequest();
-
-            if (typeof progressCallback === 'function') {
-              xhr.upload.onprogress = progressCallback;
-            }
-
-            response.data.fileName = fileName;
-            response.data.key += dir + fileName;
-
-            var fd = new FormData();
-            for (var key in response.data) {
-              fd.append(key, response.data[key]);
-            }
-            fd.append('file', file);
-
-            // Fire on network error.
-            xhr.onerror = function (err) {
-              err.networkError = true;
-              reject(err);
-            };
-
-            xhr.onload = function () {
-              if (xhr.status >= 200 && xhr.status < 300) {
-                resolve({
-                  storage: 's3',
-                  name: fileName,
-                  bucket: response.bucket,
-                  key: response.data.key,
-                  url: response.url + response.data.key,
-                  acl: response.data.acl,
-                  size: file.size,
-                  type: file.type
-                });
-              } else {
-                reject(xhr.response || 'Unable to upload file');
-              }
-            };
-
-            xhr.onabort = reject;
-
-            xhr.open('POST', response.url);
-
-            xhr.send(fd);
-          } else {
-            reject(pre.response || 'Unable to sign file');
-          }
-        };
-
-        pre.open('POST', formio.formUrl + '/storage/s3');
-
-        pre.setRequestHeader('Accept', 'application/json');
-        pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        var token = formio.getToken();
-        if (token) {
-          pre.setRequestHeader('x-jwt-token', token);
-        }
-
-        pre.send(JSON.stringify({
-          name: fileName,
-          size: file.size,
-          type: file.type
-        }));
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
-      } else {
-        return _nativePromiseOnly2.default.resolve(file);
-      }
-    }
-  };
-};
-
-s3.title = 'S3';
-exports.default = s3;
-},{"native-promise-only":198}],9:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var url = function url(formio) {
-  return {
-    title: 'Url',
-    name: 'url',
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback, url) {
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        var data = {
-          dir: dir,
-          name: fileName,
-          file: file
-        };
-
-        // Send the file with data.
-        var xhr = new XMLHttpRequest();
-
-        if (typeof progressCallback === 'function') {
-          xhr.upload.onprogress = progressCallback;
-        }
-
-        var fd = new FormData();
-        for (var key in data) {
-          fd.append(key, data[key]);
-        }
-
-        xhr.onload = function () {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            // Need to test if xhr.response is decoded or not.
-            var respData = {};
-            try {
-              respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
-              respData = respData && respData.data ? respData.data : respData;
-            } catch (err) {
-              respData = {};
-            }
-
-            var _url = respData.hasOwnProperty('url') ? respData.url : xhr.responseURL + '/' + fileName;
-            resolve({
-              storage: 'url',
-              name: fileName,
-              url: _url,
-              size: file.size,
-              type: file.type,
-              data: respData
-            });
-          } else {
-            reject(xhr.response || 'Unable to upload file');
-          }
-        };
-
-        // Fire on network error.
-        xhr.onerror = function () {
-          return reject(xhr);
-        };
-
-        xhr.onabort = function () {
-          return reject(xhr);
-        };
-
-        xhr.open('POST', url);
-        var token = formio.getToken();
-        if (token) {
-          xhr.setRequestHeader('x-jwt-token', token);
-        }
-        xhr.send(fd);
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      // Return the original as there is nothing to do.
-      return _nativePromiseOnly2.default.resolve(file);
-    }
-  };
-};
-
-url.title = 'Url';
-exports.default = url;
-},{"native-promise-only":198}],10:[function(_dereq_,module,exports){
-(function (global){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _utils = _dereq_('./utils');
-
-var FormioUtils = _interopRequireWildcard(_utils);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object') {
-  global.FormioUtils = FormioUtils;
-}
-exports.default = FormioUtils;
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./utils":12}],11:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-// Use only immutable useful functions from Lodash.
-// Visit https://lodash.com/docs for more info.
-var lodashOperators = exports.lodashOperators = [
-// Array
-'chunk', 'compact', 'concat', 'difference', 'differenceBy', 'differenceWith', 'drop', 'dropRight', 'dropRightWhile', 'dropWhile', 'findIndex', 'findLastIndex', 'first', 'flatten', 'flattenDeep', 'flattenDepth', 'fromPairs', 'head', 'indexOf', 'initial', 'intersection', 'intersectionBy', 'intersectionWith', 'join', 'last', 'lastIndexOf', 'nth', 'slice', 'sortedIndex', 'sortedIndexBy', 'sortedIndexOf', 'sortedLastIndex', 'sortedLastIndexBy', 'sortedLastIndexOf', 'sortedUniq', 'sortedUniqBy', 'tail', 'take', 'takeRight', 'takeRightWhile', 'takeWhile', 'union', 'unionBy', 'unionWith', 'uniq', 'uniqBy', 'uniqWith', 'unzip', 'unzipWith', 'without', 'xor', 'xorBy', 'xorWith', 'zip', 'zipObject', 'zipObjectDeep', 'zipWith',
-// Collection
-'countBy', 'every', 'filter', 'find', 'findLast', 'flatMap', 'flatMapDeep', 'flatMapDepth', 'groupBy', 'includes', 'invokeMap', 'keyBy', 'map', 'orderBy', 'partition', 'reduce', 'reduceRight', 'reject', 'sample', 'sampleSize', 'shuffle', 'size', 'some', 'sortBy',
-// Date
-'now',
-// Function
-'flip', 'negate', 'overArgs', 'partial', 'partialRight', 'rearg', 'rest', 'spread',
-// Lang
-'castArray', 'clone', 'cloneDeep', 'cloneDeepWith', 'cloneDeep', 'conformsTo', 'eq', 'gt', 'gte', 'isArguments', 'isArray', 'isArrayBuffer', 'isArrayLike', 'isArrayLikeObject', 'isBoolean', 'isBuffer', 'isDate', 'isElement', 'isEmpty', 'isEqual', 'isEqualWith', 'isError', 'isFinite', 'isFunction', 'isInteger', 'isLength', 'isMap', 'isMatch', 'isMatchWith', 'isNaN', 'isNative', 'isNil', 'isNull', 'isNumber', 'isObject', 'isObjectLike', 'isPlainObject', 'isRegExp', 'isSafeInteger', 'isSet', 'isString', 'isSymbol', 'isTypedArray', 'isUndefined', 'isWeakMap', 'isWeakSet', 'lt', 'lte', 'toArray', 'toFinite', 'toInteger', 'toLength', 'toNumber', 'toPlainObject', 'toSafeInteger', 'toString',
-// Math
-'add', 'ceil', 'divide', 'floor', 'max', 'maxBy', 'mean', 'meanBy', 'min', 'minBy', 'multiply', 'round', 'subtract', 'sum', 'sumBy',
-// Number
-'clamp', 'inRange', 'random',
-// Object
-'at', 'entries', 'entriesIn', 'findKey', 'findLastKey', 'functions', 'functionsIn', 'get', 'has', 'hasIn', 'invert', 'invertBy', 'invoke', 'keys', 'keysIn', 'mapKeys', 'mapValues', 'omit', 'omitBy', 'pick', 'pickBy', 'result', 'toPairs', 'toPairsIn', 'transform', 'values', 'valuesIn',
-// String
-'camelCase', 'capitalize', 'deburr', 'endsWith', 'escape', 'escapeRegExp', 'kebabCase', 'lowerCase', 'lowerFirst', 'pad', 'padEnd', 'padStart', 'parseInt', 'repeat', 'replace', 'snakeCase', 'split', 'startCase', 'startsWith', 'toLower', 'toUpper', 'trim', 'trimEnd', 'trimStart', 'truncate', 'unescape', 'upperCase', 'upperFirst', 'words',
-// Util
-'cond', 'conforms', 'constant', 'defaultTo', 'flow', 'flowRight', 'identity', 'iteratee', 'matches', 'matchesProperty', 'method', 'methodOf', 'nthArg', 'over', 'overEvery', 'overSome', 'property', 'propertyOf', 'range', 'rangeRight', 'stubArray', 'stubFalse', 'stubObject', 'stubString', 'stubTrue', 'times', 'toPath', 'uniqueId'];
-},{}],12:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.jsonLogic = undefined;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-exports.evaluate = evaluate;
-exports.getRandomComponentId = getRandomComponentId;
-exports.getPropertyValue = getPropertyValue;
-exports.getElementRect = getElementRect;
-exports.boolValue = boolValue;
-exports.isMongoId = isMongoId;
-exports.isLayoutComponent = isLayoutComponent;
-exports.eachComponent = eachComponent;
-exports.matchComponent = matchComponent;
-exports.getComponent = getComponent;
-exports.findComponents = findComponents;
-exports.flattenComponents = flattenComponents;
-exports.hasCondition = hasCondition;
-exports.parseFloatExt = parseFloatExt;
-exports.formatAsCurrency = formatAsCurrency;
-exports.escapeRegExCharacters = escapeRegExCharacters;
-exports.checkCalculated = checkCalculated;
-exports.checkSimpleConditional = checkSimpleConditional;
-exports.checkCustomConditional = checkCustomConditional;
-exports.checkJsonConditional = checkJsonConditional;
-exports.checkCondition = checkCondition;
-exports.checkTrigger = checkTrigger;
-exports.setActionProperty = setActionProperty;
-exports.getValue = getValue;
-exports.interpolate = interpolate;
-exports.uniqueName = uniqueName;
-exports.guid = guid;
-exports.getDateSetting = getDateSetting;
-exports.isValidDate = isValidDate;
-exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
-exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
-exports.convertFormatToMoment = convertFormatToMoment;
-exports.getInputMask = getInputMask;
-exports.matchInputMask = matchInputMask;
-exports.getNumberSeparators = getNumberSeparators;
-exports.getNumberDecimalLimit = getNumberDecimalLimit;
-exports.getCurrencyAffixes = getCurrencyAffixes;
-exports.fieldData = fieldData;
-
-var _lodash = _dereq_('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
-
-var _jsonLogicJs = _dereq_('json-logic-js');
-
-var _jsonLogicJs2 = _interopRequireDefault(_jsonLogicJs);
-
-var _moment = _dereq_('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
-
-var _operators = _dereq_('./jsonlogic/operators');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-// Configure JsonLogic
-_operators.lodashOperators.forEach(function (name) {
-  return _jsonLogicJs2.default.add_operation('_' + name, _lodash2.default[name]);
-});
-
-// Retrieve Any Date
-_jsonLogicJs2.default.add_operation('getDate', function (date) {
-  return (0, _moment2.default)(date).toISOString();
-});
-
-// Set Relative Minimum Date
-_jsonLogicJs2.default.add_operation('relativeMinDate', function (relativeMinDate) {
-  return (0, _moment2.default)().subtract(relativeMinDate, 'days').toISOString();
-});
-
-// Set Relative Maximum Date
-_jsonLogicJs2.default.add_operation('relativeMaxDate', function (relativeMaxDate) {
-  return (0, _moment2.default)().add(relativeMaxDate, 'days').toISOString();
-});
-
-exports.jsonLogic = _jsonLogicJs2.default;
-
-/**
- * Evaluate a method.
- *
- * @param func
- * @param args
- * @return {*}
- */
-
-function evaluate(func, args, ret, tokenize) {
-  var returnVal = null;
-  var component = args.component ? args.component : { key: 'unknown' };
-  if (!args.form && args.instance) {
-    args.form = _lodash2.default.get(args.instance, 'root._form', {});
-  }
-  if (typeof func === 'string') {
-    if (ret) {
-      func += ';return ' + ret;
-    }
-    var params = _lodash2.default.keys(args);
-
-    if (tokenize) {
-      // Replace all {{ }} references with actual data.
-      func = func.replace(/({{\s+(.*)\s+}})/, function (match, $1, $2) {
-        if ($2.indexOf('data.') === 0) {
-          return _lodash2.default.get(args.data, $2.replace('data.', ''));
-        } else if ($2.indexOf('row.') === 0) {
-          return _lodash2.default.get(args.row, $2.replace('row.', ''));
-        }
-
-        // Support legacy...
-        return _lodash2.default.get(args.data, $2);
-      });
-    }
-
-    try {
-      func = new (Function.prototype.bind.apply(Function, [null].concat(_toConsumableArray(params), [func])))();
-    } catch (err) {
-      console.warn('An error occured within the custom function for ' + component.key, err);
-      returnVal = null;
-      func = false;
-    }
-  }
-  if (typeof func === 'function') {
-    var values = _lodash2.default.values(args);
-    try {
-      returnVal = func.apply(undefined, _toConsumableArray(values));
-    } catch (err) {
-      returnVal = null;
-      console.warn('An error occured within custom function for ' + component.key, err);
-    }
-  } else if ((typeof func === 'undefined' ? 'undefined' : _typeof(func)) === 'object') {
-    try {
-      returnVal = _jsonLogicJs2.default.apply(func, args);
-    } catch (err) {
-      returnVal = null;
-      console.warn('An error occured within custom function for ' + component.key, err);
-    }
-  } else if (func) {
-    console.warn('Unknown function type for ' + component.key);
-  }
-  return returnVal;
-}
-
-function getRandomComponentId() {
-  return 'e' + Math.random().toString(36).substring(7);
-}
-
-/**
- * Get a property value of an element.
- *
- * @param style
- * @param prop
- * @return {number}
- */
-function getPropertyValue(style, prop) {
-  var value = style.getPropertyValue(prop);
-  value = value ? value.replace(/[^0-9.]/g, '') : '0';
-  return parseFloat(value);
-}
-
-/**
- * Get an elements bounding rectagle.
- *
- * @param element
- * @return {{x: string, y: string, width: string, height: string}}
- */
-function getElementRect(element) {
-  var style = window.getComputedStyle(element, null);
-  return {
-    x: getPropertyValue(style, 'left'),
-    y: getPropertyValue(style, 'top'),
-    width: getPropertyValue(style, 'width'),
-    height: getPropertyValue(style, 'height')
-  };
-}
-
-/**
- * Determines the boolean value of a setting.
- *
- * @param value
- * @return {boolean}
- */
-function boolValue(value) {
-  if (_lodash2.default.isBoolean(value)) {
-    return value;
-  } else if (_lodash2.default.isString(value)) {
-    return value.toLowerCase() === 'true';
-  } else {
-    return !!value;
-  }
-}
-
-/**
- * Check to see if an ID is a mongoID.
- * @param text
- * @return {Array|{index: number, input: string}|Boolean|*}
- */
-function isMongoId(text) {
-  return text.toString().match(/^[0-9a-fA-F]{24}$/);
-}
-
-/**
- * Determine if a component is a layout component or not.
- *
- * @param {Object} component
- *   The component to check.
- *
- * @returns {Boolean}
- *   Whether or not the component is a layout component.
- */
-function isLayoutComponent(component) {
-  return Boolean(component.columns && Array.isArray(component.columns) || component.rows && Array.isArray(component.rows) || component.components && Array.isArray(component.components));
-}
-
-/**
- * Iterate through each component within a form.
- *
- * @param {Object} components
- *   The components to iterate.
- * @param {Function} fn
- *   The iteration function to invoke for each component.
- * @param {Boolean} includeAll
- *   Whether or not to include layout components.
- * @param {String} path
- *   The current data path of the element. Example: data.user.firstName
- * @param {Object} parent
- *   The parent object.
- */
-function eachComponent(components, fn, includeAll, path, parent) {
-  if (!components) return;
-  path = path || '';
-  components.forEach(function (component) {
-    var hasColumns = component.columns && Array.isArray(component.columns);
-    var hasRows = component.rows && Array.isArray(component.rows);
-    var hasComps = component.components && Array.isArray(component.components);
-    var noRecurse = false;
-    var newPath = component.key ? path ? path + '.' + component.key : component.key : '';
-
-    // Keep track of parent references.
-    if (parent) {
-      // Ensure we don't create infinite JSON structures.
-      component.parent = _lodash2.default.clone(parent);
-      delete component.parent.components;
-      delete component.parent.componentMap;
-      delete component.parent.columns;
-      delete component.parent.rows;
-    }
-
-    if (includeAll || component.tree || !hasColumns && !hasRows && !hasComps) {
-      noRecurse = fn(component, newPath);
-    }
-
-    var subPath = function subPath() {
-      if (component.key && (['datagrid', 'container', 'editgrid'].indexOf(component.type) !== -1 || component.tree)) {
-        return newPath;
-      } else if (component.key && component.type === 'form') {
-        return newPath + '.data';
-      }
-      return path;
-    };
-
-    if (!noRecurse) {
-      if (hasColumns) {
-        component.columns.forEach(function (column) {
-          return eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
-        });
-      } else if (hasRows) {
-        component.rows.forEach(function (row) {
-          if (Array.isArray(row)) {
-            row.forEach(function (column) {
-              return eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
-            });
-          }
-        });
-      } else if (hasComps) {
-        eachComponent(component.components, fn, includeAll, subPath(), parent ? component : null);
-      }
-    }
-  });
-}
-
-/**
- * Matches if a component matches the query.
- *
- * @param component
- * @param query
- * @return {boolean}
- */
-function matchComponent(component, query) {
-  if (_lodash2.default.isString(query)) {
-    return component.key === query;
-  } else {
-    var matches = false;
-    _lodash2.default.forOwn(query, function (value, key) {
-      matches = _lodash2.default.get(component, key) === value;
-      if (!matches) {
-        return false;
-      }
-    });
-    return matches;
-  }
-}
-
-/**
- * Get a component by its key
- *
- * @param {Object} components
- *   The components to iterate.
- * @param {String|Object} key
- *   The key of the component to get, or a query of the component to search.
- *
- * @returns {Object}
- *   The component that matches the given key, or undefined if not found.
- */
-function getComponent(components, key, includeAll) {
-  var result = void 0;
-  eachComponent(components, function (component, path) {
-    if (matchComponent(component, key)) {
-      component.path = path;
-      result = component;
-      return true;
-    }
-  }, includeAll);
-  return result;
-}
-
-/**
- * Finds a component provided a query of properties of that component.
- *
- * @param components
- * @param query
- * @return {*}
- */
-function findComponents(components, query) {
-  var results = [];
-  eachComponent(components, function (component, path) {
-    if (matchComponent(component, query)) {
-      component.path = path;
-      results.push(component);
-    }
-  }, true);
-  return results;
-}
-
-/**
- * Flatten the form components for data manipulation.
- *
- * @param {Object} components
- *   The components to iterate.
- * @param {Boolean} includeAll
- *   Whether or not to include layout components.
- *
- * @returns {Object}
- *   The flattened components map.
- */
-function flattenComponents(components, includeAll) {
-  var flattened = {};
-  eachComponent(components, function (component, path) {
-    flattened[path] = component;
-  }, includeAll);
-  return flattened;
-}
-
-/**
- * Returns if this component has a conditional statement.
- *
- * @param component - The component JSON schema.
- *
- * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
- */
-function hasCondition(component) {
-  return Boolean(component.customConditional || component.conditional && component.conditional.when || component.conditional && component.conditional.json);
-}
-
-/**
- * Extension of standard #parseFloat(value) function, that also clears input string.
- *
- * @param {any} value
- *   The value to parse.
- *
- * @returns {Number}
- *   Parsed value.
- */
-function parseFloatExt(value) {
-  return parseFloat(_lodash2.default.isString(value) ? value.replace(/[^\de.+-]/gi, '') : value);
-}
-
-/**
- * Formats provided value in way how Currency component uses it.
- *
- * @param {any} value
- *   The value to format.
- *
- * @returns {String}
- *   Value formatted for Currency component.
- */
-function formatAsCurrency(value) {
-  var parsedValue = parseFloatExt(value);
-
-  if (_lodash2.default.isNaN(parsedValue)) {
-    return '';
-  }
-
-  var parts = _lodash2.default.round(parsedValue, 2).toString().split('.');
-  parts[0] = _lodash2.default.chunk(Array.from(parts[0]).reverse(), 3).reverse().map(function (part) {
-    return part.reverse().join('');
-  }).join(',');
-  parts[1] = _lodash2.default.pad(parts[1], 2, '0');
-  return parts.join('.');
-}
-
-/**
- * Escapes RegEx characters in provided String value.
- *
- * @param {String} value
- *   String for escaping RegEx characters.
- * @returns {string}
- *   String with escaped RegEx characters.
- */
-function escapeRegExCharacters(value) {
-  return value.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
-}
-
-/**
- * Checks the calculated value for a provided component and data.
- *
- * @param {Object} component
- *   The component to check for the calculated value.
- * @param {Object} submission
- *   A submission object.
- * @param data
- *   The full submission data.
- */
-function checkCalculated(component, submission, rowData) {
-  // Process calculated value stuff if present.
-  if (component.calculateValue) {
-    _lodash2.default.set(rowData, component.key, evaluate(component.calculateValue, {
-      value: undefined,
-      data: submission ? submission.data : rowData,
-      row: rowData,
-      util: this,
-      component: component
-    }, 'value'));
-  }
-}
-
-/**
- * Check if a simple conditional evaluates to true.
- *
- * @param condition
- * @param condition
- * @param row
- * @param data
- * @returns {boolean}
- */
-function checkSimpleConditional(component, condition, row, data) {
-  var value = null;
-  if (row) {
-    value = getValue({ data: row }, condition.when);
-  }
-  if (data && _lodash2.default.isNil(value)) {
-    value = getValue({ data: data }, condition.when);
-  }
-  // FOR-400 - Fix issue where falsey values were being evaluated as show=true
-  if (_lodash2.default.isNil(value)) {
-    value = '';
-  }
-  // Special check for selectboxes component.
-  if (_lodash2.default.isObject(value) && _lodash2.default.has(value, condition.eq)) {
-    return value[condition.eq].toString() === condition.show.toString();
-  }
-  // FOR-179 - Check for multiple values.
-  if (Array.isArray(value) && value.indexOf(condition.eq) !== -1) {
-    return condition.show.toString() === 'true';
-  }
-
-  return value.toString() === condition.eq.toString() === (condition.show.toString() === 'true');
-}
-
-/**
- * Check custom javascript conditional.
- *
- * @param component
- * @param custom
- * @param row
- * @param data
- * @returns {*}
- */
-function checkCustomConditional(component, custom, row, data, form, variable, onError, instance) {
-  if (typeof custom === 'string') {
-    custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
-  }
-  var value = instance && instance.evaluate ? instance.evaluate(custom, { row: row, data: data, form: form }) : evaluate(custom, { row: row, data: data, form: form });
-  if (value === null) {
-    return onError;
-  }
-  return value;
-}
-
-function checkJsonConditional(component, json, row, data, form, onError) {
-  try {
-    return _jsonLogicJs2.default.apply(json, {
-      data: data,
-      row: row,
-      form: form,
-      _: _lodash2.default
-    });
-  } catch (err) {
-    console.warn('An error occurred in jsonLogic advanced condition for ' + component.key, err);
-    return onError;
-  }
-}
-
-/**
- * Checks the conditions for a provided component and data.
- *
- * @param component
- *   The component to check for the condition.
- * @param row
- *   The data within a row
- * @param data
- *   The full submission data.
- *
- * @returns {boolean}
- */
-function checkCondition(component, row, data, form, instance) {
-  if (component.customConditional) {
-    return checkCustomConditional(component, component.customConditional, row, data, form, 'show', true, instance);
-  } else if (component.conditional && component.conditional.when) {
-    return checkSimpleConditional(component, component.conditional, row, data, true);
-  } else if (component.conditional && component.conditional.json) {
-    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
-  }
-
-  // Default to show.
-  return true;
-}
-
-/**
- * Test a trigger on a component.
- *
- * @param component
- * @param action
- * @param data
- * @param row
- * @returns {mixed}
- */
-function checkTrigger(component, trigger, row, data, form, instance) {
-  switch (trigger.type) {
-    case 'simple':
-      return checkSimpleConditional(component, trigger.simple, row, data);
-    case 'javascript':
-      return checkCustomConditional(component, trigger.javascript, row, data, form, 'result', false, instance);
-    case 'json':
-      return checkJsonConditional(component, trigger.json, row, data, form, false);
-  }
-  // If none of the types matched, don't fire the trigger.
-  return false;
-}
-
-function setActionProperty(component, action, row, data, result, instance) {
-  switch (action.property.type) {
-    case 'boolean':
-      if (_lodash2.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
-        _lodash2.default.set(component, action.property.value, action.state.toString() === 'true');
-      }
-      break;
-    case 'string':
-      {
-        var evalData = {
-          data: data,
-          row: row,
-          component: component,
-          result: result
-        };
-        var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
-        if (newValue !== _lodash2.default.get(component, action.property.value, '')) {
-          _lodash2.default.set(component, action.property.value, newValue);
-        }
-        break;
-      }
-  }
-  return component;
-}
-
-/**
- * Get the value for a component key, in the given submission.
- *
- * @param {Object} submission
- *   A submission object to search.
- * @param {String} key
- *   A for components API key to search for.
- */
-function getValue(submission, key) {
-  var search = function search(data) {
-    if (_lodash2.default.isPlainObject(data)) {
-      if (_lodash2.default.has(data, key)) {
-        return data[key];
-      }
-
-      var value = null;
-
-      _lodash2.default.forOwn(data, function (prop) {
-        var result = search(prop);
-        if (!_lodash2.default.isNil(result)) {
-          value = result;
-          return false;
-        }
-      });
-
-      return value;
-    } else {
-      return null;
-    }
-  };
-
-  return search(submission.data);
-}
-
-/**
- * Interpolate a string and add data replacements.
- *
- * @param string
- * @param data
- * @returns {XML|string|*|void}
- */
-function interpolate(string, data) {
-  var templateSettings = {
-    evaluate: /\{%(.+?)%\}/g,
-    interpolate: /\{\{(.+?)\}\}/g,
-    escape: /\{\{\{(.+?)\}\}\}/g
-  };
-  try {
-    return _lodash2.default.template(string, templateSettings)(data);
-  } catch (err) {
-    console.warn('Error interpolating template', err, string, data);
-  }
-}
-
-/**
- * Make a filename guaranteed to be unique.
- * @param name
- * @returns {string}
- */
-function uniqueName(name) {
-  var parts = name.toLowerCase().replace(/[^0-9a-z.]/g, '').split('.');
-  var fileName = parts[0];
-  var ext = parts.length > 1 ? '.' + _lodash2.default.last(parts) : '';
-  return fileName.substr(0, 10) + '-' + guid() + ext;
-}
-
-function guid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0;
-    var v = c === 'x' ? r : r & 0x3 | 0x8;
-    return v.toString(16);
-  });
-}
-
-/**
- * Return a translated date setting.
- *
- * @param date
- * @return {*}
- */
-function getDateSetting(date) {
-  if (_lodash2.default.isNil(date) || _lodash2.default.isNaN(date) || date === '') {
-    return null;
-  }
-
-  if (date instanceof Date) {
-    return date;
-  } else if (typeof date.toDate === 'function') {
-    return date.isValid() ? date.toDate() : null;
-  }
-
-  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _moment2.default)(date) : null;
-  if (dateSetting && dateSetting.isValid()) {
-    return dateSetting.toDate();
-  }
-
-  dateSetting = null;
-  try {
-    var value = new Function('moment', 'return ' + date + ';')(_moment2.default);
-    if (typeof value === 'string') {
-      dateSetting = (0, _moment2.default)(value);
-    } else if (typeof value.toDate === 'function') {
-      dateSetting = (0, _moment2.default)(value.toDate().toUTCString());
-    } else if (value instanceof Date) {
-      dateSetting = (0, _moment2.default)(value);
-    }
-  } catch (e) {
-    return null;
-  }
-
-  if (!dateSetting) {
-    return null;
-  }
-
-  // Ensure this is a date.
-  if (!dateSetting.isValid()) {
-    return null;
-  }
-
-  return dateSetting.toDate();
-}
-
-function isValidDate(date) {
-  return _lodash2.default.isDate(date) && !_lodash2.default.isNaN(date.getDate());
-}
-
-function getLocaleDateFormatInfo(locale) {
-  var formatInfo = {};
-
-  var day = 21;
-  var exampleDate = new Date(2017, 11, day);
-  var localDateString = exampleDate.toLocaleDateString(locale);
-
-  formatInfo.dayFirst = localDateString.slice(0, 2) === day.toString();
-
-  return formatInfo;
-}
-
-/**
- * Convert the format from the angular-datepicker module to flatpickr format.
- * @param format
- * @return {string}
- */
-function convertFormatToFlatpickr(format) {
-  return format
-  // Year conversion.
-  .replace(/y/g, 'Y').replace('YYYY', 'Y').replace('YY', 'y')
-
-  // Month conversion.
-  .replace('MMMM', 'F').replace(/M/g, 'n').replace('nnn', 'M').replace('nn', 'm')
-
-  // Day in month.
-  .replace(/d/g, 'j').replace('jj', 'd')
-
-  // Day in week.
-  .replace('EEEE', 'l').replace('EEE', 'D')
-
-  // Hours, minutes, seconds
-  .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
-}
-
-/**
- * Convert the format from the angular-datepicker module to moment format.
- * @param format
- * @return {string}
- */
-function convertFormatToMoment(format) {
-  return format
-  // Year conversion.
-  .replace(/y/g, 'Y')
-  // Day in month.
-  .replace(/d/g, 'D')
-  // Day in week.
-  .replace(/E/g, 'd')
-  // AM/PM marker
-  .replace(/a/g, 'A');
-}
-
-/**
- * Returns an input mask that is compatible with the input mask library.
- * @param {string} mask - The Form.io input mask.
- * @returns {Array} - The input mask for the mask library.
- */
-function getInputMask(mask) {
-  if (mask instanceof Array) {
-    return mask;
-  }
-  var maskArray = [];
-  maskArray.numeric = true;
-  for (var i = 0; i < mask.length; i++) {
-    switch (mask[i]) {
-      case '9':
-        maskArray.push(/\d/);
-        break;
-      case 'A':
-        maskArray.numeric = false;
-        maskArray.push(/[a-zA-Z]/);
-        break;
-      case 'a':
-        maskArray.numeric = false;
-        maskArray.push(/[a-z]/);
-        break;
-      case '*':
-        maskArray.numeric = false;
-        maskArray.push(/[a-zA-Z0-9]/);
-        break;
-      default:
-        maskArray.push(mask[i]);
-        break;
-    }
-  }
-  return maskArray;
-}
-
-function matchInputMask(value, inputMask) {
-  if (!inputMask) {
-    return true;
-  }
-  for (var i = 0; i < inputMask.length; i++) {
-    var char = value[i];
-    var charPart = inputMask[i];
-
-    if (!(_lodash2.default.isRegExp(charPart) && charPart.test(char) || charPart === char)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function getNumberSeparators() {
-  var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
-
-  var formattedNumberString = 12345.6789.toLocaleString(lang);
-  return {
-    delimiter: formattedNumberString.match(/12(.*)345/)[1],
-    decimalSeparator: formattedNumberString.match(/345(.*)67/)[1]
-  };
-}
-
-function getNumberDecimalLimit(component) {
-  // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
-  var decimalLimit = 20;
-  var step = _lodash2.default.get(component, 'validate.step', 'any');
-
-  if (step !== 'any') {
-    var parts = step.toString().split('.');
-    if (parts.length > 1) {
-      decimalLimit = parts[1].length;
-    }
-  }
-
-  return decimalLimit;
-}
-
-function getCurrencyAffixes(_ref) {
-  var _ref$currency = _ref.currency,
-      currency = _ref$currency === undefined ? 'USD' : _ref$currency,
-      decimalLimit = _ref.decimalLimit,
-      decimalSeparator = _ref.decimalSeparator,
-      lang = _ref.lang;
-
-  // Get the prefix and suffix from the localized string.
-  var regex = '(.*)?100';
-  if (decimalLimit) {
-    regex += (decimalSeparator === '.' ? '\\.' : decimalSeparator) + '0{' + decimalLimit + '}';
-  }
-  regex += '(.*)?';
-  var parts = 100 .toLocaleString(lang, {
-    style: 'currency',
-    currency: currency,
-    useGrouping: true,
-    maximumFractionDigits: decimalLimit,
-    minimumFractionDigits: decimalLimit
-  }).replace('.', decimalSeparator).match(new RegExp(regex));
-  return {
-    prefix: parts[1] || '',
-    suffix: parts[2] || ''
-  };
-}
-
-/**
- * Fetch the field data provided a component.
- *
- * @param data
- * @param component
- * @return {*}
- */
-function fieldData(data, component) {
-  if (!data) {
-    return '';
-  }
-  if (!component || !component.key) {
-    return data;
-  }
-  if (component.key.indexOf('.') !== -1) {
-    var value = data;
-    var parts = component.key.split('.');
-    var key = '';
-    for (var i = 0; i < parts.length; i++) {
-      key = parts[i];
-
-      // Handle nested resources
-      if (value.hasOwnProperty('_id')) {
-        value = value.data;
-      }
-
-      // Return if the key is not found on the value.
-      if (!value.hasOwnProperty(key)) {
-        return;
-      }
-
-      // Convert old single field data in submissions to multiple
-      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
-        value[key] = [value[key]];
-      }
-
-      // Set the value of this key.
-      value = value[key];
-    }
-    return value;
-  } else {
-    // Convert old single field data in submissions to multiple
-    if (component.multiple && !Array.isArray(data[component.key])) {
-      data[component.key] = [data[component.key]];
-    }
-    return data[component.key];
-  }
-}
-},{"./jsonlogic/operators":11,"json-logic-js":13,"lodash":186,"moment":197}],13:[function(_dereq_,module,exports){
-/* globals define,module */
-/*
-Using a Universal Module Loader that should be browser, require, and AMD friendly
-http://ricostacruz.com/cheatsheets/umdjs.html
-*/
-;(function(root, factory) {
-  if (typeof define === "function" && define.amd) {
-    define(factory);
-  } else if (typeof exports === "object") {
-    module.exports = factory();
-  } else {
-    root.jsonLogic = factory();
-  }
-}(this, function() {
-  "use strict";
-  /* globals console:false */
-
-  if ( ! Array.isArray) {
-    Array.isArray = function(arg) {
-      return Object.prototype.toString.call(arg) === "[object Array]";
-    };
-  }
-
-  /**
-   * Return an array that contains no duplicates (original not modified)
-   * @param  {array} array   Original reference array
-   * @return {array}         New array with no duplicates
-   */
-  function arrayUnique(array) {
-    var a = [];
-    for (var i=0, l=array.length; i<l; i++) {
-      if (a.indexOf(array[i]) === -1) {
-        a.push(array[i]);
-      }
-    }
-    return a;
-  }
-
-  var jsonLogic = {};
-  var operations = {
-    "==": function(a, b) {
-      return a == b;
-    },
-    "===": function(a, b) {
-      return a === b;
-    },
-    "!=": function(a, b) {
-      return a != b;
-    },
-    "!==": function(a, b) {
-      return a !== b;
-    },
-    ">": function(a, b) {
-      return a > b;
-    },
-    ">=": function(a, b) {
-      return a >= b;
-    },
-    "<": function(a, b, c) {
-      return (c === undefined) ? a < b : (a < b) && (b < c);
-    },
-    "<=": function(a, b, c) {
-      return (c === undefined) ? a <= b : (a <= b) && (b <= c);
-    },
-    "!!": function(a) {
-      return jsonLogic.truthy(a);
-    },
-    "!": function(a) {
-      return !jsonLogic.truthy(a);
-    },
-    "%": function(a, b) {
-      return a % b;
-    },
-    "log": function(a) {
-      console.log(a); return a;
-    },
-    "in": function(a, b) {
-      if(!b || typeof b.indexOf === "undefined") return false;
-      return (b.indexOf(a) !== -1);
-    },
-    "cat": function() {
-      return Array.prototype.join.call(arguments, "");
-    },
-    "substr":function(source, start, end) {
-      if(end < 0){
-        // JavaScript doesn't support negative end, this emulates PHP behavior
-        var temp = String(source).substr(start);
-        return temp.substr(0, temp.length + end);
-      }
-      return String(source).substr(start, end);
-    },
-    "+": function() {
-      return Array.prototype.reduce.call(arguments, function(a, b) {
-        return parseFloat(a, 10) + parseFloat(b, 10);
-      }, 0);
-    },
-    "*": function() {
-      return Array.prototype.reduce.call(arguments, function(a, b) {
-        return parseFloat(a, 10) * parseFloat(b, 10);
-      });
-    },
-    "-": function(a, b) {
-      if(b === undefined) {
-        return -a;
-      }else{
-        return a - b;
-      }
-    },
-    "/": function(a, b) {
-      return a / b;
-    },
-    "min": function() {
-      return Math.min.apply(this, arguments);
-    },
-    "max": function() {
-      return Math.max.apply(this, arguments);
-    },
-    "merge": function() {
-      return Array.prototype.reduce.call(arguments, function(a, b) {
-        return a.concat(b);
-      }, []);
-    },
-    "var": function(a, b) {
-      var not_found = (b === undefined) ? null : b;
-      var data = this;
-      if(typeof a === "undefined" || a==="" || a===null) {
-        return data;
-      }
-      var sub_props = String(a).split(".");
-      for(var i = 0; i < sub_props.length; i++) {
-        if(data === null) {
-          return not_found;
-        }
-        // Descending into data
-        data = data[sub_props[i]];
-        if(data === undefined) {
-          return not_found;
-        }
-      }
-      return data;
-    },
-    "missing": function() {
-      /*
-      Missing can receive many keys as many arguments, like {"missing:[1,2]}
-      Missing can also receive *one* argument that is an array of keys,
-      which typically happens if it's actually acting on the output of another command
-      (like 'if' or 'merge')
-      */
-
-      var missing = [];
-      var keys = Array.isArray(arguments[0]) ? arguments[0] : arguments;
-
-      for(var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        var value = jsonLogic.apply({"var": key}, this);
-        if(value === null || value === "") {
-          missing.push(key);
-        }
-      }
-
-      return missing;
-    },
-    "missing_some": function(need_count, options) {
-      // missing_some takes two arguments, how many (minimum) items must be present, and an array of keys (just like 'missing') to check for presence.
-      var are_missing = jsonLogic.apply({"missing": options}, this);
-
-      if(options.length - are_missing.length >= need_count) {
-        return [];
-      }else{
-        return are_missing;
-      }
-    },
-    "method": function(obj, method, args) {
-      return obj[method].apply(obj, args);
-    },
-
-  };
-
-  jsonLogic.is_logic = function(logic) {
-    return (
-      typeof logic === "object" && // An object
-      logic !== null && // but not null
-      ! Array.isArray(logic) && // and not an array
-      Object.keys(logic).length === 1 // with exactly one key
-    );
-  };
-
-  /*
-  This helper will defer to the JsonLogic spec as a tie-breaker when different language interpreters define different behavior for the truthiness of primitives.  E.g., PHP considers empty arrays to be falsy, but Javascript considers them to be truthy. JsonLogic, as an ecosystem, needs one consistent answer.
-
-  Spec and rationale here: http://jsonlogic.com/truthy
-  */
-  jsonLogic.truthy = function(value) {
-    if(Array.isArray(value) && value.length === 0) {
-      return false;
-    }
-    return !! value;
-  };
-
-
-  jsonLogic.get_operator = function(logic) {
-    return Object.keys(logic)[0];
-  };
-
-  jsonLogic.get_values = function(logic) {
-    return logic[jsonLogic.get_operator(logic)];
-  };
-
-  jsonLogic.apply = function(logic, data) {
-    // Does this array contain logic? Only one way to find out.
-    if(Array.isArray(logic)) {
-      return logic.map(function(l) {
-        return jsonLogic.apply(l, data);
-      });
-    }
-    // You've recursed to a primitive, stop!
-    if( ! jsonLogic.is_logic(logic) ) {
-      return logic;
-    }
-
-    data = data || {};
-
-    var op = jsonLogic.get_operator(logic);
-    var values = logic[op];
-    var i;
-    var current;
-    var scopedLogic, scopedData, filtered, initial;
-
-    // easy syntax for unary operators, like {"var" : "x"} instead of strict {"var" : ["x"]}
-    if( ! Array.isArray(values)) {
-      values = [values];
-    }
-
-    // 'if', 'and', and 'or' violate the normal rule of depth-first calculating consequents, let each manage recursion as needed.
-    if(op === "if" || op == "?:") {
-      /* 'if' should be called with a odd number of parameters, 3 or greater
-      This works on the pattern:
-      if( 0 ){ 1 }else{ 2 };
-      if( 0 ){ 1 }else if( 2 ){ 3 }else{ 4 };
-      if( 0 ){ 1 }else if( 2 ){ 3 }else if( 4 ){ 5 }else{ 6 };
-
-      The implementation is:
-      For pairs of values (0,1 then 2,3 then 4,5 etc)
-      If the first evaluates truthy, evaluate and return the second
-      If the first evaluates falsy, jump to the next pair (e.g, 0,1 to 2,3)
-      given one parameter, evaluate and return it. (it's an Else and all the If/ElseIf were false)
-      given 0 parameters, return NULL (not great practice, but there was no Else)
-      */
-      for(i = 0; i < values.length - 1; i += 2) {
-        if( jsonLogic.truthy( jsonLogic.apply(values[i], data) ) ) {
-          return jsonLogic.apply(values[i+1], data);
-        }
-      }
-      if(values.length === i+1) return jsonLogic.apply(values[i], data);
-      return null;
-    }else if(op === "and") { // Return first falsy, or last
-      for(i=0; i < values.length; i+=1) {
-        current = jsonLogic.apply(values[i], data);
-        if( ! jsonLogic.truthy(current)) {
-          return current;
-        }
-      }
-      return current; // Last
-    }else if(op === "or") {// Return first truthy, or last
-      for(i=0; i < values.length; i+=1) {
-        current = jsonLogic.apply(values[i], data);
-        if( jsonLogic.truthy(current) ) {
-          return current;
-        }
-      }
-      return current; // Last
-
-
-
-
-    }else if(op === 'filter'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-
-      if ( ! Array.isArray(scopedData)) {
-          return [];
-      }
-      // Return only the elements from the array in the first argument,
-      // that return truthy when passed to the logic in the second argument.
-      // For parity with JavaScript, reindex the returned array
-      return scopedData.filter(function(datum){
-          return jsonLogic.truthy( jsonLogic.apply(scopedLogic, datum));
-      });
-  }else if(op === 'map'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-
-      if ( ! Array.isArray(scopedData)) {
-          return [];
-      }
-
-      return scopedData.map(function(datum){
-          return jsonLogic.apply(scopedLogic, datum);
-      });
-
-  }else if(op === 'reduce'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-      initial = typeof values[2] !== 'undefined' ? values[2] : null;
-
-      if ( ! Array.isArray(scopedData)) {
-          return initial;
-      }
-
-      return scopedData.reduce(
-          function(accumulator, current){
-              return jsonLogic.apply(
-                  scopedLogic,
-                  {'current':current, 'accumulator':accumulator}
-              );
-          },
-          initial
-      );
-
-    }else if(op === "all") {
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-      // All of an empty set is false. Note, some and none have correct fallback after the for loop
-      if( ! scopedData.length) {
-        return false;
-      }
-      for(i=0; i < scopedData.length; i+=1) {
-        if( ! jsonLogic.truthy( jsonLogic.apply(scopedLogic, scopedData[i]) )) {
-          return false; // First falsy, short circuit
-        }
-      }
-      return true; // All were truthy
-    }else if(op === "none") {
-      filtered = jsonLogic.apply({'filter' : values}, data);
-      return filtered.length === 0;
-
-    }else if(op === "some") {
-      filtered = jsonLogic.apply({'filter' : values}, data);
-      return filtered.length > 0;
-    }
-
-    // Everyone else gets immediate depth-first recursion
-    values = values.map(function(val) {
-      return jsonLogic.apply(val, data);
-    });
-
-
-    // The operation is called with "data" bound to its "this" and "values" passed as arguments.
-    // Structured commands like % or > can name formal arguments while flexible commands (like missing or merge) can operate on the pseudo-array arguments
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
-    if(typeof operations[op] === "function") {
-      return operations[op].apply(data, values);
-    }else if(op.indexOf(".") > 0) { // Contains a dot, and not in the 0th position
-      var sub_ops = String(op).split(".");
-      var operation = operations;
-      for(i = 0; i < sub_ops.length; i++) {
-        // Descending into operations
-        operation = operation[sub_ops[i]];
-        if(operation === undefined) {
-          throw new Error("Unrecognized operation " + op +
-          " (failed at " + sub_ops.slice(0, i+1).join(".") + ")");
-        }
-      }
-
-      return operation.apply(data, values);
-    }
-
-    throw new Error("Unrecognized operation " + op );
-  };
-
-  jsonLogic.uses_data = function(logic) {
-    var collection = [];
-
-    if( jsonLogic.is_logic(logic) ) {
-      var op = jsonLogic.get_operator(logic);
-      var values = logic[op];
-
-      if( ! Array.isArray(values)) {
-        values = [values];
-      }
-
-      if(op === "var") {
-        // This doesn't cover the case where the arg to var is itself a rule.
-        collection.push(values[0]);
-      }else{
-        // Recursion!
-        values.map(function(val) {
-          collection.push.apply(collection, jsonLogic.uses_data(val) );
-        });
-      }
-    }
-
-    return arrayUnique(collection);
-  };
-
-  jsonLogic.add_operation = function(name, code) {
-    operations[name] = code;
-  };
-
-  jsonLogic.rm_operation = function(name) {
-    delete operations[name];
-  };
-
-  jsonLogic.rule_like = function(rule, pattern) {
-    // console.log("Is ". JSON.stringify(rule) . " like " . JSON.stringify(pattern) . "?");
-    if(pattern === rule) {
-      return true;
-    } // TODO : Deep object equivalency?
-    if(pattern === "@") {
-      return true;
-    } // Wildcard!
-    if(pattern === "number") {
-      return (typeof rule === "number");
-    }
-    if(pattern === "string") {
-      return (typeof rule === "string");
-    }
-    if(pattern === "array") {
-      // !logic test might be superfluous in JavaScript
-      return Array.isArray(rule) && ! jsonLogic.is_logic(rule);
-    }
-
-    if(jsonLogic.is_logic(pattern)) {
-      if(jsonLogic.is_logic(rule)) {
-        var pattern_op = jsonLogic.get_operator(pattern);
-        var rule_op = jsonLogic.get_operator(rule);
-
-        if(pattern_op === "@" || pattern_op === rule_op) {
-        // echo "\nOperators match, go deeper\n";
-          return jsonLogic.rule_like(
-            jsonLogic.get_values(rule, false),
-            jsonLogic.get_values(pattern, false)
-          );
-        }
-      }
-      return false; // pattern is logic, rule isn't, can't be eq
-    }
-
-    if(Array.isArray(pattern)) {
-      if(Array.isArray(rule)) {
-        if(pattern.length !== rule.length) {
-          return false;
-        }
-        /*
-          Note, array order MATTERS, because we're using this array test logic to consider arguments, where order can matter. (e.g., + is commutative, but '-' or 'if' or 'var' are NOT)
-        */
-        for(var i = 0; i < pattern.length; i += 1) {
-          // If any fail, we fail
-          if( ! jsonLogic.rule_like(rule[i], pattern[i])) {
-            return false;
-          }
-        }
-        return true; // If they *all* passed, we pass
-      }else{
-        return false; // Pattern is array, rule isn't
-      }
-    }
-
-    // Not logic, not array, not a === match for rule.
-    return false;
-  };
-
-  return jsonLogic;
-}));
-
-},{}],14:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -4035,7 +8,7 @@ var DataView = getNative(root, 'DataView');
 
 module.exports = DataView;
 
-},{"./_getNative":98,"./_root":141}],15:[function(_dereq_,module,exports){
+},{"./_getNative":85,"./_root":128}],2:[function(_dereq_,module,exports){
 var hashClear = _dereq_('./_hashClear'),
     hashDelete = _dereq_('./_hashDelete'),
     hashGet = _dereq_('./_hashGet'),
@@ -4069,7 +42,7 @@ Hash.prototype.set = hashSet;
 
 module.exports = Hash;
 
-},{"./_hashClear":106,"./_hashDelete":107,"./_hashGet":108,"./_hashHas":109,"./_hashSet":110}],16:[function(_dereq_,module,exports){
+},{"./_hashClear":93,"./_hashDelete":94,"./_hashGet":95,"./_hashHas":96,"./_hashSet":97}],3:[function(_dereq_,module,exports){
 var listCacheClear = _dereq_('./_listCacheClear'),
     listCacheDelete = _dereq_('./_listCacheDelete'),
     listCacheGet = _dereq_('./_listCacheGet'),
@@ -4103,7 +76,7 @@ ListCache.prototype.set = listCacheSet;
 
 module.exports = ListCache;
 
-},{"./_listCacheClear":121,"./_listCacheDelete":122,"./_listCacheGet":123,"./_listCacheHas":124,"./_listCacheSet":125}],17:[function(_dereq_,module,exports){
+},{"./_listCacheClear":108,"./_listCacheDelete":109,"./_listCacheGet":110,"./_listCacheHas":111,"./_listCacheSet":112}],4:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -4112,7 +85,7 @@ var Map = getNative(root, 'Map');
 
 module.exports = Map;
 
-},{"./_getNative":98,"./_root":141}],18:[function(_dereq_,module,exports){
+},{"./_getNative":85,"./_root":128}],5:[function(_dereq_,module,exports){
 var mapCacheClear = _dereq_('./_mapCacheClear'),
     mapCacheDelete = _dereq_('./_mapCacheDelete'),
     mapCacheGet = _dereq_('./_mapCacheGet'),
@@ -4146,7 +119,7 @@ MapCache.prototype.set = mapCacheSet;
 
 module.exports = MapCache;
 
-},{"./_mapCacheClear":126,"./_mapCacheDelete":127,"./_mapCacheGet":128,"./_mapCacheHas":129,"./_mapCacheSet":130}],19:[function(_dereq_,module,exports){
+},{"./_mapCacheClear":113,"./_mapCacheDelete":114,"./_mapCacheGet":115,"./_mapCacheHas":116,"./_mapCacheSet":117}],6:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -4155,7 +128,7 @@ var Promise = getNative(root, 'Promise');
 
 module.exports = Promise;
 
-},{"./_getNative":98,"./_root":141}],20:[function(_dereq_,module,exports){
+},{"./_getNative":85,"./_root":128}],7:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -4164,7 +137,7 @@ var Set = getNative(root, 'Set');
 
 module.exports = Set;
 
-},{"./_getNative":98,"./_root":141}],21:[function(_dereq_,module,exports){
+},{"./_getNative":85,"./_root":128}],8:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache'),
     setCacheAdd = _dereq_('./_setCacheAdd'),
     setCacheHas = _dereq_('./_setCacheHas');
@@ -4193,7 +166,7 @@ SetCache.prototype.has = setCacheHas;
 
 module.exports = SetCache;
 
-},{"./_MapCache":18,"./_setCacheAdd":143,"./_setCacheHas":144}],22:[function(_dereq_,module,exports){
+},{"./_MapCache":5,"./_setCacheAdd":130,"./_setCacheHas":131}],9:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     stackClear = _dereq_('./_stackClear'),
     stackDelete = _dereq_('./_stackDelete'),
@@ -4222,7 +195,7 @@ Stack.prototype.set = stackSet;
 
 module.exports = Stack;
 
-},{"./_ListCache":16,"./_stackClear":148,"./_stackDelete":149,"./_stackGet":150,"./_stackHas":151,"./_stackSet":152}],23:[function(_dereq_,module,exports){
+},{"./_ListCache":3,"./_stackClear":135,"./_stackDelete":136,"./_stackGet":137,"./_stackHas":138,"./_stackSet":139}],10:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -4230,7 +203,7 @@ var Symbol = root.Symbol;
 
 module.exports = Symbol;
 
-},{"./_root":141}],24:[function(_dereq_,module,exports){
+},{"./_root":128}],11:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -4238,7 +211,7 @@ var Uint8Array = root.Uint8Array;
 
 module.exports = Uint8Array;
 
-},{"./_root":141}],25:[function(_dereq_,module,exports){
+},{"./_root":128}],12:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -4247,7 +220,7 @@ var WeakMap = getNative(root, 'WeakMap');
 
 module.exports = WeakMap;
 
-},{"./_getNative":98,"./_root":141}],26:[function(_dereq_,module,exports){
+},{"./_getNative":85,"./_root":128}],13:[function(_dereq_,module,exports){
 /**
  * A faster alternative to `Function#apply`, this function invokes `func`
  * with the `this` binding of `thisArg` and the arguments of `args`.
@@ -4270,7 +243,7 @@ function apply(func, thisArg, args) {
 
 module.exports = apply;
 
-},{}],27:[function(_dereq_,module,exports){
+},{}],14:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.forEach` for arrays without support for
  * iteratee shorthands.
@@ -4294,7 +267,7 @@ function arrayEach(array, iteratee) {
 
 module.exports = arrayEach;
 
-},{}],28:[function(_dereq_,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for
  * iteratee shorthands.
@@ -4321,7 +294,7 @@ function arrayFilter(array, predicate) {
 
 module.exports = arrayFilter;
 
-},{}],29:[function(_dereq_,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 var baseTimes = _dereq_('./_baseTimes'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -4372,7 +345,7 @@ function arrayLikeKeys(value, inherited) {
 
 module.exports = arrayLikeKeys;
 
-},{"./_baseTimes":70,"./_isIndex":114,"./isArguments":164,"./isArray":165,"./isBuffer":168,"./isTypedArray":183}],30:[function(_dereq_,module,exports){
+},{"./_baseTimes":57,"./_isIndex":101,"./isArguments":151,"./isArray":152,"./isBuffer":155,"./isTypedArray":170}],17:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for iteratee
  * shorthands.
@@ -4395,7 +368,7 @@ function arrayMap(array, iteratee) {
 
 module.exports = arrayMap;
 
-},{}],31:[function(_dereq_,module,exports){
+},{}],18:[function(_dereq_,module,exports){
 /**
  * Appends the elements of `values` to `array`.
  *
@@ -4417,7 +390,7 @@ function arrayPush(array, values) {
 
 module.exports = arrayPush;
 
-},{}],32:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.some` for arrays without support for iteratee
  * shorthands.
@@ -4442,7 +415,7 @@ function arraySome(array, predicate) {
 
 module.exports = arraySome;
 
-},{}],33:[function(_dereq_,module,exports){
+},{}],20:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     eq = _dereq_('./eq');
 
@@ -4464,7 +437,7 @@ function assignMergeValue(object, key, value) {
 
 module.exports = assignMergeValue;
 
-},{"./_baseAssignValue":38,"./eq":159}],34:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":25,"./eq":146}],21:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     eq = _dereq_('./eq');
 
@@ -4494,7 +467,7 @@ function assignValue(object, key, value) {
 
 module.exports = assignValue;
 
-},{"./_baseAssignValue":38,"./eq":159}],35:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":25,"./eq":146}],22:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq');
 
 /**
@@ -4517,7 +490,7 @@ function assocIndexOf(array, key) {
 
 module.exports = assocIndexOf;
 
-},{"./eq":159}],36:[function(_dereq_,module,exports){
+},{"./eq":146}],23:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keys = _dereq_('./keys');
 
@@ -4536,7 +509,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"./_copyObject":82,"./keys":184}],37:[function(_dereq_,module,exports){
+},{"./_copyObject":69,"./keys":171}],24:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -4555,7 +528,7 @@ function baseAssignIn(object, source) {
 
 module.exports = baseAssignIn;
 
-},{"./_copyObject":82,"./keysIn":185}],38:[function(_dereq_,module,exports){
+},{"./_copyObject":69,"./keysIn":172}],25:[function(_dereq_,module,exports){
 var defineProperty = _dereq_('./_defineProperty');
 
 /**
@@ -4582,7 +555,7 @@ function baseAssignValue(object, key, value) {
 
 module.exports = baseAssignValue;
 
-},{"./_defineProperty":89}],39:[function(_dereq_,module,exports){
+},{"./_defineProperty":76}],26:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     arrayEach = _dereq_('./_arrayEach'),
     assignValue = _dereq_('./_assignValue'),
@@ -4755,7 +728,7 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
 
 module.exports = baseClone;
 
-},{"./_Stack":22,"./_arrayEach":27,"./_assignValue":34,"./_baseAssign":36,"./_baseAssignIn":37,"./_cloneBuffer":76,"./_copyArray":81,"./_copySymbols":83,"./_copySymbolsIn":84,"./_getAllKeys":94,"./_getAllKeysIn":95,"./_getTag":103,"./_initCloneArray":111,"./_initCloneByTag":112,"./_initCloneObject":113,"./isArray":165,"./isBuffer":168,"./isMap":174,"./isObject":178,"./isSet":181,"./keys":184}],40:[function(_dereq_,module,exports){
+},{"./_Stack":9,"./_arrayEach":14,"./_assignValue":21,"./_baseAssign":23,"./_baseAssignIn":24,"./_cloneBuffer":63,"./_copyArray":68,"./_copySymbols":70,"./_copySymbolsIn":71,"./_getAllKeys":81,"./_getAllKeysIn":82,"./_getTag":90,"./_initCloneArray":98,"./_initCloneByTag":99,"./_initCloneObject":100,"./isArray":152,"./isBuffer":155,"./isMap":161,"./isObject":165,"./isSet":168,"./keys":171}],27:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /** Built-in value references. */
@@ -4787,7 +760,7 @@ var baseCreate = (function() {
 
 module.exports = baseCreate;
 
-},{"./isObject":178}],41:[function(_dereq_,module,exports){
+},{"./isObject":165}],28:[function(_dereq_,module,exports){
 var baseForOwn = _dereq_('./_baseForOwn'),
     createBaseEach = _dereq_('./_createBaseEach');
 
@@ -4803,7 +776,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./_baseForOwn":44,"./_createBaseEach":87}],42:[function(_dereq_,module,exports){
+},{"./_baseForOwn":31,"./_createBaseEach":74}],29:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach');
 
 /**
@@ -4826,7 +799,7 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"./_baseEach":41}],43:[function(_dereq_,module,exports){
+},{"./_baseEach":28}],30:[function(_dereq_,module,exports){
 var createBaseFor = _dereq_('./_createBaseFor');
 
 /**
@@ -4844,7 +817,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./_createBaseFor":88}],44:[function(_dereq_,module,exports){
+},{"./_createBaseFor":75}],31:[function(_dereq_,module,exports){
 var baseFor = _dereq_('./_baseFor'),
     keys = _dereq_('./keys');
 
@@ -4862,7 +835,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"./_baseFor":43,"./keys":184}],45:[function(_dereq_,module,exports){
+},{"./_baseFor":30,"./keys":171}],32:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     toKey = _dereq_('./_toKey');
 
@@ -4888,7 +861,7 @@ function baseGet(object, path) {
 
 module.exports = baseGet;
 
-},{"./_castPath":74,"./_toKey":154}],46:[function(_dereq_,module,exports){
+},{"./_castPath":61,"./_toKey":141}],33:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     isArray = _dereq_('./isArray');
 
@@ -4910,7 +883,7 @@ function baseGetAllKeys(object, keysFunc, symbolsFunc) {
 
 module.exports = baseGetAllKeys;
 
-},{"./_arrayPush":31,"./isArray":165}],47:[function(_dereq_,module,exports){
+},{"./_arrayPush":18,"./isArray":152}],34:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     getRawTag = _dereq_('./_getRawTag'),
     objectToString = _dereq_('./_objectToString');
@@ -4940,7 +913,7 @@ function baseGetTag(value) {
 
 module.exports = baseGetTag;
 
-},{"./_Symbol":23,"./_getRawTag":100,"./_objectToString":138}],48:[function(_dereq_,module,exports){
+},{"./_Symbol":10,"./_getRawTag":87,"./_objectToString":125}],35:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.hasIn` without support for deep paths.
  *
@@ -4955,7 +928,7 @@ function baseHasIn(object, key) {
 
 module.exports = baseHasIn;
 
-},{}],49:[function(_dereq_,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -4975,7 +948,7 @@ function baseIsArguments(value) {
 
 module.exports = baseIsArguments;
 
-},{"./_baseGetTag":47,"./isObjectLike":179}],50:[function(_dereq_,module,exports){
+},{"./_baseGetTag":34,"./isObjectLike":166}],37:[function(_dereq_,module,exports){
 var baseIsEqualDeep = _dereq_('./_baseIsEqualDeep'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -5005,7 +978,7 @@ function baseIsEqual(value, other, bitmask, customizer, stack) {
 
 module.exports = baseIsEqual;
 
-},{"./_baseIsEqualDeep":51,"./isObjectLike":179}],51:[function(_dereq_,module,exports){
+},{"./_baseIsEqualDeep":38,"./isObjectLike":166}],38:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     equalArrays = _dereq_('./_equalArrays'),
     equalByTag = _dereq_('./_equalByTag'),
@@ -5090,7 +1063,7 @@ function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = baseIsEqualDeep;
 
-},{"./_Stack":22,"./_equalArrays":90,"./_equalByTag":91,"./_equalObjects":92,"./_getTag":103,"./isArray":165,"./isBuffer":168,"./isTypedArray":183}],52:[function(_dereq_,module,exports){
+},{"./_Stack":9,"./_equalArrays":77,"./_equalByTag":78,"./_equalObjects":79,"./_getTag":90,"./isArray":152,"./isBuffer":155,"./isTypedArray":170}],39:[function(_dereq_,module,exports){
 var getTag = _dereq_('./_getTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -5110,7 +1083,7 @@ function baseIsMap(value) {
 
 module.exports = baseIsMap;
 
-},{"./_getTag":103,"./isObjectLike":179}],53:[function(_dereq_,module,exports){
+},{"./_getTag":90,"./isObjectLike":166}],40:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     baseIsEqual = _dereq_('./_baseIsEqual');
 
@@ -5174,7 +1147,7 @@ function baseIsMatch(object, source, matchData, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"./_Stack":22,"./_baseIsEqual":50}],54:[function(_dereq_,module,exports){
+},{"./_Stack":9,"./_baseIsEqual":37}],41:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isMasked = _dereq_('./_isMasked'),
     isObject = _dereq_('./isObject'),
@@ -5223,7 +1196,7 @@ function baseIsNative(value) {
 
 module.exports = baseIsNative;
 
-},{"./_isMasked":118,"./_toSource":155,"./isFunction":172,"./isObject":178}],55:[function(_dereq_,module,exports){
+},{"./_isMasked":105,"./_toSource":142,"./isFunction":159,"./isObject":165}],42:[function(_dereq_,module,exports){
 var getTag = _dereq_('./_getTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -5243,7 +1216,7 @@ function baseIsSet(value) {
 
 module.exports = baseIsSet;
 
-},{"./_getTag":103,"./isObjectLike":179}],56:[function(_dereq_,module,exports){
+},{"./_getTag":90,"./isObjectLike":166}],43:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isLength = _dereq_('./isLength'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -5305,7 +1278,7 @@ function baseIsTypedArray(value) {
 
 module.exports = baseIsTypedArray;
 
-},{"./_baseGetTag":47,"./isLength":173,"./isObjectLike":179}],57:[function(_dereq_,module,exports){
+},{"./_baseGetTag":34,"./isLength":160,"./isObjectLike":166}],44:[function(_dereq_,module,exports){
 var baseMatches = _dereq_('./_baseMatches'),
     baseMatchesProperty = _dereq_('./_baseMatchesProperty'),
     identity = _dereq_('./identity'),
@@ -5338,7 +1311,7 @@ function baseIteratee(value) {
 
 module.exports = baseIteratee;
 
-},{"./_baseMatches":61,"./_baseMatchesProperty":62,"./identity":163,"./isArray":165,"./property":191}],58:[function(_dereq_,module,exports){
+},{"./_baseMatches":48,"./_baseMatchesProperty":49,"./identity":150,"./isArray":152,"./property":178}],45:[function(_dereq_,module,exports){
 var isPrototype = _dereq_('./_isPrototype'),
     nativeKeys = _dereq_('./_nativeKeys');
 
@@ -5370,7 +1343,7 @@ function baseKeys(object) {
 
 module.exports = baseKeys;
 
-},{"./_isPrototype":119,"./_nativeKeys":135}],59:[function(_dereq_,module,exports){
+},{"./_isPrototype":106,"./_nativeKeys":122}],46:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject'),
     isPrototype = _dereq_('./_isPrototype'),
     nativeKeysIn = _dereq_('./_nativeKeysIn');
@@ -5405,7 +1378,7 @@ function baseKeysIn(object) {
 
 module.exports = baseKeysIn;
 
-},{"./_isPrototype":119,"./_nativeKeysIn":136,"./isObject":178}],60:[function(_dereq_,module,exports){
+},{"./_isPrototype":106,"./_nativeKeysIn":123,"./isObject":165}],47:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach'),
     isArrayLike = _dereq_('./isArrayLike');
 
@@ -5429,7 +1402,7 @@ function baseMap(collection, iteratee) {
 
 module.exports = baseMap;
 
-},{"./_baseEach":41,"./isArrayLike":166}],61:[function(_dereq_,module,exports){
+},{"./_baseEach":28,"./isArrayLike":153}],48:[function(_dereq_,module,exports){
 var baseIsMatch = _dereq_('./_baseIsMatch'),
     getMatchData = _dereq_('./_getMatchData'),
     matchesStrictComparable = _dereq_('./_matchesStrictComparable');
@@ -5453,7 +1426,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./_baseIsMatch":53,"./_getMatchData":97,"./_matchesStrictComparable":132}],62:[function(_dereq_,module,exports){
+},{"./_baseIsMatch":40,"./_getMatchData":84,"./_matchesStrictComparable":119}],49:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual'),
     get = _dereq_('./get'),
     hasIn = _dereq_('./hasIn'),
@@ -5488,7 +1461,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"./_baseIsEqual":50,"./_isKey":116,"./_isStrictComparable":120,"./_matchesStrictComparable":132,"./_toKey":154,"./get":161,"./hasIn":162}],63:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":37,"./_isKey":103,"./_isStrictComparable":107,"./_matchesStrictComparable":119,"./_toKey":141,"./get":148,"./hasIn":149}],50:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     assignMergeValue = _dereq_('./_assignMergeValue'),
     baseFor = _dereq_('./_baseFor'),
@@ -5532,7 +1505,7 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
 
 module.exports = baseMerge;
 
-},{"./_Stack":22,"./_assignMergeValue":33,"./_baseFor":43,"./_baseMergeDeep":64,"./_safeGet":142,"./isObject":178,"./keysIn":185}],64:[function(_dereq_,module,exports){
+},{"./_Stack":9,"./_assignMergeValue":20,"./_baseFor":30,"./_baseMergeDeep":51,"./_safeGet":129,"./isObject":165,"./keysIn":172}],51:[function(_dereq_,module,exports){
 var assignMergeValue = _dereq_('./_assignMergeValue'),
     cloneBuffer = _dereq_('./_cloneBuffer'),
     cloneTypedArray = _dereq_('./_cloneTypedArray'),
@@ -5628,7 +1601,7 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
 
 module.exports = baseMergeDeep;
 
-},{"./_assignMergeValue":33,"./_cloneBuffer":76,"./_cloneTypedArray":80,"./_copyArray":81,"./_initCloneObject":113,"./_safeGet":142,"./isArguments":164,"./isArray":165,"./isArrayLikeObject":167,"./isBuffer":168,"./isFunction":172,"./isObject":178,"./isPlainObject":180,"./isTypedArray":183,"./toPlainObject":195}],65:[function(_dereq_,module,exports){
+},{"./_assignMergeValue":20,"./_cloneBuffer":63,"./_cloneTypedArray":67,"./_copyArray":68,"./_initCloneObject":100,"./_safeGet":129,"./isArguments":151,"./isArray":152,"./isArrayLikeObject":154,"./isBuffer":155,"./isFunction":159,"./isObject":165,"./isPlainObject":167,"./isTypedArray":170,"./toPlainObject":182}],52:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -5644,7 +1617,7 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],66:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -5662,7 +1635,7 @@ function basePropertyDeep(path) {
 
 module.exports = basePropertyDeep;
 
-},{"./_baseGet":45}],67:[function(_dereq_,module,exports){
+},{"./_baseGet":32}],54:[function(_dereq_,module,exports){
 var identity = _dereq_('./identity'),
     overRest = _dereq_('./_overRest'),
     setToString = _dereq_('./_setToString');
@@ -5681,7 +1654,7 @@ function baseRest(func, start) {
 
 module.exports = baseRest;
 
-},{"./_overRest":140,"./_setToString":146,"./identity":163}],68:[function(_dereq_,module,exports){
+},{"./_overRest":127,"./_setToString":133,"./identity":150}],55:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     castPath = _dereq_('./_castPath'),
     isIndex = _dereq_('./_isIndex'),
@@ -5730,7 +1703,7 @@ function baseSet(object, path, value, customizer) {
 
 module.exports = baseSet;
 
-},{"./_assignValue":34,"./_castPath":74,"./_isIndex":114,"./_toKey":154,"./isObject":178}],69:[function(_dereq_,module,exports){
+},{"./_assignValue":21,"./_castPath":61,"./_isIndex":101,"./_toKey":141,"./isObject":165}],56:[function(_dereq_,module,exports){
 var constant = _dereq_('./constant'),
     defineProperty = _dereq_('./_defineProperty'),
     identity = _dereq_('./identity');
@@ -5754,7 +1727,7 @@ var baseSetToString = !defineProperty ? identity : function(func, string) {
 
 module.exports = baseSetToString;
 
-},{"./_defineProperty":89,"./constant":158,"./identity":163}],70:[function(_dereq_,module,exports){
+},{"./_defineProperty":76,"./constant":145,"./identity":150}],57:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.times` without support for iteratee shorthands
  * or max array length checks.
@@ -5776,7 +1749,7 @@ function baseTimes(n, iteratee) {
 
 module.exports = baseTimes;
 
-},{}],71:[function(_dereq_,module,exports){
+},{}],58:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     arrayMap = _dereq_('./_arrayMap'),
     isArray = _dereq_('./isArray'),
@@ -5815,7 +1788,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{"./_Symbol":23,"./_arrayMap":30,"./isArray":165,"./isSymbol":182}],72:[function(_dereq_,module,exports){
+},{"./_Symbol":10,"./_arrayMap":17,"./isArray":152,"./isSymbol":169}],59:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.unary` without support for storing metadata.
  *
@@ -5831,7 +1804,7 @@ function baseUnary(func) {
 
 module.exports = baseUnary;
 
-},{}],73:[function(_dereq_,module,exports){
+},{}],60:[function(_dereq_,module,exports){
 /**
  * Checks if a `cache` value for `key` exists.
  *
@@ -5846,7 +1819,7 @@ function cacheHas(cache, key) {
 
 module.exports = cacheHas;
 
-},{}],74:[function(_dereq_,module,exports){
+},{}],61:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isKey = _dereq_('./_isKey'),
     stringToPath = _dereq_('./_stringToPath'),
@@ -5869,7 +1842,7 @@ function castPath(value, object) {
 
 module.exports = castPath;
 
-},{"./_isKey":116,"./_stringToPath":153,"./isArray":165,"./toString":196}],75:[function(_dereq_,module,exports){
+},{"./_isKey":103,"./_stringToPath":140,"./isArray":152,"./toString":183}],62:[function(_dereq_,module,exports){
 var Uint8Array = _dereq_('./_Uint8Array');
 
 /**
@@ -5887,7 +1860,7 @@ function cloneArrayBuffer(arrayBuffer) {
 
 module.exports = cloneArrayBuffer;
 
-},{"./_Uint8Array":24}],76:[function(_dereq_,module,exports){
+},{"./_Uint8Array":11}],63:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Detect free variable `exports`. */
@@ -5924,7 +1897,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-},{"./_root":141}],77:[function(_dereq_,module,exports){
+},{"./_root":128}],64:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -5942,7 +1915,7 @@ function cloneDataView(dataView, isDeep) {
 
 module.exports = cloneDataView;
 
-},{"./_cloneArrayBuffer":75}],78:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":62}],65:[function(_dereq_,module,exports){
 /** Used to match `RegExp` flags from their coerced string values. */
 var reFlags = /\w*$/;
 
@@ -5961,7 +1934,7 @@ function cloneRegExp(regexp) {
 
 module.exports = cloneRegExp;
 
-},{}],79:[function(_dereq_,module,exports){
+},{}],66:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used to convert symbols to primitives and strings. */
@@ -5981,7 +1954,7 @@ function cloneSymbol(symbol) {
 
 module.exports = cloneSymbol;
 
-},{"./_Symbol":23}],80:[function(_dereq_,module,exports){
+},{"./_Symbol":10}],67:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -5999,7 +1972,7 @@ function cloneTypedArray(typedArray, isDeep) {
 
 module.exports = cloneTypedArray;
 
-},{"./_cloneArrayBuffer":75}],81:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":62}],68:[function(_dereq_,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -6021,7 +1994,7 @@ function copyArray(source, array) {
 
 module.exports = copyArray;
 
-},{}],82:[function(_dereq_,module,exports){
+},{}],69:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     baseAssignValue = _dereq_('./_baseAssignValue');
 
@@ -6063,7 +2036,7 @@ function copyObject(source, props, object, customizer) {
 
 module.exports = copyObject;
 
-},{"./_assignValue":34,"./_baseAssignValue":38}],83:[function(_dereq_,module,exports){
+},{"./_assignValue":21,"./_baseAssignValue":25}],70:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbols = _dereq_('./_getSymbols');
 
@@ -6081,7 +2054,7 @@ function copySymbols(source, object) {
 
 module.exports = copySymbols;
 
-},{"./_copyObject":82,"./_getSymbols":101}],84:[function(_dereq_,module,exports){
+},{"./_copyObject":69,"./_getSymbols":88}],71:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbolsIn = _dereq_('./_getSymbolsIn');
 
@@ -6099,7 +2072,7 @@ function copySymbolsIn(source, object) {
 
 module.exports = copySymbolsIn;
 
-},{"./_copyObject":82,"./_getSymbolsIn":102}],85:[function(_dereq_,module,exports){
+},{"./_copyObject":69,"./_getSymbolsIn":89}],72:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Used to detect overreaching core-js shims. */
@@ -6107,7 +2080,7 @@ var coreJsData = root['__core-js_shared__'];
 
 module.exports = coreJsData;
 
-},{"./_root":141}],86:[function(_dereq_,module,exports){
+},{"./_root":128}],73:[function(_dereq_,module,exports){
 var baseRest = _dereq_('./_baseRest'),
     isIterateeCall = _dereq_('./_isIterateeCall');
 
@@ -6146,7 +2119,7 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"./_baseRest":67,"./_isIterateeCall":115}],87:[function(_dereq_,module,exports){
+},{"./_baseRest":54,"./_isIterateeCall":102}],74:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike');
 
 /**
@@ -6180,7 +2153,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./isArrayLike":166}],88:[function(_dereq_,module,exports){
+},{"./isArrayLike":153}],75:[function(_dereq_,module,exports){
 /**
  * Creates a base function for methods like `_.forIn` and `_.forOwn`.
  *
@@ -6207,7 +2180,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{}],89:[function(_dereq_,module,exports){
+},{}],76:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 var defineProperty = (function() {
@@ -6220,7 +2193,7 @@ var defineProperty = (function() {
 
 module.exports = defineProperty;
 
-},{"./_getNative":98}],90:[function(_dereq_,module,exports){
+},{"./_getNative":85}],77:[function(_dereq_,module,exports){
 var SetCache = _dereq_('./_SetCache'),
     arraySome = _dereq_('./_arraySome'),
     cacheHas = _dereq_('./_cacheHas');
@@ -6305,7 +2278,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalArrays;
 
-},{"./_SetCache":21,"./_arraySome":32,"./_cacheHas":73}],91:[function(_dereq_,module,exports){
+},{"./_SetCache":8,"./_arraySome":19,"./_cacheHas":60}],78:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     Uint8Array = _dereq_('./_Uint8Array'),
     eq = _dereq_('./eq'),
@@ -6419,7 +2392,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalByTag;
 
-},{"./_Symbol":23,"./_Uint8Array":24,"./_equalArrays":90,"./_mapToArray":131,"./_setToArray":145,"./eq":159}],92:[function(_dereq_,module,exports){
+},{"./_Symbol":10,"./_Uint8Array":11,"./_equalArrays":77,"./_mapToArray":118,"./_setToArray":132,"./eq":146}],79:[function(_dereq_,module,exports){
 var getAllKeys = _dereq_('./_getAllKeys');
 
 /** Used to compose bitmasks for value comparisons. */
@@ -6510,7 +2483,7 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalObjects;
 
-},{"./_getAllKeys":94}],93:[function(_dereq_,module,exports){
+},{"./_getAllKeys":81}],80:[function(_dereq_,module,exports){
 (function (global){
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -6518,7 +2491,7 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 module.exports = freeGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],94:[function(_dereq_,module,exports){
+},{}],81:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbols = _dereq_('./_getSymbols'),
     keys = _dereq_('./keys');
@@ -6536,7 +2509,7 @@ function getAllKeys(object) {
 
 module.exports = getAllKeys;
 
-},{"./_baseGetAllKeys":46,"./_getSymbols":101,"./keys":184}],95:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":33,"./_getSymbols":88,"./keys":171}],82:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbolsIn = _dereq_('./_getSymbolsIn'),
     keysIn = _dereq_('./keysIn');
@@ -6555,7 +2528,7 @@ function getAllKeysIn(object) {
 
 module.exports = getAllKeysIn;
 
-},{"./_baseGetAllKeys":46,"./_getSymbolsIn":102,"./keysIn":185}],96:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":33,"./_getSymbolsIn":89,"./keysIn":172}],83:[function(_dereq_,module,exports){
 var isKeyable = _dereq_('./_isKeyable');
 
 /**
@@ -6575,7 +2548,7 @@ function getMapData(map, key) {
 
 module.exports = getMapData;
 
-},{"./_isKeyable":117}],97:[function(_dereq_,module,exports){
+},{"./_isKeyable":104}],84:[function(_dereq_,module,exports){
 var isStrictComparable = _dereq_('./_isStrictComparable'),
     keys = _dereq_('./keys');
 
@@ -6601,7 +2574,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"./_isStrictComparable":120,"./keys":184}],98:[function(_dereq_,module,exports){
+},{"./_isStrictComparable":107,"./keys":171}],85:[function(_dereq_,module,exports){
 var baseIsNative = _dereq_('./_baseIsNative'),
     getValue = _dereq_('./_getValue');
 
@@ -6620,7 +2593,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"./_baseIsNative":54,"./_getValue":104}],99:[function(_dereq_,module,exports){
+},{"./_baseIsNative":41,"./_getValue":91}],86:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /** Built-in value references. */
@@ -6628,7 +2601,7 @@ var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 module.exports = getPrototype;
 
-},{"./_overArg":139}],100:[function(_dereq_,module,exports){
+},{"./_overArg":126}],87:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used for built-in method references. */
@@ -6676,7 +2649,7 @@ function getRawTag(value) {
 
 module.exports = getRawTag;
 
-},{"./_Symbol":23}],101:[function(_dereq_,module,exports){
+},{"./_Symbol":10}],88:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     stubArray = _dereq_('./stubArray');
 
@@ -6708,7 +2681,7 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbols;
 
-},{"./_arrayFilter":28,"./stubArray":193}],102:[function(_dereq_,module,exports){
+},{"./_arrayFilter":15,"./stubArray":180}],89:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     getPrototype = _dereq_('./_getPrototype'),
     getSymbols = _dereq_('./_getSymbols'),
@@ -6735,7 +2708,7 @@ var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbolsIn;
 
-},{"./_arrayPush":31,"./_getPrototype":99,"./_getSymbols":101,"./stubArray":193}],103:[function(_dereq_,module,exports){
+},{"./_arrayPush":18,"./_getPrototype":86,"./_getSymbols":88,"./stubArray":180}],90:[function(_dereq_,module,exports){
 var DataView = _dereq_('./_DataView'),
     Map = _dereq_('./_Map'),
     Promise = _dereq_('./_Promise'),
@@ -6795,7 +2768,7 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 module.exports = getTag;
 
-},{"./_DataView":14,"./_Map":17,"./_Promise":19,"./_Set":20,"./_WeakMap":25,"./_baseGetTag":47,"./_toSource":155}],104:[function(_dereq_,module,exports){
+},{"./_DataView":1,"./_Map":4,"./_Promise":6,"./_Set":7,"./_WeakMap":12,"./_baseGetTag":34,"./_toSource":142}],91:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key` of `object`.
  *
@@ -6810,7 +2783,7 @@ function getValue(object, key) {
 
 module.exports = getValue;
 
-},{}],105:[function(_dereq_,module,exports){
+},{}],92:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -6851,7 +2824,7 @@ function hasPath(object, path, hasFunc) {
 
 module.exports = hasPath;
 
-},{"./_castPath":74,"./_isIndex":114,"./_toKey":154,"./isArguments":164,"./isArray":165,"./isLength":173}],106:[function(_dereq_,module,exports){
+},{"./_castPath":61,"./_isIndex":101,"./_toKey":141,"./isArguments":151,"./isArray":152,"./isLength":160}],93:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /**
@@ -6868,7 +2841,7 @@ function hashClear() {
 
 module.exports = hashClear;
 
-},{"./_nativeCreate":134}],107:[function(_dereq_,module,exports){
+},{"./_nativeCreate":121}],94:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the hash.
  *
@@ -6887,7 +2860,7 @@ function hashDelete(key) {
 
 module.exports = hashDelete;
 
-},{}],108:[function(_dereq_,module,exports){
+},{}],95:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -6919,7 +2892,7 @@ function hashGet(key) {
 
 module.exports = hashGet;
 
-},{"./_nativeCreate":134}],109:[function(_dereq_,module,exports){
+},{"./_nativeCreate":121}],96:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used for built-in method references. */
@@ -6944,7 +2917,7 @@ function hashHas(key) {
 
 module.exports = hashHas;
 
-},{"./_nativeCreate":134}],110:[function(_dereq_,module,exports){
+},{"./_nativeCreate":121}],97:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -6969,7 +2942,7 @@ function hashSet(key, value) {
 
 module.exports = hashSet;
 
-},{"./_nativeCreate":134}],111:[function(_dereq_,module,exports){
+},{"./_nativeCreate":121}],98:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -6997,7 +2970,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],112:[function(_dereq_,module,exports){
+},{}],99:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer'),
     cloneDataView = _dereq_('./_cloneDataView'),
     cloneRegExp = _dereq_('./_cloneRegExp'),
@@ -7076,7 +3049,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./_cloneArrayBuffer":75,"./_cloneDataView":77,"./_cloneRegExp":78,"./_cloneSymbol":79,"./_cloneTypedArray":80}],113:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":62,"./_cloneDataView":64,"./_cloneRegExp":65,"./_cloneSymbol":66,"./_cloneTypedArray":67}],100:[function(_dereq_,module,exports){
 var baseCreate = _dereq_('./_baseCreate'),
     getPrototype = _dereq_('./_getPrototype'),
     isPrototype = _dereq_('./_isPrototype');
@@ -7096,7 +3069,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{"./_baseCreate":40,"./_getPrototype":99,"./_isPrototype":119}],114:[function(_dereq_,module,exports){
+},{"./_baseCreate":27,"./_getPrototype":86,"./_isPrototype":106}],101:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -7123,7 +3096,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],115:[function(_dereq_,module,exports){
+},{}],102:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq'),
     isArrayLike = _dereq_('./isArrayLike'),
     isIndex = _dereq_('./_isIndex'),
@@ -7155,7 +3128,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"./_isIndex":114,"./eq":159,"./isArrayLike":166,"./isObject":178}],116:[function(_dereq_,module,exports){
+},{"./_isIndex":101,"./eq":146,"./isArrayLike":153,"./isObject":165}],103:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isSymbol = _dereq_('./isSymbol');
 
@@ -7186,7 +3159,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"./isArray":165,"./isSymbol":182}],117:[function(_dereq_,module,exports){
+},{"./isArray":152,"./isSymbol":169}],104:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is suitable for use as unique object key.
  *
@@ -7203,7 +3176,7 @@ function isKeyable(value) {
 
 module.exports = isKeyable;
 
-},{}],118:[function(_dereq_,module,exports){
+},{}],105:[function(_dereq_,module,exports){
 var coreJsData = _dereq_('./_coreJsData');
 
 /** Used to detect methods masquerading as native. */
@@ -7225,7 +3198,7 @@ function isMasked(func) {
 
 module.exports = isMasked;
 
-},{"./_coreJsData":85}],119:[function(_dereq_,module,exports){
+},{"./_coreJsData":72}],106:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -7245,7 +3218,7 @@ function isPrototype(value) {
 
 module.exports = isPrototype;
 
-},{}],120:[function(_dereq_,module,exports){
+},{}],107:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /**
@@ -7262,7 +3235,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"./isObject":178}],121:[function(_dereq_,module,exports){
+},{"./isObject":165}],108:[function(_dereq_,module,exports){
 /**
  * Removes all key-value entries from the list cache.
  *
@@ -7277,7 +3250,7 @@ function listCacheClear() {
 
 module.exports = listCacheClear;
 
-},{}],122:[function(_dereq_,module,exports){
+},{}],109:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /** Used for built-in method references. */
@@ -7314,7 +3287,7 @@ function listCacheDelete(key) {
 
 module.exports = listCacheDelete;
 
-},{"./_assocIndexOf":35}],123:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":22}],110:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -7335,7 +3308,7 @@ function listCacheGet(key) {
 
 module.exports = listCacheGet;
 
-},{"./_assocIndexOf":35}],124:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":22}],111:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -7353,7 +3326,7 @@ function listCacheHas(key) {
 
 module.exports = listCacheHas;
 
-},{"./_assocIndexOf":35}],125:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":22}],112:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -7381,7 +3354,7 @@ function listCacheSet(key, value) {
 
 module.exports = listCacheSet;
 
-},{"./_assocIndexOf":35}],126:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":22}],113:[function(_dereq_,module,exports){
 var Hash = _dereq_('./_Hash'),
     ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map');
@@ -7404,7 +3377,7 @@ function mapCacheClear() {
 
 module.exports = mapCacheClear;
 
-},{"./_Hash":15,"./_ListCache":16,"./_Map":17}],127:[function(_dereq_,module,exports){
+},{"./_Hash":2,"./_ListCache":3,"./_Map":4}],114:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -7424,7 +3397,7 @@ function mapCacheDelete(key) {
 
 module.exports = mapCacheDelete;
 
-},{"./_getMapData":96}],128:[function(_dereq_,module,exports){
+},{"./_getMapData":83}],115:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -7442,7 +3415,7 @@ function mapCacheGet(key) {
 
 module.exports = mapCacheGet;
 
-},{"./_getMapData":96}],129:[function(_dereq_,module,exports){
+},{"./_getMapData":83}],116:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -7460,7 +3433,7 @@ function mapCacheHas(key) {
 
 module.exports = mapCacheHas;
 
-},{"./_getMapData":96}],130:[function(_dereq_,module,exports){
+},{"./_getMapData":83}],117:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -7484,7 +3457,7 @@ function mapCacheSet(key, value) {
 
 module.exports = mapCacheSet;
 
-},{"./_getMapData":96}],131:[function(_dereq_,module,exports){
+},{"./_getMapData":83}],118:[function(_dereq_,module,exports){
 /**
  * Converts `map` to its key-value pairs.
  *
@@ -7504,7 +3477,7 @@ function mapToArray(map) {
 
 module.exports = mapToArray;
 
-},{}],132:[function(_dereq_,module,exports){
+},{}],119:[function(_dereq_,module,exports){
 /**
  * A specialized version of `matchesProperty` for source values suitable
  * for strict equality comparisons, i.e. `===`.
@@ -7526,7 +3499,7 @@ function matchesStrictComparable(key, srcValue) {
 
 module.exports = matchesStrictComparable;
 
-},{}],133:[function(_dereq_,module,exports){
+},{}],120:[function(_dereq_,module,exports){
 var memoize = _dereq_('./memoize');
 
 /** Used as the maximum memoize cache size. */
@@ -7554,7 +3527,7 @@ function memoizeCapped(func) {
 
 module.exports = memoizeCapped;
 
-},{"./memoize":189}],134:[function(_dereq_,module,exports){
+},{"./memoize":176}],121:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 /* Built-in method references that are verified to be native. */
@@ -7562,7 +3535,7 @@ var nativeCreate = getNative(Object, 'create');
 
 module.exports = nativeCreate;
 
-},{"./_getNative":98}],135:[function(_dereq_,module,exports){
+},{"./_getNative":85}],122:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -7570,7 +3543,7 @@ var nativeKeys = overArg(Object.keys, Object);
 
 module.exports = nativeKeys;
 
-},{"./_overArg":139}],136:[function(_dereq_,module,exports){
+},{"./_overArg":126}],123:[function(_dereq_,module,exports){
 /**
  * This function is like
  * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
@@ -7592,7 +3565,7 @@ function nativeKeysIn(object) {
 
 module.exports = nativeKeysIn;
 
-},{}],137:[function(_dereq_,module,exports){
+},{}],124:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `exports`. */
@@ -7624,7 +3597,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-},{"./_freeGlobal":93}],138:[function(_dereq_,module,exports){
+},{"./_freeGlobal":80}],125:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -7648,7 +3621,7 @@ function objectToString(value) {
 
 module.exports = objectToString;
 
-},{}],139:[function(_dereq_,module,exports){
+},{}],126:[function(_dereq_,module,exports){
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -7665,7 +3638,7 @@ function overArg(func, transform) {
 
 module.exports = overArg;
 
-},{}],140:[function(_dereq_,module,exports){
+},{}],127:[function(_dereq_,module,exports){
 var apply = _dereq_('./_apply');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -7703,7 +3676,7 @@ function overRest(func, start, transform) {
 
 module.exports = overRest;
 
-},{"./_apply":26}],141:[function(_dereq_,module,exports){
+},{"./_apply":13}],128:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `self`. */
@@ -7714,7 +3687,7 @@ var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
 
-},{"./_freeGlobal":93}],142:[function(_dereq_,module,exports){
+},{"./_freeGlobal":80}],129:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key`, unless `key` is "__proto__".
  *
@@ -7731,7 +3704,7 @@ function safeGet(object, key) {
 
 module.exports = safeGet;
 
-},{}],143:[function(_dereq_,module,exports){
+},{}],130:[function(_dereq_,module,exports){
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
@@ -7752,7 +3725,7 @@ function setCacheAdd(value) {
 
 module.exports = setCacheAdd;
 
-},{}],144:[function(_dereq_,module,exports){
+},{}],131:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is in the array cache.
  *
@@ -7768,7 +3741,7 @@ function setCacheHas(value) {
 
 module.exports = setCacheHas;
 
-},{}],145:[function(_dereq_,module,exports){
+},{}],132:[function(_dereq_,module,exports){
 /**
  * Converts `set` to an array of its values.
  *
@@ -7788,7 +3761,7 @@ function setToArray(set) {
 
 module.exports = setToArray;
 
-},{}],146:[function(_dereq_,module,exports){
+},{}],133:[function(_dereq_,module,exports){
 var baseSetToString = _dereq_('./_baseSetToString'),
     shortOut = _dereq_('./_shortOut');
 
@@ -7804,7 +3777,7 @@ var setToString = shortOut(baseSetToString);
 
 module.exports = setToString;
 
-},{"./_baseSetToString":69,"./_shortOut":147}],147:[function(_dereq_,module,exports){
+},{"./_baseSetToString":56,"./_shortOut":134}],134:[function(_dereq_,module,exports){
 /** Used to detect hot functions by number of calls within a span of milliseconds. */
 var HOT_COUNT = 800,
     HOT_SPAN = 16;
@@ -7843,7 +3816,7 @@ function shortOut(func) {
 
 module.exports = shortOut;
 
-},{}],148:[function(_dereq_,module,exports){
+},{}],135:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache');
 
 /**
@@ -7860,7 +3833,7 @@ function stackClear() {
 
 module.exports = stackClear;
 
-},{"./_ListCache":16}],149:[function(_dereq_,module,exports){
+},{"./_ListCache":3}],136:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the stack.
  *
@@ -7880,7 +3853,7 @@ function stackDelete(key) {
 
 module.exports = stackDelete;
 
-},{}],150:[function(_dereq_,module,exports){
+},{}],137:[function(_dereq_,module,exports){
 /**
  * Gets the stack value for `key`.
  *
@@ -7896,7 +3869,7 @@ function stackGet(key) {
 
 module.exports = stackGet;
 
-},{}],151:[function(_dereq_,module,exports){
+},{}],138:[function(_dereq_,module,exports){
 /**
  * Checks if a stack value for `key` exists.
  *
@@ -7912,7 +3885,7 @@ function stackHas(key) {
 
 module.exports = stackHas;
 
-},{}],152:[function(_dereq_,module,exports){
+},{}],139:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map'),
     MapCache = _dereq_('./_MapCache');
@@ -7948,7 +3921,7 @@ function stackSet(key, value) {
 
 module.exports = stackSet;
 
-},{"./_ListCache":16,"./_Map":17,"./_MapCache":18}],153:[function(_dereq_,module,exports){
+},{"./_ListCache":3,"./_Map":4,"./_MapCache":5}],140:[function(_dereq_,module,exports){
 var memoizeCapped = _dereq_('./_memoizeCapped');
 
 /** Used to match property names within property paths. */
@@ -7977,7 +3950,7 @@ var stringToPath = memoizeCapped(function(string) {
 
 module.exports = stringToPath;
 
-},{"./_memoizeCapped":133}],154:[function(_dereq_,module,exports){
+},{"./_memoizeCapped":120}],141:[function(_dereq_,module,exports){
 var isSymbol = _dereq_('./isSymbol');
 
 /** Used as references for various `Number` constants. */
@@ -8000,7 +3973,7 @@ function toKey(value) {
 
 module.exports = toKey;
 
-},{"./isSymbol":182}],155:[function(_dereq_,module,exports){
+},{"./isSymbol":169}],142:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var funcProto = Function.prototype;
 
@@ -8028,7 +4001,7 @@ function toSource(func) {
 
 module.exports = toSource;
 
-},{}],156:[function(_dereq_,module,exports){
+},{}],143:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     copyObject = _dereq_('./_copyObject'),
     createAssigner = _dereq_('./_createAssigner'),
@@ -8088,7 +4061,7 @@ var assign = createAssigner(function(object, source) {
 
 module.exports = assign;
 
-},{"./_assignValue":34,"./_copyObject":82,"./_createAssigner":86,"./_isPrototype":119,"./isArrayLike":166,"./keys":184}],157:[function(_dereq_,module,exports){
+},{"./_assignValue":21,"./_copyObject":69,"./_createAssigner":73,"./_isPrototype":106,"./isArrayLike":153,"./keys":171}],144:[function(_dereq_,module,exports){
 var baseClone = _dereq_('./_baseClone');
 
 /** Used to compose bitmasks for cloning. */
@@ -8119,7 +4092,7 @@ function cloneDeep(value) {
 
 module.exports = cloneDeep;
 
-},{"./_baseClone":39}],158:[function(_dereq_,module,exports){
+},{"./_baseClone":26}],145:[function(_dereq_,module,exports){
 /**
  * Creates a function that returns `value`.
  *
@@ -8147,7 +4120,7 @@ function constant(value) {
 
 module.exports = constant;
 
-},{}],159:[function(_dereq_,module,exports){
+},{}],146:[function(_dereq_,module,exports){
 /**
  * Performs a
  * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
@@ -8186,7 +4159,7 @@ function eq(value, other) {
 
 module.exports = eq;
 
-},{}],160:[function(_dereq_,module,exports){
+},{}],147:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     baseFilter = _dereq_('./_baseFilter'),
     baseIteratee = _dereq_('./_baseIteratee'),
@@ -8236,7 +4209,7 @@ function filter(collection, predicate) {
 
 module.exports = filter;
 
-},{"./_arrayFilter":28,"./_baseFilter":42,"./_baseIteratee":57,"./isArray":165}],161:[function(_dereq_,module,exports){
+},{"./_arrayFilter":15,"./_baseFilter":29,"./_baseIteratee":44,"./isArray":152}],148:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -8271,7 +4244,7 @@ function get(object, path, defaultValue) {
 
 module.exports = get;
 
-},{"./_baseGet":45}],162:[function(_dereq_,module,exports){
+},{"./_baseGet":32}],149:[function(_dereq_,module,exports){
 var baseHasIn = _dereq_('./_baseHasIn'),
     hasPath = _dereq_('./_hasPath');
 
@@ -8307,7 +4280,7 @@ function hasIn(object, path) {
 
 module.exports = hasIn;
 
-},{"./_baseHasIn":48,"./_hasPath":105}],163:[function(_dereq_,module,exports){
+},{"./_baseHasIn":35,"./_hasPath":92}],150:[function(_dereq_,module,exports){
 /**
  * This method returns the first argument it receives.
  *
@@ -8330,7 +4303,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],164:[function(_dereq_,module,exports){
+},{}],151:[function(_dereq_,module,exports){
 var baseIsArguments = _dereq_('./_baseIsArguments'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -8368,7 +4341,7 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
 
 module.exports = isArguments;
 
-},{"./_baseIsArguments":49,"./isObjectLike":179}],165:[function(_dereq_,module,exports){
+},{"./_baseIsArguments":36,"./isObjectLike":166}],152:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is classified as an `Array` object.
  *
@@ -8396,7 +4369,7 @@ var isArray = Array.isArray;
 
 module.exports = isArray;
 
-},{}],166:[function(_dereq_,module,exports){
+},{}],153:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isLength = _dereq_('./isLength');
 
@@ -8431,7 +4404,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./isFunction":172,"./isLength":173}],167:[function(_dereq_,module,exports){
+},{"./isFunction":159,"./isLength":160}],154:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -8466,7 +4439,7 @@ function isArrayLikeObject(value) {
 
 module.exports = isArrayLikeObject;
 
-},{"./isArrayLike":166,"./isObjectLike":179}],168:[function(_dereq_,module,exports){
+},{"./isArrayLike":153,"./isObjectLike":166}],155:[function(_dereq_,module,exports){
 var root = _dereq_('./_root'),
     stubFalse = _dereq_('./stubFalse');
 
@@ -8506,7 +4479,7 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-},{"./_root":141,"./stubFalse":194}],169:[function(_dereq_,module,exports){
+},{"./_root":128,"./stubFalse":181}],156:[function(_dereq_,module,exports){
 var baseKeys = _dereq_('./_baseKeys'),
     getTag = _dereq_('./_getTag'),
     isArguments = _dereq_('./isArguments'),
@@ -8585,7 +4558,7 @@ function isEmpty(value) {
 
 module.exports = isEmpty;
 
-},{"./_baseKeys":58,"./_getTag":103,"./_isPrototype":119,"./isArguments":164,"./isArray":165,"./isArrayLike":166,"./isBuffer":168,"./isTypedArray":183}],170:[function(_dereq_,module,exports){
+},{"./_baseKeys":45,"./_getTag":90,"./_isPrototype":106,"./isArguments":151,"./isArray":152,"./isArrayLike":153,"./isBuffer":155,"./isTypedArray":170}],157:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual');
 
 /**
@@ -8622,7 +4595,7 @@ function isEqual(value, other) {
 
 module.exports = isEqual;
 
-},{"./_baseIsEqual":50}],171:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":37}],158:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -8660,7 +4633,7 @@ function isFinite(value) {
 
 module.exports = isFinite;
 
-},{"./_root":141}],172:[function(_dereq_,module,exports){
+},{"./_root":128}],159:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObject = _dereq_('./isObject');
 
@@ -8699,7 +4672,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./_baseGetTag":47,"./isObject":178}],173:[function(_dereq_,module,exports){
+},{"./_baseGetTag":34,"./isObject":165}],160:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -8736,7 +4709,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],174:[function(_dereq_,module,exports){
+},{}],161:[function(_dereq_,module,exports){
 var baseIsMap = _dereq_('./_baseIsMap'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -8765,7 +4738,7 @@ var isMap = nodeIsMap ? baseUnary(nodeIsMap) : baseIsMap;
 
 module.exports = isMap;
 
-},{"./_baseIsMap":52,"./_baseUnary":72,"./_nodeUtil":137}],175:[function(_dereq_,module,exports){
+},{"./_baseIsMap":39,"./_baseUnary":59,"./_nodeUtil":124}],162:[function(_dereq_,module,exports){
 var isNumber = _dereq_('./isNumber');
 
 /**
@@ -8805,7 +4778,7 @@ function isNaN(value) {
 
 module.exports = isNaN;
 
-},{"./isNumber":177}],176:[function(_dereq_,module,exports){
+},{"./isNumber":164}],163:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is `null` or `undefined`.
  *
@@ -8832,7 +4805,7 @@ function isNil(value) {
 
 module.exports = isNil;
 
-},{}],177:[function(_dereq_,module,exports){
+},{}],164:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -8872,7 +4845,7 @@ function isNumber(value) {
 
 module.exports = isNumber;
 
-},{"./_baseGetTag":47,"./isObjectLike":179}],178:[function(_dereq_,module,exports){
+},{"./_baseGetTag":34,"./isObjectLike":166}],165:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -8905,7 +4878,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],179:[function(_dereq_,module,exports){
+},{}],166:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -8936,7 +4909,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],180:[function(_dereq_,module,exports){
+},{}],167:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     getPrototype = _dereq_('./_getPrototype'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -9000,7 +4973,7 @@ function isPlainObject(value) {
 
 module.exports = isPlainObject;
 
-},{"./_baseGetTag":47,"./_getPrototype":99,"./isObjectLike":179}],181:[function(_dereq_,module,exports){
+},{"./_baseGetTag":34,"./_getPrototype":86,"./isObjectLike":166}],168:[function(_dereq_,module,exports){
 var baseIsSet = _dereq_('./_baseIsSet'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -9029,7 +5002,7 @@ var isSet = nodeIsSet ? baseUnary(nodeIsSet) : baseIsSet;
 
 module.exports = isSet;
 
-},{"./_baseIsSet":55,"./_baseUnary":72,"./_nodeUtil":137}],182:[function(_dereq_,module,exports){
+},{"./_baseIsSet":42,"./_baseUnary":59,"./_nodeUtil":124}],169:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -9060,7 +5033,7 @@ function isSymbol(value) {
 
 module.exports = isSymbol;
 
-},{"./_baseGetTag":47,"./isObjectLike":179}],183:[function(_dereq_,module,exports){
+},{"./_baseGetTag":34,"./isObjectLike":166}],170:[function(_dereq_,module,exports){
 var baseIsTypedArray = _dereq_('./_baseIsTypedArray'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -9089,7 +5062,7 @@ var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedA
 
 module.exports = isTypedArray;
 
-},{"./_baseIsTypedArray":56,"./_baseUnary":72,"./_nodeUtil":137}],184:[function(_dereq_,module,exports){
+},{"./_baseIsTypedArray":43,"./_baseUnary":59,"./_nodeUtil":124}],171:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeys = _dereq_('./_baseKeys'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -9128,7 +5101,7 @@ function keys(object) {
 
 module.exports = keys;
 
-},{"./_arrayLikeKeys":29,"./_baseKeys":58,"./isArrayLike":166}],185:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":16,"./_baseKeys":45,"./isArrayLike":153}],172:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeysIn = _dereq_('./_baseKeysIn'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -9162,7 +5135,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"./_arrayLikeKeys":29,"./_baseKeysIn":59,"./isArrayLike":166}],186:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":16,"./_baseKeysIn":46,"./isArrayLike":153}],173:[function(_dereq_,module,exports){
 (function (global){
 /**
  * @license
@@ -26271,7 +22244,7 @@ module.exports = keysIn;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],187:[function(_dereq_,module,exports){
+},{}],174:[function(_dereq_,module,exports){
 var arrayMap = _dereq_('./_arrayMap'),
     baseIteratee = _dereq_('./_baseIteratee'),
     baseMap = _dereq_('./_baseMap'),
@@ -26326,7 +22299,7 @@ function map(collection, iteratee) {
 
 module.exports = map;
 
-},{"./_arrayMap":30,"./_baseIteratee":57,"./_baseMap":60,"./isArray":165}],188:[function(_dereq_,module,exports){
+},{"./_arrayMap":17,"./_baseIteratee":44,"./_baseMap":47,"./isArray":152}],175:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     baseForOwn = _dereq_('./_baseForOwn'),
     baseIteratee = _dereq_('./_baseIteratee');
@@ -26371,7 +22344,7 @@ function mapValues(object, iteratee) {
 
 module.exports = mapValues;
 
-},{"./_baseAssignValue":38,"./_baseForOwn":44,"./_baseIteratee":57}],189:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":25,"./_baseForOwn":31,"./_baseIteratee":44}],176:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache');
 
 /** Error message constants. */
@@ -26446,7 +22419,7 @@ memoize.Cache = MapCache;
 
 module.exports = memoize;
 
-},{"./_MapCache":18}],190:[function(_dereq_,module,exports){
+},{"./_MapCache":5}],177:[function(_dereq_,module,exports){
 var baseMerge = _dereq_('./_baseMerge'),
     createAssigner = _dereq_('./_createAssigner');
 
@@ -26487,7 +22460,7 @@ var merge = createAssigner(function(object, source, srcIndex) {
 
 module.exports = merge;
 
-},{"./_baseMerge":63,"./_createAssigner":86}],191:[function(_dereq_,module,exports){
+},{"./_baseMerge":50,"./_createAssigner":73}],178:[function(_dereq_,module,exports){
 var baseProperty = _dereq_('./_baseProperty'),
     basePropertyDeep = _dereq_('./_basePropertyDeep'),
     isKey = _dereq_('./_isKey'),
@@ -26521,7 +22494,7 @@ function property(path) {
 
 module.exports = property;
 
-},{"./_baseProperty":65,"./_basePropertyDeep":66,"./_isKey":116,"./_toKey":154}],192:[function(_dereq_,module,exports){
+},{"./_baseProperty":52,"./_basePropertyDeep":53,"./_isKey":103,"./_toKey":141}],179:[function(_dereq_,module,exports){
 var baseSet = _dereq_('./_baseSet');
 
 /**
@@ -26558,7 +22531,7 @@ function set(object, path, value) {
 
 module.exports = set;
 
-},{"./_baseSet":68}],193:[function(_dereq_,module,exports){
+},{"./_baseSet":55}],180:[function(_dereq_,module,exports){
 /**
  * This method returns a new empty array.
  *
@@ -26583,7 +22556,7 @@ function stubArray() {
 
 module.exports = stubArray;
 
-},{}],194:[function(_dereq_,module,exports){
+},{}],181:[function(_dereq_,module,exports){
 /**
  * This method returns `false`.
  *
@@ -26603,7 +22576,7 @@ function stubFalse() {
 
 module.exports = stubFalse;
 
-},{}],195:[function(_dereq_,module,exports){
+},{}],182:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -26637,7 +22610,7 @@ function toPlainObject(value) {
 
 module.exports = toPlainObject;
 
-},{"./_copyObject":82,"./keysIn":185}],196:[function(_dereq_,module,exports){
+},{"./_copyObject":69,"./keysIn":172}],183:[function(_dereq_,module,exports){
 var baseToString = _dereq_('./_baseToString');
 
 /**
@@ -26667,7 +22640,7 @@ function toString(value) {
 
 module.exports = toString;
 
-},{"./_baseToString":71}],197:[function(_dereq_,module,exports){
+},{"./_baseToString":58}],184:[function(_dereq_,module,exports){
 //! moment.js
 
 ;(function (global, factory) {
@@ -31175,607 +27148,7 @@ module.exports = toString;
 
 })));
 
-},{}],198:[function(_dereq_,module,exports){
-(function (global,setImmediate){
-/*! Native Promise Only
-    v0.8.1 (c) Kyle Simpson
-    MIT License: http://getify.mit-license.org
-*/
-
-(function UMD(name,context,definition){
-	// special form of UMD for polyfilling across evironments
-	context[name] = context[name] || definition();
-	if (typeof module != "undefined" && module.exports) { module.exports = context[name]; }
-	else if (typeof define == "function" && define.amd) { define(function $AMD$(){ return context[name]; }); }
-})("Promise",typeof global != "undefined" ? global : this,function DEF(){
-	/*jshint validthis:true */
-	"use strict";
-
-	var builtInProp, cycle, scheduling_queue,
-		ToString = Object.prototype.toString,
-		timer = (typeof setImmediate != "undefined") ?
-			function timer(fn) { return setImmediate(fn); } :
-			setTimeout
-	;
-
-	// dammit, IE8.
-	try {
-		Object.defineProperty({},"x",{});
-		builtInProp = function builtInProp(obj,name,val,config) {
-			return Object.defineProperty(obj,name,{
-				value: val,
-				writable: true,
-				configurable: config !== false
-			});
-		};
-	}
-	catch (err) {
-		builtInProp = function builtInProp(obj,name,val) {
-			obj[name] = val;
-			return obj;
-		};
-	}
-
-	// Note: using a queue instead of array for efficiency
-	scheduling_queue = (function Queue() {
-		var first, last, item;
-
-		function Item(fn,self) {
-			this.fn = fn;
-			this.self = self;
-			this.next = void 0;
-		}
-
-		return {
-			add: function add(fn,self) {
-				item = new Item(fn,self);
-				if (last) {
-					last.next = item;
-				}
-				else {
-					first = item;
-				}
-				last = item;
-				item = void 0;
-			},
-			drain: function drain() {
-				var f = first;
-				first = last = cycle = void 0;
-
-				while (f) {
-					f.fn.call(f.self);
-					f = f.next;
-				}
-			}
-		};
-	})();
-
-	function schedule(fn,self) {
-		scheduling_queue.add(fn,self);
-		if (!cycle) {
-			cycle = timer(scheduling_queue.drain);
-		}
-	}
-
-	// promise duck typing
-	function isThenable(o) {
-		var _then, o_type = typeof o;
-
-		if (o != null &&
-			(
-				o_type == "object" || o_type == "function"
-			)
-		) {
-			_then = o.then;
-		}
-		return typeof _then == "function" ? _then : false;
-	}
-
-	function notify() {
-		for (var i=0; i<this.chain.length; i++) {
-			notifyIsolated(
-				this,
-				(this.state === 1) ? this.chain[i].success : this.chain[i].failure,
-				this.chain[i]
-			);
-		}
-		this.chain.length = 0;
-	}
-
-	// NOTE: This is a separate function to isolate
-	// the `try..catch` so that other code can be
-	// optimized better
-	function notifyIsolated(self,cb,chain) {
-		var ret, _then;
-		try {
-			if (cb === false) {
-				chain.reject(self.msg);
-			}
-			else {
-				if (cb === true) {
-					ret = self.msg;
-				}
-				else {
-					ret = cb.call(void 0,self.msg);
-				}
-
-				if (ret === chain.promise) {
-					chain.reject(TypeError("Promise-chain cycle"));
-				}
-				else if (_then = isThenable(ret)) {
-					_then.call(ret,chain.resolve,chain.reject);
-				}
-				else {
-					chain.resolve(ret);
-				}
-			}
-		}
-		catch (err) {
-			chain.reject(err);
-		}
-	}
-
-	function resolve(msg) {
-		var _then, self = this;
-
-		// already triggered?
-		if (self.triggered) { return; }
-
-		self.triggered = true;
-
-		// unwrap
-		if (self.def) {
-			self = self.def;
-		}
-
-		try {
-			if (_then = isThenable(msg)) {
-				schedule(function(){
-					var def_wrapper = new MakeDefWrapper(self);
-					try {
-						_then.call(msg,
-							function $resolve$(){ resolve.apply(def_wrapper,arguments); },
-							function $reject$(){ reject.apply(def_wrapper,arguments); }
-						);
-					}
-					catch (err) {
-						reject.call(def_wrapper,err);
-					}
-				})
-			}
-			else {
-				self.msg = msg;
-				self.state = 1;
-				if (self.chain.length > 0) {
-					schedule(notify,self);
-				}
-			}
-		}
-		catch (err) {
-			reject.call(new MakeDefWrapper(self),err);
-		}
-	}
-
-	function reject(msg) {
-		var self = this;
-
-		// already triggered?
-		if (self.triggered) { return; }
-
-		self.triggered = true;
-
-		// unwrap
-		if (self.def) {
-			self = self.def;
-		}
-
-		self.msg = msg;
-		self.state = 2;
-		if (self.chain.length > 0) {
-			schedule(notify,self);
-		}
-	}
-
-	function iteratePromises(Constructor,arr,resolver,rejecter) {
-		for (var idx=0; idx<arr.length; idx++) {
-			(function IIFE(idx){
-				Constructor.resolve(arr[idx])
-				.then(
-					function $resolver$(msg){
-						resolver(idx,msg);
-					},
-					rejecter
-				);
-			})(idx);
-		}
-	}
-
-	function MakeDefWrapper(self) {
-		this.def = self;
-		this.triggered = false;
-	}
-
-	function MakeDef(self) {
-		this.promise = self;
-		this.state = 0;
-		this.triggered = false;
-		this.chain = [];
-		this.msg = void 0;
-	}
-
-	function Promise(executor) {
-		if (typeof executor != "function") {
-			throw TypeError("Not a function");
-		}
-
-		if (this.__NPO__ !== 0) {
-			throw TypeError("Not a promise");
-		}
-
-		// instance shadowing the inherited "brand"
-		// to signal an already "initialized" promise
-		this.__NPO__ = 1;
-
-		var def = new MakeDef(this);
-
-		this["then"] = function then(success,failure) {
-			var o = {
-				success: typeof success == "function" ? success : true,
-				failure: typeof failure == "function" ? failure : false
-			};
-			// Note: `then(..)` itself can be borrowed to be used against
-			// a different promise constructor for making the chained promise,
-			// by substituting a different `this` binding.
-			o.promise = new this.constructor(function extractChain(resolve,reject) {
-				if (typeof resolve != "function" || typeof reject != "function") {
-					throw TypeError("Not a function");
-				}
-
-				o.resolve = resolve;
-				o.reject = reject;
-			});
-			def.chain.push(o);
-
-			if (def.state !== 0) {
-				schedule(notify,def);
-			}
-
-			return o.promise;
-		};
-		this["catch"] = function $catch$(failure) {
-			return this.then(void 0,failure);
-		};
-
-		try {
-			executor.call(
-				void 0,
-				function publicResolve(msg){
-					resolve.call(def,msg);
-				},
-				function publicReject(msg) {
-					reject.call(def,msg);
-				}
-			);
-		}
-		catch (err) {
-			reject.call(def,err);
-		}
-	}
-
-	var PromisePrototype = builtInProp({},"constructor",Promise,
-		/*configurable=*/false
-	);
-
-	// Note: Android 4 cannot use `Object.defineProperty(..)` here
-	Promise.prototype = PromisePrototype;
-
-	// built-in "brand" to signal an "uninitialized" promise
-	builtInProp(PromisePrototype,"__NPO__",0,
-		/*configurable=*/false
-	);
-
-	builtInProp(Promise,"resolve",function Promise$resolve(msg) {
-		var Constructor = this;
-
-		// spec mandated checks
-		// note: best "isPromise" check that's practical for now
-		if (msg && typeof msg == "object" && msg.__NPO__ === 1) {
-			return msg;
-		}
-
-		return new Constructor(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			resolve(msg);
-		});
-	});
-
-	builtInProp(Promise,"reject",function Promise$reject(msg) {
-		return new this(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			reject(msg);
-		});
-	});
-
-	builtInProp(Promise,"all",function Promise$all(arr) {
-		var Constructor = this;
-
-		// spec mandated checks
-		if (ToString.call(arr) != "[object Array]") {
-			return Constructor.reject(TypeError("Not an array"));
-		}
-		if (arr.length === 0) {
-			return Constructor.resolve([]);
-		}
-
-		return new Constructor(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			var len = arr.length, msgs = Array(len), count = 0;
-
-			iteratePromises(Constructor,arr,function resolver(idx,msg) {
-				msgs[idx] = msg;
-				if (++count === len) {
-					resolve(msgs);
-				}
-			},reject);
-		});
-	});
-
-	builtInProp(Promise,"race",function Promise$race(arr) {
-		var Constructor = this;
-
-		// spec mandated checks
-		if (ToString.call(arr) != "[object Array]") {
-			return Constructor.reject(TypeError("Not an array"));
-		}
-
-		return new Constructor(function executor(resolve,reject){
-			if (typeof resolve != "function" || typeof reject != "function") {
-				throw TypeError("Not a function");
-			}
-
-			iteratePromises(Constructor,arr,function resolver(idx,msg){
-				resolve(msg);
-			},reject);
-		});
-	});
-
-	return Promise;
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},_dereq_("timers").setImmediate)
-},{"timers":203}],199:[function(_dereq_,module,exports){
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-},{}],200:[function(_dereq_,module,exports){
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
-};
-
-},{}],201:[function(_dereq_,module,exports){
+},{}],185:[function(_dereq_,module,exports){
 /*!
  * Signature Pad v2.3.2
  * https://github.com/szimek/signature_pad
@@ -32387,558 +27760,11 @@ return SignaturePad;
 
 })));
 
-},{}],202:[function(_dereq_,module,exports){
+},{}],186:[function(_dereq_,module,exports){
 !function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.textMaskAddons=t():e.textMaskAddons=t()}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var o=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(o).default}});var i=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(i).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy";return function(t){var n=[],r=e.split(/[^dmyHMS]+/),o={dd:31,mm:12,yy:99,yyyy:9999,HH:23,MM:59,SS:59},i={dd:1,mm:1,yy:0,yyyy:1,HH:0,MM:0,SS:0},u=t.split("");r.forEach(function(t){var r=e.indexOf(t),i=parseInt(o[t].toString().substr(0,1),10);parseInt(u[r],10)>i&&(u[r+1]=u[r],u[r]=0,n.push(r))});var c=r.some(function(n){var r=e.indexOf(n),u=n.length,c=t.substr(r,u).replace(/\D/g,""),l=parseInt(c,10);return l>o[n]||c.length===u&&l<i[n]});return!c&&{value:u.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:c,t=e.length;if(e===c||e[0]===g[0]&&1===t)return g.split(c).concat([v]).concat(m.split(c));if(e===P&&_)return g.split(c).concat(["0",P,v]).concat(m.split(c));var n=e[0]===s&&H;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),l=u!==-1,a=void 0,h=void 0,b=void 0;if(e.slice($*-1)===m&&(e=e.slice(0,$*-1)),l&&(_||D)?(a=e.slice(e.slice(0,N)===g?N:0,u),h=e.slice(u+1,t),h=r(h.replace(f,c))):a=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":i(L))===p){var O="."===M?"[.]":""+M,S=(a.match(new RegExp(O,"g"))||[]).length;a=a.slice(0,L+S*V)}return a=a.replace(f,c),R||(a=a.replace(/^0+(0$|[^0])/,"$1")),a=x?o(a,M):a,b=r(a),(l&&_||D===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),h&&(("undefined"==typeof C?"undefined":i(C))===p&&(h=h.slice(0,C)),b=b.concat(h)),D===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(c).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),m.length>0&&(b=b.concat(m.split(c))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,h=t.suffix,m=void 0===h?c:h,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,M=void 0===O?l:O,S=t.allowDecimal,_=void 0!==S&&S,j=t.decimalSymbol,P=void 0===j?a:j,w=t.decimalLimit,C=void 0===w?2:w,k=t.requireDecimal,D=void 0!==k&&k,E=t.allowNegative,H=void 0!==E&&E,I=t.allowLeadingZeroes,R=void 0!==I&&I,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=m&&m.length||0,V=M&&M.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(c).map(function(e){return v.test(e)?v:e})}function o(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",c="",l=",",a=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function o(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,o=e.indexOf(y),s=e.lastIndexOf(p),d=s<o?-1:s,f=i(e,o+1,y),g=i(e,d-1,p),h=u(e,o,n),m=c(e,o,d,n),b=l(e,d,n,r);h=a(h),m=a(m),b=a(b,!0);var x=h.concat(f).concat(m).concat(g).concat(b);return x}function i(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function c(e,t,n,r){var o=v;return t!==-1&&(o=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),o=o.replace(new RegExp("[\\s"+r+"]",m),v),o===y?f:o.length<1?h:o[o.length-1]===p?o.slice(0,o.length-1):o}function l(e,t,n,r){var o=v;return t!==-1&&(o=e.slice(t+1,e.length)),o=o.replace(new RegExp("[\\s"+n+".]",m),v),0===o.length?e[t-1]===p&&r!==e.length?f:v:o}function a(e,t){return e.split(v).map(function(e){return e===h?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",h=" ",m="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:o,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,i=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(c),g=null===i.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(a)!==-1||y!==-1&&n!==y+1||i.indexOf(o)===-1&&f!==u&&i.indexOf(l)!==-1)return!1;var h=v.indexOf(o),m=v.slice(h+1,v.length);return(m.match(d)||s).length>1&&v.substr(-1)===l&&n!==i.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(i,function(){return t++,1===t?o:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var o="@",i=/@/g,u="",c="@.",l=".",a="..",s=[],d=/\./g}])});
-},{}],203:[function(_dereq_,module,exports){
-(function (setImmediate,clearImmediate){
-var nextTick = _dereq_('process/browser.js').nextTick;
-var apply = Function.prototype.apply;
-var slice = Array.prototype.slice;
-var immediateIds = {};
-var nextImmediateId = 0;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) { timeout.close(); };
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// That's not how node.js implements it but the exposed api is the same.
-exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-  var id = nextImmediateId++;
-  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
-  immediateIds[id] = true;
-
-  nextTick(function onNextTick() {
-    if (immediateIds[id]) {
-      // fn.call() is faster so we optimize for the common use-case
-      // @see http://jsperf.com/call-apply-segu
-      if (args) {
-        fn.apply(null, args);
-      } else {
-        fn.call(null);
-      }
-      // Prevent ids from leaking
-      exports.clearImmediate(id);
-    }
-  });
-
-  return id;
-};
-
-exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-  delete immediateIds[id];
-};
-}).call(this,_dereq_("timers").setImmediate,_dereq_("timers").clearImmediate)
-},{"process/browser.js":199,"timers":203}],204:[function(_dereq_,module,exports){
+},{}],187:[function(_dereq_,module,exports){
 !function(e,r){"object"==typeof exports&&"object"==typeof module?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.vanillaTextMask=r():e.vanillaTextMask=r()}(this,function(){return function(e){function r(n){if(t[n])return t[n].exports;var o=t[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var t={};return r.m=e,r.c=t,r.p="",r(0)}([function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r=e.inputElement,t=(0,u.default)(e),n=function(e){var r=e.target.value;return t.update(r)};return r.addEventListener("input",n),t.update(r.value),{textMaskInputElement:t,destroy:function(){r.removeEventListener("input",n)}}}Object.defineProperty(r,"__esModule",{value:!0}),r.conformToMask=void 0,r.maskInput=o;var i=t(2);Object.defineProperty(r,"conformToMask",{enumerable:!0,get:function(){return n(i).default}});var a=t(5),u=n(a);r.default=o},function(e,r){"use strict";Object.defineProperty(r,"__esModule",{value:!0}),r.placeholderChar="_",r.strFunction="function"},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:l,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:u,t=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};if(!(0,i.isArray)(r)){if(("undefined"==typeof r?"undefined":o(r))!==a.strFunction)throw new Error("Text-mask:conformToMask; The mask property must be an array.");r=r(e,t),r=(0,i.processCaretTraps)(r).maskWithoutCaretTraps}var n=t.guide,s=void 0===n||n,f=t.previousConformedValue,d=void 0===f?l:f,c=t.placeholderChar,p=void 0===c?a.placeholderChar:c,v=t.placeholder,h=void 0===v?(0,i.convertMaskToPlaceholder)(r,p):v,m=t.currentCaretPosition,y=t.keepCharPositions,g=s===!1&&void 0!==d,b=e.length,C=d.length,k=h.length,x=r.length,P=b-C,T=P>0,O=m+(T?-P:0),M=O+Math.abs(P);if(y===!0&&!T){for(var w=l,S=O;S<M;S++)h[S]===p&&(w+=p);e=e.slice(0,O)+w+e.slice(O,b)}for(var _=e.split(l).map(function(e,r){return{char:e,isNew:r>=O&&r<M}}),j=b-1;j>=0;j--){var V=_[j].char;if(V!==p){var A=j>=O&&C===x;V===h[A?j-P:j]&&_.splice(j,1)}}var E=l,N=!1;e:for(var F=0;F<k;F++){var I=h[F];if(I===p){if(_.length>0)for(;_.length>0;){var L=_.shift(),R=L.char,J=L.isNew;if(R===p&&g!==!0){E+=p;continue e}if(r[F].test(R)){if(y===!0&&J!==!1&&d!==l&&s!==!1&&T){for(var W=_.length,q=null,z=0;z<W;z++){var B=_[z];if(B.char!==p&&B.isNew===!1)break;if(B.char===p){q=z;break}}null!==q?(E+=R,_.splice(q,1)):F--}else E+=R;continue e}N=!0}g===!1&&(E+=h.substr(F,k));break}E+=I}if(g&&T===!1){for(var D=null,G=0;G<E.length;G++)h[G]===p&&(D=G);E=null!==D?E.substr(0,D+1):l}return{conformedValue:E,meta:{someCharsRejected:N}}}Object.defineProperty(r,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=n;var i=t(3),a=t(1),u=[],l=""},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:s,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:l.placeholderChar;if(!o(e))throw new Error("Text-mask:convertMaskToPlaceholder; The mask property must be an array.");if(e.indexOf(r)!==-1)throw new Error("Placeholder character must not be used as part of the mask. Please specify a character that is not present in your mask as your placeholder character.\n\n"+("The placeholder character that was received is: "+JSON.stringify(r)+"\n\n")+("The mask that was received is: "+JSON.stringify(e)));return e.map(function(e){return e instanceof RegExp?r:e}).join("")}function o(e){return Array.isArray&&Array.isArray(e)||e instanceof Array}function i(e){return"string"==typeof e||e instanceof String}function a(e){return"number"==typeof e&&void 0===e.length&&!isNaN(e)}function u(e){for(var r=[],t=void 0;t=e.indexOf(f),t!==-1;)r.push(t),e.splice(t,1);return{maskWithoutCaretTraps:e,indexes:r}}Object.defineProperty(r,"__esModule",{value:!0}),r.convertMaskToPlaceholder=n,r.isArray=o,r.isString=i,r.isNumber=a,r.processCaretTraps=u;var l=t(1),s=[],f="[]"},function(e,r){"use strict";function t(e){var r=e.previousConformedValue,t=void 0===r?o:r,i=e.previousPlaceholder,a=void 0===i?o:i,u=e.currentCaretPosition,l=void 0===u?0:u,s=e.conformedValue,f=e.rawValue,d=e.placeholderChar,c=e.placeholder,p=e.indexesOfPipedChars,v=void 0===p?n:p,h=e.caretTrapIndexes,m=void 0===h?n:h;if(0===l||!f.length)return 0;var y=f.length,g=t.length,b=c.length,C=s.length,k=y-g,x=k>0,P=0===g,T=k>1&&!x&&!P;if(T)return l;var O=x&&(t===s||s===c),M=0,w=void 0,S=void 0;if(O)M=l-k;else{var _=s.toLowerCase(),j=f.toLowerCase(),V=j.substr(0,l).split(o),A=V.filter(function(e){return _.indexOf(e)!==-1});S=A[A.length-1];var E=a.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,N=c.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,F=N!==E,I=void 0!==a[A.length-1]&&void 0!==c[A.length-2]&&a[A.length-1]!==d&&a[A.length-1]!==c[A.length-1]&&a[A.length-1]===c[A.length-2];!x&&(F||I)&&E>0&&c.indexOf(S)>-1&&void 0!==f[l]&&(w=!0,S=f[l]);for(var L=v.map(function(e){return _[e]}),R=L.filter(function(e){return e===S}).length,J=A.filter(function(e){return e===S}).length,W=c.substr(0,c.indexOf(d)).split(o).filter(function(e,r){return e===S&&f[r]!==e}).length,q=W+J+R+(w?1:0),z=0,B=0;B<C;B++){var D=_[B];if(M=B+1,D===S&&z++,z>=q)break}}if(x){for(var G=M,H=M;H<=b;H++)if(c[H]===d&&(G=H),c[H]===d||m.indexOf(H)!==-1||H===b)return G}else if(w){for(var K=M-1;K>=0;K--)if(s[K]===S||m.indexOf(K)!==-1||0===K)return K}else for(var Q=M;Q>=0;Q--)if(c[Q-1]===d||m.indexOf(Q)!==-1||0===Q)return Q}Object.defineProperty(r,"__esModule",{value:!0}),r.default=t;var n=[],o=""},function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r={previousConformedValue:void 0,previousPlaceholder:void 0};return{state:r,update:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:e,o=n.inputElement,s=n.mask,d=n.guide,m=n.pipe,g=n.placeholderChar,b=void 0===g?v.placeholderChar:g,C=n.keepCharPositions,k=void 0!==C&&C,x=n.showMask,P=void 0!==x&&x;if("undefined"==typeof t&&(t=o.value),t!==r.previousConformedValue){("undefined"==typeof s?"undefined":l(s))===y&&void 0!==s.pipe&&void 0!==s.mask&&(m=s.pipe,s=s.mask);var T=void 0,O=void 0;if(s instanceof Array&&(T=(0,p.convertMaskToPlaceholder)(s,b)),s!==!1){var M=a(t),w=o.selectionEnd,S=r.previousConformedValue,_=r.previousPlaceholder,j=void 0;if(("undefined"==typeof s?"undefined":l(s))===v.strFunction){if(O=s(M,{currentCaretPosition:w,previousConformedValue:S,placeholderChar:b}),O===!1)return;var V=(0,p.processCaretTraps)(O),A=V.maskWithoutCaretTraps,E=V.indexes;O=A,j=E,T=(0,p.convertMaskToPlaceholder)(O,b)}else O=s;var N={previousConformedValue:S,guide:d,placeholderChar:b,pipe:m,placeholder:T,currentCaretPosition:w,keepCharPositions:k},F=(0,c.default)(M,O,N),I=F.conformedValue,L=("undefined"==typeof m?"undefined":l(m))===v.strFunction,R={};L&&(R=m(I,u({rawValue:M},N)),R===!1?R={value:S,rejected:!0}:(0,p.isString)(R)&&(R={value:R}));var J=L?R.value:I,W=(0,f.default)({previousConformedValue:S,previousPlaceholder:_,conformedValue:J,placeholder:T,rawValue:M,currentCaretPosition:w,placeholderChar:b,indexesOfPipedChars:R.indexesOfPipedChars,caretTrapIndexes:j}),q=J===T&&0===W,z=P?T:h,B=q?z:J;r.previousConformedValue=B,r.previousPlaceholder=T,o.value!==B&&(o.value=B,i(o,W))}}}}}function i(e,r){document.activeElement===e&&(g?b(function(){return e.setSelectionRange(r,r,m)},0):e.setSelectionRange(r,r,m))}function a(e){if((0,p.isString)(e))return e;if((0,p.isNumber)(e))return String(e);if(void 0===e||null===e)return h;throw new Error("The 'value' provided to Text Mask needs to be a string or a number. The value received was:\n\n "+JSON.stringify(e))}Object.defineProperty(r,"__esModule",{value:!0});var u=Object.assign||function(e){for(var r=1;r<arguments.length;r++){var t=arguments[r];for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&(e[n]=t[n])}return e},l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=o;var s=t(4),f=n(s),d=t(2),c=n(d),p=t(3),v=t(1),h="",m="none",y="object",g="undefined"!=typeof navigator&&/Android/i.test(navigator.userAgent),b="undefined"!=typeof requestAnimationFrame?requestAnimationFrame:setTimeout}])});
-},{}],205:[function(_dereq_,module,exports){
-(function(self) {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  var support = {
-    searchParams: 'URLSearchParams' in self,
-    iterable: 'Symbol' in self && 'iterator' in Symbol,
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob()
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self,
-    arrayBuffer: 'ArrayBuffer' in self
-  }
-
-  if (support.arrayBuffer) {
-    var viewClasses = [
-      '[object Int8Array]',
-      '[object Uint8Array]',
-      '[object Uint8ClampedArray]',
-      '[object Int16Array]',
-      '[object Uint16Array]',
-      '[object Int32Array]',
-      '[object Uint32Array]',
-      '[object Float32Array]',
-      '[object Float64Array]'
-    ]
-
-    var isDataView = function(obj) {
-      return obj && DataView.prototype.isPrototypeOf(obj)
-    }
-
-    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
-      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
-    }
-  }
-
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = String(name)
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = String(value)
-    }
-    return value
-  }
-
-  // Build a destructive iterator for the value list
-  function iteratorFor(items) {
-    var iterator = {
-      next: function() {
-        var value = items.shift()
-        return {done: value === undefined, value: value}
-      }
-    }
-
-    if (support.iterable) {
-      iterator[Symbol.iterator] = function() {
-        return iterator
-      }
-    }
-
-    return iterator
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-    } else if (Array.isArray(headers)) {
-      headers.forEach(function(header) {
-        this.append(header[0], header[1])
-      }, this)
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var oldValue = this.map[name]
-    this.map[name] = oldValue ? oldValue+','+value : value
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    name = normalizeName(name)
-    return this.has(name) ? this.map[name] : null
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = normalizeValue(value)
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    for (var name in this.map) {
-      if (this.map.hasOwnProperty(name)) {
-        callback.call(thisArg, this.map[name], name, this)
-      }
-    }
-  }
-
-  Headers.prototype.keys = function() {
-    var items = []
-    this.forEach(function(value, name) { items.push(name) })
-    return iteratorFor(items)
-  }
-
-  Headers.prototype.values = function() {
-    var items = []
-    this.forEach(function(value) { items.push(value) })
-    return iteratorFor(items)
-  }
-
-  Headers.prototype.entries = function() {
-    var items = []
-    this.forEach(function(value, name) { items.push([name, value]) })
-    return iteratorFor(items)
-  }
-
-  if (support.iterable) {
-    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    var promise = fileReaderReady(reader)
-    reader.readAsArrayBuffer(blob)
-    return promise
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    var promise = fileReaderReady(reader)
-    reader.readAsText(blob)
-    return promise
-  }
-
-  function readArrayBufferAsText(buf) {
-    var view = new Uint8Array(buf)
-    var chars = new Array(view.length)
-
-    for (var i = 0; i < view.length; i++) {
-      chars[i] = String.fromCharCode(view[i])
-    }
-    return chars.join('')
-  }
-
-  function bufferClone(buf) {
-    if (buf.slice) {
-      return buf.slice(0)
-    } else {
-      var view = new Uint8Array(buf.byteLength)
-      view.set(new Uint8Array(buf))
-      return view.buffer
-    }
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (!body) {
-        this._bodyText = ''
-      } else if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-        this._bodyText = body.toString()
-      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
-        this._bodyArrayBuffer = bufferClone(body.buffer)
-        // IE 10-11 can't handle a DataView body.
-        this._bodyInit = new Blob([this._bodyArrayBuffer])
-      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
-        this._bodyArrayBuffer = bufferClone(body)
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-
-      if (!this.headers.get('content-type')) {
-        if (typeof body === 'string') {
-          this.headers.set('content-type', 'text/plain;charset=UTF-8')
-        } else if (this._bodyBlob && this._bodyBlob.type) {
-          this.headers.set('content-type', this._bodyBlob.type)
-        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
-        }
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyArrayBuffer) {
-          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        if (this._bodyArrayBuffer) {
-          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
-        } else {
-          return this.blob().then(readBlobAsArrayBuffer)
-        }
-      }
-    }
-
-    this.text = function() {
-      var rejected = consumed(this)
-      if (rejected) {
-        return rejected
-      }
-
-      if (this._bodyBlob) {
-        return readBlobAsText(this._bodyBlob)
-      } else if (this._bodyArrayBuffer) {
-        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
-      } else if (this._bodyFormData) {
-        throw new Error('could not read FormData body as text')
-      } else {
-        return Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(input, options) {
-    options = options || {}
-    var body = options.body
-
-    if (input instanceof Request) {
-      if (input.bodyUsed) {
-        throw new TypeError('Already read')
-      }
-      this.url = input.url
-      this.credentials = input.credentials
-      if (!options.headers) {
-        this.headers = new Headers(input.headers)
-      }
-      this.method = input.method
-      this.mode = input.mode
-      if (!body && input._bodyInit != null) {
-        body = input._bodyInit
-        input.bodyUsed = true
-      }
-    } else {
-      this.url = String(input)
-    }
-
-    this.credentials = options.credentials || this.credentials || 'omit'
-    if (options.headers || !this.headers) {
-      this.headers = new Headers(options.headers)
-    }
-    this.method = normalizeMethod(options.method || this.method || 'GET')
-    this.mode = options.mode || this.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(body)
-  }
-
-  Request.prototype.clone = function() {
-    return new Request(this, { body: this._bodyInit })
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function parseHeaders(rawHeaders) {
-    var headers = new Headers()
-    // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
-    // https://tools.ietf.org/html/rfc7230#section-3.2
-    var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ')
-    preProcessedHeaders.split(/\r?\n/).forEach(function(line) {
-      var parts = line.split(':')
-      var key = parts.shift().trim()
-      if (key) {
-        var value = parts.join(':').trim()
-        headers.append(key, value)
-      }
-    })
-    return headers
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this.type = 'default'
-    this.status = options.status === undefined ? 200 : options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = 'statusText' in options ? options.statusText : 'OK'
-    this.headers = new Headers(options.headers)
-    this.url = options.url || ''
-    this._initBody(bodyInit)
-  }
-
-  Body.call(Response.prototype)
-
-  Response.prototype.clone = function() {
-    return new Response(this._bodyInit, {
-      status: this.status,
-      statusText: this.statusText,
-      headers: new Headers(this.headers),
-      url: this.url
-    })
-  }
-
-  Response.error = function() {
-    var response = new Response(null, {status: 0, statusText: ''})
-    response.type = 'error'
-    return response
-  }
-
-  var redirectStatuses = [301, 302, 303, 307, 308]
-
-  Response.redirect = function(url, status) {
-    if (redirectStatuses.indexOf(status) === -1) {
-      throw new RangeError('Invalid status code')
-    }
-
-    return new Response(null, {status: status, headers: {location: url}})
-  }
-
-  self.Headers = Headers
-  self.Request = Request
-  self.Response = Response
-
-  self.fetch = function(input, init) {
-    return new Promise(function(resolve, reject) {
-      var request = new Request(input, init)
-      var xhr = new XMLHttpRequest()
-
-      xhr.onload = function() {
-        var options = {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
-        }
-        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
-        var body = 'response' in xhr ? xhr.response : xhr.responseText
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.ontimeout = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      } else if (request.credentials === 'omit') {
-        xhr.withCredentials = false
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
-  }
-  self.fetch.polyfill = true
-})(typeof self !== 'undefined' ? self : this);
-
-},{}],206:[function(_dereq_,module,exports){
+},{}],188:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33046,7 +27872,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],207:[function(_dereq_,module,exports){
+},{}],189:[function(_dereq_,module,exports){
 "use strict";
 
 var _merge = _dereq_('lodash/merge');
@@ -33287,7 +28113,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/merge":190}],208:[function(_dereq_,module,exports){
+},{"lodash/merge":177}],190:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33371,7 +28197,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],209:[function(_dereq_,module,exports){
+},{}],191:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -33465,7 +28291,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],210:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],192:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -33537,7 +28363,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],211:[function(_dereq_,module,exports){
+},{}],193:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -33609,7 +28435,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],212:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],194:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33638,7 +28464,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],213:[function(_dereq_,module,exports){
+},{}],195:[function(_dereq_,module,exports){
 "use strict";
 
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -33726,7 +28552,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":161,"lodash/isNil":176,"text-mask-addons":202}],214:[function(_dereq_,module,exports){
+},{"lodash/get":148,"lodash/isNil":163,"text-mask-addons":186}],196:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -33754,7 +28580,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],215:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],197:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils').default;
@@ -33891,7 +28717,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":10}],216:[function(_dereq_,module,exports){
+},{"formiojs/utils":undefined}],198:[function(_dereq_,module,exports){
 "use strict";
 
 var _get = _dereq_('lodash/get');
@@ -34009,7 +28835,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":161}],217:[function(_dereq_,module,exports){
+},{"lodash/get":148}],199:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -34261,7 +29087,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],218:[function(_dereq_,module,exports){
+},{}],200:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils').default;
@@ -34687,7 +29513,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":10}],219:[function(_dereq_,module,exports){
+},{"formiojs/utils":undefined}],201:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -34722,7 +29548,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],220:[function(_dereq_,module,exports){
+},{}],202:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -34784,7 +29610,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],221:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],203:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -35136,7 +29962,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],222:[function(_dereq_,module,exports){
+},{}],204:[function(_dereq_,module,exports){
 "use strict";
 
 var isEmpty = _dereq_('lodash/isEmpty');
@@ -35326,7 +30152,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260,"lodash/isEmpty":169}],223:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242,"lodash/isEmpty":156}],205:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35362,7 +30188,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],224:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],206:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -35456,7 +30282,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],207:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -35501,7 +30327,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":206,"./button":207,"./checkbox":208,"./columns":209,"./components":210,"./container":211,"./content":212,"./currency":213,"./custom":214,"./datagrid":215,"./datetime":216,"./day":217,"./editgrid":218,"./email":219,"./fieldset":220,"./file":221,"./form":222,"./hidden":223,"./htmlelement":224,"./number":226,"./page":227,"./panel":228,"./password":229,"./phonenumber":230,"./radio":231,"./resource":232,"./select":233,"./selectboxes":234,"./signature":235,"./survey":236,"./table":237,"./textarea":238,"./textfield":239,"./time":240,"./well":241}],226:[function(_dereq_,module,exports){
+},{"./address":188,"./button":189,"./checkbox":190,"./columns":191,"./components":192,"./container":193,"./content":194,"./currency":195,"./custom":196,"./datagrid":197,"./datetime":198,"./day":199,"./editgrid":200,"./email":201,"./fieldset":202,"./file":203,"./form":204,"./hidden":205,"./htmlelement":206,"./number":208,"./page":209,"./panel":210,"./password":211,"./phonenumber":212,"./radio":213,"./resource":214,"./select":215,"./selectboxes":216,"./signature":217,"./survey":218,"./table":219,"./textarea":220,"./textfield":221,"./time":222,"./well":223}],208:[function(_dereq_,module,exports){
 "use strict";
 
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -35598,7 +30424,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":161,"lodash/isNil":176,"text-mask-addons":202}],227:[function(_dereq_,module,exports){
+},{"lodash/get":148,"lodash/isNil":163,"text-mask-addons":186}],209:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -35625,7 +30451,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],210:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35688,7 +30514,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],229:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],211:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -35720,7 +30546,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],230:[function(_dereq_,module,exports){
+},{}],212:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -35757,7 +30583,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -35810,7 +30636,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],232:[function(_dereq_,module,exports){
+},{}],214:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -36060,7 +30886,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],233:[function(_dereq_,module,exports){
+},{}],215:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -36675,7 +31501,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":156,"lodash/cloneDeep":157,"lodash/get":161,"lodash/isEqual":170,"lodash/isNil":176,"lodash/mapValues":188,"lodash/set":192}],234:[function(_dereq_,module,exports){
+},{"lodash/assign":143,"lodash/cloneDeep":144,"lodash/get":148,"lodash/isEqual":157,"lodash/isNil":163,"lodash/mapValues":175,"lodash/set":179}],216:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -36801,7 +31627,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],235:[function(_dereq_,module,exports){
+},{}],217:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -36943,7 +31769,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":201}],236:[function(_dereq_,module,exports){
+},{"signature_pad":185}],218:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -37004,7 +31830,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],237:[function(_dereq_,module,exports){
+},{}],219:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -37090,7 +31916,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],238:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],220:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -37231,7 +32057,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],221:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -37294,7 +32120,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],240:[function(_dereq_,module,exports){
+},{}],222:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -37367,7 +32193,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"moment":197}],241:[function(_dereq_,module,exports){
+},{"moment":184}],223:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -37427,7 +32253,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":260}],242:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":242}],224:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -37505,7 +32331,7 @@ module.exports = function() {
   };
 };
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],225:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38072,7 +32898,7 @@ module.exports = function() {
   };
 };
 
-},{}],244:[function(_dereq_,module,exports){
+},{}],226:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -38089,7 +32915,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],245:[function(_dereq_,module,exports){
+},{}],227:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 var moment = _dereq_('moment');
@@ -38464,7 +33290,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":161,"moment":197}],246:[function(_dereq_,module,exports){
+},{"lodash/get":148,"moment":184}],228:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38480,7 +33306,7 @@ module.exports = function() {
   };
 };
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],229:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -38553,7 +33379,7 @@ module.exports = [
   }
 ];
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38638,7 +33464,7 @@ module.exports = function() {
   };
 };
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],231:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -38657,7 +33483,7 @@ module.exports = [
   }
 ];
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],232:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38667,7 +33493,7 @@ module.exports = function() {
   };
 };
 
-},{}],251:[function(_dereq_,module,exports){
+},{}],233:[function(_dereq_,module,exports){
 "use strict";
 var maskInput = _dereq_('vanilla-text-mask').default;
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -38852,7 +33678,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"formiojs/utils":10,"lodash":186,"text-mask-addons":202,"vanilla-text-mask":204}],252:[function(_dereq_,module,exports){
+},{"formiojs/utils":undefined,"lodash":173,"text-mask-addons":186,"vanilla-text-mask":187}],234:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38879,7 +33705,7 @@ module.exports = function() {
     }
   };
 };
-},{}],253:[function(_dereq_,module,exports){
+},{}],235:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38907,7 +33733,7 @@ module.exports = function() {
   };
 };
 
-},{}],254:[function(_dereq_,module,exports){
+},{}],236:[function(_dereq_,module,exports){
 "use strict";
 var _map = _dereq_('lodash/map');
 // Javascript editor directive
@@ -38983,7 +33809,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"lodash/map":187}],255:[function(_dereq_,module,exports){
+},{"lodash/map":174}],237:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -39015,7 +33841,7 @@ module.exports = function() {
   };
 };
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],238:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -39071,7 +33897,7 @@ module.exports = function() {
   };
 };
 
-},{}],257:[function(_dereq_,module,exports){
+},{}],239:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNaN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -39713,7 +34539,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isEmpty":169,"lodash/isFinite":171,"lodash/isNaN":175}],258:[function(_dereq_,module,exports){
+},{"lodash/isEmpty":156,"lodash/isFinite":158,"lodash/isNaN":162}],240:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -39910,7 +34736,7 @@ module.exports = [
   }
 ];
 
-},{}],259:[function(_dereq_,module,exports){
+},{}],241:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils').default;
 var conformToMask = _dereq_('vanilla-text-mask').conformToMask;
@@ -40402,7 +35228,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":10,"lodash/filter":160,"lodash/get":161,"vanilla-text-mask":204}],260:[function(_dereq_,module,exports){
+},{"formiojs/utils":undefined,"lodash/filter":147,"lodash/get":148,"vanilla-text-mask":187}],242:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, options) {
@@ -40529,7 +35355,7 @@ module.exports = function() {
   };
 };
 
-},{}],261:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -40578,7 +35404,7 @@ module.exports = [
   }
 ];
 
-},{}],262:[function(_dereq_,module,exports){
+},{}],244:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -40624,7 +35450,7 @@ module.exports = [
   }
 ];
 
-},{}],263:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -40633,7 +35459,7 @@ module.exports = [
   }
 ];
 
-},{}],264:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -40646,7 +35472,7 @@ module.exports = [
   }
 ];
 
-},{}],265:[function(_dereq_,module,exports){
+},{}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
     return function(label, shortcut) {
@@ -40668,7 +35494,7 @@ module.exports = function() {
     };
   }
   
-},{}],266:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -40687,7 +35513,7 @@ module.exports = [
   }
 ];
 
-},{}],267:[function(_dereq_,module,exports){
+},{}],249:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -40700,7 +35526,7 @@ module.exports = [
   }
 ];
 
-},{}],268:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -40715,7 +35541,7 @@ module.exports = [
   }
 ];
 
-},{}],269:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -40772,7 +35598,7 @@ module.exports = [
   }
 ];
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -40780,7 +35606,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],271:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -40944,7 +35770,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":225,"./directives/customValidator":242,"./directives/formio":243,"./directives/formioBindHtml.js":244,"./directives/formioComponent":245,"./directives/formioComponentTooltip":246,"./directives/formioComponentView":247,"./directives/formioDelete":248,"./directives/formioElement":249,"./directives/formioErrors":250,"./directives/formioMask":251,"./directives/formioMax":252,"./directives/formioMin":253,"./directives/formioScriptEditor":254,"./directives/formioSubmission":255,"./directives/formioSubmissions":256,"./directives/formioWizard":257,"./factories/FormioScope":258,"./factories/FormioUtils":259,"./factories/formioInterceptor":261,"./factories/formioTableView":262,"./filters/flattenComponents":263,"./filters/safehtml":264,"./filters/shortcut":265,"./filters/tableComponents":266,"./filters/tableFieldView":267,"./filters/tableView":268,"./filters/translate":269,"./filters/trusturl":270,"./polyfills/polyfills":273,"./providers/Formio":274}],272:[function(_dereq_,module,exports){
+},{"./components":207,"./directives/customValidator":224,"./directives/formio":225,"./directives/formioBindHtml.js":226,"./directives/formioComponent":227,"./directives/formioComponentTooltip":228,"./directives/formioComponentView":229,"./directives/formioDelete":230,"./directives/formioElement":231,"./directives/formioErrors":232,"./directives/formioMask":233,"./directives/formioMax":234,"./directives/formioMin":235,"./directives/formioScriptEditor":236,"./directives/formioSubmission":237,"./directives/formioSubmissions":238,"./directives/formioWizard":239,"./factories/FormioScope":240,"./factories/FormioUtils":241,"./factories/formioInterceptor":243,"./factories/formioTableView":244,"./filters/flattenComponents":245,"./filters/safehtml":246,"./filters/shortcut":247,"./filters/tableComponents":248,"./filters/tableFieldView":249,"./filters/tableView":250,"./filters/translate":251,"./filters/trusturl":252,"./polyfills/polyfills":255,"./providers/Formio":256}],254:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -40975,13 +35801,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],273:[function(_dereq_,module,exports){
+},{}],255:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":272}],274:[function(_dereq_,module,exports){
+},{"./Object.assign":254}],256:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -41062,5 +35888,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/Formio":3}]},{},[271])(271)
+},{"formiojs/Formio":undefined}]},{},[253])(253)
 });

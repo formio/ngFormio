@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.25.2
+### Changed
+ - Upgraded core renderer and other dependencies.
+
 ## 2.35.1
 ### Changed
  - Upgraded core renderer which introduces Okta SSO integration.
