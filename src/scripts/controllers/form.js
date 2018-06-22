@@ -858,6 +858,9 @@ app.controller('FormViewController', [
           if (submission._id) {
             $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
           }
+          else {
+            $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
+          }
         })
         .catch(function(err) {
           _.each(err.details, function(errDetails) {
