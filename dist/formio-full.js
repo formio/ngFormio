@@ -1,4 +1,4 @@
-/*! ng-formio v2.35.3 | https://unpkg.com/ng-formio@2.35.3/LICENSE.txt */
+/*! ng-formio v2.35.4 | https://unpkg.com/ng-formio@2.35.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -52325,7 +52325,7 @@ function checkCustomConditional(component, custom, row, data, form, variable, on
   if (typeof custom === 'string') {
     custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
   }
-  var value = instance && instance.evaluate ? instance.evaluate(custom, { row: row, data: data, form: form }) : evaluate(custom, { row: row, data: data, form: form });
+  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, { row: row, data: data, form: form });
   if (value === null) {
     return onError;
   }
@@ -106542,14 +106542,14 @@ module.exports = [
 },{}],297:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
-  'Formio',
+  'FormioUtils',
   'formioTableView',
   function(
-    Formio,
+    FormioUtils,
     formioTableView
   ) {
     return function(data, component) {
-      return formioTableView(Formio.fieldData(data, component), component);
+      return formioTableView(FormioUtils.fieldData(data, component), component);
     };
   }
 ];
