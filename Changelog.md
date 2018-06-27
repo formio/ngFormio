@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [UNRELEASED]
+### Fixed
+ - Redirect after form submitting when form doesn't have Save Submission action.
+
 ## 5.7.0
 ### Fixed
  - Adding roles to openid.
