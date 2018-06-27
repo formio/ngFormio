@@ -106,9 +106,6 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               if (!info) {
                 throw {data: 'Cannot find project information.'};
               }
-              if (info.data.host !== location.hostname) {
-                throw {data: 'Cannot modify pdfs under different host names.'};
-              }
               infoCache[project._id] = null;
               delete infoCache[project._id];
               return $http.post(this.pdfUrl(project) + '/purchase', purchase, {
@@ -127,9 +124,6 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
             return this.getInfo(projectPromise).then(function(info) {
               if (!info) {
                 throw {data: 'Cannot find project information.'};
-              }
-              if (info.data.host !== location.hostname) {
-                throw {data: 'Cannot modify pdfs under different host names.'};
               }
               infoCache[project._id] = null;
               delete infoCache[project._id];
