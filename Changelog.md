@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+ - CSS classes for wizard buttons
+
 ## 2.33.2
 ### Fixed
  - Update new syntax for importing from formio.js v3.x
