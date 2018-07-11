@@ -90,13 +90,22 @@ module.exports = function() {
           });
         };
 
+        var sendIframeForm = function(form) {
+          if ($scope.formio) {
+            form.projectUrl = $scope.formio.projectUrl;
+            form.url = $scope.formio.formUrl;
+            form.base = $scope.formio.base;
+          }
+          sendIframeMessage({name: 'form', data: form});
+        };
+
         $scope.$on('iframe-ready', function() {
           $scope.iframeReady = true;
           var iframe = $element.find('.formio-iframe')[0];
           if (iframe) {
             iframeReady.resolve(iframe);
             if ($scope.form) {
-              sendIframeMessage({name: 'form', data: $scope.form});
+              sendIframeForm($scope.form);
             }
             if ($scope.submission) {
               $scope.submission.readOnly = $scope.readOnly;
@@ -115,7 +124,7 @@ module.exports = function() {
           cancelFormLoadEvent();
           $timeout(function() {
             $scope.setDownloadUrl(form);
-            sendIframeMessage({name: 'form', data: form});
+            sendIframeForm(form);
           });
         });
 

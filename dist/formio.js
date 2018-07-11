@@ -1,4 +1,4 @@
-/*! ng-formio v2.33.1 | https://unpkg.com/ng-formio@2.33.1/LICENSE.txt */
+/*! ng-formio v2.35.4 | https://unpkg.com/ng-formio@2.35.4/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -883,9 +883,6 @@ exports.all = function() {
 },{"_process":199}],3:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -893,7 +890,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* globals OktaAuth */
+
+// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+// duck-punch the global Promise definition which messes up Angular 2 since it
+// also duck-punches the global Promise definition. For now, keep native-promise-only.
+
 
 var _nativePromiseOnly = _dereq_('native-promise-only');
 
@@ -914,6 +916,10 @@ var _shallowCopy2 = _interopRequireDefault(_shallowCopy);
 var _providers = _dereq_('./providers');
 
 var _providers2 = _interopRequireDefault(_providers);
+
+var _get2 = _dereq_('lodash/get');
+
+var _get3 = _interopRequireDefault(_get2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -991,10 +997,12 @@ var Formio = function () {
     }
 
     var project = this.projectUrl || Formio.projectUrl;
+    var projectRegEx = /(^|\/)(project)($|\/[^/]+)/;
+    var isProjectUrl = path.search(projectRegEx) !== -1;
 
-    // The baseURL is the same as the projectUrl. This is almost certainly against
-    // the Open Source server.
-    if (project && this.base === project) {
+    // The baseURL is the same as the projectUrl, and does not contain "/project/MONGO_ID" in
+    // its domain. This is almost certainly against the Open Source server.
+    if (project && this.base === project && !isProjectUrl) {
       this.noProject = true;
       this.projectUrl = this.base;
     }
@@ -1048,9 +1056,10 @@ var Formio = function () {
 
     if (!this.noProject) {
       // Determine the projectUrl and projectId
-      if (path.search(/(^|\/)(project)($|\/)/) !== -1) {
+      if (isProjectUrl) {
         // Get project id as project/:projectId.
         registerItems(['project'], hostName);
+        path = path.replace(projectRegEx, '');
       } else if (hostName === this.base) {
         // Get project id as first part of path (subdirectory).
         if (hostparts.length > 3 && path.split('/').length > 1) {
@@ -1071,7 +1080,7 @@ var Formio = function () {
     }
 
     // Configure Form urls and form ids.
-    if (path.search(/(^|\/)(project|form)($|\/)/) !== -1) {
+    if (path.search(/(^|\/)(form)($|\/)/) !== -1) {
       registerItems(['form', ['submission', 'action', 'v']], this.projectUrl);
     } else {
       var subRegEx = new RegExp('/(submission|action|v)($|/.*)');
@@ -1080,7 +1089,7 @@ var Formio = function () {
       path = path.replace(subRegEx, '');
       path = path.replace(/\/$/, '');
       this.formsUrl = this.projectUrl + '/form';
-      this.formUrl = this.projectUrl + path;
+      this.formUrl = path ? this.projectUrl + path : '';
       this.formId = path.replace(/^\/+|\/+$/g, '');
       var items = ['submission', 'action', 'v'];
       for (var i in items) {
@@ -1693,7 +1702,7 @@ var Formio = function () {
         // was introduced with the request, but the response contains a token. This is an Invalid
         // case where we do not send an x-jwt-token and get one in return for any GET request.
         var tokenIntroduced = false;
-        if (method === 'GET' && !requestToken && token && !(url.indexOf('token=') !== -1) && !(url.indexOf('x-jwt-token=') !== -1)) {
+        if (method === 'GET' && !requestToken && token && !opts.external && !(url.indexOf('token=') !== -1) && !(url.indexOf('x-jwt-token=') !== -1)) {
           console.warn('Token was introduced in request.');
           tokenIntroduced = true;
         }
@@ -2012,7 +2021,7 @@ var Formio = function () {
   }, {
     key: 'currentUser',
     value: function currentUser(formio, options) {
-      var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
+      var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
       projectUrl += '/current';
       var user = this.getUser();
       if (user) {
@@ -2022,8 +2031,7 @@ var Formio = function () {
           options: options
         });
       }
-      var token = Formio.getToken();
-      if (!token) {
+      if ((!options || !options.external) && !Formio.getToken()) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
           url: projectUrl,
           method: 'GET',
@@ -2044,6 +2052,147 @@ var Formio = function () {
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
       return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
     }
+  }, {
+    key: 'oAuthCurrentUser',
+    value: function oAuthCurrentUser(formio, token) {
+      return Formio.currentUser(formio, {
+        external: true,
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+    }
+  }, {
+    key: 'oktaInit',
+    value: function oktaInit(options) {
+      options = options || {};
+      if ((typeof OktaAuth === 'undefined' ? 'undefined' : _typeof(OktaAuth)) !== undefined) {
+        options.OktaAuth = OktaAuth;
+      }
+
+      if (_typeof(options.OktaAuth) === undefined) {
+        var errorMessage = 'Cannot find OktaAuth. Please include the Okta JavaScript SDK within your application. See https://developer.okta.com/code/javascript/okta_auth_sdk for an example.';
+        console.warn(errorMessage);
+        return _nativePromiseOnly2.default.reject(errorMessage);
+      }
+      return new _nativePromiseOnly2.default(function (resolve, reject) {
+        var Okta = options.OktaAuth;
+        delete options.OktaAuth;
+        var authClient = new Okta(options);
+        var accessToken = authClient.tokenManager.get('accessToken');
+        if (accessToken) {
+          resolve(Formio.oAuthCurrentUser(options.formio, accessToken.accessToken));
+        } else if (location.hash) {
+          authClient.token.parseFromUrl().then(function (token) {
+            authClient.tokenManager.add('accessToken', token);
+            resolve(Formio.oAuthCurrentUser(options.formio, token.accessToken));
+          }).catch(function (err) {
+            console.warn(err);
+            reject(err);
+          });
+        } else {
+          authClient.token.getWithRedirect({
+            responseType: 'token',
+            scopes: options.scopes
+          });
+          resolve(false);
+        }
+      });
+    }
+  }, {
+    key: 'ssoInit',
+    value: function ssoInit(type, options) {
+      switch (type) {
+        case 'okta':
+          return Formio.oktaInit(options);
+        default:
+          console.warn('Unknown SSO type');
+          return _nativePromiseOnly2.default.reject('Unknown SSO type');
+      }
+    }
+  }, {
+    key: 'requireLibrary',
+    value: function requireLibrary(name, property, src, polling) {
+      if (!Formio.libraries.hasOwnProperty(name)) {
+        Formio.libraries[name] = {};
+        Formio.libraries[name].ready = new _nativePromiseOnly2.default(function (resolve, reject) {
+          Formio.libraries[name].resolve = resolve;
+          Formio.libraries[name].reject = reject;
+        });
+
+        var callbackName = name + 'Callback';
+
+        if (!polling && !window[callbackName]) {
+          window[callbackName] = function () {
+            return Formio.libraries[name].resolve();
+          };
+        }
+
+        // See if the plugin already exists.
+        var plugin = (0, _get3.default)(window, property);
+        if (plugin) {
+          Formio.libraries[name].resolve(plugin);
+        } else {
+          src = Array.isArray(src) ? src : [src];
+          src.forEach(function (lib) {
+            var attrs = {};
+            var elementType = '';
+            if (typeof lib === 'string') {
+              lib = {
+                type: 'script',
+                src: lib
+              };
+            }
+            switch (lib.type) {
+              case 'script':
+                elementType = 'script';
+                attrs = {
+                  src: lib.src,
+                  type: 'text/javascript',
+                  defer: true,
+                  async: true
+                };
+                break;
+              case 'styles':
+                elementType = 'link';
+                attrs = {
+                  href: lib.src,
+                  rel: 'stylesheet'
+                };
+                break;
+            }
+
+            // Add the script to the top page.
+            var script = document.createElement(elementType);
+            for (var attr in attrs) {
+              script.setAttribute(attr, attrs[attr]);
+            }
+            document.getElementsByTagName('head')[0].appendChild(script);
+          });
+
+          // if no callback is provided, then check periodically for the script.
+          if (polling) {
+            var interval = setInterval(function () {
+              var plugin = (0, _get3.default)(window, property);
+              if (plugin) {
+                clearInterval(interval);
+                Formio.libraries[name].resolve(plugin);
+              }
+            }, 200);
+          }
+        }
+      }
+      return Formio.libraries[name].ready;
+    }
+  }, {
+    key: 'libraryReady',
+    value: function libraryReady(name) {
+      if (Formio.libraries.hasOwnProperty(name) && Formio.libraries[name].ready) {
+        return Formio.libraries[name].ready;
+      }
+
+      return _nativePromiseOnly2.default.reject(name + ' library was not required.');
+    }
   }]);
 
   return Formio;
@@ -2053,6 +2202,7 @@ var Formio = function () {
 
 
 exports.default = Formio;
+Formio.libraries = {};
 Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
@@ -2069,7 +2219,7 @@ if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object'
   global.Formio = Formio;
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":4,"browser-cookies":1,"eventemitter2":2,"native-promise-only":198,"shallow-copy":200,"whatwg-fetch":204}],4:[function(_dereq_,module,exports){
+},{"./providers":4,"browser-cookies":1,"eventemitter2":2,"lodash/get":161,"native-promise-only":198,"shallow-copy":200,"whatwg-fetch":205}],4:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -2184,9 +2334,7 @@ var dropbox = function dropbox(formio) {
           }
         };
 
-        xhr.onabort = function (err) {
-          reject(err);
-        };
+        xhr.onabort = reject;
 
         xhr.open('POST', formio.formUrl + '/storage/dropbox');
         var token = formio.getToken();
@@ -2268,9 +2416,7 @@ var s3 = function s3(formio) {
           reject(err);
         };
 
-        pre.onabort = function (err) {
-          reject(err);
-        };
+        pre.onabort = reject;
 
         pre.onload = function () {
           if (pre.status >= 200 && pre.status < 300) {
@@ -2315,9 +2461,7 @@ var s3 = function s3(formio) {
               }
             };
 
-            xhr.onabort = function (err) {
-              reject(err);
-            };
+            xhr.onabort = reject;
 
             xhr.open('POST', response.url);
 
@@ -2403,10 +2547,11 @@ var url = function url(formio) {
               respData = {};
             }
 
+            var _url = respData.hasOwnProperty('url') ? respData.url : xhr.responseURL + '/' + fileName;
             resolve({
               storage: 'url',
               name: fileName,
-              url: xhr.responseURL + '/' + fileName,
+              url: _url,
               size: file.size,
               type: file.type,
               data: respData
@@ -2418,11 +2563,11 @@ var url = function url(formio) {
 
         // Fire on network error.
         xhr.onerror = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.onabort = function () {
-          reject(xhr);
+          return reject(xhr);
         };
 
         xhr.open('POST', url);
@@ -2539,6 +2684,7 @@ exports.matchInputMask = matchInputMask;
 exports.getNumberSeparators = getNumberSeparators;
 exports.getNumberDecimalLimit = getNumberDecimalLimit;
 exports.getCurrencyAffixes = getCurrencyAffixes;
+exports.fieldData = fieldData;
 
 var _lodash = _dereq_('lodash');
 
@@ -2937,7 +3083,7 @@ function checkCalculated(component, submission, rowData) {
   // Process calculated value stuff if present.
   if (component.calculateValue) {
     _lodash2.default.set(rowData, component.key, evaluate(component.calculateValue, {
-      value: [],
+      value: undefined,
       data: submission ? submission.data : rowData,
       row: rowData,
       util: this,
@@ -2992,7 +3138,7 @@ function checkCustomConditional(component, custom, row, data, form, variable, on
   if (typeof custom === 'string') {
     custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
   }
-  var value = evaluate(custom, { component: component, row: row, data: data, form: form, instance: instance });
+  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, { row: row, data: data, form: form });
   if (value === null) {
     return onError;
   }
@@ -3031,7 +3177,7 @@ function checkCondition(component, row, data, form, instance) {
   } else if (component.conditional && component.conditional.when) {
     return checkSimpleConditional(component, component.conditional, row, data, true);
   } else if (component.conditional && component.conditional.json) {
-    return checkJsonConditional(component, component.conditional.json, row, data, form);
+    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
   }
 
   // Default to show.
@@ -3060,7 +3206,7 @@ function checkTrigger(component, trigger, row, data, form, instance) {
   return false;
 }
 
-function setActionProperty(component, action, row, data, result) {
+function setActionProperty(component, action, row, data, result, instance) {
   switch (action.property.type) {
     case 'boolean':
       if (_lodash2.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
@@ -3069,12 +3215,13 @@ function setActionProperty(component, action, row, data, result) {
       break;
     case 'string':
       {
-        var newValue = interpolate(action.text, {
+        var evalData = {
           data: data,
           row: row,
           component: component,
           result: result
-        });
+        };
+        var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
         if (newValue !== _lodash2.default.get(component, action.property.value, '')) {
           _lodash2.default.set(component, action.property.value, newValue);
         }
@@ -3169,15 +3316,32 @@ function getDateSetting(date) {
     return null;
   }
 
-  var dateSetting = (0, _moment2.default)(date);
-  if (dateSetting.isValid()) {
+  if (date instanceof Date) {
+    return date;
+  } else if (typeof date.toDate === 'function') {
+    return date.isValid() ? date.toDate() : null;
+  }
+
+  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _moment2.default)(date) : null;
+  if (dateSetting && dateSetting.isValid()) {
     return dateSetting.toDate();
   }
 
+  dateSetting = null;
   try {
     var value = new Function('moment', 'return ' + date + ';')(_moment2.default);
-    dateSetting = (0, _moment2.default)(value);
+    if (typeof value === 'string') {
+      dateSetting = (0, _moment2.default)(value);
+    } else if (typeof value.toDate === 'function') {
+      dateSetting = (0, _moment2.default)(value.toDate().toUTCString());
+    } else if (value instanceof Date) {
+      dateSetting = (0, _moment2.default)(value);
+    }
   } catch (e) {
+    return null;
+  }
+
+  if (!dateSetting) {
     return null;
   }
 
@@ -3346,6 +3510,55 @@ function getCurrencyAffixes(_ref) {
     prefix: parts[1] || '',
     suffix: parts[2] || ''
   };
+}
+
+/**
+ * Fetch the field data provided a component.
+ *
+ * @param data
+ * @param component
+ * @return {*}
+ */
+function fieldData(data, component) {
+  if (!data) {
+    return '';
+  }
+  if (!component || !component.key) {
+    return data;
+  }
+  if (component.key.indexOf('.') !== -1) {
+    var value = data;
+    var parts = component.key.split('.');
+    var key = '';
+    for (var i = 0; i < parts.length; i++) {
+      key = parts[i];
+
+      // Handle nested resources
+      if (value.hasOwnProperty('_id')) {
+        value = value.data;
+      }
+
+      // Return if the key is not found on the value.
+      if (!value.hasOwnProperty(key)) {
+        return;
+      }
+
+      // Convert old single field data in submissions to multiple
+      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+        value[key] = [value[key]];
+      }
+
+      // Set the value of this key.
+      value = value[key];
+    }
+    return value;
+  } else {
+    // Convert old single field data in submissions to multiple
+    if (component.multiple && !Array.isArray(data[component.key])) {
+      data[component.key] = [data[component.key]];
+    }
+    return data[component.key];
+  }
 }
 },{"./jsonlogic/operators":11,"json-logic-js":13,"lodash":186,"moment":197}],13:[function(_dereq_,module,exports){
 /* globals define,module */
@@ -27929,9 +28142,9 @@ module.exports = toString;
 
             mom = createUTC([2000, 1]).day(i);
             if (strict && !this._fullWeekdaysParse[i]) {
-                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\.?') + '$', 'i');
-                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\.?') + '$', 'i');
-                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\.?') + '$', 'i');
+                this._fullWeekdaysParse[i] = new RegExp('^' + this.weekdays(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._shortWeekdaysParse[i] = new RegExp('^' + this.weekdaysShort(mom, '').replace('.', '\\.?') + '$', 'i');
+                this._minWeekdaysParse[i] = new RegExp('^' + this.weekdaysMin(mom, '').replace('.', '\\.?') + '$', 'i');
             }
             if (!this._weekdaysParse[i]) {
                 regex = '^' + this.weekdays(mom, '') + '|^' + this.weekdaysShort(mom, '') + '|^' + this.weekdaysMin(mom, '');
@@ -28734,7 +28947,7 @@ module.exports = toString;
 
     function preprocessRFC2822(s) {
         // Remove comments and folding whitespace and replace multiple-spaces with a single space
-        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').trim();
+        return s.replace(/\([^)]*\)|[\n\t]/g, ' ').replace(/(\s\s+)/g, ' ').replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     }
 
     function checkWeekday(weekdayStr, parsedInput, config) {
@@ -30913,7 +31126,7 @@ module.exports = toString;
     // Side effect imports
 
 
-    hooks.version = '2.22.1';
+    hooks.version = '2.22.2';
 
     setHookCallback(createLocal);
 
@@ -30963,7 +31176,7 @@ module.exports = toString;
 })));
 
 },{}],198:[function(_dereq_,module,exports){
-(function (global){
+(function (global,setImmediate){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
     MIT License: http://getify.mit-license.org
@@ -31338,8 +31551,8 @@ module.exports = toString;
 	return Promise;
 });
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],199:[function(_dereq_,module,exports){
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},_dereq_("timers").setImmediate)
+},{"timers":203}],199:[function(_dereq_,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -32177,8 +32390,87 @@ return SignaturePad;
 },{}],202:[function(_dereq_,module,exports){
 !function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.textMaskAddons=t():e.textMaskAddons=t()}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var o=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(o).default}});var i=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(i).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy";return function(t){var n=[],r=e.split(/[^dmyHMS]+/),o={dd:31,mm:12,yy:99,yyyy:9999,HH:23,MM:59,SS:59},i={dd:1,mm:1,yy:0,yyyy:1,HH:0,MM:0,SS:0},u=t.split("");r.forEach(function(t){var r=e.indexOf(t),i=parseInt(o[t].toString().substr(0,1),10);parseInt(u[r],10)>i&&(u[r+1]=u[r],u[r]=0,n.push(r))});var c=r.some(function(n){var r=e.indexOf(n),u=n.length,c=t.substr(r,u).replace(/\D/g,""),l=parseInt(c,10);return l>o[n]||c.length===u&&l<i[n]});return!c&&{value:u.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:c,t=e.length;if(e===c||e[0]===g[0]&&1===t)return g.split(c).concat([v]).concat(m.split(c));if(e===P&&_)return g.split(c).concat(["0",P,v]).concat(m.split(c));var n=e[0]===s&&H;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),l=u!==-1,a=void 0,h=void 0,b=void 0;if(e.slice($*-1)===m&&(e=e.slice(0,$*-1)),l&&(_||D)?(a=e.slice(e.slice(0,N)===g?N:0,u),h=e.slice(u+1,t),h=r(h.replace(f,c))):a=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":i(L))===p){var O="."===M?"[.]":""+M,S=(a.match(new RegExp(O,"g"))||[]).length;a=a.slice(0,L+S*V)}return a=a.replace(f,c),R||(a=a.replace(/^0+(0$|[^0])/,"$1")),a=x?o(a,M):a,b=r(a),(l&&_||D===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),h&&(("undefined"==typeof C?"undefined":i(C))===p&&(h=h.slice(0,C)),b=b.concat(h)),D===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(c).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),m.length>0&&(b=b.concat(m.split(c))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,h=t.suffix,m=void 0===h?c:h,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,M=void 0===O?l:O,S=t.allowDecimal,_=void 0!==S&&S,j=t.decimalSymbol,P=void 0===j?a:j,w=t.decimalLimit,C=void 0===w?2:w,k=t.requireDecimal,D=void 0!==k&&k,E=t.allowNegative,H=void 0!==E&&E,I=t.allowLeadingZeroes,R=void 0!==I&&I,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=m&&m.length||0,V=M&&M.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(c).map(function(e){return v.test(e)?v:e})}function o(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",c="",l=",",a=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function o(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,o=e.indexOf(y),s=e.lastIndexOf(p),d=s<o?-1:s,f=i(e,o+1,y),g=i(e,d-1,p),h=u(e,o,n),m=c(e,o,d,n),b=l(e,d,n,r);h=a(h),m=a(m),b=a(b,!0);var x=h.concat(f).concat(m).concat(g).concat(b);return x}function i(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function c(e,t,n,r){var o=v;return t!==-1&&(o=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),o=o.replace(new RegExp("[\\s"+r+"]",m),v),o===y?f:o.length<1?h:o[o.length-1]===p?o.slice(0,o.length-1):o}function l(e,t,n,r){var o=v;return t!==-1&&(o=e.slice(t+1,e.length)),o=o.replace(new RegExp("[\\s"+n+".]",m),v),0===o.length?e[t-1]===p&&r!==e.length?f:v:o}function a(e,t){return e.split(v).map(function(e){return e===h?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",h=" ",m="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:o,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,i=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(c),g=null===i.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(a)!==-1||y!==-1&&n!==y+1||i.indexOf(o)===-1&&f!==u&&i.indexOf(l)!==-1)return!1;var h=v.indexOf(o),m=v.slice(h+1,v.length);return(m.match(d)||s).length>1&&v.substr(-1)===l&&n!==i.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(i,function(){return t++,1===t?o:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var o="@",i=/@/g,u="",c="@.",l=".",a="..",s=[],d=/\./g}])});
 },{}],203:[function(_dereq_,module,exports){
+(function (setImmediate,clearImmediate){
+var nextTick = _dereq_('process/browser.js').nextTick;
+var apply = Function.prototype.apply;
+var slice = Array.prototype.slice;
+var immediateIds = {};
+var nextImmediateId = 0;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) { timeout.close(); };
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// That's not how node.js implements it but the exposed api is the same.
+exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+  var id = nextImmediateId++;
+  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+  immediateIds[id] = true;
+
+  nextTick(function onNextTick() {
+    if (immediateIds[id]) {
+      // fn.call() is faster so we optimize for the common use-case
+      // @see http://jsperf.com/call-apply-segu
+      if (args) {
+        fn.apply(null, args);
+      } else {
+        fn.call(null);
+      }
+      // Prevent ids from leaking
+      exports.clearImmediate(id);
+    }
+  });
+
+  return id;
+};
+
+exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+  delete immediateIds[id];
+};
+}).call(this,_dereq_("timers").setImmediate,_dereq_("timers").clearImmediate)
+},{"process/browser.js":199,"timers":203}],204:[function(_dereq_,module,exports){
 !function(e,r){"object"==typeof exports&&"object"==typeof module?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.vanillaTextMask=r():e.vanillaTextMask=r()}(this,function(){return function(e){function r(n){if(t[n])return t[n].exports;var o=t[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var t={};return r.m=e,r.c=t,r.p="",r(0)}([function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r=e.inputElement,t=(0,u.default)(e),n=function(e){var r=e.target.value;return t.update(r)};return r.addEventListener("input",n),t.update(r.value),{textMaskInputElement:t,destroy:function(){r.removeEventListener("input",n)}}}Object.defineProperty(r,"__esModule",{value:!0}),r.conformToMask=void 0,r.maskInput=o;var i=t(2);Object.defineProperty(r,"conformToMask",{enumerable:!0,get:function(){return n(i).default}});var a=t(5),u=n(a);r.default=o},function(e,r){"use strict";Object.defineProperty(r,"__esModule",{value:!0}),r.placeholderChar="_",r.strFunction="function"},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:l,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:u,t=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};if(!(0,i.isArray)(r)){if(("undefined"==typeof r?"undefined":o(r))!==a.strFunction)throw new Error("Text-mask:conformToMask; The mask property must be an array.");r=r(e,t),r=(0,i.processCaretTraps)(r).maskWithoutCaretTraps}var n=t.guide,s=void 0===n||n,f=t.previousConformedValue,d=void 0===f?l:f,c=t.placeholderChar,p=void 0===c?a.placeholderChar:c,v=t.placeholder,h=void 0===v?(0,i.convertMaskToPlaceholder)(r,p):v,m=t.currentCaretPosition,y=t.keepCharPositions,g=s===!1&&void 0!==d,b=e.length,C=d.length,k=h.length,x=r.length,P=b-C,T=P>0,O=m+(T?-P:0),M=O+Math.abs(P);if(y===!0&&!T){for(var w=l,S=O;S<M;S++)h[S]===p&&(w+=p);e=e.slice(0,O)+w+e.slice(O,b)}for(var _=e.split(l).map(function(e,r){return{char:e,isNew:r>=O&&r<M}}),j=b-1;j>=0;j--){var V=_[j].char;if(V!==p){var A=j>=O&&C===x;V===h[A?j-P:j]&&_.splice(j,1)}}var E=l,N=!1;e:for(var F=0;F<k;F++){var I=h[F];if(I===p){if(_.length>0)for(;_.length>0;){var L=_.shift(),R=L.char,J=L.isNew;if(R===p&&g!==!0){E+=p;continue e}if(r[F].test(R)){if(y===!0&&J!==!1&&d!==l&&s!==!1&&T){for(var W=_.length,q=null,z=0;z<W;z++){var B=_[z];if(B.char!==p&&B.isNew===!1)break;if(B.char===p){q=z;break}}null!==q?(E+=R,_.splice(q,1)):F--}else E+=R;continue e}N=!0}g===!1&&(E+=h.substr(F,k));break}E+=I}if(g&&T===!1){for(var D=null,G=0;G<E.length;G++)h[G]===p&&(D=G);E=null!==D?E.substr(0,D+1):l}return{conformedValue:E,meta:{someCharsRejected:N}}}Object.defineProperty(r,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=n;var i=t(3),a=t(1),u=[],l=""},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:s,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:l.placeholderChar;if(!o(e))throw new Error("Text-mask:convertMaskToPlaceholder; The mask property must be an array.");if(e.indexOf(r)!==-1)throw new Error("Placeholder character must not be used as part of the mask. Please specify a character that is not present in your mask as your placeholder character.\n\n"+("The placeholder character that was received is: "+JSON.stringify(r)+"\n\n")+("The mask that was received is: "+JSON.stringify(e)));return e.map(function(e){return e instanceof RegExp?r:e}).join("")}function o(e){return Array.isArray&&Array.isArray(e)||e instanceof Array}function i(e){return"string"==typeof e||e instanceof String}function a(e){return"number"==typeof e&&void 0===e.length&&!isNaN(e)}function u(e){for(var r=[],t=void 0;t=e.indexOf(f),t!==-1;)r.push(t),e.splice(t,1);return{maskWithoutCaretTraps:e,indexes:r}}Object.defineProperty(r,"__esModule",{value:!0}),r.convertMaskToPlaceholder=n,r.isArray=o,r.isString=i,r.isNumber=a,r.processCaretTraps=u;var l=t(1),s=[],f="[]"},function(e,r){"use strict";function t(e){var r=e.previousConformedValue,t=void 0===r?o:r,i=e.previousPlaceholder,a=void 0===i?o:i,u=e.currentCaretPosition,l=void 0===u?0:u,s=e.conformedValue,f=e.rawValue,d=e.placeholderChar,c=e.placeholder,p=e.indexesOfPipedChars,v=void 0===p?n:p,h=e.caretTrapIndexes,m=void 0===h?n:h;if(0===l||!f.length)return 0;var y=f.length,g=t.length,b=c.length,C=s.length,k=y-g,x=k>0,P=0===g,T=k>1&&!x&&!P;if(T)return l;var O=x&&(t===s||s===c),M=0,w=void 0,S=void 0;if(O)M=l-k;else{var _=s.toLowerCase(),j=f.toLowerCase(),V=j.substr(0,l).split(o),A=V.filter(function(e){return _.indexOf(e)!==-1});S=A[A.length-1];var E=a.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,N=c.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,F=N!==E,I=void 0!==a[A.length-1]&&void 0!==c[A.length-2]&&a[A.length-1]!==d&&a[A.length-1]!==c[A.length-1]&&a[A.length-1]===c[A.length-2];!x&&(F||I)&&E>0&&c.indexOf(S)>-1&&void 0!==f[l]&&(w=!0,S=f[l]);for(var L=v.map(function(e){return _[e]}),R=L.filter(function(e){return e===S}).length,J=A.filter(function(e){return e===S}).length,W=c.substr(0,c.indexOf(d)).split(o).filter(function(e,r){return e===S&&f[r]!==e}).length,q=W+J+R+(w?1:0),z=0,B=0;B<C;B++){var D=_[B];if(M=B+1,D===S&&z++,z>=q)break}}if(x){for(var G=M,H=M;H<=b;H++)if(c[H]===d&&(G=H),c[H]===d||m.indexOf(H)!==-1||H===b)return G}else if(w){for(var K=M-1;K>=0;K--)if(s[K]===S||m.indexOf(K)!==-1||0===K)return K}else for(var Q=M;Q>=0;Q--)if(c[Q-1]===d||m.indexOf(Q)!==-1||0===Q)return Q}Object.defineProperty(r,"__esModule",{value:!0}),r.default=t;var n=[],o=""},function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r={previousConformedValue:void 0,previousPlaceholder:void 0};return{state:r,update:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:e,o=n.inputElement,s=n.mask,d=n.guide,m=n.pipe,g=n.placeholderChar,b=void 0===g?v.placeholderChar:g,C=n.keepCharPositions,k=void 0!==C&&C,x=n.showMask,P=void 0!==x&&x;if("undefined"==typeof t&&(t=o.value),t!==r.previousConformedValue){("undefined"==typeof s?"undefined":l(s))===y&&void 0!==s.pipe&&void 0!==s.mask&&(m=s.pipe,s=s.mask);var T=void 0,O=void 0;if(s instanceof Array&&(T=(0,p.convertMaskToPlaceholder)(s,b)),s!==!1){var M=a(t),w=o.selectionEnd,S=r.previousConformedValue,_=r.previousPlaceholder,j=void 0;if(("undefined"==typeof s?"undefined":l(s))===v.strFunction){if(O=s(M,{currentCaretPosition:w,previousConformedValue:S,placeholderChar:b}),O===!1)return;var V=(0,p.processCaretTraps)(O),A=V.maskWithoutCaretTraps,E=V.indexes;O=A,j=E,T=(0,p.convertMaskToPlaceholder)(O,b)}else O=s;var N={previousConformedValue:S,guide:d,placeholderChar:b,pipe:m,placeholder:T,currentCaretPosition:w,keepCharPositions:k},F=(0,c.default)(M,O,N),I=F.conformedValue,L=("undefined"==typeof m?"undefined":l(m))===v.strFunction,R={};L&&(R=m(I,u({rawValue:M},N)),R===!1?R={value:S,rejected:!0}:(0,p.isString)(R)&&(R={value:R}));var J=L?R.value:I,W=(0,f.default)({previousConformedValue:S,previousPlaceholder:_,conformedValue:J,placeholder:T,rawValue:M,currentCaretPosition:w,placeholderChar:b,indexesOfPipedChars:R.indexesOfPipedChars,caretTrapIndexes:j}),q=J===T&&0===W,z=P?T:h,B=q?z:J;r.previousConformedValue=B,r.previousPlaceholder=T,o.value!==B&&(o.value=B,i(o,W))}}}}}function i(e,r){document.activeElement===e&&(g?b(function(){return e.setSelectionRange(r,r,m)},0):e.setSelectionRange(r,r,m))}function a(e){if((0,p.isString)(e))return e;if((0,p.isNumber)(e))return String(e);if(void 0===e||null===e)return h;throw new Error("The 'value' provided to Text Mask needs to be a string or a number. The value received was:\n\n "+JSON.stringify(e))}Object.defineProperty(r,"__esModule",{value:!0});var u=Object.assign||function(e){for(var r=1;r<arguments.length;r++){var t=arguments[r];for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&(e[n]=t[n])}return e},l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=o;var s=t(4),f=n(s),d=t(2),c=n(d),p=t(3),v=t(1),h="",m="none",y="object",g="undefined"!=typeof navigator&&/Android/i.test(navigator.userAgent),b="undefined"!=typeof requestAnimationFrame?requestAnimationFrame:setTimeout}])});
-},{}],204:[function(_dereq_,module,exports){
+},{}],205:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -32646,7 +32938,7 @@ return SignaturePad;
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],205:[function(_dereq_,module,exports){
+},{}],206:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -32743,7 +33035,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/address.html',
-        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\" ng-style=\"getLabelStyles(component)\"\n       id=\"{{componentId+'Label'}}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select auto-focus=\"true\" ng-model=\"data[component.key]\" safe-multiple-to-single ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" tabindex=\"{{ component.tabindex || 0 }}\"  aria-labelledby=\"{{ componentId +'Label'}}\"\n           aria-describedby=\"{{componentId + 'Desc'}}\" theme=\"bootstrap\" ng-style=\"getInputGroupStyles(component)\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"address in addresses\" refresh=\"refreshAddress($select.search)\" refresh-delay=\"500\">\n    <div ng-bind-html=\"address.formatted_address | highlight: $select.search\"></div>\n  </ui-select-choices>\n</ui-select>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\" class=\"control-label--bottom\" id=\"{{componentId+'Desc'}}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
+        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\" ng-style=\"getLabelStyles(component)\"\n       id=\"{{componentId+'Label'}}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select auto-focus=\"true\" ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" safe-multiple-to-single ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" tabindex=\"{{ component.tabindex || 0 }}\"  aria-labelledby=\"{{ componentId +'Label'}}\"\n           aria-describedby=\"{{componentId + 'Desc'}}\" theme=\"bootstrap\" ng-style=\"getInputGroupStyles(component)\">\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">{{$item.formatted_address || $select.selected.formatted_address}}</ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"address in addresses\" refresh=\"refreshAddress($select.search)\" refresh-delay=\"500\">\n    <div ng-bind-html=\"address.formatted_address | highlight: $select.search\"></div>\n  </ui-select-choices>\n</ui-select>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\" class=\"control-label--bottom\" id=\"{{componentId+'Desc'}}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
       );
 
       // Change the ui-select to ui-select multiple.
@@ -32754,7 +33046,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],206:[function(_dereq_,module,exports){
+},{}],207:[function(_dereq_,module,exports){
 "use strict";
 
 var _merge = _dereq_('lodash/merge');
@@ -32820,8 +33112,8 @@ module.exports = function(app) {
               }
               var flattened = FormioUtils.flattenComponents(parent.form.components, true);
               var components = flattened;
-              (new Function('form', 'flattened', 'components', '_merge', '$scope', 'data', $scope.component.custom.toString()))
-              (parent.form, flattened, components, _merge, $scope, $scope.data);
+              (new Function('form', 'flattened', 'components', '_merge', '$scope', 'data', 'row', $scope.component.custom.toString()))
+              (parent.form, flattened, components, _merge, $scope, $scope.data, $scope.data);
             }
             catch (e) {
               /* eslint-disable no-console */
@@ -32995,7 +33287,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/merge":190}],207:[function(_dereq_,module,exports){
+},{"lodash/merge":190}],208:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33014,18 +33306,19 @@ module.exports = function(app) {
             true: true,
             false: false
           };
+
           var defaultValue = $scope.component.hasOwnProperty('defaultValue')
             ? boolean[$scope.component.defaultValue] || false
             : false;
 
-          // FOR-440 - Only use the default value if the data isn't defined.
-          // On the first load, attempt to set the default value.
-          $scope.data[$scope.component.key] = $scope.data.hasOwnProperty($scope.component.key) && boolean.hasOwnProperty($scope.data[$scope.component.key])
-            ? boolean[$scope.data[$scope.component.key]]
-            : defaultValue;
-
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
           if ($scope.component.inputType === 'checkbox') {
+            // FOR-440 - Only use the default value if the data isn't defined.
+            // On the first load, attempt to set the default value.
+            $scope.data[$scope.component.key] = $scope.data.hasOwnProperty($scope.component.key) && boolean.hasOwnProperty($scope.data[$scope.component.key])
+              ? boolean[$scope.data[$scope.component.key]]
+              : defaultValue;
+
             $scope.$watch('data.' + $scope.component.key, function() {
               if (!$scope.data || !$scope.component.key) return;
 
@@ -33033,11 +33326,9 @@ module.exports = function(app) {
               if (
                 $scope.component.validate
                 && $scope.component.validate.required
-                && (boolean[$scope.data[$scope.component.key]] || false) === false
+                && boolean[$scope.data[$scope.component.key]] === false
               ) {
-                $timeout(function() {
-                  delete $scope.data[$scope.component.key];
-                });
+                delete $scope.data[$scope.component.key];
               }
             });
           }
@@ -33074,13 +33365,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/checkbox.html',
-        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\" id=\"{{ componentId+'Label' }}\" ng-style=\"getOptionLabelStyles(component)\">\n    <span ng-if=\"labelVisible() && topOrLeftOptionLabel(component)\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </span>\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      aria-labelledby=\"{{ componentId +'Label'}}\"\n      aria-describedby=\"{{componentId + 'Desc'}}\"\n      ng-disabled=\"readOnly\"\n      auto-focus=\"true\"\n      ng-model=\"data[component.name]\"\n      ng-required=\"component.validate.required\"\n      ng-style=\"getOptionInputStyles(component)\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      auto-focus=\"true\"\n      ng-model=\"data[component.key]\"\n      aria-labelledby=\"{{ componentId +'Label'}}\"\n      aria-describedby=\"{{componentId + 'Desc'}}\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n      ng-style=\"getOptionInputStyles(component)\"\n    >\n    <span ng-if=\"labelVisible() && !topOrLeftOptionLabel(component)\">\n      {{ component.label | formioTranslate:null:options.building | shortcut:component.shortcut }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span id=\"{{ componentId+'Desc' }}\">{{ component.description }}</span>\n</div>\n"
+        "<div class=\"checkbox\">\n  <label for=\"{{ componentId }}\" ng-class=\"{'field-required': isRequired(component)}\" id=\"{{ componentId+'Label' }}\" ng-style=\"getOptionLabelStyles(component)\">\n    <span ng-if=\"labelVisible() && topOrLeftOptionLabel(component)\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </span>\n    <input\n      ng-if=\"component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ component.name }}\"\n      value=\"{{ component.value }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      aria-labelledby=\"{{ componentId +'Label'}}\"\n      aria-describedby=\"{{componentId + 'Desc'}}\"\n      ng-disabled=\"readOnly\"\n      auto-focus=\"true\"\n      ng-model=\"data[component.name]\"\n      ng-model-options=\"{allowInvalid: true}\"\n      ng-required=\"component.validate.required\"\n      ng-style=\"getOptionInputStyles(component)\"\n    >\n    <input\n      ng-if=\"!component.name\"\n      type=\"{{ component.inputType }}\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\"\n      tabindex=\"{{ component.tabindex || 0 }}\"\n      ng-disabled=\"readOnly\"\n      auto-focus=\"true\"\n      ng-model=\"data[component.key]\"\n      ng-model-options=\"{allowInvalid: true}\"\n      aria-labelledby=\"{{ componentId +'Label'}}\"\n      aria-describedby=\"{{componentId + 'Desc'}}\"\n      ng-required=\"isRequired(component)\"\n      custom-validator=\"component.validate.custom\"\n      ng-style=\"getOptionInputStyles(component)\"\n    >\n    <span ng-if=\"labelVisible() && !topOrLeftOptionLabel(component)\">\n      {{ component.label | formioTranslate:null:options.building | shortcut:component.shortcut }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </span>\n  </label>\n</div>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span id=\"{{ componentId+'Desc' }}\">{{ component.description }}</span>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],208:[function(_dereq_,module,exports){
+},{}],209:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -33174,7 +33465,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],209:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],210:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -33246,7 +33537,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],210:[function(_dereq_,module,exports){
+},{}],211:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -33318,7 +33609,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],211:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],212:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33347,7 +33638,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],212:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 "use strict";
 
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -33408,7 +33699,7 @@ module.exports = function(app) {
           clearOnHide: true,
           delimiter: true,
           decimalLimit: 2,
-          requireDecimals: true,
+          requireDecimal: true,
           validate: {
             required: false,
             multiple: '',
@@ -33429,13 +33720,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/currency.html', FormioUtils.fieldWrap(
-        "<input\n  type=\"text\"\n  inputmode=\"numeric\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  formio-mask=\"currency\"\n>\n"
+        "<input\n  type=\"text\"\n  inputmode=\"numeric\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  formio-mask=\"currency\"\n>\n"
       ));
     }
   ]);
 };
 
-},{"lodash/get":161,"lodash/isNil":176,"text-mask-addons":202}],213:[function(_dereq_,module,exports){
+},{"lodash/get":161,"lodash/isNil":176,"text-mask-addons":202}],214:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -33463,7 +33754,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],214:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],215:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils').default;
@@ -33538,35 +33829,6 @@ module.exports = function(app) {
       });
     }
   ]);
-  app.directive('datagridValidation', function() {
-    return {
-      require: 'ngModel',
-      restrict: 'A',
-      link: function(scope, elem, attr, ctrl) {
-        if ((scope.options && scope.options.building) || !scope.formioForm || !scope.component.validate || !scope.component.validate.custom) return;
-
-        // Add the control to the main form.
-        ctrl.$name = scope.componentId;
-        scope.formioForm.$addControl(ctrl);
-        // For some reason the validator deletes the ng-model value if validation fails so make a fake copy since we don't need it anyway.
-        scope.dataValue = angular.copy(scope.data);
-
-        var init = true;
-
-        // Wait 300ms for changes to trigger the datagrid.
-        setTimeout(function() {
-          init = false;
-        }, 300);
-        scope.$watch('data', function() {
-          scope.dataValue = angular.copy(scope.data);
-          ctrl.$validate();
-          if (!init) {
-            ctrl.$setDirty(true);
-          }
-        }, true);
-      }
-    }
-  });
   app.controller('formioDataGrid', [
     '$scope',
     'FormioUtils',
@@ -33574,11 +33836,11 @@ module.exports = function(app) {
       if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
-      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
+      $scope.data[$scope.componentId] = $scope.data[$scope.componentId] || [{}];
 
       // Determine if any component is visible.
       $scope.anyVisible = function(component) {
-        var data = $scope.data[$scope.component.key];
+        var data = $scope.data[$scope.componentId];
         var visible = false;
         angular.forEach(data, function(rowData) {
           visible = (visible || FormioUtils.isVisible(component, rowData, $scope.data, $scope.hideComponents));
@@ -33587,7 +33849,7 @@ module.exports = function(app) {
       };
 
       // Pull out the rows and cols for easy iteration.
-      $scope.rows = $scope.data[$scope.component.key];
+      $scope.rows = $scope.data[$scope.componentId];
       // If less than minLength, add that many rows.
       if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
         var toAdd = $scope.component.validate.minLength - $scope.rows.length;
@@ -33623,13 +33885,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datagrid.html', FormioUtils.fieldWrap(
-        "<div name=\"{{ componentId }}\" class=\"formio-data-grid\" ng-model=\"dataValue[componentId]\" custom-validator=\"component.validate.custom\" datagrid-validation ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <thead>\n      <tr>\n        <th\n          ng-repeat=\"col in cols track by $index\"\n          ng-class=\"{'field-required': col.validate.required}\"\n          ng-if=\"options.building ? '::true' : anyVisible(col)\"\n        ><span ng-if=\"!col.dataGridLabel && (col.input || !col.hideLabel)\">{{ col.label | formioTranslate:null:options.building }}</span></th>\n        <th style=\"padding-left: 9px;\">\n          <div style=\"padding: 0; margin-bottom: 0;\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both')\">\n            <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n              <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ \"\" | formioTranslate:null:options.building }}\n            </a>\n          </div>\n        </th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.inDataGrid = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"options.building ? '::true' : anyVisible(col)\">\n          <formio-component\n            component=\"col\"\n            data=\"rows[rowIndex]\"\n            form-name=\"formName\"\n            formio=\"formio\"\n            submission=\"submission\"\n            hide-components=\"hideComponents\"\n            ng-if=\"options.building ? '::true' : isVisible(col, row)\"\n            read-only=\"isDisabled(col, row)\"\n            grid-row=\"rowIndex\"\n            grid-col=\"colIndex\"\n            options=\"options\"\n          ></formio-component>\n        </td>\n        <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n          <a ng-click=\"(readOnly || formioForm.submitting)? null: removeRow(rowIndex) \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-default\">\n            <span class=\"glyphicon glyphicon-remove-circle\"></span>\n          </a>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <div style=\"margin-top: 10px\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || !component.validate.maxLength || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')\">\n    <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n    </a>\n  </div>\n</div>\n\n\n"
+        "<div name=\"{{ componentId }}\" class=\"formio-data-grid\" ng-model=\"data[componentId]\" ng-model-options=\"{allowInvalid: true}\" custom-validator=\"component.validate.custom\" ng-controller=\"formioDataGrid\">\n  <table ng-class=\"{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}\" class=\"table datagrid-table\">\n    <thead>\n      <tr>\n        <th\n          ng-repeat=\"col in cols track by $index\"\n          ng-class=\"{'field-required': col.validate.required}\"\n          ng-if=\"options.building ? '::true' : anyVisible(col)\"\n        ><span ng-if=\"!col.dataGridLabel && (col.input || !col.hideLabel)\">{{ col.label | formioTranslate:null:options.building }}</span></th>\n        <th style=\"padding-left: 9px;\">\n          <div style=\"padding: 0; margin-bottom: 0;\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength) && (component.addAnotherPosition === 'top' || component.addAnotherPosition === 'both')\">\n            <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n              <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ \"\" | formioTranslate:null:options.building }}\n            </a>\n          </div>\n        </th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <td ng-repeat=\"col in cols track by $index\" ng-init=\"col.inDataGrid = true; colIndex = $index\" class=\"formio-data-grid-row\" ng-if=\"options.building ? '::true' : anyVisible(col)\">\n          <formio-component\n            component=\"col\"\n            data=\"rows[rowIndex]\"\n            form-name=\"formName\"\n            formio=\"formio\"\n            submission=\"submission\"\n            hide-components=\"hideComponents\"\n            ng-if=\"options.building ? '::true' : isVisible(col, row)\"\n            read-only=\"isDisabled(col, row)\"\n            grid-row=\"rowIndex\"\n            grid-col=\"colIndex\"\n            options=\"options\"\n          ></formio-component>\n        </td>\n        <td ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength\">\n          <a ng-click=\"(readOnly || formioForm.submitting)? null: removeRow(rowIndex) \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-default datagrid-remove\">\n            <span class=\"glyphicon glyphicon-remove-circle\"></span>\n          </a>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <div style=\"margin-top: 10px\" class=\"datagrid-add\" ng-if=\"(!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || !component.validate.maxLength || rows.length < component.validate.maxLength) && (!component.addAnotherPosition || component.addAnotherPosition === 'bottom' || component.addAnotherPosition === 'both')\">\n    <a ng-click=\"(readOnly || formioForm.submitting)? null: addRow() \" ng-disabled = \"readOnly || formioForm.submitting\" class=\"btn btn-primary\">\n      <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n    </a>\n  </div>\n</div>\n\n\n"
       ));
     }
   ]);
 };
 
-},{"formiojs/utils":10}],215:[function(_dereq_,module,exports){
+},{"formiojs/utils":10}],216:[function(_dereq_,module,exports){
 "use strict";
 
 var _get = _dereq_('lodash/get');
@@ -33741,13 +34003,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-        "<div class=\"input-group\">\n  <input\n    type=\"text\"\n    class=\"form-control\"\n    name=\"{{ componentId }}\"\n    id=\"{{ componentId }}\"\n    ng-focus=\"calendarOpen = autoOpen\"\n    ng-click=\"calendarOpen = true\"\n    ng-init=\"calendarOpen = false\"\n    ng-disabled=\"readOnly\"\n    auto-focus=\"true\"\n    ng-required=\"isRequired(component)\"\n    is-open=\"calendarOpen\"\n    datetime-picker=\"{{ component.format }}\"\n    datepicker-mode=\"component.datepickerMode\"\n    when-closed=\"onClosed()\"\n    aria-labelledby=\"{{ componentId +'Label'}}\"\n    aria-describedby=\"{{componentId + 'Desc'}}\"\n    custom-validator=\"component.validate.custom\"\n    enable-date=\"component.enableDate\"\n    enable-time=\"component.enableTime\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n    datepicker-options=\"component.datePicker\"\n    timepicker-options=\"component.timePicker\"\n  />\n  <span class=\"input-group-btn\">\n    <button type=\"button\" ng-disabled=\"readOnly\" class=\"btn btn-default\" ng-click=\"calendarOpen = true\" tabindex=\"-1\" ng-keydown=\"calendarOpen = onKeyDown($event)\">\n      <i ng-if=\"component.enableDate\" class=\"glyphicon glyphicon-calendar\"></i>\n      <i ng-if=\"!component.enableDate\" class=\"glyphicon glyphicon-time\"></i>\n    </button>\n  </span>\n</div>\n"
+        "<div class=\"input-group\">\n  <input\n    type=\"text\"\n    class=\"form-control\"\n    name=\"{{ componentId }}\"\n    id=\"{{ componentId }}\"\n    ng-focus=\"calendarOpen = autoOpen\"\n    ng-click=\"calendarOpen = true\"\n    ng-init=\"calendarOpen = false\"\n    ng-disabled=\"readOnly\"\n    auto-focus=\"true\"\n    ng-required=\"isRequired(component)\"\n    is-open=\"calendarOpen\"\n    datetime-picker=\"{{ component.format }}\"\n    datepicker-mode=\"component.datepickerMode\"\n    when-closed=\"onClosed()\"\n    aria-labelledby=\"{{ componentId +'Label'}}\"\n    aria-describedby=\"{{componentId + 'Desc'}}\"\n    custom-validator=\"component.validate.custom\"\n    enable-date=\"component.enableDate\"\n    enable-time=\"component.enableTime\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n    datepicker-options=\"component.datePicker\"\n    timepicker-options=\"component.timePicker\"\n  />\n  <span class=\"input-group-btn\">\n    <button type=\"button\" ng-disabled=\"readOnly\" class=\"btn btn-default\" ng-click=\"calendarOpen = true\" tabindex=\"-1\" ng-keydown=\"calendarOpen = onKeyDown($event)\">\n      <i ng-if=\"component.enableDate\" class=\"glyphicon glyphicon-calendar\"></i>\n      <i ng-if=\"!component.enableDate\" class=\"glyphicon glyphicon-time\"></i>\n    </button>\n  </span>\n</div>\n"
       ));
     }
   ]);
 };
 
-},{"lodash/get":161}],216:[function(_dereq_,module,exports){
+},{"lodash/get":161}],217:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -33990,16 +34252,16 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/day.html', FormioUtils.fieldWrap(
-        "<div class=\"day-input\">\n  <day-input\n    name=\"{{componentId}}\"\n    component-id=\"componentId\"\n    read-only=\"isDisabled(component, data)\"\n    component=\"component\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    aria-labelledby=\"{{ componentId +'Label'}}\"\n    aria-describedby=\"{{componentId + 'Desc'}}\"\n    ng-model=\"data[component.key]\"\n    options=\"options\"\n  ></day-input>\n</div>\n"
+        "<div class=\"day-input\">\n  <day-input\n    name=\"{{componentId}}\"\n    component-id=\"componentId\"\n    read-only=\"isDisabled(component, data)\"\n    component=\"component\"\n    ng-required=\"isRequired(component)\"\n    custom-validator=\"component.validate.custom\"\n    aria-labelledby=\"{{ componentId +'Label'}}\"\n    aria-describedby=\"{{componentId + 'Desc'}}\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    options=\"options\"\n  ></day-input>\n</div>\n"
       ));
       $templateCache.put('formio/components/day-input.html',
-        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" id=\"{{componentId}}-dayLabel\" ng-if=\"component.inputsLabelPosition !== 'bottom'\"\n           ng-class=\"{'field-required': component.fields.day.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n        <input\n        class=\"form-control\"\n        type=\"number\"\n        id=\"{{componentId}}-day\"\n        ng-model=\"date.day\"\n        aria-labelledby=\"{{ componentId }}-dayLabel\"\n        ng-change=\"onChange()\"\n        style=\"padding-right: 10px;\"\n        auto-focus=\"true\"\n        ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n        day-part\n        characters=\"2\"\n        min=\"1\"\n        max=\"{{maxDay}}\"\n        ng-disabled=\"readOnly\"\n      />\n    </div>\n    <label for=\"{{componentId}}-day\" id=\"{{componentId}}-dayLabel\" ng-if=\"component.inputsLabelPosition === 'bottom'\"\n           ng-class=\"{'field-required': component.fields.day.required}\" class=\"control-label--bottom\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" id=\"{{componentId}}-monthLabel\" ng-if=\"component.inputsLabelPosition !== 'bottom'\" ng-class=\"{'field-required': component.fields.month.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Month\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n      <select\n        class=\"form-control\"\n        type=\"text\"\n        id=\"{{componentId}}-month\"\n        aria-labelledby=\"{{ componentId }}-monthLabel\"\n        ng-model=\"date.month\"\n        auto-focus=\"{{ !component.dayFirst || component.fields.day.hide }}\"\n        ng-change=\"onChange()\"\n        ng-disabled=\"readOnly\"\n        ng-options=\"month.value as month.label | formioTranslate:null:options.building for month in months\"\n      ></select>\n    </div>\n    <label for=\"{{componentId}}-month\" id=\"{{componentId}}-monthLabel\" ng-if=\"component.inputsLabelPosition === 'bottom'\" ng-class=\"{'field-required': component.fields.month.required}\" class=\"control-label--bottom\">{{ \"Month\" | formioTranslate:null:options.building }}</label>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if =\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day1\" id=\"{{componentId}}-day1Label\" ng-if=\"component.inputsLabelPosition !== 'bottom'\"\n           ng-class=\"{'field-required': component.fields.day.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n      <input\n        class=\"form-control\"\n        type=\"number\"\n        id=\"{{componentId}}-day1\"\n        ng-model=\"date.day\"\n        ng-change=\"onChange()\"\n        style=\"padding-right: 10px;\"\n        aria-labelledby=\"{{ componentId }}-day1Label\"\n        auto-focus=\"{{ component.fields.month.hide }}\"\n        ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n        day-part\n        characters=\"2\"\n        min=\"1\"\n        max=\"{{maxDay}}\"\n        ng-disabled=\"readOnly\"\n      />\n    </div>\n    <label for=\"{{componentId}}-day\" id=\"{{componentId}}-day1Label\" ng-if=\"component.inputsLabelPosition === 'bottom'\" ng-class=\"{'field-required': component.fields.day.required}\" class=\"control-label--bottom\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" id=\"{{componentId}}-yearLabel\" ng-if=\"component.inputsLabelPosition !== 'bottom'\" ng-class=\"{'field-required': component.fields.year.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Year\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n      <input\n        class=\"form-control\"\n        type=\"number\"\n        id=\"{{componentId}}-year\"\n        ng-model=\"date.year\"\n        ng-change=\"onChange()\"\n        aria-labelledby=\"{{ componentId }}-yearLabel\"\n        style=\"padding-right: 10px;\"\n        ng-attr-placeholder=\"{{component.fields.year.placeholder}}\"\n        auto-focus=\"{{ component.fields.day.hide && component.fields.month.hide }}\"\n        characters=\"4\"\n        min=\"0\"\n        max=\"2100\"\n        ng-disabled=\"readOnly\"\n      />\n    </div>\n    <label for=\"{{componentId}}-year\" id=\"{{componentId}}-yearLabel\" ng-if=\"component.inputsLabelPosition === 'bottom'\" ng-class=\"{'field-required': component.fields.year.required}\" class=\"control-label--bottom\">{{ \"Year\" | formioTranslate:null:options.building }}</label>\n  </div>\n</div>\n"
+        "<div class=\"daySelect form row\">\n  <div class=\"form-group col-xs-3\" ng-if=\"component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day\" id=\"{{componentId}}-dayLabel\" ng-if=\"component.inputsLabelPosition !== 'bottom'\"\n           ng-class=\"{'field-required': component.fields.day.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n        <input\n        class=\"form-control\"\n        type=\"number\"\n        id=\"{{componentId}}-day\"\n        ng-model=\"date.day\"\n        ng-model-options=\"{allowInvalid: true}\"\n        aria-labelledby=\"{{ componentId }}-dayLabel\"\n        ng-change=\"onChange()\"\n        style=\"padding-right: 10px;\"\n        auto-focus=\"true\"\n        ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n        day-part\n        characters=\"2\"\n        min=\"1\"\n        max=\"{{maxDay}}\"\n        ng-disabled=\"readOnly\"\n      />\n    </div>\n    <label for=\"{{componentId}}-day\" id=\"{{componentId}}-dayLabel\" ng-if=\"component.inputsLabelPosition === 'bottom'\"\n           ng-class=\"{'field-required': component.fields.day.required}\" class=\"control-label--bottom\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n  </div>\n  <div class=\"form-group col-xs-4\" ng-if=\"!component.fields.month.hide\">\n    <label for=\"{{componentId}}-month\" id=\"{{componentId}}-monthLabel\" ng-if=\"component.inputsLabelPosition !== 'bottom'\" ng-class=\"{'field-required': component.fields.month.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Month\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n      <select\n        class=\"form-control\"\n        type=\"text\"\n        id=\"{{componentId}}-month\"\n        aria-labelledby=\"{{ componentId }}-monthLabel\"\n        ng-model=\"date.month\"\n        ng-model-options=\"{allowInvalid: true}\"\n        auto-focus=\"{{ !component.dayFirst || component.fields.day.hide }}\"\n        ng-change=\"onChange()\"\n        ng-disabled=\"readOnly\"\n        ng-options=\"month.value as month.label | formioTranslate:null:options.building for month in months\"\n      ></select>\n    </div>\n    <label for=\"{{componentId}}-month\" id=\"{{componentId}}-monthLabel\" ng-if=\"component.inputsLabelPosition === 'bottom'\" ng-class=\"{'field-required': component.fields.month.required}\" class=\"control-label--bottom\">{{ \"Month\" | formioTranslate:null:options.building }}</label>\n  </div>\n  <div class=\"form-group col-xs-3\" ng-if =\"!component.dayFirst && !component.fields.day.hide\">\n    <label for=\"{{componentId}}-day1\" id=\"{{componentId}}-day1Label\" ng-if=\"component.inputsLabelPosition !== 'bottom'\"\n           ng-class=\"{'field-required': component.fields.day.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n      <input\n        class=\"form-control\"\n        type=\"number\"\n        id=\"{{componentId}}-day1\"\n        ng-model=\"date.day\"\n        ng-model-options=\"{allowInvalid: true}\"\n        ng-change=\"onChange()\"\n        style=\"padding-right: 10px;\"\n        aria-labelledby=\"{{ componentId }}-day1Label\"\n        auto-focus=\"{{ component.fields.month.hide }}\"\n        ng-attr-placeholder=\"{{component.fields.day.placeholder}}\"\n        day-part\n        characters=\"2\"\n        min=\"1\"\n        max=\"{{maxDay}}\"\n        ng-disabled=\"readOnly\"\n      />\n    </div>\n    <label for=\"{{componentId}}-day\" id=\"{{componentId}}-day1Label\" ng-if=\"component.inputsLabelPosition === 'bottom'\" ng-class=\"{'field-required': component.fields.day.required}\" class=\"control-label--bottom\">{{ \"Day\" | formioTranslate:null:options.building }}</label>\n  </div>\n  <div class=\"form-group col-xs-5\" ng-if=\"!component.fields.year.hide\">\n    <label for=\"{{componentId}}-year\" id=\"{{componentId}}-yearLabel\" ng-if=\"component.inputsLabelPosition !== 'bottom'\" ng-class=\"{'field-required': component.fields.year.required}\" ng-style=\"getLabelStyles(component)\">{{ \"Year\" | formioTranslate:null:options.building }}</label>\n    <div ng-style=\"getInputStyles(component)\">\n      <input\n        class=\"form-control\"\n        type=\"number\"\n        id=\"{{componentId}}-year\"\n        ng-model=\"date.year\"\n        ng-model-options=\"{allowInvalid: true}\"\n        ng-change=\"onChange()\"\n        aria-labelledby=\"{{ componentId }}-yearLabel\"\n        style=\"padding-right: 10px;\"\n        ng-attr-placeholder=\"{{component.fields.year.placeholder}}\"\n        auto-focus=\"{{ component.fields.day.hide && component.fields.month.hide }}\"\n        characters=\"4\"\n        min=\"0\"\n        max=\"2100\"\n        ng-disabled=\"readOnly\"\n      />\n    </div>\n    <label for=\"{{componentId}}-year\" id=\"{{componentId}}-yearLabel\" ng-if=\"component.inputsLabelPosition === 'bottom'\" ng-class=\"{'field-required': component.fields.year.required}\" class=\"control-label--bottom\">{{ \"Year\" | formioTranslate:null:options.building }}</label>\n  </div>\n</div>\n"
       );
     }
   ]);
 };
 
-},{}],217:[function(_dereq_,module,exports){
+},{}],218:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils').default;
@@ -34420,12 +34682,12 @@ module.exports = function(app) {
     '$templateCache',
     'FormioUtils',
     function($templateCache, FormioUtils) {
-      $templateCache.put('formio/components/editgrid.html', "<div name=\"{{ componentId }}\" ng-model=\"data[component.key]\" custom-validator=\"component.validate.custom\" editgrid-validation ng-controller=\"formioEditGrid\">\n  <label ng-if=\"labelVisible()\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <div class=\"formio-data-grid\" id=\"formio-editgrid-{{ component.key }}\">\n    <ul class=\"list-group\">\n      <li ng-if=\"component.templates.header\" class=\"list-group-item list-group-header\">\n        <render-template template=\"component.templates.header\" data=\"headerData\" />\n      </li>\n      <li class=\"list-group-item\" ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <div name=\"{{ componentId }}-row-{{ $index }}\" ng-model=\"row\" editgrid-row-validation>\n          <edit-grid-row />\n          <p class=\"help-block\" ng-show=\"openRows.indexOf($index) !== -1 && formioForm.$error.editgrid\">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>\n          <p class=\"help-block\" ng-show=\"formioForm[componentId + '-row-' + $index].$error.editgridrow\">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>\n        </div>\n      </li>\n      <li ng-if=\"component.templates.footer\" class=\"list-group-item list-group-footer\">\n        <render-template template=\"component.templates.footer\" data=\"headerData\" />\n      </li>\n    </ul>\n    <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n      <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n        <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n      </a>\n    </div>\n  </div>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n");
+      $templateCache.put('formio/components/editgrid.html', "<div name=\"{{ componentId }}\" ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" custom-validator=\"component.validate.custom\" editgrid-validation ng-controller=\"formioEditGrid\">\n  <label ng-if=\"labelVisible()\" for=\"{{ component.key }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <div class=\"formio-data-grid\" id=\"formio-editgrid-{{ component.key }}\">\n    <ul class=\"list-group\">\n      <li ng-if=\"component.templates.header\" class=\"list-group-item list-group-header\">\n        <render-template template=\"component.templates.header\" data=\"headerData\" />\n      </li>\n      <li class=\"list-group-item\" ng-repeat=\"row in rows track by $index\" ng-init=\"rowIndex = $index\">\n        <div name=\"{{ componentId }}-row-{{ $index }}\" ng-model=\"row\" ng-model-options=\"{allowInvalid: true}\" editgrid-row-validation>\n          <edit-grid-row />\n          <p class=\"help-block\" ng-show=\"openRows.indexOf($index) !== -1 && formioForm.$error.editgrid\">{{ 'Please save all rows before proceeding' | formioTranslate }}.</p>\n          <p class=\"help-block\" ng-show=\"formioForm[componentId + '-row-' + $index].$error.editgridrow\">{{ 'Please correct rows before proceeding' | formioTranslate }}.</p>\n        </div>\n      </li>\n      <li ng-if=\"component.templates.footer\" class=\"list-group-item list-group-footer\">\n        <render-template template=\"component.templates.footer\" data=\"headerData\" />\n      </li>\n    </ul>\n    <div class=\"datagrid-add\" ng-if=\"!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('maxLength') || rows.length < component.validate.maxLength\">\n      <a ng-click=\"addRow()\" class=\"btn btn-primary\">\n        <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addAnother || \"Add Another\" | formioTranslate:null:options.building }}\n      </a>\n    </div>\n  </div>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n");
     }
   ]);
 };
 
-},{"formiojs/utils":10}],218:[function(_dereq_,module,exports){
+},{"formiojs/utils":10}],219:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -34460,7 +34722,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],219:[function(_dereq_,module,exports){
+},{}],220:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -34522,7 +34784,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],220:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],221:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -34534,7 +34796,7 @@ module.exports = function(app) {
         template: 'formio/components/file.html',
         group: 'advanced',
         tableView: function(data, options) {
-          if (!data) {
+          if (!data || data.length === 0) {
             return '';
           }
 
@@ -34664,7 +34926,7 @@ module.exports = function(app) {
             evt.preventDefault();
             $scope.form = $scope.form || $rootScope.filePath;
             $scope.options = $scope.options || {};
-            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var baseUrl = Formio.setScopeBase($scope);
             var formio = new Formio($scope.form, {base: baseUrl});
             formio
               .downloadFile($scope.file).then(function(file) {
@@ -34705,7 +34967,7 @@ module.exports = function(app) {
           if ($scope.options && $scope.options.building) return;
           $scope.form = $scope.form || $rootScope.filePath;
           $scope.options = $scope.options || {};
-          var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+          var baseUrl = Formio.setScopeBase($scope);
           var formio = new Formio($scope.form, {base: baseUrl});
           formio.downloadFile($scope.file)
             .then(function(result) {
@@ -34864,7 +35126,7 @@ module.exports = function(app) {
       );
 
       $templateCache.put('formio/components/file.html',
-        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\" ng-style=\"getLabelStyles(component)\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div class=\"formio-errors\"><formio-errors ng-if=\"::!options.building\"></formio-errors></div>\n<div ng-controller=\"formioFileUpload\" ng-style=\"getInputGroupStyles(component)\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\" read-only=\"readOnly\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" name=\"{{ componentId }}\" read-only=\"readOnly\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files, $invalidFiles)\"\n      class=\"fileSelector\"\n      ngf-drag-over-class=\"'fileDragOver'\"\n      ngf-pattern=\"component.filePattern\"\n      ngf-min-size=\"component.fileMinSize\"\n      ngf-max-size=\"component.fileMaxSize\"\n      ngf-multiple=\"component.multiple\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\">\n      <span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or\n      <a style=\"cursor: pointer;\"\n        ng-keypress=\"browseKeyPress($event)\"\n        ng-attr-id=\"{{component.key}}-browse\"\n        ngf-select=\"upload($files, $invalidFiles)\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ngf-pattern=\"component.filePattern\"\n        ngf-min-size=\"component.fileMinSize\"\n        ngf-max-size=\"component.fileMaxSize\"\n        ngf-multiple=\"component.multiple\">browse</a>.\n    </div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.originalName || fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n"
+        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\" ng-style=\"getLabelStyles(component)\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<div class=\"formio-errors\"><formio-errors ng-if=\"::!options.building\"></formio-errors></div>\n<div ng-controller=\"formioFileUpload\" ng-style=\"getInputGroupStyles(component)\">\n  <formio-file-list files=\"data[component.key]\" form=\"formio.formUrl\" ng-if=\"!component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" name=\"{{ componentId }}\" read-only=\"readOnly\"></formio-file-list>\n  <formio-image-list files=\"data[component.key]\" form=\"formio.formUrl\" width=\"component.imageSize\" ng-if=\"component.image\" ng-required=\"isRequired(component)\" ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" name=\"{{ componentId }}\" read-only=\"readOnly\"></formio-image-list>\n  <div ng-if=\"!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))\">\n    <div ngf-drop=\"upload($files, $invalidFiles)\"\n      class=\"fileSelector\"\n      ngf-drag-over-class=\"'fileDragOver'\"\n      ngf-pattern=\"component.filePattern\"\n      ngf-min-size=\"component.fileMinSize\"\n      ngf-max-size=\"component.fileMaxSize\"\n      ngf-multiple=\"component.multiple\"\n      id=\"{{ componentId }}\"\n      name=\"{{ componentId }}\">\n      <span class=\"glyphicon glyphicon-cloud-upload\"></span>Drop files to attach, or\n      <a style=\"cursor: pointer;\"\n        ng-keypress=\"browseKeyPress($event)\"\n        ng-attr-id=\"{{component.key}}-browse\"\n        ngf-select=\"upload($files, $invalidFiles)\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ngf-pattern=\"component.filePattern\"\n        ngf-min-size=\"component.fileMinSize\"\n        ngf-max-size=\"component.fileMaxSize\"\n        ngf-multiple=\"component.multiple\">browse</a>.\n    </div>\n    <div ng-if=\"!component.storage\" class=\"alert alert-warning\">No storage has been set for this field. File uploads are disabled until storage is set up.</div>\n    <div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>\n  </div>\n  <div ng-repeat=\"fileUpload in fileUploads track by $index\" ng-class=\"{'has-error': fileUpload.status === 'error'}\" class=\"file\">\n    <div class=\"row\">\n      <div class=\"fileName control-label col-sm-10\">{{ fileUpload.originalName || fileUpload.name }} <span ng-click=\"removeUpload(fileUpload.name)\" class=\"glyphicon glyphicon-remove\"></span></div>\n      <div class=\"fileSize control-label col-sm-2 text-right\">{{ fileSize(fileUpload.size) }}</div>\n    </div>\n    <div class=\"row\">\n      <div class=\"col-sm-12\">\n        <span ng-if=\"fileUpload.status === 'progress'\">\n          <div class=\"progress\">\n            <div class=\"progress-bar\" role=\"progressbar\" aria-valuenow=\"{{fileUpload.progress}}\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:{{fileUpload.progress}}%\">\n              <span class=\"sr-only\">{{fileUpload.progress}}% Complete</span>\n            </div>\n          </div>\n        </span>\n        <div ng-if=\"!fileUpload.status !== 'progress'\" class=\"bg-{{ fileUpload.status }} control-label\">{{ fileUpload.message }}</div>\n      </div>\n    </div>\n  </div>\n</div>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n"
       );
 
       $templateCache.put('formio/componentsView/file.html',
@@ -34874,7 +35136,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],221:[function(_dereq_,module,exports){
+},{}],222:[function(_dereq_,module,exports){
 "use strict";
 
 var isEmpty = _dereq_('lodash/isEmpty');
@@ -34914,7 +35176,7 @@ module.exports = function(app) {
             $timeout
           ) {
             $scope.options = $scope.options || {};
-            var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+            var baseUrl = Formio.setScopeBase($scope);
             if (!$scope.data[$scope.component.key]) {
               $scope.data[$scope.component.key] = {data: {}};
             }
@@ -35064,7 +35326,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259,"lodash/isEmpty":169}],222:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260,"lodash/isEmpty":169}],223:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35094,13 +35356,13 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/hidden.html',
-        "<input type=\"hidden\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" ng-model=\"data[component.key]\">\n"
+        "<input type=\"hidden\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\">\n"
       );
     }
   ]);
 };
 
-},{"../factories/GridUtils":259}],223:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],224:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -35194,7 +35456,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],224:[function(_dereq_,module,exports){
+},{}],225:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -35239,7 +35501,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":205,"./button":206,"./checkbox":207,"./columns":208,"./components":209,"./container":210,"./content":211,"./currency":212,"./custom":213,"./datagrid":214,"./datetime":215,"./day":216,"./editgrid":217,"./email":218,"./fieldset":219,"./file":220,"./form":221,"./hidden":222,"./htmlelement":223,"./number":225,"./page":226,"./panel":227,"./password":228,"./phonenumber":229,"./radio":230,"./resource":231,"./select":232,"./selectboxes":233,"./signature":234,"./survey":235,"./table":236,"./textarea":237,"./textfield":238,"./time":239,"./well":240}],225:[function(_dereq_,module,exports){
+},{"./address":206,"./button":207,"./checkbox":208,"./columns":209,"./components":210,"./container":211,"./content":212,"./currency":213,"./custom":214,"./datagrid":215,"./datetime":216,"./day":217,"./editgrid":218,"./email":219,"./fieldset":220,"./file":221,"./form":222,"./hidden":223,"./htmlelement":224,"./number":226,"./page":227,"./panel":228,"./password":229,"./phonenumber":230,"./radio":231,"./resource":232,"./select":233,"./selectboxes":234,"./signature":235,"./survey":236,"./table":237,"./textarea":238,"./textfield":239,"./time":240,"./well":241}],226:[function(_dereq_,module,exports){
 "use strict";
 
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -35330,13 +35592,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/number.html', FormioUtils.fieldWrap(
-        "<input\n  type=\"text\"\n  inputmode=\"numeric\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  formio-min=\"{{ component.validate.min }}\"\n  formio-max=\"{{ component.validate.max }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  formio-mask=\"number\"\n>\n"
+        "<input\n  type=\"text\"\n  inputmode=\"numeric\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  ng-required=\"isRequired(component)\"\n  ng-disabled=\"readOnly\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  formio-min=\"{{ component.validate.min }}\"\n  formio-max=\"{{ component.validate.max }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  formio-mask=\"number\"\n>\n"
       ));
     }
   ]);
 };
 
-},{"lodash/get":161,"lodash/isNil":176,"text-mask-addons":202}],226:[function(_dereq_,module,exports){
+},{"lodash/get":161,"lodash/isNil":176,"text-mask-addons":202}],227:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -35363,7 +35625,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],227:[function(_dereq_,module,exports){
+},{}],228:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -35383,7 +35645,7 @@ module.exports = function(app) {
           title: '',
           theme: 'default',
           tableView: false,
-          hideLabel: true,
+          hideLabel: false,
           components: []
         },
         viewTemplate: 'formio/componentsView/panel.html',
@@ -35426,7 +35688,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],228:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],229:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -35458,7 +35720,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],229:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -35495,7 +35757,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],230:[function(_dereq_,module,exports){
+},{}],231:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -35542,13 +35804,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/radio.html', FormioUtils.fieldWrap(
-        "<ng-form name=\"{{ componentId }}\" ng-model=\"data[component.key]\" custom-validator=\"component.validate.custom\">\n  <fieldset ng-if=\"component.fieldSet\">\n    <legend ng-if=\"component.label\">\n      {{ component.label }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </legend>\n    <div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n      <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\" id=\"{{ componentId +'-'+ v.value+'Label' }}\" ng-style=\"getOptionLabelStyles(component)\">\n        <span ng-if=\"topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building }}</span>\n        <input\n          type=\"{{ component.inputType }}\"\n          id=\"{{ componentId }}-{{ v.value }}\"\n          value=\"{{ v.value }}\"\n          tabindex=\"{{ component.tabindex || 0 }}\"\n          ng-model=\"data[component.key]\"\n          aria-labelledby=\"{{componentId +'-'+ v.value+'Label'}}\"\n          ng-required=\"isRequired(component)\"\n          custom-validator=\"component.validate.custom\"\n          auto-focus=\"{{ $first }}\"\n          ng-disabled=\"readOnly\"\n          ng-style=\"getOptionInputStyles(component)\"\n        >\n        <span ng-if=\"!topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>\n      </label>\n    </div>\n  </fieldset>\n  <div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\"\n       ng-if=\"!component.fieldSet\">\n    <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\" id=\"{{ componentId +'-'+ v.value+'Label' }}\" ng-style=\"getOptionLabelStyles(component)\">\n      <span ng-if=\"topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building }}</span>\n      <input\n        type=\"{{ component.inputType }}\"\n        id=\"{{ componentId }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        aria-labelledby=\"{{componentId +'-'+ v.value+'Label'}}\"\n        ng-model=\"data[component.key]\"\n        auto-focus=\"{{ $first }}\"\n        ng-required=\"isRequired(component)\"\n        custom-validator=\"component.validate.custom\"\n        ng-disabled=\"readOnly\"\n        ng-style=\"getOptionInputStyles(component)\"\n      >\n      <span ng-if=\"!topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>\n    </label>\n  </div>\n</ng-form>\n"
+        "<ng-form name=\"{{ componentId }}\" ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" custom-validator=\"component.validate.custom\">\n  <fieldset ng-if=\"component.fieldSet\">\n    <legend ng-if=\"component.label\">\n      {{ component.label }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </legend>\n    <div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\">\n      <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\" id=\"{{ componentId +'-'+ v.value+'Label' }}\" ng-style=\"getOptionLabelStyles(component)\">\n        <span ng-if=\"topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building }}</span>\n        <input\n          type=\"{{ component.inputType }}\"\n          id=\"{{ componentId }}-{{ v.value }}\"\n          value=\"{{ v.value }}\"\n          tabindex=\"{{ component.tabindex || 0 }}\"\n          ng-model=\"data[component.key]\"\n          ng-model-options=\"{allowInvalid: true}\"\n          aria-labelledby=\"{{componentId +'-'+ v.value+'Label'}}\"\n          ng-required=\"isRequired(component)\"\n          custom-validator=\"component.validate.custom\"\n          auto-focus=\"{{ $first }}\"\n          ng-disabled=\"readOnly\"\n          ng-style=\"getOptionInputStyles(component)\"\n        >\n        <span ng-if=\"!topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>\n      </label>\n    </div>\n  </fieldset>\n  <div ng-class=\"component.inline ? 'radio-inline' : 'radio'\" ng-repeat=\"v in component.values track by $index\"\n       ng-if=\"!component.fieldSet\">\n    <label class=\"control-label\" for=\"{{ componentId }}-{{ v.value }}\" id=\"{{ componentId +'-'+ v.value+'Label' }}\" ng-style=\"getOptionLabelStyles(component)\">\n      <span ng-if=\"topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building }}</span>\n      <input\n        type=\"{{ component.inputType }}\"\n        id=\"{{ componentId }}-{{ v.value }}\"\n        value=\"{{ v.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        aria-labelledby=\"{{componentId +'-'+ v.value+'Label'}}\"\n        ng-model=\"data[component.key]\"\n        ng-model-options=\"{allowInvalid: true}\"\n        auto-focus=\"{{ $first }}\"\n        ng-required=\"isRequired(component)\"\n        custom-validator=\"component.validate.custom\"\n        ng-disabled=\"readOnly\"\n        ng-style=\"getOptionInputStyles(component)\"\n      >\n      <span ng-if=\"!topOrLeftOptionLabel(component)\">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>\n    </label>\n  </div>\n</ng-form>\n"
       ));
     }
   ]);
 };
 
-},{}],231:[function(_dereq_,module,exports){
+},{}],232:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -35601,7 +35863,7 @@ module.exports = function(app) {
               settings.defaultValue = [];
             }
             if (settings.resource) {
-              var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+              var baseUrl = Formio.setScopeBase($scope);
               var url = '';
               if ($scope.formio) {
                 url = $scope.formio.formsUrl + '/' + settings.resource;
@@ -35787,7 +36049,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/resource.html',
-        "<div ng-if=\"!component.addResource\">\n  <label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\" ng-style=\"getLabelStyles(component)\"\n         id=\"{{ componentId+'Label'}}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n  <ui-select ui-select-required safe-multiple-to-single ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"  aria-labelledby=\"{{ componentId +'Label'}}\"\n             aria-describedby=\"{{componentId + 'Desc'}}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\" ng-style=\"getInputGroupStyles(component)\">\n    <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n      <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    </ui-select-match>\n    <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n      <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n      <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n    </ui-select-choices>\n  </ui-select>\n  <label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\"\n         id=\"{{ componentId+'Label' }}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n<div ng-if=\"component.addResource\">\n  <table class=\"table table-bordered\">\n    <label ng-if=\"labelVisible()\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </label>\n    <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n    <tr>\n      <td>\n        <ui-select ui-select-required safe-multiple-to-single ng-model=\"data[component.key]\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n          <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n            <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n          </ui-select-match>\n          <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n            <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n            <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n          </ui-select-choices>\n        </ui-select>\n        <formio-errors ng-if=\"::!options.building\"></formio-errors>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <a ng-click=\"newResource()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addResourceLabel || \"Add Resource\" | formioTranslate:null:options.building}}\n        </a>\n      </td>\n    </tr>\n  </table>\n</div>\n"
+        "<div ng-if=\"!component.addResource\">\n  <label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\" ng-style=\"getLabelStyles(component)\"\n         id=\"{{ componentId+'Label'}}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n  <ui-select ui-select-required safe-multiple-to-single ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\"  aria-labelledby=\"{{ componentId +'Label'}}\"\n             aria-describedby=\"{{componentId + 'Desc'}}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\" ng-style=\"getInputGroupStyles(component)\">\n    <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n      <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    </ui-select-match>\n    <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n      <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n      <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n    </ui-select-choices>\n  </ui-select>\n  <label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\"\n         id=\"{{ componentId+'Label' }}\">\n    {{ component.label | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </label>\n  <formio-errors ng-if=\"::!options.building\"></formio-errors>\n</div>\n<div ng-if=\"component.addResource\">\n  <table class=\"table table-bordered\">\n    <label ng-if=\"labelVisible()\" for=\"{{ componentId }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\">\n      {{ component.label | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </label>\n    <span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n    <tr>\n      <td>\n        <ui-select ui-select-required safe-multiple-to-single ng-model=\"data[component.key]\" ng-model-options=\"{allowInvalid: true}\" ng-disabled=\"readOnly\" ng-required=\"isRequired(component)\" id=\"{{ componentId }}\" name=\"{{ componentId }}\" theme=\"bootstrap\" tabindex=\"{{ component.tabindex || 0 }}\">\n          <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n            <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n          </ui-select-match>\n          <ui-select-choices class=\"ui-select-choices\" repeat=\"item in selectItems | filter: $select.search\" refresh=\"refreshSubmissions($select.search)\" refresh-delay=\"250\">\n            <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n            <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"resourceLoading\">Load more...</button>\n          </ui-select-choices>\n        </ui-select>\n        <formio-errors ng-if=\"::!options.building\"></formio-errors>\n      </td>\n    </tr>\n    <tr>\n      <td>\n        <a ng-click=\"newResource()\" class=\"btn btn-primary\">\n          <span class=\"glyphicon glyphicon-plus\" aria-hidden=\"true\"></span> {{ component.addResourceLabel || \"Add Resource\" | formioTranslate:null:options.building}}\n        </a>\n      </td>\n    </tr>\n  </table>\n</div>\n"
       );
 
       // Change the ui-select to ui-select multiple.
@@ -35798,7 +36060,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],232:[function(_dereq_,module,exports){
+},{}],233:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -36184,8 +36446,7 @@ module.exports = function(app) {
                 }
                 $scope.options = $scope.options || {};
                 var url = '';
-                var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
-                //var baseUrl = Formio.getBaseUrl();
+                var baseUrl = Formio.setScopeBase($scope);
                 if (settings.dataSrc === 'url') {
                   url = settings.data.url;
                   if (url.substr(0, 1) === '/') {
@@ -36403,7 +36664,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/select.html',
-        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" id=\"{{ componentId+'Label' }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\"\n       ng-style=\"getLabelStyles(component)\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  name=\"{{ componentId }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  id=\"{{ componentId }}\"\n  theme=\"bootstrap\"\n  custom-validator=\"component.validate.custom\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-style=\"getInputGroupStyles(component)\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"selectLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span id=\"{{ componentId+'Desc' }}\">{{ component.description }}</span>\n</div>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
+        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" id=\"{{ componentId+'Label' }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\"\n       ng-style=\"getLabelStyles(component)\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  name=\"{{ componentId }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  id=\"{{ componentId }}\"\n  theme=\"bootstrap\"\n  custom-validator=\"component.validate.custom\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-style=\"getInputGroupStyles(component)\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"selectLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span id=\"{{ componentId+'Desc' }}\">{{ component.description }}</span>\n</div>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
       );
 
       // Change the ui-select to ui-select multiple.
@@ -36414,7 +36675,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":156,"lodash/cloneDeep":157,"lodash/get":161,"lodash/isEqual":170,"lodash/isNil":176,"lodash/mapValues":188,"lodash/set":192}],233:[function(_dereq_,module,exports){
+},{"lodash/assign":156,"lodash/cloneDeep":157,"lodash/get":161,"lodash/isEqual":170,"lodash/isNil":176,"lodash/mapValues":188,"lodash/set":192}],234:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -36540,7 +36801,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],234:[function(_dereq_,module,exports){
+},{}],235:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -36672,7 +36933,7 @@ module.exports = function(app) {
     function($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/signature.html', FormioUtils.fieldWrap(
-        "<div ng-if=\"readOnly\">\n  <div ng-if=\"data[component.key] === 'YES'\">\n    [ Signature is hidden ]\n  </div>\n  <div ng-if=\"!data[component.key]\">\n    <div ng-style=\"{width: component.width, height: '150px', backgroundColor: component.backgroundColor, cursor: 'not-allowed'}\"></div>\n    <div class=\"formio-signature-footer\" style=\"text-align: center;color:#C3C3C3;\" ng-class=\"{'field-required': isRequired(component)}\">\n      {{ component.footer | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </div>\n  </div>\n  <div ng-if=\"data[component.key] && data[component.key] !== 'YES'\">\n    <img class=\"signature\" ng-attr-src=\"{{data[component.key]}}\" src=\"\" />\n  </div>\n</div>\n<div ng-if=\"!readOnly\" ng-style=\"{width: component.width, height: '100%'}\">\n  <a class=\"btn btn-xs btn-default\" style=\"position:absolute; left: 0; top: 0; z-index: 1000\" ng-click=\"component.clearSignature()\">\n    <span class=\"glyphicon glyphicon-refresh\"></span>\n  </a>\n  <canvas\n    signature\n    component=\"component\"\n    name=\"{{ componentId }}\"\n    ng-model=\"data[component.key]\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    auto-focus=\"true\"\n    ng-required=\"isRequired(component)\"\n  ></canvas>\n  <div class=\"formio-signature-footer\" style=\"text-align: center;color:#C3C3C3;\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.footer | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </div>\n</div>\n"
+        "<div ng-if=\"readOnly\">\n  <div ng-if=\"data[component.key] === 'YES'\">\n    [ Signature is hidden ]\n  </div>\n  <div ng-if=\"!data[component.key]\">\n    <div ng-style=\"{width: component.width, height: '150px', backgroundColor: component.backgroundColor, cursor: 'not-allowed'}\"></div>\n    <div class=\"formio-signature-footer\" style=\"text-align: center;color:#C3C3C3;\" ng-class=\"{'field-required': isRequired(component)}\">\n      {{ component.footer | formioTranslate:null:options.building }}\n      <formio-component-tooltip></formio-component-tooltip>\n    </div>\n  </div>\n  <div ng-if=\"data[component.key] && data[component.key] !== 'YES'\">\n    <img class=\"signature\" ng-attr-src=\"{{data[component.key]}}\" src=\"\" />\n  </div>\n</div>\n<div ng-if=\"!readOnly\" ng-style=\"{width: component.width, height: '100%'}\">\n  <a class=\"btn btn-xs btn-default\" style=\"position:absolute; left: 0; top: 0; z-index: 1000\" ng-click=\"component.clearSignature()\">\n    <span class=\"glyphicon glyphicon-refresh\"></span>\n  </a>\n  <canvas\n    signature\n    component=\"component\"\n    name=\"{{ componentId }}\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    auto-focus=\"true\"\n    ng-required=\"isRequired(component)\"\n  ></canvas>\n  <div class=\"formio-signature-footer\" style=\"text-align: center;color:#C3C3C3;\" ng-class=\"{'field-required': isRequired(component)}\">\n    {{ component.footer | formioTranslate:null:options.building }}\n    <formio-component-tooltip></formio-component-tooltip>\n  </div>\n</div>\n"
       ));
 
       $templateCache.put('formio/componentsView/signature.html', FormioUtils.fieldWrap(
@@ -36682,7 +36943,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":201}],235:[function(_dereq_,module,exports){
+},{"signature_pad":201}],236:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -36737,13 +36998,13 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/survey.html', FormioUtils.fieldWrap(
-        "<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <td></td>\n      <th ng-repeat=\"v in component.values track by $index\" style=\"text-align: center;\">{{ v.label }}</th>\n    </tr>\n  </thead>\n  <tr ng-repeat=\"question in component.questions\"\n    ng-init=\"inputName = componentId + '-' + question.value\"\n    ng-class=\"{\n      'text-danger': !formioForm[inputName].$pristine && formioForm[inputName].$invalid\n    }\">\n    <td>{{ question.label }}</td>\n    <td ng-repeat=\"v in component.values track by $index\" style=\"text-align: center;\">\n      <input\n        type=\"radio\"\n        id=\"{{ componentId }}-{{ question.value }}-{{ v.value }}\" name=\"{{ componentId }}-{{ question.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-value=\"v.value\"\n        auto-focus=\"{{ $parent.$first && $first }}\"\n        ng-model=\"data[component.key][question.value]\"\n        ng-required=\"isRequired(component)\"\n        ng-disabled=\"readOnly\"\n        custom-validator=\"component.validate.custom\"\n      >\n    </td>\n  </tr>\n</table>\n"
+        "<table class=\"table table-striped table-bordered\">\n  <thead>\n    <tr>\n      <td></td>\n      <th ng-repeat=\"v in component.values track by $index\" style=\"text-align: center;\">{{ v.label }}</th>\n    </tr>\n  </thead>\n  <tr ng-repeat=\"question in component.questions\"\n    ng-init=\"inputName = componentId + '-' + question.value\"\n    ng-class=\"{\n      'text-danger': !formioForm[inputName].$pristine && formioForm[inputName].$invalid\n    }\">\n    <td>{{ question.label }}</td>\n    <td ng-repeat=\"v in component.values track by $index\" style=\"text-align: center;\">\n      <input\n        type=\"radio\"\n        id=\"{{ componentId }}-{{ question.value }}-{{ v.value }}\" name=\"{{ componentId }}-{{ question.value }}\"\n        tabindex=\"{{ component.tabindex || 0 }}\"\n        ng-value=\"v.value\"\n        auto-focus=\"{{ $parent.$first && $first }}\"\n        ng-model=\"data[component.key][question.value]\"\n        ng-model-options=\"{allowInvalid: true}\"\n        ng-required=\"isRequired(component)\"\n        ng-disabled=\"readOnly\"\n        custom-validator=\"component.validate.custom\"\n      >\n    </td>\n  </tr>\n</table>\n"
       ));
     }
   ]);
 };
 
-},{}],236:[function(_dereq_,module,exports){
+},{}],237:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -36829,7 +37090,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],237:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],238:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -36955,22 +37216,22 @@ module.exports = function(app) {
     function($templateCache,
               FormioUtils) {
       $templateCache.put('formio/components/textarea.html', FormioUtils.fieldWrap(
-        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  spellcheck=\"{{ component.spellcheck }}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
+        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  spellcheck=\"{{ component.spellcheck }}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
       ));
       $templateCache.put('formio/componentsView/content.html', FormioUtils.fieldWrap(
         "<div class=\"well\" id=\"formio-content-{{ component.key }}\" style=\"margin:0;\">\n  <div ng-bind-html=\"html\"></div>\n</div>\n"
       ));
       $templateCache.put('formio/components/texteditor.html', FormioUtils.fieldWrap(
-        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  spellcheck=\"{{ component.spellcheck }}\"\n  ckeditor=\"component.wysiwyg\"\n  formio-ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
+        "<textarea\n  class=\"form-control\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  spellcheck=\"{{ component.spellcheck }}\"\n  ckeditor=\"component.wysiwyg\"\n  formio-ckeditor=\"component.wysiwyg\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></textarea>\n"
       ));
       $templateCache.put('formio/components/scripteditor.html', FormioUtils.fieldWrap(
-        "<formio-script-editor\n  ng-model=\"data[component.key]\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></formio-script-editor>\n\n"
+        "<formio-script-editor\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  safe-multiple-to-single\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  custom-validator=\"component.validate.custom\"\n  rows=\"{{ component.rows }}\"\n></formio-script-editor>\n\n"
       ));
     }
   ]);
 };
 
-},{}],238:[function(_dereq_,module,exports){
+},{}],239:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -37027,13 +37288,13 @@ module.exports = function(app) {
       FormioUtils
     ) {
       $templateCache.put('formio/components/textfield.html', FormioUtils.fieldWrap(
-        "<input\n  type=\"{{ component.mask ? 'password' : component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{ debounce: 500 }\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  ng-required=\"isRequired(component)\"\n  spellcheck=\"{{ component.spellcheck }}\"\n  ng-minlength=\"component.validate.minLength\"\n  ng-maxlength=\"component.validate.maxLength\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  formio-mask\n>\n"
+        "<input\n  type=\"{{ component.mask ? 'password' : component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{ allowInvalid: true, debounce: 500 }\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  ng-required=\"isRequired(component)\"\n  spellcheck=\"{{ component.spellcheck }}\"\n  ng-minlength=\"component.validate.minLength\"\n  ng-maxlength=\"component.validate.maxLength\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n  formio-mask\n>\n"
       ));
     }
   ]);
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],240:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -37100,13 +37361,13 @@ module.exports = function(app) {
       FormioUtils
     ) {
       $templateCache.put('formio/components/time.html', FormioUtils.fieldWrap(
-        "<input\n  time-format\n  type=\"{{ component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  ng-model=\"data[component.key]\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  ng-required=\"isRequired(component)\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n>\n"
+        "<input\n  time-format\n  type=\"{{ component.inputType }}\"\n  class=\"form-control\"\n  id=\"{{ componentId }}\"\n  name=\"{{ componentId }}\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-disabled=\"readOnly\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  ng-required=\"isRequired(component)\"\n  ng-pattern=\"component.validate.pattern\"\n  custom-validator=\"component.validate.custom\"\n  ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n>\n"
       ));
     }
   ]);
 };
 
-},{"moment":197}],240:[function(_dereq_,module,exports){
+},{"moment":197}],241:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -37166,7 +37427,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":259}],241:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":260}],242:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -37221,7 +37482,6 @@ module.exports = function() {
         var row = scope.data;
         /*eslint-enable no-unused-vars */
 
-        var component = scope.component;
         var custom = scope.component.validate.custom;
         custom = custom.replace(/({{\s{0,}(.*[^\s]){1}\s{0,}}})/g, function(match, $1, $2) {
           return _get(scope.submission.data, $2);
@@ -37245,7 +37505,7 @@ module.exports = function() {
   };
 };
 
-},{}],242:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -37339,13 +37599,22 @@ module.exports = function() {
           });
         };
 
+        var sendIframeForm = function(form) {
+          if ($scope.formio) {
+            form.projectUrl = $scope.formio.projectUrl;
+            form.url = $scope.formio.formUrl;
+            form.base = $scope.formio.base;
+          }
+          sendIframeMessage({name: 'form', data: form});
+        };
+
         $scope.$on('iframe-ready', function() {
           $scope.iframeReady = true;
           var iframe = $element.find('.formio-iframe')[0];
           if (iframe) {
             iframeReady.resolve(iframe);
             if ($scope.form) {
-              sendIframeMessage({name: 'form', data: $scope.form});
+              sendIframeForm($scope.form);
             }
             if ($scope.submission) {
               $scope.submission.readOnly = $scope.readOnly;
@@ -37364,7 +37633,7 @@ module.exports = function() {
           cancelFormLoadEvent();
           $timeout(function() {
             $scope.setDownloadUrl(form);
-            sendIframeMessage({name: 'form', data: form});
+            sendIframeForm(form);
           });
         });
 
@@ -37803,7 +38072,7 @@ module.exports = function() {
   };
 };
 
-},{}],243:[function(_dereq_,module,exports){
+},{}],244:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -37820,7 +38089,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],244:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 var moment = _dereq_('moment');
@@ -38195,7 +38464,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":161,"moment":197}],245:[function(_dereq_,module,exports){
+},{"lodash/get":161,"moment":197}],246:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38211,7 +38480,7 @@ module.exports = function() {
   };
 };
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],247:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -38284,7 +38553,7 @@ module.exports = [
   }
 ];
 
-},{}],247:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38369,7 +38638,7 @@ module.exports = function() {
   };
 };
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],249:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -38388,7 +38657,7 @@ module.exports = [
   }
 ];
 
-},{}],249:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38398,7 +38667,7 @@ module.exports = function() {
   };
 };
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],251:[function(_dereq_,module,exports){
 "use strict";
 var maskInput = _dereq_('vanilla-text-mask').default;
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -38583,7 +38852,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"formiojs/utils":10,"lodash":186,"text-mask-addons":202,"vanilla-text-mask":203}],251:[function(_dereq_,module,exports){
+},{"formiojs/utils":10,"lodash":186,"text-mask-addons":202,"vanilla-text-mask":204}],252:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38610,7 +38879,7 @@ module.exports = function() {
     }
   };
 };
-},{}],252:[function(_dereq_,module,exports){
+},{}],253:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38638,7 +38907,7 @@ module.exports = function() {
   };
 };
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 var _map = _dereq_('lodash/map');
 // Javascript editor directive
@@ -38714,7 +38983,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"lodash/map":187}],254:[function(_dereq_,module,exports){
+},{"lodash/map":187}],255:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38746,7 +39015,7 @@ module.exports = function() {
   };
 };
 
-},{}],255:[function(_dereq_,module,exports){
+},{}],256:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -38802,7 +39071,7 @@ module.exports = function() {
   };
 };
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],257:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNaN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -38876,12 +39145,39 @@ module.exports = function() {
         $timeout
       ) {
         $scope.options = $scope.options || {};
-        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
+        Formio.setScopeBase($scope);
         var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
         if (session) {
           session = angular.fromJson(session);
         }
 
+        var storedData = {};
+        var storage = {
+          getItem: function(key) {
+            if ($scope.options.noStorage) {
+              return storedData[key];
+            }
+            try {
+              var value = localStorage.getItem(key);
+              return value ? JSON.parse(value) : false;
+            }
+            catch (err) {
+              console.warn('error parsing json from localstorage', err);
+            }
+          },
+          setItem: function(key, value) {
+            if ($scope.options.noStorage) {
+              storedData[key] = value;
+              return;
+            }
+            if (typeof value !== 'string') {
+              value = JSON.stringify(value);
+            }
+            localStorage.setItem(key, value);
+          }
+        };
+
+        var session = ($scope.storage && !$scope.readOnly) ? storage.getItem($scope.storage) : false;
         $scope.formio = null;
         $scope.url = $scope.url || $scope.src;
         $scope.page = {};
@@ -38926,25 +39222,24 @@ module.exports = function() {
             // Handle Local Storage Definition
             if ($scope.storage && !$scope.readOnly) {
               // If there is no localStorage object - make a new object schema
-              if (!localStorage.getItem($scope.storage)) {
-                localStorage.setItem($scope.storage, angular.toJson({
+              if (!storage.getItem($scope.storage)) {
+                storage.setItem($scope.storage, {
                   page: $scope.currentPage,
                   data: $scope.submission.data
-                }));
+                });
               }
 
               // if there is a localStorage object && submission.data is blank then bind localStorage to $scope
-              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
-                var storageToScope = JSON.parse(localStorage.getItem($scope.storage));
-                $scope.submission.data = storageToScope.data
+              if(storage.getItem($scope.storage) && isEmpty($scope.submission.data) == true){
+                $scope.submission.data = storage.getItem($scope.storage).data;
               }
 
               // if there is a localStorage object | && it is data | merge the two
-              if(localStorage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
-                localStorage.setItem($scope.storage, angular.toJson({
+              if(storage.getItem($scope.storage) && isEmpty($scope.submission.data) == false){
+                storage.setItem($scope.storage, {
                   page: $scope.currentPage,
                   data: $scope.submission.data
-                }));
+                });
               }
             }
 
@@ -38989,7 +39284,7 @@ module.exports = function() {
 
         $scope.clear = function() {
           if ($scope.storage && !$scope.readOnly) {
-            localStorage.setItem($scope.storage, '');
+            storage.setItem($scope.storage, '');
           }
           $scope.submission = {data: {}};
           $scope.currentPage = 0;
@@ -39136,7 +39431,7 @@ module.exports = function() {
 
             var onDone = function(submission) {
               if ($scope.storage && !$scope.readOnly) {
-                localStorage.setItem($scope.storage, '');
+                storage.setItem($scope.storage, '');
               }
               $scope.showAlerts({
                 type: 'success',
@@ -39418,7 +39713,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isEmpty":169,"lodash/isFinite":171,"lodash/isNaN":175}],257:[function(_dereq_,module,exports){
+},{"lodash/isEmpty":169,"lodash/isFinite":171,"lodash/isNaN":175}],258:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -39537,7 +39832,7 @@ module.exports = [
           }, this.onError($scope));
         }.bind(this);
 
-        var baseUrl = $scope.options.baseUrl || Formio.getBaseUrl();
+        var baseUrl = Formio.setScopeBase($scope);
         if ($scope._src) {
           loader = new Formio($scope._src, {base: baseUrl});
           var submissionPromise = new Promise(function(resolve, reject) {
@@ -39615,7 +39910,7 @@ module.exports = [
   }
 ];
 
-},{}],258:[function(_dereq_,module,exports){
+},{}],259:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils').default;
 var conformToMask = _dereq_('vanilla-text-mask').conformToMask;
@@ -39928,6 +40223,7 @@ module.exports = function() {
         return item !== '[]';
       })).conformedValue;
     },
+    fieldData: formioUtils.fieldData,
     parseFloat: formioUtils.parseFloat,
     formatAsCurrency: formioUtils.formatAsCurrency,
     checkCalculated: formioUtils.checkCalculated,
@@ -40106,7 +40402,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":10,"lodash/filter":160,"lodash/get":161,"vanilla-text-mask":203}],259:[function(_dereq_,module,exports){
+},{"formiojs/utils":10,"lodash/filter":160,"lodash/get":161,"vanilla-text-mask":204}],260:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, options) {
@@ -40233,7 +40529,7 @@ module.exports = function() {
   };
 };
 
-},{}],260:[function(_dereq_,module,exports){
+},{}],261:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -40282,7 +40578,7 @@ module.exports = [
   }
 ];
 
-},{}],261:[function(_dereq_,module,exports){
+},{}],262:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -40328,7 +40624,7 @@ module.exports = [
   }
 ];
 
-},{}],262:[function(_dereq_,module,exports){
+},{}],263:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -40337,7 +40633,7 @@ module.exports = [
   }
 ];
 
-},{}],263:[function(_dereq_,module,exports){
+},{}],264:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -40350,7 +40646,7 @@ module.exports = [
   }
 ];
 
-},{}],264:[function(_dereq_,module,exports){
+},{}],265:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
     return function(label, shortcut) {
@@ -40372,7 +40668,7 @@ module.exports = function() {
     };
   }
   
-},{}],265:[function(_dereq_,module,exports){
+},{}],266:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -40391,7 +40687,7 @@ module.exports = [
   }
 ];
 
-},{}],266:[function(_dereq_,module,exports){
+},{}],267:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -40404,22 +40700,22 @@ module.exports = [
   }
 ];
 
-},{}],267:[function(_dereq_,module,exports){
+},{}],268:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
-  'Formio',
+  'FormioUtils',
   'formioTableView',
   function(
-    Formio,
+    FormioUtils,
     formioTableView
   ) {
     return function(data, component) {
-      return formioTableView(Formio.fieldData(data, component), component);
+      return formioTableView(FormioUtils.fieldData(data, component), component);
     };
   }
 ];
 
-},{}],268:[function(_dereq_,module,exports){
+},{}],269:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -40476,7 +40772,7 @@ module.exports = [
   }
 ];
 
-},{}],269:[function(_dereq_,module,exports){
+},{}],270:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -40484,7 +40780,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],270:[function(_dereq_,module,exports){
+},{}],271:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -40608,7 +40904,7 @@ app.run([
 
     // The template for the formio forms.
     $templateCache.put('formio.html',
-      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !options.building\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"{{ formName }}\" class=\"formio-form\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"options.building ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      form-name=\"formName\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
+      "<div>\n  <i style=\"font-size: 2em;\" ng-if=\"formLoading\" ng-class=\"{'formio-hidden': !formLoading}\" class=\"formio-loading glyphicon glyphicon-refresh glyphicon-spin\"></i>\n  <formio-wizard ng-if=\"form.display === 'wizard'\" src=\"src\" url=\"url\" form=\"form\" submission=\"submission\" form-action=\"formAction\" read-only=\"readOnly\" hide-components=\"hideComponents\" disable-components=\"disableComponents\" formio-options=\"formioOptions\" storage=\"form.name\" options=\"options\"></formio-wizard>\n  <div ng-if=\"form.display === 'pdf' && form.settings.pdf\" style=\"position:relative;\">\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <span style=\"position:absolute;right:10px;top:10px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomIn()\"><span class=\"glyphicon glyphicon-zoom-in\"></span></span>\n    <span style=\"position:absolute;right:10px;top:60px;cursor:pointer;\" class=\"btn btn-default no-disable\" ng-click=\"zoomOut()\"><span class=\"glyphicon glyphicon-zoom-out\"></span></span>\n    <a ng-if=\"downloadUrl\" style=\"position:absolute;right:10px;top:110px;cursor:pointer;\" class=\"no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <iframe ng-src=\"{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}\" seamless class=\"formio-iframe\"></iframe>\n    <button ng-if=\"!readOnly && !options.building\" type=\"button\" class=\"btn btn-primary\" ng-click=\"submitIFrameForm()\">Submit</button>\n  </div>\n  <form ng-if=\"!form.display || (form.display === 'form')\" role=\"form\" name=\"{{ formName }}\" class=\"formio-form\" ng-submit=\"onSubmit(formioForm)\" novalidate>\n    <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\" ng-if=\"::!options.building\">\n      {{ alert.message | formioTranslate:null:options.building }}\n    </div>\n    <a ng-if=\"downloadUrl && form.settings.pdf.id\" class=\"pull-right no-disable\" href=\"{{ downloadUrl | trustAsResourceUrl }}\" target=\"_blank\"><img ng-src=\"{{ pdfImage }}\" style=\"width:3em;\" /></a>\n    <!-- DO NOT PUT \"track by $index\" HERE SINCE DYNAMICALLY ADDING/REMOVING COMPONENTS WILL BREAK -->\n    <formio-component\n      ng-repeat=\"component in form.components track by $index\"\n      component=\"component\"\n      ng-if=\"options.building ? '::true' : isVisible(component)\"\n      data=\"submission.data\"\n      form-name=\"formName\"\n      formio=\"formio\"\n      submission=\"submission\"\n      hide-components=\"hideComponents\"\n      read-only=\"isDisabled(component, submission.data)\"\n      options=\"options\"\n    ></formio-component>\n  </form>\n</div>\n"
     );
 
     $templateCache.put('formio-wizard.html',
@@ -40624,7 +40920,7 @@ app.run([
     );
 
     $templateCache.put('formio/submissions.html',
-      "<div>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message | formioTranslate:null:options.building }}\n  </div>\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th ng-repeat=\"component in form.components | flattenComponents track by $index\" ng-if=\"tableView(component)\">{{ component.label || component.key }}</th>\n        <th>Submitted</th>\n        <th>Updated</th>\n        <th>Operations</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"submission in submissions track by $index\" class=\"formio-submission\" ng-click=\"$emit('submissionView', submission)\">\n        <td ng-repeat=\"component in form.components | flattenComponents track by $index\" ng-if=\"tableView(component)\">{{ submission.data | tableView:component }}</td>\n        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>\n          <div class=\"button-group\" style=\"display:flex;\">\n            <a ng-click=\"$emit('submissionView', submission); $event.stopPropagation();\" class=\"btn btn-primary btn-xs\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionEdit', submission); $event.stopPropagation();\" class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionDelete', submission); $event.stopPropagation();\" class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>\n          </div>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <pagination\n    ng-if=\"submissions.serverCount > perPage\"\n    ng-model=\"currentPage\"\n    ng-change=\"pageChanged(currentPage)\"\n    total-items=\"submissions.serverCount\"\n    items-per-page=\"perPage\"\n    direction-links=\"false\"\n    boundary-links=\"true\"\n    first-text=\"&laquo;\"\n    last-text=\"&raquo;\"\n    >\n  </pagination>\n</div>\n"
+      "<div>\n  <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n    {{ alert.message | formioTranslate:null:options.building }}\n  </div>\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th ng-repeat=\"component in form.components | flattenComponents track by $index\" ng-if=\"tableView(component)\">{{ component.label || component.key }}</th>\n        <th>Submitted</th>\n        <th>Updated</th>\n        <th>Operations</th>\n      </tr>\n    </thead>\n    <tbody>\n      <tr ng-repeat=\"submission in submissions track by $index\" class=\"formio-submission\" ng-click=\"$emit('submissionView', submission)\">\n        <td ng-repeat=\"component in form.components | flattenComponents track by $index\" ng-if=\"tableView(component)\">{{ submission.data | tableView:component }}</td>\n        <td>{{ submission.created | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>{{ submission.modified | amDateFormat:'l, h:mm:ss a' }}</td>\n        <td>\n          <div class=\"button-group\" style=\"display:flex;\">\n            <a ng-click=\"$emit('submissionView', submission); $event.stopPropagation();\" class=\"btn btn-primary btn-xs\"><span class=\"glyphicon glyphicon-eye-open\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionEdit', submission); $event.stopPropagation();\" class=\"btn btn-default btn-xs\"><span class=\"glyphicon glyphicon-edit\"></span></a>&nbsp;\n            <a ng-click=\"$emit('submissionDelete', submission); $event.stopPropagation();\" class=\"btn btn-danger btn-xs\"><span class=\"glyphicon glyphicon-remove-circle\"></span></a>\n          </div>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n  <pagination\n    ng-if=\"submissions.serverCount > perPage\"\n    ng-model=\"currentPage\"\n    ng-model-options=\"{allowInvalid: true}\"\n    ng-change=\"pageChanged(currentPage)\"\n    total-items=\"submissions.serverCount\"\n    items-per-page=\"perPage\"\n    direction-links=\"false\"\n    boundary-links=\"true\"\n    first-text=\"&laquo;\"\n    last-text=\"&raquo;\"\n  >\n  </pagination>\n</div>\n"
     );
 
     // A formio component template.
@@ -40648,7 +40944,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":224,"./directives/customValidator":241,"./directives/formio":242,"./directives/formioBindHtml.js":243,"./directives/formioComponent":244,"./directives/formioComponentTooltip":245,"./directives/formioComponentView":246,"./directives/formioDelete":247,"./directives/formioElement":248,"./directives/formioErrors":249,"./directives/formioMask":250,"./directives/formioMax":251,"./directives/formioMin":252,"./directives/formioScriptEditor":253,"./directives/formioSubmission":254,"./directives/formioSubmissions":255,"./directives/formioWizard":256,"./factories/FormioScope":257,"./factories/FormioUtils":258,"./factories/formioInterceptor":260,"./factories/formioTableView":261,"./filters/flattenComponents":262,"./filters/safehtml":263,"./filters/shortcut":264,"./filters/tableComponents":265,"./filters/tableFieldView":266,"./filters/tableView":267,"./filters/translate":268,"./filters/trusturl":269,"./polyfills/polyfills":272,"./providers/Formio":273}],271:[function(_dereq_,module,exports){
+},{"./components":225,"./directives/customValidator":242,"./directives/formio":243,"./directives/formioBindHtml.js":244,"./directives/formioComponent":245,"./directives/formioComponentTooltip":246,"./directives/formioComponentView":247,"./directives/formioDelete":248,"./directives/formioElement":249,"./directives/formioErrors":250,"./directives/formioMask":251,"./directives/formioMax":252,"./directives/formioMin":253,"./directives/formioScriptEditor":254,"./directives/formioSubmission":255,"./directives/formioSubmissions":256,"./directives/formioWizard":257,"./factories/FormioScope":258,"./factories/FormioUtils":259,"./factories/formioInterceptor":261,"./factories/formioTableView":262,"./filters/flattenComponents":263,"./filters/safehtml":264,"./filters/shortcut":265,"./filters/tableComponents":266,"./filters/tableFieldView":267,"./filters/tableView":268,"./filters/translate":269,"./filters/trusturl":270,"./polyfills/polyfills":273,"./providers/Formio":274}],272:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -40679,13 +40975,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],272:[function(_dereq_,module,exports){
+},{}],273:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":271}],273:[function(_dereq_,module,exports){
+},{"./Object.assign":272}],274:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -40693,7 +40989,6 @@ module.exports = function() {
 
   // Return the provider interface.
   return {
-
     // Expose Formio configuration functions
     setBaseUrl: Formio.setBaseUrl,
     getBaseUrl: Formio.getBaseUrl,
@@ -40748,6 +41043,18 @@ module.exports = function() {
           });
         });
 
+        // Add ability to set the scope base url.
+        Formio.setScopeBase = function($scope) {
+          $scope.baseUrl = $scope.options ? $scope.options.baseUrl : '';
+          if (!$scope.baseUrl && $scope.formio && $scope.formio.projectUrl) {
+            $scope.baseUrl = $scope.formio.projectUrl;
+          }
+          if (!$scope.baseUrl) {
+            $scope.baseUrl = Formio.getBaseUrl();
+          }
+          return $scope.baseUrl;
+        };
+
         // Return the formio interface.
         return Formio;
       }
@@ -40755,5 +41062,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/Formio":3}]},{},[270])(270)
+},{"formiojs/Formio":3}]},{},[271])(271)
 });

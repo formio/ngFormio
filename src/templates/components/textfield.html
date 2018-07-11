@@ -6,7 +6,7 @@
   tabindex="{{ component.tabindex || 0 }}"
   ng-disabled="readOnly"
   ng-model="data[component.key]"
-  ng-model-options="{ debounce: 500 }"
+  ng-model-options="{ allowInvalid: true, debounce: 500 }"
   safe-multiple-to-single
   auto-focus="true"
   aria-labelledby="{{ componentId +'Label'}}"

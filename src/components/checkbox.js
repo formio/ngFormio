@@ -15,18 +15,19 @@ module.exports = function(app) {
             true: true,
             false: false
           };
+
           var defaultValue = $scope.component.hasOwnProperty('defaultValue')
             ? boolean[$scope.component.defaultValue] || false
             : false;
 
-          // FOR-440 - Only use the default value if the data isn't defined.
-          // On the first load, attempt to set the default value.
-          $scope.data[$scope.component.key] = $scope.data.hasOwnProperty($scope.component.key) && boolean.hasOwnProperty($scope.data[$scope.component.key])
-            ? boolean[$scope.data[$scope.component.key]]
-            : defaultValue;
-
           // FA-850 - Ensure the checked value is always a boolean object when loaded, then unbind the watch.
           if ($scope.component.inputType === 'checkbox') {
+            // FOR-440 - Only use the default value if the data isn't defined.
+            // On the first load, attempt to set the default value.
+            $scope.data[$scope.component.key] = $scope.data.hasOwnProperty($scope.component.key) && boolean.hasOwnProperty($scope.data[$scope.component.key])
+              ? boolean[$scope.data[$scope.component.key]]
+              : defaultValue;
+
             $scope.$watch('data.' + $scope.component.key, function() {
               if (!$scope.data || !$scope.component.key) return;
 
@@ -34,11 +35,9 @@ module.exports = function(app) {
               if (
                 $scope.component.validate
                 && $scope.component.validate.required
-                && (boolean[$scope.data[$scope.component.key]] || false) === false
+                && boolean[$scope.data[$scope.component.key]] === false
               ) {
-                $timeout(function() {
-                  delete $scope.data[$scope.component.key];
-                });
+                delete $scope.data[$scope.component.key];
               }
             });
           }

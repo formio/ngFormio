@@ -22,6 +22,7 @@
     component="component"
     name="{{ componentId }}"
     ng-model="data[component.key]"
+    ng-model-options="{allowInvalid: true}"
     tabindex="{{ component.tabindex || 0 }}"
     auto-focus="true"
     ng-required="isRequired(component)"

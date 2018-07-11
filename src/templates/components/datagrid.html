@@ -1,4 +1,4 @@
-<div name="{{ componentId }}" class="formio-data-grid" ng-model="dataValue[componentId]" custom-validator="component.validate.custom" datagrid-validation ng-controller="formioDataGrid">
+<div name="{{ componentId }}" class="formio-data-grid" ng-model="data[componentId]" ng-model-options="{allowInvalid: true}" custom-validator="component.validate.custom" ng-controller="formioDataGrid">
   <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table datagrid-table">
     <thead>
       <tr>
@@ -34,7 +34,7 @@
           ></formio-component>
         </td>
         <td ng-if="!component.hasOwnProperty('validate') || !component.validate.hasOwnProperty('minLength') || rows.length > component.validate.minLength">
-          <a ng-click="(readOnly || formioForm.submitting)? null: removeRow(rowIndex) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default">
+          <a ng-click="(readOnly || formioForm.submitting)? null: removeRow(rowIndex) " ng-disabled = "readOnly || formioForm.submitting" class="btn btn-default datagrid-remove">
             <span class="glyphicon glyphicon-remove-circle"></span>
           </a>
         </td>

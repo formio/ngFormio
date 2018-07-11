@@ -71,35 +71,6 @@ module.exports = function(app) {
       });
     }
   ]);
-  app.directive('datagridValidation', function() {
-    return {
-      require: 'ngModel',
-      restrict: 'A',
-      link: function(scope, elem, attr, ctrl) {
-        if ((scope.options && scope.options.building) || !scope.formioForm || !scope.component.validate || !scope.component.validate.custom) return;
-
-        // Add the control to the main form.
-        ctrl.$name = scope.componentId;
-        scope.formioForm.$addControl(ctrl);
-        // For some reason the validator deletes the ng-model value if validation fails so make a fake copy since we don't need it anyway.
-        scope.dataValue = angular.copy(scope.data);
-
-        var init = true;
-
-        // Wait 300ms for changes to trigger the datagrid.
-        setTimeout(function() {
-          init = false;
-        }, 300);
-        scope.$watch('data', function() {
-          scope.dataValue = angular.copy(scope.data);
-          ctrl.$validate();
-          if (!init) {
-            ctrl.$setDirty(true);
-          }
-        }, true);
-      }
-    }
-  });
   app.controller('formioDataGrid', [
     '$scope',
     'FormioUtils',
@@ -107,11 +78,11 @@ module.exports = function(app) {
       if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
-      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
+      $scope.data[$scope.componentId] = $scope.data[$scope.componentId] || [{}];
 
       // Determine if any component is visible.
       $scope.anyVisible = function(component) {
-        var data = $scope.data[$scope.component.key];
+        var data = $scope.data[$scope.componentId];
         var visible = false;
         angular.forEach(data, function(rowData) {
           visible = (visible || FormioUtils.isVisible(component, rowData, $scope.data, $scope.hideComponents));
@@ -120,7 +91,7 @@ module.exports = function(app) {
       };
 
       // Pull out the rows and cols for easy iteration.
-      $scope.rows = $scope.data[$scope.component.key];
+      $scope.rows = $scope.data[$scope.componentId];
       // If less than minLength, add that many rows.
       if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
         var toAdd = $scope.component.validate.minLength - $scope.rows.length;

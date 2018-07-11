@@ -70,6 +70,11 @@ module.exports = function() {
         $timeout
       ) {
         $scope.options = $scope.options || {};
+        Formio.setScopeBase($scope);
+        var session = ($scope.storage && !$scope.readOnly) ? localStorage.getItem($scope.storage) : false;
+        if (session) {
+          session = angular.fromJson(session);
+        }
 
         var storedData = {};
         var storage = {
@@ -97,9 +102,7 @@ module.exports = function() {
           }
         };
 
-        $scope.baseUrl = $scope.options.baseurl || Formio.getBaseUrl();
         var session = ($scope.storage && !$scope.readOnly) ? storage.getItem($scope.storage) : false;
-
         $scope.formio = null;
         $scope.url = $scope.url || $scope.src;
         $scope.page = {};

@@ -8,6 +8,57 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - CSS classes for wizard buttons
 
+## 2.25.4
+### Fixed
+ - Issue where Formio.fieldData is not defined and should use FormioUtils instead.
+
+## 2.25.3
+### Fixed
+ - Issue with build where formiojs was not getting included.
+
+## 2.25.2
+### Changed
+ - Upgraded core renderer and other dependencies.
+
+## 2.35.1
+### Changed
+ - Upgraded core renderer which introduces Okta SSO integration.
+
+## 2.35.0
+### Fixed
+ - File fields where a file was added and removes are crashing data view on portal.
+
+### Changed
+ - Inputs store invalid value.
+
+### Fixed
+ - `tableView` for File component.
+
+## 2.34.2
+### Fixed
+ - Upgraded formiojs to 3.0.0-rc.4 which contains formData method.
+
+## 2.34.1
+### Fixed
+ - Issues with the formData method not being exposed to FormioUtils.
+ - PDF forms to allow for the url context of the form to be passed to the pdf.
+
+## 2.34.0
+### Fixed
+ - Required Checkbox submission loading.
+ - Problems with the wizard component not keeping the baseUrl configuration.
+ - How the baseUrl is handled within components.
+ - Fixed typo in default settings for requireDecimal
+ - Fix issue where checkbox radios set default to boolean.
+
+### Added
+ - `row` value into Button's custom logic.
+ - Add option to wizard to not use localStorage.
+
+### Changed
+ - Default setting for hideLabel on Panels should be false.
+ - Upgraded dependencies vanilla-text-mask@5.1.1, browserify@16.2.2, gulp-rename@1.2.3, angular@1.7.0, angular-sanitize@1.7.0, babel-preset-env@1.7.0, gulp-debug@4.0.0, uglifyify@5.0.0, gulp-wrap@0.14.0
+
 ## 2.33.2
 ### Fixed
  - Update new syntax for importing from formio.js v3.x

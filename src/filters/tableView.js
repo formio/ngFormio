@@ -1,12 +1,12 @@
 module.exports = [
-  'Formio',
+  'FormioUtils',
   'formioTableView',
   function(
-    Formio,
+    FormioUtils,
     formioTableView
   ) {
     return function(data, component) {
-      return formioTableView(Formio.fieldData(data, component), component);
+      return formioTableView(FormioUtils.fieldData(data, component), component);
     };
   }
 ];

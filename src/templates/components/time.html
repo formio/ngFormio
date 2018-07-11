@@ -9,6 +9,7 @@
   aria-labelledby="{{ componentId +'Label'}}"
   aria-describedby="{{componentId + 'Desc'}}"
   ng-model="data[component.key]"
+  ng-model-options="{allowInvalid: true}"
   safe-multiple-to-single
   auto-focus="true"
   ng-required="isRequired(component)"

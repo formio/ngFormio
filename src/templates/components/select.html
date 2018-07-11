@@ -7,6 +7,7 @@
 <ui-select
   ui-select-required
   ng-model="data[component.key]"
+  ng-model-options="{allowInvalid: true}"
   safe-multiple-to-single
   auto-focus="true"
   aria-labelledby="{{ componentId +'Label'}}"
