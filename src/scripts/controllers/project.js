@@ -334,7 +334,8 @@ app.controller('ProjectController', [
           $scope.localProject.remote &&
         $scope.localProject.remote.hasOwnProperty('project')) &&
         $scope.localProject._id !== $scope.currentProject._id &&
-        $scope.localProject.remote.name !== project.name
+        $scope.localProject.remote.project._id === project._id &&
+        $scope.localProject.remote.project.name !== project.name
       ) {
         $scope.localProject.remote.project.name = project.name;
         $scope.localFormio.saveProject($scope.localProject);
@@ -552,8 +553,11 @@ app.controller('ProjectController', [
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
     $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
     $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
+    $scope.getEmailCallsLimit = ProjectPlans.getEmailCallsLimit.bind(ProjectPlans);
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
+    $scope.getEmailCallsPercent = ProjectPlans.getEmailCallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
+    $scope.getProgressBarClassPercent = ProjectPlans.getProgressBarClassPercent.bind(ProjectPlans);
   }
 ]);
 
@@ -2169,19 +2173,30 @@ app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
       $scope.roles = result.data;
     });
   $scope.$watch('currentProject.settings.oauth.openid', function() {
-    if (!$scope.currentProject.settings || !$scope.currentProject.settings.oauth || $scope.currentProject.settings.oauth.openid) {
+    var openIdData = getOpenIdData();
+    if (!openIdData) {
       return;
     }
-    $scope.currentProject.settings.oauth.openid.roles = $scope.currentProject.settings.oauth.openid.roles || [{}];
+    openIdData.roles = openIdData.roles || [{}];
   }, true);
 
   $scope.addRow = function() {
-    $scope.currentProject.settings.oauth.openid.roles.push({});
+    var openIdData = getOpenIdData();
+    if (openIdData) {
+      openIdData.roles = (openIdData.roles || [{}]).concat({});
+    }
   };
 
   $scope.removeRow = function(index) {
-    $scope.currentProject.settings.oauth.openid.roles.splice(index, 1);
+    var openIdData = getOpenIdData();
+    if (openIdData && openIdData.roles) {
+      openIdData.roles.splice(index, 1);
+    }
   };
+
+  function getOpenIdData() {
+    return $scope.currentProject.settings && $scope.currentProject.settings.oauth && $scope.currentProject.settings.oauth.openid;
+  }
 }]);
 
 app.controller('ProjectRemoteController', [
@@ -2314,6 +2329,7 @@ app.controller('ProjectRemoteController', [
             delete project.access;
             delete project._id;
             delete project.project;
+            delete project.plan;
             $http({
               method: 'POST',
               url: $scope.remote.url + '/project',
@@ -2560,7 +2576,10 @@ app.controller('ProjectStorageController', [
       }
     });
 
-    $http.get($scope.projectUrl + '/dropbox/auth')
+    $scope.loadProjectPromise
+      .then(function() {
+        return $http.get($scope.projectUrl + '/dropbox/auth');
+      })
       .then(function(response) {
         $scope.dropboxSettings = response.data;
       });

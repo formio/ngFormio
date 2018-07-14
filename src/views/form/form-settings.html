@@ -15,7 +15,7 @@
     <div class="well">
       This setting allows you to modify the database collection that stores all of the submissions within the form. This allows for you to select certain fields as <strong>indexes</strong> for significant performance improvements.
     </div>
-    <div class="well" ng-if="disableCollection()">This is only available for <strong>Enterprise Projects.</strong> Please <a ui-sref="project.billing()">Upgrade your Project</a> to enable this feature.</div>
+    <div class="well" ng-if="disableCollection()">This is only available for <strong>Enterprise Projects using on-premise servers.</strong> Please <a ui-sref="project.billing()">Upgrade your Project</a> to enable this feature.</div>
     <label for="formCollection" class="control-label">Collection Name</label>
     <input type="text" ng-disabled="disableCollection()" ng-model="form.settings.collection" class="form-control" id="formCollection"/>
   </div>

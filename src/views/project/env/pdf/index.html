@@ -1,9 +1,9 @@
-<ul class="nav nav-tabs" role="tablist" ng-if="pdfInfo.data.plan === 'enterprise'" style="margin-bottom:10px;">
+<ul class="nav nav-tabs" role="tablist" ng-if="minPlan('team')" style="margin-bottom:10px;">
   <li role="presentation" ng-class="{'active': (currentTab === 'pdf')}"><a ng-click="setTab('pdf')"aria-controls="home" role="tab">PDF</a></li>
   <li role="presentation" ng-class="{'active': (currentTab === 'enterprise')}"><a ng-click="setTab('enterprise')" aria-controls="profile" role="tab">Enterprise</a></li>
 </ul>
 <span class="fa fa-spinner fa-pulse" ng-if="loading" style="font-size: 2em;"></span>
-<div class="row" ng-if="(pdfInfo.data.plan === 'enterprise') && (currentTab === 'enterprise')">
+<div class="row" ng-if="minPlan('team') && currentTab === 'enterprise'">
   <div class="col col-sm-12">
     <p>Our Enterprise PDF solution allows you to deploy our PDF server within your own environment. To setup your server, please click on the following button to go to our online PDF Server deployment instructions.</p>
     <p><a class="btn btn-primary" href="https://help.form.io/userguide/pdfserver/" target="_blank">PDF Server Deployment Instructions</a></p>
@@ -54,7 +54,7 @@ docker run -itd \
     </div>
   </div>
 </div>
-<div ng-if="pdfInfo.data && ((pdfInfo.data.plan !== 'enterprise') || (currentTab === 'pdf'))">
+<div ng-if="currentTab === 'pdf'">
   <div class="row">
     <div class="col col-sm-6">
       <div class="panel panel-info">

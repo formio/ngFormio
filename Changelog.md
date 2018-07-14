@@ -4,7 +4,19 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [UNRELEASED]
+### Fixed
+ - Redirect after form submitting when form doesn't have Save Submission action.
+
+## 5.7.0
+### Fixed
+ - Adding roles to openid.
+ - Disabling premium actions for independent plan.
+
+### Added
+ - Email usage indicator.
+
+## 5.0.0
 ### Added
  - Overall access page in left menu
  - Project Stages!
@@ -14,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - New Environments
  - 'Not Found' option for team members search.
  - Custom Form properties.
+ - Pagination for action lists
 
 ### Changed
  - Projects are created from platforms, not app templates
@@ -26,6 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Environment Settings menu in IE11.
  - Alerts on Premium actions when project plan is not Basic.
  - Unique validation.
+ - Error message when trying to add role mapping in OpenID authentication.
 
 ## 4.1.5
  - Upgraded ng-formio to 2.20.7

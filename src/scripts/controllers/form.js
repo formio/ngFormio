@@ -156,6 +156,10 @@ app.config([
           templateUrl: 'views/form/form-settings.html',
           controller: ['$scope', function($scope) {
             $scope.disableCollection = function() {
+              // Don't allow collections for hosted projects
+              if (_.get($scope, 'localProject._id') === _.get($scope, 'currentProject._id')) {
+                return true;
+              }
               if (!$scope.minPlan('commercial')) {
                 return true;
               }
@@ -952,6 +956,9 @@ app.controller('FormViewController', [
           if (submission._id) {
             $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
           }
+          else {
+            $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
+          }
         })
         .catch(function(err) {
           _.each(err.details, function(errDetails) {
@@ -1504,22 +1511,44 @@ app.controller('FormActionIndexController', [
         });
       }
     };
-    $scope.loadProjectPromise.then(function() {
-      $scope.formio.loadActions()
-        .then(function(actions) {
-          $scope.actions = actions;
-        }, FormioAlerts.onError.bind(FormioAlerts))
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
-      $scope.formio.availableActions().then(function(available) {
-        if (!available[0].name) {
-          available.shift();
-        }
-        available.unshift($scope.newAction);
-        $scope.availableActions = _.filter(available, function(action) {
-          return action.name !== 'sql';
+
+    if (!$scope.numPerPage) {
+      $scope.numPerPage = 10;
+    }
+    $scope.totalItems = 0;
+    $scope.currentPage = 1;
+
+    var query = {params: {
+      limit: $scope.numPerPage,
+      skip: 0
+    }};
+
+    var getActions = function() {
+      $scope.loadProjectPromise.then(function() {
+        $scope.formio.loadActions(query)
+          .then(function(actions) {
+            $scope.totalItems = actions.serverCount;
+            $scope.actions = actions;
+          }, FormioAlerts.onError.bind(FormioAlerts))
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
+        $scope.formio.availableActions().then(function(available) {
+          if (!available[0].name) {
+            available.shift();
+          }
+          available.unshift($scope.newAction);
+          $scope.availableActions = _.filter(available, function(action) {
+            return action.name !== 'sql';
+          });
         });
       });
-    });
+    };
+
+    $scope.setPage = function() {
+      query.params.skip = ($scope.currentPage - 1) * query.params.limit;
+      getActions();
+    };
+
+    getActions();
   }
 ]);
 
@@ -1719,9 +1748,9 @@ app.controller('FormActionEditController', [
           actionInfo.premium === true &&
           $scope.primaryProject &&
           $scope.primaryProject.hasOwnProperty('plan') &&
-          ['basic', 'trial'].indexOf($scope.primaryProject.plan) !== -1
+          ['basic', 'trial', 'independent'].indexOf($scope.primaryProject.plan) !== -1
         ) {
-          $scope.formDisabled = ($scope.primaryProject.plan === 'basic');
+          $scope.formDisabled = ['basic', 'independent'].includes($scope.primaryProject.plan);
           $scope.premiumNotAvailable = true;
           $scope.premiumWarning = $scope.formDisabled ?
             '<i class="glyphicon glyphicon-exclamation-sign"></i> This is a Premium Action, please upgrade your <a ui-sref="project.billing({projectId: $scope.primaryProject._id)">project plan</a> to enable it.' :
