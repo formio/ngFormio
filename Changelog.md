@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Added
  - Time component.
+### Fixed
+ - ngFormioGrid display being broken
 
 ## 2.19.5
 ### Changed
