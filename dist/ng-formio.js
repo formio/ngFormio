@@ -348,6 +348,71 @@ __webpack_require__(/*! ./formBuilder */ "./lib/directives/formBuilder.js");
 
 /***/ }),
 
+/***/ "./lib/factories/formioTableView.js":
+/*!******************************************!*\
+  !*** ./lib/factories/formioTableView.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Components = __webpack_require__(/*! formiojs/components/Components */ "./node_modules/formiojs/components/Components.js");
+
+var _Components2 = _interopRequireDefault(_Components);
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj };
+}
+
+var app = angular.module('formio');
+exports.default = app.factory('formioTableView', [function () {
+  return function (value, component) {
+    if (!value && value !== 0 && value !== false) {
+      return '';
+    }
+    if (!component || !component.input || !component.type) {
+      return value;
+    }
+    var componentObject = _Components2.default.create(component, {
+      readOnly: true,
+      viewAsHtml: true
+    });
+    if (!componentObject.getView) {
+      return value;
+    }
+    if (component.multiple && value.length > 0) {
+      var values = [];
+      angular.forEach(value, function (arrayValue) {
+        values.push(componentObject.getView(arrayValue));
+      });
+      return values;
+    }
+    return componentObject.getView(value);
+  };
+}]);
+
+/***/ }),
+
+/***/ "./lib/factories/index.js":
+/*!********************************!*\
+  !*** ./lib/factories/index.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! ./formioTableView */ "./lib/factories/formioTableView.js");
+
+/***/ }),
+
 /***/ "./lib/index.js":
 /*!**********************!*\
   !*** ./lib/index.js ***!
@@ -363,6 +428,8 @@ __webpack_require__(/*! ./module */ "./lib/module.js");
 __webpack_require__(/*! ./providers */ "./lib/providers/index.js");
 
 __webpack_require__(/*! ./directives */ "./lib/directives/index.js");
+
+__webpack_require__(/*! ./factories */ "./lib/factories/index.js");
 
 __webpack_require__(/*! formiojs/dist/formio.full.min.css */ "./node_modules/formiojs/dist/formio.full.min.css");
 
@@ -2715,7 +2782,7 @@ module.exports = dragula;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.0, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.1, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
@@ -2966,8 +3033,9 @@ module.exports = dragula;
           config = _ref2$config === void 0 ? defaults : _ref2$config,
           _ref2$l10n = _ref2.l10n,
           l10n = _ref2$l10n === void 0 ? english : _ref2$l10n;
-      return function (date, givenFormat, timeless) {
+      return function (date, givenFormat, timeless, customLocale) {
         if (date !== 0 && !date) return undefined;
+        var locale = customLocale || l10n;
         var parsedDate;
         var date_orig = date;
         if (date instanceof Date) parsedDate = new Date(date.getTime());else if (typeof date !== "string" && date.toFixed !== undefined) parsedDate = new Date(date);else if (typeof date === "string") {
@@ -3002,7 +3070,7 @@ module.exports = dragula;
               ops.forEach(function (_ref3) {
                 var fn = _ref3.fn,
                     val = _ref3.val;
-                return parsedDate = fn(parsedDate, val, l10n) || parsedDate;
+                return parsedDate = fn(parsedDate, val, locale) || parsedDate;
               });
             }
 
@@ -3267,11 +3335,18 @@ module.exports = dragula;
 
       function updateTime(e) {
         if (self.selectedDates.length === 0) return;
-        if (e !== undefined && e.type !== "blur") timeWrapper(e);
+
+        if (e !== undefined && e.type !== "blur") {
+          timeWrapper(e);
+        }
+
+        var prevValue = self._input.value;
         setHoursFromInputs();
         updateValue();
 
-        self._debouncedChange();
+        if (self._input.value !== prevValue) {
+          self._debouncedChange();
+        }
       }
 
       function ampm2military(hour, amPM) {
@@ -3686,18 +3761,20 @@ module.exports = dragula;
 
         self.daysContainer.appendChild(frag);
         self.days = self.daysContainer.firstChild;
+
+        if (self.config.mode === "range" && self.selectedDates.length === 1) {
+          onMouseOver();
+        }
       }
 
       function buildMonth() {
         var container = createElement("div", "flatpickr-month");
         var monthNavFragment = window.document.createDocumentFragment();
         var monthElement = createElement("span", "cur-month");
-        monthElement.title = self.l10n.scrollTitle;
         var yearInput = createNumberInput("cur-year", {
           tabindex: "-1"
         });
         var yearElement = yearInput.childNodes[0];
-        yearElement.title = self.l10n.scrollTitle;
         yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
         if (self.config.minDate) yearElement.setAttribute("data-min", self.config.minDate.getFullYear().toString());
 
@@ -3916,7 +3993,18 @@ module.exports = dragula;
         if (self.mobileInput) {
           if (self.mobileInput.parentNode) self.mobileInput.parentNode.removeChild(self.mobileInput);
           self.mobileInput = undefined;
-        } else if (self.calendarContainer && self.calendarContainer.parentNode) self.calendarContainer.parentNode.removeChild(self.calendarContainer);
+        } else if (self.calendarContainer && self.calendarContainer.parentNode) {
+          if (self.config.static && self.calendarContainer.parentNode) {
+            var wrapper = self.calendarContainer.parentNode;
+            wrapper.lastChild && wrapper.removeChild(wrapper.lastChild);
+
+            while (wrapper.firstChild) {
+              wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+            }
+
+            wrapper.parentNode.removeChild(wrapper);
+          } else self.calendarContainer.parentNode.removeChild(self.calendarContainer);
+        }
 
         if (self.altInput) {
           self.input.type = "text";
@@ -4123,16 +4211,17 @@ module.exports = dragula;
       }
 
       function onMouseOver(elem) {
-        if (self.selectedDates.length !== 1 || !elem.classList.contains("flatpickr-day") || elem.classList.contains("disabled")) return;
-        var hoverDate = elem.dateObj.getTime(),
+        if (self.selectedDates.length !== 1 || elem && (!elem.classList.contains("flatpickr-day") || elem.classList.contains("disabled"))) return;
+        var hoverDate = elem ? elem.dateObj.getTime() : self.days.firstElementChild.dateObj.getTime(),
             initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(),
             rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()),
-            rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime());
+            rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime()),
+            lastDate = self.daysContainer.lastChild.lastChild.dateObj.getTime();
         var containsDisabled = false;
         var minRange = 0,
             maxRange = 0;
 
-        for (var t = rangeStartDate; t < rangeEndDate; t += duration.DAY) {
+        for (var t = rangeStartDate; t < lastDate; t += duration.DAY) {
           if (!isEnabled(new Date(t), true)) {
             containsDisabled = containsDisabled || t > rangeStartDate && t < rangeEndDate;
             if (t < initialDate && (!minRange || t > minRange)) minRange = t;else if (t > initialDate && (!maxRange || t < maxRange)) maxRange = t;
@@ -4160,11 +4249,14 @@ module.exports = dragula;
             ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
               dayElem.classList.remove(c);
             });
-            elem.classList.add(hoverDate < self.selectedDates[0].getTime() ? "startRange" : "endRange");
 
-            if (month.contains(elem) || !(m > 0 && prevMonth && prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
-              if (initialDate < hoverDate && timestamp === initialDate) dayElem.classList.add("startRange");else if (initialDate > hoverDate && timestamp === initialDate) dayElem.classList.add("endRange");
-              if (timestamp >= minRange && (maxRange === 0 || timestamp <= maxRange) && isBetween(timestamp, initialDate, hoverDate)) dayElem.classList.add("inRange");
+            if (elem !== undefined) {
+              elem.classList.add(hoverDate < self.selectedDates[0].getTime() ? "startRange" : "endRange");
+
+              if (month.contains(elem) || !(m > 0 && prevMonth && prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
+                if (initialDate < hoverDate && timestamp === initialDate) dayElem.classList.add("startRange");else if (initialDate > hoverDate && timestamp === initialDate) dayElem.classList.add("endRange");
+                if (timestamp >= minRange && (maxRange === 0 || timestamp <= maxRange) && isBetween(timestamp, initialDate, hoverDate)) dayElem.classList.add("inRange");
+              }
             }
           };
 
@@ -4182,7 +4274,7 @@ module.exports = dragula;
 
       function open(e, positionElement) {
         if (positionElement === void 0) {
-          positionElement = self._input;
+          positionElement = self._positionElement;
         }
 
         if (self.isMobile === true) {
@@ -4353,6 +4445,10 @@ module.exports = dragula;
         self.l10n = Object.assign({}, flatpickr.l10ns.default, typeof self.config.locale === "object" ? self.config.locale : self.config.locale !== "default" ? flatpickr.l10ns[self.config.locale] : undefined);
         tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
         self.formatDate = createDateFormatter(self);
+        self.parseDate = createDateParser({
+          config: self.config,
+          l10n: self.l10n
+        });
       }
 
       function positionCalendar(customPositionElement) {
@@ -4441,18 +4537,10 @@ module.exports = dragula;
 
         updateNavigationCurrentMonth();
         buildDays();
-        setDefaultHours();
         updateValue();
         if (self.config.enableTime) setTimeout(function () {
           return self.showTimeInput = true;
         }, 50);
-
-        if (self.config.mode === "range") {
-          if (self.selectedDates.length === 1) {
-            onMouseOver(target);
-          } else updateNavigationCurrentMonth();
-        }
-
         if (!shouldChangeMonth && self.config.mode !== "range" && self.config.showMonths === 1) focusOnDayElem(target);else self.selectedDateElem && self.selectedDateElem.focus();
         if (self.hourElement !== undefined) setTimeout(function () {
           return self.hourElement !== undefined && self.hourElement.select();
@@ -4559,7 +4647,7 @@ module.exports = dragula;
       function setupDates() {
         self.selectedDates = [];
         self.now = self.parseDate(self.config.now) || new Date();
-        var preloadedDate = self.config.defaultDate || (self.input.placeholder.length > 0 && self.input.value === self.input.placeholder ? null : self.input.value);
+        var preloadedDate = self.config.defaultDate || ((self.input.nodeName === "INPUT" || self.input.nodeName === "TEXTAREA") && self.input.placeholder && self.input.value === self.input.placeholder ? null : self.input.value);
         if (preloadedDate) setSelectedDate(preloadedDate, self.config.dateFormat);
         var initialDate = self.selectedDates.length > 0 ? self.selectedDates[0] : self.config.minDate && self.config.minDate.getTime() > self.now.getTime() ? self.config.minDate : self.config.maxDate && self.config.maxDate.getTime() < self.now.getTime() ? self.config.maxDate : self.now;
         self.currentYear = initialDate.getFullYear();
@@ -5173,11 +5261,13 @@ var _shallowCopy2 = _interopRequireDefault(_shallowCopy);
 
 var _providers = __webpack_require__(/*! ./providers */ "./node_modules/formiojs/providers/index.js");
 
-var _providers2 = _interopRequireDefault(_providers);
+var providers = _interopRequireWildcard(_providers);
 
 var _get2 = __webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js");
 
 var _get3 = _interopRequireDefault(_get2);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6461,13 +6551,14 @@ var Formio = function () {
 
 exports.default = Formio;
 Formio.libraries = {};
+Formio.Promise = _nativePromiseOnly2.default;
 Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
 Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
-Formio.providers = _providers2.default;
+Formio.providers = providers;
 Formio.events = new _eventemitter.EventEmitter2({
   wildcard: false,
   maxListeners: 0
@@ -6599,23 +6690,25 @@ var PDF = function (_Webform) {
       submission.readOnly = !!this.options.readOnly;
       this.postMessage({ name: 'submission', data: submission });
       return _get(PDF.prototype.__proto__ || Object.getPrototypeOf(PDF.prototype), 'setSubmission', this).call(this, submission).then(function () {
-        _this4.formio.getDownloadUrl().then(function (url) {
-          // Add a download button if it has a download url.
-          if (!url) {
-            return;
-          }
-          if (!_this4.downloadButton) {
-            _this4.downloadButton = _this4.ce('a', {
-              href: url,
-              target: '_blank',
-              style: 'position:absolute;right:10px;top:110px;cursor:pointer;'
-            }, _this4.ce('img', {
-              src: __webpack_require__(/*! ./pdf.image */ "./node_modules/formiojs/pdf.image.js"),
-              style: 'width:3em;'
-            }));
-            _this4.element.insertBefore(_this4.downloadButton, _this4.iframe);
-          }
-        });
+        if (_this4.formio) {
+          _this4.formio.getDownloadUrl().then(function (url) {
+            // Add a download button if it has a download url.
+            if (!url) {
+              return;
+            }
+            if (!_this4.downloadButton) {
+              _this4.downloadButton = _this4.ce('a', {
+                href: url,
+                target: '_blank',
+                style: 'position:absolute;right:10px;top:110px;cursor:pointer;'
+              }, _this4.ce('img', {
+                src: __webpack_require__(/*! ./pdf.image */ "./node_modules/formiojs/pdf.image.js"),
+                style: 'width:3em;'
+              }));
+              _this4.element.insertBefore(_this4.downloadButton, _this4.iframe);
+            }
+          });
+        }
       });
     }
   }, {
@@ -7187,7 +7280,9 @@ var Webform = function (_NestedComponent) {
         i18n = options.i18n;
       } else {
         _lodash2.default.each(options.i18n, function (lang, code) {
-          if (!i18n.resources[code]) {
+          if (code === 'options') {
+            _lodash2.default.merge(i18n, lang);
+          } else if (!i18n.resources[code]) {
             i18n.resources[code] = { translation: lang };
           } else {
             _lodash2.default.assign(i18n.resources[code].translation, lang);
@@ -7825,6 +7920,9 @@ var Webform = function (_NestedComponent) {
   }, {
     key: 'setAlert',
     value: function setAlert(type, message) {
+      if (!type && this.submitted) {
+        return;
+      }
       if (this.options.noAlerts) {
         if (!message) {
           this.emit('error', false);
@@ -8442,14 +8540,14 @@ var WebformBuilder = function (_Webform) {
           class: 'btn btn-xxs btn-danger component-settings-button component-settings-button-remove'
         }, parent.getIcon('remove'));
         parent.addEventListener(removeButton, 'click', function () {
-          return parent.deleteComponent(comp);
+          return parent.root.deleteComponent(comp);
         });
 
         var editButton = parent.ce('div', {
           class: 'btn btn-xxs btn-default component-settings-button component-settings-button-edit'
         }, parent.getIcon('cog'));
         parent.addEventListener(editButton, 'click', function () {
-          return parent.editComponent(comp);
+          return parent.root.editComponent(comp);
         });
 
         // Add the edit buttons to the component.
@@ -9075,6 +9173,9 @@ var WebformBuilder = function (_Webform) {
         this.dragula.destroy();
       }
       this.dragula = (0, _dragula2.default)(this.sidebarContainers.concat(this.dragContainers), {
+        moves: function moves(el) {
+          return !el.classList.contains('no-drag');
+        },
         copy: function copy(el) {
           return el.classList.contains('drag-copy');
         },
@@ -11889,6 +11990,7 @@ var BaseComponent = function () {
         row: this.data,
         rowIndex: this.rowIndex,
         data: this.root ? this.root.data : this.data,
+        form: this.root ? this.root._form : {},
         _: _lodash2.default,
         utils: FormioUtils,
         util: FormioUtils,
@@ -12906,6 +13008,12 @@ var BaseComponent = function () {
   }, {
     key: 'show',
     value: function show(_show) {
+      if (this.options.hide && this.options.hide[this.component.key]) {
+        _show = false;
+      } else if (this.options.show && this.options.show[this.component.key]) {
+        _show = true;
+      }
+
       // Execute only if visibility changes or if we are in builder mode or if hidden fields should be shown.
       if (!_show === !this._visible || this.options.builder || this.options.showHiddenFields) {
         return _show;
@@ -13059,14 +13167,42 @@ var BaseComponent = function () {
       }
       this.inputs.push(input);
       this.hook('input', input, container);
+      this.addFocusBlurEvents(input);
       this.addInputEventListener(input);
       this.addInputSubmitListener(input);
       return input;
     }
   }, {
+    key: 'addFocusBlurEvents',
+    value: function addFocusBlurEvents(element) {
+      var _this18 = this;
+
+      this.addEventListener(element, 'focus', function () {
+        if (_this18.root.focusedComponent !== _this18) {
+          if (_this18.root.pendingBlur) {
+            _this18.root.pendingBlur();
+          }
+
+          _this18.root.focusedComponent = _this18;
+
+          _this18.emit('focus', _this18);
+        } else if (_this18.root.focusedComponent === _this18 && _this18.root.pendingBlur) {
+          _this18.root.pendingBlur.cancel();
+          _this18.root.pendingBlur = null;
+        }
+      });
+      this.addEventListener(element, 'blur', function () {
+        _this18.root.pendingBlur = FormioUtils.delay(function () {
+          _this18.emit('blur', _this18);
+          _this18.root.focusedComponent = null;
+          _this18.root.pendingBlur = null;
+        });
+      });
+    }
+  }, {
     key: 'addQuill',
     value: function addQuill(element, settings, onChange) {
-      var _this18 = this;
+      var _this19 = this;
 
       settings = _lodash2.default.isEmpty(settings) ? this.wysiwygDefault : settings;
 
@@ -13075,18 +13211,18 @@ var BaseComponent = function () {
 
       // Lazy load the quill library.
       return _Formio2.default.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.6/quill.min.js', true).then(function () {
-        _this18.quill = new Quill(element, settings);
+        _this19.quill = new Quill(element, settings);
 
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
         var txtArea = document.createElement('textarea');
         txtArea.setAttribute('class', 'quill-source-code');
-        _this18.quill.addContainer('ql-custom').appendChild(txtArea);
+        _this19.quill.addContainer('ql-custom').appendChild(txtArea);
         var qlSource = element.parentNode.querySelector('.ql-source');
         if (qlSource) {
-          _this18.addEventListener(qlSource, 'click', function (event) {
+          _this19.addEventListener(qlSource, 'click', function (event) {
             event.preventDefault();
             if (txtArea.style.display === 'inherit') {
-              _this18.quill.setContents(_this18.quill.clipboard.convert(txtArea.value));
+              _this19.quill.setContents(_this19.quill.clipboard.convert(txtArea.value));
             }
             txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
           });
@@ -13094,8 +13230,8 @@ var BaseComponent = function () {
         /** END CODEBLOCK **/
 
         // Make sure to select cursor when they click on the element.
-        _this18.addEventListener(element, 'click', function () {
-          return _this18.quill.focus();
+        _this19.addEventListener(element, 'click', function () {
+          return _this19.quill.focus();
         });
 
         // Allows users to skip toolbar items when tabbing though form
@@ -13104,12 +13240,12 @@ var BaseComponent = function () {
           elm[i].setAttribute('tabindex', '-1');
         }
 
-        _this18.quill.on('text-change', function () {
-          txtArea.value = _this18.quill.root.innerHTML;
+        _this19.quill.on('text-change', function () {
+          txtArea.value = _this19.quill.root.innerHTML;
           onChange(txtArea);
         });
 
-        return _this18.quill;
+        return _this19.quill;
       });
     }
 
@@ -13425,7 +13561,7 @@ var BaseComponent = function () {
   }, {
     key: 'setCustomValidity',
     value: function setCustomValidity(message, dirty) {
-      var _this19 = this;
+      var _this20 = this;
 
       if (this.errorElement && this.errorContainer) {
         this.errorElement.innerHTML = '';
@@ -13441,7 +13577,7 @@ var BaseComponent = function () {
         this.addInputError(message, dirty);
       } else {
         this.inputs.forEach(function (input) {
-          return _this19.removeClass(_this19.performInputMapping(input), 'is-invalid');
+          return _this20.removeClass(_this20.performInputMapping(input), 'is-invalid');
         });
         if (this.options.highlightErrors) {
           this.removeClass(this.element, 'alert alert-danger');
@@ -13450,7 +13586,7 @@ var BaseComponent = function () {
         this.error = null;
       }
       _lodash2.default.each(this.inputs, function (input) {
-        input = _this19.performInputMapping(input);
+        input = _this20.performInputMapping(input);
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
         }
@@ -13585,7 +13721,7 @@ var BaseComponent = function () {
   }, {
     key: 'selectOptions',
     value: function selectOptions(select, tag, options, defaultValue) {
-      var _this20 = this;
+      var _this21 = this;
 
       _lodash2.default.each(options, function (option) {
         var attrs = {
@@ -13594,8 +13730,8 @@ var BaseComponent = function () {
         if (defaultValue !== undefined && option.value === defaultValue) {
           attrs.selected = 'selected';
         }
-        var optionElement = _this20.ce('option', attrs);
-        optionElement.appendChild(_this20.text(option.label));
+        var optionElement = _this21.ce('option', attrs);
+        optionElement.appendChild(_this21.text(option.label));
         select.appendChild(optionElement);
       });
     }
@@ -13705,11 +13841,11 @@ var BaseComponent = function () {
   }, {
     key: 'autofocus',
     value: function autofocus() {
-      var _this21 = this;
+      var _this22 = this;
 
       if (this.component.autofocus) {
         this.on('render', function () {
-          return _this21.focus();
+          return _this22.focus();
         });
       }
     }
@@ -13941,7 +14077,7 @@ var BaseComponent = function () {
      */
     ,
     set: function set(disabled) {
-      var _this22 = this;
+      var _this23 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable) {
@@ -13959,7 +14095,7 @@ var BaseComponent = function () {
 
       // Disable all inputs.
       _lodash2.default.each(this.inputs, function (input) {
-        return _this22.setDisabled(_this22.performInputMapping(input), disabled);
+        return _this23.setDisabled(_this23.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -14812,13 +14948,29 @@ var _Address = __webpack_require__(/*! ./address/Address.form */ "./node_modules
 
 var _Address2 = _interopRequireDefault(_Address);
 
-var _Content = __webpack_require__(/*! ./content/Content.form */ "./node_modules/formiojs/components/content/Content.form.js");
+var _Button = __webpack_require__(/*! ./button/Button.form */ "./node_modules/formiojs/components/button/Button.form.js");
 
-var _Content2 = _interopRequireDefault(_Content);
+var _Button2 = _interopRequireDefault(_Button);
+
+var _Checkbox = __webpack_require__(/*! ./checkbox/Checkbox.form */ "./node_modules/formiojs/components/checkbox/Checkbox.form.js");
+
+var _Checkbox2 = _interopRequireDefault(_Checkbox);
+
+var _Columns = __webpack_require__(/*! ./columns/Columns.form */ "./node_modules/formiojs/components/columns/Columns.form.js");
+
+var _Columns2 = _interopRequireDefault(_Columns);
 
 var _Container = __webpack_require__(/*! ./container/Container.form */ "./node_modules/formiojs/components/container/Container.form.js");
 
 var _Container2 = _interopRequireDefault(_Container);
+
+var _Content = __webpack_require__(/*! ./content/Content.form */ "./node_modules/formiojs/components/content/Content.form.js");
+
+var _Content2 = _interopRequireDefault(_Content);
+
+var _Currency = __webpack_require__(/*! ./currency/Currency.form */ "./node_modules/formiojs/components/currency/Currency.form.js");
+
+var _Currency2 = _interopRequireDefault(_Currency);
 
 var _DataGrid = __webpack_require__(/*! ./datagrid/DataGrid.form */ "./node_modules/formiojs/components/datagrid/DataGrid.form.js");
 
@@ -14832,159 +14984,143 @@ var _Day = __webpack_require__(/*! ./day/Day.form */ "./node_modules/formiojs/co
 
 var _Day2 = _interopRequireDefault(_Day);
 
-var _HTML = __webpack_require__(/*! ./html/HTML.form */ "./node_modules/formiojs/components/html/HTML.form.js");
-
-var _HTML2 = _interopRequireDefault(_HTML);
-
-var _Hidden = __webpack_require__(/*! ./hidden/Hidden.form */ "./node_modules/formiojs/components/hidden/Hidden.form.js");
-
-var _Hidden2 = _interopRequireDefault(_Hidden);
-
 var _EditGrid = __webpack_require__(/*! ./editgrid/EditGrid.form */ "./node_modules/formiojs/components/editgrid/EditGrid.form.js");
 
 var _EditGrid2 = _interopRequireDefault(_EditGrid);
-
-var _Form = __webpack_require__(/*! ./form/Form.form */ "./node_modules/formiojs/components/form/Form.form.js");
-
-var _Form2 = _interopRequireDefault(_Form);
-
-var _TextField = __webpack_require__(/*! ./textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js");
-
-var _TextField2 = _interopRequireDefault(_TextField);
-
-var _PhoneNumber = __webpack_require__(/*! ./phonenumber/PhoneNumber.form */ "./node_modules/formiojs/components/phonenumber/PhoneNumber.form.js");
-
-var _PhoneNumber2 = _interopRequireDefault(_PhoneNumber);
-
-var _Location = __webpack_require__(/*! ./location/Location.form */ "./node_modules/formiojs/components/location/Location.form.js");
-
-var _Location2 = _interopRequireDefault(_Location);
 
 var _Email = __webpack_require__(/*! ./email/Email.form */ "./node_modules/formiojs/components/email/Email.form.js");
 
 var _Email2 = _interopRequireDefault(_Email);
 
-var _Time = __webpack_require__(/*! ./time/Time.form */ "./node_modules/formiojs/components/time/Time.form.js");
-
-var _Time2 = _interopRequireDefault(_Time);
-
-var _Checkbox = __webpack_require__(/*! ./checkbox/Checkbox.form */ "./node_modules/formiojs/components/checkbox/Checkbox.form.js");
-
-var _Checkbox2 = _interopRequireDefault(_Checkbox);
-
-var _Currency = __webpack_require__(/*! ./currency/Currency.form */ "./node_modules/formiojs/components/currency/Currency.form.js");
-
-var _Currency2 = _interopRequireDefault(_Currency);
-
 var _Fieldset = __webpack_require__(/*! ./fieldset/Fieldset.form */ "./node_modules/formiojs/components/fieldset/Fieldset.form.js");
 
 var _Fieldset2 = _interopRequireDefault(_Fieldset);
-
-var _Signature = __webpack_require__(/*! ./signature/Signature.form */ "./node_modules/formiojs/components/signature/Signature.form.js");
-
-var _Signature2 = _interopRequireDefault(_Signature);
-
-var _Select = __webpack_require__(/*! ./select/Select.form */ "./node_modules/formiojs/components/select/Select.form.js");
-
-var _Select2 = _interopRequireDefault(_Select);
-
-var _Resource = __webpack_require__(/*! ./resource/Resource.form */ "./node_modules/formiojs/components/resource/Resource.form.js");
-
-var _Resource2 = _interopRequireDefault(_Resource);
-
-var _TextArea = __webpack_require__(/*! ./textarea/TextArea.form */ "./node_modules/formiojs/components/textarea/TextArea.form.js");
-
-var _TextArea2 = _interopRequireDefault(_TextArea);
-
-var _Tags = __webpack_require__(/*! ./tags/Tags.form */ "./node_modules/formiojs/components/tags/Tags.form.js");
-
-var _Tags2 = _interopRequireDefault(_Tags);
-
-var _Button = __webpack_require__(/*! ./button/Button.form */ "./node_modules/formiojs/components/button/Button.form.js");
-
-var _Button2 = _interopRequireDefault(_Button);
-
-var _Number = __webpack_require__(/*! ./number/Number.form */ "./node_modules/formiojs/components/number/Number.form.js");
-
-var _Number2 = _interopRequireDefault(_Number);
-
-var _Password = __webpack_require__(/*! ./password/Password.form */ "./node_modules/formiojs/components/password/Password.form.js");
-
-var _Password2 = _interopRequireDefault(_Password);
-
-var _Panel = __webpack_require__(/*! ./panel/Panel.form */ "./node_modules/formiojs/components/panel/Panel.form.js");
-
-var _Panel2 = _interopRequireDefault(_Panel);
-
-var _Tabs = __webpack_require__(/*! ./tabs/Tabs.form */ "./node_modules/formiojs/components/tabs/Tabs.form.js");
-
-var _Tabs2 = _interopRequireDefault(_Tabs);
-
-var _Columns = __webpack_require__(/*! ./columns/Columns.form */ "./node_modules/formiojs/components/columns/Columns.form.js");
-
-var _Columns2 = _interopRequireDefault(_Columns);
-
-var _Table = __webpack_require__(/*! ./table/Table.form */ "./node_modules/formiojs/components/table/Table.form.js");
-
-var _Table2 = _interopRequireDefault(_Table);
-
-var _Radio = __webpack_require__(/*! ./radio/Radio.form */ "./node_modules/formiojs/components/radio/Radio.form.js");
-
-var _Radio2 = _interopRequireDefault(_Radio);
-
-var _SelectBoxes = __webpack_require__(/*! ./selectboxes/SelectBoxes.form */ "./node_modules/formiojs/components/selectboxes/SelectBoxes.form.js");
-
-var _SelectBoxes2 = _interopRequireDefault(_SelectBoxes);
-
-var _Survey = __webpack_require__(/*! ./survey/Survey.form */ "./node_modules/formiojs/components/survey/Survey.form.js");
-
-var _Survey2 = _interopRequireDefault(_Survey);
-
-var _Well = __webpack_require__(/*! ./well/Well.form */ "./node_modules/formiojs/components/well/Well.form.js");
-
-var _Well2 = _interopRequireDefault(_Well);
 
 var _File = __webpack_require__(/*! ./file/File.form */ "./node_modules/formiojs/components/file/File.form.js");
 
 var _File2 = _interopRequireDefault(_File);
 
+var _Form = __webpack_require__(/*! ./form/Form.form */ "./node_modules/formiojs/components/form/Form.form.js");
+
+var _Form2 = _interopRequireDefault(_Form);
+
+var _Hidden = __webpack_require__(/*! ./hidden/Hidden.form */ "./node_modules/formiojs/components/hidden/Hidden.form.js");
+
+var _Hidden2 = _interopRequireDefault(_Hidden);
+
+var _HTML = __webpack_require__(/*! ./html/HTML.form */ "./node_modules/formiojs/components/html/HTML.form.js");
+
+var _HTML2 = _interopRequireDefault(_HTML);
+
+var _Location = __webpack_require__(/*! ./location/Location.form */ "./node_modules/formiojs/components/location/Location.form.js");
+
+var _Location2 = _interopRequireDefault(_Location);
+
+var _Number = __webpack_require__(/*! ./number/Number.form */ "./node_modules/formiojs/components/number/Number.form.js");
+
+var _Number2 = _interopRequireDefault(_Number);
+
+var _Panel = __webpack_require__(/*! ./panel/Panel.form */ "./node_modules/formiojs/components/panel/Panel.form.js");
+
+var _Panel2 = _interopRequireDefault(_Panel);
+
+var _Password = __webpack_require__(/*! ./password/Password.form */ "./node_modules/formiojs/components/password/Password.form.js");
+
+var _Password2 = _interopRequireDefault(_Password);
+
+var _PhoneNumber = __webpack_require__(/*! ./phonenumber/PhoneNumber.form */ "./node_modules/formiojs/components/phonenumber/PhoneNumber.form.js");
+
+var _PhoneNumber2 = _interopRequireDefault(_PhoneNumber);
+
+var _Radio = __webpack_require__(/*! ./radio/Radio.form */ "./node_modules/formiojs/components/radio/Radio.form.js");
+
+var _Radio2 = _interopRequireDefault(_Radio);
+
+var _Resource = __webpack_require__(/*! ./resource/Resource.form */ "./node_modules/formiojs/components/resource/Resource.form.js");
+
+var _Resource2 = _interopRequireDefault(_Resource);
+
+var _Select = __webpack_require__(/*! ./select/Select.form */ "./node_modules/formiojs/components/select/Select.form.js");
+
+var _Select2 = _interopRequireDefault(_Select);
+
+var _SelectBoxes = __webpack_require__(/*! ./selectboxes/SelectBoxes.form */ "./node_modules/formiojs/components/selectboxes/SelectBoxes.form.js");
+
+var _SelectBoxes2 = _interopRequireDefault(_SelectBoxes);
+
+var _Signature = __webpack_require__(/*! ./signature/Signature.form */ "./node_modules/formiojs/components/signature/Signature.form.js");
+
+var _Signature2 = _interopRequireDefault(_Signature);
+
+var _Survey = __webpack_require__(/*! ./survey/Survey.form */ "./node_modules/formiojs/components/survey/Survey.form.js");
+
+var _Survey2 = _interopRequireDefault(_Survey);
+
+var _Table = __webpack_require__(/*! ./table/Table.form */ "./node_modules/formiojs/components/table/Table.form.js");
+
+var _Table2 = _interopRequireDefault(_Table);
+
+var _Tabs = __webpack_require__(/*! ./tabs/Tabs.form */ "./node_modules/formiojs/components/tabs/Tabs.form.js");
+
+var _Tabs2 = _interopRequireDefault(_Tabs);
+
+var _Tags = __webpack_require__(/*! ./tags/Tags.form */ "./node_modules/formiojs/components/tags/Tags.form.js");
+
+var _Tags2 = _interopRequireDefault(_Tags);
+
+var _TextArea = __webpack_require__(/*! ./textarea/TextArea.form */ "./node_modules/formiojs/components/textarea/TextArea.form.js");
+
+var _TextArea2 = _interopRequireDefault(_TextArea);
+
+var _TextField = __webpack_require__(/*! ./textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js");
+
+var _TextField2 = _interopRequireDefault(_TextField);
+
+var _Time = __webpack_require__(/*! ./time/Time.form */ "./node_modules/formiojs/components/time/Time.form.js");
+
+var _Time2 = _interopRequireDefault(_Time);
+
+var _Well = __webpack_require__(/*! ./well/Well.form */ "./node_modules/formiojs/components/well/Well.form.js");
+
+var _Well2 = _interopRequireDefault(_Well);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _2.default.address.editForm = _Address2.default;
-_2.default.content.editForm = _Content2.default;
+_2.default.button.editForm = _Button2.default;
+_2.default.checkbox.editForm = _Checkbox2.default;
+_2.default.columns.editForm = _Columns2.default;
 _2.default.container.editForm = _Container2.default;
+_2.default.content.editForm = _Content2.default;
+_2.default.currency.editForm = _Currency2.default;
 _2.default.datagrid.editForm = _DataGrid2.default;
 _2.default.datetime.editForm = _DateTime2.default;
 _2.default.day.editForm = _Day2.default;
-_2.default.htmlelement.editForm = _HTML2.default;
-_2.default.hidden.editForm = _Hidden2.default;
 _2.default.editgrid.editForm = _EditGrid2.default;
-_2.default.form.editForm = _Form2.default;
-_2.default.textfield.editForm = _TextField2.default;
-_2.default.phoneNumber.editForm = _PhoneNumber2.default;
-_2.default.location.editForm = _Location2.default;
 _2.default.email.editForm = _Email2.default;
-_2.default.time.editForm = _Time2.default;
-_2.default.checkbox.editForm = _Checkbox2.default;
-_2.default.currency.editForm = _Currency2.default;
 _2.default.fieldset.editForm = _Fieldset2.default;
-_2.default.signature.editForm = _Signature2.default;
-_2.default.select.editForm = _Select2.default;
-_2.default.resource.editForm = _Resource2.default;
-_2.default.textarea.editForm = _TextArea2.default;
-_2.default.tags.editForm = _Tags2.default;
-_2.default.button.editForm = _Button2.default;
-_2.default.number.editForm = _Number2.default;
-_2.default.password.editForm = _Password2.default;
-_2.default.panel.editForm = _Panel2.default;
-_2.default.tabs.editForm = _Tabs2.default;
-_2.default.columns.editForm = _Columns2.default;
-_2.default.table.editForm = _Table2.default;
-_2.default.radio.editForm = _Radio2.default;
-_2.default.selectboxes.editForm = _SelectBoxes2.default;
-_2.default.survey.editForm = _Survey2.default;
-_2.default.well.editForm = _Well2.default;
 _2.default.file.editForm = _File2.default;
+_2.default.form.editForm = _Form2.default;
+_2.default.hidden.editForm = _Hidden2.default;
+_2.default.htmlelement.editForm = _HTML2.default;
+_2.default.location.editForm = _Location2.default;
+_2.default.number.editForm = _Number2.default;
+_2.default.panel.editForm = _Panel2.default;
+_2.default.password.editForm = _Password2.default;
+_2.default.phoneNumber.editForm = _PhoneNumber2.default;
+_2.default.radio.editForm = _Radio2.default;
+_2.default.resource.editForm = _Resource2.default;
+_2.default.select.editForm = _Select2.default;
+_2.default.selectboxes.editForm = _SelectBoxes2.default;
+_2.default.signature.editForm = _Signature2.default;
+_2.default.survey.editForm = _Survey2.default;
+_2.default.table.editForm = _Table2.default;
+_2.default.tabs.editForm = _Tabs2.default;
+_2.default.tags.editForm = _Tags2.default;
+_2.default.textarea.editForm = _TextArea2.default;
+_2.default.textfield.editForm = _TextField2.default;
+_2.default.time.editForm = _Time2.default;
+_2.default.well.editForm = _Well2.default;
 
 exports.default = _2.default;
 
@@ -15123,7 +15259,7 @@ var ButtonComponent = function (_BaseComponent) {
     value: function build() {
       var _this2 = this;
 
-      if (this.viewOnly) {
+      if (this.viewOnly || this.options.hideButtons) {
         this.component.hidden = true;
       }
 
@@ -15132,7 +15268,6 @@ var ButtonComponent = function (_BaseComponent) {
       this.createElement();
       this.createInput(this.element);
       this.addShortcut(this.buttonElement);
-      this.hook('input', this.buttonElement, this.element);
       if (this.component.leftIcon) {
         this.buttonElement.appendChild(this.ce('span', {
           class: this.component.leftIcon
@@ -15161,15 +15296,18 @@ var ButtonComponent = function (_BaseComponent) {
           _this2.loading = false;
           _this2.disabled = false;
           _this2.empty(message);
+          _this2.addClass(_this2.buttonElement, 'btn-success submit-success');
+          _this2.removeClass(_this2.buttonElement, 'btn-danger submit-fail');
           _this2.addClass(message, 'has-success');
           _this2.removeClass(message, 'has-error');
-          message.appendChild(_this2.buttonMessage('complete'));
           _this2.append(message);
         });
         this.on('change', function (value) {
           _this2.loading = false;
           var isValid = _this2.root.isValid(value.data, true);
           _this2.disabled = _this2.options.readOnly || _this2.component.disableOnInvalid && !isValid;
+          _this2.removeClass(_this2.buttonElement, 'btn-success submit-success');
+          _this2.removeClass(_this2.buttonElement, 'btn-danger submit-fail');
           if (isValid && _this2.hasError) {
             _this2.hasError = false;
             _this2.empty(message);
@@ -15181,10 +15319,11 @@ var ButtonComponent = function (_BaseComponent) {
         this.on('error', function () {
           _this2.loading = false;
           _this2.hasError = true;
+          _this2.removeClass(_this2.buttonElement, 'btn-success submit-success');
+          _this2.addClass(_this2.buttonElement, 'btn-danger submit-fail');
           _this2.empty(message);
           _this2.removeClass(message, 'has-success');
           _this2.addClass(message, 'has-error');
-          message.appendChild(_this2.buttonMessage(_this2.errorMessage('error')));
           _this2.append(message);
         });
       }
@@ -15397,7 +15536,7 @@ var ButtonComponent = function (_BaseComponent) {
   }, {
     key: 'focus',
     value: function focus() {
-      this.button.focus();
+      this.buttonElement.focus();
     }
   }, {
     key: 'defaultSchema',
@@ -16456,6 +16595,7 @@ var ContainerComponent = function (_NestedComponent) {
         key: 'container',
         clearOnHide: true,
         input: true,
+        tree: true,
         components: []
       }].concat(extend));
     }
@@ -16999,6 +17139,7 @@ var DataGridComponent = function (_NestedComponent) {
         type: 'datagrid',
         clearOnHide: true,
         input: true,
+        tree: true,
         components: []
       }].concat(extend));
     }
@@ -17241,6 +17382,7 @@ var DataGridComponent = function (_NestedComponent) {
         _lodash2.default.each(_this7.rows, function (comps) {
           showColumn |= comps[col.key].checkConditions(data);
         });
+        showColumn = showColumn && col.type !== 'hidden' && !col.hidden;
         if (_this7.visibleColumns[col.key] && !showColumn || !_this7.visibleColumns[col.key] && showColumn) {
           rebuild = true;
         }
@@ -17642,6 +17784,7 @@ var DateTimeComponent = function (_BaseComponent) {
     value: function getCalendar(input) {
       if (!input.calendar && !this.options.noCalendar) {
         input.calendar = new _flatpickr2.default(input, this.config);
+        this.addFocusBlurEvents(input.calendar.altInput);
       }
       return input.calendar;
     }
@@ -18179,6 +18322,7 @@ var DayComponent = function (_BaseComponent) {
         id: id
       });
       this.hook('input', this.dayInput, dayInputWrapper);
+      this.addFocusBlurEvents(this.dayInput);
       this.addEventListener(this.dayInput, 'change', function () {
         return _this2.updateValue();
       });
@@ -18221,6 +18365,7 @@ var DayComponent = function (_BaseComponent) {
         id: id
       });
       this.hook('input', this.monthInput, monthInputWrapper);
+      this.addFocusBlurEvents(this.monthInput);
       this.selectOptions(this.monthInput, 'monthOption', this.months);
       var self = this;
 
@@ -18278,6 +18423,7 @@ var DayComponent = function (_BaseComponent) {
       });
 
       this.hook('input', this.yearInput, yearInputWrapper);
+      this.addFocusBlurEvents(this.yearInput);
       this.addEventListener(this.yearInput, 'change', function () {
         return _this3.updateValue();
       });
@@ -18817,6 +18963,7 @@ var EditGridComponent = function (_NestedComponent) {
         key: 'editGrid',
         clearOnHide: true,
         input: true,
+        tree: true,
         components: [],
         templates: {
           header: this.defaultHeaderTemplate,
@@ -19734,7 +19881,8 @@ var FileComponent = function (_BaseComponent) {
         imageSize: '200',
         filePattern: '*',
         fileMinSize: '0KB',
-        fileMaxSize: '1GB'
+        fileMaxSize: '1GB',
+        uploadOnly: false
       }].concat(extend));
     }
   }, {
@@ -19891,6 +20039,9 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'createFileLink',
     value: function createFileLink(file) {
+      if (this.options.uploadOnly) {
+        return file.originalName || file.name;
+      }
       return this.ce('a', {
         href: file.url, target: '_blank',
         onClick: this.getFile.bind(this, file)
@@ -19977,6 +20128,7 @@ var FileComponent = function (_BaseComponent) {
         },
         class: 'browse'
       }, this.text('browse'));
+      this.addFocusBlurEvents(this.browseLink);
 
       return this.browseLink;
     }
@@ -20445,6 +20597,10 @@ var _get = function get(object, property, receiver) { if (object === null) objec
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js");
 
 var _Base2 = _interopRequireDefault(_Base);
@@ -20717,7 +20873,7 @@ var FormComponent = function (_BaseComponent) {
               form: result.submission.form
             } : result.submission;
             return _this5.dataValue;
-          });
+          }).catch(function () {});
         });
       } else {
         return _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'beforeSubmit', this).call(this);
@@ -20739,20 +20895,18 @@ var FormComponent = function (_BaseComponent) {
       var _this6 = this;
 
       var changed = _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'setValue', this).call(this, submission, flags);
-      if (this.subForm) {
-        this.subForm.setValue(submission, flags);
-      } else {
-        this.loadSubForm().then(function (form) {
-          if (submission && submission._id && form.formio && !flags.noload) {
-            var submissionUrl = form.formio.formsUrl + '/' + submission.form + '/submission/' + submission._id;
-            form.setUrl(submissionUrl, _this6.options);
-            form.nosubmit = false;
-            form.loadSubmission();
-          } else {
-            form.setValue(submission, flags);
-          }
-        });
-      }
+
+      (this.subForm ? _nativePromiseOnly2.default.resolve(this.subForm) : this.loadSubForm()).then(function (form) {
+        if (submission && submission._id && form.formio && !flags.noload && _lodash2.default.isEmpty(submission.data)) {
+          var submissionUrl = form.formio.formsUrl + '/' + submission.form + '/submission/' + submission._id;
+          form.setUrl(submissionUrl, _this6.options);
+          form.nosubmit = false;
+          form.loadSubmission();
+        } else {
+          form.setValue(submission, flags);
+        }
+      });
+
       return changed;
     }
   }, {
@@ -20762,6 +20916,11 @@ var FormComponent = function (_BaseComponent) {
         return this.subForm.getValue();
       }
       return this.dataValue;
+    }
+  }, {
+    key: 'getAllComponents',
+    value: function getAllComponents() {
+      return this.subForm.getAllComponents();
     }
   }, {
     key: 'defaultSchema',
@@ -21785,9 +21944,7 @@ var NestedComponent = function (_BaseComponent) {
         extend[_key] = arguments[_key];
       }
 
-      return _Base2.default.schema.apply(_Base2.default, [{
-        tree: true
-      }].concat(extend));
+      return _Base2.default.schema.apply(_Base2.default, [{}].concat(extend));
     }
   }]);
 
@@ -21816,6 +21973,19 @@ var NestedComponent = function (_BaseComponent) {
     key: 'getComponents',
     value: function getComponents() {
       return this.components;
+    }
+  }, {
+    key: 'getAllComponents',
+    value: function getAllComponents() {
+      return this.getComponents().reduce(function (components, component) {
+        var result = component;
+
+        if (component.getAllComponents) {
+          result = component.getAllComponents();
+        }
+
+        return components.concat(result);
+      }, []);
     }
 
     /**
@@ -22138,6 +22308,23 @@ var NestedComponent = function (_BaseComponent) {
         return component.clearOnHide(show);
       });
     }
+  }, {
+    key: 'show',
+    value: function show(_show) {
+      var shown = _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'show', this).call(this, _show);
+      var forceShow = this.options.show && this.options.show[this.component.key];
+      var forceHide = this.options.hide && this.options.hide[this.component.key];
+      if (forceShow || forceHide) {
+        this.getComponents().forEach(function (component) {
+          if (forceShow) {
+            component.show(true);
+          } else if (forceHide) {
+            component.show(false);
+          }
+        });
+      }
+      return shown;
+    }
 
     /**
      * Allow components to hook into the next page trigger to perform their own logic.
@@ -22362,7 +22549,7 @@ var NestedComponent = function (_BaseComponent) {
     key: 'errors',
     get: function get() {
       var errors = [];
-      _lodash2.default.each(this.getComponents(), function (comp) {
+      _lodash2.default.each(this.getAllComponents(), function (comp) {
         var compErrors = comp.errors;
         if (compErrors.length) {
           errors = errors.concat(compErrors);
@@ -24235,16 +24422,21 @@ var SelectComponent = function (_BaseComponent) {
         values: []
       }, 'values') || []);
     }
+
+    /* eslint-disable max-statements */
+
   }, {
     key: 'updateItems',
     value: function updateItems(searchInput, forceUpdate) {
       if (!this.component.data) {
         console.warn('Select component ' + this.key + ' does not have data configuration.');
+        this.itemsLoadedResolve();
         return;
       }
 
       // Only load the data if it is visible.
       if (!this.checkConditions()) {
+        this.itemsLoadedResolve();
         return;
       }
 
@@ -24304,6 +24496,8 @@ var SelectComponent = function (_BaseComponent) {
           }
       }
     }
+    /* eslint-enable max-statements */
+
   }, {
     key: 'addPlaceholder',
     value: function addPlaceholder(input) {
@@ -24416,6 +24610,7 @@ var SelectComponent = function (_BaseComponent) {
           return _this5.focusableElement.focus();
         });
       }
+      this.addFocusBlurEvents(this.focusableElement);
       this.focusableElement.setAttribute('tabIndex', tabIndex);
 
       this.setInputStyles(this.choices.containerOuter);
@@ -25442,6 +25637,7 @@ var SignatureComponent = function (_BaseComponent) {
         style: 'width: ' + this.component.width + ';height: ' + this.component.height + ';padding:0;margin:0;',
         tabindex: this.component.tabindex || 0
       });
+      this.addFocusBlurEvents(this.padBody);
 
       // Create the refresh button.
       this.refresh = this.ce('a', {
@@ -27500,6 +27696,7 @@ var TextFieldComponent = function (_BaseComponent) {
         container.appendChild(textInput);
       }
       this.hook('input', textInput, container);
+      this.addFocusBlurEvents(textInput);
       this.addInputEventListener(textInput);
       this.addInputSubmitListener(textInput);
     }
@@ -28076,6 +28273,52 @@ exports.default = WellComponent;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/formio.form.js":
+/*!**********************************************!*\
+  !*** ./node_modules/formiojs/formio.form.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Formio = exports.Components = exports.Utils = exports.Form = undefined;
+
+var _components = __webpack_require__(/*! ./components */ "./node_modules/formiojs/components/index.js");
+
+var _components2 = _interopRequireDefault(_components);
+
+var _Components = __webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js");
+
+var _Components2 = _interopRequireDefault(_Components);
+
+var _Formio = __webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js");
+
+var _Formio2 = _interopRequireDefault(_Formio);
+
+var _Form2 = __webpack_require__(/*! ./Form */ "./node_modules/formiojs/Form.js");
+
+var _Form3 = _interopRequireDefault(_Form2);
+
+var _utils = __webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/index.js");
+
+var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_Components2.default.setComponents(_components2.default);
+_Formio2.default.Components = _Components2.default;
+exports.Form = _Form3.default;
+exports.Utils = _utils2.default;
+exports.Components = _Components2.default;
+exports.Formio = _Formio2.default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/formio.polyfill.js":
 /*!**************************************************!*\
   !*** ./node_modules/formiojs/formio.polyfill.js ***!
@@ -28194,56 +28437,27 @@ exports.default = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Components = exports.Utils = exports.FormBuilder = exports.Form = exports.Formio = undefined;
+exports.FormBuilder = undefined;
 
-var _Formio = __webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js");
+var _formio = __webpack_require__(/*! ./formio.form */ "./node_modules/formiojs/formio.form.js");
 
-Object.defineProperty(exports, 'Formio', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_Formio).default;
-  }
+Object.keys(_formio).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _formio[key];
+    }
+  });
 });
 
-var _Form = __webpack_require__(/*! ./Form */ "./node_modules/formiojs/Form.js");
+var _FormBuilder2 = __webpack_require__(/*! ./FormBuilder */ "./node_modules/formiojs/FormBuilder.js");
 
-Object.defineProperty(exports, 'Form', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_Form).default;
-  }
-});
-
-var _FormBuilder = __webpack_require__(/*! ./FormBuilder */ "./node_modules/formiojs/FormBuilder.js");
-
-Object.defineProperty(exports, 'FormBuilder', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_FormBuilder).default;
-  }
-});
-
-var _utils = __webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/index.js");
-
-Object.defineProperty(exports, 'Utils', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_utils).default;
-  }
-});
-
-var _components = __webpack_require__(/*! ./components */ "./node_modules/formiojs/components/index.js");
-
-var _components2 = _interopRequireDefault(_components);
-
-var _Components = __webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js");
-
-var _Components2 = _interopRequireDefault(_Components);
+var _FormBuilder3 = _interopRequireDefault(_FormBuilder2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_Components2.default.setComponents(_components2.default);
-exports.Components = _Components2.default;
+exports.FormBuilder = _FormBuilder3.default;
 
 /***/ }),
 
@@ -28274,16 +28488,15 @@ module.exports = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.storage = undefined;
 
-var _storage = __webpack_require__(/*! ./storage */ "./node_modules/formiojs/providers/storage/index.js");
+var _storage2 = __webpack_require__(/*! ./storage */ "./node_modules/formiojs/providers/storage/index.js");
 
-var _storage2 = _interopRequireDefault(_storage);
+var _storage3 = _interopRequireDefault(_storage2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = {
-  storage: _storage2.default
-};
+exports.storage = _storage3.default;
 
 /***/ }),
 
@@ -28619,8 +28832,8 @@ var url = function url(formio) {
       return new _nativePromiseOnly2.default(function (resolve, reject) {
         var data = {
           dir: dir,
-          name: fileName,
-          file: file
+          file: file,
+          name: fileName
         };
 
         // Send the file with data.
@@ -28933,6 +29146,7 @@ exports.getNumberSeparators = getNumberSeparators;
 exports.getNumberDecimalLimit = getNumberDecimalLimit;
 exports.getCurrencyAffixes = getCurrencyAffixes;
 exports.fieldData = fieldData;
+exports.delay = delay;
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
@@ -29147,7 +29361,7 @@ function eachComponent(components, fn, includeAll, path, parent) {
     }
 
     var subPath = function subPath() {
-      if (component.key && (['datagrid', 'container', 'editgrid'].indexOf(component.type) !== -1 || component.tree)) {
+      if (component.key && !(['panel', 'table', 'well', 'columns', 'fieldset', 'tabs', 'form'].indexOf(component.type) !== -1) && (['datagrid', 'container', 'editgrid'].indexOf(component.type) !== -1 || component.tree)) {
         return newPath;
       } else if (component.key && component.type === 'form') {
         return newPath + '.data';
@@ -29386,7 +29600,7 @@ function checkCustomConditional(component, custom, row, data, form, variable, on
   if (typeof custom === 'string') {
     custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
   }
-  var value = instance && instance.evaluate ? instance.evaluate(custom, { row: row, data: data, form: form }) : evaluate(custom, { row: row, data: data, form: form });
+  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, { row: row, data: data, form: form });
   if (value === null) {
     return onError;
   }
@@ -29713,9 +29927,16 @@ function getNumberSeparators() {
   var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
 
   var formattedNumberString = 12345.6789.toLocaleString(lang);
+  var delimeters = formattedNumberString.match(/..(.)...(.)../);
+  if (!delimeters) {
+    return {
+      delimiter: ',',
+      decimalSeparator: '.'
+    };
+  }
   return {
-    delimiter: formattedNumberString.match(/12(.*)345/)[1],
-    decimalSeparator: formattedNumberString.match(/345(.*)67/)[1]
+    delimiter: delimeters.length > 1 ? delimeters[1] : ',',
+    decimalSeparator: delimeters.length > 2 ? delimeters[2] : '.'
   };
 }
 
@@ -29807,6 +30028,37 @@ function fieldData(data, component) {
     }
     return data[component.key];
   }
+}
+
+/**
+ * Delays function execution with possibility to execute function synchronously or cancel it.
+ *
+ * @param fn Function to delay
+ * @param delay Delay time
+ * @return {*}
+ */
+function delay(fn) {
+  for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    args[_key - 2] = arguments[_key];
+  }
+
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  var timer = setTimeout.apply(undefined, [fn, delay].concat(args));
+
+  function cancel() {
+    clearTimeout(timer);
+  }
+
+  function earlyCall() {
+    cancel();
+    return fn.apply(undefined, args);
+  }
+
+  earlyCall.timer = timer;
+  earlyCall.cancel = cancel;
+
+  return earlyCall;
 }
 
 /***/ }),
@@ -29926,8 +30178,6 @@ var Connector = function (_EventEmitter) {
   };
 
   Connector.prototype.loaded = function loaded(name, err, data) {
-    var _this3 = this;
-
     var _name$split = name.split('|'),
         _name$split2 = _slicedToArray(_name$split, 2),
         lng = _name$split2[0],
@@ -29942,6 +30192,9 @@ var Connector = function (_EventEmitter) {
     // set loaded
     this.state[name] = err ? -1 : 2;
 
+    // consolidated loading done in this run - only emit once for a loaded namespace
+    var loaded = {};
+
     // callback if ready
     this.queue.forEach(function (q) {
       _utils_js__WEBPACK_IMPORTED_MODULE_0__["pushPath"](q.loaded, [lng], ns);
@@ -29950,7 +30203,16 @@ var Connector = function (_EventEmitter) {
       if (err) q.errors.push(err);
 
       if (q.pending.length === 0 && !q.done) {
-        _this3.emit('loaded', q.loaded);
+        // only do once per loaded -> this.emit('loaded', q.loaded);
+        Object.keys(q.loaded).forEach(function (l) {
+          if (!loaded[l]) loaded[l] = [];
+          if (q.loaded[l].length) {
+            q.loaded[l].forEach(function (ns) {
+              if (loaded[l].indexOf(ns) < 0) loaded[l].push(ns);
+            });
+          }
+        });
+
         /* eslint no-param-reassign: 0 */
         q.done = true;
         if (q.errors.length) {
@@ -29961,6 +30223,9 @@ var Connector = function (_EventEmitter) {
       }
     });
 
+    // emit consolidated loaded event
+    this.emit('loaded', loaded);
+
     // remove done load requests
     this.queue = this.queue.filter(function (q) {
       return !q.done;
@@ -29970,7 +30235,7 @@ var Connector = function (_EventEmitter) {
   Connector.prototype.read = function read(lng, ns, fcName) {
     var tried = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
-    var _this4 = this;
+    var _this3 = this;
 
     var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
     var callback = arguments[5];
@@ -29980,7 +30245,7 @@ var Connector = function (_EventEmitter) {
     return this.backend[fcName](lng, ns, function (err, data) {
       if (err && data /* = retryFlag */ && tried < 5) {
         setTimeout(function () {
-          _this4.read.call(_this4, lng, ns, fcName, tried + 1, wait * 2, callback);
+          _this3.read.call(_this3, lng, ns, fcName, tried + 1, wait * 2, callback);
         }, wait);
         return;
       }
@@ -29992,7 +30257,7 @@ var Connector = function (_EventEmitter) {
 
 
   Connector.prototype.load = function load(languages, namespaces, callback) {
-    var _this5 = this;
+    var _this4 = this;
 
     if (!this.backend) {
       this.logger.warn('No backend was added via i18next.use. Will not load resources.');
@@ -30009,12 +30274,12 @@ var Connector = function (_EventEmitter) {
     }
 
     toLoad.toLoad.forEach(function (name) {
-      _this5.loadOne(name);
+      _this4.loadOne(name);
     });
   };
 
   Connector.prototype.reload = function reload(languages, namespaces) {
-    var _this6 = this;
+    var _this5 = this;
 
     if (!this.backend) {
       this.logger.warn('No backend was added via i18next.use. Will not load resources.');
@@ -30025,13 +30290,13 @@ var Connector = function (_EventEmitter) {
 
     languages.forEach(function (l) {
       namespaces.forEach(function (n) {
-        _this6.loadOne(l + '|' + n, 're');
+        _this5.loadOne(l + '|' + n, 're');
       });
     });
   };
 
   Connector.prototype.loadOne = function loadOne(name) {
-    var _this7 = this;
+    var _this6 = this;
 
     var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
@@ -30041,10 +30306,10 @@ var Connector = function (_EventEmitter) {
         ns = _name$split4[1];
 
     this.read(lng, ns, 'read', null, null, function (err, data) {
-      if (err) _this7.logger.warn(prefix + 'loading namespace ' + ns + ' for language ' + lng + ' failed', err);
-      if (!err && data) _this7.logger.log(prefix + 'loaded namespace ' + ns + ' for language ' + lng, data);
+      if (err) _this6.logger.warn(prefix + 'loading namespace ' + ns + ' for language ' + lng + ' failed', err);
+      if (!err && data) _this6.logger.log(prefix + 'loaded namespace ' + ns + ' for language ' + lng, data);
 
-      _this7.loaded(name, err, data);
+      _this6.loaded(name, err, data);
     });
   };
 
@@ -30651,9 +30916,9 @@ var PluralResolver = function () {
         if (suffix === 1) return '';
         if (typeof suffix === 'number') return '_plural_' + suffix.toString();
         return returnSuffix();
-      } else if ( /* v2 */this.options.compatibilityJSON === 'v2' || rule.numbers.length === 2 && rule.numbers[0] === 1) {
+      } else if ( /* v2 */this.options.compatibilityJSON === 'v2' && rule.numbers.length === 2 && rule.numbers[0] === 1) {
         return returnSuffix();
-      } else if ( /* v3 - gettext index */rule.numbers.length === 2 && rule.numbers[0] === 1) {
+      } else if ( /* v3 - gettext index */this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
         return returnSuffix();
       }
       return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
@@ -31029,7 +31294,8 @@ var Translator = function (_EventEmitter) {
         };
 
         if (this.options.saveMissing) {
-          if (this.options.saveMissingPlurals && options.count) {
+          var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+          if (this.options.saveMissingPlurals && needsPluralHandling) {
             lngs.forEach(function (l) {
               var plurals = _this2.pluralResolver.getPluralFormsOfKey(l, key);
 
