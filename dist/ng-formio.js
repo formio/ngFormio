@@ -10204,6 +10204,40 @@ exports.default = {
         return value.length <= maxLength;
       }
     },
+    maxWords: {
+      key: 'validate.maxWords',
+      message: function message(component, setting) {
+        return component.t(component.errorMessage('maxWords'), {
+          field: component.errorLabel,
+          length: setting + 1,
+          data: component.data
+        });
+      },
+      check: function check(component, setting, value) {
+        var maxWords = parseInt(setting, 10);
+        if (!maxWords || typeof value !== 'string') {
+          return true;
+        }
+        return value.trim().split(/\s+/).length <= maxWords;
+      }
+    },
+    minWords: {
+      key: 'validate.minWords',
+      message: function message(component, setting) {
+        return component.t(component.errorMessage('minWords'), {
+          field: component.errorLabel,
+          length: setting + 1,
+          data: component.data
+        });
+      },
+      check: function check(component, setting, value) {
+        var minWords = parseInt(setting, 10);
+        if (!minWords || typeof value !== 'string') {
+          return true;
+        }
+        return value.trim().split(/\s+/).length >= minWords;
+      }
+    },
     email: {
       message: function message(component) {
         return component.t(component.errorMessage('invalid_email'), {
@@ -17574,7 +17608,7 @@ exports.default = function () {
     label: 'Time',
     key: 'time',
     weight: 2,
-    components: _DateTimeEdit6.default
+    components: _DateTimeEdit8.default
   }, {
     key: 'data',
     components: _DateTimeEdit2.default
@@ -17596,6 +17630,10 @@ var _DateTimeEdit4 = _interopRequireDefault(_DateTimeEdit3);
 var _DateTimeEdit5 = __webpack_require__(/*! ./editForm/DateTime.edit.display */ "./node_modules/formiojs/components/datetime/editForm/DateTime.edit.display.js");
 
 var _DateTimeEdit6 = _interopRequireDefault(_DateTimeEdit5);
+
+var _DateTimeEdit7 = __webpack_require__(/*! ./editForm/DateTime.edit.time */ "./node_modules/formiojs/components/datetime/editForm/DateTime.edit.time.js");
+
+var _DateTimeEdit8 = _interopRequireDefault(_DateTimeEdit7);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -17889,6 +17927,7 @@ var DateTimeComponent = function (_BaseComponent) {
     get: function get() {
       var _this3 = this;
 
+      /* eslint-disable camelcase */
       return {
         altInput: true,
         clickOpens: true,
@@ -17901,6 +17940,7 @@ var DateTimeComponent = function (_BaseComponent) {
         defaultDate: this.defaultDate,
         hourIncrement: _lodash2.default.get(this.component, 'timePicker.hourStep', 1),
         minuteIncrement: _lodash2.default.get(this.component, 'timePicker.minuteStep', 5),
+        time_24hr: !_lodash2.default.get(this.component, 'timePicker.showMeridian', true),
         minDate: (0, _utils.getDateSetting)(_lodash2.default.get(this.component, 'datePicker.minDate')),
         maxDate: (0, _utils.getDateSetting)(_lodash2.default.get(this.component, 'datePicker.maxDate')),
         onChange: function onChange() {
@@ -17910,6 +17950,7 @@ var DateTimeComponent = function (_BaseComponent) {
           return _this3.closedOn = Date.now();
         }
       };
+      /* eslint-enable camelcase */
     }
   }, {
     key: 'disabled',
@@ -18102,6 +18143,51 @@ exports.default = [{
   placeholder: 'Format',
   tooltip: 'The moment.js format for saving the value of this field.',
   weight: 51
+}];
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/datetime/editForm/DateTime.edit.time.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/datetime/editForm/DateTime.edit.time.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = [{
+  type: 'checkbox',
+  input: true,
+  key: 'enableTime',
+  label: 'Enable Time Input',
+  tooltip: 'Enables time input for this field.',
+  weight: 0
+}, {
+  type: 'number',
+  input: true,
+  key: 'timePicker.hourStep',
+  label: 'Hour Step Size',
+  tooltip: 'The number of hours to increment/decrement in the time picker.',
+  weight: 10
+}, {
+  type: 'number',
+  input: true,
+  key: 'timePicker.minuteStep',
+  label: 'Minute Step Size',
+  tooltip: 'The number of minutes to increment/decrement in the time picker.',
+  weight: 20
+}, {
+  type: 'checkbox',
+  input: true,
+  key: 'timePicker.showMeridian',
+  label: '12 Hour Time (AM/PM)',
+  tooltip: 'Display time in 12 hour time with AM/PM.',
+  weight: 30
 }];
 
 /***/ }),
@@ -27190,6 +27276,7 @@ var TextAreaComponent = function (_TextFieldComponent) {
         class: 'formio-wysiwyg-editor'
       });
       container.appendChild(this.input);
+      this.addCounter(container);
 
       if (this.component.editor === 'ace') {
         this.editorReady = _Formio2.default.requireLibrary('ace', 'ace', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.0/ace.js', true).then(function () {
@@ -27556,7 +27643,9 @@ var TextFieldComponent = function (_BaseComponent) {
     key: 'createInput',
     value: function createInput(container) {
       if (!this.isMultipleMasksField) {
-        return _get(TextFieldComponent.prototype.__proto__ || Object.getPrototypeOf(TextFieldComponent.prototype), 'createInput', this).call(this, container);
+        var _inputGroup = _get(TextFieldComponent.prototype.__proto__ || Object.getPrototypeOf(TextFieldComponent.prototype), 'createInput', this).call(this, container);
+        this.addCounter(container);
+        return _inputGroup;
       }
       //if component should have multiple masks
       var id = '' + this.key;
@@ -27575,8 +27664,59 @@ var TextFieldComponent = function (_BaseComponent) {
 
       this.errorContainer = container;
       this.setInputStyles(inputGroup);
+      this.addCounter(inputGroup);
       container.appendChild(inputGroup);
       return inputGroup;
+    }
+  }, {
+    key: 'addCounter',
+    value: function addCounter(container) {
+      if (_lodash2.default.get(this.component, 'showWordCount', false)) {
+        this.maxWordCount = _lodash2.default.parseInt(_lodash2.default.get(this.component, 'validate.maxWords', 0), 10);
+        this.wordCount = this.ce('span', {
+          class: 'text-muted pull-right',
+          style: 'margin-left: 4px'
+        });
+        container.appendChild(this.wordCount);
+      }
+      if (_lodash2.default.get(this.component, 'showCharCount', false)) {
+        this.maxCharCount = _lodash2.default.parseInt(_lodash2.default.get(this.component, 'validate.maxLength', 0), 10);
+        this.charCount = this.ce('span', {
+          class: 'text-muted pull-right'
+        });
+        container.appendChild(this.charCount);
+      }
+      return container;
+    }
+  }, {
+    key: 'setCounter',
+    value: function setCounter(type, element, count, max) {
+      if (max) {
+        var remaining = max - count;
+        if (remaining > 0) {
+          this.removeClass(element, 'text-danger');
+        } else {
+          this.addClass(element, 'text-danger');
+        }
+        element.innerHTML = this.t('{{ remaining }} ' + type + ' remaining.', {
+          remaining: remaining
+        });
+      } else {
+        element.innerHTML = this.t('{{ count }} ' + type, {
+          count: count
+        });
+      }
+    }
+  }, {
+    key: 'onChange',
+    value: function onChange(flags, fromRoot) {
+      _get(TextFieldComponent.prototype.__proto__ || Object.getPrototypeOf(TextFieldComponent.prototype), 'onChange', this).call(this, flags, fromRoot);
+      if (this.wordCount) {
+        this.setCounter('words', this.wordCount, this.dataValue.trim().split(/\s+/).length, this.maxWordCount);
+      }
+      if (this.charCount) {
+        this.setCounter('characters', this.charCount, this.dataValue.length, this.maxCharCount);
+      }
     }
   }, {
     key: 'setInputMask',
@@ -27763,6 +27903,8 @@ var TextFieldComponent = function (_BaseComponent) {
         validate: {
           minLength: '',
           maxLength: '',
+          minWords: '',
+          maxWords: '',
           pattern: ''
         }
       }].concat(extend));
@@ -27884,6 +28026,18 @@ exports.default = [{
   input: true,
   key: 'suffix',
   label: 'Suffix'
+}, {
+  weight: 710,
+  type: 'checkbox',
+  input: true,
+  key: 'showWordCount',
+  label: 'Show Word Counter'
+}, {
+  weight: 720,
+  type: 'checkbox',
+  input: true,
+  key: 'showCharCount',
+  label: 'Show Character Counter'
 }];
 
 /***/ }),
@@ -27916,6 +28070,22 @@ exports.default = [{
   placeholder: 'Maximum Length',
   type: 'number',
   tooltip: 'The maximum length requirement this field must meet.',
+  input: true
+}, {
+  weight: 125,
+  key: 'validate.minWords',
+  label: 'Minimum Word Length',
+  placeholder: 'Minimum Word Length',
+  type: 'number',
+  tooltip: 'The minimum amount of words that can be added to this field.',
+  input: true
+}, {
+  weight: 126,
+  key: 'validate.maxWords',
+  label: 'Maximum Word Length',
+  placeholder: 'Maximum Word Length',
+  type: 'number',
+  tooltip: 'The maximum amount of words that can be added to this field.',
   input: true
 }, {
   weight: 130,
@@ -29425,7 +29595,7 @@ function matchComponent(component, query) {
 function getComponent(components, key, includeAll) {
   var result = void 0;
   eachComponent(components, function (component, path) {
-    if (matchComponent(component, key)) {
+    if (path === key) {
       component.path = path;
       result = component;
       return true;
