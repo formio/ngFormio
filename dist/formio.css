@@ -1,4 +1,4 @@
-/*! ng-formio v3.0.0-rc.30 | https://unpkg.com/ngFormio@3.0.0-rc.30/LICENSE.txt */
+/*! ng-formio v3.0.0-rc.31 | https://unpkg.com/ngFormio@3.0.0-rc.31/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3776,5 +3776,18 @@ body.formio-dialog-open, html.formio-dialog-open {
 
 .form-builder-panel .panel-body {
   padding: 5px; }
+
+.formio-pdf-builder {
+  position: relative; }
+
+.formio-drop-zone {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  background-color: #0d87e9;
+  opacity: .1; }
+
+.formio-drop-zone.enabled {
+  display: inherit; }
 
 /*# sourceMappingURL=formio.css.map*/

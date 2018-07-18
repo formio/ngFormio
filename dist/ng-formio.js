@@ -5696,8 +5696,8 @@ var Formio = function () {
 
   }, {
     key: 'getToken',
-    value: function getToken() {
-      return Formio.getToken();
+    value: function getToken(options) {
+      return Formio.getToken(options);
     }
 
     /**
@@ -5706,8 +5706,8 @@ var Formio = function () {
 
   }, {
     key: 'getTempToken',
-    value: function getTempToken(expire, allowed) {
-      var token = Formio.getToken();
+    value: function getTempToken(expire, allowed, options) {
+      var token = Formio.getToken(options);
       if (!token) {
         return _nativePromiseOnly2.default.reject('You must be authenticated to generate a temporary auth token.');
       }
@@ -5966,6 +5966,8 @@ var Formio = function () {
       }
 
       var requestArgs = Formio.getRequestArgs(formio, type, url, method, data, opts);
+      requestArgs.opts = requestArgs.opts || {};
+      requestArgs.opts.formio = formio;
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
         return Formio.pluginGet('request', requestArgs).then(function (result) {
           if (isNil(result)) {
@@ -6007,7 +6009,7 @@ var Formio = function () {
         'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8'
       });
-      var token = Formio.getToken();
+      var token = Formio.getToken(opts);
       if (token && !opts.noToken) {
         headers.append('x-jwt-token', token);
       }
@@ -6023,6 +6025,9 @@ var Formio = function () {
 
       // Allow plugins to alter the options.
       options = Formio.pluginAlter('requestOptions', options, url);
+      if (options.namespace) {
+        opts.namespace = options.namespace;
+      }
 
       var requestToken = options.headers.get('x-jwt-token');
       return fetch(url, options).then(function (response) {
@@ -6031,7 +6036,7 @@ var Formio = function () {
 
         if (!response.ok) {
           if (response.status === 440) {
-            Formio.setToken(null);
+            Formio.setToken(null, opts);
             Formio.events.emit('formio.sessionExpired', response.body);
           } else if (response.status === 401) {
             Formio.events.emit('formio.unauthorized', response.body);
@@ -6056,7 +6061,7 @@ var Formio = function () {
         }
 
         if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
-          Formio.setToken(token);
+          Formio.setToken(token, opts);
         }
         // 204 is no content. Don't try to .json() it.
         if (response.status === 204) {
@@ -6117,7 +6122,7 @@ var Formio = function () {
         return resultCopy;
       }).catch(function (err) {
         if (err === 'Bad Token') {
-          Formio.setToken(null);
+          Formio.setToken(null, opts);
           Formio.events.emit('formio.badToken', err);
         }
         if (err.message) {
@@ -6127,71 +6132,91 @@ var Formio = function () {
         return _nativePromiseOnly2.default.reject(err);
       });
     }
+
+    // Needed to maintain reverse compatability...
+
   }, {
     key: 'setToken',
-    value: function setToken(token) {
+    value: function setToken(token, opts) {
       token = token || '';
-      if (token === this.token) {
+      opts = typeof opts === 'string' ? { namespace: opts } : opts || {};
+      var tokenName = (opts.namespace || 'formio') + 'Token';
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      if (Formio.tokens[tokenName] === token) {
         return;
       }
-      this.token = token;
+
+      Formio.tokens[tokenName] = token;
       if (!token) {
-        Formio.setUser(null);
+        Formio.setUser(null, opts);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioToken');
+          return localStorage.removeItem(tokenName);
         } catch (err) {
-          return _browserCookies2.default.erase('formioToken', { path: '/' });
+          return _browserCookies2.default.erase(tokenName, { path: '/' });
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioToken', token);
+        localStorage.setItem(tokenName, token);
       } catch (err) {
-        _browserCookies2.default.set('formioToken', token, { path: '/' });
+        _browserCookies2.default.set(tokenName, token, { path: '/' });
       }
-      return Formio.currentUser(); // Run this so user is updated if null
+      return Formio.currentUser(opts.formio, opts); // Run this so user is updated if null
     }
   }, {
     key: 'getToken',
-    value: function getToken() {
-      if (this.token) {
-        return this.token;
+    value: function getToken(options) {
+      options = typeof options === 'string' ? { namespace: options } : options || {};
+      var tokenName = (options.namespace || 'formio') + 'Token';
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      if (Formio.tokens[tokenName]) {
+        return Formio.tokens[tokenName];
       }
       try {
-        this.token = localStorage.getItem('formioToken') || '';
-        return this.token;
+        Formio.tokens[tokenName] = localStorage.getItem(tokenName) || '';
+        return Formio.tokens[tokenName];
       } catch (e) {
-        this.token = _browserCookies2.default.get('formioToken');
-        return this.token;
+        Formio.tokens[tokenName] = _browserCookies2.default.get(tokenName);
+        return Formio.tokens[tokenName];
       }
     }
   }, {
     key: 'setUser',
-    value: function setUser(user) {
+    value: function setUser(user, opts) {
+      opts = opts || {};
+      var userName = (opts.namespace || 'formio') + 'User';
       if (!user) {
-        this.setToken(null);
+        this.setToken(null, opts);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioUser');
+          return localStorage.removeItem(userName);
         } catch (err) {
-          return _browserCookies2.default.erase('formioUser', { path: '/' });
+          return _browserCookies2.default.erase(userName, { path: '/' });
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioUser', JSON.stringify(user));
+        localStorage.setItem(userName, JSON.stringify(user));
       } catch (err) {
-        _browserCookies2.default.set('formioUser', JSON.stringify(user), { path: '/' });
+        _browserCookies2.default.set(userName, JSON.stringify(user), { path: '/' });
       }
     }
   }, {
     key: 'getUser',
-    value: function getUser() {
+    value: function getUser(options) {
+      options = options || {};
+      var userName = (options.namespace || 'formio') + 'User';
       try {
-        return JSON.parse(localStorage.getItem('formioUser') || null);
+        return JSON.parse(localStorage.getItem(userName) || null);
       } catch (e) {
-        return JSON.parse(_browserCookies2.default.get('formioUser'));
+        return JSON.parse(_browserCookies2.default.get(userName));
       }
     }
   }, {
@@ -6371,7 +6396,7 @@ var Formio = function () {
     value: function currentUser(formio, options) {
       var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
       projectUrl += '/current';
-      var user = this.getUser();
+      var user = this.getUser(options);
       if (user) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(user), {
           url: projectUrl,
@@ -6379,7 +6404,8 @@ var Formio = function () {
           options: options
         });
       }
-      if ((!options || !options.external) && !Formio.getToken()) {
+      var token = Formio.getToken(options);
+      if ((!options || !options.external) && !token) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
           url: projectUrl,
           method: 'GET',
@@ -6387,15 +6413,17 @@ var Formio = function () {
         });
       }
       return Formio.makeRequest(formio, 'currentUser', projectUrl, 'GET', null, options).then(function (response) {
-        Formio.setUser(response);
+        Formio.setUser(response, options);
         return response;
       });
     }
   }, {
     key: 'logout',
-    value: function logout(formio) {
-      Formio.setToken(null);
-      Formio.setUser(null);
+    value: function logout(formio, options) {
+      options = options || {};
+      options.formio = formio;
+      Formio.setToken(null, options);
+      Formio.setUser(null, options);
       Formio.clearCache();
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
       return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
@@ -6540,6 +6568,25 @@ var Formio = function () {
       }
 
       return _nativePromiseOnly2.default.reject(name + ' library was not required.');
+    }
+  }, {
+    key: 'token',
+    get: function get() {
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      return Formio.tokens.formioToken ? Formio.tokens.formioToken : '';
+    }
+
+    // Needed to maintain reverse compatability...
+    ,
+    set: function set(token) {
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      return Formio.tokens.formioToken = token || '';
     }
   }]);
 
@@ -6872,12 +6919,12 @@ var PDFBuilder = function (_WebformBuilder) {
     value: function addDropZone() {
       var _this2 = this;
 
-      if (this.dropZone) {
-        return;
+      if (!this.dropZone) {
+        this.dropZone = this.ce('div', {
+          class: 'formio-drop-zone'
+        });
+        this.prepend(this.dropZone);
       }
-      this.dropZone = this.ce('div');
-      this.disableDropZone();
-      this.pdfForm.prepend(this.dropZone);
       this.addEventListener(this.dropZone, 'dragover', function (event) {
         event.preventDefault();
         return false;
@@ -6887,6 +6934,7 @@ var PDFBuilder = function (_WebformBuilder) {
         _this2.dragStop(event);
         return false;
       });
+      this.disableDropZone();
     }
   }, {
     key: 'render',
@@ -6910,17 +6958,20 @@ var PDFBuilder = function (_WebformBuilder) {
       });
     }
   }, {
-    key: 'activateDropZone',
-    value: function activateDropZone() {
+    key: 'enableDropZone',
+    value: function enableDropZone() {
       if (this.dropZone) {
-        this.dropZone.setAttribute('style', this.dropZoneStyles + 'display:inherit;');
+        var iframeRect = (0, _utils.getElementRect)(this.pdfForm.element);
+        this.dropZone.style.height = iframeRect && iframeRect.height ? iframeRect.height + 'px' : '1000px';
+        this.dropZone.style.width = iframeRect && iframeRect.width ? iframeRect.width + 'px' : '100%';
+        this.addClass(this.dropZone, 'enabled');
       }
     }
   }, {
     key: 'disableDropZone',
     value: function disableDropZone() {
       if (this.dropZone) {
-        this.dropZone.setAttribute('style', this.dropZoneStyles + 'display:none;');
+        this.removeClass(this.dropZone, 'enabled');
       }
     }
   }, {
@@ -6957,8 +7008,10 @@ var PDFBuilder = function (_WebformBuilder) {
   }, {
     key: 'dragStart',
     value: function dragStart(event, component) {
-      event.dataTransfer.setData('text/plain', JSON.stringify(component.schema));
-      this.activateDropZone();
+      event.stopPropagation();
+      event.dataTransfer.setData('text/plain', 'true');
+      this.currentComponent = component;
+      this.enableDropZone();
     }
   }, {
     key: 'removeEventListeners',
@@ -6969,6 +7022,7 @@ var PDFBuilder = function (_WebformBuilder) {
       _lodash2.default.each(this.groups, function (group) {
         _lodash2.default.each(group.components, function (builderComponent) {
           _this4.removeEventListener(builderComponent, 'dragstart');
+          _this4.removeEventListener(builderComponent, 'dragend');
         });
       });
     }
@@ -6987,13 +7041,7 @@ var PDFBuilder = function (_WebformBuilder) {
   }, {
     key: 'dragStop',
     value: function dragStop(event) {
-      event.preventDefault();
-      var dropData = event.dataTransfer.getData('text/plain');
-      if (!dropData || typeof dropData !== 'string') {
-        return false;
-      }
-
-      var schema = JSON.parse(dropData);
+      var schema = this.currentComponent ? this.currentComponent.schema : null;
       if (!schema) {
         return false;
       }
@@ -7027,6 +7075,9 @@ var PDFBuilder = function (_WebformBuilder) {
         this.addEventListener(builderComponent.element, 'dragstart', function (event) {
           return _this5.dragStart(event, component);
         });
+        this.addEventListener(builderComponent.element, 'dragend', function () {
+          return _this5.disableDropZone();
+        });
       }
       return builderComponent;
     }
@@ -7051,6 +7102,7 @@ var PDFBuilder = function (_WebformBuilder) {
       if (!this.pdfForm) {
         this.element.noDrop = true;
         this.pdfForm = new _PDF2.default(this.element, this.options);
+        this.addClass(this.pdfForm.element, 'formio-pdf-builder');
       }
       this.pdfForm.removeEventListeners(true);
       this.pdfForm.events.removeAllListeners();
@@ -7139,13 +7191,6 @@ var PDFBuilder = function (_WebformBuilder) {
         premium: false,
         resource: false
       };
-    }
-  }, {
-    key: 'dropZoneStyles',
-    get: function get() {
-      var iframeRect = (0, _utils.getElementRect)(this.pdfForm.element);
-      var iframeHeight = iframeRect ? iframeRect.height || 1000 : 1000;
-      return 'position:absolute;width: 100%;height:' + iframeHeight + 'px;';
     }
   }]);
 
@@ -8027,6 +8072,9 @@ var Webform = function (_NestedComponent) {
         noCheck: true
       });
       this.setAlert('success', '<p>' + this.t('complete') + '</p>');
+      if (!submission.hasOwnProperty('saved')) {
+        submission.saved = saved;
+      }
       this.emit('submit', submission);
       if (saved) {
         this.emit('submitDone', submission);
@@ -8536,22 +8584,22 @@ var WebformBuilder = function (_Webform) {
         // Make sure the component position is relative so the buttons align properly.
         comp.getElement().style.position = 'relative';
 
-        var removeButton = parent.ce('div', {
+        var removeButton = _this.ce('div', {
           class: 'btn btn-xxs btn-danger component-settings-button component-settings-button-remove'
-        }, parent.getIcon('remove'));
-        parent.addEventListener(removeButton, 'click', function () {
-          return parent.root.deleteComponent(comp);
+        }, _this.getIcon('remove'));
+        _this.addEventListener(removeButton, 'click', function () {
+          return _this.deleteComponent(comp);
         });
 
-        var editButton = parent.ce('div', {
+        var editButton = _this.ce('div', {
           class: 'btn btn-xxs btn-default component-settings-button component-settings-button-edit'
-        }, parent.getIcon('cog'));
-        parent.addEventListener(editButton, 'click', function () {
-          return parent.root.editComponent(comp);
+        }, _this.getIcon('cog'));
+        _this.addEventListener(editButton, 'click', function () {
+          return _this.editComponent(comp);
         });
 
         // Add the edit buttons to the component.
-        comp.prepend(parent.ce('div', {
+        comp.prepend(_this.ce('div', {
           class: 'component-btn-group'
         }, [removeButton, editButton]));
       }
@@ -8723,7 +8771,11 @@ var WebformBuilder = function (_Webform) {
       // Append the settings page to the dialog body.
       this.dialog.body.appendChild(componentEdit);
 
-      var editForm = _Components2.default.components[componentCopy.component.type].editForm();
+      // Allow editForm overrides per component.
+      var overrides = _lodash2.default.get(this.options, 'editForm.' + componentCopy.component.type, {});
+
+      // Get the editform for this component.
+      var editForm = _Components2.default.components[componentCopy.component.type].editForm(overrides);
 
       // Change the defaultValue component to be reflective.
       this.defaultValueComponent = (0, _utils.getComponent)(editForm.components, 'defaultValue');
@@ -9071,9 +9123,16 @@ var WebformBuilder = function (_Webform) {
     value: function addComponentTo(parent, schema, element, sibling) {
       return parent.addComponent(schema, element, parent.data, sibling);
     }
+
+    /* eslint-disable  max-statements */
+
   }, {
     key: 'onDrop',
     value: function onDrop(element, target, source, sibling) {
+      if (!element || !element.id) {
+        console.warn('No element.id defined for dropping');
+        return;
+      }
       var builderElement = source.querySelector('#' + element.id);
       var newParent = this.getParentElement(element);
       if (!newParent || !newParent.component) {
@@ -9143,6 +9202,7 @@ var WebformBuilder = function (_Webform) {
           this.form = this.schema;
         }
     }
+    /* eslint-enable  max-statements */
 
     /**
      * Adds a submit button if there are no components.
@@ -11405,6 +11465,10 @@ var BaseComponent = function () {
       row: ''
     });
 
+    // Determine if we are inside a datagrid.
+    this.inDataGrid = this.options.inDataGrid;
+    this.options.inDataGrid = false;
+
     // Use the i18next that is passed in, otherwise use the global version.
     this.i18next = this.options.i18next || _i18next2.default;
 
@@ -12313,7 +12377,7 @@ var BaseComponent = function () {
   }, {
     key: 'labelIsHidden',
     value: function labelIsHidden() {
-      return !this.component.label || this.component.hideLabel || this.options.inputsOnly;
+      return !this.component.label || this.component.hideLabel || this.options.inputsOnly || this.inDataGrid && !this.component.dataGridLabel;
     }
 
     /**
@@ -12882,7 +12946,7 @@ var BaseComponent = function () {
     value: function removeClass(element, className) {
       var cls = element.getAttribute('class');
       if (cls) {
-        cls = cls.replace(new RegExp(className, 'g'), '');
+        cls = cls.replace(new RegExp(' ' + className, 'g'), '');
         element.setAttribute('class', cls);
       }
     }
@@ -15309,7 +15373,7 @@ var ButtonComponent = function (_BaseComponent) {
         this.buttonElement.appendChild(this.text(' '));
       }
 
-      if (this.component.label) {
+      if (!this.labelIsHidden()) {
         this.labelElement = this.text(this.addShortcutToLabel());
         this.buttonElement.appendChild(this.labelElement);
         this.createTooltip(this.buttonElement, null, this.iconClass('question-sign'));
@@ -15636,7 +15700,8 @@ var ButtonComponent = function (_BaseComponent) {
         action: 'submit',
         persistent: false,
         disableOnInvalid: false,
-        theme: 'default'
+        theme: 'default',
+        dataGridLabel: true
       }].concat(extend));
     }
   }, {
@@ -15951,7 +16016,7 @@ var CheckBoxComponent = function (_BaseComponent) {
     key: 'createElement',
     value: function createElement() {
       var className = 'form-check ' + this.className;
-      if (this.component.label) {
+      if (!this.labelIsHidden()) {
         className += ' checkbox';
       }
       this.element = this.ce('div', {
@@ -16017,7 +16082,7 @@ var CheckBoxComponent = function (_BaseComponent) {
   }, {
     key: 'createLabel',
     value: function createLabel(container, input) {
-      if (!this.component.label) {
+      if (this.labelIsHidden()) {
         return null;
       }
 
@@ -16180,7 +16245,7 @@ var CheckBoxComponent = function (_BaseComponent) {
         inputType: 'checkbox',
         label: 'Checkbox',
         key: 'checkbox',
-        datagridLabel: true,
+        dataGridLabel: true,
         labelPosition: 'right',
         value: '',
         name: ''
@@ -16288,7 +16353,7 @@ exports.default = [{
   input: true,
   weight: 440,
   label: 'Datagrid Label',
-  key: 'datagridLabel',
+  key: 'dataGridLabel',
   tooltip: 'Show the label when in a datagrid.'
 }];
 
@@ -17237,8 +17302,20 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'build',
     value: function build() {
+      var _this2 = this;
+
       this.createElement();
       this.createLabel(this.element);
+      var tableClass = 'table datagrid-table table-bordered form-group formio-data-grid ';
+      _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
+        if (_this2.component[prop]) {
+          tableClass += 'table-' + prop + ' ';
+        }
+      });
+      this.tableElement = this.ce('table', {
+        class: tableClass
+      });
+      this.element.appendChild(this.tableElement);
       if (!this.dataValue.length) {
         this.addNewValue();
       }
@@ -17250,7 +17327,7 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'setVisibleComponents',
     value: function setVisibleComponents() {
-      var _this2 = this;
+      var _this3 = this;
 
       // Add new values based on minLength.
       for (var dIndex = this.dataValue.length; dIndex < _lodash2.default.get(this.component, 'validate.minLength', 0); dIndex++) {
@@ -17267,32 +17344,23 @@ var DataGridComponent = function (_NestedComponent) {
       }
 
       this.visibleComponents = _lodash2.default.filter(this.component.components, function (comp) {
-        return _this2.visibleColumns[comp.key];
+        return _this3.visibleColumns[comp.key];
       });
       this.numColumns += this.visibleComponents.length;
     }
   }, {
     key: 'buildRows',
     value: function buildRows() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.setVisibleComponents();
-      this.clear();
-      this.createLabel(this.element);
-      var tableClass = 'table datagrid-table table-bordered form-group formio-data-grid ';
-      _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
-        if (_this3.component[prop]) {
-          tableClass += 'table-' + prop + ' ';
-        }
-      });
-      this.tableElement = this.ce('table', {
-        class: tableClass
-      });
+      this.destroy();
+      this.empty(this.tableElement);
 
       // Build the rows.
       var tableRows = [];
       this.dataValue.forEach(function (row, rowIndex) {
-        return tableRows.push(_this3.buildRow(row, rowIndex));
+        return tableRows.push(_this4.buildRow(row, rowIndex));
       });
 
       // Create the header (must happen after build rows to get correct column length)
@@ -17306,9 +17374,6 @@ var DataGridComponent = function (_NestedComponent) {
       if (this.hasBottomSubmit()) {
         this.tableElement.appendChild(this.ce('tfoot', null, this.ce('tr', null, this.ce('td', { colspan: this.numColumns }, this.addButton()))));
       }
-
-      // Add the table to the element.
-      this.element.appendChild(this.tableElement);
     }
 
     // Build the header.
@@ -17316,21 +17381,21 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'createHeader',
     value: function createHeader() {
-      var _this4 = this;
+      var _this5 = this;
 
       var hasTopButton = this.hasTopSubmit();
       var hasEnd = this.hasExtraColumn() || hasTopButton;
       var needsHeader = false;
       var thead = this.ce('thead', null, this.ce('tr', null, [this.visibleComponents.map(function (comp) {
-        var th = _this4.ce('th');
+        var th = _this5.ce('th');
         if (comp.validate && comp.validate.required) {
           th.setAttribute('class', 'field-required');
         }
         var title = comp.label || comp.title;
         if (title && !comp.dataGridLabel) {
           needsHeader = true;
-          th.appendChild(_this4.text(title));
-          _this4.createTooltip(th, comp);
+          th.appendChild(_this5.text(title));
+          _this5.createTooltip(th, comp);
         }
         return th;
       }), hasEnd ? this.ce('th', null, hasTopButton ? this.addButton(true) : null) : null]));
@@ -17339,7 +17404,7 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'buildRow',
     value: function buildRow(row, index) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.rows[index] = {};
       var lastColumn = null;
@@ -17358,21 +17423,26 @@ var DataGridComponent = function (_NestedComponent) {
         this.root.addDragContainer(lastColumn, this);
       }
       return this.ce('tr', null, [this.component.components.map(function (col, colIndex) {
-        return _this5.buildComponent(col, colIndex, row, index);
+        return _this6.buildComponent(col, colIndex, row, index);
       }), lastColumn]);
+    }
+  }, {
+    key: 'destroyRows',
+    value: function destroyRows() {
+      var _this7 = this;
+
+      _lodash2.default.each(this.rows, function (row) {
+        return _lodash2.default.each(row, function (col) {
+          return _this7.removeComponent(col, row);
+        });
+      });
+      this.rows = [];
     }
   }, {
     key: 'destroy',
     value: function destroy(all) {
-      var _this6 = this;
-
       _get(DataGridComponent.prototype.__proto__ || Object.getPrototypeOf(DataGridComponent.prototype), 'destroy', this).call(this, all);
-      _lodash2.default.each(this.rows, function (row) {
-        return _lodash2.default.each(row, function (col) {
-          return _this6.removeComponent(col, row);
-        });
-      });
-      this.rows = [];
+      this.destroyRows();
     }
   }, {
     key: 'buildComponent',
@@ -17387,8 +17457,8 @@ var DataGridComponent = function (_NestedComponent) {
       var options = _lodash2.default.clone(this.options);
       options.name += '[' + rowIndex + ']';
       options.row = rowIndex + '-' + colIndex;
+      options.inDataGrid = true;
       var comp = this.createComponent(_lodash2.default.assign({}, column, {
-        label: column.dataGridLabel ? column.label : false,
         row: options.row
       }), options, row);
       comp.rowIndex = rowIndex;
@@ -17400,7 +17470,7 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'checkConditions',
     value: function checkConditions(data) {
-      var _this7 = this;
+      var _this8 = this;
 
       var show = _get(DataGridComponent.prototype.__proto__ || Object.getPrototypeOf(DataGridComponent.prototype), 'checkConditions', this).call(this, data);
       // If table isn't visible, don't bother calculating columns.
@@ -17413,15 +17483,15 @@ var DataGridComponent = function (_NestedComponent) {
       }
       _lodash2.default.each(this.component.components, function (col) {
         var showColumn = false;
-        _lodash2.default.each(_this7.rows, function (comps) {
+        _lodash2.default.each(_this8.rows, function (comps) {
           showColumn |= comps[col.key].checkConditions(data);
         });
         showColumn = showColumn && col.type !== 'hidden' && !col.hidden;
-        if (_this7.visibleColumns[col.key] && !showColumn || !_this7.visibleColumns[col.key] && showColumn) {
+        if (_this8.visibleColumns[col.key] && !showColumn || !_this8.visibleColumns[col.key] && showColumn) {
           rebuild = true;
         }
 
-        _this7.visibleColumns[col.key] = showColumn;
+        _this8.visibleColumns[col.key] = showColumn;
         show |= showColumn;
       });
 
@@ -21153,6 +21223,18 @@ var HiddenComponent = function (_BaseComponent) {
       return;
     }
   }, {
+    key: 'setValue',
+    value: function setValue(value, flags) {
+      flags = this.getFlags.apply(this, arguments);
+      this.dataValue = value;
+      return this.updateValue(flags);
+    }
+  }, {
+    key: 'getValue',
+    value: function getValue() {
+      return this.dataValue;
+    }
+  }, {
     key: 'defaultSchema',
     get: function get() {
       return HiddenComponent.schema();
@@ -22487,7 +22569,6 @@ var NestedComponent = function (_BaseComponent) {
     key: 'destroy',
     value: function destroy(all) {
       _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'destroy', this).call(this, all);
-      this.empty(this.getElement());
       this.destroyComponents();
     }
   }, {
