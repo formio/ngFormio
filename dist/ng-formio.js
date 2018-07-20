@@ -19431,6 +19431,7 @@ var EditGridComponent = function (_NestedComponent) {
     key: 'editRow',
     value: function editRow(rowIndex) {
       this.editRows[rowIndex].isOpen = true;
+      this.editRows[rowIndex].editing = true;
       this.editRows[rowIndex].data = _lodash2.default.cloneDeep(this.dataValue[rowIndex]);
       this.refreshDOM();
     }
@@ -19468,7 +19469,11 @@ var EditGridComponent = function (_NestedComponent) {
         return;
       }
       this.removeRowComponents(rowIndex);
-      this.dataValue[rowIndex] = this.editRows[rowIndex].data;
+      if (this.editRows[rowIndex].editing) {
+        this.dataValue[rowIndex] = this.editRows[rowIndex].data;
+      } else {
+        this.dataValue.push(this.editRows[rowIndex].data);
+      }
       this.editRows[rowIndex].isOpen = false;
       this.checkValidity(this.data, true);
       this.updateValue();
@@ -25196,6 +25201,16 @@ exports.default = [{
   label: 'Data Source URL',
   placeholder: 'Data Source URL',
   tooltip: 'A URL that returns a JSON array to use as the data source.',
+  conditional: {
+    json: { '===': [{ var: 'data.dataSrc' }, 'url'] }
+  }
+}, {
+  type: 'checkbox',
+  input: true,
+  label: 'Lazy Load URL',
+  key: 'lazyLoad',
+  tooltip: 'When set, this will not fire off the request to the URL until this control is within focus. This can improve performance if you have many Select dropdowns on your form where the API\'s will only fire when the control is activated.',
+  weight: 11,
   conditional: {
     json: { '===': [{ var: 'data.dataSrc' }, 'url'] }
   }
