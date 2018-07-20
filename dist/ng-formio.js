@@ -8789,6 +8789,7 @@ var WebformBuilder = function (_Webform) {
 
       // Pass along the form being edited.
       this.editForm.editForm = this._form;
+      this.editForm.editComponent = component;
 
       // Update the preview with this component.
       this.updateComponent(componentCopy);
@@ -10433,10 +10434,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _AddressEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -11157,51 +11158,52 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return {
-    components: _lodash2.default.unionWith(extend.map(function (items) {
-      return {
-        type: 'tabs',
-        key: 'tabs',
-        components: items
-      };
-    }), [{
+  var components = [{
+    type: 'tabs',
+    key: 'tabs',
+    components: [{
+      label: 'Display',
+      key: 'display',
+      weight: 0,
+      components: _BaseEdit8.default
+    }, {
+      label: 'Data',
+      key: 'data',
+      weight: 10,
+      components: _BaseEdit4.default
+    }, {
+      label: 'Validation',
+      key: 'validation',
+      weight: 20,
+      components: _BaseEdit12.default
+    }, {
+      label: 'API',
+      key: 'api',
+      weight: 30,
+      components: _BaseEdit6.default
+    }, {
+      label: 'Conditional',
+      key: 'conditional',
+      weight: 40,
+      components: _BaseEdit2.default
+    }, {
+      label: 'Logic',
+      key: 'logic',
+      weight: 50,
+      components: _BaseEdit10.default
+    }]
+  }].concat(extend.map(function (items) {
+    return {
       type: 'tabs',
       key: 'tabs',
-      components: [{
-        label: 'Display',
-        key: 'display',
-        weight: 0,
-        components: _BaseEdit8.default
-      }, {
-        label: 'Data',
-        key: 'data',
-        weight: 10,
-        components: _BaseEdit4.default
-      }, {
-        label: 'Validation',
-        key: 'validation',
-        weight: 20,
-        components: _BaseEdit12.default
-      }, {
-        label: 'API',
-        key: 'api',
-        weight: 30,
-        components: _BaseEdit6.default
-      }, {
-        label: 'Conditional',
-        key: 'conditional',
-        weight: 40,
-        components: _BaseEdit2.default
-      }, {
-        label: 'Logic',
-        key: 'logic',
-        weight: 50,
-        components: _BaseEdit10.default
-      }]
-    }, {
+      components: items
+    };
+  }));
+  return {
+    components: _lodash2.default.unionWith(components, _utils2.default.unifyComponents).concat({
       type: 'hidden',
       key: 'type'
-    }], _utils2.default.unifyComponents)
+    })
   };
 };
 
@@ -11383,6 +11385,11 @@ var BaseComponent = function () {
         tableView: true,
 
         /**
+         * If true, will show label when component is in a datagrid.
+         */
+        dataGridLabel: false,
+
+        /**
          * The input label provided to this component.
          */
         label: '',
@@ -11399,6 +11406,7 @@ var BaseComponent = function () {
         dbIndex: false,
         customDefaultValue: '',
         calculateValue: '',
+        validateOn: 'change',
 
         /**
          * The validation criteria for this component.
@@ -12252,7 +12260,7 @@ var BaseComponent = function () {
       var _this6 = this;
 
       var addButton = this.ce('button', {
-        class: 'btn btn-primary'
+        class: 'btn btn-primary formio-button-add-row'
       });
       this.addEventListener(addButton, 'click', function (event) {
         event.preventDefault();
@@ -12304,7 +12312,7 @@ var BaseComponent = function () {
 
       var removeButton = this.ce('button', {
         type: 'button',
-        class: 'btn btn-default btn-secondary'
+        class: 'btn btn-default btn-secondary formio-button-remove-row'
       });
 
       this.addEventListener(removeButton, 'click', function (event) {
@@ -13196,6 +13204,11 @@ var BaseComponent = function () {
         this.pristine = false;
       }
 
+      // If we are supposed to validate on blur, then don't trigger validation yet.
+      if (this.component.validateOn === 'blur' && !this.errors.length) {
+        flags.noValidate = true;
+      }
+
       // Set the changed variable.
       var changed = {
         instance: this,
@@ -13292,6 +13305,14 @@ var BaseComponent = function () {
       this.addEventListener(element, 'blur', function () {
         _this18.root.pendingBlur = FormioUtils.delay(function () {
           _this18.emit('blur', _this18);
+          if (_this18.component.validateOn === 'blur') {
+            _this18.root.triggerChange({}, {
+              instance: _this18,
+              component: _this18.component,
+              value: _this18.dataValue,
+              flags: {}
+            });
+          }
           _this18.root.focusedComponent = null;
           _this18.root.pendingBlur = null;
         });
@@ -14535,6 +14556,14 @@ exports.default = [{
   key: 'mask',
   input: true
 }, {
+  weight: 1310,
+  type: 'checkbox',
+  label: 'Show Label in DataGrid',
+  tooltip: 'Show the label when in a Datagrid.',
+  key: 'dataGridLabel',
+  input: true,
+  customConditional: 'show = instance.root.editComponent.inDataGrid'
+}, {
   weight: 1400,
   type: 'checkbox',
   label: 'Disabled',
@@ -14850,6 +14879,18 @@ exports.default = [{
   key: 'validate.unique',
   input: true
 }, {
+  weight: 150,
+  type: 'select',
+  key: 'validateOn',
+  defaultValue: 'change',
+  input: true,
+  label: 'Validate On',
+  tooltip: 'Determines when this component should trigger front-end validation.',
+  dataSrc: 'values',
+  data: {
+    values: [{ label: 'Change', value: 'change' }, { label: 'Blur', value: 'blur' }]
+  }
+}, {
   weight: 200,
   key: 'validate.customMessage',
   label: 'Custom Error Message',
@@ -14946,6 +14987,18 @@ var EditFormUtils = {
   unifyComponents: function unifyComponents(objValue, srcValue) {
     if (objValue.key && srcValue.key) {
       if (objValue.key === srcValue.key) {
+        // Create complete objects by including missing keys.
+        _lodash2.default.each(objValue, function (value, prop) {
+          if (!srcValue.hasOwnProperty(prop)) {
+            srcValue[prop] = value;
+          }
+        });
+        _lodash2.default.each(srcValue, function (value, prop) {
+          if (!objValue.hasOwnProperty(prop)) {
+            objValue[prop] = value;
+          }
+        });
+
         if (objValue.components) {
           srcValue.components = EditFormUtils.sortAndFilterComponents(_lodash2.default.unionWith(objValue.components, srcValue.components, EditFormUtils.unifyComponents));
         }
@@ -15243,10 +15296,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _ButtonEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -15912,10 +15965,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _CheckboxEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -16348,13 +16401,6 @@ exports.default = [{
   conditional: {
     json: { '===': [{ var: 'data.inputType' }, 'radio'] }
   }
-}, {
-  type: 'checkbox',
-  input: true,
-  weight: 440,
-  label: 'Datagrid Label',
-  key: 'dataGridLabel',
-  tooltip: 'Show the label when in a datagrid.'
 }];
 
 /***/ }),
@@ -16437,10 +16483,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _NestedComponent2.default.apply(undefined, extend.concat([[{
+  return _NestedComponent2.default.apply(undefined, [[{
     key: 'display',
     components: _ColumnsEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _NestedComponent = __webpack_require__(/*! ../nested/NestedComponent.form */ "./node_modules/formiojs/components/nested/NestedComponent.form.js");
@@ -16636,12 +16682,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports.default = function () {
-  return _NestedComponent2.default.apply(undefined, arguments);
+  return _Base2.default.apply(undefined, arguments);
 };
 
-var _NestedComponent = __webpack_require__(/*! ../nested/NestedComponent.form */ "./node_modules/formiojs/components/nested/NestedComponent.form.js");
+var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
 
-var _NestedComponent2 = _interopRequireDefault(_NestedComponent);
+var _Base2 = _interopRequireDefault(_Base);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -16810,10 +16856,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _ContentEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -17168,10 +17214,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _DataGridEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -17201,6 +17247,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _set = function set(object, property, value, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent !== null) { set(parent, property, value, receiver); } } else if ("value" in desc && desc.writable) { desc.value = value; } else { var setter = desc.set; if (setter !== undefined) { setter.call(receiver, value); } } return value; };
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
@@ -17447,12 +17495,12 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'buildComponent',
     value: function buildComponent(col, colIndex, row, rowIndex) {
-      if (!this.visibleColumns || this.visibleColumns.hasOwnProperty(col.key) && !this.visibleColumns[col.key]) {
-        return;
+      var container;
+      var isVisible = this.visibleColumns && (!this.visibleColumns.hasOwnProperty(col.key) || this.visibleColumns[col.key]);
+      if (isVisible) {
+        container = this.ce('td');
+        container.noDrop = true;
       }
-
-      var container = this.ce('td');
-      container.noDrop = true;
       var column = _lodash2.default.clone(col);
       var options = _lodash2.default.clone(this.options);
       options.name += '[' + rowIndex + ']';
@@ -17463,9 +17511,11 @@ var DataGridComponent = function (_NestedComponent) {
       }), options, row);
       comp.rowIndex = rowIndex;
       this.hook('addComponent', container, comp, this);
-      container.appendChild(comp.getElement());
       this.rows[rowIndex][column.key] = comp;
-      return container;
+      if (isVisible) {
+        container.appendChild(comp.getElement());
+        return container;
+      }
     }
   }, {
     key: 'checkConditions',
@@ -17484,7 +17534,9 @@ var DataGridComponent = function (_NestedComponent) {
       _lodash2.default.each(this.component.components, function (col) {
         var showColumn = false;
         _lodash2.default.each(_this8.rows, function (comps) {
-          showColumn |= comps[col.key].checkConditions(data);
+          if (comps && comps[col.key] && typeof comps[col.key].checkConditions === 'function') {
+            showColumn |= comps[col.key].checkConditions(data);
+          }
         });
         showColumn = showColumn && col.type !== 'hidden' && !col.hidden;
         if (_this8.visibleColumns[col.key] && !showColumn || !_this8.visibleColumns[col.key] && showColumn) {
@@ -17581,6 +17633,18 @@ var DataGridComponent = function (_NestedComponent) {
       return _lodash2.default.get(this.component, 'addAnotherPosition', 'bottom');
     }
   }, {
+    key: 'dataValue',
+    get: function get() {
+      var dataValue = _get(DataGridComponent.prototype.__proto__ || Object.getPrototypeOf(DataGridComponent.prototype), 'dataValue', this);
+      if (!dataValue || !_lodash2.default.isArray(dataValue)) {
+        return this.emptyValue;
+      }
+      return dataValue;
+    },
+    set: function set(value) {
+      _set(DataGridComponent.prototype.__proto__ || Object.getPrototypeOf(DataGridComponent.prototype), 'dataValue', value, this);
+    }
+  }, {
     key: 'defaultValue',
     get: function get() {
       var value = _get(DataGridComponent.prototype.__proto__ || Object.getPrototypeOf(DataGridComponent.prototype), 'defaultValue', this);
@@ -17666,7 +17730,7 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _DateTimeEdit6.default
   }, {
@@ -17682,7 +17746,7 @@ exports.default = function () {
   }, {
     key: 'data',
     components: _DateTimeEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -18281,13 +18345,13 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _DayEdit2.default
   }, {
     key: 'validation',
     components: _DayEdit4.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -19041,12 +19105,12 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     label: 'Templates',
     key: 'templates',
     weight: 5,
     components: _EditGridEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -19487,7 +19551,9 @@ var EditGridComponent = function (_NestedComponent) {
         rowsValid &= rowValid;
 
         // Any open rows causes validation to fail.
-        rowsClosed &= !editRow.isOpen;
+        if (dirty) {
+          rowsClosed &= !editRow.isOpen;
+        }
       });
 
       if (!rowsValid) {
@@ -19959,12 +20025,12 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     label: 'File',
     key: 'file',
     weight: 5,
     components: _FileEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -21291,10 +21357,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _HTMLEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -21726,12 +21792,12 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     label: 'Map',
     key: 'map',
     weight: 1,
     components: _LocationEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -22041,13 +22107,13 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'data',
     ignore: true
   }, {
     key: 'validation',
     ignore: true
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -22305,10 +22371,15 @@ var NestedComponent = function (_BaseComponent) {
       }
       this.setHidden(comp);
       element = this.hook('addComponent', element, comp, this);
+      var compElement = comp.getElement();
+      if (!compElement) {
+        console.warn('Component ' + component.key + ' has no element.');
+        return comp;
+      }
       if (before) {
-        element.insertBefore(comp.getElement(), before);
+        element.insertBefore(compElement, before);
       } else {
-        element.appendChild(comp.getElement());
+        element.appendChild(compElement);
       }
       return comp;
     }
@@ -22766,10 +22837,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'validation',
     components: _NumberEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -23057,10 +23128,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _NestedComponent2.default.apply(undefined, extend.concat([[{
+  return _NestedComponent2.default.apply(undefined, [[{
     key: 'display',
     components: _PanelEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _NestedComponent = __webpack_require__(/*! ../nested/NestedComponent.form */ "./node_modules/formiojs/components/nested/NestedComponent.form.js");
@@ -23126,6 +23197,7 @@ var PanelComponent = function (_NestedComponent) {
         clearOnHide: false,
         input: false,
         tableView: false,
+        dataGridLabel: false,
         persistent: false
       }].concat(extend));
     }
@@ -23280,10 +23352,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _TextField2.default.apply(undefined, extend.concat([[{
+  return _TextField2.default.apply(undefined, [[{
     key: 'display',
     components: _PasswordEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _TextField = __webpack_require__(/*! ../textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js");
@@ -23425,7 +23497,7 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _TextField2.default.apply(undefined, extend.concat([[]]));
+  return _TextField2.default.apply(undefined, [[]].concat(extend));
 };
 
 var _TextField = __webpack_require__(/*! ../textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js");
@@ -23533,10 +23605,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _RadioEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -23940,10 +24012,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _ResourceEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -24187,13 +24259,13 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'data',
     components: _SelectEdit2.default
   }, {
     key: 'validation',
     components: _SelectEdit4.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -24751,7 +24823,7 @@ var SelectComponent = function (_BaseComponent) {
         addItemText: false,
         placeholder: !!this.component.placeholder,
         placeholderValue: placeholderValue,
-        searchPlaceholderValue: placeholderValue,
+        searchPlaceholderValue: this.t('Type to search'),
         shouldSort: false,
         position: this.component.dropdown || 'auto',
         searchEnabled: useSearch,
@@ -24803,6 +24875,14 @@ var SelectComponent = function (_BaseComponent) {
       this.addEventListener(input, 'showDropdown', function () {
         return _this5.update();
       });
+      if (placeholderValue && this.choices.isSelectOneElement) {
+        this.addEventListener(input, 'removeItem', function () {
+          var items = _this5.choices.store.getItemsFilteredByActive();
+          if (!items.length) {
+            _this5.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
+          }
+        });
+      }
 
       // Force the disabled state with getters and setters.
       this.disabled = this.disabled;
@@ -25619,10 +25699,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _SignatureEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -26014,10 +26094,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _SurveyEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -26347,10 +26427,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _NestedComponent2.default.apply(undefined, extend.concat([[{
+  return _NestedComponent2.default.apply(undefined, [[{
     key: 'display',
     components: _TableEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _NestedComponent = __webpack_require__(/*! ../nested/NestedComponent.form */ "./node_modules/formiojs/components/nested/NestedComponent.form.js");
@@ -26668,10 +26748,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _NestedComponent2.default.apply(undefined, extend.concat([[{
+  return _NestedComponent2.default.apply(undefined, [[{
     key: 'display',
     components: _TabsEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _NestedComponent = __webpack_require__(/*! ../nested/NestedComponent.form */ "./node_modules/formiojs/components/nested/NestedComponent.form.js");
@@ -26965,10 +27045,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _TagsEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -27100,7 +27180,9 @@ var TagsComponent = function (_BaseComponent) {
           value = [value];
         }
         this.choices.removeActiveItems();
-        this.choices.setValue(value);
+        if (value) {
+          this.choices.setValue(value);
+        }
       }
     }
   }, {
@@ -27210,10 +27292,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _TextField2.default.apply(undefined, extend.concat([[{
+  return _TextField2.default.apply(undefined, [[{
     key: 'display',
     components: _TextAreaEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _TextField = __webpack_require__(/*! ../textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js");
@@ -27621,7 +27703,7 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _TextFieldEdit4.default
   }, {
@@ -27630,7 +27712,7 @@ exports.default = function () {
   }, {
     key: 'validation',
     components: _TextFieldEdit6.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
@@ -28199,10 +28281,10 @@ exports.default = function () {
     extend[_key] = arguments[_key];
   }
 
-  return _Base2.default.apply(undefined, extend.concat([[{
+  return _Base2.default.apply(undefined, [[{
     key: 'display',
     components: _TimeEdit2.default
-  }]]));
+  }]].concat(extend));
 };
 
 var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
