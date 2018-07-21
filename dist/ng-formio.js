@@ -6990,14 +6990,6 @@ var PDFBuilder = function (_WebformBuilder) {
       return _get(PDFBuilder.prototype.__proto__ || Object.getPrototypeOf(PDFBuilder.prototype), 'addComponent', this).call(this, component, element, data, before, true);
     }
   }, {
-    key: 'updateComponent',
-    value: function updateComponent(component) {
-      if (this.pdfForm && component.component) {
-        this.pdfForm.postMessage({ name: 'updateElement', data: component.component });
-      }
-      return _get(PDFBuilder.prototype.__proto__ || Object.getPrototypeOf(PDFBuilder.prototype), 'updateComponent', this).call(this, component);
-    }
-  }, {
     key: 'deleteComponent',
     value: function deleteComponent(component) {
       if (this.pdfForm && component.component) {
