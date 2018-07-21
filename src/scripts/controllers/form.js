@@ -748,7 +748,8 @@ app.controller('FormController', [
         getHeaders: true
       })
       .then(function(response) {
-        $scope.form = $scope.originalForm = response.result;
+        $scope.originalForm = response.result;
+        _.merge($scope.form, $scope.originalForm);
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
         GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
@@ -815,7 +816,7 @@ app.controller('FormController', [
     $scope.$on('updateFormPermissions', function(event, form) {
       event.stopPropagation();
       $scope.updateCurrentFormResources(form);
-      $scope.form = form;
+      _.merge($scope.form, form);
     });
 
 
