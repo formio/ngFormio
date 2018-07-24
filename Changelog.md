@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Time component.
 ### Fixed
  - ngFormioGrid display being broken
+ - View not being updated when inner submission fields are changed
 
 ## 2.19.5
 ### Changed
