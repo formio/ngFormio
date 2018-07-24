@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Time component.
 ### Fixed
  - ngFormioGrid display being broken
+ - Watchers not firing when input is changed on the form
 
 ## 2.19.5
 ### Changed
