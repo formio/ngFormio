@@ -27,7 +27,7 @@ var actions = new custom(config);
 
 before(function (next) {
   browser.waitForAngularEnabled(false);
-  browser.driver.manage().window().setSize(1920, 1080);
+  browser.driver.manage().window().maximize();
   browser.get(url).then(next).catch(next);
 });
 
