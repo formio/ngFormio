@@ -12,7 +12,7 @@ exports.config = {
     'browserName': 'chrome',
     "maxDuration": 5400,
     "platform" : 'Windows 10',
-    "screenResolution" : '1920*1080'
+    "screenResolution" : '1920x1080'
   },
   // multiCapabilities: [{
   //   'browserName': 'firefox'
