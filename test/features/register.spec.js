@@ -78,13 +78,13 @@ module.exports = function (actions) {
       actions.btnEnabled('REGISTER');
       actions.clickOnElementWithText('REGISTER');
     });
-    describe(' Terms of Use and Privacy Policy links', function () {
-      actions.logout();
-      actions.clickOnElementWithText('Terms of Service');
-      // actions.checkingUrlIamOn('https://form.io/#/terms');
-      actions.goToPage('#/auth');
-      actions.clickOnElementWithText('Privacy Policy');
-      // actions.checkingUrlIamOn('https://form.io/#/privacy');
-    });
+    // describe(' Terms of Use and Privacy Policy links', function () {
+    //   actions.logout();
+    //   actions.clickOnElementWithText('Terms of Service');
+    //   // actions.checkingUrlIamOn('https://form.io/#/terms');
+    //   actions.goToPage('#/auth');
+    //   actions.clickOnElementWithText('Privacy Policy');
+    //   // actions.checkingUrlIamOn('https://form.io/#/privacy');
+    // });
   });
 };

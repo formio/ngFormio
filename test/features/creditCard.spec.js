@@ -3,9 +3,6 @@ module.exports = function (actions) {
     describe('Navigating to ‘Payment Info’ page',function(){
       actions.logout();
       actions.iAmLoggedInFor('profileuser2');
-      // actions.enterTextInField('.login-container #email', 'admin@example.com');
-      // actions.enterTextInField('.login-container #password', 'password');
-      // actions.clickOnElementWithText('LOG IN');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnClass('#user-menu');
@@ -14,7 +11,6 @@ module.exports = function (actions) {
     });
     describe('Navigating to the Credit Card input page',function(){
       actions.clickOnElementWithText('Add Credit Card');
-      // actions.clickOnElementWithText('Change Credit Card');
       actions.checkingUrlEndsWith('#/profile/payment/edit');
     });
     describe('Adding valid Credit Card to profile',function(){
@@ -177,6 +173,140 @@ module.exports = function (actions) {
       actions.clickOnClass('#form-group-ccExpiryYear');
       actions.clickOnElementWithText('25');
       actions.clickOnButton('Submit');
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+    });
+    describe('Invalid field test for credit card on billing page',function(){
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#cardholderName','New Creditcard');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#cardholderName','New Creditcard');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#cardholderName','New Creditcard');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.enterTextInField('#securityCode','411');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#cardholderName','New Creditcard');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#cardholderName','New Creditcard');
+      actions.enterTextInField('#ccNumber','0000000000000000');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('25');
+      actions.enterTextInField('#securityCode','411');
+      actions.waitForActionToComplete(1000);
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Bad Request (22) - Invalid Credit Card Number');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+
+      actions.iSeeText('Payments will be charged to:');
+      actions.iSeeText('Visa ending in 1111');
+      actions.iSeeText('Expires on 01/25');
+      actions.iSeeText('Name on Card: New Creditcard');
+      actions.clickOnElementWithText('Change my credit card');
+      actions.enterTextInField('#cardholderName','New Creditcard');
+      actions.enterTextInField('#ccNumber','4111111111111111');
+      actions.clickOnClass('#form-group-ccExpiryMonth');
+      actions.clickOnElementWithText('01');
+      actions.clickOnClass('#form-group-ccExpiryYear');
+      actions.clickOnElementWithText('18');
+      actions.enterTextInField('#securityCode','411');
+      actions.waitForActionToComplete(1000);
+      actions.clickOnButton('Submit');
+      actions.iSeeText('Invalid Expiration Date');
+      actions.iSeeText('Enter your credit card info.');
+      actions.goToPage('#/');
+      actions.clickOnElementWithText('Test Project');
+      actions.clickOnElementWithText('Trial');
+      actions.upgradeToPlan('Independent');
+
+
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');

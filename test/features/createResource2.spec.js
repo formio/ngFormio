@@ -48,6 +48,12 @@ module.exports = function (actions) {
       actions.iSeeText('Submit Form');
       actions.iSeeText('Email ');
       actions.iSeeText('Password ');
+      actions.enterTextInField('#email', 'test@automation');
+      actions.enterTextInField('#password', 'password');
+      actions.clickOnElementWithText('Submit');
+      actions.iSeeText('View');
+      actions.iSeeText('Edit');
+      actions.iSeeText('Delete');
     });
     describe('Clicking ‘API’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' API');
@@ -57,10 +63,10 @@ module.exports = function (actions) {
       actions.iSeeText('Key');
       actions.iSeeText('Type');
       actions.iSeeText('Persistent');
-      // actions.clickOnElementWithText(' Read full API Documentation');
-      // actions.switchTab();
-      // actions.checkingUrlIamOn('https://help.form.io/developer/api/postman/');
-      // actions.closeWindow();
+      actions.clickOnElementWithText(' Read full API Documentation');
+      actions.switchTab();
+      actions.checkingUrlIamOn('https://documenter.getpostman.com/view/684631/formio-api/2Jvuks');
+      actions.closeWindow();
       var documentLinks = [
         [1,'https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#bacdc-2e3d-b76a-f00e-e67a5755ee0c'],
         [2,'https://documenter.getpostman.com/view/684631/formio-api/2Jvuks#ccda63-404f-4523-0679-96bf8dbbc2b6'],
@@ -77,7 +83,6 @@ module.exports = function (actions) {
         actions.checkingUrlIamOn(documentLink[1]);
         actions.closeWindow();
       });
-
     });
     // describe('Adding/Editing a component updates info section of API',function(){
     //   actions.clickOnElementWithText(' Edit');
@@ -99,12 +104,22 @@ module.exports = function (actions) {
     //   actions.clickOnElementWithText(' API');
     //   actions.iSeeText('update');
     // });
+    describe('Clicking ‘Revisions’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Revisions');
+      actions.checkingUrlEndsWith('/revision');
+      actions.iSeeText('Form Revisions');
+    });
     describe('Clicking ‘Data’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Data');
       actions.checkingUrlEndsWith('/submission');
       actions.iSeeText('User Resource ');
       actions.iSeeText('{...} Export JSON');
       actions.iSeeText(' Export CSV');
+    });
+    describe('Verify resource components display in Kendo UI grid',function(){
+      actions.iSeeText('Email');
+      actions.iSeeText('test@automation');
+      actions.iDonotSeeText('password');
     });
     describe('Clicking ‘Action’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Actions');
@@ -118,6 +133,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/permission');
       actions.iSeeText('User Resource ');
       actions.iSeeText('Submission Data Permissions');
+      actions.iSeeTextCount('Administrator',5);
     });
     describe('Deleting a ‘Resource',function(){
       actions.clickOnElementWithText('Resources');
@@ -220,9 +236,27 @@ module.exports = function (actions) {
       actions.clickSave('Save Resource');
       actions.iSeeTextIn(".toast-message", 'Successfully updated form!');
       actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText(' API');
+      actions.iSeeText('3000/editresource');
       actions.clickOnElementWithText('Resources');
       actions.checkingUrlEndsWith('/resource/');
       actions.iSeeText('Edit Resource');
+    });
+    describe('Attempt to Edit an existing Resource with blank fields',function(){
+      actions.clickOnElementWithText('Edit Resource');
+      actions.checkingUrlEndsWith('/edit');
+      actions.enterTextInField('#title','Test Resource1');
+      actions.iSeeValueIn('#name','testResource1');
+      actions.enterTextInField('#path','');
+      actions.clickSave('Save Resource');
+      actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
+      actions.clickOnClass('.toast-message');
+      actions.enterTextInField('#path','testresource1');
+      actions.enterTextInField('#title','');
+      actions.enterTextInField('#name','testResource1');
+      actions.clickSave('Save Resource');
+      actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
+      actions.clickOnClass('.toast-message');
     });
     // describe('Adding field tags',function(){
     //   actions.clickOnElementWithText(' New Resource');
@@ -280,6 +314,22 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Existing Resource Fields');
       actions.clickOnElementWithText('Test Resource');
     });
+    describe('Import a Resource',function(){
+      actions.clickOnElementWithText('Resources');
+      actions.clickOnClass('.glyphicon.glyphicon-cloud-download');
+      actions.enterTextInField('#embedURL','https://ovwnowebssiuixy.test-form.io/importresource');
+      actions.clickOnClassWithIndex('.btn.btn-primary',1);
+      actions.checkingUrlEndsWith('/resource/create/resource');
+      actions.enterTextInField('#title','Test Import Resource');
+      actions.iSeeValueIn('#name','testImportResource');
+      actions.iSeeValueIn('#path','testimportresource');
+      actions.iSeeText('Name ');
+      actions.iSeeText('Phone ');
+      actions.clickOnButton('Create Resource');
+      actions.iSeeTextIn(".toast-message", 'Successfully created form!');
+      actions.clickOnElementWithText('Resources');
+      actions.iSeeText('Test Import Resource');
+    });
     describe('Copy a Resource',function(){
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Test Resource');
@@ -309,6 +359,11 @@ module.exports = function (actions) {
       actions.iSeeText('You have unsaved changes. Would you like to save these changes before leaving the editor?');
       actions.clickOnButton('Cancel Changes');
       actions.checkingUrlEndsWith('/resource/');
+    });
+    describe('Cancelling the Cancel function of Resource',function(){
+      actions.clickOnElementWithText('Edit Resource');
+      actions.checkingUrlEndsWith('/edit');
+      actions.iDonotSeeText('Text Field Component');
       actions.goToPage('#/');
       actions.waitForActionToComplete(2000);
       actions.logout();

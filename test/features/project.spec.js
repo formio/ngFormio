@@ -12,6 +12,9 @@ module.exports = function (actions) {
       actions.clickOnButton('Create Project');
       actions.iSeeTextIn('.toast-message', 'New Project created!');
       actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Overview');
+      actions.iSeeText('Current Framework');
+      actions.iSeeText(' AngularJS ');
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', '${project1.title}');
       actions.iSeeValueIn('#description', '${project1.description}');
@@ -68,14 +71,14 @@ module.exports = function (actions) {
     });
     describe('Deleting a Project', function () {
       actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");
-      actions.iSeeValueIn('.btn.btn-danger.ng-binding', 'Delete Updated Title Project');
+      actions.iSeeTextIn('.btn.btn-danger.ng-binding', 'Delete Updated Title Project');
       actions.clickOnElementWithText('Delete Updated Title Project');
       actions.checkingUrlEndsWith('/delete');
       actions.iSeeText('Are you sure you wish to delete the Project ');
       actions.clickOnElementWithText('No');
       actions.checkingUrlEndsWith('/settings');
       actions.clickOnElementWithText('Delete Updated Title Project');
-      actions.iSeeValueIn('.btn.btn-danger', 'Yes');
+      actions.iSeeTextIn('.btn.btn-danger', 'Yes');
       actions.clickOnElementWithText(' Yes');
       actions.iSeeTextIn('.toast-message', 'Project was deleted!');
       actions.clickOnClass('.toast-message');

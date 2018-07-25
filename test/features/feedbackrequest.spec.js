@@ -5,7 +5,6 @@ module.exports = function (actions) {
       actions.clickOnElement('.feedback ');
       actions.iSeeElement('.feedback');
     });
-
     describe('Clicking ‘Submit’ button with no value in the ‘Feedback’ field', function(){
       actions.goToPage('#/auth');
       actions.clickOnElement('.feedback ');
@@ -13,13 +12,11 @@ module.exports = function (actions) {
       actions.enterTextInField("#feedback","${empty}");
       actions.btnDisabled('Send it!');
     });
-
     describe('Closes Feedback modal',function(){
       actions.clickOnElement('.feedback-cancel ');
       actions.iDonotSeeText('Close');
       actions.iSeeElement('.feedback');
     });
-
     describe('Submitting Feedback request', function(){
       actions.goToPage('#/auth');
       actions.clickOnElement('.feedback ');
@@ -29,9 +26,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Send it!');
       actions.iDonotSeeText('Close');
       actions.iSeeElement('.feedback');
-
     });
-
-
   });
 };

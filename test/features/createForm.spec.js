@@ -1,133 +1,112 @@
 module.exports = function (actions) {
-  describe('Basic Components',function() {
-    describe('Number', function () {
+  describe('Creating/Editing A Form',function() {
+    describe('Given', function () {
       actions.iAmLoggedInFor('testUser');
       actions.goToPage('#/');
-      actions.projectExisting('testtitle', 'testdesc');
-      actions.clickOnElementWithText('testtitle');
-      actions.creatingFormWithComponents();
-      actions.waitForActionToComplete(2000);
-      actions.clickOnElementWithText('Forms');
-      actions.clickOnElementWithText('sampletestform');
-      actions.clickOnElement('xpath://*[@value="Save Form"]');
-      actions.clickOnElementWithText(' Use');
-      actions.iSeeText('@');
-      actions.iSeeText('!');
-      actions.enterTextInField('#numberField', '1');
-      actions.clickOnElement('#submit');
-      actions.iSeeTextIn('.alert', 'Please fix the following errors before submitting.');
-      actions.clickOnElementWithText(' Data');
-      actions.iDonotSeeText('1');
-      actions.clickOnElementWithText(' Use');
-      actions.enterTextInField('#numberField', '32');
-      actions.clickOnElement('#submit');
-      actions.iSeeTextIn('.alert', 'Please fix the following errors before submitting.');
-      actions.clickOnElementWithText(' Data');
-      actions.iDonotSeeText('32');
-      actions.clickOnElementWithText(' Use');
-      actions.enterTextInField('#numberField', '18');
-      actions.clickOnElement('#submit');
-      actions.clickOnElementWithText(' Data');
-      actions.iSeeText('18');
+      actions.projectExisting('New Project', 'This is a test project');
+      actions.clickOnElementWithText('New Project');
     });
-
-    /*describe('Password',function(){
-     actions.iAmLoggedInFor('testUser');
-     actions.goToPage('#/');
-     actions.projectExisting('testtitle','testdesc');
-     actions.clickOnElementWithText('testtitle');
-     actions.creatingFormWithComponents();
-     actions.waitForActionToComplete(2000);
-     actions.clickOnElementWithText('Forms');
-     actions.clickOnElementWithText('sampletestform');
-     actions.clickOnElement('xpath://!*[@value="Save Form"]');
-     actions.clickOnElementWithText(' Use');
-     actions.enterTextInField('#passwordField','1');
-     actions.clickOnElement('#submit');
-
-     });*/
-
-     // describe('Text Area',function(){
-     //   actions.iAmLoggedInFor('testUser');
-     //   actions.goToPage('#/');
-     //   actions.projectExisting('testtitle','testdesc');
-     //   actions.clickOnElementWithText('testtitle');
-     //   actions.creatingFormWithComponents();
-     //   actions.waitForActionToComplete(2000);
-     //   actions.clickOnElementWithText('Forms');
-     //   actions.clickOnElementWithText('sampletestform');
-     //   actions.clickOnElement('xpath://*[@value="Save Form"]');
-     //   actions.clickOnElementWithText(' Use');
-     //   actions.enterTextInField('#textareaField','This is a sample test for the text area component');
-     //   actions.clickOnElement('#submit');
-     //   actions.clickOnElementWithText(' Data');
-     //   actions.iSeeText('This is a sample test for the text area component');
-     //   actions.clickOnElementWithText(' Use');
-     //   actions.enterTextInField('#textareaField','123467542');
-     //   actions.clickOnElement('#submit');
-     //   actions.clickOnElementWithText(' Data');
-     //   actions.iSeeText('123467542');
-     // });
-
-    // describe('Checkbox',function(){
-    //   actions.iAmLoggedInFor('testUser');
-    //   actions.goToPage('#/');
-    //   actions.projectExisting('testtitle','testdesc');
-    //   actions.clickOnElementWithText('testtitle');
-    //   actions.creatingFormWithComponents();
-    //   actions.clickOnElementWithText('Forms');
-    //   actions.clickOnElementWithText('sampletestform');
-    //   actions.clickOnElement('xpath://*[@value="Save Form"]');
-    //   actions.clickOnElementWithText(' Use');
-    //   actions.clickOnElement("#checkboxField");
-    //   //actions.waitForActionToComplete(20000);
-    //   actions.clickOnElement('#submit');
-    //   actions.clickOnElementWithText('Data');
-    //   actions.clickOnElementWithText('sampletestform');
-    //   actions.waitForActionToComplete(20000);
-    //
-    // });
-
-    // describe('Selectbox',function(){
-    //   actions.iAmLoggedInFor('testUser');
-    //   actions.goToPage('#/');
-    //   actions.projectExisting('testtitle','testdesc');
-    //   actions.clickOnElementWithText('testtitle');
-    //   actions.creatingFormWithComponents();
-    //   actions.clickOnElementWithText('Forms');
-    //   actions.clickOnElementWithText('sampletestform');
-    //   actions.clickOnElement('xpath://*[@value="Save Form"]');
-    //   actions.clickOnElementWithText(' Use');
-    //   actions.clickOnElement("#selectboxesField-a");
-    //   //actions.waitForActionToComplete(20000);
-    //   actions.clickOnElement('#submit');
-    //   actions.clickOnElementWithText('Data');
-    //   actions.clickOnElementWithText('sampletestform');
-    //   actions.waitForActionToComplete(20000);
-    //
-    // });
-
-
-    // describe('Radio' ,function(){
-    //
-    //   actions.iAmLoggedInFor('testUser');
-    //   actions.goToPage('#/');
-    //   actions.projectExisting('testtitle','testdesc');
-    //   actions.clickOnElementWithText('testtitle');
-    //   actions.creatingFormWithComponents();
-    //   actions.clickOnElementWithText('Forms');
-    //   actions.clickOnElementWithText('sampletestform');
-    //   actions.clickOnElement('xpath://*[@value="Save Form"]');
-    //   actions.clickOnElementWithText(' Use');
-    //   actions.clickOnElement("#radioField-");
-    //   actions.clickOnElement('#submit');
-    //   actions.clickOnElementWithText('Data');
-    //   actions.waitForActionToComplete(20000);
-    //   actions.waitForActionToComplete(20000);
-    //   actions.waitForActionToComplete(20000);
-    //   actions.waitForActionToComplete(20000);
-    //
-    // });
-});
-
-};
+    describe('Accessing Form page', function () {
+      actions.clickOnElementWithText('Forms');
+      actions.checkingUrlEndsWith('/form/');
+      actions.iSeeText('User Login');
+      actions.iSeeText('User Register');
+      actions.iSeeText('Admin Login');
+      actions.iSeeText('User');
+      actions.iSeeText('User');
+    });
+    describe('Searching for existing Forms/Resource with search bar',function(){
+      actions.enterTextInField('#form-search','Lo');
+      actions.iSeeText('User Login');
+      actions.iDonotSeeText('User Register');
+      actions.iSeeText('Admin Login');
+      actions.enterTextInField('#form-search','R');
+      actions.iSeeText('User Login');
+      actions.iSeeText('User Register');
+      actions.iDonotSeeText('Admin Login');
+    });
+    describe('Searching for non existing Forms in search bar',function(){
+      actions.enterTextInField('#form-search','Z');
+      actions.iDonotSeeText('User Login');
+      actions.iDonotSeeText('User Register');
+      actions.iDonotSeeText('Admin Login');
+      actions.enterTextInField('#form-search','');
+      actions.iSeeText('User Login');
+      actions.iSeeText('User Register');
+      actions.iSeeText('Admin Login');
+    });
+    describe('Navigating to ‘Edit’ edit page on Form', function () {
+      actions.clickOnElementWithText(' Edit');
+      actions.checkingUrlEndsWith('/edit');
+      actions.iSeeText('Email ');
+      actions.iSeeText('Password ');
+    });
+    describe('Clicking ‘Use’ button for Form on Form page', function () {
+      actions.clickOnElementWithText('Forms');
+      actions.checkingUrlEndsWith('/form/');
+      actions.clickOnElementWithText(' New Form');
+      actions.clickOnElementWithText('API Web Form');
+      actions.enterTextInField('#title','Test Form');
+      actions.dragTo('Text Field', 'formarea');
+      actions.iSeeText('Text Field Component');
+      actions.enterTextInField('#label', 'Text Field');
+      actions.clickOnElementWithText('Save');
+      actions.waitForActionToComplete(1000);
+      actions.clickOnElementWithText('Create Form');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText(' Use');
+      actions.iSeeText('Submit Form');
+      actions.iSeeText('Text Field');
+      actions.enterTextInField('#textField','Test Submission');
+      actions.clickOnButton('Submit');
+      actions.iSeeTextIn(".toast-message",'New submission added!');
+    });
+    describe('Clicking ‘Embed’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Embed');
+      actions.checkingUrlEndsWith('/embed');
+      actions.iSeeText('Form Embedding');
+    });
+    describe('Clicking ‘Revisions’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Revisions');
+      actions.checkingUrlEndsWith('/revision');
+      actions.iSeeText('Form Revisions');
+    });
+    describe('Clicking ‘Data’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Data');
+      actions.checkingUrlEndsWith('/submission');
+      actions.iSeeText('{...} Export JSON');
+      actions.iSeeText(' Export CSV');
+      actions.iSeeText('Test Submission');
+    });
+    describe('Clicking ‘Action’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Actions');
+      actions.checkingUrlEndsWith('/action');
+      actions.iSeeText('Save Submission');
+    });
+    describe('Clicking ‘Access’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Access');
+      actions.checkingUrlEndsWith('/permission');
+      actions.iSeeText('Submission Data Permissions');
+    });
+    describe('Clicking ‘Launch’ button for Form on Form page', function () {
+      actions.clickOnElementWithText(' Launch');
+      actions.checkingUrlEndsWith('/share');
+      actions.iSeeText('Preview');
+    });
+    describe('Deleting a ‘Form’', function () {
+      actions.clickOnElementWithText('Forms');
+      actions.checkingUrlEndsWith('/form/');
+      actions.clickOnClass('.glyphicon.glyphicon-trash');
+      actions.iSeeText('User Login Form ');
+      actions.iSeeText('Are you sure you wish to delete the form?');
+      actions.clickOnButton('No');
+      actions.checkingUrlEndsWith('/form/');
+      actions.iSeeText('User Login');
+      actions.clickOnClass('.glyphicon.glyphicon-trash');
+      actions.iSeeText('Are you sure you wish to delete the form?');
+      actions.clickOnButton('Yes');
+      actions.checkingUrlEndsWith('/form/');
+      actions.iDonotSeeText('User Login');
+    });
+  });
+}
