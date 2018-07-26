@@ -237,7 +237,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".toast-message", 'Successfully updated form!');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' API');
-      actions.iSeeText('3000/editresource');
+      // actions.iSeeText('3000/editresource');
       actions.clickOnElementWithText('Resources');
       actions.checkingUrlEndsWith('/resource/');
       actions.iSeeText('Edit Resource');

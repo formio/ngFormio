@@ -10,7 +10,7 @@ exports.config = {
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
     'browserName': 'chrome',
-    "maxDuration": 5400,
+    "maxDuration": 7200,
     "platform" : 'Windows 10',
     "screenResolution" : '1920x1080'
   },

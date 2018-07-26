@@ -9,7 +9,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Endpoint: ');
-      actions.iSeeText('.localhost:3000');
+      // actions.iSeeText('.localhost:3000');
       actions.clickOnElementWithText(' Online API Documenation');
       actions.switchTab();
       actions.checkingUrlIamOn('https://documenter.getpostman.com/view/684631/formio-api/2Jvuks');
