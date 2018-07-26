@@ -9,14 +9,14 @@
     <label class="control-label required-field">Project Path</label>
     <div class="input-group" ng-if="primaryProject.remote.type !== 'Subdirectories'">
       <span class="input-group-addon">{{ projectProtocol }}//</span>
-      <input type="text" class="form-control" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
+      <input type="text" class="form-control" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="{{localProject.remote.url || baseUrl}}/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
       <span class="input-group-addon">.{{ projectServer }}</span>
     </div>
     <div class="input-group" ng-if="primaryProject.remote.type === 'Subdirectories'">
       <span class="input-group-addon">{{ projectProtocol }}//{{ projectServer }}/</span>
       <i class="form-control-feedback glyphicon" ng-class="{'glyphicon-ok': projectForm.name.$valid, 'glyphicon-remove': projectForm.name.$invalid && projectForm.name.$dirty}" style="right: -36px;"></i>
-      <input type="text" class="form-control" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
+      <input type="text" class="form-control" name="name" ng-model="currentProject.name" title="{{ currentProject.name }}" placeholder="myproject" valid-subdomain unique-checker="{{localProject.remote.url || baseUrl}}/project/available" ng-model-options="{ debounce: { 'default': 500, 'blur': 0 } }" ng-maxlength="63" ng-disabled="['basic', 'trial'].indexOf(primaryProject.plan) !== -1 || currentProject.protect" ng-required="['basic', 'trial'].indexOf(primaryProject.plan) === -1">
     </div>
     <div ng-if="['basic', 'trial'].indexOf(primaryProject.plan) === -1 && projectSettingsVisible() && !onPrem">
       <p class="help-block" ng-show="projectForm.name.$error.maxlength">Path Name cannot be longer than 63 characters.</p>

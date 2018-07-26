@@ -68,7 +68,7 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
           return $q.reject();
         }
 
-        return $http.post(Formio.getBaseUrl() + $scope.url, req)
+        return $http.post($scope.url, req)
           .then(function(response) {
             if(!response.data.available) {
               return $q.reject('unavailable');
@@ -399,6 +399,7 @@ app.controller('ProjectController', [
           url: $scope.localProjectUrl + '/access/remote'
         })
           .then(function(response) {
+            RemoteTokens.setRemoteToken($scope.baseUrl, response.data);
             RemoteTokens.setRemoteToken($scope.projectUrl, response.data);
             // Set remote token for projectId url as well.
             RemoteTokens.setRemoteToken($scope.projectUrl.replace($scope.localProject.remote.project.name, 'project/' + $scope.localProject.remote.project._id), response.data);
