@@ -2262,7 +2262,7 @@ app.controller('ProjectRemoteController', [
                   if (result && result.data && result.data.version && semver.satisfies(result.data.version.split('-')[0], '>=5.0.0')) {
                     $http({
                       method: 'GET',
-                      url: $scope.remote.url + '/project?limit=10000',
+                      url: $scope.remote.url + '/project?limit=10000&select=title,name',
                       headers: {
                         'x-remote-token': $scope.remoteToken
                       },
