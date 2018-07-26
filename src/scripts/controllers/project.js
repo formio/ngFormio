@@ -2670,12 +2670,16 @@ app.controller('ProjectDeleteController', [
     $scope.primaryProjectPromise.then(function(primaryProject) {
       var isProject = ($scope.currentProject._id === primaryProject._id);
       var type = (isProject ? 'Project' : 'Stage');
-      $scope.deleteProject = function() {
+      $scope.deleteProject = function(deleteRemote) {
+        var deletePromises = [];
         if (!$scope.currentProject || !$scope.currentProject._id) { return; }
         $scope.isBusy = true;
         var localFormio = new Formio('/project/' + $scope.localProject._id);
-        localFormio.deleteProject()
-          .then(function() {
+        deletePromises.push(localFormio.deleteProject());
+        if (deleteRemote) {
+          deletePromises.push($scope.formio.deleteProject());
+        }
+        Promise.all(deletePromises).then(function() {
             FormioAlerts.addAlert({
               type: 'success',
               message: type + ' was deleted!'
