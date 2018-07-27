@@ -326,14 +326,18 @@ app.controller('ProjectController', [
         return;
       }
 
-      // If the remote project name changes, be sure to update the link as well.
+      // If the remote project name or title changes, be sure to update the link as well.
       if(($scope.localProject.hasOwnProperty('remote') &&
           $scope.localProject.remote &&
         $scope.localProject.remote.hasOwnProperty('project')) &&
         $scope.localProject._id !== $scope.currentProject._id &&
         $scope.localProject.remote.project._id === project._id &&
-        $scope.localProject.remote.project.name !== project.name
+        (
+          $scope.localProject.remote.project.name !== project.name ||
+          $scope.localProject.title !== project.title
+        )
       ) {
+        $scope.localProject.title = project.title;
         $scope.localProject.remote.project.name = project.name;
         $scope.localFormio.saveProject($scope.localProject);
       }
