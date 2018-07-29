@@ -2667,13 +2667,15 @@ app.controller('ProjectDeleteController', [
   'GoogleAnalytics',
   'PrimaryProject',
   'Formio',
+  '$q',
   function(
     $scope,
     $state,
     FormioAlerts,
     GoogleAnalytics,
     PrimaryProject,
-    Formio
+    Formio,
+    $q
   ) {
     $scope.primaryProjectPromise.then(function(primaryProject) {
       var isProject = ($scope.currentProject._id === primaryProject._id);
@@ -2687,7 +2689,7 @@ app.controller('ProjectDeleteController', [
         if (deleteRemote) {
           deletePromises.push($scope.formio.deleteProject());
         }
-        Promise.all(deletePromises).then(function() {
+        $q.all(deletePromises).then(function() {
             FormioAlerts.addAlert({
               type: 'success',
               message: type + ' was deleted!'
