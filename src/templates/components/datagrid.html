@@ -1,4 +1,4 @@
-<div name="{{ componentId }}" class="formio-data-grid" ng-model="data[componentId]" ng-model-options="{allowInvalid: true}" custom-validator="component.validate.custom" ng-controller="formioDataGrid">
+<div name="{{ component.key }}" class="formio-data-grid" ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" custom-validator="component.validate.custom" ng-controller="formioDataGrid">
   <table ng-class="{'table-striped': component.striped, 'table-bordered': component.bordered, 'table-hover': component.hover, 'table-condensed': component.condensed}" class="table datagrid-table">
     <thead>
       <tr>
