@@ -78,11 +78,11 @@ module.exports = function(app) {
       if ($scope.options && $scope.options.building) return;
       // Ensure each data grid has a valid data model.
       $scope.data = $scope.data || {};
-      $scope.data[$scope.componentId] = $scope.data[$scope.componentId] || [{}];
+      $scope.data[$scope.component.key] = $scope.data[$scope.component.key] || [{}];
 
       // Determine if any component is visible.
       $scope.anyVisible = function(component) {
-        var data = $scope.data[$scope.componentId];
+        var data = $scope.data[$scope.component.key];
         var visible = false;
         angular.forEach(data, function(rowData) {
           visible = (visible || FormioUtils.isVisible(component, rowData, $scope.data, $scope.hideComponents));
@@ -91,7 +91,7 @@ module.exports = function(app) {
       };
 
       // Pull out the rows and cols for easy iteration.
-      $scope.rows = $scope.data[$scope.componentId];
+      $scope.rows = $scope.data[$scope.component.key];
       // If less than minLength, add that many rows.
       if ($scope.component.validate && $scope.component.validate.hasOwnProperty('minLength') && $scope.rows.length < $scope.component.validate.minLength) {
         var toAdd = $scope.component.validate.minLength - $scope.rows.length;
