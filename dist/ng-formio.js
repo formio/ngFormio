@@ -240,6 +240,8 @@ exports.default = app.directive('formio', function () {
 
           var eventParts = args[0].split('.');
 
+          var shouldFire = true;
+
           // Only handle formio events.
           if (eventParts[0] !== 'formio' || eventParts.length !== 2) {
             return;
@@ -266,10 +268,16 @@ exports.default = app.directive('formio', function () {
               break;
             case 'customEvent':
               args[0] = args[1].type;
+              //prevent customEvent from firing when it's emitted by button with event action (as it is emitted twice)
+              if (args[1].component && args[1].component.type === 'button' && args[1].component.action === 'event') {
+                shouldFire = false;
+              }
               break;
           }
 
-          $scope.$emit.apply($scope, args);
+          if (shouldFire) {
+            $scope.$emit.apply($scope, args);
+          }
         });
 
         $scope.formioReady = true;
@@ -317,6 +325,10 @@ exports.default = app.directive('formio', function () {
         if ($scope.formioReady) {
           $scope.formio.submission = submission;
         }
+      }, true);
+
+      $scope.$on('componentChange', function () {
+        $scope.$apply();
       });
 
       // Clean up the Form from DOM.
@@ -8822,6 +8834,9 @@ var WebformBuilder = function (_Webform) {
       });
 
       this.addEventListener(saveButton, 'click', function (event) {
+        if (!_this4.editForm.checkValidity(_this4.editForm.data, true)) {
+          return;
+        }
         event.preventDefault();
         component.isNew = false;
         component.component = componentCopy.component;
@@ -8932,7 +8947,7 @@ var WebformBuilder = function (_Webform) {
             _this5.element.style.minHeight = _this5.builderSidebar.offsetHeight + 'px';
             _this5.scrollSidebar();
           }
-        });
+        }, true);
       }
 
       info.element = this.ce('div', {
@@ -9026,11 +9041,12 @@ var WebformBuilder = function (_Webform) {
     value: function buildSidebar() {
       var _this6 = this;
 
+      // Do not rebuild the sidebar.
+      if (this.sideBarElement) {
+        return;
+      }
       this.groups = {};
       this.sidebarContainers = [];
-      if (this.sideBarElement) {
-        this.removeChildFrom(this.sideBarElement, this.builderSidebar);
-      }
       this.sideBarElement = this.ce('div', {
         id: 'builder-sidebar-' + this.id,
         class: 'accordion panel-group'
@@ -9076,7 +9092,7 @@ var WebformBuilder = function (_Webform) {
       this.updateDraggable();
       this.sideBarTop = this.sideBarElement.getBoundingClientRect().top + window.scrollY;
       if (this.options.sideBarScroll) {
-        this.addEventListener(window, 'scroll', _lodash2.default.throttle(this.scrollSidebar.bind(this), 10));
+        this.addEventListener(window, 'scroll', _lodash2.default.throttle(this.scrollSidebar.bind(this), 10), true);
       }
     }
   }, {
@@ -12088,6 +12104,7 @@ var BaseComponent = function () {
         row: this.data,
         rowIndex: this.rowIndex,
         data: this.root ? this.root.data : this.data,
+        submission: this.root ? this.root._submission : {},
         form: this.root ? this.root._form : {},
         _: _lodash2.default,
         utils: FormioUtils,
@@ -12689,12 +12706,16 @@ var BaseComponent = function () {
      *   The event name to add.
      * @param func
      *   The callback function to be executed when the listener is triggered.
+     * @param persistent
+     *   If this listener should persist beyond "destroy" commands.
      */
 
   }, {
     key: 'addEventListener',
-    value: function addEventListener(obj, type, func) {
-      this.eventHandlers.push({ id: this.id, obj: obj, type: type, func: func });
+    value: function addEventListener(obj, type, func, persistent) {
+      if (!persistent) {
+        this.eventHandlers.push({ id: this.id, obj: obj, type: type, func: func });
+      }
       if ('addEventListener' in obj) {
         obj.addEventListener(type, func, false);
       } else if ('attachEvent' in obj) {
@@ -12888,6 +12909,9 @@ var BaseComponent = function () {
     value: function attr(element, _attr) {
       var _this12 = this;
 
+      if (!element) {
+        return;
+      }
       _lodash2.default.each(_attr, function (value, key) {
         if (typeof value !== 'undefined') {
           if (key.indexOf('on') === 0) {
@@ -12910,6 +12934,9 @@ var BaseComponent = function () {
   }, {
     key: 'hasClass',
     value: function hasClass(element, className) {
+      if (!element) {
+        return;
+      }
       className = ' ' + className + ' ';
       return (' ' + element.className + ' ').replace(/[\n\t\r]/g, ' ').indexOf(className) > -1;
     }
@@ -12926,6 +12953,9 @@ var BaseComponent = function () {
   }, {
     key: 'addClass',
     value: function addClass(element, className) {
+      if (!element) {
+        return;
+      }
       var classes = element.getAttribute('class');
       if (!classes || classes.indexOf(className) === -1) {
         element.setAttribute('class', classes + ' ' + className);
@@ -12944,6 +12974,9 @@ var BaseComponent = function () {
   }, {
     key: 'removeClass',
     value: function removeClass(element, className) {
+      if (!element) {
+        return;
+      }
       var cls = element.getAttribute('class');
       if (cls) {
         cls = cls.replace(new RegExp(' ' + className, 'g'), '');
@@ -12969,6 +13002,22 @@ var BaseComponent = function () {
     }
 
     /**
+     * Check if this component is conditionally visible.
+     *
+     * @param data
+     * @return {boolean}
+     */
+
+  }, {
+    key: 'conditionallyVisible',
+    value: function conditionallyVisible(data) {
+      if (!this.hasCondition()) {
+        return true;
+      }
+      return FormioUtils.checkCondition(this.component, this.data, data, this.root ? this.root._form : {}, this);
+    }
+
+    /**
      * Check for conditionals and hide/show the element based on those conditions.
      */
 
@@ -12978,14 +13027,7 @@ var BaseComponent = function () {
       data = data || (this.root ? this.root.data : {});
 
       // Check advanced conditions
-      var result = void 0;
-
-      if (!this.hasCondition()) {
-        result = this.show(true);
-      } else {
-        result = this.show(FormioUtils.checkCondition(this.component, this.data, data, this.root ? this.root._form : {}, this));
-      }
-
+      var result = this.show(this.conditionallyVisible(data));
       if (this.fieldLogic(data)) {
         this.redraw();
       }
@@ -13114,6 +13156,9 @@ var BaseComponent = function () {
 
       // Execute only if visibility changes or if we are in builder mode or if hidden fields should be shown.
       if (!_show === !this._visible || this.options.builder || this.options.showHiddenFields) {
+        if (!_show) {
+          this.clearOnHide(false);
+        }
         return _show;
       }
 
@@ -15007,7 +15052,7 @@ var EditFormUtils = {
       type: 'htmlelement',
       tag: 'div',
       /* eslint-disable prefer-template */
-      content: '<p>The following variables are available in all scripts.</p>' + '<table class="table table-bordered table-condensed table-striped">' + additional + '<tr><th>form</th><td>The complete form JSON object</td></tr>' + '<tr><th>data</th><td>The complete submission data object.</td></tr>' + '<tr><th>row</th><td>Contextual "row" data, used within DataGrid, EditGrid, and Container components</td></tr>' + '<tr><th>component</th><td>The current component JSON</td></tr>' + '<tr><th>instance</th><td>The current component instance.</td></tr>' + '<tr><th>value</th><td>The current value of the component.</td></tr>' + '<tr><th>moment</th><td>The moment.js library for date manipulation.</td></tr>' + '</table><br/>'
+      content: '<p>The following variables are available in all scripts.</p>' + '<table class="table table-bordered table-condensed table-striped">' + additional + '<tr><th>form</th><td>The complete form JSON object</td></tr>' + '<tr><th>submission</th><td>The complete submission object.</td></tr>' + '<tr><th>data</th><td>The complete submission data object.</td></tr>' + '<tr><th>row</th><td>Contextual "row" data, used within DataGrid, EditGrid, and Container components</td></tr>' + '<tr><th>component</th><td>The current component JSON</td></tr>' + '<tr><th>instance</th><td>The current component instance.</td></tr>' + '<tr><th>value</th><td>The current value of the component.</td></tr>' + '<tr><th>moment</th><td>The moment.js library for date manipulation.</td></tr>' + '<tr><th>_</th><td>An instance of <a href="https://lodash.com/docs/" target="_blank">Lodash</a>.</td></tr>' + '<tr><th>utils</th><td>An instance of the <a href="http://formio.github.io/formio.js/docs/identifiers.html#utils" target="_blank">FormioUtils</a> object.</td></tr>' + '<tr><th>util</th><td>An alias for "utils".</td></tr>' + '</table><br/>'
       /* eslint-enable prefer-template */
     };
   },
@@ -17254,6 +17299,10 @@ var _NestedComponent2 = __webpack_require__(/*! ../nested/NestedComponent */ "./
 
 var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
 
+var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js");
+
+var _Base2 = _interopRequireDefault(_Base);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -17548,6 +17597,12 @@ var DataGridComponent = function (_NestedComponent) {
       return show;
     }
   }, {
+    key: 'updateValue',
+    value: function updateValue(flags, value) {
+      // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
+      return _Base2.default.prototype.updateValue.call(this, flags, value);
+    }
+  }, {
     key: 'setValue',
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
@@ -17699,6 +17754,13 @@ exports.default = [{
   },
   weight: 420,
   customConditional: 'show = !data.disableAddingRemovingRows'
+}, {
+  type: 'checkbox',
+  label: 'Default Open Rows',
+  key: 'defaultOpen',
+  tooltip: 'Check this if you would like for the rows of the edit grid to be defaulted to opened if values exist.',
+  weight: 405,
+  input: true
 }];
 
 /***/ }),
@@ -17999,7 +18061,7 @@ var DateTimeComponent = function (_BaseComponent) {
         if (value) {
           calendar.setDate(new Date(value), false);
         } else {
-          calendar.clear();
+          calendar.clear(false);
         }
       }
     }
@@ -19145,6 +19207,10 @@ var _NestedComponent2 = __webpack_require__(/*! ../nested/NestedComponent */ "./
 
 var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
 
+var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js");
+
+var _Base2 = _interopRequireDefault(_Base);
+
 var _Components = __webpack_require__(/*! ../Components */ "./node_modules/formiojs/components/Components.js");
 
 var _Components2 = _interopRequireDefault(_Components);
@@ -19176,6 +19242,7 @@ var EditGridComponent = function (_NestedComponent) {
         clearOnHide: true,
         input: true,
         tree: true,
+        defaultOpen: false,
         components: [],
         templates: {
           header: this.defaultHeaderTemplate,
@@ -19236,19 +19303,20 @@ var EditGridComponent = function (_NestedComponent) {
     value: function buildTable() {
       var _this2 = this;
 
-      if (this.tableElement) {
-        this.tableElement.innerHTML = '';
-      }
-
       var tableClass = 'editgrid-listgroup list-group ';
       _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
         if (_this2.component[prop]) {
           tableClass += 'table-' + prop + ' ';
         }
       });
-      this.tableElement = this.ce('ul', { class: tableClass }, [this.headerElement = this.createHeader(), this.rowElements = _lodash2.default.map(this.rows, this.createRow.bind(this)), this.footerElement = this.createFooter()]);
+      var tableElement = this.ce('ul', { class: tableClass }, [this.headerElement = this.createHeader(), this.rowElements = _lodash2.default.map(this.editRows, this.createRow.bind(this)), this.footerElement = this.createFooter()]);
 
-      this.element.appendChild(this.tableElement);
+      if (this.tableElement && this.element.contains(this.tableElement)) {
+        this.element.replaceChild(tableElement, this.tableElement);
+      } else {
+        this.element.appendChild(tableElement);
+      }
+      this.tableElement = tableElement;
     }
   }, {
     key: 'createHeader',
@@ -19273,10 +19341,10 @@ var EditGridComponent = function (_NestedComponent) {
       var rowTemplate = _lodash2.default.get(this.component, 'templates.row', EditGridComponent.defaultRowTemplate);
 
       // Store info so we can detect changes later.
-      wrapper.rowData = row;
+      wrapper.rowData = row.data;
       wrapper.rowIndex = rowIndex;
-      wrapper.rowOpen = this.editRows[rowIndex].isOpen;
-      this.editRows[rowIndex].components = [];
+      wrapper.rowOpen = row.isOpen;
+      row.components = [];
 
       if (wrapper.rowOpen) {
         wrapper.appendChild(this.ce('div', { class: 'editgrid-edit' }, this.ce('div', { class: 'editgrid-body' }, [this.component.components.map(function (comp) {
@@ -19284,9 +19352,9 @@ var EditGridComponent = function (_NestedComponent) {
           var options = _lodash2.default.clone(_this3.options);
           options.row = _this3.row + '-' + rowIndex;
           options.name += '[' + rowIndex + ']';
-          var instance = _this3.createComponent(component, options, _this3.editRows[rowIndex].data);
+          var instance = _this3.createComponent(component, options, row.data);
           instance.rowIndex = rowIndex;
-          _this3.editRows[rowIndex].components.push(instance);
+          row.components.push(instance);
           return instance.element;
         }), this.ce('div', { class: 'editgrid-actions' }, [this.ce('button', {
           class: 'btn btn-primary',
@@ -19297,7 +19365,8 @@ var EditGridComponent = function (_NestedComponent) {
         }, this.component.removeRow || 'Cancel') : null])])));
       } else {
         wrapper.appendChild(this.renderTemplate(rowTemplate, {
-          row: row,
+          row: row.data,
+          data: this.data,
           rowIndex: rowIndex,
           components: this.component.components,
           getView: function getView(component, data) {
@@ -19313,7 +19382,7 @@ var EditGridComponent = function (_NestedComponent) {
           action: this.editRow.bind(this, rowIndex)
         }]));
       }
-      wrapper.appendChild(this.editRows[rowIndex].errorContainer = this.ce('div', { class: 'has-error' }));
+      wrapper.appendChild(row.errorContainer = this.ce('div', { class: 'has-error' }));
       this.checkData(this.data, { noValidate: true }, rowIndex);
       return wrapper;
     }
@@ -19360,7 +19429,7 @@ var EditGridComponent = function (_NestedComponent) {
         }
       });
 
-      valid &= this.validateRow(index, false);
+      valid &= this.validateRow(index);
 
       // Trigger the change if the values changed.
       if (changed) {
@@ -19380,96 +19449,77 @@ var EditGridComponent = function (_NestedComponent) {
       }, [this.ce('span', { class: this.iconClass('plus'), 'aria-hidden': true }), ' ', this.t(this.component.addAnother ? this.component.addAnother : 'Add Another', {})])));
     }
   }, {
-    key: 'refreshDOM',
-    value: function refreshDOM() {
-      var _this5 = this;
-
-      var newHeader = this.createHeader();
-      this.tableElement.replaceChild(newHeader, this.headerElement);
-      this.headerElement = newHeader;
-
-      var newFooter = this.createFooter();
-      this.tableElement.replaceChild(newFooter, this.footerElement);
-      this.footerElement = newFooter;
-
-      this.editRows.forEach(function (editRow, rowIndex) {
-        if (!editRow.element) {
-          // New row
-          editRow.element = _this5.createRow(editRow.data, rowIndex);
-          _this5.tableElement.insertBefore(editRow.element, _this5.tableElement.children[rowIndex + 1]);
-        } else if (editRow.element.rowData !== editRow.data || editRow.element.rowIndex !== rowIndex || editRow.element.rowOpen !== editRow.isOpen) {
-          // Row has changed due to an edit or delete.
-          _this5.removeRowComponents(rowIndex);
-          var newRow = _this5.createRow(editRow.data, rowIndex);
-          _this5.tableElement.replaceChild(newRow, editRow.element);
-          editRow.element = newRow;
-        }
-      });
-    }
-  }, {
     key: 'addRow',
     value: function addRow() {
       if (this.options.readOnly) {
         return;
       }
       this.editRows.push({
+        components: [],
         isOpen: true,
         data: {}
       });
       this.updateValue();
-      this.refreshDOM();
+      this.buildTable();
     }
   }, {
     key: 'editRow',
     value: function editRow(rowIndex) {
+      this.editRows[rowIndex].dirty = false;
       this.editRows[rowIndex].isOpen = true;
       this.editRows[rowIndex].editing = true;
       this.editRows[rowIndex].data = _lodash2.default.cloneDeep(this.dataValue[rowIndex]);
-      this.refreshDOM();
+      this.buildTable();
     }
   }, {
     key: 'cancelRow',
     value: function cancelRow(rowIndex) {
       if (this.options.readOnly) {
+        this.editRows[rowIndex].dirty = false;
         this.editRows[rowIndex].isOpen = false;
-        this.removeRowComponents(rowIndex);
-        this.refreshDOM();
+        this.buildTable();
         return;
       }
-      this.removeRowComponents(rowIndex);
-      // Remove if new.
-      if (!this.dataValue[rowIndex]) {
-        this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
-        this.editRows.splice(rowIndex, 1);
-        this.splice(rowIndex);
-      } else {
+      if (this.editRows[rowIndex].editing) {
+        this.editRows[rowIndex].dirty = false;
         this.editRows[rowIndex].isOpen = false;
         this.editRows[rowIndex].data = this.dataValue[rowIndex];
+      } else {
+        this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
+        this.editRows.splice(rowIndex, 1);
       }
-      this.refreshDOM();
+      this.buildTable();
+      this.checkValidity(this.data, true);
     }
   }, {
     key: 'saveRow',
     value: function saveRow(rowIndex) {
       if (this.options.readOnly) {
+        this.editRows[rowIndex].dirty = false;
         this.editRows[rowIndex].isOpen = false;
-        this.removeRowComponents(rowIndex);
-        this.refreshDOM();
+        this.buildTable();
         return;
       }
-      if (!this.validateRow(rowIndex, true)) {
+      this.editRows[rowIndex].dirty = true;
+      if (!this.validateRow(rowIndex)) {
         return;
       }
-      this.removeRowComponents(rowIndex);
       if (this.editRows[rowIndex].editing) {
         this.dataValue[rowIndex] = this.editRows[rowIndex].data;
       } else {
-        this.dataValue.push(this.editRows[rowIndex].data);
+        // Insert this row into its proper place.
+        var newIndex = this.dataValue.length;
+        var row = this.editRows[rowIndex];
+        this.dataValue.push(row.data);
+        this.editRows.splice(rowIndex, 1);
+        this.editRows.splice(newIndex, 0, row);
+        rowIndex = newIndex;
       }
+      this.editRows[rowIndex].dirty = false;
       this.editRows[rowIndex].isOpen = false;
-      this.checkValidity(this.data, true);
       this.updateValue();
-      this.refreshDOM();
+      this.buildTable();
+      this.checkValidity(this.data, true);
     }
   }, {
     key: 'removeRow',
@@ -19477,33 +19527,34 @@ var EditGridComponent = function (_NestedComponent) {
       if (this.options.readOnly) {
         return;
       }
-      this.removeRowComponents(rowIndex);
       this.splice(rowIndex);
       this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
       this.editRows.splice(rowIndex, 1);
       this.updateValue();
-      this.refreshDOM();
+      this.buildTable();
+      this.checkValidity(this.data, true);
     }
   }, {
     key: 'removeRowComponents',
     value: function removeRowComponents(rowIndex) {
-      var _this6 = this;
+      var _this5 = this;
 
       // Clean up components list.
       this.editRows[rowIndex].components.forEach(function (comp) {
-        _this6.removeComponent(comp, _this6.components);
+        _this5.removeComponent(comp, _this5.components);
       });
       this.editRows[rowIndex].components = [];
     }
   }, {
     key: 'validateRow',
     value: function validateRow(rowIndex, dirty) {
-      var _this7 = this;
+      var _this6 = this;
 
       var check = true;
+      var isDirty = dirty || !!this.editRows[rowIndex].dirty;
       this.editRows[rowIndex].components.forEach(function (comp) {
-        comp.setPristine(!dirty);
-        check &= comp.checkValidity(_this7.editRows[rowIndex].data, dirty);
+        comp.setPristine(!isDirty);
+        check &= comp.checkValidity(_this6.editRows[rowIndex].data, isDirty);
       });
 
       if (this.component.validate && this.component.validate.row) {
@@ -19527,7 +19578,7 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'checkValidity',
     value: function checkValidity(data, dirty) {
-      var _this8 = this;
+      var _this7 = this;
 
       if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
         this.setCustomValidity('');
@@ -19538,12 +19589,12 @@ var EditGridComponent = function (_NestedComponent) {
       var rowsClosed = true;
       this.editRows.forEach(function (editRow, rowIndex) {
         // Trigger all errors on the row.
-        var rowValid = _this8.validateRow(rowIndex, false);
+        var rowValid = _this7.validateRow(rowIndex, dirty);
         // Add has-error class to row.
         if (!rowValid) {
-          _this8.addClass(_this8.editRows[rowIndex].element, 'has-error');
+          _this7.addClass(_this7.editRows[rowIndex].element, 'has-error');
         } else {
-          _this8.removeClass(_this8.editRows[rowIndex].element, 'has-error');
+          _this7.removeClass(_this7.editRows[rowIndex].element, 'has-error');
         }
         rowsValid &= rowValid;
 
@@ -19592,9 +19643,15 @@ var EditGridComponent = function (_NestedComponent) {
       }
     }
   }, {
+    key: 'updateValue',
+    value: function updateValue(flags, value) {
+      // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
+      return _Base2.default.prototype.updateValue.call(this, flags, value);
+    }
+  }, {
     key: 'setValue',
     value: function setValue(value) {
-      var _this9 = this;
+      var _this8 = this;
 
       if (!value) {
         return;
@@ -19607,14 +19664,16 @@ var EditGridComponent = function (_NestedComponent) {
         }
       }
 
+      var changed = this.hasChanged(value, this.dataValue);
       this.dataValue = value;
       // Refresh editRow data when data changes.
       this.dataValue.forEach(function (row, rowIndex) {
-        if (_this9.editRows[rowIndex]) {
-          _this9.editRows[rowIndex].data = row;
+        if (_this8.editRows[rowIndex]) {
+          _this8.editRows[rowIndex].data = row;
         } else {
-          _this9.editRows[rowIndex] = {
-            isOpen: false,
+          _this8.editRows[rowIndex] = {
+            components: [],
+            isOpen: !!_this8.options.defaultOpen,
             data: row
           };
         }
@@ -19622,12 +19681,12 @@ var EditGridComponent = function (_NestedComponent) {
       // Remove any extra edit rows.
       if (this.dataValue.length < this.editRows.length) {
         for (var rowIndex = this.editRows.length - 1; rowIndex >= this.dataValue.length; rowIndex--) {
-          this.removeRowComponents(rowIndex);
           this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
           this.editRows.splice(rowIndex, 1);
         }
       }
-      this.refreshDOM();
+      this.buildTable();
+      return changed;
     }
 
     /**
@@ -22666,8 +22725,10 @@ var NestedComponent = function (_BaseComponent) {
         component.hideComponents(this.hidden);
       } else if (component.component.hidden) {
         component.visible = false;
-      } else {
-        component.visible = !this.hidden || !(this.hidden.indexOf(component.key) !== -1);
+      } else if (this.hidden && this.hidden.indexOf(component.key) !== -1) {
+        component.visible = false;
+      } else if (!component.conditionallyVisible()) {
+        component.visible = false;
       }
     }
   }, {
@@ -23824,17 +23885,9 @@ var RadioComponent = function (_BaseComponent) {
   }, {
     key: 'setValueAt',
     value: function setValueAt(index, value) {
-      if (this.inputs && this.inputs[index]) {
+      if (this.inputs && this.inputs[index] && value !== null && value !== undefined) {
         var inputValue = this.inputs[index].value;
-        if (inputValue === 'true') {
-          inputValue = true;
-        } else if (inputValue === 'false') {
-          inputValue = false;
-        } else if (!isNaN(parseInt(inputValue, 10)) && isFinite(inputValue)) {
-          inputValue = parseInt(inputValue, 10);
-        }
-
-        this.inputs[index].checked = inputValue === value;
+        this.inputs[index].checked = inputValue === value.toString();
       }
     }
   }, {
@@ -24351,6 +24404,8 @@ var SelectComponent = function (_BaseComponent) {
         refreshOn: '',
         filter: '',
         searchEnabled: true,
+        searchField: '',
+        minSearch: 0,
         authenticate: false,
         template: '<span>{{ item.label }}</span>',
         selectFields: ''
@@ -24589,6 +24644,13 @@ var SelectComponent = function (_BaseComponent) {
       var _this4 = this;
 
       options = options || {};
+
+      // See if they have not met the minimum search requirements.
+      var minSearch = parseInt(this.component.minSearch, 10);
+      if (this.component.searchField && minSearch > 0 && (!search || search.length < minSearch)) {
+        // Set empty items.
+        return this.setItems([]);
+      }
 
       // Ensure we have a method and remove any body if method is get
       method = method || 'GET';
@@ -25358,11 +25420,24 @@ exports.default = [{
     }
   }
 }, {
+  type: 'number',
+  input: true,
+  key: 'minSearch',
+  weight: 17,
+  label: 'Minimum Search Length',
+  tooltip: 'The minimum amount of characters they must type before a search is made.',
+  defaultValue: 0,
+  conditional: {
+    json: {
+      and: [{ '===': [{ var: 'data.dataSrc' }, 'url'] }, { '!=': [{ var: 'data.searchField' }, ''] }]
+    }
+  }
+}, {
   type: 'textfield',
   input: true,
   key: 'filter',
   label: 'Filter Query',
-  weight: 17,
+  weight: 18,
   description: 'The filter query for results.',
   tooltip: 'Use this to provide additional filtering using query parameters.',
   conditional: {
@@ -25375,7 +25450,7 @@ exports.default = [{
   input: true,
   key: 'limit',
   label: 'Limit',
-  weight: 17,
+  weight: 18,
   description: 'Maximum number of items to view per page of results.',
   tooltip: 'Use this to limit the number of items to request or view.',
   conditional: {
@@ -27343,6 +27418,10 @@ var _Formio = __webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/F
 
 var _Formio2 = _interopRequireDefault(_Formio);
 
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -27519,6 +27598,10 @@ var TextAreaComponent = function (_TextFieldComponent) {
     value: function setValue(value, flags) {
       var _this3 = this;
 
+      if (_lodash2.default.isEqual(value, this.getValue())) {
+        //don't do anything if new value is equal to current
+        return;
+      }
       value = value || '';
       if (this.isPlain) {
         return _get(TextAreaComponent.prototype.__proto__ || Object.getPrototypeOf(TextAreaComponent.prototype), 'setValue', this).call(this, this.setConvertedValue(value), flags);
@@ -29680,6 +29763,9 @@ function eachComponent(components, fn, includeAll, path, parent) {
   if (!components) return;
   path = path || '';
   components.forEach(function (component) {
+    if (!component) {
+      return;
+    }
     var hasColumns = component.columns && Array.isArray(component.columns);
     var hasRows = component.rows && Array.isArray(component.rows);
     var hasComps = component.components && Array.isArray(component.components);
@@ -30697,6 +30783,7 @@ var EventEmitter = function () {
       _this.observers[event] = _this.observers[event] || [];
       _this.observers[event].push(listener);
     });
+    return this;
   };
 
   EventEmitter.prototype.off = function off(event, listener) {
@@ -30786,13 +30873,14 @@ var Interpolator = function () {
       this.format = options.interpolation && options.interpolation.format || function (value) {
         return value;
       };
-      this.escape = options.interpolation && options.interpolation.escape || _utils_js__WEBPACK_IMPORTED_MODULE_0__["escape"];
     }
     if (!options.interpolation) options.interpolation = { escapeValue: true };
 
     var iOpts = options.interpolation;
 
+    this.escape = iOpts.escape !== undefined ? iOpts.escape : _utils_js__WEBPACK_IMPORTED_MODULE_0__["escape"];
     this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
+    this.useRawValueToEscape = iOpts.useRawValueToEscape !== undefined ? iOpts.useRawValueToEscape : false;
 
     this.prefix = iOpts.prefix ? _utils_js__WEBPACK_IMPORTED_MODULE_0__["regexEscape"](iOpts.prefix) : iOpts.prefixEscaped || '{{';
     this.suffix = iOpts.suffix ? _utils_js__WEBPACK_IMPORTED_MODULE_0__["regexEscape"](iOpts.suffix) : iOpts.suffixEscaped || '}}';
@@ -30875,7 +30963,7 @@ var Interpolator = function () {
           this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
           value = '';
         }
-      } else if (typeof value !== 'string') {
+      } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
         value = _utils_js__WEBPACK_IMPORTED_MODULE_0__["makeString"](value);
       }
       value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
@@ -69530,7 +69618,7 @@ webpackContext.id = "./node_modules/moment/locale sync recursive ^\\.\\/.*$";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.3
+ * @version 1.14.4
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -69867,10 +69955,10 @@ function getBordersSize(styles, axis) {
 }
 
 function getSize(axis, body, html, computedStyle) {
-  return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE(10) ? html['offset' + axis] + computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')] + computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')] : 0);
+  return Math.max(body['offset' + axis], body['scroll' + axis], html['client' + axis], html['offset' + axis], html['scroll' + axis], isIE(10) ? parseInt(html['offset' + axis]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Top' : 'Left')]) + parseInt(computedStyle['margin' + (axis === 'Height' ? 'Bottom' : 'Right')]) : 0);
 }
 
-function getWindowSizes() {
+function getWindowSizes(document) {
   var body = document.body;
   var html = document.documentElement;
   var computedStyle = isIE(10) && getComputedStyle(html);
@@ -69987,7 +70075,7 @@ function getBoundingClientRect(element) {
   };
 
   // subtract scrollbar size from sizes
-  var sizes = element.nodeName === 'HTML' ? getWindowSizes() : {};
+  var sizes = element.nodeName === 'HTML' ? getWindowSizes(element.ownerDocument) : {};
   var width = sizes.width || element.clientWidth || result.right - result.left;
   var height = sizes.height || element.clientHeight || result.bottom - result.top;
 
@@ -70022,7 +70110,7 @@ function getOffsetRectRelativeToArbitraryNode(children, parent) {
   var borderLeftWidth = parseFloat(styles.borderLeftWidth, 10);
 
   // In cases where the parent is fixed, we must ignore negative scroll in offset calc
-  if (fixedPosition && parent.nodeName === 'HTML') {
+  if (fixedPosition && isHTML) {
     parentRect.top = Math.max(parentRect.top, 0);
     parentRect.left = Math.max(parentRect.left, 0);
   }
@@ -70160,7 +70248,7 @@ function getBoundaries(popper, reference, padding, boundariesElement) {
 
     // In case of HTML, we need a different computation
     if (boundariesNode.nodeName === 'HTML' && !isFixed(offsetParent)) {
-      var _getWindowSizes = getWindowSizes(),
+      var _getWindowSizes = getWindowSizes(popper.ownerDocument),
           height = _getWindowSizes.height,
           width = _getWindowSizes.width;
 
@@ -70175,10 +70263,12 @@ function getBoundaries(popper, reference, padding, boundariesElement) {
   }
 
   // Add paddings
-  boundaries.left += padding;
-  boundaries.top += padding;
-  boundaries.right -= padding;
-  boundaries.bottom -= padding;
+  padding = padding || 0;
+  var isPaddingNumber = typeof padding === 'number';
+  boundaries.left += isPaddingNumber ? padding : padding.left || 0;
+  boundaries.top += isPaddingNumber ? padding : padding.top || 0;
+  boundaries.right -= isPaddingNumber ? padding : padding.right || 0;
+  boundaries.bottom -= isPaddingNumber ? padding : padding.bottom || 0;
 
   return boundaries;
 }
@@ -70503,7 +70593,7 @@ function getSupportedPropertyName(property) {
 }
 
 /**
- * Destroy the popper
+ * Destroys the popper.
  * @method
  * @memberof Popper
  */
@@ -70610,7 +70700,7 @@ function removeEventListeners(reference, state) {
 
 /**
  * It will remove resize/scroll events and won't recalculate popper position
- * when they are triggered. It also won't trigger onUpdate callback anymore,
+ * when they are triggered. It also won't trigger `onUpdate` callback anymore,
  * unless you call `update` method manually.
  * @method
  * @memberof Popper
@@ -70787,12 +70877,22 @@ function computeStyle(data, options) {
   var left = void 0,
       top = void 0;
   if (sideA === 'bottom') {
-    top = -offsetParentRect.height + offsets.bottom;
+    // when offsetParent is <html> the positioning is relative to the bottom of the screen (excluding the scrollbar)
+    // and not the bottom of the html element
+    if (offsetParent.nodeName === 'HTML') {
+      top = -offsetParent.clientHeight + offsets.bottom;
+    } else {
+      top = -offsetParentRect.height + offsets.bottom;
+    }
   } else {
     top = offsets.top;
   }
   if (sideB === 'right') {
-    left = -offsetParentRect.width + offsets.right;
+    if (offsetParent.nodeName === 'HTML') {
+      left = -offsetParent.clientWidth + offsets.right;
+    } else {
+      left = -offsetParentRect.width + offsets.right;
+    }
   } else {
     left = offsets.left;
   }
@@ -70901,7 +71001,7 @@ function arrow(data, options) {
 
   //
   // extends keepTogether behavior making sure the popper and its
-  // reference have enough pixels in conjuction
+  // reference have enough pixels in conjunction
   //
 
   // top/left side
@@ -70971,7 +71071,7 @@ function getOppositeVariation(variation) {
  * - `top-end` (on top of reference, right aligned)
  * - `right-start` (on right of reference, top aligned)
  * - `bottom` (on bottom, centered)
- * - `auto-right` (on the side with more space available, alignment depends by placement)
+ * - `auto-end` (on the side with more space available, alignment depends by placement)
  *
  * @static
  * @type {Array}
@@ -71513,7 +71613,7 @@ var modifiers = {
    * The `offset` modifier can shift your popper on both its axis.
    *
    * It accepts the following units:
-   * - `px` or unitless, interpreted as pixels
+   * - `px` or unit-less, interpreted as pixels
    * - `%` or `%r`, percentage relative to the length of the reference element
    * - `%p`, percentage relative to the length of the popper element
    * - `vw`, CSS viewport width unit
@@ -71521,7 +71621,7 @@ var modifiers = {
    *
    * For length is intended the main axis relative to the placement of the popper.<br />
    * This means that if the placement is `top` or `bottom`, the length will be the
-   * `width`. In case of `left` or `right`, it will be the height.
+   * `width`. In case of `left` or `right`, it will be the `height`.
    *
    * You can provide a single value (as `Number` or `String`), or a pair of values
    * as `String` divided by a comma or one (or more) white spaces.<br />
@@ -71542,7 +71642,7 @@ var modifiers = {
    * ```
    * > **NB**: If you desire to apply offsets to your poppers in a way that may make them overlap
    * > with their reference element, unfortunately, you will have to disable the `flip` modifier.
-   * > More on this [reading this issue](https://github.com/FezVrasta/popper.js/issues/373)
+   * > You can read more on this at this [issue](https://github.com/FezVrasta/popper.js/issues/373).
    *
    * @memberof modifiers
    * @inner
@@ -71563,7 +71663,7 @@ var modifiers = {
   /**
    * Modifier used to prevent the popper from being positioned outside the boundary.
    *
-   * An scenario exists where the reference itself is not within the boundaries.<br />
+   * A scenario exists where the reference itself is not within the boundaries.<br />
    * We can say it has "escaped the boundaries" — or just "escaped".<br />
    * In this case we need to decide whether the popper should either:
    *
@@ -71593,23 +71693,23 @@ var modifiers = {
     /**
      * @prop {number} padding=5
      * Amount of pixel used to define a minimum distance between the boundaries
-     * and the popper this makes sure the popper has always a little padding
+     * and the popper. This makes sure the popper always has a little padding
      * between the edges of its container
      */
     padding: 5,
     /**
      * @prop {String|HTMLElement} boundariesElement='scrollParent'
-     * Boundaries used by the modifier, can be `scrollParent`, `window`,
+     * Boundaries used by the modifier. Can be `scrollParent`, `window`,
      * `viewport` or any DOM element.
      */
     boundariesElement: 'scrollParent'
   },
 
   /**
-   * Modifier used to make sure the reference and its popper stay near eachothers
-   * without leaving any gap between the two. Expecially useful when the arrow is
-   * enabled and you want to assure it to point to its reference element.
-   * It cares only about the first axis, you can still have poppers with margin
+   * Modifier used to make sure the reference and its popper stay near each other
+   * without leaving any gap between the two. Especially useful when the arrow is
+   * enabled and you want to ensure that it points to its reference element.
+   * It cares only about the first axis. You can still have poppers with margin
    * between the popper and its reference element.
    * @memberof modifiers
    * @inner
@@ -71627,7 +71727,7 @@ var modifiers = {
    * This modifier is used to move the `arrowElement` of the popper to make
    * sure it is positioned between the reference element and its popper element.
    * It will read the outer size of the `arrowElement` node to detect how many
-   * pixels of conjuction are needed.
+   * pixels of conjunction are needed.
    *
    * It has no effect if no `arrowElement` is provided.
    * @memberof modifiers
@@ -71666,7 +71766,7 @@ var modifiers = {
      * @prop {String|Array} behavior='flip'
      * The behavior used to change the popper's placement. It can be one of
      * `flip`, `clockwise`, `counterclockwise` or an array with a list of valid
-     * placements (with optional variations).
+     * placements (with optional variations)
      */
     behavior: 'flip',
     /**
@@ -71676,9 +71776,9 @@ var modifiers = {
     padding: 5,
     /**
      * @prop {String|HTMLElement} boundariesElement='viewport'
-     * The element which will define the boundaries of the popper position,
-     * the popper will never be placed outside of the defined boundaries
-     * (except if keepTogether is enabled)
+     * The element which will define the boundaries of the popper position.
+     * The popper will never be placed outside of the defined boundaries
+     * (except if `keepTogether` is enabled)
      */
     boundariesElement: 'viewport'
   },
@@ -71742,8 +71842,8 @@ var modifiers = {
     fn: computeStyle,
     /**
      * @prop {Boolean} gpuAcceleration=true
-     * If true, it uses the CSS 3d transformation to position the popper.
-     * Otherwise, it will use the `top` and `left` properties.
+     * If true, it uses the CSS 3D transformation to position the popper.
+     * Otherwise, it will use the `top` and `left` properties
      */
     gpuAcceleration: true,
     /**
@@ -71770,7 +71870,7 @@ var modifiers = {
    * Note that if you disable this modifier, you must make sure the popper element
    * has its position set to `absolute` before Popper.js can do its work!
    *
-   * Just disable this modifier and define you own to achieve the desired effect.
+   * Just disable this modifier and define your own to achieve the desired effect.
    *
    * @memberof modifiers
    * @inner
@@ -71787,27 +71887,27 @@ var modifiers = {
     /**
      * @deprecated since version 1.10.0, the property moved to `computeStyle` modifier
      * @prop {Boolean} gpuAcceleration=true
-     * If true, it uses the CSS 3d transformation to position the popper.
-     * Otherwise, it will use the `top` and `left` properties.
+     * If true, it uses the CSS 3D transformation to position the popper.
+     * Otherwise, it will use the `top` and `left` properties
      */
     gpuAcceleration: undefined
   }
 };
 
 /**
- * The `dataObject` is an object containing all the informations used by Popper.js
- * this object get passed to modifiers and to the `onCreate` and `onUpdate` callbacks.
+ * The `dataObject` is an object containing all the information used by Popper.js.
+ * This object is passed to modifiers and to the `onCreate` and `onUpdate` callbacks.
  * @name dataObject
  * @property {Object} data.instance The Popper.js instance
  * @property {String} data.placement Placement applied to popper
  * @property {String} data.originalPlacement Placement originally defined on init
  * @property {Boolean} data.flipped True if popper has been flipped by flip modifier
- * @property {Boolean} data.hide True if the reference element is out of boundaries, useful to know when to hide the popper.
+ * @property {Boolean} data.hide True if the reference element is out of boundaries, useful to know when to hide the popper
  * @property {HTMLElement} data.arrowElement Node used as arrow by arrow modifier
- * @property {Object} data.styles Any CSS property defined here will be applied to the popper, it expects the JavaScript nomenclature (eg. `marginBottom`)
- * @property {Object} data.arrowStyles Any CSS property defined here will be applied to the popper arrow, it expects the JavaScript nomenclature (eg. `marginBottom`)
+ * @property {Object} data.styles Any CSS property defined here will be applied to the popper. It expects the JavaScript nomenclature (eg. `marginBottom`)
+ * @property {Object} data.arrowStyles Any CSS property defined here will be applied to the popper arrow. It expects the JavaScript nomenclature (eg. `marginBottom`)
  * @property {Object} data.boundaries Offsets of the popper boundaries
- * @property {Object} data.offsets The measurements of popper, reference and arrow elements.
+ * @property {Object} data.offsets The measurements of popper, reference and arrow elements
  * @property {Object} data.offsets.popper `top`, `left`, `width`, `height` values
  * @property {Object} data.offsets.reference `top`, `left`, `width`, `height` values
  * @property {Object} data.offsets.arrow] `top` and `left` offsets, only one of them will be different from 0
@@ -71815,9 +71915,9 @@ var modifiers = {
 
 /**
  * Default options provided to Popper.js constructor.<br />
- * These can be overriden using the `options` argument of Popper.js.<br />
- * To override an option, simply pass as 3rd argument an object with the same
- * structure of this object, example:
+ * These can be overridden using the `options` argument of Popper.js.<br />
+ * To override an option, simply pass an object with the same
+ * structure of the `options` object, as the 3rd argument. For example:
  * ```
  * new Popper(ref, pop, {
  *   modifiers: {
@@ -71831,7 +71931,7 @@ var modifiers = {
  */
 var Defaults = {
   /**
-   * Popper's placement
+   * Popper's placement.
    * @prop {Popper.placements} placement='bottom'
    */
   placement: 'bottom',
@@ -71843,7 +71943,7 @@ var Defaults = {
   positionFixed: false,
 
   /**
-   * Whether events (resize, scroll) are initially enabled
+   * Whether events (resize, scroll) are initially enabled.
    * @prop {Boolean} eventsEnabled=true
    */
   eventsEnabled: true,
@@ -71857,17 +71957,17 @@ var Defaults = {
 
   /**
    * Callback called when the popper is created.<br />
-   * By default, is set to no-op.<br />
+   * By default, it is set to no-op.<br />
    * Access Popper.js instance with `data.instance`.
    * @prop {onCreate}
    */
   onCreate: function onCreate() {},
 
   /**
-   * Callback called when the popper is updated, this callback is not called
+   * Callback called when the popper is updated. This callback is not called
    * on the initialization/creation of the popper, but only on subsequent
    * updates.<br />
-   * By default, is set to no-op.<br />
+   * By default, it is set to no-op.<br />
    * Access Popper.js instance with `data.instance`.
    * @prop {onUpdate}
    */
@@ -71875,7 +71975,7 @@ var Defaults = {
 
   /**
    * List of modifiers used to modify the offsets before they are applied to the popper.
-   * They provide most of the functionalities of Popper.js
+   * They provide most of the functionalities of Popper.js.
    * @prop {modifiers}
    */
   modifiers: modifiers
@@ -71895,10 +71995,10 @@ var Defaults = {
 // Methods
 var Popper = function () {
   /**
-   * Create a new Popper.js instance
+   * Creates a new Popper.js instance.
    * @class Popper
    * @param {HTMLElement|referenceObject} reference - The reference element used to position the popper
-   * @param {HTMLElement} popper - The HTML element used as popper.
+   * @param {HTMLElement} popper - The HTML element used as the popper
    * @param {Object} options - Your custom options to override the ones defined in [Defaults](#defaults)
    * @return {Object} instance - The generated Popper.js instance
    */
@@ -71994,7 +72094,7 @@ var Popper = function () {
     }
 
     /**
-     * Schedule an update, it will run on the next UI update available
+     * Schedules an update. It will run on the next UI update available.
      * @method scheduleUpdate
      * @memberof Popper
      */
@@ -72031,7 +72131,7 @@ var Popper = function () {
  * new Popper(referenceObject, popperNode);
  * ```
  *
- * NB: This feature isn't supported in Internet Explorer 10
+ * NB: This feature isn't supported in Internet Explorer 10.
  * @name referenceObject
  * @property {Function} data.getBoundingClientRect
  * A function that returns a set of coordinates compatible with the native `getBoundingClientRect` method.
@@ -73119,7 +73219,7 @@ return SignaturePad;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-!function(e,t){ true?module.exports=t():undefined}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var o=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(o).default}});var i=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(i).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy";return function(t){var n=[],r=e.split(/[^dmyHMS]+/),o={dd:31,mm:12,yy:99,yyyy:9999,HH:23,MM:59,SS:59},i={dd:1,mm:1,yy:0,yyyy:1,HH:0,MM:0,SS:0},u=t.split("");r.forEach(function(t){var r=e.indexOf(t),i=parseInt(o[t].toString().substr(0,1),10);parseInt(u[r],10)>i&&(u[r+1]=u[r],u[r]=0,n.push(r))});var c=r.some(function(n){var r=e.indexOf(n),u=n.length,c=t.substr(r,u).replace(/\D/g,""),l=parseInt(c,10);return l>o[n]||c.length===u&&l<i[n]});return!c&&{value:u.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:c,t=e.length;if(e===c||e[0]===g[0]&&1===t)return g.split(c).concat([v]).concat(m.split(c));if(e===P&&_)return g.split(c).concat(["0",P,v]).concat(m.split(c));var n=e[0]===s&&H;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),l=u!==-1,a=void 0,h=void 0,b=void 0;if(e.slice($*-1)===m&&(e=e.slice(0,$*-1)),l&&(_||D)?(a=e.slice(e.slice(0,N)===g?N:0,u),h=e.slice(u+1,t),h=r(h.replace(f,c))):a=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":i(L))===p){var O="."===M?"[.]":""+M,S=(a.match(new RegExp(O,"g"))||[]).length;a=a.slice(0,L+S*V)}return a=a.replace(f,c),R||(a=a.replace(/^0+(0$|[^0])/,"$1")),a=x?o(a,M):a,b=r(a),(l&&_||D===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),h&&(("undefined"==typeof C?"undefined":i(C))===p&&(h=h.slice(0,C)),b=b.concat(h)),D===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(c).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),m.length>0&&(b=b.concat(m.split(c))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,h=t.suffix,m=void 0===h?c:h,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,M=void 0===O?l:O,S=t.allowDecimal,_=void 0!==S&&S,j=t.decimalSymbol,P=void 0===j?a:j,w=t.decimalLimit,C=void 0===w?2:w,k=t.requireDecimal,D=void 0!==k&&k,E=t.allowNegative,H=void 0!==E&&E,I=t.allowLeadingZeroes,R=void 0!==I&&I,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=m&&m.length||0,V=M&&M.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(c).map(function(e){return v.test(e)?v:e})}function o(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",c="",l=",",a=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function o(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,o=e.indexOf(y),s=e.lastIndexOf(p),d=s<o?-1:s,f=i(e,o+1,y),g=i(e,d-1,p),h=u(e,o,n),m=c(e,o,d,n),b=l(e,d,n,r);h=a(h),m=a(m),b=a(b,!0);var x=h.concat(f).concat(m).concat(g).concat(b);return x}function i(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function c(e,t,n,r){var o=v;return t!==-1&&(o=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),o=o.replace(new RegExp("[\\s"+r+"]",m),v),o===y?f:o.length<1?h:o[o.length-1]===p?o.slice(0,o.length-1):o}function l(e,t,n,r){var o=v;return t!==-1&&(o=e.slice(t+1,e.length)),o=o.replace(new RegExp("[\\s"+n+".]",m),v),0===o.length?e[t-1]===p&&r!==e.length?f:v:o}function a(e,t){return e.split(v).map(function(e){return e===h?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",h=" ",m="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:o,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,i=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(c),g=null===i.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(a)!==-1||y!==-1&&n!==y+1||i.indexOf(o)===-1&&f!==u&&i.indexOf(l)!==-1)return!1;var h=v.indexOf(o),m=v.slice(h+1,v.length);return(m.match(d)||s).length>1&&v.substr(-1)===l&&n!==i.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(i,function(){return t++,1===t?o:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var o="@",i=/@/g,u="",c="@.",l=".",a="..",s=[],d=/\./g}])});
+!function(e,t){ true?module.exports=t():undefined}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var i=n[r]={exports:{},id:r,loaded:!1};return e[r].call(i.exports,i,i.exports,t),i.loaded=!0,i.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var i=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(i).default}});var o=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(o).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy",t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},n=t.minYear,o=void 0===n?1:n,u=t.maxYear,a=void 0===u?9999:u,c=e.split(/[^dmyHMS]+/).sort(function(e,t){return i.indexOf(e)-i.indexOf(t)});return function(t){var n=[],i={dd:31,mm:12,yy:99,yyyy:a,HH:23,MM:59,SS:59},u={dd:1,mm:1,yy:0,yyyy:o,HH:0,MM:0,SS:0},l=t.split("");c.forEach(function(t){var r=e.indexOf(t),o=parseInt(i[t].toString().substr(0,1),10);parseInt(l[r],10)>o&&(l[r+1]=l[r],l[r]=0,n.push(r))});var s=0,d=c.some(function(n){var c=e.indexOf(n),l=n.length,d=t.substr(c,l).replace(/\D/g,""),f=parseInt(d,10);"mm"===n&&(s=f||0);var p="dd"===n?r[s]:i[n];if("yyyy"===n&&(1!==o||9999!==a)){var v=parseInt(i[n].toString().substring(0,d.length),10),y=parseInt(u[n].toString().substring(0,d.length),10);return f<y||f>v}return f>p||d.length===l&&f<u[n]});return!d&&{value:l.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var r=[31,31,29,31,30,31,30,31,31,30,31,30,31],i=["yyyy","yy","mm","dd","HH","MM","SS"]},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:a,t=e.length;if(e===a||e[0]===g[0]&&1===t)return g.split(a).concat([v]).concat(h.split(a));if(e===P&&_)return g.split(a).concat(["0",P,v]).concat(h.split(a));var n=e[0]===s&&D;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),c=u!==-1,l=void 0,m=void 0,b=void 0;if(e.slice($*-1)===h&&(e=e.slice(0,$*-1)),c&&(_||I)?(l=e.slice(e.slice(0,N)===g?N:0,u),m=e.slice(u+1,t),m=r(m.replace(f,a))):l=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":o(L))===p){var O="."===S?"[.]":""+S,M=(l.match(new RegExp(O,"g"))||[]).length;l=l.slice(0,L+M*V)}return l=l.replace(f,a),R||(l=l.replace(/^0+(0$|[^0])/,"$1")),l=x?i(l,S):l,b=r(l),(c&&_||I===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),m&&(("undefined"==typeof C?"undefined":o(C))===p&&(m=m.slice(0,C)),b=b.concat(m)),I===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(a).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),h.length>0&&(b=b.concat(h.split(a))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,m=t.suffix,h=void 0===m?a:m,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,S=void 0===O?c:O,M=t.allowDecimal,_=void 0!==M&&M,j=t.decimalSymbol,P=void 0===j?l:j,w=t.decimalLimit,C=void 0===w?2:w,H=t.requireDecimal,I=void 0!==H&&H,k=t.allowNegative,D=void 0!==k&&k,E=t.allowLeadingZeroes,R=void 0!==E&&E,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=h&&h.length||0,V=S&&S.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(a).map(function(e){return v.test(e)?v:e})}function i(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",a="",c=",",l=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function i(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,i=e.indexOf(y),s=e.lastIndexOf(p),d=s<i?-1:s,f=o(e,i+1,y),g=o(e,d-1,p),m=u(e,i,n),h=a(e,i,d,n),b=c(e,d,n,r);m=l(m),h=l(h),b=l(b,!0);var x=m.concat(f).concat(h).concat(g).concat(b);return x}function o(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function a(e,t,n,r){var i=v;return t!==-1&&(i=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),i=i.replace(new RegExp("[\\s"+r+"]",h),v),i===y?f:i.length<1?m:i[i.length-1]===p?i.slice(0,i.length-1):i}function c(e,t,n,r){var i=v;return t!==-1&&(i=e.slice(t+1,e.length)),i=i.replace(new RegExp("[\\s"+n+".]",h),v),0===i.length?e[t-1]===p&&r!==e.length?f:v:i}function l(e,t){return e.split(v).map(function(e){return e===m?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",m=" ",h="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:i,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,o=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(a),g=null===o.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(l)!==-1||y!==-1&&n!==y+1||o.indexOf(i)===-1&&f!==u&&o.indexOf(c)!==-1)return!1;var m=v.indexOf(i),h=v.slice(m+1,v.length);return(h.match(d)||s).length>1&&v.substr(-1)===c&&n!==o.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(o,function(){return t++,1===t?i:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var i="@",o=/@/g,u="",a="@.",c=".",l="..",s=[],d=/\./g}])});
 
 /***/ }),
 
