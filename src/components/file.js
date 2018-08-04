@@ -275,14 +275,7 @@ module.exports = function(app) {
             };
             var dir = $scope.component.dir || '';
             dir = $interpolate(dir)({data: $scope.data, row: $scope.row});
-            var formio = null;
-            if ($scope.formio) {
-              formio = $scope.formio;
-            }
-            else {
-              $scope.fileUploads[fileName].status = 'error';
-              $scope.fileUploads[fileName].message = 'File Upload URL not provided.';
-            }
+            var formio = $scope.formio || new Formio();
 
             if (formio) {
               formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
