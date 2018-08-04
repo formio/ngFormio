@@ -54,7 +54,7 @@ export default app.directive('formio', function() {
             $scope.formio.submission = $scope.submission
           }
           if ($scope.url) {
-            $scope.formio.url = $scope.url
+            $scope.formio.url = $scope.url;
             $scope.formio.nosubmit = false;
           }
           $scope.formio.events.onAny(function() {
@@ -62,6 +62,8 @@ export default app.directive('formio', function() {
             const args = Array.prototype.slice.call(arguments);
 
             const eventParts = args[0].split('.');
+
+            let shouldFire = true;
 
             // Only handle formio events.
             if (eventParts[0] !== 'formio' || eventParts.length !== 2) {
@@ -89,10 +91,16 @@ export default app.directive('formio', function() {
                 break;
               case 'customEvent':
                 args[0] = args[1].type;
+                //prevent customEvent from firing when it's emitted by button with event action (as it is emitted twice)
+                if (args[1].component && args[1].component.type === 'button' && args[1].component.action === 'event') {
+                  shouldFire = false;
+                }
                 break;
             }
 
-            $scope.$emit.apply($scope, args);
+            if (shouldFire) {
+              $scope.$emit.apply($scope, args);
+            }
           });
 
           $scope.formioReady = true;
@@ -144,6 +152,10 @@ export default app.directive('formio', function() {
             $scope.formio.submission = submission;
           }
         }, true);
+
+        $scope.$on('componentChange', function(){
+          $scope.$apply();
+        });
 
         // Clean up the Form from DOM.
         $scope.$on('$destroy', function () {
