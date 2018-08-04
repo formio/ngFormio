@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 2.26.0
+### Fixed 
+ - Issue where Formio class would not be created in file component.
+
+### Changed
+ - Upgraded gulp-uglify@3.0.1 karma@2.0.5 eslint@5.3.0 gulp-rename@1.4.0 formiojs@3.1.0 
+
 ### Added
  - CSS classes for wizard buttons
 
