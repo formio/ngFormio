@@ -151,7 +151,7 @@ export default app.directive('formio', function() {
           if ($scope.formioReady) {
             $scope.formio.submission = submission;
           }
-        });
+        }, true);
 
         $scope.$on('componentChange', function(){
           $scope.$apply();
