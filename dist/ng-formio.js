@@ -16107,7 +16107,7 @@ var CheckBoxComponent = function (_BaseComponent) {
     value: function createElement() {
       var className = 'form-check ' + this.className;
       if (!this.labelIsHidden()) {
-        className += ' checkbox';
+        className += ' ' + (this.component.inputType || 'checkbox');
       }
       this.element = this.ce('div', {
         id: this.id,
@@ -19288,11 +19288,27 @@ var EditGridComponent = function (_NestedComponent) {
   _createClass(EditGridComponent, [{
     key: 'build',
     value: function build() {
+      var _this2 = this;
+
       if (this.options.builder) {
         return _get(EditGridComponent.prototype.__proto__ || Object.getPrototypeOf(EditGridComponent.prototype), 'build', this).call(this, true);
       }
       this.createElement();
       this.createLabel(this.element);
+
+      // Ensure we always have rows for each dataValue available.
+      this.dataValue.forEach(function (row, rowIndex) {
+        if (_this2.editRows[rowIndex]) {
+          _this2.editRows[rowIndex].data = row;
+        } else {
+          _this2.editRows[rowIndex] = {
+            components: [],
+            isOpen: !!_this2.options.defaultOpen,
+            data: row
+          };
+        }
+      });
+
       this.buildTable();
       this.createDescription(this.element);
       this.createAddButton();
@@ -19301,11 +19317,11 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'buildTable',
     value: function buildTable() {
-      var _this2 = this;
+      var _this3 = this;
 
       var tableClass = 'editgrid-listgroup list-group ';
       _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
-        if (_this2.component[prop]) {
+        if (_this3.component[prop]) {
           tableClass += 'table-' + prop + ' ';
         }
       });
@@ -19335,7 +19351,7 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'createRow',
     value: function createRow(row, rowIndex) {
-      var _this3 = this;
+      var _this4 = this;
 
       var wrapper = this.ce('li', { class: 'list-group-item' });
       var rowTemplate = _lodash2.default.get(this.component, 'templates.row', EditGridComponent.defaultRowTemplate);
@@ -19347,22 +19363,26 @@ var EditGridComponent = function (_NestedComponent) {
       row.components = [];
 
       if (wrapper.rowOpen) {
-        wrapper.appendChild(this.ce('div', { class: 'editgrid-edit' }, this.ce('div', { class: 'editgrid-body' }, [this.component.components.map(function (comp) {
+        var editForm = this.component.components.map(function (comp) {
           var component = _lodash2.default.cloneDeep(comp);
-          var options = _lodash2.default.clone(_this3.options);
-          options.row = _this3.row + '-' + rowIndex;
+          var options = _lodash2.default.clone(_this4.options);
+          options.row = _this4.row + '-' + rowIndex;
           options.name += '[' + rowIndex + ']';
-          var instance = _this3.createComponent(component, options, row.data);
+          var instance = _this4.createComponent(component, options, row.data);
           instance.rowIndex = rowIndex;
           row.components.push(instance);
           return instance.element;
-        }), this.ce('div', { class: 'editgrid-actions' }, [this.ce('button', {
-          class: 'btn btn-primary',
-          onClick: this.saveRow.bind(this, rowIndex)
-        }, this.component.saveRow || 'Save'), ' ', this.component.removeRow ? this.ce('button', {
-          class: 'btn btn-danger',
-          onClick: this.cancelRow.bind(this, rowIndex)
-        }, this.component.removeRow || 'Cancel') : null])])));
+        });
+        if (!this.options.readOnly) {
+          editForm.push(this.ce('div', { class: 'editgrid-actions' }, [this.ce('button', {
+            class: 'btn btn-primary',
+            onClick: this.saveRow.bind(this, rowIndex)
+          }, this.component.saveRow || 'Save'), ' ', this.component.removeRow ? this.ce('button', {
+            class: 'btn btn-danger',
+            onClick: this.cancelRow.bind(this, rowIndex)
+          }, this.component.removeRow || 'Cancel') : null]));
+        }
+        wrapper.appendChild(this.ce('div', { class: 'editgrid-edit' }, this.ce('div', { class: 'editgrid-body' }, editForm)));
       } else {
         wrapper.appendChild(this.renderTemplate(rowTemplate, {
           row: row.data,
@@ -19370,7 +19390,7 @@ var EditGridComponent = function (_NestedComponent) {
           rowIndex: rowIndex,
           components: this.component.components,
           getView: function getView(component, data) {
-            return _Components2.default.create(component, _this3.options, data, true).getView(data);
+            return _Components2.default.create(component, _this4.options, data, true).getView(data);
           }
         }, [{
           class: 'removeRow',
@@ -19403,7 +19423,7 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'checkData',
     value: function checkData(data) {
-      var _this4 = this;
+      var _this5 = this;
 
       var flags = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var index = arguments[2];
@@ -19423,9 +19443,9 @@ var EditGridComponent = function (_NestedComponent) {
         changed |= comp.calculateValue(data, {
           noUpdateEvent: true
         });
-        comp.checkConditions(_this4.editRows[index].data);
+        comp.checkConditions(_this5.editRows[index].data);
         if (!flags.noValidate) {
-          valid &= comp.checkValidity(_this4.editRows[index].data, !_this4.editRows[index].isOpen);
+          valid &= comp.checkValidity(_this5.editRows[index].data, !_this5.editRows[index].isOpen);
         }
       });
 
@@ -19442,6 +19462,9 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'createAddButton',
     value: function createAddButton() {
+      if (this.options.readOnly) {
+        return;
+      }
       this.element.appendChild(this.ce('div', { class: 'editgrid-add' }, this.ce('button', {
         class: 'btn btn-primary',
         role: 'button',
@@ -19459,7 +19482,6 @@ var EditGridComponent = function (_NestedComponent) {
         isOpen: true,
         data: {}
       });
-      this.updateValue();
       this.buildTable();
     }
   }, {
@@ -19537,24 +19559,24 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'removeRowComponents',
     value: function removeRowComponents(rowIndex) {
-      var _this5 = this;
+      var _this6 = this;
 
       // Clean up components list.
       this.editRows[rowIndex].components.forEach(function (comp) {
-        _this5.removeComponent(comp, _this5.components);
+        _this6.removeComponent(comp, _this6.components);
       });
       this.editRows[rowIndex].components = [];
     }
   }, {
     key: 'validateRow',
     value: function validateRow(rowIndex, dirty) {
-      var _this6 = this;
+      var _this7 = this;
 
       var check = true;
       var isDirty = dirty || !!this.editRows[rowIndex].dirty;
       this.editRows[rowIndex].components.forEach(function (comp) {
         comp.setPristine(!isDirty);
-        check &= comp.checkValidity(_this6.editRows[rowIndex].data, isDirty);
+        check &= comp.checkValidity(_this7.editRows[rowIndex].data, isDirty);
       });
 
       if (this.component.validate && this.component.validate.row) {
@@ -19578,7 +19600,7 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'checkValidity',
     value: function checkValidity(data, dirty) {
-      var _this7 = this;
+      var _this8 = this;
 
       if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
         this.setCustomValidity('');
@@ -19589,12 +19611,12 @@ var EditGridComponent = function (_NestedComponent) {
       var rowsClosed = true;
       this.editRows.forEach(function (editRow, rowIndex) {
         // Trigger all errors on the row.
-        var rowValid = _this7.validateRow(rowIndex, dirty);
+        var rowValid = _this8.validateRow(rowIndex, dirty);
         // Add has-error class to row.
         if (!rowValid) {
-          _this7.addClass(_this7.editRows[rowIndex].element, 'has-error');
+          _this8.addClass(_this8.editRows[rowIndex].element, 'has-error');
         } else {
-          _this7.removeClass(_this7.editRows[rowIndex].element, 'has-error');
+          _this8.removeClass(_this8.editRows[rowIndex].element, 'has-error');
         }
         rowsValid &= rowValid;
 
@@ -19651,7 +19673,7 @@ var EditGridComponent = function (_NestedComponent) {
   }, {
     key: 'setValue',
     value: function setValue(value) {
-      var _this8 = this;
+      var _this9 = this;
 
       if (!value) {
         return;
@@ -19666,14 +19688,15 @@ var EditGridComponent = function (_NestedComponent) {
 
       var changed = this.hasChanged(value, this.dataValue);
       this.dataValue = value;
+
       // Refresh editRow data when data changes.
       this.dataValue.forEach(function (row, rowIndex) {
-        if (_this8.editRows[rowIndex]) {
-          _this8.editRows[rowIndex].data = row;
+        if (_this9.editRows[rowIndex]) {
+          _this9.editRows[rowIndex].data = row;
         } else {
-          _this8.editRows[rowIndex] = {
+          _this9.editRows[rowIndex] = {
             components: [],
-            isOpen: !!_this8.options.defaultOpen,
+            isOpen: !!_this9.options.defaultOpen,
             data: row
           };
         }
@@ -19685,6 +19708,7 @@ var EditGridComponent = function (_NestedComponent) {
           this.editRows.splice(rowIndex, 1);
         }
       }
+
       this.buildTable();
       return changed;
     }
