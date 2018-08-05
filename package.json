@@ -39,7 +39,7 @@
     "json-logic-js": "^1.1.0"
   },
   "dependencies": {
-    "angular": "^1.7.0",
+    "angular": "^1.7.2",
     "formiojs": "^3.1.2"
   },
   "browserify": {
