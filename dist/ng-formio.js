@@ -7078,10 +7078,10 @@ var PDFBuilder = function (_WebformBuilder) {
         builderComponent.element.setAttribute('draggable', true);
         this.addEventListener(builderComponent.element, 'dragstart', function (event) {
           return _this5.dragStart(event, component);
-        });
+        }, true);
         this.addEventListener(builderComponent.element, 'dragend', function () {
           return _this5.disableDropZone();
-        });
+        }, true);
       }
       return builderComponent;
     }
