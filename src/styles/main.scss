@@ -942,11 +942,15 @@ pre code {
   }
 
   p {
-    text-align: right;
+    text-align: center;
     font-weight: 100;
     a {
       color: #FFF;
     }
+  }
+
+  .alert p {
+    text-align: left;
   }
 
   // FOR-124 - ie does defaults to submit type, and does not allow you to change it.
