@@ -17602,6 +17602,9 @@ var DataGridComponent = function (_NestedComponent) {
       // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
       return _Base2.default.prototype.updateValue.call(this, flags, value);
     }
+
+    /* eslint-disable max-statements */
+
   }, {
     key: 'setValue',
     value: function setValue(value, flags) {
@@ -17620,8 +17623,46 @@ var DataGridComponent = function (_NestedComponent) {
       }
 
       var changed = this.hasChanged(value, this.dataValue);
+
+      //always should build if not built yet OR is trying to set empty value (in order to prevent deleting last row)
+      var shouldBuildRows = !this.isBuilt || _lodash2.default.isEqual(this.emptyValue, value);
+      //check if visible columns changed
+      var visibleColumnsAmount = 0;
+      _lodash2.default.forEach(this.visibleColumns, function (value) {
+        if (value) {
+          visibleColumnsAmount++;
+        }
+      });
+      var visibleComponentsAmount = this.visibleComponents ? this.visibleComponents.length : 0;
+      //should build if visible columns changed
+      shouldBuildRows = shouldBuildRows || visibleColumnsAmount !== visibleComponentsAmount;
+      //loop through all rows and check if there is field in new value that differs from current value
+      var keys = this.componentComponents.map(function (component) {
+        return component.key;
+      });
+      for (var i = 0; i < value.length; i++) {
+        if (shouldBuildRows) {
+          break;
+        }
+        var valueRow = value[i];
+        for (var j = 0; j < keys.length; j++) {
+          var key = keys[j];
+          var newFieldValue = valueRow[key];
+          var currentFieldValue = this.rows[i] && this.rows[i][key] ? this.rows[i][key].getValue() : undefined;
+          var defaultFieldValue = this.rows[i] && this.rows[i][key] ? this.rows[i][key].defaultValue : undefined;
+          var isMissingValue = newFieldValue === undefined && currentFieldValue === defaultFieldValue;
+          if (!isMissingValue && !_lodash2.default.isEqual(newFieldValue, currentFieldValue)) {
+            shouldBuildRows = true;
+            break;
+          }
+        }
+      }
+
       this.dataValue = value;
-      this.buildRows();
+      if (shouldBuildRows) {
+        this.buildRows();
+      }
+
       _lodash2.default.each(this.rows, function (row, index) {
         if (value.length <= index) {
           return;
@@ -17639,6 +17680,7 @@ var DataGridComponent = function (_NestedComponent) {
       });
       return changed;
     }
+    /* eslint-enable max-statements */
 
     /**
      * Get the value of this component.
@@ -17649,20 +17691,7 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'getValue',
     value: function getValue() {
-      if (this.viewOnly) {
-        return this.dataValue;
-      }
-      var values = [];
-      _lodash2.default.each(this.rows, function (row) {
-        var value = {};
-        _lodash2.default.each(row, function (col) {
-          if (col && col.key) {
-            _lodash2.default.set(value, col.key, col.getValue());
-          }
-        });
-        values.push(value);
-      });
-      return values;
+      return this.dataValue;
     }
   }, {
     key: 'defaultSchema',
@@ -19482,6 +19511,10 @@ var EditGridComponent = function (_NestedComponent) {
         isOpen: true,
         data: {}
       });
+      this.emit('editGridAddRow', {
+        component: this.component,
+        row: this.editRows[this.editRows.length - 1]
+      });
       this.buildTable();
     }
   }, {
@@ -19540,6 +19573,7 @@ var EditGridComponent = function (_NestedComponent) {
       this.editRows[rowIndex].dirty = false;
       this.editRows[rowIndex].isOpen = false;
       this.updateValue();
+      this.triggerChange();
       this.buildTable();
       this.checkValidity(this.data, true);
     }
@@ -19553,6 +19587,7 @@ var EditGridComponent = function (_NestedComponent) {
       this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
       this.editRows.splice(rowIndex, 1);
       this.updateValue();
+      this.triggerChange();
       this.buildTable();
       this.checkValidity(this.data, true);
     }
