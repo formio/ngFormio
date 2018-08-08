@@ -1,6 +1,6 @@
 module.exports = function (actions,tags) {
-  describe('Project Settings Functionality', function () {
-    describe('Navigating to the Project Settings', function () {
+  describe('Access Page', function () {
+    describe('', function () {
       actions.logout();
       actions.iAmLoggedInFor('accessProj');
       actions.goToPage('#/');
