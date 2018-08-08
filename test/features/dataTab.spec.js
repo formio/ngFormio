@@ -1,5 +1,5 @@
 module.exports = function (actions,tags) {
-  describe('Test 20',function() {
+  tags('smoke').describe('Test 20',function() {
     describe('Data Tab', function () {
       actions.logout();
       actions.iAmLoggedInFor('testDataUser');

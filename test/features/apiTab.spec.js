@@ -6,6 +6,8 @@ module.exports = function (actions,tags) {
       actions.goToPage('#/');
       actions.projectExisting('New Project', 'This is a test project');
       actions.clickOnElementWithText('New Project');
+      actions.clickOnElementWithText('Data');
+      actions.checkingUrlEndsWith('/data');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Endpoint: ');
