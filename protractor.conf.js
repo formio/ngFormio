@@ -9,37 +9,38 @@ exports.config = {
 
   // Capabilities to be passed to the webdriver instance.
 
-  maxSessions: 2,
-  multiCapabilities: [
-    {
-      browserName: 'chrome',
-      maxDuration: 10800,
-      platform : 'Windows 10',
-      screenResolution : '1920x1080',
-      shardTestFiles: false,
-      maxInstances: 1,
-      maxSessions: 1,
-      count: 1,
-      specs: [ 'test/test.js']
-    }, {
-      shardTestFiles: false,
-      browserName: 'chrome',
-      maxDuration: 10800,
-      platform : 'Windows 10',
-      screenResolution : '1920x1080',
-      maxInstances: 1,
-      maxSessions: 1,
-      count: 1,
-      specs: ['test/test1.js']
-    }],
+  // maxSessions: 2,
+  // multiCapabilities: [
+  //   {
+  //     browserName: 'chrome',
+  //     maxDuration: 10800,
+  //     platform : 'Windows 10',
+  //     screenResolution : '1920x1080',
+  //     shardTestFiles: false,
+  //     maxInstances: 1,
+  //     maxSessions: 1,
+  //     count: 1,
+  //     specs: [ 'test/test.js']
+  //   }, {
+  //     shardTestFiles: false,
+  //     browserName: 'chrome',
+  //     maxDuration: 10800,
+  //     platform : 'Windows 10',
+  //     screenResolution : '1920x1080',
+  //     maxInstances: 1,
+  //     maxSessions: 1,
+  //     count: 1,
+  //     specs: ['test/test1.js']
+  //   }],
 
 
-  // capabilities: {
-  //   'browserName': 'chrome',
-  //   "maxDuration": 10800,
-  //   "platform" : 'Windows 10',
-  //   "screenResolution" : '1920x1080'
-  // },
+  capabilities: {
+    'browserName': 'chrome',
+    version:'68',
+    "maxDuration": 10800,
+    "platform" : 'Windows 10',
+    "screenResolution" : '1920x1080'
+  },
   // multiCapabilities: [{
   //   'browserName': 'firefox'
   // }, {
@@ -50,7 +51,7 @@ exports.config = {
   // Spec patterns are relative to the current working directory when
   // protractor is called.
   // specs: [paths.e2e + '/**/*.js'],
-  // specs: ['test/test.js','test/test1.js'],
+  specs: ['test/test.js'],
   framework : 'mocha',
   // Options to be passed to Jasmine-node.
   //jasmineNodeOpts: {
