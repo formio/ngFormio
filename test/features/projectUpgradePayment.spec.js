@@ -1,9 +1,19 @@
-module.exports = function (actions) {
-  describe('Project Upgrade/Payment',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Project Upgrade/Payment',function(){
     describe('Project Upgrade/Payment',function(){
       actions.logout();
       actions.iAmLoggedInFor('profileuser7');
       actions.goToPage('#/');
+      actions.clickOnElementWithText('New Project');
+      actions.enterTextInField('#title', 'projectPayment');
+      actions.clickOnElementWithText(' Create Project');
+      actions.clickOnClass('.toast-message');
+      actions.waitForActionToComplete(1000);
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnElementWithText('Plan and Pricing');
+      actions.checkingUrlEndsWith('billing');
+      actions.upgradeToPlan('Independent');
+      actions.btnDisabled('Submit');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');
       actions.checkingUrlEndsWith('#/profile/payment/view');
@@ -18,11 +28,7 @@ module.exports = function (actions) {
       actions.clickOnClass('#submit');
       actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
-      actions.enterTextInField('#title', 'projectPayment');
-      actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
-      actions.waitForActionToComplete(1000);
+      actions.clickOnElementWithText('projectPayment');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Plan and Pricing');
       actions.checkingUrlEndsWith('billing');
@@ -141,6 +147,42 @@ module.exports = function (actions) {
       actions.iSeeText('$1100/month');
       actions.clickOnElementWithText('Downgrade');
       actions.iSeeText('$15/month');
+      actions.clickOnElementWithText('our help documentation');
+      actions.switchTab();
+      actions.checkingUrlIamOn('https://help.form.io/userguide/pdfserver/');
+      actions.iSeeText('PDF Server');
+      actions.closeWindow();
+      actions.iDonotSeeText('Hosted PDF');
+      actions.clickOnElementWithText('Select');
+      actions.iSeeText('Hosted PDF');
+      actions.iSeeText('$65/month');
+      // actions.clickOnElementWithText(' Confirm Billing Change');
+      // actions.waitForActionToComplete(1000);
+      // actions.iSeeText('Hosted PDF');
+      // actions.iSeeText('$65/month');
+      // actions.pageReload();
+      // actions.iSeeText('Hosted PDF');
+      // actions.iSeeText('$65/month');
+      // actions.clickOnElementWithText('Settings');
+      // actions.clickOnElementWithText('PDF Management');
+      // actions.iSeeText('25');
+      // actions.iSeeText('1,000');
+      // actions.clickOnClass('.fa.fa-cog');
+      // actions.clickOnElementWithText('Plan and Pricing');
+      actions.clickOnElementWithText('Select');
+      actions.iSeeText('$15/month');
+      actions.iDonotSeeText('Hosted PDF');
+      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.waitForActionToComplete(1000);
+      actions.iDonotSeeText('Hosted PDF');
+      actions.iSeeText('$15/month');
+      actions.pageReload();
+      actions.iDonotSeeText('Hosted PDF');
+      actions.iSeeText('$15/month');
+      actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('PDF Management');
+      actions.iSeeText('1');
+      actions.iSeeText('10');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Delete projectPayment Project');
       actions.clickOnElementWithText(' Yes');

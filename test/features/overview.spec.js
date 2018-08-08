@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('Form Versioning Test',function() {
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Overview Page',function() {
     actions.logout();
     actions.iAmLoggedInFor('projuser2');
     actions.goToPage("#/");

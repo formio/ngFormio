@@ -1,7 +1,8 @@
-module.exports = function (actions) {
-  describe('Form Versioning Test',function() {
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Form Versioning Test',function() {
     actions.logout();
     actions.iAmLoggedInFor('formVersioning');
+    actions.userExistsWith('${random-name>formVersioning.name}','${random-email>formVersioning.email}','${random-password>formVersioning.password}');
     actions.goToPage('#/');
     actions.clickOnClass('#user-menu');
     actions.clickOnElementWithText(' Payment Info');
@@ -18,7 +19,7 @@ module.exports = function (actions) {
     actions.waitForActionToComplete(2000);
     actions.goToPage('#/');
     actions.clickOnElementWithText('New Project');
-    actions.enterTextInField('#title','versioningProject');
+    actions.enterTextInField('#title','formRevisionsProject');
     actions.clickOnElementWithText(' Create Project');
     actions.clickOnElementWithText('Trial');
     actions.upgradeToPlan("Enterprise");
@@ -75,6 +76,7 @@ module.exports = function (actions) {
     actions.switchTab();
     actions.iSeeText('form');
     actions.closeWindow();
+    actions.iSeeText('${formVersioning.name}')
     actions.iSeeText('Test Note Version 0');
     actions.clickOnElementWithText('Use');
     actions.iSeeText('Version 0');

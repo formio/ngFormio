@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('User Portal Links and Welcome Module ',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('User Portal Links and Welcome Module ',function(){
     describe('Closing the Welcome Module',function(){
       actions.goToPage('#/');
       actions.logout();

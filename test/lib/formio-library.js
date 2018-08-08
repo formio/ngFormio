@@ -931,6 +931,21 @@ module.exports = function (config) {
       });
     });
   };
+  this.iSeeValueInContains = function (ele, text) {
+    text = replacements(text.toString());
+    it('I see value ' + text + ' in ' + ele, function (next) {
+      var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).first();
+      browser.wait(function () {
+        return ele1.isPresent();
+      }, timeout).then(function () {
+        ele1.getAttribute('value').then(function (value) {
+          config.expect(value).contain(text);
+          next();
+        })
+          .catch(next);
+      });
+    });
+  };
   this.iSeeValueInIndex = function (ele, text,index) {
     text = replacements(text.toString());
     it('I see value ' + text + ' in ' + ele, function (next) {
@@ -1524,6 +1539,14 @@ module.exports = function (config) {
   this.goBack = function () {
     it('Going to previous page.', function (next) {
       browser.navigate().back().then(next).catch(next);
+    });
+  };
+  this.clickSettings = function () {
+    it('Click Settings', function (next) {
+      var EC = protractor.ExpectedConditions;
+      var ele = element.all(by.xpath('//*[@class="glyphicon glyphicon-cog"]')).get(2);
+      browser.wait(EC.visibilityOf(ele), 5000);
+      ele.click().then();
     });
   };
 };

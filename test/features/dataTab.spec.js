@@ -1,4 +1,4 @@
-module.exports = function (actions) {
+module.exports = function (actions,tags) {
   describe('Test 20',function() {
     describe('Data Tab', function () {
       actions.logout();
@@ -8,6 +8,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.clickOnElementWithText('Data');
       actions.checkingUrlEndsWith('/data');
+    });
+    tags('smoke').describe('',function(){
       actions.iSeeText('User Login');
       actions.iSeeText('User Register');
       actions.iSeeText('Admin Login');

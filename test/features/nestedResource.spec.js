@@ -7,19 +7,12 @@ module.exports = function(actions){
      actions.goToPage("#/");
      actions.clickOnElementWithText('Manage');
      actions.clickOnElementWithText('Resources');
-     actions.iSeeText('Resources');
-     actions.iSeeText('User');
-     actions.iSeeText('Admin');
      actions.clickOnElementWithText(' New Resource');
      actions.checkingUrlEndsWith('/resource/create/resource');
      actions.enterTextInField('#title','Test Resource');
-     actions.iSeeValueIn('#name','testResource');
-     actions.iSeeValueIn('#path','testresource');
      actions.clickOnButton('Create Resource');
-     actions.iSeeTextIn(".toast-message", 'Successfully created form!');
-     actions.iSeeText('Save Resource');
+     actions.clickOnClass('.toast-message');
      actions.clickOnElementWithText('Resources');
-     actions.iSeeText('Test Resource');
      actions.clickOnElementWithText('Forms');
      actions.checkingUrlEndsWith('/form/');
      actions.clickOnElementWithText(' New Form');
@@ -108,8 +101,20 @@ module.exports = function(actions){
       actions.clickOnElementWithText(' Data');
       actions.checkingUrlEndsWith('/submission');
       actions.iSeeText('Travis');
-
-
+    });
+    describe('Editing Nested Resources',function(){
+      actions.clickOnElementWithText('Travis');
+      actions.clickOnElementWithTextIndex(' Edit',1);
+      actions.clickOnClass('.caret.pull-right');
+      actions.iSeeText('Gary');
+      actions.iSeeText('Travis');
+      actions.iSeeText('Denise');
+      actions.clickOnElementWithText('Denise');
+      actions.clickOnButton('Submit');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText(' Data');
+      actions.checkingUrlEndsWith('/submission');
+      actions.iSeeText('Denise');
     });
   });
 }

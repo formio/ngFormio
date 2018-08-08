@@ -1,4 +1,4 @@
-module.exports = function (actions) {
+module.exports = function (actions,tags) {
   describe('Adding Stages',function(){
     describe('Testing Adding/Removing Environments',function() {
       actions.logout();
@@ -11,7 +11,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
-      actions.enterTextInField('#title','Test Form');
+      actions.enterTextInField('#title', 'Test Form');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
       actions.enterTextInField('#label', 'Text Field');
@@ -22,28 +22,97 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
-      actions.enterTextInField('#title','Test Resource');
-      actions.iSeeValueIn('#name','testResource');
-      actions.iSeeValueIn('#path','testresource');
+      actions.enterTextInField('#title', 'Test Resource');
+      actions.iSeeValueIn('#name', 'testResource');
+      actions.iSeeValueIn('#path', 'testresource');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Successfully created form!');
       actions.iSeeText('Save Resource');
       actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('Integrations');
+      actions.checkingUrlEndsWith('env/integrations/info');
+      actions.clickOnElementWithText('Email Providers');
+      actions.clickOnElementWithText('SMTP Settings');
+      actions.checkElement('//*[@id="smtpSecure"]');
+      actions.enterTextInField('#smtpHost', 'smtpHost');
+      actions.enterTextInField('#smtpPort', 'smtpPort');
+      actions.enterTextInField('#smtpUser', 'smtpUser');
+      actions.enterTextInField('#smtpPass', 'smtpPass');
+      actions.clickOnElementWithText('Save Settings');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('File Storage');
+      actions.clickOnElementWithText('S3 Storage');
+      actions.enterTextInField('#bucket', 'testbucket');
+      actions.iSeeValueIn('#bucketUrl', 'https://testbucket.s3.amazonaws.com/');
+      actions.clickOnClass('#acl');
+      actions.iSeeText('Any');
+      actions.iSeeText('Public');
+      actions.iSeeText('Private');
+      actions.enterTextInField('#AWSAccessKeyId', 'AWSAccessKeyId');
+      actions.enterTextInField('#AWSSecretKey', 'AWSSecretKey');
+      actions.enterTextInField('#startsWith', 'startsWith');
+      actions.enterTextInField('#maxSize', '100');
+      actions.enterTextInField('#expiration', '100');
+      actions.clickOnElementWithText('Save Settings');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Data Connections');
+      actions.clickOnElementWithText('Microsoft Office 365');
+      actions.enterTextInField('#tenant', 'tenant');
+      actions.enterTextInField('#clientId', 'clientId');
+      actions.enterTextInField('#email', 'email');
+      actions.enterTextInField('#cert', 'cert');
+      actions.enterTextInField('#thumbprint', 'thumbprint');
+      actions.clickOnElementWithText('Save Settings');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Settings');
       actions.iSeeText(' Live ');
+      actions.iDonotSeeText('Delete Live Stage');
+      actions.checkElement('//*[@id="protect"]');
+      actions.clickOnElementWithText(' Save Stage');
+      actions.waitForActionToComplete(2000);
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.clickOnElementWithText('+ New Stage');
       actions.btnDisabled(' Add Stage');
       actions.enterTextInField('#title', 'Dev');
       actions.clickOnElementWithText(' Add Stage');
       actions.waitForActionToComplete(1000);
+      actions.iSeeText('Dev Project Url:');
       actions.checkingUrlEndsWith('/overview');
       actions.clickOnElementWithText('Forms');
+      actions.checkElementWithTextIsNotDisabled(' New Form');
+      actions.checkElementWithTextIsNotDisabled(' Edit');
+      actions.checkElementWithTextIsNotDisabled(' Actions');
+      actions.checkElementWithTextIsNotDisabled(' Access');
+      actions.checkElementWithTextIsNotDisabled(' Use');
+      actions.checkElementWithTextIsNotDisabled(' Embed');
       actions.iSeeText('Test Form');
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Test Resource');
+      actions.clickOnElementWithText('Settings');
+      actions.clickOnElementWithText('Integrations');
+      actions.checkingUrlEndsWith('env/integrations/info');
+      actions.clickOnElementWithText('Email Providers');
+      actions.clickOnElementWithText('SMTP Settings');
+      actions.iDonotSeeText('smtpHost');
+      actions.iDonotSeeText('smtpPort');
+      actions.iDonotSeeText('smtpUser');
+      actions.iDonotSeeText('smtpPass');
+      actions.clickOnElementWithText('File Storage');
+      actions.clickOnElementWithText('S3 Storage');
+      actions.iDonotSeeText('AWSAccessKeyId');
+      actions.iDonotSeeText('AWSSecretKey');
+      actions.iDonotSeeText('startsWith');
+      actions.iDonotSeeText('100');
+      actions.clickOnElementWithText('Data Connections');
+      actions.clickOnElementWithText('Microsoft Office 365');
+      actions.iDonotSeeText('tenant');
+      actions.iDonotSeeText('clientId');
+      actions.iDonotSeeText('email');
+      actions.iDonotSeeText('cert');
+      actions.iDonotSeeText('thumbprint');
+    });
+    tags('smoke').describe('',function(){
       var path = ['Dev1','Dev2','Dev3','Dev4','Dev5','Dev6','Dev7','Dev8'];
-      actions.clickOnElementWithText('Resources');
-      actions.clickOnElementWithText('Test Resource');
       path.forEach(function (value) {
         actions.clickOnElementWithText('+ New Stage');
         actions.enterTextInField('#title', value);
@@ -67,7 +136,10 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Yes');
       actions.iDonotSeeText(' Updated Dev ');
       actions.clickOnElementWithText(' Live ');
-
+      actions.clickOnElementWithText('Settings');
+      actions.checkElement('//*[@id="protect"]');
+      actions.clickOnElementWithText(' Save Stage');
+      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText('Forms');
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
@@ -117,7 +189,7 @@ module.exports = function (actions) {
       actions.iSeeText(' Export CSV');
       actions.iDonotSeeText('Test Submission');
     });
-    describe('Removing Environment',function() {
+    tags('smoke').describe('Removing Environment',function() {
       actions.clickOnElementWithText(' Dev1 ');
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('Delete Dev1 Stage');

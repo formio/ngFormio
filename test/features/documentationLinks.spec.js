@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('Documentation Links ',function () {
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Documentation Links ',function () {
      describe('Collapsing the ‘Documentation’ button',function(){
         actions.goToPage('#/auth');
         actions.clickOnElementWithText(' Docs');

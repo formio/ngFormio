@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('User Profile Functionality',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('User Profile Functionality',function(){
     describe('Profile navigation',function(){
       actions.logout();
       actions.iAmLoggedInFor('projuser8');
@@ -26,7 +26,6 @@ module.exports = function (actions) {
       actions.enterTextInField('#password','password');
       actions.clickOnElementWithText('Submit');
       actions.checkingUrlIamOn("#/profile/edit");
-      actions.iSeeValueIn('#password','password');
       actions.logout();
       actions.enterTextInField('.login-container #email', '${profileuser1.email}');
       actions.enterTextInField('.login-container #password', 'password');

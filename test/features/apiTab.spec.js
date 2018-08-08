@@ -1,4 +1,4 @@
-module.exports = function (actions) {
+module.exports = function (actions,tags) {
   describe('Test 19',function() {
     describe('API Tab', function () {
       actions.logout();
@@ -9,7 +9,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Endpoint: ');
-      // actions.iSeeText('.localhost:3000');
       actions.clickOnElementWithText(' Online API Documenation');
       actions.switchTab();
       actions.checkingUrlIamOn('https://documenter.getpostman.com/view/684631/formio-api/2Jvuks');
@@ -24,7 +23,7 @@ module.exports = function (actions) {
       actions.iSeeText('Admin Login');
       actions.clickOnElementWithText('Forms');
       actions.checkingUrlEndsWith('/form/');
-      actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash',2);
+      actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash', 2);
       actions.clickOnButton('Yes');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
@@ -34,7 +33,7 @@ module.exports = function (actions) {
       actions.iSeeText('Admin');
       actions.clickOnElementWithText('Resources');
       actions.checkingUrlEndsWith('/resource/');
-      actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash',1);
+      actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash', 1);
       actions.clickOnButton('Yes');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
@@ -45,7 +44,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
-      actions.enterTextInField('#title','Test Resource');
+      actions.enterTextInField('#title', 'Test Resource');
       actions.clickOnButton('Create Resource');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
@@ -57,7 +56,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
-      actions.enterTextInField('#title','Test Form');
+      actions.enterTextInField('#title', 'Test Form');
       actions.clickOnElementWithText('Create Form');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
@@ -67,7 +66,7 @@ module.exports = function (actions) {
       actions.iDonotSeeText('Updated Resource');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText('Test Resource');
-      actions.enterTextInField('#title','Updated Resource');
+      actions.enterTextInField('#title', 'Updated Resource');
       actions.clickSave('Save Resource');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
@@ -78,12 +77,14 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Forms');
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText('Test Form');
-      actions.enterTextInField('#title','Updated Form');
+      actions.enterTextInField('#title', 'Updated Form');
       actions.clickSave('Save Form');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Updated Form');
+    });
+    tags('smoke').describe('',function(){
       var formsAndResources = [
         [0,'/updatedform/submission','/updatedform/submission/{updatedFormId}','List multiple updatedForm resources.','Create a new updatedForm','Return a specific Updated Form instance.','Update a specific Updated Form instance.','Delete a specific Updated Form'],
         [1,'/updatedresource/submission','/updatedresource/submission/{updatedResourceId}','List multiple updatedResource resources.','Create a new updatedResource','Return a specific Updated Resource instance.','Update a specific Updated Resource instance.','Delete a specific Updated Resource'],

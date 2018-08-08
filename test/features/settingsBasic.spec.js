@@ -1,23 +1,23 @@
-module.exports = function (actions) {
-  describe('Settings',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Settings',function(){
     describe('Basic Plan > Environment Settings',function(){
       actions.logout();
       actions.iAmLoggedInFor('profileuser3');
       actions.goToPage('#/');
-      actions.clickOnClass('#user-menu');
-      actions.clickOnElementWithText(' Payment Info');
-      actions.checkingUrlEndsWith('#/profile/payment/view');
-      actions.clickOnElementWithText('Add Credit Card');
-      actions.enterTextInField('#cardholderName','Test');
-      actions.enterTextInField('#ccNumber','4111111111111111');
-      actions.enterTextInField('#securityCode','411');
-      actions.clickOnClass('#form-group-ccExpiryMonth');
-      actions.clickOnElementWithText('01');
-      actions.clickOnClass('#form-group-ccExpiryYear');
-      actions.clickOnElementWithText('25');
-      actions.clickOnClass('#submit');
-      actions.waitForActionToComplete(2000);
-      actions.goToPage('#/');
+      // actions.clickOnClass('#user-menu');
+      // actions.clickOnElementWithText(' Payment Info');
+      // actions.checkingUrlEndsWith('#/profile/payment/view');
+      // actions.clickOnElementWithText('Add Credit Card');
+      // actions.enterTextInField('#cardholderName','Test');
+      // actions.enterTextInField('#ccNumber','4111111111111111');
+      // actions.enterTextInField('#securityCode','411');
+      // actions.clickOnClass('#form-group-ccExpiryMonth');
+      // actions.clickOnElementWithText('01');
+      // actions.clickOnClass('#form-group-ccExpiryYear');
+      // actions.clickOnElementWithText('25');
+      // actions.clickOnClass('#submit');
+      // actions.waitForActionToComplete(2000);
+      // actions.goToPage('#/');
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','basicProject');
       actions.clickOnElementWithText(' Create Project');
@@ -44,6 +44,8 @@ module.exports = function (actions) {
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Create Form');
       actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText(' Revisions');
+      actions.iSeeText('Upgrade your Project');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsDisabled('//*[@id="form-group-name"]/div/input');
@@ -127,10 +129,10 @@ module.exports = function (actions) {
     });
     describe('Basic Plan > Integrations Settings',function(){
       actions.clickOnElementWithText('Settings');
-      // actions.clickOnElementWithText('PDF Management');
-      // actions.checkingUrlEndsWith('env/pdf');
-      // actions.iSeeText('1');
-      // actions.iSeeText('10');
+      actions.clickOnElementWithText('PDF Management');
+      actions.checkingUrlEndsWith('env/pdf');
+      actions.iSeeText('1');
+      actions.iSeeText('10');
       // actions.clickOnElementWithText('Change Plan');
       // actions.checkingUrlEndsWith('/billing');
       // actions.iSeeText('$0/month');

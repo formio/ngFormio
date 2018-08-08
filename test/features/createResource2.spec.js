@@ -1,4 +1,4 @@
-module.exports = function (actions) {
+module.exports = function (actions,tags) {
   describe('Create Resource2', function () {
     describe('Accessing Resource page',function(){
       actions.logout();
@@ -11,7 +11,7 @@ module.exports = function (actions) {
       actions.iSeeText('User');
       actions.iSeeText('Admin');
     });
-    describe('Clicking ‘More Info’ help button',function(){
+    tags('smoke').describe('Clicking ‘More Info’ help button',function(){
       actions.clickOnElementWithText(' More info');
       actions.switchTab();
       actions.checkingUrlIamOn('https://help.form.io/userguide/resources/');
@@ -29,20 +29,21 @@ module.exports = function (actions) {
       actions.enterTextInField('#resource-search','Z');
       actions.iDonotSeeText('Admin');
       actions.iDonotSeeText('User');
+      actions.enterTextInField('#resource-search','');
     });
-    describe('Clearing Search Resource bar',function(){
+    tags('smoke').describe('Clearing Search Resource bar',function(){
       actions.enterTextInField('#resource-search','');
       actions.iSeeText('Admin');
       actions.iSeeText('User');
     });
-    describe('Clicking ‘Edit’ button for Resource on Resource page',function(){
+    tags('smoke').describe('Clicking ‘Edit’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Edit');
       actions.iSeeText('User Resource ');
       actions.checkingUrlEndsWith('/edit');
       actions.iSeeText('Email ');
       actions.iSeeText('Password ');
     });
-    describe('Clicking ‘Use’ button for Resource on Resource page',function(){
+    tags('smoke').describe('Clicking ‘Use’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Use');
       actions.iSeeText('User Resource ');
       actions.iSeeText('Submit Form');
@@ -55,7 +56,7 @@ module.exports = function (actions) {
       actions.iSeeText('Edit');
       actions.iSeeText('Delete');
     });
-    describe('Clicking ‘API’ button for Resource on Resource page',function(){
+    tags('smoke').describe('Clicking ‘API’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' API');
       actions.iSeeText('User Resource ');
       actions.checkingUrlEndsWith('/api');
@@ -84,51 +85,50 @@ module.exports = function (actions) {
         actions.closeWindow();
       });
     });
-    // describe('Adding/Editing a component updates info section of API',function(){
-    //   actions.clickOnElementWithText(' Edit');
-    //   actions.dragTo('Text Field', 'formarea');
-    //   actions.iSeeText('Text Field Component');
-    //   actions.enterTextInField('#label', 'Text Field');
-    //   actions.clickOnElementWithText('Save');
-    //   actions.clickSave('Save Resource');
-    //   actions.clickOnElementWithText(' API');
-    //   actions.iSeeText('textField');
-    //   actions.clickOnElementWithText(' Edit');
-    //   actions.clickOnClass('.glyphicon.glyphicon-cog');
-    //   actions.enterTextInField('#label','Updated Email');
-    //   actions.clickOnElementWithText('API');
-    //   actions.enterTextInField('#key','update');
-    //   actions.clickOnButton('Save');
-    //   actions.waitForClassRemoval('ngdialog-overlay');
-    //   actions.clickOnButton('Save Resource');
-    //   actions.clickOnElementWithText(' API');
-    //   actions.iSeeText('update');
-    // });
-    describe('Clicking ‘Revisions’ button for Form on Form page', function () {
+    tags('smoke').describe('Adding/Editing a component updates info section of API',function(){
+      actions.clickOnElementWithText(' Edit');
+      actions.dragTo('Text Field', 'formarea');
+      actions.iSeeText('Text Field Component');
+      actions.enterTextInField('#label', 'Text Field');
+      actions.clickOnElementWithText('Save');
+      actions.clickSave('Save Resource');
+      actions.clickOnElementWithText(' API');
+      actions.iSeeText('textField');
+      // actions.clickOnElementWithText(' Edit');
+      // actions.clickSettings();
+      // actions.enterTextInField('#label','Updated TextField');
+      // actions.clickOnElementWithTextIndex('API',1);
+      // actions.enterTextInField('#key','update');
+      // actions.clickOnElementWithText('Save');
+      // actions.clickSave('Save Resource');
+      // actions.clickOnElementWithText(' API');
+      // actions.iSeeText('update');
+    });
+    tags('smoke').describe('Clicking ‘Revisions’ button for Form on Form page', function () {
       actions.clickOnElementWithText(' Revisions');
       actions.checkingUrlEndsWith('/revision');
       actions.iSeeText('Form Revisions');
     });
-    describe('Clicking ‘Data’ button for Resource on Resource page',function(){
+    tags('smoke').describe('Clicking ‘Data’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Data');
       actions.checkingUrlEndsWith('/submission');
       actions.iSeeText('User Resource ');
       actions.iSeeText('{...} Export JSON');
       actions.iSeeText(' Export CSV');
     });
-    describe('Verify resource components display in Kendo UI grid',function(){
+    tags('smoke').describe('Verify resource components display in Kendo UI grid',function(){
       actions.iSeeText('Email');
       actions.iSeeText('test@automation');
       actions.iDonotSeeText('password');
     });
-    describe('Clicking ‘Action’ button for Resource on Resource page',function(){
+    tags('smoke').describe('Clicking ‘Action’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Actions');
       actions.checkingUrlEndsWith('/action');
       actions.iSeeText('User Resource ');
       actions.iSeeText('Save Submission');
       actions.iSeeText('Role Assignment');
     });
-    describe('Clicking ‘Access’ button for Resource on Resource page',function(){
+    tags('smoke').describe('Clicking ‘Access’ button for Resource on Resource page',function(){
       actions.clickOnElementWithText(' Access');
       actions.checkingUrlEndsWith('/permission');
       actions.iSeeText('User Resource ');
@@ -160,7 +160,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Test Resource');
     });
-    describe('Attempt to create a new Resource with blank Resource fields',function(){
+    tags('smoke').describe('Attempt to create a new Resource with blank Resource fields',function(){
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Resource1');
@@ -176,7 +176,7 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
       actions.clickOnClass('.toast-message');
     });
-    describe('Attempt to create a new Resource with non unique name and path',function(){
+    tags('smoke').describe('Attempt to create a new Resource with non unique name and path',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
@@ -194,7 +194,7 @@ module.exports = function (actions) {
       actions.iSeeText('The Path must be unique per Project.');
       actions.clickOnClass('.toast-message');
     });
-    describe('Attempt to create a new ‘Resource’ with invalid path name', function () {
+    tags('smoke').describe('Attempt to create a new ‘Resource’ with invalid path name', function () {
       var message = 'Form path cannot contain one of the following names: submission, report, version, tag, owner, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token, v, draft';
       var path = ['submission', 'report', 'exists', 'export', 'role', 'current', 'logout', 'import', 'form', 'storage/s3', 'storage/dropbox', 'dropbox/auth', 'upgrade', 'access', 'atlassian/oauth/authorize', 'atlassian/oauth/finalize', 'sqlconnector','token','v','draft'];
       actions.clickOnElementWithText('Resources');
@@ -209,7 +209,7 @@ module.exports = function (actions) {
         actions.clickOnClass('.toast-message');
       });
     });
-    describe('Attempt to ‘save’ an existing ‘Resource’ with invalid path name', function () {
+    tags('smoke').describe('Attempt to ‘save’ an existing ‘Resource’ with invalid path name', function () {
       var message = 'Form path cannot contain one of the following names: submission, report, version, tag, owner, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token, v, draft';
       var path = ['submission', 'report', 'exists', 'export', 'role', 'current', 'logout', 'import', 'form', 'storage/s3', 'storage/dropbox', 'dropbox/auth', 'upgrade', 'access', 'atlassian/oauth/authorize', 'atlassian/oauth/finalize', 'sqlconnector','token','v','draft'];
       actions.clickOnElementWithText('Resources');
@@ -221,12 +221,12 @@ module.exports = function (actions) {
         actions.clickOnClass('.toast-message');
       });
     });
-    describe('New Resources are created on ‘Forms’ Page',function(){
+    tags('smoke').describe('New Resources are created on ‘Forms’ Page',function(){
       actions.clickOnElementWithText('Forms');
       actions.checkingUrlEndsWith('/form/');
       actions.iSeeText('Test Resource');
     });
-    describe('Editing an existing ‘Resource’',function(){
+    tags('smoke').describe('Editing an existing ‘Resource’',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText('Test Resource');
       actions.checkingUrlEndsWith('/edit');
@@ -242,7 +242,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/resource/');
       actions.iSeeText('Edit Resource');
     });
-    describe('Attempt to Edit an existing Resource with blank fields',function(){
+    tags('smoke').describe('Attempt to Edit an existing Resource with blank fields',function(){
       actions.clickOnElementWithText('Edit Resource');
       actions.checkingUrlEndsWith('/edit');
       actions.enterTextInField('#title','Test Resource1');
@@ -258,37 +258,55 @@ module.exports = function (actions) {
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
       actions.clickOnClass('.toast-message');
     });
-    // describe('Adding field tags',function(){
-    //   actions.clickOnElementWithText(' New Resource');
-    //   actions.checkingUrlEndsWith('/resource/create/r esource');
-    //   actions.enterTextInField('#title','Test Resource');
-    //   actions.iSeeValueIn('#name','testResource');
-    //   actions.iSeeValueIn('#path','testresource');
-    //   actions.clickOnButton('Create Resource');
-    //   actions.iSeeTextIn(".toast-message", 'Successfully created form!');
-    //   actions.iSeeText('Save Resource');
-    //   actions.clickOnElementWithText('Resources');
-    //   actions.iSeeText('Test Resource');
-    //   actions.clickOnElementWithText('Test Resource');
-    //   actions.checkingUrlEndsWith('/edit');
-    //   actions.clickOnClass('i.fa.fa-gear');
-    //   actions.iSeeText('Custom Action URL');
-    //   actions.iSeeText('Form Tags');
-    //   actions.checkElementIsDisabled('//*[@id="formCollection"]');
-    //   actions.clickOnClass('.input.ng-pristine.ng-valid.ng-empty.ng-touched');
-    //   actions.enterTextInField('.input.ng-pristine.ng-valid.ng-empty.ng-touched','test');
-    //   actions.clickOnButton('Save Settings');
-    //   actions.iSeeText('test');
-    // });
-    // describe('Adding ‘Custom Action URL ’',function(){
-    //   actions.enterTextInField('#form-action','test.com');
-    //   actions.clickOnButton('Save Settings');
-    //   actions.iSeeValueIn('#form-action','test.com');
-    // });
-    // describe('Viewing /Modifying Machine name',function(){
-    //   actions.iSeeText('MachineName');
-    // });
-    describe('Fields in a Resource create ‘Existing Resource Fields’',function(){
+    describe('Adding field tags',function(){
+      actions.clickOnElementWithText('Resources');
+      actions.clickOnElementWithText(' New Resource');
+      actions.checkingUrlEndsWith('/resource/create/resource');
+      actions.enterTextInField('#title','FieldTags Resource');
+      actions.clickOnButton('Create Resource');
+      actions.clickOnClass('.toast-message');
+      actions.checkingUrlEndsWith('/edit');
+      actions.clickOnClassWithIndex('.fa.fa-gear',1);
+      actions.iSeeText('Custom Action URL');
+      actions.iSeeText('Form Tags');
+      actions.checkElementIsDisabled('//*[@id="formCollection"]');
+      actions.enterTextInField('xpath://*[@id="form-group-tags"]/tags-input/div/div/input','test');
+      actions.clickOnButton('Save Settings');
+      actions.iSeeText('test');
+      actions.pageReload();
+      // actions.iSeeText('test');
+    });
+    tags('smoke').describe('Adding ‘Custom Action URL ’',function(){
+      actions.clickOnElementWithText('Resources');
+      actions.clickOnElementWithText(' New Resource');
+      actions.checkingUrlEndsWith('/resource/create/resource');
+      actions.enterTextInField('#title','Custom URL');
+      actions.clickOnButton('Create Resource');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnClassWithIndex('.fa.fa-gear',1);
+      actions.enterTextInField('#form-action','test.com');
+      actions.clickOnButton('Save Settings');
+      actions.pageReload();
+      actions.iSeeValueIn('#form-action','test.com');
+    });
+    tags('smoke').describe('Viewing /Modifying Machine name',function(){
+      actions.iSeeText('MachineName');
+      actions.iSeeValueInContains('#machineName','customUrl');
+      actions.clickOnElementWithText(' Edit');
+      actions.enterTextInField('#title','Updated Resource');
+      actions.clickSave('Save Resource');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnClassWithIndex('.fa.fa-gear',1);
+      actions.iSeeValueInContains('#machineName','customUrl');
+      actions.enterTextInField('#machineName','updatedMachineName');
+      actions.clickOnButton('Save Settings');
+      actions.clickOnClass('.toast-message');
+      actions.waitForActionToComplete(500);
+      actions.pageReload();
+      // actions.iSeeValueIn('#machineName','updatedMachineName');
+
+    });
+    tags('smoke').describe('Fields in a Resource create ‘Existing Resource Fields’',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
@@ -332,8 +350,7 @@ module.exports = function (actions) {
     });
     describe('Copy a Resource',function(){
       actions.clickOnElementWithText('Resources');
-      actions.iSeeText('Test Resource');
-      actions.clickOnElementWithText('Test Resource');
+      actions.clickOnElementWithText('Test Import Resource');
       actions.checkingUrlEndsWith('/edit');
       actions.clickOnClass('.glyphicon.glyphicon-copy');
       actions.checkingUrlEndsWith('/resource/create/resource');
@@ -345,9 +362,8 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Copy Test');
     });
-    describe('Cancelling a Resource',function(){
+    tags('smoke').describe('Cancelling a Resource',function(){
       actions.clickOnElementWithText('Resources');
-      actions.iSeeText('Test Resource');
       actions.clickOnElementWithText('Edit Resource');
       actions.checkingUrlEndsWith('/edit');
       actions.dragTo('Text Field', 'formarea');
@@ -360,12 +376,10 @@ module.exports = function (actions) {
       actions.clickOnButton('Cancel Changes');
       actions.checkingUrlEndsWith('/resource/');
     });
-    describe('Cancelling the Cancel function of Resource',function(){
+    tags('smoke').describe('Cancelling the Cancel function of Resource',function(){
       actions.clickOnElementWithText('Edit Resource');
       actions.checkingUrlEndsWith('/edit');
       actions.iDonotSeeText('Text Field Component');
-      actions.goToPage('#/');
-      actions.waitForActionToComplete(2000);
       actions.logout();
     });
   });

@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('Feedback Request ',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Feedback Request ',function(){
     describe('Expanding Feedback modalExpanding Feedback modal',function(){
       actions.goToPage('#/auth');
       actions.clickOnElement('.feedback ');
