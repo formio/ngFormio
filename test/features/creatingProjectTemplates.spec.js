@@ -3,7 +3,6 @@ module.exports = function (actions,tags) {
     describe('Creating AngularJS', function () {
       actions.logout();
       actions.iAmLoggedInFor('creatingProj');
-      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnElementWithText('AngularJS');
       actions.iSeeText("Create a New AngularJS");

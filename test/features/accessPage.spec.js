@@ -4,13 +4,8 @@ module.exports = function (actions,tags) {
       actions.logout();
       actions.iAmLoggedInFor('accessProj');
       actions.goToPage('#/');
+      actions.projectExisting('New Project', 'This is a test project');
       actions.clickOnElementWithText('New Project');
-      actions.iSeeText('Project Title');
-      actions.iSeeText('Description');
-      actions.enterTextInField('#title', '${random-title>project1.title}');
-      actions.enterTextInField('#description', '${random-description>project1.description}');
-      actions.clickOnButton('Create Project');
-      actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Access');
       actions.iSeeTextCount('Administrator', 5);
       actions.iSeeTextCount('Authenticated', 3);

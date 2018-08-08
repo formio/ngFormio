@@ -1,4 +1,4 @@
-module.exports = function(actions){
+module.exports = function(actions,tags){
   describe('Creating and Populating Nested Resources', function(){
    describe('',function(){
      actions.logout();
@@ -102,7 +102,7 @@ module.exports = function(actions){
       actions.checkingUrlEndsWith('/submission');
       actions.iSeeText('Travis');
     });
-    describe('Editing Nested Resources',function(){
+    tags('smoke').describe('Editing Nested Resources',function(){
       actions.clickOnElementWithText('Travis');
       actions.clickOnElementWithTextIndex(' Edit',1);
       actions.clickOnClass('.caret.pull-right');

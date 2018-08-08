@@ -10,6 +10,8 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/data');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
+    });
+    tags('smoke').describe('',function() {
       actions.iSeeText('Endpoint: ');
       actions.clickOnElementWithText(' Online API Documenation');
       actions.switchTab();
@@ -21,7 +23,8 @@ module.exports = function (actions,tags) {
       actions.checkingUrlIamOn('https://help.form.io/developer/api/');
       actions.iSeeText('API Documentation');
       actions.closeWindow();
-
+    });
+    describe('',function(){
       actions.iSeeText('Admin Login');
       actions.clickOnElementWithText('Forms');
       actions.checkingUrlEndsWith('/form/');

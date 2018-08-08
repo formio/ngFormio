@@ -20,9 +20,8 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('#submit');
       // actions.waitForActionToComplete(2000);
       // actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
-      actions.enterTextInField('#title','enterpriseProject');
-      actions.clickOnElementWithText(' Create Project');
+      actions.projectExisting('enterpriseProject', 'This is a test project');
+      actions.clickOnElementWithText('enterpriseProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Enterprise");
       actions.clickOnElementWithText(' Confirm Billing Change');
@@ -52,7 +51,6 @@ module.exports = function (actions,tags) {
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="form-group-name"]/div[1]/input');
       actions.enterTextInField('#form-group-name>div.input-group.ng-scope>input','${random-name>test.name}');
-      actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Save Stage');
       actions.waitForActionToComplete(500);
       actions.clickOnElementWithText('Forms');
@@ -251,9 +249,8 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('#submit');
       // actions.waitForActionToComplete(2000);
       // actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
-      actions.enterTextInField('#title', 'enterpriseProject');
-      actions.clickOnElementWithText(' Create Project');
+      actions.projectExisting('enterpriseProject', 'This is a test project');
+      actions.clickOnElementWithText('enterpriseProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Enterprise");
       actions.clickOnElementWithText(' Confirm Billing Change');

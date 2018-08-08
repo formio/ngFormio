@@ -13,7 +13,6 @@ module.exports = function (actions,tags) {
       actions.iSeeText('User Register');
       actions.iSeeText('Admin Login');
       actions.iSeeText('User');
-      actions.iSeeText('User');
     });
     tags('smoke').describe('Searching for existing Forms/Resource with search bar',function(){
       actions.enterTextInField('#form-search','Lo');

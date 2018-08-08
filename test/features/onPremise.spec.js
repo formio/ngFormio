@@ -20,9 +20,8 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('#submit');
       // actions.waitForActionToComplete(2000);
       // actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
-      actions.enterTextInField('#title', 'onPremiseProject');
-      actions.clickOnElementWithText(' Create Project');
+      actions.projectExisting('onPremiseProject', 'This is a test project');
+      actions.clickOnElementWithText('onPremiseProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Enterprise");
       actions.clickOnElementWithText(' Confirm Billing Change');
@@ -35,7 +34,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Continue ');
       actions.iSeeText('Connect to an On-Premise Environment');
       actions.clickOnClass('.ui-select-match.ng-scope');
-      actions.clickOnClass('#ui-select-choices-row-0-0');
+      actions.clickOnClass('.ui-select-choices-row-inner');
       actions.clickOnElementWithText('Connect Stage ');
       actions.waitForActionToComplete(2000);
       actions.iSeeText('https://remote.form.io');

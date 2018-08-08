@@ -5,9 +5,8 @@ module.exports = function (actions,tags) {
         actions.logout();
         actions.iAmLoggedInFor('profileuser2');
         actions.goToPage('#/');
-        actions.clickOnElementWithText('New Project');
-        actions.enterTextInField('#title', 'testProject');
-        actions.clickOnElementWithText(' Create Project');
+        actions.projectExisting('testVersioningProject', 'This is a test project');
+        actions.clickOnElementWithText('testVersioningProject');
         actions.clickOnLink('Settings');
         actions.clickOnLink('Staging');
         actions.iSeeText('No version tags exist. ');
@@ -25,7 +24,6 @@ module.exports = function (actions,tags) {
         actions.enterTextInField('#title', 'Dev');
         actions.clickOnElementWithText(' Add Stage');
         actions.clickOnClass('.toast-message');
-        actions.waitForActionToComplete(1000);
         actions.checkingUrlEndsWith('/overview');
         actions.clickOnLink('Settings');
         actions.clickOnLink('Staging');

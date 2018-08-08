@@ -25,7 +25,7 @@ module.exports = function (actions,tags) {
       actions.iDonotSeeText('User');
       actions.iSeeText('Admin');
     });
-    describe('Searching for non existing Resource in Resource search bar',function(){
+    tags('smoke').describe('Searching for non existing Resource in Resource search bar',function(){
       actions.enterTextInField('#resource-search','Z');
       actions.iDonotSeeText('Admin');
       actions.iDonotSeeText('User');
@@ -152,11 +152,8 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Resource');
-      actions.iSeeValueIn('#name','testResource');
-      actions.iSeeValueIn('#path','testresource');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Successfully created form!');
-      actions.iSeeText('Save Resource');
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Test Resource');
     });
@@ -339,8 +336,6 @@ module.exports = function (actions,tags) {
       actions.clickOnClassWithIndex('.btn.btn-primary',1);
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Import Resource');
-      actions.iSeeValueIn('#name','testImportResource');
-      actions.iSeeValueIn('#path','testimportresource');
       actions.iSeeText('Name ');
       actions.iSeeText('Phone ');
       actions.clickOnButton('Create Resource');
@@ -355,8 +350,6 @@ module.exports = function (actions,tags) {
       actions.clickOnClass('.glyphicon.glyphicon-copy');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Copy Test');
-      actions.iSeeValueIn('#name','copyTest');
-      actions.iSeeValueIn('#path','copytest');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Successfully created form!');
       actions.clickOnElementWithText('Resources');

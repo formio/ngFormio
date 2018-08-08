@@ -18,9 +18,8 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('#submit');
       // actions.waitForActionToComplete(2000);
       // actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
-      actions.enterTextInField('#title','basicProject');
-      actions.clickOnElementWithText(' Create Project');
+      actions.projectExisting('basicProject', 'This is a test project');
+      actions.clickOnElementWithText('basicProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
       actions.clickOnElementWithText(' Confirm Billing Change');

@@ -3,7 +3,6 @@ module.exports = function (actions,tags) {
     describe('Navigating to ‘Payment Info’ page',function(){
       actions.logout();
       actions.iAmLoggedInFor('authProfile');
-      actions.waitForActionToComplete(2000);
       actions.goToPage('#/');
       actions.clickOnClass('#user-menu');
       actions.clickOnElementWithText(' Payment Info');

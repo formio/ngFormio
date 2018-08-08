@@ -20,9 +20,8 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('#submit');
       // actions.waitForActionToComplete(2000);
       // actions.goToPage('#/');
-      actions.clickOnElementWithText('New Project');
-      actions.enterTextInField('#title', 'teamProProject');
-      actions.clickOnElementWithText(' Create Project');
+      actions.projectExisting('teamProProject', 'This is a test project');
+      actions.clickOnElementWithText('teamProProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Team Pro");
       actions.clickOnElementWithText(' Confirm Billing Change');
