@@ -400,7 +400,6 @@ app.controller('ProjectController', [
         $scope.formio = new Formio($scope.projectUrl, {
           base: $scope.localProject.remote.url
         });
-        formioReady.resolve($scope.formio);
         promiseResult = $http({
           method: 'GET',
           url: $scope.localProjectUrl + '/access/remote'
@@ -417,6 +416,7 @@ app.controller('ProjectController', [
               .then(function(currentProject) {
                 $scope.currentProject = currentProject;
                 $scope.loadRoles();
+                formioReady.resolve($scope.formio);
                 return currentProject;
               });
           });
