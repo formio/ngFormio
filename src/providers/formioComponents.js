@@ -1,6 +1,7 @@
 const app = angular.module('formio');
+const Components = require('formiojs/components').default;
 export default app.provider('formioComponents', function() {
-  var components = {};
+  var components = Components;
   var groups = {
     __component: {
       title: 'Basic Components'
@@ -20,7 +21,6 @@ export default app.provider('formioComponents', function() {
       console.warn('formioComponents is deprecated');
     },
     $get: function() {
-      console.warn('formioComponents is deprecated');
       return {
         components: components,
         groups: groups

@@ -632,8 +632,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 var app = angular.module('formio');
+var Components = __webpack_require__(/*! formiojs/components */ "./node_modules/formiojs/components/index.js").default;
 exports.default = app.provider('formioComponents', function () {
-  var components = {};
+  var components = Components;
   var groups = {
     __component: {
       title: 'Basic Components'
@@ -653,7 +654,6 @@ exports.default = app.provider('formioComponents', function () {
       console.warn('formioComponents is deprecated');
     },
     $get: function $get() {
-      console.warn('formioComponents is deprecated');
       return {
         components: components,
         groups: groups
@@ -7231,6 +7231,10 @@ var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _moment = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+
+var _moment2 = _interopRequireDefault(_moment);
+
 var _eventemitter = __webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
@@ -7869,6 +7873,8 @@ var Webform = function (_NestedComponent) {
       if (!submission || !submission.data) {
         submission = { data: {} };
       }
+      // Metadata needs to be available before setValue
+      this._submission.metadata = submission.metadata || {};
       var changed = _get(Webform.prototype.__proto__ || Object.getPrototypeOf(Webform.prototype), 'setValue', this).call(this, submission.data, flags);
       this.mergeData(this.data, submission.data);
       submission.data = this.data;
@@ -8186,6 +8192,19 @@ var Webform = function (_NestedComponent) {
         }
 
         var submission = _this12.submission || {};
+
+        // Add in metadata about client submitting the form
+        submission.metadata = submission.metadata || {};
+        _lodash2.default.defaults(submission.metadata, {
+          timezone: _this12.submissionTimezone,
+          offset: _this12.submissionOffset,
+          referrer: document.referrer,
+          browserName: navigator.appName,
+          userAgent: navigator.userAgent,
+          pathName: window.location.pathname,
+          onLine: navigator.onLine
+        });
+
         submission.state = options.state || 'submitted';
         var isDraft = submission.state === 'draft';
         _this12.hook('beforeSubmit', submission, function (err) {
@@ -8462,6 +8481,21 @@ var Webform = function (_NestedComponent) {
         return schema.components.push(component.schema);
       });
       return schema;
+    }
+  }, {
+    key: 'submissionOffset',
+    get: function get() {
+      return parseInt(_lodash2.default.get(this, '_submission.metadata.offset', (0, _moment2.default)().utcOffset()), 10);
+    }
+  }, {
+    key: 'hasTimezone',
+    get: function get() {
+      return _lodash2.default.has(this, '_submission.metadata.timezone');
+    }
+  }, {
+    key: 'submissionTimezone',
+    get: function get() {
+      return _lodash2.default.get(this, '_submission.metadata.timezone', this.timezone);
     }
   }]);
 
@@ -10059,6 +10093,14 @@ var Components = function () {
   _createClass(Components, null, [{
     key: 'setComponents',
     value: function setComponents(comps) {
+      // Set the tableView method on BaseComponent.
+      if (comps.base) {
+        // Implement the tableView method.
+        comps.base.tableView = function (value, options) {
+          var comp = Components.create(options.component, {}, {}, true);
+          return comp.getView(value);
+        };
+      }
       _lodash2.default.assign(Components.components, comps);
     }
   }, {
@@ -11448,6 +11490,20 @@ var BaseComponent = function () {
     }
 
     /**
+     * Provides a table view for this component. Override if you wish to do something different than using getView
+     * method of your instance.
+     *
+     * @param value
+     * @param options
+     */
+    /* eslint-disable no-unused-vars */
+
+  }, {
+    key: 'tableView',
+    value: function tableView(value, options) {}
+    /* eslint-enable no-unused-vars */
+
+    /**
      * Initialize a new BaseComponent.
      *
      * @param {Object} component - The component JSON you wish to initialize.
@@ -12531,9 +12587,7 @@ var BaseComponent = function () {
       container.appendChild(this.text(' '));
       container.appendChild(ttElement);
       this.tooltip = new _tooltip2.default(ttElement, {
-        delay: {
-          hide: 100
-        },
+        trigger: 'hover click',
         placement: 'right',
         html: true,
         title: component.tooltip.replace(/(?:\r\n|\r|\n)/g, '<br />')
@@ -14253,6 +14307,16 @@ var BaseComponent = function () {
       _lodash2.default.each(this.inputs, function (input) {
         return _this23.setDisabled(_this23.performInputMapping(input), disabled);
       });
+    }
+  }, {
+    key: 'timezone',
+    get: function get() {
+      if (navigator.languages && navigator.languages.length) {
+        return new Date().toLocaleTimeString(navigator.languages[0], {
+          timeZoneName: 'short'
+        }).split(' ')[2];
+      }
+      return (0, _moment2.default)().format('Z');
     }
   }]);
 
@@ -16458,6 +16522,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 var _NestedComponent2 = __webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js");
 
 var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
@@ -16483,6 +16553,18 @@ var ColumnComponent = function (_NestedComponent) {
   }
 
   _createClass(ColumnComponent, [{
+    key: 'conditionallyVisible',
+    value: function conditionallyVisible(data) {
+      // Check children components for visibility.
+      var allChildrenHidden = _lodash2.default.every(this.getComponents(), ['visible', false]);
+
+      if (allChildrenHidden) {
+        return false;
+      }
+
+      return _get(ColumnComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnComponent.prototype), 'conditionallyVisible', this).call(this, data);
+    }
+  }, {
     key: 'className',
     get: function get() {
       var comp = this.component;
@@ -16566,6 +16648,8 @@ var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -16575,25 +16659,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var ColumnsComponent = function (_NestedComponent) {
   _inherits(ColumnsComponent, _NestedComponent);
 
-  function ColumnsComponent() {
-    _classCallCheck(this, ColumnsComponent);
-
-    return _possibleConstructorReturn(this, (ColumnsComponent.__proto__ || Object.getPrototypeOf(ColumnsComponent)).apply(this, arguments));
-  }
-
   _createClass(ColumnsComponent, [{
-    key: 'addComponents',
-    value: function addComponents() {
-      var _this2 = this;
-
-      var container = this.getContainer();
-      container.noDrop = true;
-      _lodash2.default.each(this.component.columns, function (column) {
-        column.type = 'column';
-        _this2.addComponent(column, container, _this2.data);
-      });
-    }
-  }, {
     key: 'defaultSchema',
     get: function get() {
       return ColumnsComponent.schema();
@@ -16601,23 +16667,18 @@ var ColumnsComponent = function (_NestedComponent) {
   }, {
     key: 'schema',
     get: function get() {
-      var _this3 = this;
+      var _this2 = this;
 
       var schema = _lodash2.default.omit(_get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'schema', this), 'components');
       schema.columns = [];
       this.eachComponent(function (component, index) {
-        _lodash2.default.merge(component.component, _lodash2.default.omit(_this3.component.columns[index], 'components'));
+        _lodash2.default.merge(component.component, _lodash2.default.omit(_this2.component.columns[index], 'components'));
         schema.columns.push(component.schema);
       });
       for (var i = this.components.length; i < this.component.columns.length; i++) {
         schema.columns.push(this.component.columns[i]);
       }
       return schema;
-    }
-  }, {
-    key: 'className',
-    get: function get() {
-      return 'row ' + _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'className', this);
     }
   }], [{
     key: 'schema',
@@ -16634,7 +16695,8 @@ var ColumnsComponent = function (_NestedComponent) {
         clearOnHide: false,
         input: false,
         tableView: false,
-        persistent: false
+        persistent: false,
+        autoAdjust: false
       }].concat(extend));
     }
   }, {
@@ -16648,6 +16710,133 @@ var ColumnsComponent = function (_NestedComponent) {
         weight: 10,
         schema: ColumnsComponent.schema()
       };
+    }
+  }]);
+
+  function ColumnsComponent(component, options, data) {
+    _classCallCheck(this, ColumnsComponent);
+
+    var _this = _possibleConstructorReturn(this, (ColumnsComponent.__proto__ || Object.getPrototypeOf(ColumnsComponent)).call(this, component, options, data));
+
+    _this.rows = [];
+    return _this;
+  }
+
+  _createClass(ColumnsComponent, [{
+    key: 'justifyRow',
+
+
+    /**
+     * Justify columns width according to `this.gridSize`.
+     * @param {ColumnComponent[]} columns
+     * @return {*}
+     */
+    value: function justifyRow(columns) {
+      var visible = _lodash2.default.filter(columns, 'visible');
+      var nbColumns = columns.length;
+      var nbVisible = visible.length;
+
+      if (nbColumns > 0 && nbVisible > 0) {
+        var w = Math.floor(this.gridSize / nbVisible);
+        var totalWidth = w * nbVisible;
+        var span = this.gridSize - totalWidth;
+
+        _lodash2.default.each(visible, function (column) {
+          column.component.width = w;
+        });
+
+        // In case when row is not fully filled,
+        // extending last col to fill empty space.
+        _lodash2.default.last(visible).component.width += span;
+
+        _lodash2.default.each(visible, function (col) {
+          col.element.setAttribute('class', col.className);
+        });
+      }
+    }
+
+    /**
+     * Group columns in rows.
+     * @return {Array.<ColumnComponent[]>}
+     */
+
+  }, {
+    key: 'groupByRow',
+    value: function groupByRow() {
+      var _this3 = this;
+
+      var initVal = { stack: [], rows: [] };
+      var width = function width(x) {
+        return x.component.width;
+      };
+      var result = _lodash2.default.reduce(this.components, function (acc, next) {
+        var stack = [].concat(_toConsumableArray(acc.stack), [next]);
+        if (_lodash2.default.sumBy(stack, width) <= _this3.gridSize) {
+          acc.stack = stack;
+          return acc;
+        } else {
+          acc.rows = [].concat(_toConsumableArray(acc.rows), [acc.stack]);
+          acc.stack = [next];
+          return acc;
+        }
+      }, initVal);
+
+      return _lodash2.default.concat(result.rows, [result.stack]);
+    }
+  }, {
+    key: 'justify',
+    value: function justify() {
+      _lodash2.default.each(this.rows, this.justifyRow.bind(this));
+    }
+  }, {
+    key: 'addComponents',
+    value: function addComponents() {
+      var _this4 = this;
+
+      var container = this.getContainer();
+      container.noDrop = true;
+      _lodash2.default.each(this.component.columns, function (column) {
+        column.type = 'column';
+        _this4.addComponent(column, container, _this4.data);
+      });
+      this.rows = this.groupByRow();
+    }
+  }, {
+    key: 'checkConditions',
+    value: function checkConditions(data) {
+      if (this.component.autoAdjust) {
+        var before = this.nbVisible;
+        _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
+        if (before !== this.nbVisible) {
+          this.justify();
+        }
+      } else {
+        _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
+      }
+    }
+  }, {
+    key: 'destroy',
+    value: function destroy(all) {
+      _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'destroy', this).call(this, all);
+      this.rows = [];
+    }
+  }, {
+    key: 'className',
+    get: function get() {
+      return 'row ' + _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'className', this);
+    }
+  }, {
+    key: 'gridSize',
+    get: function get() {
+      return 12;
+    }
+
+    /** @type {number} */
+
+  }, {
+    key: 'nbVisible',
+    get: function get() {
+      return _lodash2.default.filter(this.components, 'visible').length;
     }
   }]);
 
@@ -16700,6 +16889,13 @@ exports.default = [{
     defaultValue: 0,
     label: 'Pull'
   }]
+}, {
+  weight: 160,
+  type: 'checkbox',
+  label: 'Auto adjust columns',
+  tooltip: 'Will automatically adjust columns based on if nested components are hidden.',
+  key: 'autoAdjust',
+  input: true
 }];
 
 /***/ }),
@@ -17917,6 +18113,8 @@ var DateTimeComponent = function (_BaseComponent) {
         label: 'Date / Time',
         key: 'dateTime',
         format: 'yyyy-MM-dd HH:mm a',
+        useLocaleSettings: false,
+        allowInput: true,
         enableDate: true,
         enableTime: true,
         defaultDate: '',
@@ -17963,7 +18161,6 @@ var DateTimeComponent = function (_BaseComponent) {
 
     _this.validators.push('date');
     _this.closedOn = 0;
-
     var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(_this.options.language);
     _this.defaultFormat = {
       date: dateFormatInfo.dayFirst ? 'd/m/Y ' : 'm/d/Y ',
@@ -17975,6 +18172,10 @@ var DateTimeComponent = function (_BaseComponent) {
   _createClass(DateTimeComponent, [{
     key: 'elementInfo',
     value: function elementInfo() {
+      // Default the placeholder to the format if none is present.
+      if (!this.component.placeholder) {
+        this.component.placeholder = (0, _utils.convertFlatpickrToFormat)(this.dateTimeFormat);
+      }
       var info = _get(DateTimeComponent.prototype.__proto__ || Object.getPrototypeOf(DateTimeComponent.prototype), 'elementInfo', this).call(this);
       info.type = 'input';
       info.attr.type = 'text';
@@ -17991,19 +18192,23 @@ var DateTimeComponent = function (_BaseComponent) {
       return false;
     }
   }, {
-    key: 'getLocaleFormat',
-    value: function getLocaleFormat() {
-      var format = '';
-
-      if (this.component.enableDate) {
-        format += this.defaultFormat.date;
+    key: 'offset',
+    value: function offset(date) {
+      if (this.component.displayInTimezone === 'submission' && this.root && this.root.hasTimezone) {
+        return {
+          date: new Date(date.getTime() + (this.root.submissionOffset + date.getTimezoneOffset()) * 60000),
+          timezone: ' (' + this.root.submissionTimezone + ')'
+        };
+      } else if (this.component.displayInTimezone === 'gmt') {
+        return {
+          date: new Date(date.getTime() + date.getTimezoneOffset() * 60000),
+          timezone: ' (GMT)'
+        };
       }
-
-      if (this.component.enableTime) {
-        format += this.defaultFormat.time;
-      }
-
-      return format;
+      return {
+        date: date,
+        timezone: ' (' + this.timezone + ')'
+      };
     }
   }, {
     key: 'addSuffix',
@@ -18074,7 +18279,13 @@ var DateTimeComponent = function (_BaseComponent) {
   }, {
     key: 'getView',
     value: function getView(value) {
-      return value ? (0, _moment2.default)(value).format((0, _utils.convertFormatToMoment)(_lodash2.default.get(this.component, 'format', ''))) : '';
+      if (!value) {
+        return '';
+      }
+      var offset = this.offset((0, _moment2.default)(value).toDate());
+      var dateFormat = (0, _utils.convertFormatToMoment)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
+      var formatted = (0, _moment2.default)(offset.date).format(dateFormat);
+      return '' + formatted + offset.timezone;
     }
   }, {
     key: 'setValueAt',
@@ -18140,19 +18351,41 @@ var DateTimeComponent = function (_BaseComponent) {
       return (0, _utils.getDateSetting)(this.component.defaultDate);
     }
   }, {
+    key: 'localeFormat',
+    get: function get() {
+      var format = '';
+
+      if (this.component.enableDate) {
+        format += this.defaultFormat.date;
+      }
+
+      if (this.component.enableTime) {
+        format += this.defaultFormat.time;
+      }
+
+      return format;
+    }
+  }, {
+    key: 'dateTimeFormat',
+    get: function get() {
+      return this.component.useLocaleSettings ? this.localeFormat() : (0, _utils.convertFormatToFlatpickr)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
+    }
+  }, {
     key: 'config',
     get: function get() {
       var _this3 = this;
 
+      var altFormat = this.dateTimeFormat;
       /* eslint-disable camelcase */
       return {
         altInput: true,
+        allowInput: _lodash2.default.get(this.component, 'allowInput', true),
         clickOpens: true,
         enableDate: true,
         mode: this.component.multiple ? 'multiple' : 'single',
         enableTime: _lodash2.default.get(this.component, 'enableTime', true),
         noCalendar: !_lodash2.default.get(this.component, 'enableDate', true),
-        altFormat: this.component.useLocaleSettings ? this.getLocaleFormat() : (0, _utils.convertFormatToFlatpickr)(_lodash2.default.get(this.component, 'format', '')),
+        altFormat: altFormat,
         dateFormat: 'U',
         defaultDate: this.defaultDate,
         hourIncrement: _lodash2.default.get(this.component, 'timePicker.hourStep', 1),
@@ -18165,6 +18398,15 @@ var DateTimeComponent = function (_BaseComponent) {
         },
         onClose: function onClose() {
           return _this3.closedOn = Date.now();
+        },
+        formatDate: function formatDate(date, format) {
+          // Only format this if this is the altFormat and the form is readOnly.
+          if (_this3.options.readOnly && format === altFormat) {
+            var offset = _this3.offset(date);
+            return '' + _flatpickr2.default.formatDate(offset.date, format) + offset.timezone;
+          }
+
+          return _flatpickr2.default.formatDate(date, format);
         }
       };
       /* eslint-enable camelcase */
@@ -18346,12 +18588,31 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = [{
+  type: 'select',
+  input: true,
+  key: 'displayInTimezone',
+  label: 'Display in Timezone',
+  tooltip: 'This will display the captured date time in the select timezone.',
+  weight: 30,
+  defaultValue: 'submission',
+  dataSrc: 'values',
+  data: {
+    values: [{ label: 'of Viewer', value: 'viewer' }, { label: 'of Submission', value: 'submission' }, { label: 'of GMT', value: 'gmt' }]
+  }
+}, {
   type: 'checkbox',
   input: true,
   key: 'useLocaleSettings',
   label: 'Use Locale Settings',
   tooltip: 'Use locale settings to display date and time.',
-  weight: 50
+  weight: 51
+}, {
+  type: 'checkbox',
+  input: true,
+  key: 'allowInput',
+  label: 'Allow Manual Input',
+  tooltip: 'Check this if you would like to allow the user to manually enter in the date.',
+  weight: 51
 }, {
   type: 'textfield',
   input: true,
@@ -18359,7 +18620,7 @@ exports.default = [{
   label: 'Format',
   placeholder: 'Format',
   tooltip: 'The moment.js format for saving the value of this field.',
-  weight: 51
+  weight: 52
 }];
 
 /***/ }),
@@ -19348,6 +19609,10 @@ var EditGridComponent = function (_NestedComponent) {
     value: function buildTable() {
       var _this3 = this;
 
+      // Do not show the table when in builder mode.
+      if (this.options.builder) {
+        return;
+      }
       var tableClass = 'editgrid-listgroup list-group ';
       _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
         if (_this3.component[prop]) {
@@ -20425,8 +20690,43 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'buildUpload',
     value: function buildUpload() {
+      var _this7 = this;
+
       // Drop event must change this pointer so need a reference to parent this.
       var element = this;
+      // Declare Camera Instace
+      var Camera = void 0;
+      // Implement Camera file upload for WebView Apps.
+      if ((navigator.camera || Camera) && this.component.image) {
+        var camera = navigator.camera || Camera;
+        return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
+          class: 'fileSelector'
+        }, [this.ce('button', {
+          class: 'btn btn-primary',
+          onClick: function onClick(event) {
+            event.preventDefault();
+            camera.getPicture(function (success) {
+              window.resolveLocalFileSystemURL(success, function (fileEntry) {
+                fileEntry.file(function (file) {
+                  _this7.upload([file]);
+                });
+              });
+            }, null, { sourceType: camera.PictureSourceType.PHOTOLIBRARY });
+          }
+        }, [this.ce('i', { class: this.iconClass('book') }), this.text('Gallery')]), this.ce('button', {
+          class: 'btn btn-primary',
+          onClick: function onClick(event) {
+            event.preventDefault();
+            camera.getPicture(function (success) {
+              window.resolveLocalFileSystemURL(success, function (fileEntry) {
+                fileEntry.file(function (file) {
+                  _this7.upload([file]);
+                });
+              });
+            });
+          }
+        }, [this.ce('i', { class: this.iconClass('camera') }), this.text('Camera')])]) : this.ce('div'));
+      }
       // If this is disabled or a single value with a value, don't show the upload div.
       return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
         class: 'fileSelector',
@@ -20449,7 +20749,7 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'buildBrowseLink',
     value: function buildBrowseLink() {
-      var _this7 = this;
+      var _this8 = this;
 
       this.browseLink = this.ce('a', {
         href: '#',
@@ -20457,10 +20757,10 @@ var FileComponent = function (_BaseComponent) {
           event.preventDefault();
           // There is no direct way to trigger a file dialog. To work around this, create an input of type file and trigger
           // a click event on it.
-          if (typeof _this7.hiddenFileInputElement.trigger === 'function') {
-            _this7.hiddenFileInputElement.trigger('click');
+          if (typeof _this8.hiddenFileInputElement.trigger === 'function') {
+            _this8.hiddenFileInputElement.trigger('click');
           } else {
-            _this7.hiddenFileInputElement.click();
+            _this8.hiddenFileInputElement.click();
           }
         },
         class: 'browse'
@@ -20518,13 +20818,13 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'createUploadStatus',
     value: function createUploadStatus(fileUpload) {
-      var _this8 = this;
+      var _this9 = this;
 
       var container = void 0;
       return container = this.ce('div', { class: 'file' + (fileUpload.status === 'error' ? ' has-error' : '') }, [this.ce('div', { class: 'row' }, [this.ce('div', { class: 'fileName control-label col-sm-10' }, [fileUpload.originalName, this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick() {
-          return _this8.removeChildFrom(container, _this8.uploadStatusList);
+          return _this9.removeChildFrom(container, _this9.uploadStatusList);
         }
       })]), this.ce('div', { class: 'fileSize control-label col-sm-2 text-right' }, this.fileSize(fileUpload.size))]), this.ce('div', { class: 'row' }, [this.ce('div', { class: 'col-sm-12' }, [fileUpload.status === 'progress' ? this.ce('div', { class: 'progress' }, this.ce('div', {
         class: 'progress-bar',
@@ -20629,7 +20929,7 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'upload',
     value: function upload(files) {
-      var _this9 = this;
+      var _this10 = this;
 
       // Only allow one upload if not multiple.
       if (!this.component.multiple) {
@@ -20648,55 +20948,55 @@ var FileComponent = function (_BaseComponent) {
           };
 
           // Check file pattern
-          if (_this9.component.filePattern && !_this9.validatePattern(file, _this9.component.filePattern)) {
+          if (_this10.component.filePattern && !_this10.validatePattern(file, _this10.component.filePattern)) {
             fileUpload.status = 'error';
-            fileUpload.message = 'File is the wrong type; it must be ' + _this9.component.filePattern;
+            fileUpload.message = 'File is the wrong type; it must be ' + _this10.component.filePattern;
           }
 
           // Check file minimum size
-          if (_this9.component.fileMinSize && !_this9.validateMinSize(file, _this9.component.fileMinSize)) {
+          if (_this10.component.fileMinSize && !_this10.validateMinSize(file, _this10.component.fileMinSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = 'File is too small; it must be at least ' + _this9.component.fileMinSize;
+            fileUpload.message = 'File is too small; it must be at least ' + _this10.component.fileMinSize;
           }
 
           // Check file maximum size
-          if (_this9.component.fileMaxSize && !_this9.validateMaxSize(file, _this9.component.fileMaxSize)) {
+          if (_this10.component.fileMaxSize && !_this10.validateMaxSize(file, _this10.component.fileMaxSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = 'File is too big; it must be at most ' + _this9.component.fileMaxSize;
+            fileUpload.message = 'File is too big; it must be at most ' + _this10.component.fileMaxSize;
           }
 
           // Get a unique name for this file to keep file collisions from occurring.
-          var dir = _this9.interpolate(_this9.component.dir || '');
-          var fileService = _this9.fileService;
+          var dir = _this10.interpolate(_this10.component.dir || '');
+          var fileService = _this10.fileService;
           if (!fileService) {
             fileUpload.status = 'error';
             fileUpload.message = 'File Service not provided.';
           }
 
-          var uploadStatus = _this9.createUploadStatus(fileUpload);
-          _this9.uploadStatusList.appendChild(uploadStatus);
+          var uploadStatus = _this10.createUploadStatus(fileUpload);
+          _this10.uploadStatusList.appendChild(uploadStatus);
 
           if (fileUpload.status !== 'error') {
-            fileService.uploadFile(_this9.component.storage, file, fileName, dir, function (evt) {
+            fileService.uploadFile(_this10.component.storage, file, fileName, dir, function (evt) {
               fileUpload.status = 'progress';
               fileUpload.progress = parseInt(100.0 * evt.loaded / evt.total);
               delete fileUpload.message;
               var originalStatus = uploadStatus;
-              uploadStatus = _this9.createUploadStatus(fileUpload);
-              _this9.uploadStatusList.replaceChild(uploadStatus, originalStatus);
-            }, _this9.component.url).then(function (fileInfo) {
-              _this9.removeChildFrom(uploadStatus, _this9.uploadStatusList);
+              uploadStatus = _this10.createUploadStatus(fileUpload);
+              _this10.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+            }, _this10.component.url).then(function (fileInfo) {
+              _this10.removeChildFrom(uploadStatus, _this10.uploadStatusList);
               fileInfo.originalName = file.name;
-              _this9.dataValue.push(fileInfo);
-              _this9.refreshDOM();
-              _this9.triggerChange();
+              _this10.dataValue.push(fileInfo);
+              _this10.refreshDOM();
+              _this10.triggerChange();
             }).catch(function (response) {
               fileUpload.status = 'error';
               fileUpload.message = response;
               delete fileUpload.progress;
               var originalStatus = uploadStatus;
-              uploadStatus = _this9.createUploadStatus(fileUpload);
-              _this9.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+              uploadStatus = _this10.createUploadStatus(fileUpload);
+              _this10.uploadStatusList.replaceChild(uploadStatus, originalStatus);
             });
           }
         });
@@ -21257,6 +21557,9 @@ var FormComponent = function (_BaseComponent) {
   }, {
     key: 'getAllComponents',
     value: function getAllComponents() {
+      if (!this.subForm) {
+        return [];
+      }
       return this.subForm.getAllComponents();
     }
   }, {
@@ -22329,7 +22632,7 @@ var NestedComponent = function (_BaseComponent) {
       return this.getComponents().reduce(function (components, component) {
         var result = component;
 
-        if (component.getAllComponents) {
+        if (component && component.getAllComponents) {
           result = component.getAllComponents();
         }
 
@@ -29180,19 +29483,21 @@ var _nativePromiseOnly = __webpack_require__(/*! native-promise-only */ "./node_
 
 var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
 
+var _trim2 = __webpack_require__(/*! lodash/trim */ "./node_modules/lodash/trim.js");
+
+var _trim3 = _interopRequireDefault(_trim2);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var trim = function trim(text) {
+  return (0, _trim3.default)(text, '/');
+};
 var s3 = function s3(formio) {
   return {
     uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
       return new _nativePromiseOnly2.default(function (resolve, reject) {
         // Send the pre response to sign the upload.
         var pre = new XMLHttpRequest();
-
-        var prefd = new FormData();
-        prefd.append('name', fileName);
-        prefd.append('size', file.size);
-        prefd.append('type', file.type);
 
         // This only fires on a network error.
         pre.onerror = function (err) {
@@ -29214,13 +29519,7 @@ var s3 = function s3(formio) {
             }
 
             response.data.fileName = fileName;
-            response.data.key += dir + fileName;
-
-            var fd = new FormData();
-            for (var key in response.data) {
-              fd.append(key, response.data[key]);
-            }
-            fd.append('file', file);
+            response.data.key = trim(response.data.key) + '/' + trim(dir) + '/' + trim(fileName);
 
             // Fire on network error.
             xhr.onerror = function (err) {
@@ -29235,7 +29534,7 @@ var s3 = function s3(formio) {
                   name: fileName,
                   bucket: response.bucket,
                   key: response.data.key,
-                  url: response.url + response.data.key,
+                  url: trim(response.url) + '/' + trim(response.data.key),
                   acl: response.data.acl,
                   size: file.size,
                   type: file.type
@@ -29246,10 +29545,19 @@ var s3 = function s3(formio) {
             };
 
             xhr.onabort = reject;
-
-            xhr.open('POST', response.url);
-
-            xhr.send(fd);
+            if (response.signed) {
+              xhr.open('PUT', response.signed);
+              xhr.setRequestHeader('Content-Type', file.type);
+              xhr.send(file);
+            } else {
+              var fd = new FormData();
+              for (var key in response.data) {
+                fd.append(key, response.data[key]);
+              }
+              fd.append('file', file);
+              xhr.open('POST', response.url);
+              xhr.send(fd);
+            }
           } else {
             reject(pre.response || 'Unable to sign file');
           }
@@ -29265,7 +29573,7 @@ var s3 = function s3(formio) {
         }
 
         pre.send(JSON.stringify({
-          name: fileName,
+          name: trim(trim(dir) + '/' + trim(fileName)),
           size: file.size,
           type: file.type
         }));
@@ -29273,7 +29581,7 @@ var s3 = function s3(formio) {
     },
     downloadFile: function downloadFile(file) {
       if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
+        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + trim(file.bucket) + '&key=' + trim(file.key), 'GET');
       } else {
         return _nativePromiseOnly2.default.resolve(file);
       }
@@ -29621,6 +29929,7 @@ exports.getDateSetting = getDateSetting;
 exports.isValidDate = isValidDate;
 exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
 exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
+exports.convertFlatpickrToFormat = convertFlatpickrToFormat;
 exports.convertFormatToMoment = convertFormatToMoment;
 exports.getInputMask = getInputMask;
 exports.matchInputMask = matchInputMask;
@@ -30337,6 +30646,24 @@ function convertFormatToFlatpickr(format) {
 
   // Hours, minutes, seconds
   .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
+}
+
+function convertFlatpickrToFormat(format) {
+  return format
+  // Year conversion.
+  .replace('Y', 'YYYY').replace('y', 'YY')
+
+  // Month conversion.
+  .replace('F', 'MMMM').replace('M', 'MMM').replace('m', 'MM').replace('n', 'M')
+
+  // Day in month.
+  .replace('d', 'dd').replace('j', 'd')
+
+  // Day in week.
+  .replace('l', 'EEEE').replace('D', 'EEE')
+
+  // Hours, minutes, seconds
+  .replace('H', 'HH').replace('h', 'H').replace('i', 'mm').replace('S', 'ss').replace('K', 'a');
 }
 
 /**
@@ -31573,6 +31900,10 @@ var ResourceStore = function (_EventEmitter) {
     return this.getResource(lng, ns);
   };
 
+  ResourceStore.prototype.getDataByLanguage = function getDataByLanguage(lng) {
+    return this.data[lng];
+  };
+
   ResourceStore.prototype.toJSON = function toJSON() {
     return this.data;
   };
@@ -32170,7 +32501,7 @@ var I18n = function (_EventEmitter) {
     }
 
     // append api
-    var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle'];
+    var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle', 'getDataByLanguage'];
     storeApi.forEach(function (fcName) {
       _this2[fcName] = function () {
         var _store;
@@ -33415,6 +33746,29 @@ module.exports = arrayMap;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_asciiToArray.js":
+/*!**********************************************!*\
+  !*** ./node_modules/lodash/_asciiToArray.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Converts an ASCII `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function asciiToArray(string) {
+  return string.split('');
+}
+
+module.exports = asciiToArray;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_assocIndexOf.js":
 /*!**********************************************!*\
   !*** ./node_modules/lodash/_assocIndexOf.js ***!
@@ -33443,6 +33797,41 @@ function assocIndexOf(array, key) {
 }
 
 module.exports = assocIndexOf;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseFindIndex.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_baseFindIndex.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * The base implementation of `_.findIndex` and `_.findLastIndex` without
+ * support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} predicate The function invoked per iteration.
+ * @param {number} fromIndex The index to search from.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseFindIndex(array, predicate, fromIndex, fromRight) {
+  var length = array.length,
+      index = fromIndex + (fromRight ? 1 : -1);
+
+  while ((fromRight ? index-- : ++index < length)) {
+    if (predicate(array[index], index, array)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = baseFindIndex;
 
 
 /***/ }),
@@ -33521,6 +33910,60 @@ module.exports = baseGetTag;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_baseIndexOf.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/_baseIndexOf.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseFindIndex = __webpack_require__(/*! ./_baseFindIndex */ "./node_modules/lodash/_baseFindIndex.js"),
+    baseIsNaN = __webpack_require__(/*! ./_baseIsNaN */ "./node_modules/lodash/_baseIsNaN.js"),
+    strictIndexOf = __webpack_require__(/*! ./_strictIndexOf */ "./node_modules/lodash/_strictIndexOf.js");
+
+/**
+ * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseIndexOf(array, value, fromIndex) {
+  return value === value
+    ? strictIndexOf(array, value, fromIndex)
+    : baseFindIndex(array, baseIsNaN, fromIndex);
+}
+
+module.exports = baseIndexOf;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseIsNaN.js":
+/*!*******************************************!*\
+  !*** ./node_modules/lodash/_baseIsNaN.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * The base implementation of `_.isNaN` without support for number objects.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is `NaN`, else `false`.
+ */
+function baseIsNaN(value) {
+  return value !== value;
+}
+
+module.exports = baseIsNaN;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_baseIsNative.js":
 /*!**********************************************!*\
   !*** ./node_modules/lodash/_baseIsNative.js ***!
@@ -33575,6 +34018,48 @@ function baseIsNative(value) {
 }
 
 module.exports = baseIsNative;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseSlice.js":
+/*!*******************************************!*\
+  !*** ./node_modules/lodash/_baseSlice.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * The base implementation of `_.slice` without an iteratee call guard.
+ *
+ * @private
+ * @param {Array} array The array to slice.
+ * @param {number} [start=0] The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the slice of `array`.
+ */
+function baseSlice(array, start, end) {
+  var index = -1,
+      length = array.length;
+
+  if (start < 0) {
+    start = -start > length ? 0 : (length + start);
+  }
+  end = end > length ? length : end;
+  if (end < 0) {
+    end += length;
+  }
+  length = start > end ? 0 : ((end - start) >>> 0);
+  start >>>= 0;
+
+  var result = Array(length);
+  while (++index < length) {
+    result[index] = array[index + start];
+  }
+  return result;
+}
+
+module.exports = baseSlice;
 
 
 /***/ }),
@@ -33655,6 +34140,96 @@ function castPath(value, object) {
 }
 
 module.exports = castPath;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_castSlice.js":
+/*!*******************************************!*\
+  !*** ./node_modules/lodash/_castSlice.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseSlice = __webpack_require__(/*! ./_baseSlice */ "./node_modules/lodash/_baseSlice.js");
+
+/**
+ * Casts `array` to a slice if it's needed.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {number} start The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the cast slice.
+ */
+function castSlice(array, start, end) {
+  var length = array.length;
+  end = end === undefined ? length : end;
+  return (!start && end >= length) ? array : baseSlice(array, start, end);
+}
+
+module.exports = castSlice;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_charsEndIndex.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_charsEndIndex.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/lodash/_baseIndexOf.js");
+
+/**
+ * Used by `_.trim` and `_.trimEnd` to get the index of the last string symbol
+ * that is not found in the character symbols.
+ *
+ * @private
+ * @param {Array} strSymbols The string symbols to inspect.
+ * @param {Array} chrSymbols The character symbols to find.
+ * @returns {number} Returns the index of the last unmatched string symbol.
+ */
+function charsEndIndex(strSymbols, chrSymbols) {
+  var index = strSymbols.length;
+
+  while (index-- && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1) {}
+  return index;
+}
+
+module.exports = charsEndIndex;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_charsStartIndex.js":
+/*!*************************************************!*\
+  !*** ./node_modules/lodash/_charsStartIndex.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/lodash/_baseIndexOf.js");
+
+/**
+ * Used by `_.trim` and `_.trimStart` to get the index of the first string symbol
+ * that is not found in the character symbols.
+ *
+ * @private
+ * @param {Array} strSymbols The string symbols to inspect.
+ * @param {Array} chrSymbols The character symbols to find.
+ * @returns {number} Returns the index of the first unmatched string symbol.
+ */
+function charsStartIndex(strSymbols, chrSymbols) {
+  var index = -1,
+      length = strSymbols.length;
+
+  while (++index < length && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1) {}
+  return index;
+}
+
+module.exports = charsStartIndex;
 
 
 /***/ }),
@@ -33826,6 +34401,43 @@ function getValue(object, key) {
 }
 
 module.exports = getValue;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_hasUnicode.js":
+/*!********************************************!*\
+  !*** ./node_modules/lodash/_hasUnicode.js ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsZWJ = '\\u200d';
+
+/** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
+
+/**
+ * Checks if `string` contains Unicode symbols.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {boolean} Returns `true` if a symbol is found, else `false`.
+ */
+function hasUnicode(string) {
+  return reHasUnicode.test(string);
+}
+
+module.exports = hasUnicode;
 
 
 /***/ }),
@@ -34509,6 +35121,69 @@ module.exports = root;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_strictIndexOf.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_strictIndexOf.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * A specialized version of `_.indexOf` which performs strict equality
+ * comparisons of values, i.e. `===`.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function strictIndexOf(array, value, fromIndex) {
+  var index = fromIndex - 1,
+      length = array.length;
+
+  while (++index < length) {
+    if (array[index] === value) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = strictIndexOf;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_stringToArray.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_stringToArray.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var asciiToArray = __webpack_require__(/*! ./_asciiToArray */ "./node_modules/lodash/_asciiToArray.js"),
+    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/lodash/_hasUnicode.js"),
+    unicodeToArray = __webpack_require__(/*! ./_unicodeToArray */ "./node_modules/lodash/_unicodeToArray.js");
+
+/**
+ * Converts `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function stringToArray(string) {
+  return hasUnicode(string)
+    ? unicodeToArray(string)
+    : asciiToArray(string);
+}
+
+module.exports = stringToArray;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_stringToPath.js":
 /*!**********************************************!*\
   !*** ./node_modules/lodash/_stringToPath.js ***!
@@ -34612,6 +35287,57 @@ function toSource(func) {
 }
 
 module.exports = toSource;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_unicodeToArray.js":
+/*!************************************************!*\
+  !*** ./node_modules/lodash/_unicodeToArray.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsAstral = '[' + rsAstralRange + ']',
+    rsCombo = '[' + rsComboRange + ']',
+    rsFitz = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')',
+    rsNonAstral = '[^' + rsAstralRange + ']',
+    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsZWJ = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var reOptMod = rsModifier + '?',
+    rsOptVar = '[' + rsVarRange + ']?',
+    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
+    rsSeq = rsOptVar + reOptMod + rsOptJoin,
+    rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
+
+/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+var reUnicode = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
+
+/**
+ * Converts a Unicode `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function unicodeToArray(string) {
+  return string.match(reUnicode) || [];
+}
+
+module.exports = unicodeToArray;
 
 
 /***/ }),
@@ -52143,6 +52869,66 @@ function toString(value) {
 }
 
 module.exports = toString;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/trim.js":
+/*!*************************************!*\
+  !*** ./node_modules/lodash/trim.js ***!
+  \*************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/lodash/_baseToString.js"),
+    castSlice = __webpack_require__(/*! ./_castSlice */ "./node_modules/lodash/_castSlice.js"),
+    charsEndIndex = __webpack_require__(/*! ./_charsEndIndex */ "./node_modules/lodash/_charsEndIndex.js"),
+    charsStartIndex = __webpack_require__(/*! ./_charsStartIndex */ "./node_modules/lodash/_charsStartIndex.js"),
+    stringToArray = __webpack_require__(/*! ./_stringToArray */ "./node_modules/lodash/_stringToArray.js"),
+    toString = __webpack_require__(/*! ./toString */ "./node_modules/lodash/toString.js");
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/**
+ * Removes leading and trailing whitespace or specified characters from `string`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to trim.
+ * @param {string} [chars=whitespace] The characters to trim.
+ * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
+ * @returns {string} Returns the trimmed string.
+ * @example
+ *
+ * _.trim('  abc  ');
+ * // => 'abc'
+ *
+ * _.trim('-_-abc-_-', '_-');
+ * // => 'abc'
+ *
+ * _.map(['  foo  ', '  bar  '], _.trim);
+ * // => ['foo', 'bar']
+ */
+function trim(string, chars, guard) {
+  string = toString(string);
+  if (string && (guard || chars === undefined)) {
+    return string.replace(reTrim, '');
+  }
+  if (!string || !(chars = baseToString(chars))) {
+    return string;
+  }
+  var strSymbols = stringToArray(string),
+      chrSymbols = stringToArray(chars),
+      start = charsStartIndex(strSymbols, chrSymbols),
+      end = charsEndIndex(strSymbols, chrSymbols) + 1;
+
+  return castSlice(strSymbols, start, end).join('');
+}
+
+module.exports = trim;
 
 
 /***/ }),
