@@ -32,7 +32,7 @@
 <div class="form-group" ng-if="!currentProject.settings.storage.s3.minio">
   <label for="region">Bucket Region (optional)</label>
   <input ng-model="currentProject.settings.storage.s3.region" type="text" class="form-control" id="region" name="region" placeholder="us-east-1">
-  <p class="text-muted">Will default to us-east-1 if left empty.</p>
+  <p class="text-muted">If empty, and the Bucket URL does not contain the bucket region, then this will cause a redirect and will fail to upload.</p>
 </div>
 <div class="form-group">
   <label for="startsWith">Starts With (optional) - Put all files in a folder such as "uploads/"</label>
