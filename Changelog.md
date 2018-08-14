@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
  - CSS classes for wizard buttons
+ - Fixed Edit Grid's and Data Grid's tableView crashing on null values
 
 ## 2.25.4
 ### Fixed
