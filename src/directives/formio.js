@@ -38,6 +38,7 @@ export default app.directive('formio', function() {
               $scope.initializing = true;
               resolve(Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options)
                 .then(formio => {
+                  $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
                   $scope.formio = formio;
                   return formio;
                 }));
