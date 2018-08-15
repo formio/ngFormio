@@ -1656,7 +1656,7 @@ app.controller('FormActionEditController', [
         // SQL Action missing sql server warning
         if(actionInfo && actionInfo.name === 'sql') {
           var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'type');
-          if(JSON.parse(typeComponent.data.json).length === 0) {
+          if(typeComponent && typeComponent.data && JSON.parse(typeComponent.data.json).length === 0) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/data">Stage Settings</a>.');
           }
         }
@@ -1664,7 +1664,7 @@ app.controller('FormActionEditController', [
         // Email action missing transports (other than the default one).
         if(actionInfo && actionInfo.name === 'email') {
           var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
-          if(JSON.parse(transportComponent.data.json).length <= 1) {
+          if(transportComponent && transportComponent.data && JSON.parse(transportComponent.data.json).length <= 1) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/email">Stage Settings</a>, or you can use the default transport (charges may apply).');
           }
         }
@@ -1672,7 +1672,7 @@ app.controller('FormActionEditController', [
         // Oauth action alert for new resource missing role assignment.
         if (actionInfo && actionInfo.name === 'oauth') {
           var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'provider');
-          if (providers.data && providers.data.json && providers.data.json === '[]') {
+          if (providers && providers.data && providers.data.json && providers.data.json === '[]') {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Stage Settings</a>.');
           }
         }
