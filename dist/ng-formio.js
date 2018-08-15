@@ -191,39 +191,35 @@ exports.default = app.directive('formio', function () {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
-      options: '=?'
+      options: '<?'
     },
     link: function link(scope, element) {
       scope.element = element[0];
       scope.formioReady = false;
-      scope.initializing = false;
-      scope.onFormio = scope.initializeForm().then(function (formio) {
-        return scope.setupForm(formio);
-      }).catch(function (err) {
-        console.warn(err);
-      });
+      scope.initialized = false;
+      scope.options = scope.options || {};
     },
-    controller: ['$scope', function ($scope) {
+    controller: ['$scope', '$q', function ($scope, $q) {
+      $scope.onLoad = $q.defer();
+      $scope.onFormio = $scope.onLoad.promise;
       $scope.initializeForm = function () {
-        $scope.options = $scope.options || {};
+        if (!$scope.element) {
+          return;
+        }
 
         // Set read only if using legacy option.
         if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
           $scope.options.readOnly = $scope.readOnly;
         }
 
-        return new Promise(function (resolve, reject) {
-          if ($scope.src || $scope.form) {
-            $scope.initializing = true;
-            resolve(_formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(function (formio) {
-              $scope.formio = formio;
-              return formio;
-            }));
-          } else {
-            // If we get to here there is no src or form
-            reject('Must set src or form attribute');
-          }
-        });
+        if ($scope.src || $scope.form) {
+          $scope.initialized = true;
+          _formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(function (formio) {
+            $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
+            $scope.formio = formio;
+            $scope.setupForm();
+          });
+        }
       };
 
       $scope.setupForm = function () {
@@ -281,6 +277,7 @@ exports.default = app.directive('formio', function () {
         });
 
         $scope.formioReady = true;
+        $scope.onLoad.resolve($scope.formio);
         return $scope.formio;
       };
 
@@ -290,8 +287,12 @@ exports.default = app.directive('formio', function () {
         }
         if ($scope.formioReady) {
           $scope.formio.src = src;
-        } else if (!$scope.initializing) {
+        } else if (!$scope.initialized) {
           $scope.initializeForm();
+        } else {
+          $scope.onFormio.then(function () {
+            return $scope.formio.src = src;
+          });
         }
       });
 
@@ -302,8 +303,13 @@ exports.default = app.directive('formio', function () {
         if ($scope.formioReady) {
           $scope.formio.url = url;
           $scope.formio.nosubmit = false;
-        } else if (!$scope.initializing) {
+        } else if (!$scope.initialized) {
           $scope.initializeForm();
+        } else {
+          $scope.onFormio.then(function () {
+            $scope.formio.url = url;
+            $scope.formio.nosubmit = false;
+          });
         }
       });
 
@@ -313,8 +319,12 @@ exports.default = app.directive('formio', function () {
         }
         if ($scope.formioReady) {
           $scope.formio.form = form;
-        } else if (!$scope.initializing) {
+        } else if (!$scope.initialized) {
           $scope.initializeForm();
+        } else {
+          $scope.onFormio.then(function () {
+            return $scope.formio.form = form;
+          });
         }
       });
 
@@ -322,9 +332,9 @@ exports.default = app.directive('formio', function () {
         if (!submission) {
           return;
         }
-        if ($scope.formioReady) {
-          $scope.formio.submission = submission;
-        }
+        $scope.onFormio.then(function () {
+          return $scope.formio.submission = submission;
+        });
       }, true);
 
       $scope.$on('componentChange', function () {
@@ -337,6 +347,9 @@ exports.default = app.directive('formio', function () {
           $scope.formio.destroy(true);
         }
       });
+
+      // Initialize the form.
+      $scope.initializeForm();
     }],
     template: '<div />'
   };
@@ -5334,6 +5347,10 @@ var Formio = function () {
     this.vUrl = '';
     this.query = '';
 
+    // Store the original path and options.
+    this.path = path;
+    this.options = options;
+
     if (options.hasOwnProperty('base')) {
       this.base = options.base;
     } else if (Formio.baseUrl) {
@@ -7259,6 +7276,8 @@ var _NestedComponent2 = __webpack_require__(/*! ./components/nested/NestedCompon
 
 var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
 
+var _utils = __webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -7817,6 +7836,12 @@ var Webform = function (_NestedComponent) {
 
       // Create the form.
       this._form = form;
+
+      // Allow the form to provide component overrides.
+      if (form && form.settings && form.settings.components) {
+        this.options.components = form.settings.components;
+      }
+
       return this.createForm(form).then(function () {
         _this6.emit('formLoad', form);
         return form;
@@ -8221,13 +8246,20 @@ var Webform = function (_NestedComponent) {
           }
 
           _this12.loading = true;
-          if (_this12.nosubmit || !_this12.formio) {
+
+          // Use the form action to submit the form if available.
+          var submitFormio = _this12.formio;
+          if (_this12._form && _this12._form.action) {
+            submitFormio = new _Formio2.default(_this12._form.action, _this12.formio ? _this12.formio.options : {});
+          }
+
+          if (_this12.nosubmit || !submitFormio) {
             return resolve({
               submission: submission,
               saved: false
             });
           }
-          _this12.formio.saveSubmission(submission).then(function (result) {
+          submitFormio.saveSubmission(submission).then(function (result) {
             return resolve({
               submission: result,
               saved: true
@@ -8495,7 +8527,7 @@ var Webform = function (_NestedComponent) {
   }, {
     key: 'submissionTimezone',
     get: function get() {
-      return _lodash2.default.get(this, '_submission.metadata.timezone', this.timezone);
+      return _lodash2.default.get(this, '_submission.metadata.timezone', (0, _utils.currentTimezone)());
     }
   }]);
 
@@ -11562,6 +11594,11 @@ var BaseComponent = function () {
      */
     this.data = data || {};
 
+    // Allow global override for any component JSON.
+    if (this.options.components && this.options.components[component.type]) {
+      _lodash2.default.merge(component, this.options.components[component.type]);
+    }
+
     /**
      * The Form.io component JSON schema.
      * @type {*}
@@ -14308,16 +14345,6 @@ var BaseComponent = function () {
         return _this23.setDisabled(_this23.performInputMapping(input), disabled);
       });
     }
-  }, {
-    key: 'timezone',
-    get: function get() {
-      if (navigator.languages && navigator.languages.length) {
-        return new Date().toLocaleTimeString(navigator.languages[0], {
-          timeZoneName: 'short'
-        }).split(' ')[2];
-      }
-      return (0, _moment2.default)().format('Z');
-    }
   }]);
 
   return BaseComponent;
@@ -17004,10 +17031,17 @@ var ContainerComponent = function (_NestedComponent) {
     key: 'build',
     value: function build() {
       this.createElement();
+      var labelAtTheBottom = this.component.labelPosition === 'bottom';
+      if (!labelAtTheBottom) {
+        this.createLabel(this.element);
+      }
       if (!this.hasValue()) {
         this.dataValue = {};
       }
       this.addComponents(this.getContainer(), this.dataValue);
+      if (labelAtTheBottom) {
+        this.createLabel(this.element);
+      }
     }
   }, {
     key: 'hasChanged',
@@ -18118,6 +18152,8 @@ var DateTimeComponent = function (_BaseComponent) {
         enableDate: true,
         enableTime: true,
         defaultDate: '',
+        displayInTimezone: 'viewer',
+        timezone: null,
         datepickerMode: 'day',
         datePicker: {
           showWeeks: true,
@@ -18192,25 +18228,6 @@ var DateTimeComponent = function (_BaseComponent) {
       return false;
     }
   }, {
-    key: 'offset',
-    value: function offset(date) {
-      if (this.component.displayInTimezone === 'submission' && this.root && this.root.hasTimezone) {
-        return {
-          date: new Date(date.getTime() + (this.root.submissionOffset + date.getTimezoneOffset()) * 60000),
-          timezone: ' (' + this.root.submissionTimezone + ')'
-        };
-      } else if (this.component.displayInTimezone === 'gmt') {
-        return {
-          date: new Date(date.getTime() + date.getTimezoneOffset() * 60000),
-          timezone: ' (GMT)'
-        };
-      }
-      return {
-        date: date,
-        timezone: ' (' + this.timezone + ')'
-      };
-    }
-  }, {
     key: 'addSuffix',
     value: function addSuffix(input, inputGroup) {
       var _this2 = this;
@@ -18282,10 +18299,7 @@ var DateTimeComponent = function (_BaseComponent) {
       if (!value) {
         return '';
       }
-      var offset = this.offset((0, _moment2.default)(value).toDate());
-      var dateFormat = (0, _utils.convertFormatToMoment)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
-      var formatted = (0, _moment2.default)(offset.date).format(dateFormat);
-      return '' + formatted + offset.timezone;
+      return (0, _utils.formatDate)(value, _lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'), this.timezone);
     }
   }, {
     key: 'setValueAt',
@@ -18371,6 +18385,27 @@ var DateTimeComponent = function (_BaseComponent) {
       return this.component.useLocaleSettings ? this.localeFormat() : (0, _utils.convertFormatToFlatpickr)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
     }
   }, {
+    key: 'timezone',
+    get: function get() {
+      var timezone = this.component.timezone;
+      if (timezone && timezone.abbr) {
+        return timezone;
+      }
+      if (this.component.displayInTimezone === 'submission' && this.root && this.root.hasTimezone) {
+        return {
+          offset: this.root.submissionOffset,
+          abbr: this.root.submissionTimezone
+        };
+      }
+      if (this.component.displayInTimezone === 'gmt') {
+        return {
+          offset: 0,
+          abbr: 'GST'
+        };
+      }
+      return null;
+    }
+  }, {
     key: 'config',
     get: function get() {
       var _this3 = this;
@@ -18402,8 +18437,8 @@ var DateTimeComponent = function (_BaseComponent) {
         formatDate: function formatDate(date, format) {
           // Only format this if this is the altFormat and the form is readOnly.
           if (_this3.options.readOnly && format === altFormat) {
-            var offset = _this3.offset(date);
-            return '' + _flatpickr2.default.formatDate(offset.date, format) + offset.timezone;
+            var offset = (0, _utils.offsetDate)(date, _this3.timezone);
+            return '' + _flatpickr2.default.formatDate(offset.date, format) + offset.abbr;
           }
 
           return _flatpickr2.default.formatDate(date, format);
@@ -18594,10 +18629,27 @@ exports.default = [{
   label: 'Display in Timezone',
   tooltip: 'This will display the captured date time in the select timezone.',
   weight: 30,
-  defaultValue: 'submission',
+  defaultValue: 'viewer',
   dataSrc: 'values',
   data: {
-    values: [{ label: 'of Viewer', value: 'viewer' }, { label: 'of Submission', value: 'submission' }, { label: 'of GMT', value: 'gmt' }]
+    values: [{ label: 'of Viewer', value: 'viewer' }, { label: 'of Submission', value: 'submission' }, { label: 'of Location', value: 'location' }, { label: 'of GMT', value: 'gmt' }]
+  }
+}, {
+  type: 'select',
+  input: true,
+  key: 'timezoneOffset',
+  label: 'Select Timezone',
+  tooltip: 'Select the timezone you wish to display this Date',
+  weight: 31,
+  defaultValue: '',
+  lazyLoad: true,
+  dataSrc: 'url',
+  data: {
+    url: 'https://cdn.rawgit.com/travist/1072389661176f3efcd20f71b245e8aa/raw/timezones.json'
+  },
+  template: '<span>{{ item.name }}</span>',
+  conditional: {
+    json: { '===': [{ var: 'data.displayInTimezone' }, 'select'] }
   }
 }, {
   type: 'checkbox',
@@ -24254,10 +24306,10 @@ var RadioComponent = function (_BaseComponent) {
     }
   }, {
     key: 'updateValue',
-    value: function updateValue(value, flags) {
+    value: function updateValue(flags, value) {
       var _this3 = this;
 
-      var changed = _get(RadioComponent.prototype.__proto__ || Object.getPrototypeOf(RadioComponent.prototype), 'updateValue', this).call(this, value, flags);
+      var changed = _get(RadioComponent.prototype.__proto__ || Object.getPrototypeOf(RadioComponent.prototype), 'updateValue', this).call(this, flags, value);
       if (changed) {
         //add/remove selected option class
         var _value = this.dataValue;
@@ -24284,6 +24336,11 @@ var RadioComponent = function (_BaseComponent) {
     key: 'defaultSchema',
     get: function get() {
       return RadioComponent.schema();
+    }
+  }, {
+    key: 'emptyValue',
+    get: function get() {
+      return '';
     }
   }, {
     key: 'optionWrapperClass',
@@ -25324,11 +25381,12 @@ var SelectComponent = function (_BaseComponent) {
   }, {
     key: 'show',
     value: function show(_show) {
+      _show = _get(SelectComponent.prototype.__proto__ || Object.getPrototypeOf(SelectComponent.prototype), 'show', this).call(this, _show);
       // If we go from hidden to visible, trigger a refresh.
-      if (_show && this._visible !== _show) {
+      if (_show && !this._visible !== !_show) {
         this.triggerUpdate();
       }
-      return _get(SelectComponent.prototype.__proto__ || Object.getPrototypeOf(SelectComponent.prototype), 'show', this).call(this, _show);
+      return _show;
     }
   }, {
     key: 'addCurrentChoices',
@@ -25381,6 +25439,10 @@ var SelectComponent = function (_BaseComponent) {
           }
         });
         value = this.component.multiple ? values : values.shift();
+      }
+      // Choices will return undefined if nothing is selected. We really want '' to be empty.
+      if (value === undefined) {
+        value = '';
       }
       return value;
     }
@@ -25453,6 +25515,17 @@ var SelectComponent = function (_BaseComponent) {
     }
 
     /**
+     * Deletes the value of the component.
+     */
+
+  }, {
+    key: 'deleteValue',
+    value: function deleteValue() {
+      this.setValue('');
+      _lodash2.default.unset(this.data, this.key);
+    }
+
+    /**
      * Check if a component is eligible for multiple validation
      *
      * @return {boolean}
@@ -25514,6 +25587,11 @@ var SelectComponent = function (_BaseComponent) {
     key: 'defaultSchema',
     get: function get() {
       return SelectComponent.schema();
+    }
+  }, {
+    key: 'emptyValue',
+    get: function get() {
+      return '';
     }
   }, {
     key: 'requestHeaders',
@@ -29927,6 +30005,9 @@ exports.uniqueName = uniqueName;
 exports.guid = guid;
 exports.getDateSetting = getDateSetting;
 exports.isValidDate = isValidDate;
+exports.currentTimezone = currentTimezone;
+exports.offsetDate = offsetDate;
+exports.formatDate = formatDate;
 exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
 exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
 exports.convertFlatpickrToFormat = convertFlatpickrToFormat;
@@ -30611,6 +30692,55 @@ function getDateSetting(date) {
 
 function isValidDate(date) {
   return _lodash2.default.isDate(date) && !_lodash2.default.isNaN(date.getDate());
+}
+
+/**
+ * Get the current timezone string.
+ *
+ * @return {string}
+ */
+function currentTimezone() {
+  if (navigator.languages && navigator.languages.length) {
+    return new Date().toLocaleTimeString(navigator.languages[0], {
+      timeZoneName: 'short'
+    }).split(' ')[2];
+  }
+  return (0, _moment2.default)().format('Z');
+}
+
+/**
+ * Get an offset date provided a date object and timezone object.
+ *
+ * @param date
+ * @param timezone
+ * @return {Date}
+ */
+function offsetDate(date, timezone) {
+  if (!timezone) {
+    return {
+      date: date,
+      abbr: ' (' + currentTimezone() + ')'
+    };
+  }
+  return {
+    date: new Date(date.getTime() + (parseInt(timezone.offset, 10) + date.getTimezoneOffset()) * 60000),
+    abbr: timezone.abbr ? ' (' + timezone.abbr + ')' : ''
+  };
+}
+
+/**
+ * Format a date provided a value, formate, and timezone object.
+ *
+ * @param value
+ * @param format
+ * @param timezone
+ * @return {string}
+ */
+function formatDate(value, format, timezone) {
+  var date = (0, _moment2.default)(value).toDate();
+  var offset = offsetDate(date, timezone);
+  var dateFormat = convertFormatToMoment(format);
+  return '' + (0, _moment2.default)(offset.date).format(dateFormat) + offset.abbr;
 }
 
 function getLocaleDateFormatInfo(locale) {

@@ -10,44 +10,38 @@ export default app.directive('formio', function() {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
-      options: '=?'
+      options: '<?'
     },
     link: function (scope, element) {
       scope.element = element[0];
       scope.formioReady = false;
-      scope.initializing = false;
-      scope.onFormio = scope.initializeForm()
-        .then((formio) => scope.setupForm(formio))
-        .catch((err) => {
-          console.warn(err);
-        });
+      scope.initialized = false;
+      scope.options = scope.options || {};
     },
     controller: [
       '$scope',
-      function ($scope) {
+      '$q',
+      function ($scope, $q) {
+        $scope.onLoad = $q.defer();
+        $scope.onFormio = $scope.onLoad.promise;
         $scope.initializeForm = function() {
-          $scope.options = $scope.options || {};
+          if (!$scope.element) {
+            return;
+          }
 
           // Set read only if using legacy option.
           if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
             $scope.options.readOnly = $scope.readOnly;
           }
 
-          return new Promise((resolve, reject) => {
-            if ($scope.src || $scope.form) {
-              $scope.initializing = true;
-              resolve(Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options)
-                .then(formio => {
-                  $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
-                  $scope.formio = formio;
-                  return formio;
-                }));
-            }
-            else {
-              // If we get to here there is no src or form
-              reject('Must set src or form attribute');
-            }
-          });
+          if ($scope.src || $scope.form) {
+            $scope.initialized = true;
+            Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(formio => {
+              $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
+              $scope.formio = formio;
+              $scope.setupForm();
+            });
+          }
         };
 
         $scope.setupForm = function() {
@@ -105,6 +99,7 @@ export default app.directive('formio', function() {
           });
 
           $scope.formioReady = true;
+          $scope.onLoad.resolve($scope.formio);
           return $scope.formio;
         };
 
@@ -115,8 +110,11 @@ export default app.directive('formio', function() {
           if ($scope.formioReady) {
             $scope.formio.src = src;
           }
-          else if (!$scope.initializing) {
+          else if (!$scope.initialized) {
             $scope.initializeForm();
+          }
+          else {
+            $scope.onFormio.then(() => ($scope.formio.src = src));
           }
         });
 
@@ -128,8 +126,14 @@ export default app.directive('formio', function() {
             $scope.formio.url = url;
             $scope.formio.nosubmit = false;
           }
-          else if (!$scope.initializing) {
+          else if (!$scope.initialized) {
             $scope.initializeForm();
+          }
+          else {
+            $scope.onFormio.then(() => {
+              $scope.formio.url = url;
+              $scope.formio.nosubmit = false;
+            });
           }
         });
 
@@ -140,8 +144,11 @@ export default app.directive('formio', function() {
           if ($scope.formioReady) {
             $scope.formio.form = form;
           }
-          else if (!$scope.initializing) {
+          else if (!$scope.initialized) {
             $scope.initializeForm();
+          }
+          else {
+            $scope.onFormio.then(() => ($scope.formio.form = form));
           }
         });
 
@@ -149,9 +156,7 @@ export default app.directive('formio', function() {
           if (!submission) {
             return;
           }
-          if ($scope.formioReady) {
-            $scope.formio.submission = submission;
-          }
+          $scope.onFormio.then(() => ($scope.formio.submission = submission));
         }, true);
 
         $scope.$on('componentChange', function(){
@@ -164,6 +169,9 @@ export default app.directive('formio', function() {
             $scope.formio.destroy(true);
           }
         });
+
+        // Initialize the form.
+        $scope.initializeForm();
       }
     ],
     template: '<div />'
