@@ -18649,7 +18649,7 @@ exports.default = [{
   },
   template: '<span>{{ item.name }}</span>',
   conditional: {
-    json: { '===': [{ var: 'data.displayInTimezone' }, 'select'] }
+    json: { '===': [{ var: 'data.displayInTimezone' }, 'location'] }
   }
 }, {
   type: 'checkbox',
