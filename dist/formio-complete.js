@@ -1,4 +1,4 @@
-/*! ng-formio v2.36.0 | https://unpkg.com/ng-formio@2.36.0/LICENSE.txt */
+/*! ng-formio v2.36.1 | https://unpkg.com/ng-formio@2.36.1/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -1498,9 +1498,9 @@ return /******/ (function(modules) { // webpackBootstrap
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"angular":10,"moment":221}],4:[function(_dereq_,module,exports){
+},{"angular":10,"moment":234}],4:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.7.2
+ * @license AngularJS v1.7.3
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -2212,7 +2212,7 @@ function sanitizeText(chars) {
 // define ngSanitize module and register $sanitize service
 angular.module('ngSanitize', [])
   .provider('$sanitize', $SanitizeProvider)
-  .info({ angularVersion: '1.7.2' });
+  .info({ angularVersion: '1.7.3' });
 
 /**
  * @ngdoc filter
@@ -10558,7 +10558,7 @@ module.exports = 'ui.bootstrap';
 
 },{"./dist/ui-bootstrap-tpls":7}],9:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.7.2
+ * @license AngularJS v1.7.3
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10658,7 +10658,7 @@ function isValidObjectMaxDepth(maxDepth) {
 function minErr(module, ErrorConstructor) {
   ErrorConstructor = ErrorConstructor || Error;
 
-  var url = 'https://errors.angularjs.org/1.7.2/';
+  var url = 'https://errors.angularjs.org/1.7.3/';
   var regex = url.replace('.', '\\.') + '[\\s\\S]*';
   var errRegExp = new RegExp(regex, 'g');
 
@@ -12393,8 +12393,13 @@ function angularInit(element, bootstrap) {
   });
   if (appElement) {
     if (!isAutoBootstrapAllowed) {
-      window.console.error('AngularJS: disabling automatic bootstrap. <script> protocol indicates ' +
+      try {
+        window.console.error('AngularJS: disabling automatic bootstrap. <script> protocol indicates ' +
           'an extension, document.location.href does not match.');
+      } catch (e) {
+        // Support: Safari 11 w/ Webdriver
+        // The console.error will throw and make the test fail
+      }
       return;
     }
     config.strictDi = getNgAttribute(appElement, 'strict-di') !== null;
@@ -12607,7 +12612,7 @@ function bindJQuery() {
   jqLite.cleanData = function(elems) {
     var events;
     for (var i = 0, elem; (elem = elems[i]) != null; i++) {
-      events = jqLite._data(elem).events;
+      events = (jqLite._data(elem) || {}).events;
       if (events && events.$destroy) {
         jqLite(elem).triggerHandler('$destroy');
       }
@@ -13291,6 +13296,7 @@ function toDebugString(obj, maxDepth) {
   $FilterProvider,
   $$ForceReflowProvider,
   $InterpolateProvider,
+  $$IntervalFactoryProvider,
   $IntervalProvider,
   $HttpProvider,
   $HttpParamSerializerProvider,
@@ -13309,6 +13315,7 @@ function toDebugString(obj, maxDepth) {
   $SceProvider,
   $SceDelegateProvider,
   $SnifferProvider,
+  $$TaskTrackerFactoryProvider,
   $TemplateCacheProvider,
   $TemplateRequestProvider,
   $$TestabilityProvider,
@@ -13338,11 +13345,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.7.2',
+  full: '1.7.3',
   major: 1,
   minor: 7,
-  dot: 2,
-  codeName: 'extreme-compatiplication'
+  dot: 3,
+  codeName: 'eventful-proposal'
 };
 
 
@@ -13462,6 +13469,7 @@ function publishExternalAPI(angular) {
         $$forceReflow: $$ForceReflowProvider,
         $interpolate: $InterpolateProvider,
         $interval: $IntervalProvider,
+        $$intervalFactory: $$IntervalFactoryProvider,
         $http: $HttpProvider,
         $httpParamSerializer: $HttpParamSerializerProvider,
         $httpParamSerializerJQLike: $HttpParamSerializerJQLikeProvider,
@@ -13477,6 +13485,7 @@ function publishExternalAPI(angular) {
         $sce: $SceProvider,
         $sceDelegate: $SceDelegateProvider,
         $sniffer: $SnifferProvider,
+        $$taskTrackerFactory: $$TaskTrackerFactoryProvider,
         $templateCache: $TemplateCacheProvider,
         $templateRequest: $TemplateRequestProvider,
         $$testability: $$TestabilityProvider,
@@ -13489,7 +13498,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.7.2' });
+  .info({ angularVersion: '1.7.3' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -14669,11 +14678,10 @@ function NgMapShim() {
 }
 NgMapShim.prototype = {
   _idx: function(key) {
-    if (key === this._lastKey) {
-      return this._lastIndex;
+    if (key !== this._lastKey) {
+      this._lastKey = key;
+      this._lastIndex = this._keys.indexOf(key);
     }
-    this._lastKey = key;
-    this._lastIndex = this._keys.indexOf(key);
     return this._lastIndex;
   },
   _transformKey: function(key) {
@@ -14685,6 +14693,11 @@ NgMapShim.prototype = {
     if (idx !== -1) {
       return this._values[idx];
     }
+  },
+  has: function(key) {
+    key = this._transformKey(key);
+    var idx = this._idx(key);
+    return idx !== -1;
   },
   set: function(key, value) {
     key = this._transformKey(key);
@@ -16339,14 +16352,39 @@ var $AnimateProvider = ['$provide', /** @this */ function($provide) {
        * );
        * ```
        *
+       * <div class="alert alert-warning">
+       * **Note**: Generally, the events that are fired correspond 1:1 to `$animate` method names,
+       * e.g. {@link ng.$animate#addClass addClass()} will fire `addClass`, and {@link ng.ngClass}
+       * will fire `addClass` if classes are added, and `removeClass` if classes are removed.
+       * However, there are two exceptions:
+       *
+       * <ul>
+       *   <li>if both an {@link ng.$animate#addClass addClass()} and a
+       *   {@link ng.$animate#removeClass removeClass()} action are performed during the same
+       *   animation, the event fired will be `setClass`. This is true even for `ngClass`.</li>
+       *   <li>an {@link ng.$animate#animate animate()} call that adds and removes classes will fire
+       *   the `setClass` event, but if it either removes or adds classes,
+       *   it will fire `animate` instead.</li>
+       * </ul>
+       *
+       * </div>
+       *
        * @param {string} event the animation event that will be captured (e.g. enter, leave, move, addClass, removeClass, etc...)
        * @param {DOMElement} container the container element that will capture each of the animation events that are fired on itself
        *     as well as among its children
-       * @param {Function} callback the callback function that will be fired when the listener is triggered
+       * @param {Function} callback the callback function that will be fired when the listener is triggered.
        *
        * The arguments present in the callback function are:
        * * `element` - The captured DOM element that the animation was fired on.
        * * `phase` - The phase of the animation. The two possible phases are **start** (when the animation starts) and **close** (when it ends).
+       * * `data` - an object with these properties:
+       *     * addClass - `{string|null}` - space-separated CSS classes to add to the element
+       *     * removeClass - `{string|null}` - space-separated CSS classes to remove from the element
+       *     * from - `{Object|null}` - CSS properties & values at the beginning of the animation
+       *     * to - `{Object|null}` - CSS properties & values at the end of the animation
+       *
+       * Note that the callback does not trigger a scope digest. Wrap your call into a
+       * {@link $rootScope.Scope#$apply scope.$apply} to propagate changes to the scope.
        */
       on: $$animateQueue.on,
 
@@ -16614,9 +16652,8 @@ var $AnimateProvider = ['$provide', /** @this */ function($provide) {
        * @param {object=} options an optional collection of options/styles that will be applied to the element.
        *   The object can have the following properties:
        *
-       *   - **addClass** - `{string}` - space-separated CSS classes to add to element
-       *   - **from** - `{Object}` - CSS properties & values at the beginning of animation. Must have matching `to`
        *   - **removeClass** - `{string}` - space-separated CSS classes to remove from element
+       *   - **from** - `{Object}` - CSS properties & values at the beginning of animation. Must have matching `to`
        *   - **to** - `{Object}` - CSS properties & values at end of animation. Must have matching `from`
        *
        * @return {Runner} animationRunner the animation runner
@@ -16646,7 +16683,6 @@ var $AnimateProvider = ['$provide', /** @this */ function($provide) {
        *
        *   - **addClass** - `{string}` - space-separated CSS classes to add to element
        *   - **from** - `{Object}` - CSS properties & values at the beginning of animation. Must have matching `to`
-       *   - **removeClass** - `{string}` - space-separated CSS classes to remove from element
        *   - **to** - `{Object}` - CSS properties & values at end of animation. Must have matching `from`
        *
        * @return {Runner} the animation runner
@@ -16676,8 +16712,8 @@ var $AnimateProvider = ['$provide', /** @this */ function($provide) {
        *   The object can have the following properties:
        *
        *   - **addClass** - `{string}` - space-separated CSS classes to add to element
-       *   - **from** - `{Object}` - CSS properties & values at the beginning of animation. Must have matching `to`
        *   - **removeClass** - `{string}` - space-separated CSS classes to remove from element
+       *   - **from** - `{Object}` - CSS properties & values at the beginning of animation. Must have matching `to`
        *   - **to** - `{Object}` - CSS properties & values at end of animation. Must have matching `from`
        *
        * @return {Runner} the animation runner
@@ -17004,7 +17040,16 @@ var $CoreAnimateCssProvider = function() {
   }];
 };
 
-/* global stripHash: true */
+/* global getHash: true, stripHash: false */
+
+function getHash(url) {
+  var index = url.indexOf('#');
+  return index === -1 ? '' : url.substr(index);
+}
+
+function trimEmptyHash(url) {
+  return url.replace(/#$/, '');
+}
 
 /**
  * ! This is a private undocumented service !
@@ -17027,61 +17072,27 @@ var $CoreAnimateCssProvider = function() {
  * @param {object} $log window.console or an object with the same interface.
  * @param {object} $sniffer $sniffer service
  */
-function Browser(window, document, $log, $sniffer) {
+function Browser(window, document, $log, $sniffer, $$taskTrackerFactory) {
   var self = this,
       location = window.location,
       history = window.history,
       setTimeout = window.setTimeout,
       clearTimeout = window.clearTimeout,
-      pendingDeferIds = {};
+      pendingDeferIds = {},
+      taskTracker = $$taskTrackerFactory($log);
 
   self.isMock = false;
 
-  var outstandingRequestCount = 0;
-  var outstandingRequestCallbacks = [];
+  //////////////////////////////////////////////////////////////
+  // Task-tracking API
+  //////////////////////////////////////////////////////////////
 
   // TODO(vojta): remove this temporary api
-  self.$$completeOutstandingRequest = completeOutstandingRequest;
-  self.$$incOutstandingRequestCount = function() { outstandingRequestCount++; };
+  self.$$completeOutstandingRequest = taskTracker.completeTask;
+  self.$$incOutstandingRequestCount = taskTracker.incTaskCount;
 
-  /**
-   * Executes the `fn` function(supports currying) and decrements the `outstandingRequestCallbacks`
-   * counter. If the counter reaches 0, all the `outstandingRequestCallbacks` are executed.
-   */
-  function completeOutstandingRequest(fn) {
-    try {
-      fn.apply(null, sliceArgs(arguments, 1));
-    } finally {
-      outstandingRequestCount--;
-      if (outstandingRequestCount === 0) {
-        while (outstandingRequestCallbacks.length) {
-          try {
-            outstandingRequestCallbacks.pop()();
-          } catch (e) {
-            $log.error(e);
-          }
-        }
-      }
-    }
-  }
-
-  function getHash(url) {
-    var index = url.indexOf('#');
-    return index === -1 ? '' : url.substr(index);
-  }
-
-  /**
-   * @private
-   * TODO(vojta): prefix this method with $$ ?
-   * @param {function()} callback Function that will be called when no outstanding request
-   */
-  self.notifyWhenNoOutstandingRequests = function(callback) {
-    if (outstandingRequestCount === 0) {
-      callback();
-    } else {
-      outstandingRequestCallbacks.push(callback);
-    }
-  };
+  // TODO(vojta): prefix this method with $$ ?
+  self.notifyWhenNoOutstandingRequests = taskTracker.notifyWhenNoPendingTasks;
 
   //////////////////////////////////////////////////////////////
   // URL API
@@ -17106,20 +17117,21 @@ function Browser(window, document, $log, $sniffer) {
    *
    * @description
    * GETTER:
-   * Without any argument, this method just returns current value of location.href.
+   * Without any argument, this method just returns current value of `location.href` (with a
+   * trailing `#` stripped of if the hash is empty).
    *
    * SETTER:
    * With at least one argument, this method sets url to new value.
-   * If html5 history api supported, pushState/replaceState is used, otherwise
-   * location.href/location.replace is used.
-   * Returns its own instance to allow chaining
+   * If html5 history api supported, `pushState`/`replaceState` is used, otherwise
+   * `location.href`/`location.replace` is used.
+   * Returns its own instance to allow chaining.
    *
-   * NOTE: this api is intended for use only by the $location service. Please use the
+   * NOTE: this api is intended for use only by the `$location` service. Please use the
    * {@link ng.$location $location service} to change url.
    *
    * @param {string} url New url (when used as setter)
    * @param {boolean=} replace Should new url replace current history record?
-   * @param {object=} state object to use with pushState/replaceState
+   * @param {object=} state State object to use with `pushState`/`replaceState`
    */
   self.url = function(url, replace, state) {
     // In modern browsers `history.state` is `null` by default; treating it separately
@@ -17177,7 +17189,7 @@ function Browser(window, document, $log, $sniffer) {
       // - pendingLocation is needed as browsers don't allow to read out
       //   the new location.href if a reload happened or if there is a bug like in iOS 9 (see
       //   https://openradar.appspot.com/22186109).
-      return pendingLocation || location.href;
+      return trimEmptyHash(pendingLocation || location.href);
     }
   };
 
@@ -17312,7 +17324,8 @@ function Browser(window, document, $log, $sniffer) {
   /**
    * @name $browser#defer
    * @param {function()} fn A function, who's execution should be deferred.
-   * @param {number=} [delay=0] of milliseconds to defer the function execution.
+   * @param {number=} [delay=0] Number of milliseconds to defer the function execution.
+   * @param {string=} [taskType=DEFAULT_TASK_TYPE] The type of task that is deferred.
    * @returns {*} DeferId that can be used to cancel the task via `$browser.defer.cancel()`.
    *
    * @description
@@ -17323,14 +17336,19 @@ function Browser(window, document, $log, $sniffer) {
    * via `$browser.defer.flush()`.
    *
    */
-  self.defer = function(fn, delay) {
+  self.defer = function(fn, delay, taskType) {
     var timeoutId;
-    outstandingRequestCount++;
+
+    delay = delay || 0;
+    taskType = taskType || taskTracker.DEFAULT_TASK_TYPE;
+
+    taskTracker.incTaskCount(taskType);
     timeoutId = setTimeout(function() {
       delete pendingDeferIds[timeoutId];
-      completeOutstandingRequest(fn);
-    }, delay || 0);
-    pendingDeferIds[timeoutId] = true;
+      taskTracker.completeTask(fn, taskType);
+    }, delay);
+    pendingDeferIds[timeoutId] = taskType;
+
     return timeoutId;
   };
 
@@ -17346,10 +17364,11 @@ function Browser(window, document, $log, $sniffer) {
    *                    canceled.
    */
   self.defer.cancel = function(deferId) {
-    if (pendingDeferIds[deferId]) {
+    if (pendingDeferIds.hasOwnProperty(deferId)) {
+      var taskType = pendingDeferIds[deferId];
       delete pendingDeferIds[deferId];
       clearTimeout(deferId);
-      completeOutstandingRequest(noop);
+      taskTracker.completeTask(noop, taskType);
       return true;
     }
     return false;
@@ -17359,10 +17378,10 @@ function Browser(window, document, $log, $sniffer) {
 
 /** @this */
 function $BrowserProvider() {
-  this.$get = ['$window', '$log', '$sniffer', '$document',
-      function($window, $log, $sniffer, $document) {
-        return new Browser($window, $document, $log, $sniffer);
-      }];
+  this.$get = ['$window', '$log', '$sniffer', '$document', '$$taskTrackerFactory',
+       function($window,   $log,   $sniffer,   $document,   $$taskTrackerFactory) {
+    return new Browser($window, $document, $log, $sniffer, $$taskTrackerFactory);
+  }];
 }
 
 /**
@@ -18802,8 +18821,7 @@ function $TemplateCacheProvider() {
  *
  * See issue [#2573](https://github.com/angular/angular.js/issues/2573).
  *
- * #### `transclude: element` in the replace template root can have
- * unexpected effects
+ * #### `transclude: element` in the replace template root can have unexpected effects
  *
  * When the replace template has a directive at the root node that uses
  * {@link $compile#-transclude- `transclude: element`}, e.g.
@@ -18815,6 +18833,325 @@ function $TemplateCacheProvider() {
  * - Different DOM between `template` and `templateUrl`:
  * [#10612](https://github.com/angular/angular.js/issues/14326)
  *
+ */
+
+/**
+ * @ngdoc directive
+ * @name ngProp
+ * @restrict A
+ * @element ANY
+ *
+ * @usage
+ *
+ * ```html
+ * <ANY ng-prop-propname="expression">
+ * </ANY>
+ * ```
+ *
+ * or with uppercase letters in property (e.g. "propName"):
+ *
+ *
+ * ```html
+ * <ANY ng-prop-prop_name="expression">
+ * </ANY>
+ * ```
+ *
+ *
+ * @description
+ * The `ngProp` directive binds an expression to a DOM element property.
+ * `ngProp` allows writing to arbitrary properties by including
+ * the property name in the attribute, e.g. `ng-prop-value="'my value'"` binds 'my value' to
+ * the `value` property.
+ *
+ * Usually, it's not necessary to write to properties in AngularJS, as the built-in directives
+ * handle the most common use cases (instead of the above example, you would use {@link ngValue}).
+ *
+ * However, [custom elements](https://developer.mozilla.org/docs/Web/Web_Components/Using_custom_elements)
+ * often use custom properties to hold data, and `ngProp` can be used to provide input to these
+ * custom elements.
+ *
+ * ## Binding to camelCase properties
+ *
+ * Since HTML attributes are case-insensitive, camelCase properties like `innerHTML` must be escaped.
+ * AngularJS uses the underscore (_) in front of a character to indicate that it is uppercase, so
+ * `innerHTML`  must be written as `ng-prop-inner_h_t_m_l="expression"` (Note that this is just an
+ * example, and for binding HTML {@link ngBindHtml} should be used.
+ *
+ * ## Security
+ *
+ * Binding expressions to arbitrary properties poses a security risk, as  properties like `innerHTML`
+ * can insert potentially dangerous HTML into the application, e.g. script tags that execute
+ * malicious code.
+ * For this reason, `ngProp` applies Strict Contextual Escaping with the {@link ng.$sce $sce service}.
+ * This means vulnerable properties require their content to be "trusted", based on the
+ * context of the property. For example, the `innerHTML` is in the `HTML` context, and the
+ * `iframe.src` property is in the `RESOURCE_URL` context, which requires that values written to
+ * this property are trusted as a `RESOURCE_URL`.
+ *
+ * This can be set explicitly by calling $sce.trustAs(type, value) on the value that is
+ * trusted before passing it to the `ng-prop-*` directive. There are exist shorthand methods for
+ * each context type in the form of {@link ng.$sce#trustAsResourceUrl $sce.trustAsResourceUrl()} et al.
+ *
+ * In some cases you can also rely upon automatic sanitization of untrusted values - see below.
+ *
+ * Based on the context, other options may exist to mark a value as trusted / configure the behavior
+ * of {@link ng.$sce}. For example, to restrict the `RESOURCE_URL` context to specific origins, use
+ * the {@link $sceDelegateProvider#resourceUrlWhitelist resourceUrlWhitelist()}
+ * and {@link $sceDelegateProvider#resourceUrlBlacklist resourceUrlBlacklist()}.
+ *
+ * {@link ng.$sce#what-trusted-context-types-are-supported- Find out more about the different context types}.
+ *
+ * ### HTML Sanitization
+ *
+ * By default, `$sce` will throw an error if it detects untrusted HTML content, and will not bind the
+ * content.
+ * However, if you include the {@link ngSanitize ngSanitize module}, it will try to sanitize the
+ * potentially dangerous HTML, e.g. strip non-whitelisted tags and attributes when binding to
+ * `innerHTML`.
+ *
+ * @example
+ * ### Binding to different contexts
+ *
+ * <example name="ngProp" module="exampleNgProp">
+ *   <file name="app.js">
+ *     angular.module('exampleNgProp', [])
+ *       .component('main', {
+ *         templateUrl: 'main.html',
+ *         controller: function($sce) {
+ *           this.safeContent = '<strong>Safe content</strong>';
+ *           this.unsafeContent = '<button onclick="alert(\'Hello XSS!\')">Click for XSS</button>';
+ *           this.trustedUnsafeContent = $sce.trustAsHtml(this.unsafeContent);
+ *         }
+ *       });
+ *   </file>
+ *   <file name="main.html">
+ *     <div>
+ *       <div class="prop-unit">
+ *         Binding to a property without security context:
+ *         <div class="prop-binding" ng-prop-inner_text="$ctrl.safeContent"></div>
+ *         <span class="prop-note">innerText</span> (safeContent)
+ *       </div>
+ *
+ *       <div class="prop-unit">
+ *         "Safe" content that requires a security context will throw because the contents could potentially be dangerous ...
+ *         <div class="prop-binding" ng-prop-inner_h_t_m_l="$ctrl.safeContent"></div>
+ *         <span class="prop-note">innerHTML</span> (safeContent)
+ *       </div>
+ *
+ *       <div class="prop-unit">
+ *         ... so that actually dangerous content cannot be executed:
+ *         <div class="prop-binding" ng-prop-inner_h_t_m_l="$ctrl.unsafeContent"></div>
+ *         <span class="prop-note">innerHTML</span> (unsafeContent)
+ *       </div>
+ *
+ *       <div class="prop-unit">
+ *         ... but unsafe Content that has been trusted explicitly works - only do this if you are 100% sure!
+ *         <div class="prop-binding" ng-prop-inner_h_t_m_l="$ctrl.trustedUnsafeContent"></div>
+ *         <span class="prop-note">innerHTML</span> (trustedUnsafeContent)
+ *       </div>
+ *     </div>
+ *   </file>
+ *   <file name="index.html">
+ *     <main></main>
+ *   </file>
+ *   <file name="styles.css">
+ *     .prop-unit {
+ *       margin-bottom: 10px;
+ *     }
+ *
+ *     .prop-binding {
+ *       min-height: 30px;
+ *       border: 1px solid blue;
+ *     }
+ *
+ *     .prop-note {
+ *       font-family: Monospace;
+ *     }
+ *   </file>
+ * </example>
+ *
+ *
+ * @example
+ * ### Binding to innerHTML with ngSanitize
+ *
+ * <example name="ngProp" module="exampleNgProp" deps="angular-sanitize.js">
+ *   <file name="app.js">
+ *     angular.module('exampleNgProp', ['ngSanitize'])
+ *       .component('main', {
+ *         templateUrl: 'main.html',
+ *         controller: function($sce) {
+ *           this.safeContent = '<strong>Safe content</strong>';
+ *           this.unsafeContent = '<button onclick="alert(\'Hello XSS!\')">Click for XSS</button>';
+ *           this.trustedUnsafeContent = $sce.trustAsHtml(this.unsafeContent);
+ *         }
+ *       });
+ *   </file>
+ *   <file name="main.html">
+ *     <div>
+ *       <div class="prop-unit">
+ *         "Safe" content will be sanitized ...
+ *         <div class="prop-binding" ng-prop-inner_h_t_m_l="$ctrl.safeContent"></div>
+ *         <span class="prop-note">innerHTML</span> (safeContent)
+ *       </div>
+ *
+ *       <div class="prop-unit">
+ *         ... as will dangerous content:
+ *         <div class="prop-binding" ng-prop-inner_h_t_m_l="$ctrl.unsafeContent"></div>
+ *         <span class="prop-note">innerHTML</span> (unsafeContent)
+ *       </div>
+ *
+ *       <div class="prop-unit">
+ *         ... and content that has been trusted explicitly works the same as without ngSanitize:
+ *         <div class="prop-binding" ng-prop-inner_h_t_m_l="$ctrl.trustedUnsafeContent"></div>
+ *         <span class="prop-note">innerHTML</span> (trustedUnsafeContent)
+ *       </div>
+ *     </div>
+ *   </file>
+ *   <file name="index.html">
+ *     <main></main>
+ *   </file>
+ *   <file name="styles.css">
+ *     .prop-unit {
+ *       margin-bottom: 10px;
+ *     }
+ *
+ *     .prop-binding {
+ *       min-height: 30px;
+ *       border: 1px solid blue;
+ *     }
+ *
+ *     .prop-note {
+ *       font-family: Monospace;
+ *     }
+ *   </file>
+ * </example>
+ *
+ */
+
+/** @ngdoc directive
+ * @name ngOn
+ * @restrict A
+ * @element ANY
+ *
+ * @usage
+ *
+ * ```html
+ * <ANY ng-on-eventname="expression">
+ * </ANY>
+ * ```
+ *
+ * or with uppercase letters in property (e.g. "eventName"):
+ *
+ *
+ * ```html
+ * <ANY ng-on-event_name="expression">
+ * </ANY>
+ * ```
+ *
+ * @description
+ * The `ngOn` directive adds an event listener to a DOM element via
+ * {@link angular.element angular.element().on()}, and evaluates an expression when the event is
+ * fired.
+ * `ngOn` allows adding listeners for arbitrary events by including
+ * the event name in the attribute, e.g. `ng-on-drop="onDrop()"` executes the 'onDrop()' expression
+ * when the `drop` event is fired.
+ *
+ * AngularJS provides specific directives for many events, such as {@link ngClick}, so in most
+ * cases it is not necessary to use `ngOn`. However, AngularJS does not support all events
+ * (e.g. the `drop` event in the example above), and new events might be introduced in later DOM
+ * standards.
+ *
+ * Another use-case for `ngOn` is listening to
+ * [custom events](https://developer.mozilla.org/docs/Web/Guide/Events/Creating_and_triggering_events)
+ * fired by
+ * [custom elements](https://developer.mozilla.org/docs/Web/Web_Components/Using_custom_elements).
+ *
+ * ## Binding to camelCase properties
+ *
+ * Since HTML attributes are case-insensitive, camelCase properties like `myEvent` must be escaped.
+ * AngularJS uses the underscore (_) in front of a character to indicate that it is uppercase, so
+ * `myEvent` must be written as `ng-on-my_event="expression"`.
+ *
+ * @example
+ * ### Bind to built-in DOM events
+ *
+ * <example name="ngOn" module="exampleNgOn">
+ *   <file name="app.js">
+ *     angular.module('exampleNgOn', [])
+ *       .component('main', {
+ *         templateUrl: 'main.html',
+ *         controller: function() {
+ *           this.clickCount = 0;
+ *           this.mouseoverCount = 0;
+ *
+ *           this.loadingState = 0;
+ *         }
+ *       });
+ *   </file>
+ *   <file name="main.html">
+ *     <div>
+ *       This is equivalent to `ngClick` and `ngMouseover`:<br>
+ *       <button
+ *         ng-on-click="$ctrl.clickCount = $ctrl.clickCount + 1"
+ *         ng-on-mouseover="$ctrl.mouseoverCount = $ctrl.mouseoverCount + 1">Click or mouseover</button><br>
+ *       clickCount: {{$ctrl.clickCount}}<br>
+ *       mouseover: {{$ctrl.mouseoverCount}}
+ *
+ *       <hr>
+ *
+ *       For the `error` and `load` event on images no built-in AngularJS directives exist:<br>
+ *       <img src="thisimagedoesnotexist.png" ng-on-error="$ctrl.loadingState = -1" ng-on-load="$ctrl.loadingState = 1"><br>
+ *       <div ng-switch="$ctrl.loadingState">
+ *         <span ng-switch-when="0">Image is loading</span>
+ *         <span ng-switch-when="-1">Image load error</span>
+ *         <span ng-switch-when="1">Image loaded successfully</span>
+ *       </div>
+ *     </div>
+ *   </file>
+ *   <file name="index.html">
+ *     <main></main>
+ *   </file>
+ * </example>
+ *
+ *
+ * @example
+ * ### Bind to custom DOM events
+ *
+ * <example name="ngOnCustom" module="exampleNgOn">
+ *   <file name="app.js">
+ *     angular.module('exampleNgOn', [])
+ *       .component('main', {
+ *         templateUrl: 'main.html',
+ *         controller: function() {
+ *           this.eventLog = '';
+ *
+ *           this.listener = function($event) {
+ *             this.eventLog = 'Event with type "' + $event.type + '" fired at ' + $event.detail;
+ *           };
+ *         }
+ *       })
+ *       .component('childComponent', {
+ *         templateUrl: 'child.html',
+ *         controller: function($element) {
+ *           this.fireEvent = function() {
+ *             var event = new CustomEvent('customtype', { detail: new Date()});
+ *
+ *             $element[0].dispatchEvent(event);
+ *           };
+ *         }
+ *       });
+ *   </file>
+ *   <file name="main.html">
+ *     <child-component ng-on-customtype="$ctrl.listener($event)"></child-component><br>
+ *     <span>Event log: {{$ctrl.eventLog}}</span>
+ *   </file>
+ *   <file name="child.html">
+      <button ng-click="$ctrl.fireEvent()">Fire custom event</button>
+ *   </file>
+ *   <file name="index.html">
+ *     <main></main>
+ *   </file>
+ * </example>
  */
 
 var $compileMinErr = minErr('$compile');
@@ -19359,6 +19696,91 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     return cssClassDirectivesEnabledConfig;
   };
 
+
+  /**
+   * The security context of DOM Properties.
+   * @private
+   */
+  var PROP_CONTEXTS = createMap();
+
+  /**
+   * @ngdoc method
+   * @name $compileProvider#addPropertySecurityContext
+   * @description
+   *
+   * Defines the security context for DOM properties bound by ng-prop-*.
+   *
+   * @param {string} elementName The element name or '*' to match any element.
+   * @param {string} propertyName The DOM property name.
+   * @param {string} ctx The {@link $sce} security context in which this value is safe for use, e.g. `$sce.URL`
+   * @returns {object} `this` for chaining
+   */
+  this.addPropertySecurityContext = function(elementName, propertyName, ctx) {
+    var key = (elementName.toLowerCase() + '|' + propertyName.toLowerCase());
+
+    if (key in PROP_CONTEXTS && PROP_CONTEXTS[key] !== ctx) {
+      throw $compileMinErr('ctxoverride', 'Property context \'{0}.{1}\' already set to \'{2}\', cannot override to \'{3}\'.', elementName, propertyName, PROP_CONTEXTS[key], ctx);
+    }
+
+    PROP_CONTEXTS[key] = ctx;
+    return this;
+  };
+
+  /* Default property contexts.
+   *
+   * Copy of https://github.com/angular/angular/blob/6.0.6/packages/compiler/src/schema/dom_security_schema.ts#L31-L58
+   * Changing:
+   * - SecurityContext.* => SCE_CONTEXTS/$sce.*
+   * - STYLE => CSS
+   * - various URL => MEDIA_URL
+   * - *|formAction, form|action URL => RESOURCE_URL (like the attribute)
+   */
+  (function registerNativePropertyContexts() {
+    function registerContext(ctx, values) {
+      forEach(values, function(v) { PROP_CONTEXTS[v.toLowerCase()] = ctx; });
+    }
+
+    registerContext(SCE_CONTEXTS.HTML, [
+      'iframe|srcdoc',
+      '*|innerHTML',
+      '*|outerHTML'
+    ]);
+    registerContext(SCE_CONTEXTS.CSS, ['*|style']);
+    registerContext(SCE_CONTEXTS.URL, [
+      'area|href',       'area|ping',
+      'a|href',          'a|ping',
+      'blockquote|cite',
+      'body|background',
+      'del|cite',
+      'input|src',
+      'ins|cite',
+      'q|cite'
+    ]);
+    registerContext(SCE_CONTEXTS.MEDIA_URL, [
+      'audio|src',
+      'img|src',    'img|srcset',
+      'source|src', 'source|srcset',
+      'track|src',
+      'video|src',  'video|poster'
+    ]);
+    registerContext(SCE_CONTEXTS.RESOURCE_URL, [
+      '*|formAction',
+      'applet|code',      'applet|codebase',
+      'base|href',
+      'embed|src',
+      'frame|src',
+      'form|action',
+      'head|profile',
+      'html|manifest',
+      'iframe|src',
+      'link|href',
+      'media|src',
+      'object|codebase',  'object|data',
+      'script|src'
+    ]);
+  })();
+
+
   this.$get = [
             '$injector', '$interpolate', '$exceptionHandler', '$templateRequest', '$parse',
             '$controller', '$rootScope', '$sce', '$animate',
@@ -19401,6 +19823,57 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       } finally {
         onChangesTtl++;
       }
+    }
+
+
+    function sanitizeSrcset(value, invokeType) {
+      if (!value) {
+        return value;
+      }
+      if (!isString(value)) {
+        throw $compileMinErr('srcset', 'Can\'t pass trusted values to `{0}`: "{1}"', invokeType, value.toString());
+      }
+
+      // Such values are a bit too complex to handle automatically inside $sce.
+      // Instead, we sanitize each of the URIs individually, which works, even dynamically.
+
+      // It's not possible to work around this using `$sce.trustAsMediaUrl`.
+      // If you want to programmatically set explicitly trusted unsafe URLs, you should use
+      // `$sce.trustAsHtml` on the whole `img` tag and inject it into the DOM using the
+      // `ng-bind-html` directive.
+
+      var result = '';
+
+      // first check if there are spaces because it's not the same pattern
+      var trimmedSrcset = trim(value);
+      //                (   999x   ,|   999w   ,|   ,|,   )
+      var srcPattern = /(\s+\d+x\s*,|\s+\d+w\s*,|\s+,|,\s+)/;
+      var pattern = /\s/.test(trimmedSrcset) ? srcPattern : /(,)/;
+
+      // split srcset into tuple of uri and descriptor except for the last item
+      var rawUris = trimmedSrcset.split(pattern);
+
+      // for each tuples
+      var nbrUrisWith2parts = Math.floor(rawUris.length / 2);
+      for (var i = 0; i < nbrUrisWith2parts; i++) {
+        var innerIdx = i * 2;
+        // sanitize the uri
+        result += $sce.getTrustedMediaUrl(trim(rawUris[innerIdx]));
+        // add the descriptor
+        result += ' ' + trim(rawUris[innerIdx + 1]);
+      }
+
+      // split the last item into uri and descriptor
+      var lastTuple = trim(rawUris[i * 2]).split(/\s/);
+
+      // sanitize the last uri
+      result += $sce.getTrustedMediaUrl(trim(lastTuple[0]));
+
+      // and add the last descriptor if any
+      if (lastTuple.length === 2) {
+        result += (' ' + trim(lastTuple[1]));
+      }
+      return result;
     }
 
 
@@ -19540,51 +20013,8 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         nodeName = nodeName_(this.$$element);
 
         // Sanitize img[srcset] values.
-        if (nodeName === 'img' && key === 'srcset' && value) {
-          if (!isString(value)) {
-            throw $compileMinErr('srcset', 'Can\'t pass trusted values to `$set(\'srcset\', value)`: "{0}"', value.toString());
-          }
-
-          // Such values are a bit too complex to handle automatically inside $sce.
-          // Instead, we sanitize each of the URIs individually, which works, even dynamically.
-
-          // It's not possible to work around this using `$sce.trustAsMediaUrl`.
-          // If you want to programmatically set explicitly trusted unsafe URLs, you should use
-          // `$sce.trustAsHtml` on the whole `img` tag and inject it into the DOM using the
-          // `ng-bind-html` directive.
-
-          var result = '';
-
-          // first check if there are spaces because it's not the same pattern
-          var trimmedSrcset = trim(value);
-          //                (   999x   ,|   999w   ,|   ,|,   )
-          var srcPattern = /(\s+\d+x\s*,|\s+\d+w\s*,|\s+,|,\s+)/;
-          var pattern = /\s/.test(trimmedSrcset) ? srcPattern : /(,)/;
-
-          // split srcset into tuple of uri and descriptor except for the last item
-          var rawUris = trimmedSrcset.split(pattern);
-
-          // for each tuples
-          var nbrUrisWith2parts = Math.floor(rawUris.length / 2);
-          for (var i = 0; i < nbrUrisWith2parts; i++) {
-            var innerIdx = i * 2;
-            // sanitize the uri
-            result += $sce.getTrustedMediaUrl(trim(rawUris[innerIdx]));
-            // add the descriptor
-            result += ' ' + trim(rawUris[innerIdx + 1]);
-          }
-
-          // split the last item into uri and descriptor
-          var lastTuple = trim(rawUris[i * 2]).split(/\s/);
-
-          // sanitize the last uri
-          result += $sce.getTrustedMediaUrl(trim(lastTuple[0]));
-
-          // and add the last descriptor if any
-          if (lastTuple.length === 2) {
-            result += (' ' + trim(lastTuple[1]));
-          }
-          this[key] = value = result;
+        if (nodeName === 'img' && key === 'srcset') {
+          this[key] = value = sanitizeSrcset(value, '$set(\'srcset\', value)');
         }
 
         if (writeAttr !== false) {
@@ -19681,7 +20111,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             : function denormalizeTemplate(template) {
               return template.replace(/\{\{/g, startSymbol).replace(/}}/g, endSymbol);
         },
-        NG_ATTR_BINDING = /^ngAttr[A-Z]/;
+        NG_PREFIX_BINDING = /^ng(Attr|Prop|On)([A-Z].*)$/;
     var MULTI_ELEMENT_DIR_RE = /^(.+)Start$/;
 
     compile.$$addBindingInfo = debugInfoEnabled ? function $$addBindingInfo($element, binding) {
@@ -20017,43 +20447,66 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               directiveNormalize(nodeName), 'E', maxPriority, ignoreDirective);
 
           // iterate over the attributes
-          for (var attr, name, nName, ngAttrName, value, isNgAttr, nAttrs = node.attributes,
+          for (var attr, name, nName, value, ngPrefixMatch, nAttrs = node.attributes,
                    j = 0, jj = nAttrs && nAttrs.length; j < jj; j++) {
             var attrStartName = false;
             var attrEndName = false;
+
+            var isNgAttr = false, isNgProp = false, isNgEvent = false;
+            var multiElementMatch;
 
             attr = nAttrs[j];
             name = attr.name;
             value = attr.value;
 
-            // support ngAttr attribute binding
-            ngAttrName = directiveNormalize(name);
-            isNgAttr = NG_ATTR_BINDING.test(ngAttrName);
-            if (isNgAttr) {
+            nName = directiveNormalize(name.toLowerCase());
+
+            // Support ng-attr-*, ng-prop-* and ng-on-*
+            if ((ngPrefixMatch = nName.match(NG_PREFIX_BINDING))) {
+              isNgAttr = ngPrefixMatch[1] === 'Attr';
+              isNgProp = ngPrefixMatch[1] === 'Prop';
+              isNgEvent = ngPrefixMatch[1] === 'On';
+
+              // Normalize the non-prefixed name
               name = name.replace(PREFIX_REGEXP, '')
-                .substr(8).replace(/_(.)/g, function(match, letter) {
+                .toLowerCase()
+                .substr(4 + ngPrefixMatch[1].length).replace(/_(.)/g, function(match, letter) {
                   return letter.toUpperCase();
                 });
-            }
 
-            var multiElementMatch = ngAttrName.match(MULTI_ELEMENT_DIR_RE);
-            if (multiElementMatch && directiveIsMultiElement(multiElementMatch[1])) {
+            // Support *-start / *-end multi element directives
+            } else if ((multiElementMatch = nName.match(MULTI_ELEMENT_DIR_RE)) && directiveIsMultiElement(multiElementMatch[1])) {
               attrStartName = name;
               attrEndName = name.substr(0, name.length - 5) + 'end';
               name = name.substr(0, name.length - 6);
             }
 
-            nName = directiveNormalize(name.toLowerCase());
-            attrsMap[nName] = name;
-            if (isNgAttr || !attrs.hasOwnProperty(nName)) {
+            if (isNgProp || isNgEvent) {
+              attrs[nName] = value;
+              attrsMap[nName] = attr.name;
+
+              if (isNgProp) {
+                addPropertyDirective(node, directives, nName, name);
+              } else {
+                addEventDirective(directives, nName, name);
+              }
+            } else {
+              // Update nName for cases where a prefix was removed
+              // NOTE: the .toLowerCase() is unnecessary and causes https://github.com/angular/angular.js/issues/16624 for ng-attr-*
+              nName = directiveNormalize(name.toLowerCase());
+              attrsMap[nName] = name;
+
+              if (isNgAttr || !attrs.hasOwnProperty(nName)) {
                 attrs[nName] = value;
                 if (getBooleanAttrName(node, nName)) {
                   attrs[nName] = true; // presence means true
                 }
+              }
+
+              addAttrInterpolateDirective(node, directives, value, nName, isNgAttr);
+              addDirective(directives, nName, 'A', maxPriority, ignoreDirective, attrStartName,
+                            attrEndName);
             }
-            addAttrInterpolateDirective(node, directives, value, nName, isNgAttr);
-            addDirective(directives, nName, 'A', maxPriority, ignoreDirective, attrStartName,
-                          attrEndName);
           }
 
           if (nodeName === 'input' && node.getAttribute('type') === 'hidden') {
@@ -20392,11 +20845,12 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
               for (var slotName in slots) {
                 if (slots[slotName]) {
                   // Only define a transclusion function if the slot was filled
-                  slots[slotName] = compilationGenerator(mightHaveMultipleTransclusionError, slots[slotName].childNodes, transcludeFn);
+                  var slotCompileNodes = jqLite(slots[slotName].childNodes);
+                  slots[slotName] = compilationGenerator(mightHaveMultipleTransclusionError, slotCompileNodes, transcludeFn);
                 }
               }
 
-              $template = $template.childNodes;
+              $template = jqLite($template.childNodes);
             }
 
             $compileNode.empty(); // clear contents
@@ -20732,7 +21186,14 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
         if (!value) {
           var dataName = '$' + name + 'Controller';
-          value = inheritType ? $element.inheritedData(dataName) : $element.data(dataName);
+
+          if (inheritType === '^^' && $element[0] && $element[0].nodeType === NODE_TYPE_DOCUMENT) {
+            // inheritedData() uses the documentElement when it finds the document, so we would
+            // require from the element itself.
+            value = null;
+          } else {
+            value = inheritType ? $element.inheritedData(dataName) : $element.data(dataName);
+          }
         }
 
         if (!value && !optional) {
@@ -21089,42 +21550,95 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     }
 
 
-    function getTrustedContext(node, attrNormalizedName) {
+    function getTrustedAttrContext(nodeName, attrNormalizedName) {
       if (attrNormalizedName === 'srcdoc') {
         return $sce.HTML;
       }
-      var tag = nodeName_(node);
-      // All tags with src attributes require a RESOURCE_URL value, except for
-      // img and various html5 media tags, which require the MEDIA_URL context.
+      // All nodes with src attributes require a RESOURCE_URL value, except for
+      // img and various html5 media nodes, which require the MEDIA_URL context.
       if (attrNormalizedName === 'src' || attrNormalizedName === 'ngSrc') {
-        if (['img', 'video', 'audio', 'source', 'track'].indexOf(tag) === -1) {
+        if (['img', 'video', 'audio', 'source', 'track'].indexOf(nodeName) === -1) {
           return $sce.RESOURCE_URL;
         }
         return $sce.MEDIA_URL;
       } else if (attrNormalizedName === 'xlinkHref') {
         // Some xlink:href are okay, most aren't
-        if (tag === 'image') return $sce.MEDIA_URL;
-        if (tag === 'a') return $sce.URL;
+        if (nodeName === 'image') return $sce.MEDIA_URL;
+        if (nodeName === 'a') return $sce.URL;
         return $sce.RESOURCE_URL;
       } else if (
           // Formaction
-          (tag === 'form' && attrNormalizedName === 'action') ||
+          (nodeName === 'form' && attrNormalizedName === 'action') ||
           // If relative URLs can go where they are not expected to, then
           // all sorts of trust issues can arise.
-          (tag === 'base' && attrNormalizedName === 'href') ||
+          (nodeName === 'base' && attrNormalizedName === 'href') ||
           // links can be stylesheets or imports, which can run script in the current origin
-          (tag === 'link' && attrNormalizedName === 'href')
+          (nodeName === 'link' && attrNormalizedName === 'href')
       ) {
         return $sce.RESOURCE_URL;
-      } else if (tag === 'a' && (attrNormalizedName === 'href' ||
+      } else if (nodeName === 'a' && (attrNormalizedName === 'href' ||
                                  attrNormalizedName === 'ngHref')) {
         return $sce.URL;
       }
     }
 
+    function getTrustedPropContext(nodeName, propNormalizedName) {
+      var prop = propNormalizedName.toLowerCase();
+      return PROP_CONTEXTS[nodeName + '|' + prop] || PROP_CONTEXTS['*|' + prop];
+    }
+
+    function sanitizeSrcsetPropertyValue(value) {
+      return sanitizeSrcset($sce.valueOf(value), 'ng-prop-srcset');
+    }
+    function addPropertyDirective(node, directives, attrName, propName) {
+      if (EVENT_HANDLER_ATTR_REGEXP.test(propName)) {
+        throw $compileMinErr('nodomevents', 'Property bindings for HTML DOM event properties are disallowed');
+      }
+
+      var nodeName = nodeName_(node);
+      var trustedContext = getTrustedPropContext(nodeName, propName);
+
+      var sanitizer = identity;
+      // Sanitize img[srcset] + source[srcset] values.
+      if (propName === 'srcset' && (nodeName === 'img' || nodeName === 'source')) {
+        sanitizer = sanitizeSrcsetPropertyValue;
+      } else if (trustedContext) {
+        sanitizer = $sce.getTrusted.bind($sce, trustedContext);
+      }
+
+      directives.push({
+        priority: 100,
+        compile: function ngPropCompileFn(_, attr) {
+          var ngPropGetter = $parse(attr[attrName]);
+          var ngPropWatch = $parse(attr[attrName], function sceValueOf(val) {
+            // Unwrap the value to compare the actual inner safe value, not the wrapper object.
+            return $sce.valueOf(val);
+          });
+
+          return {
+            pre: function ngPropPreLinkFn(scope, $element) {
+              function applyPropValue() {
+                var propValue = ngPropGetter(scope);
+                $element.prop(propName, sanitizer(propValue));
+              }
+
+              applyPropValue();
+              scope.$watch(ngPropWatch, applyPropValue);
+            }
+          };
+        }
+      });
+    }
+
+    function addEventDirective(directives, attrName, eventName) {
+      directives.push(
+        createEventDirective($parse, $rootScope, $exceptionHandler, attrName, eventName, /*forceAsync=*/false)
+      );
+    }
 
     function addAttrInterpolateDirective(node, directives, value, name, isNgAttr) {
-      var trustedContext = getTrustedContext(node, name);
+      var nodeName = nodeName_(node);
+      var trustedContext = getTrustedAttrContext(nodeName, name);
       var mustHaveExpression = !isNgAttr;
       var allOrNothing = ALL_OR_NOTHING_ATTRS[name] || isNgAttr;
 
@@ -21133,16 +21647,14 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       // no interpolation found -> ignore
       if (!interpolateFn) return;
 
-      if (name === 'multiple' && nodeName_(node) === 'select') {
+      if (name === 'multiple' && nodeName === 'select') {
         throw $compileMinErr('selmulti',
             'Binding to the \'multiple\' attribute is not supported. Element: {0}',
             startingTag(node));
       }
 
       if (EVENT_HANDLER_ATTR_REGEXP.test(name)) {
-        throw $compileMinErr('nodomevents',
-            'Interpolations for HTML DOM event attributes are disallowed.  Please use the ' +
-                'ng- versions (such as ng-click instead of onclick) instead.');
+        throw $compileMinErr('nodomevents', 'Interpolations for HTML DOM event attributes are disallowed');
       }
 
       directives.push({
@@ -22940,7 +23452,7 @@ function $HttpProvider() {
       config.paramSerializer = isString(config.paramSerializer) ?
           $injector.get(config.paramSerializer) : config.paramSerializer;
 
-      $browser.$$incOutstandingRequestCount();
+      $browser.$$incOutstandingRequestCount('$http');
 
       var requestInterceptors = [];
       var responseInterceptors = [];
@@ -22978,7 +23490,7 @@ function $HttpProvider() {
       }
 
       function completeOutstandingRequest() {
-        $browser.$$completeOutstandingRequest(noop);
+        $browser.$$completeOutstandingRequest(noop, '$http');
       }
 
       function executeHeaderFns(headers, config) {
@@ -24067,10 +24579,18 @@ var $intervalMinErr = minErr('$interval');
 
 /** @this */
 function $IntervalProvider() {
-  this.$get = ['$rootScope', '$window', '$q', '$$q', '$browser',
-       function($rootScope,   $window,   $q,   $$q,   $browser) {
+  this.$get = ['$$intervalFactory', '$window',
+       function($$intervalFactory,   $window) {
     var intervals = {};
-
+    var setIntervalFn = function(tick, delay, deferred) {
+      var id = $window.setInterval(tick, delay);
+      intervals[id] = deferred;
+      return id;
+    };
+    var clearIntervalFn = function(id) {
+      $window.clearInterval(id);
+      delete intervals[id];
+    };
 
     /**
      * @ngdoc service
@@ -24198,49 +24718,7 @@ function $IntervalProvider() {
      * </file>
      * </example>
      */
-    function interval(fn, delay, count, invokeApply) {
-      var hasParams = arguments.length > 4,
-          args = hasParams ? sliceArgs(arguments, 4) : [],
-          setInterval = $window.setInterval,
-          clearInterval = $window.clearInterval,
-          iteration = 0,
-          skipApply = (isDefined(invokeApply) && !invokeApply),
-          deferred = (skipApply ? $$q : $q).defer(),
-          promise = deferred.promise;
-
-      count = isDefined(count) ? count : 0;
-
-      promise.$$intervalId = setInterval(function tick() {
-        if (skipApply) {
-          $browser.defer(callback);
-        } else {
-          $rootScope.$evalAsync(callback);
-        }
-        deferred.notify(iteration++);
-
-        if (count > 0 && iteration >= count) {
-          deferred.resolve(iteration);
-          clearInterval(promise.$$intervalId);
-          delete intervals[promise.$$intervalId];
-        }
-
-        if (!skipApply) $rootScope.$apply();
-
-      }, delay);
-
-      intervals[promise.$$intervalId] = deferred;
-
-      return promise;
-
-      function callback() {
-        if (!hasParams) {
-          fn(iteration);
-        } else {
-          fn.apply(null, args);
-        }
-      }
-    }
-
+    var interval = $$intervalFactory(setIntervalFn, clearIntervalFn);
 
     /**
      * @ngdoc method
@@ -24268,13 +24746,59 @@ function $IntervalProvider() {
       // Interval cancels should not report an unhandled promise.
       markQExceptionHandled(deferred.promise);
       deferred.reject('canceled');
-      $window.clearInterval(id);
-      delete intervals[id];
+      clearIntervalFn(id);
 
       return true;
     };
 
     return interval;
+  }];
+}
+
+/** @this */
+function $$IntervalFactoryProvider() {
+  this.$get = ['$browser', '$q', '$$q', '$rootScope',
+       function($browser,   $q,   $$q,   $rootScope) {
+    return function intervalFactory(setIntervalFn, clearIntervalFn) {
+      return function intervalFn(fn, delay, count, invokeApply) {
+        var hasParams = arguments.length > 4,
+            args = hasParams ? sliceArgs(arguments, 4) : [],
+            iteration = 0,
+            skipApply = isDefined(invokeApply) && !invokeApply,
+            deferred = (skipApply ? $$q : $q).defer(),
+            promise = deferred.promise;
+
+        count = isDefined(count) ? count : 0;
+
+        function callback() {
+          if (!hasParams) {
+            fn(iteration);
+          } else {
+            fn.apply(null, args);
+          }
+        }
+
+        function tick() {
+          if (skipApply) {
+            $browser.defer(callback);
+          } else {
+            $rootScope.$evalAsync(callback);
+          }
+          deferred.notify(iteration++);
+
+          if (count > 0 && iteration >= count) {
+            deferred.resolve(iteration);
+            clearIntervalFn(promise.$$intervalId);
+          }
+
+          if (!skipApply) $rootScope.$apply();
+        }
+
+        promise.$$intervalId = setIntervalFn(tick, delay, deferred, skipApply);
+
+        return promise;
+      };
+    };
   }];
 }
 
@@ -24370,6 +24894,8 @@ var $jsonpCallbacksProvider = /** @this */ function() {
  * * `id` – `{string}` – locale id formatted as `languageId-countryId` (e.g. `en-us`)
  */
 
+/* global stripHash: true */
+
 var PATH_MATCH = /^([^?#]*)(\?([^#]*))?(#(.*))?$/,
     DEFAULT_PORTS = {'http': 80, 'https': 443, 'ftp': 21};
 var $locationMinErr = minErr('$location');
@@ -24406,6 +24932,14 @@ function decodePath(path, html5Mode) {
   }
 
   return segments.join('/');
+}
+
+function normalizePath(pathValue, searchValue, hashValue) {
+  var search = toKeyValue(searchValue),
+    hash = hashValue ? '#' + encodeUriSegment(hashValue) : '',
+    path = encodePath(pathValue);
+
+  return path + (search ? '?' + search : '') + hash;
 }
 
 function parseAbsoluteUrl(absoluteUrl, locationObj) {
@@ -24456,16 +24990,10 @@ function stripBaseUrl(base, url) {
   }
 }
 
-
 function stripHash(url) {
   var index = url.indexOf('#');
   return index === -1 ? url : url.substr(0, index);
 }
-
-function trimEmptyHash(url) {
-  return url.replace(/(#.+)|#$/, '$1');
-}
-
 
 function stripFile(url) {
   return url.substr(0, stripHash(url).lastIndexOf('/') + 1);
@@ -24513,18 +25041,8 @@ function LocationHtml5Url(appBase, appBaseNoFile, basePrefix) {
     this.$$compose();
   };
 
-  /**
-   * Compose url and update `absUrl` property
-   * @private
-   */
-  this.$$compose = function() {
-    var search = toKeyValue(this.$$search),
-        hash = this.$$hash ? '#' + encodeUriSegment(this.$$hash) : '';
-
-    this.$$url = encodePath(this.$$path) + (search ? '?' + search : '') + hash;
-    this.$$absUrl = appBaseNoFile + this.$$url.substr(1); // first char is always '/'
-
-    this.$$urlUpdatedByLocation = true;
+  this.$$normalizeUrl = function(url) {
+    return appBaseNoFile + url.substr(1); // first char is always '/'
   };
 
   this.$$parseLinkUrl = function(url, relHref) {
@@ -24648,18 +25166,8 @@ function LocationHashbangUrl(appBase, appBaseNoFile, hashPrefix) {
     }
   };
 
-  /**
-   * Compose hashbang URL and update `absUrl` property
-   * @private
-   */
-  this.$$compose = function() {
-    var search = toKeyValue(this.$$search),
-        hash = this.$$hash ? '#' + encodeUriSegment(this.$$hash) : '';
-
-    this.$$url = encodePath(this.$$path) + (search ? '?' + search : '') + hash;
-    this.$$absUrl = appBase + (this.$$url ? hashPrefix + this.$$url : '');
-
-    this.$$urlUpdatedByLocation = true;
+  this.$$normalizeUrl = function(url) {
+    return appBase + (url ? hashPrefix + url : '');
   };
 
   this.$$parseLinkUrl = function(url, relHref) {
@@ -24710,17 +25218,10 @@ function LocationHashbangInHtml5Url(appBase, appBaseNoFile, hashPrefix) {
     return !!rewrittenUrl;
   };
 
-  this.$$compose = function() {
-    var search = toKeyValue(this.$$search),
-        hash = this.$$hash ? '#' + encodeUriSegment(this.$$hash) : '';
-
-    this.$$url = encodePath(this.$$path) + (search ? '?' + search : '') + hash;
+  this.$$normalizeUrl = function(url) {
     // include hashPrefix in $$absUrl when $$url is empty so IE9 does not reload page because of removal of '#'
-    this.$$absUrl = appBase + hashPrefix + this.$$url;
-
-    this.$$urlUpdatedByLocation = true;
+    return appBase + hashPrefix + url;
   };
-
 }
 
 
@@ -24743,6 +25244,16 @@ var locationPrototype = {
    * @private
    */
   $$replace: false,
+
+  /**
+   * Compose url and update `url` and `absUrl` property
+   * @private
+   */
+  $$compose: function() {
+    this.$$url = normalizePath(this.$$path, this.$$search, this.$$hash);
+    this.$$absUrl = this.$$normalizeUrl(this.$$url);
+    this.$$urlUpdatedByLocation = true;
+  },
 
   /**
    * @ngdoc method
@@ -25249,6 +25760,13 @@ function $LocationProvider() {
 
     var IGNORE_URI_REGEXP = /^\s*(javascript|mailto):/i;
 
+    // Determine if two URLs are equal despite potentially having different encoding/normalizing
+    //  such as $location.absUrl() vs $browser.url()
+    // See https://github.com/angular/angular.js/issues/16592
+    function urlsEqual(a, b) {
+      return a === b || urlResolve(a).href === urlResolve(b).href;
+    }
+
     function setBrowserUrlWithFallback(url, replace, state) {
       var oldUrl = $location.url();
       var oldState = $location.$$state;
@@ -25315,7 +25833,7 @@ function $LocationProvider() {
 
 
     // rewrite hashbang url <> html5 url
-    if (trimEmptyHash($location.absUrl()) !== trimEmptyHash(initialUrl)) {
+    if ($location.absUrl() !== initialUrl) {
       $browser.url($location.absUrl(), true);
     }
 
@@ -25334,7 +25852,6 @@ function $LocationProvider() {
         var oldUrl = $location.absUrl();
         var oldState = $location.$$state;
         var defaultPrevented;
-        newUrl = trimEmptyHash(newUrl);
         $location.$$parse(newUrl);
         $location.$$state = newState;
 
@@ -25362,11 +25879,11 @@ function $LocationProvider() {
       if (initializing || $location.$$urlUpdatedByLocation) {
         $location.$$urlUpdatedByLocation = false;
 
-        var oldUrl = trimEmptyHash($browser.url());
-        var newUrl = trimEmptyHash($location.absUrl());
+        var oldUrl = $browser.url();
+        var newUrl = $location.absUrl();
         var oldState = $browser.state();
         var currentReplace = $location.$$replace;
-        var urlOrStateChanged = oldUrl !== newUrl ||
+        var urlOrStateChanged = !urlsEqual(oldUrl, newUrl) ||
           ($location.$$html5 && $sniffer.history && oldState !== $location.$$state);
 
         if (initializing || urlOrStateChanged) {
@@ -29435,7 +29952,7 @@ function $RootScopeProvider() {
             if (asyncQueue.length) {
               $rootScope.$digest();
             }
-          });
+          }, null, '$evalAsync');
         }
 
         asyncQueue.push({scope: this, fn: $parse(expr), locals: locals});
@@ -29806,7 +30323,7 @@ function $RootScopeProvider() {
       if (applyAsyncId === null) {
         applyAsyncId = $browser.defer(function() {
           $rootScope.$apply(flushApplyAsync);
-        });
+        }, null, '$applyAsync');
       }
     }
   }];
@@ -30531,7 +31048,7 @@ function $SceDelegateProvider() {
  * | `$sce.CSS`          | For CSS that's safe to source into the application.  Currently unused.  Feel free to use it in your own directives. |
  * | `$sce.MEDIA_URL`    | For URLs that are safe to render as media. Is automatically converted from string by sanitizing when needed. |
  * | `$sce.URL`          | For URLs that are safe to follow as links. Is automatically converted from string by sanitizing when needed. Note that `$sce.URL` makes a stronger statement about the URL than `$sce.MEDIA_URL` does and therefore contexts requiring values trusted for `$sce.URL` can be used anywhere that values trusted for `$sce.MEDIA_URL` are required.|
- * | `$sce.RESOURCE_URL` | For URLs that are not only safe to follow as links, but whose contents are also safe to include in your application.  Examples include `ng-include`, `src` / `ngSrc` bindings for tags other than `IMG` (e.g. `IFRAME`, `OBJECT`, etc.)  <br><br>Note that `$sce.RESOURCE_URL` makes a stronger statement about the URL than `$sce.URL` or `$sce.MEDIA_URL` do and therefore contexts requiring values trusted for `$sce.RESOURCE_URL` can be used anywhere that values trusted for `$sce.URL` or `$sce.MEDIA_URL` are required. |
+ * | `$sce.RESOURCE_URL` | For URLs that are not only safe to follow as links, but whose contents are also safe to include in your application.  Examples include `ng-include`, `src` / `ngSrc` bindings for tags other than `IMG` (e.g. `IFRAME`, `OBJECT`, etc.)  <br><br>Note that `$sce.RESOURCE_URL` makes a stronger statement about the URL than `$sce.URL` or `$sce.MEDIA_URL` do and therefore contexts requiring values trusted for `$sce.RESOURCE_URL` can be used anywhere that values trusted for `$sce.URL` or `$sce.MEDIA_URL` are required. <br><br> The {@link $sceDelegateProvider#resourceUrlWhitelist $sceDelegateProvider#resourceUrlWhitelist()} and {@link $sceDelegateProvider#resourceUrlBlacklist $sceDelegateProvider#resourceUrlBlacklist()} can be used to restrict trusted origins for `RESOURCE_URL` |
  * | `$sce.JS`           | For JavaScript that is safe to execute in your application's context.  Currently unused.  Feel free to use it in your own directives. |
  *
  *
@@ -31173,6 +31690,127 @@ function $SnifferProvider() {
   }];
 }
 
+/**
+ * ! This is a private undocumented service !
+ *
+ * @name $$taskTrackerFactory
+ * @description
+ * A function to create `TaskTracker` instances.
+ *
+ * A `TaskTracker` can keep track of pending tasks (grouped by type) and can notify interested
+ * parties when all pending tasks (or tasks of a specific type) have been completed.
+ *
+ * @param {$log} log - A logger instance (such as `$log`). Used to log error during callback
+ *     execution.
+ *
+ * @this
+ */
+function $$TaskTrackerFactoryProvider() {
+  this.$get = valueFn(function(log) { return new TaskTracker(log); });
+}
+
+function TaskTracker(log) {
+  var self = this;
+  var taskCounts = {};
+  var taskCallbacks = [];
+
+  var ALL_TASKS_TYPE = self.ALL_TASKS_TYPE = '$$all$$';
+  var DEFAULT_TASK_TYPE = self.DEFAULT_TASK_TYPE = '$$default$$';
+
+  /**
+   * Execute the specified function and decrement the appropriate `taskCounts` counter.
+   * If the counter reaches 0, all corresponding `taskCallbacks` are executed.
+   *
+   * @param {Function} fn - The function to execute.
+   * @param {string=} [taskType=DEFAULT_TASK_TYPE] - The type of task that is being completed.
+   */
+  self.completeTask = completeTask;
+
+  /**
+   * Increase the task count for the specified task type (or the default task type if non is
+   * specified).
+   *
+   * @param {string=} [taskType=DEFAULT_TASK_TYPE] - The type of task whose count will be increased.
+   */
+  self.incTaskCount = incTaskCount;
+
+  /**
+   * Execute the specified callback when all pending tasks have been completed.
+   *
+   * If there are no pending tasks, the callback is executed immediately. You can optionally limit
+   * the tasks that will be waited for to a specific type, by passing a `taskType`.
+   *
+   * @param {function} callback - The function to call when there are no pending tasks.
+   * @param {string=} [taskType=ALL_TASKS_TYPE] - The type of tasks that will be waited for.
+   */
+  self.notifyWhenNoPendingTasks = notifyWhenNoPendingTasks;
+
+  function completeTask(fn, taskType) {
+    taskType = taskType || DEFAULT_TASK_TYPE;
+
+    try {
+      fn();
+    } finally {
+      decTaskCount(taskType);
+
+      var countForType = taskCounts[taskType];
+      var countForAll = taskCounts[ALL_TASKS_TYPE];
+
+      // If at least one of the queues (`ALL_TASKS_TYPE` or `taskType`) is empty, run callbacks.
+      if (!countForAll || !countForType) {
+        var getNextCallback = !countForAll ? getLastCallback : getLastCallbackForType;
+        var nextCb;
+
+        while ((nextCb = getNextCallback(taskType))) {
+          try {
+            nextCb();
+          } catch (e) {
+            log.error(e);
+          }
+        }
+      }
+    }
+  }
+
+  function decTaskCount(taskType) {
+    taskType = taskType || DEFAULT_TASK_TYPE;
+    if (taskCounts[taskType]) {
+      taskCounts[taskType]--;
+      taskCounts[ALL_TASKS_TYPE]--;
+    }
+  }
+
+  function getLastCallback() {
+    var cbInfo = taskCallbacks.pop();
+    return cbInfo && cbInfo.cb;
+  }
+
+  function getLastCallbackForType(taskType) {
+    for (var i = taskCallbacks.length - 1; i >= 0; --i) {
+      var cbInfo = taskCallbacks[i];
+      if (cbInfo.type === taskType) {
+        taskCallbacks.splice(i, 1);
+        return cbInfo.cb;
+      }
+    }
+  }
+
+  function incTaskCount(taskType) {
+    taskType = taskType || DEFAULT_TASK_TYPE;
+    taskCounts[taskType] = (taskCounts[taskType] || 0) + 1;
+    taskCounts[ALL_TASKS_TYPE] = (taskCounts[ALL_TASKS_TYPE] || 0) + 1;
+  }
+
+  function notifyWhenNoPendingTasks(callback, taskType) {
+    taskType = taskType || ALL_TASKS_TYPE;
+    if (!taskCounts[taskType]) {
+      callback();
+    } else {
+      taskCallbacks.push({type: taskType, cb: callback});
+    }
+  }
+}
+
 var $templateRequestMinErr = minErr('$templateRequest');
 
 /**
@@ -31399,7 +32037,15 @@ function $$TestabilityProvider() {
      * @name $$testability#whenStable
      *
      * @description
-     * Calls the callback when $timeout and $http requests are completed.
+     * Calls the callback when all pending tasks are completed.
+     *
+     * Types of tasks waited for include:
+     * - Pending timeouts (via {@link $timeout}).
+     * - Pending HTTP requests (via {@link $http}).
+     * - In-progress route transitions (via {@link $route}).
+     * - Pending tasks scheduled via {@link $rootScope#$applyAsync}.
+     * - Pending tasks scheduled via {@link $rootScope#$evalAsync}.
+     *   These include tasks scheduled via `$evalAsync()` indirectly (such as {@link $q} promises).
      *
      * @param {function} callback
      */
@@ -31474,7 +32120,7 @@ function $TimeoutProvider() {
         }
 
         if (!skipApply) $rootScope.$apply();
-      }, delay);
+      }, delay, '$timeout');
 
       promise.$$timeoutId = timeoutId;
       deferreds[timeoutId] = deferred;
@@ -34311,6 +34957,7 @@ forEach(['src', 'srcset', 'href'], function(attrName) {
  */
 var nullFormCtrl = {
   $addControl: noop,
+  $getControls: valueFn([]),
   $$renameControl: nullFormRenameControl,
   $removeControl: noop,
   $setValidity: noop,
@@ -34464,6 +35111,30 @@ FormController.prototype = {
     }
 
     control.$$parentForm = this;
+  },
+
+  /**
+   * @ngdoc method
+   * @name form.FormController#$getControls
+   * @returns {Array} the controls that are currently part of this form
+   *
+   * @description
+   * This method returns a **shallow copy** of the controls that are currently part of this form.
+   * The controls can be instances of {@link form.FormController `FormController`}
+   * ({@link ngForm "child-forms"}) and of {@link ngModel.NgModelController `NgModelController`}.
+   * If you need access to the controls of child-forms, you have to call `$getControls()`
+   * recursively on them.
+   * This can be used for example to iterate over all controls to validate them.
+   *
+   * The controls can be accessed normally, but adding to, or removing controls from the array has
+   * no effect on the form. Instead, use {@link form.FormController#$addControl `$addControl()`} and
+   * {@link form.FormController#$removeControl `$removeControl()`} for this use-case.
+   * Likewise, adding a control to, or removing a control from the form is not reflected
+   * in the shallow copy. That means you should get a fresh copy from `$getControls()` every time
+   * you need access to the controls.
+   */
+  $getControls: function() {
+    return shallowCopy(this.$$controls);
   },
 
   // Private API: rename a form control
@@ -35263,6 +35934,10 @@ var inputType = {
     * The timezone to be used to read/write the `Date` instance in the model can be defined using
     * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
     *
+    * The format of the displayed time can be adjusted with the
+    * {@link ng.directive:ngModelOptions#ngModelOptions-arguments ngModelOptions} `timeSecondsFormat`
+    * and `timeStripZeroSeconds`.
+    *
     * @param {string} ngModel Assignable AngularJS expression to data-bind to.
     * @param {string=} name Property name of the form under which the control is published.
     * @param {string=} min Sets the `min` validation error key if the value entered is less than `min`.
@@ -35364,7 +36039,12 @@ var inputType = {
    * Invalid `Date` objects (dates whose `getTime()` is `NaN`) will be rendered as an empty string.
    *
    * The timezone to be used to read/write the `Date` instance in the model can be defined using
-   * {@link ng.directive:ngModelOptions ngModelOptions}. By default, this is the timezone of the browser.
+   * {@link ng.directive:ngModelOptions#ngModelOptions-arguments ngModelOptions}. By default,
+   * this is the timezone of the browser.
+   *
+   * The format of the displayed time can be adjusted with the
+   * {@link ng.directive:ngModelOptions#ngModelOptions-arguments ngModelOptions} `timeSecondsFormat`
+   * and `timeStripZeroSeconds`.
    *
    * @param {string} ngModel Assignable AngularJS expression to data-bind to.
    * @param {string=} name Property name of the form under which the control is published.
@@ -36499,6 +37179,8 @@ function createDateInputType(type, regexp, parseDate, format) {
   return function dynamicDateInputType(scope, element, attr, ctrl, $sniffer, $browser, $filter) {
     badInputChecker(scope, element, attr, ctrl, type);
     baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
+
+    var isTimeType = type === 'time' || type === 'datetimelocal';
     var previousDate;
     var previousTimezone;
 
@@ -36522,11 +37204,13 @@ function createDateInputType(type, regexp, parseDate, format) {
       if (isValidDate(value)) {
         previousDate = value;
         var timezone = ctrl.$options.getOption('timezone');
+
         if (timezone) {
           previousTimezone = timezone;
           previousDate = convertTimezoneToLocal(previousDate, timezone, true);
         }
-        return $filter('date')(value, format, timezone);
+
+        return formatter(value, timezone);
       } else {
         previousDate = null;
         previousTimezone = null;
@@ -36580,6 +37264,24 @@ function createDateInputType(type, regexp, parseDate, format) {
         parsedDate = convertTimezoneToLocal(parsedDate, timezone);
       }
       return parsedDate;
+    }
+
+    function formatter(value, timezone) {
+      var targetFormat = format;
+
+      if (isTimeType && isString(ctrl.$options.getOption('timeSecondsFormat'))) {
+        targetFormat = format
+          .replace('ss.sss', ctrl.$options.getOption('timeSecondsFormat'))
+          .replace(/:$/, '');
+      }
+
+      var formatted =  $filter('date')(value, targetFormat, timezone);
+
+      if (isTimeType && ctrl.$options.getOption('timeStripZeroSeconds')) {
+        formatted = formatted.replace(/(?::00)?(?:\.000)?$/, '');
+      }
+
+      return formatted;
     }
   };
 }
@@ -37727,6 +38429,7 @@ function classDirective(name, selector) {
  * |----------------------------------|-------------------------------------|
  * | {@link ng.$animate#addClass addClass}       | just before the class is applied to the element   |
  * | {@link ng.$animate#removeClass removeClass} | just before the class is removed from the element |
+ * | {@link ng.$animate#setClass setClass} | just before classes are added and classes are removed from the element at the same time |
  *
  * ### ngClass and pre-existing CSS3 Transitions/Animations
    The ngClass directive still supports CSS3 Transitions/Animations even if they do not follow the ngAnimate CSS naming structure.
@@ -38645,32 +39348,43 @@ forEach(
   'click dblclick mousedown mouseup mouseover mouseout mousemove mouseenter mouseleave keydown keyup keypress submit focus blur copy cut paste'.split(' '),
   function(eventName) {
     var directiveName = directiveNormalize('ng-' + eventName);
-    ngEventDirectives[directiveName] = ['$parse', '$rootScope', function($parse, $rootScope) {
-      return {
-        restrict: 'A',
-        compile: function($element, attr) {
-          // NOTE:
-          // We expose the powerful `$event` object on the scope that provides access to the Window,
-          // etc. This is OK, because expressions are not sandboxed any more (and the expression
-          // sandbox was never meant to be a security feature anyway).
-          var fn = $parse(attr[directiveName]);
-          return function ngEventHandler(scope, element) {
-            element.on(eventName, function(event) {
-              var callback = function() {
-                fn(scope, {$event: event});
-              };
-              if (forceAsyncEvents[eventName] && $rootScope.$$phase) {
-                scope.$evalAsync(callback);
-              } else {
-                scope.$apply(callback);
-              }
-            });
-          };
-        }
-      };
+    ngEventDirectives[directiveName] = ['$parse', '$rootScope', '$exceptionHandler', function($parse, $rootScope, $exceptionHandler) {
+      return createEventDirective($parse, $rootScope, $exceptionHandler, directiveName, eventName, forceAsyncEvents[eventName]);
     }];
   }
 );
+
+function createEventDirective($parse, $rootScope, $exceptionHandler, directiveName, eventName, forceAsync) {
+  return {
+    restrict: 'A',
+    compile: function($element, attr) {
+      // NOTE:
+      // We expose the powerful `$event` object on the scope that provides access to the Window,
+      // etc. This is OK, because expressions are not sandboxed any more (and the expression
+      // sandbox was never meant to be a security feature anyway).
+      var fn = $parse(attr[directiveName]);
+      return function ngEventHandler(scope, element) {
+        element.on(eventName, function(event) {
+          var callback = function() {
+            fn(scope, {$event: event});
+          };
+
+          if (!$rootScope.$$phase) {
+            scope.$apply(callback);
+          } else if (forceAsync) {
+            scope.$evalAsync(callback);
+          } else {
+            try {
+              callback();
+            } catch (error) {
+              $exceptionHandler(error);
+            }
+          }
+        });
+      };
+    }
+  };
+}
 
 /**
  * @ngdoc directive
@@ -41518,12 +42232,6 @@ defaultModelOptions = new ModelOptions({
  * </example>
  *
  *
- * ## Specifying timezones
- *
- * You can specify the timezone that date/time input directives expect by providing its name in the
- * `timezone` property.
- *
- *
  * ## Programmatically changing options
  *
  * The `ngModelOptions` expression is only evaluated once when the directive is linked; it is not
@@ -41535,8 +42243,70 @@ defaultModelOptions = new ModelOptions({
  * Default events, extra triggers, and catch-all debounce values}.
  *
  *
+ * ## Specifying timezones
+ *
+ * You can specify the timezone that date/time input directives expect by providing its name in the
+ * `timezone` property.
+ *
+ *
+ * ## Formatting the value of `time` and `datetime-local`
+ *
+ * With the options `timeSecondsFormat` and `timeStripZeroSeconds` it is possible to adjust the value
+ * that is displayed in the control. Note that browsers may apply their own formatting
+ * in the user interface.
+ *
+   <example name="ngModelOptions-time-format" module="timeExample">
+     <file name="index.html">
+       <time-example></time-example>
+     </file>
+     <file name="script.js">
+        angular.module('timeExample', [])
+          .component('timeExample', {
+            templateUrl: 'timeExample.html',
+            controller: function() {
+              this.time = new Date(1970, 0, 1, 14, 57, 0);
+
+              this.options = {
+                timeSecondsFormat: 'ss',
+                timeStripZeroSeconds: true
+              };
+
+              this.optionChange = function() {
+                this.timeForm.timeFormatted.$overrideModelOptions(this.options);
+                this.time = new Date(this.time);
+              };
+            }
+          });
+     </file>
+     <file name="timeExample.html">
+       <form name="$ctrl.timeForm">
+         <strong>Default</strong>:
+         <input type="time" ng-model="$ctrl.time" step="any" /><br>
+         <strong>With options</strong>:
+         <input type="time" name="timeFormatted" ng-model="$ctrl.time" step="any" ng-model-options="$ctrl.options" />
+         <br>
+
+         Options:<br>
+         <code>timeSecondsFormat</code>:
+         <input
+           type="text"
+           ng-model="$ctrl.options.timeSecondsFormat"
+           ng-change="$ctrl.optionChange()">
+         <br>
+         <code>timeStripZeroSeconds</code>:
+         <input
+           type="checkbox"
+           ng-model="$ctrl.options.timeStripZeroSeconds"
+           ng-change="$ctrl.optionChange()">
+        </form>
+      </file>
+ *  </example>
+ *
  * @param {Object} ngModelOptions options to apply to {@link ngModel} directives on this element and
- *   and its descendents. Valid keys are:
+ *   and its descendents.
+ *
+ * **General options**:
+ *
  *   - `updateOn`: string specifying which event should the input be bound to. You can set several
  *     events using an space delimited list. There is a special event called `default` that
  *     matches the default events belonging to the control. These are the events that are bound to
@@ -41569,6 +42339,10 @@ defaultModelOptions = new ModelOptions({
  *     not validate correctly instead of the default behavior of setting the model to undefined.
  *   - `getterSetter`: boolean value which determines whether or not to treat functions bound to
  *     `ngModel` as getters/setters.
+ *
+ *
+ *  **Input-type specific options**:
+ *
  *   - `timezone`: Defines the timezone to be used to read/write the `Date` instance in the model for
  *     `<input type="date" />`, `<input type="time" />`, ... . It understands UTC/GMT and the
  *     continental US time zone abbreviations, but for general use, use a time zone offset, for
@@ -41576,6 +42350,24 @@ defaultModelOptions = new ModelOptions({
  *     If not specified, the timezone of the browser will be used.
  *     Note that changing the timezone will have no effect on the current date, and is only applied after
  *     the next input / model change.
+ *
+ *   - `timeSecondsFormat`: Defines if the `time` and `datetime-local` types should show seconds and
+ *     milliseconds. The option follows the format string of {@link date date filter}.
+ *     By default, the options is `undefined` which is equal to `'ss.sss'` (seconds and milliseconds).
+ *     The other options are `'ss'` (strips milliseconds), and `''` (empty string), which strips both
+ *     seconds and milliseconds.
+ *     Note that browsers that support `time` and `datetime-local` require the hour and minutes
+ *     part of the time string, and may show the value differently in the user interface.
+ *     {@link ngModelOptions#formatting-the-value-of-time-and-datetime-local- See the example}.
+ *
+ *   - `timeStripZeroSeconds`: Defines if the `time` and `datetime-local` types should strip the
+ *     seconds and milliseconds from the formatted value if they are zero. This option is applied
+ *     after `timeSecondsFormat`.
+ *     This option can be used to make the formatting consistent over different browsers, as some
+ *     browsers with support for `time` will natively hide the milliseconds and
+ *     seconds if they are zero, but others won't, and browsers that don't implement these input
+ *     types will always show the full string.
+ *     {@link ngModelOptions#formatting-the-value-of-time-and-datetime-local- See the example}.
  *
  */
 var ngModelOptionsDirective = function() {
@@ -50067,7 +50859,7 @@ exports.all = function() {
 }();
 
 }).call(this,_dereq_('_process'))
-},{"_process":226}],27:[function(_dereq_,module,exports){
+},{"_process":239}],27:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
 
@@ -50162,6 +50954,10 @@ var Formio = function () {
     this.vId = '';
     this.vUrl = '';
     this.query = '';
+
+    // Store the original path and options.
+    this.path = path;
+    this.options = options;
 
     if (options.hasOwnProperty('base')) {
       this.base = options.base;
@@ -51456,7 +52252,7 @@ if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object'
   global.Formio = Formio;
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./providers":28,"browser-cookies":25,"eventemitter2":26,"lodash/get":185,"native-promise-only":222,"shallow-copy":227,"whatwg-fetch":233}],28:[function(_dereq_,module,exports){
+},{"./providers":28,"browser-cookies":25,"eventemitter2":26,"lodash/get":197,"native-promise-only":235,"shallow-copy":240,"whatwg-fetch":246}],28:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51522,7 +52318,7 @@ var base64 = function base64() {
 
 base64.title = 'Base64';
 exports.default = base64;
-},{"native-promise-only":222}],30:[function(_dereq_,module,exports){
+},{"native-promise-only":235}],30:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51590,7 +52386,7 @@ var dropbox = function dropbox(formio) {
 
 dropbox.title = 'Dropbox';
 exports.default = dropbox;
-},{"native-promise-only":222}],31:[function(_dereq_,module,exports){
+},{"native-promise-only":235}],31:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51632,19 +52428,21 @@ var _nativePromiseOnly = _dereq_('native-promise-only');
 
 var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
 
+var _trim2 = _dereq_('lodash/trim');
+
+var _trim3 = _interopRequireDefault(_trim2);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var trim = function trim(text) {
+  return (0, _trim3.default)(text, '/');
+};
 var s3 = function s3(formio) {
   return {
     uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
       return new _nativePromiseOnly2.default(function (resolve, reject) {
         // Send the pre response to sign the upload.
         var pre = new XMLHttpRequest();
-
-        var prefd = new FormData();
-        prefd.append('name', fileName);
-        prefd.append('size', file.size);
-        prefd.append('type', file.type);
 
         // This only fires on a network error.
         pre.onerror = function (err) {
@@ -51666,13 +52464,7 @@ var s3 = function s3(formio) {
             }
 
             response.data.fileName = fileName;
-            response.data.key += dir + fileName;
-
-            var fd = new FormData();
-            for (var key in response.data) {
-              fd.append(key, response.data[key]);
-            }
-            fd.append('file', file);
+            response.data.key = trim(response.data.key) + '/' + trim(dir) + '/' + trim(fileName);
 
             // Fire on network error.
             xhr.onerror = function (err) {
@@ -51687,7 +52479,7 @@ var s3 = function s3(formio) {
                   name: fileName,
                   bucket: response.bucket,
                   key: response.data.key,
-                  url: response.url + response.data.key,
+                  url: trim(response.url) + '/' + trim(response.data.key),
                   acl: response.data.acl,
                   size: file.size,
                   type: file.type
@@ -51698,10 +52490,19 @@ var s3 = function s3(formio) {
             };
 
             xhr.onabort = reject;
-
-            xhr.open('POST', response.url);
-
-            xhr.send(fd);
+            if (response.signed) {
+              xhr.open('PUT', response.signed);
+              xhr.setRequestHeader('Content-Type', file.type);
+              xhr.send(file);
+            } else {
+              var fd = new FormData();
+              for (var key in response.data) {
+                fd.append(key, response.data[key]);
+              }
+              fd.append('file', file);
+              xhr.open('POST', response.url);
+              xhr.send(fd);
+            }
           } else {
             reject(pre.response || 'Unable to sign file');
           }
@@ -51717,7 +52518,7 @@ var s3 = function s3(formio) {
         }
 
         pre.send(JSON.stringify({
-          name: fileName,
+          name: trim(trim(dir) + '/' + trim(fileName)),
           size: file.size,
           type: file.type
         }));
@@ -51725,7 +52526,7 @@ var s3 = function s3(formio) {
     },
     downloadFile: function downloadFile(file) {
       if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + file.bucket + '&key=' + file.key, 'GET');
+        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + trim(file.bucket) + '&key=' + trim(file.key), 'GET');
       } else {
         return _nativePromiseOnly2.default.resolve(file);
       }
@@ -51735,7 +52536,7 @@ var s3 = function s3(formio) {
 
 s3.title = 'S3';
 exports.default = s3;
-},{"native-promise-only":222}],33:[function(_dereq_,module,exports){
+},{"lodash/trim":233,"native-promise-only":235}],33:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -51823,7 +52624,7 @@ var url = function url(formio) {
 
 url.title = 'Url';
 exports.default = url;
-},{"native-promise-only":222}],34:[function(_dereq_,module,exports){
+},{"native-promise-only":235}],34:[function(_dereq_,module,exports){
 (function (global){
 'use strict';
 
@@ -51912,8 +52713,12 @@ exports.uniqueName = uniqueName;
 exports.guid = guid;
 exports.getDateSetting = getDateSetting;
 exports.isValidDate = isValidDate;
+exports.currentTimezone = currentTimezone;
+exports.offsetDate = offsetDate;
+exports.formatDate = formatDate;
 exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
 exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
+exports.convertFlatpickrToFormat = convertFlatpickrToFormat;
 exports.convertFormatToMoment = convertFormatToMoment;
 exports.getInputMask = getInputMask;
 exports.matchInputMask = matchInputMask;
@@ -52597,6 +53402,55 @@ function isValidDate(date) {
   return _lodash2.default.isDate(date) && !_lodash2.default.isNaN(date.getDate());
 }
 
+/**
+ * Get the current timezone string.
+ *
+ * @return {string}
+ */
+function currentTimezone() {
+  if (navigator.languages && navigator.languages.length) {
+    return new Date().toLocaleTimeString(navigator.languages[0], {
+      timeZoneName: 'short'
+    }).split(' ')[2];
+  }
+  return (0, _moment2.default)().format('Z');
+}
+
+/**
+ * Get an offset date provided a date object and timezone object.
+ *
+ * @param date
+ * @param timezone
+ * @return {Date}
+ */
+function offsetDate(date, timezone) {
+  if (!timezone) {
+    return {
+      date: date,
+      abbr: ' (' + currentTimezone() + ')'
+    };
+  }
+  return {
+    date: new Date(date.getTime() + (parseInt(timezone.offset, 10) + date.getTimezoneOffset()) * 60000),
+    abbr: timezone.abbr ? ' (' + timezone.abbr + ')' : ''
+  };
+}
+
+/**
+ * Format a date provided a value, formate, and timezone object.
+ *
+ * @param value
+ * @param format
+ * @param timezone
+ * @return {string}
+ */
+function formatDate(value, format, timezone) {
+  var date = (0, _moment2.default)(value).toDate();
+  var offset = offsetDate(date, timezone);
+  var dateFormat = convertFormatToMoment(format);
+  return '' + (0, _moment2.default)(offset.date).format(dateFormat) + offset.abbr;
+}
+
 function getLocaleDateFormatInfo(locale) {
   var formatInfo = {};
 
@@ -52630,6 +53484,24 @@ function convertFormatToFlatpickr(format) {
 
   // Hours, minutes, seconds
   .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
+}
+
+function convertFlatpickrToFormat(format) {
+  return format
+  // Year conversion.
+  .replace('Y', 'YYYY').replace('y', 'YY')
+
+  // Month conversion.
+  .replace('F', 'MMMM').replace('M', 'MMM').replace('m', 'MM').replace('n', 'M')
+
+  // Day in month.
+  .replace('d', 'dd').replace('j', 'd')
+
+  // Day in week.
+  .replace('l', 'EEEE').replace('D', 'EEE')
+
+  // Hours, minutes, seconds
+  .replace('H', 'HH').replace('h', 'H').replace('i', 'mm').replace('S', 'ss').replace('K', 'a');
 }
 
 /**
@@ -52838,7 +53710,7 @@ function delay(fn) {
 
   return earlyCall;
 }
-},{"./jsonlogic/operators":35,"json-logic-js":37,"lodash":210,"moment":221}],37:[function(_dereq_,module,exports){
+},{"./jsonlogic/operators":35,"json-logic-js":37,"lodash":222,"moment":234}],37:[function(_dereq_,module,exports){
 /* globals define,module */
 /*
 Using a Universal Module Loader that should be browser, require, and AMD friendly
@@ -53313,7 +54185,7 @@ var DataView = getNative(root, 'DataView');
 
 module.exports = DataView;
 
-},{"./_getNative":122,"./_root":165}],39:[function(_dereq_,module,exports){
+},{"./_getNative":130,"./_root":174}],39:[function(_dereq_,module,exports){
 var hashClear = _dereq_('./_hashClear'),
     hashDelete = _dereq_('./_hashDelete'),
     hashGet = _dereq_('./_hashGet'),
@@ -53347,7 +54219,7 @@ Hash.prototype.set = hashSet;
 
 module.exports = Hash;
 
-},{"./_hashClear":130,"./_hashDelete":131,"./_hashGet":132,"./_hashHas":133,"./_hashSet":134}],40:[function(_dereq_,module,exports){
+},{"./_hashClear":139,"./_hashDelete":140,"./_hashGet":141,"./_hashHas":142,"./_hashSet":143}],40:[function(_dereq_,module,exports){
 var listCacheClear = _dereq_('./_listCacheClear'),
     listCacheDelete = _dereq_('./_listCacheDelete'),
     listCacheGet = _dereq_('./_listCacheGet'),
@@ -53381,7 +54253,7 @@ ListCache.prototype.set = listCacheSet;
 
 module.exports = ListCache;
 
-},{"./_listCacheClear":145,"./_listCacheDelete":146,"./_listCacheGet":147,"./_listCacheHas":148,"./_listCacheSet":149}],41:[function(_dereq_,module,exports){
+},{"./_listCacheClear":154,"./_listCacheDelete":155,"./_listCacheGet":156,"./_listCacheHas":157,"./_listCacheSet":158}],41:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -53390,7 +54262,7 @@ var Map = getNative(root, 'Map');
 
 module.exports = Map;
 
-},{"./_getNative":122,"./_root":165}],42:[function(_dereq_,module,exports){
+},{"./_getNative":130,"./_root":174}],42:[function(_dereq_,module,exports){
 var mapCacheClear = _dereq_('./_mapCacheClear'),
     mapCacheDelete = _dereq_('./_mapCacheDelete'),
     mapCacheGet = _dereq_('./_mapCacheGet'),
@@ -53424,7 +54296,7 @@ MapCache.prototype.set = mapCacheSet;
 
 module.exports = MapCache;
 
-},{"./_mapCacheClear":150,"./_mapCacheDelete":151,"./_mapCacheGet":152,"./_mapCacheHas":153,"./_mapCacheSet":154}],43:[function(_dereq_,module,exports){
+},{"./_mapCacheClear":159,"./_mapCacheDelete":160,"./_mapCacheGet":161,"./_mapCacheHas":162,"./_mapCacheSet":163}],43:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -53433,7 +54305,7 @@ var Promise = getNative(root, 'Promise');
 
 module.exports = Promise;
 
-},{"./_getNative":122,"./_root":165}],44:[function(_dereq_,module,exports){
+},{"./_getNative":130,"./_root":174}],44:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -53442,7 +54314,7 @@ var Set = getNative(root, 'Set');
 
 module.exports = Set;
 
-},{"./_getNative":122,"./_root":165}],45:[function(_dereq_,module,exports){
+},{"./_getNative":130,"./_root":174}],45:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache'),
     setCacheAdd = _dereq_('./_setCacheAdd'),
     setCacheHas = _dereq_('./_setCacheHas');
@@ -53471,7 +54343,7 @@ SetCache.prototype.has = setCacheHas;
 
 module.exports = SetCache;
 
-},{"./_MapCache":42,"./_setCacheAdd":167,"./_setCacheHas":168}],46:[function(_dereq_,module,exports){
+},{"./_MapCache":42,"./_setCacheAdd":176,"./_setCacheHas":177}],46:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     stackClear = _dereq_('./_stackClear'),
     stackDelete = _dereq_('./_stackDelete'),
@@ -53500,7 +54372,7 @@ Stack.prototype.set = stackSet;
 
 module.exports = Stack;
 
-},{"./_ListCache":40,"./_stackClear":172,"./_stackDelete":173,"./_stackGet":174,"./_stackHas":175,"./_stackSet":176}],47:[function(_dereq_,module,exports){
+},{"./_ListCache":40,"./_stackClear":181,"./_stackDelete":182,"./_stackGet":183,"./_stackHas":184,"./_stackSet":185}],47:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -53508,7 +54380,7 @@ var Symbol = root.Symbol;
 
 module.exports = Symbol;
 
-},{"./_root":165}],48:[function(_dereq_,module,exports){
+},{"./_root":174}],48:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Built-in value references. */
@@ -53516,7 +54388,7 @@ var Uint8Array = root.Uint8Array;
 
 module.exports = Uint8Array;
 
-},{"./_root":165}],49:[function(_dereq_,module,exports){
+},{"./_root":174}],49:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative'),
     root = _dereq_('./_root');
 
@@ -53525,7 +54397,7 @@ var WeakMap = getNative(root, 'WeakMap');
 
 module.exports = WeakMap;
 
-},{"./_getNative":122,"./_root":165}],50:[function(_dereq_,module,exports){
+},{"./_getNative":130,"./_root":174}],50:[function(_dereq_,module,exports){
 /**
  * A faster alternative to `Function#apply`, this function invokes `func`
  * with the `this` binding of `thisArg` and the arguments of `args`.
@@ -53650,7 +54522,7 @@ function arrayLikeKeys(value, inherited) {
 
 module.exports = arrayLikeKeys;
 
-},{"./_baseTimes":94,"./_isIndex":138,"./isArguments":188,"./isArray":189,"./isBuffer":192,"./isTypedArray":207}],54:[function(_dereq_,module,exports){
+},{"./_baseTimes":99,"./_isIndex":147,"./isArguments":200,"./isArray":201,"./isBuffer":204,"./isTypedArray":219}],54:[function(_dereq_,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for iteratee
  * shorthands.
@@ -53721,6 +54593,20 @@ function arraySome(array, predicate) {
 module.exports = arraySome;
 
 },{}],57:[function(_dereq_,module,exports){
+/**
+ * Converts an ASCII `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function asciiToArray(string) {
+  return string.split('');
+}
+
+module.exports = asciiToArray;
+
+},{}],58:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     eq = _dereq_('./eq');
 
@@ -53742,7 +54628,7 @@ function assignMergeValue(object, key, value) {
 
 module.exports = assignMergeValue;
 
-},{"./_baseAssignValue":62,"./eq":183}],58:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":63,"./eq":195}],59:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     eq = _dereq_('./eq');
 
@@ -53772,7 +54658,7 @@ function assignValue(object, key, value) {
 
 module.exports = assignValue;
 
-},{"./_baseAssignValue":62,"./eq":183}],59:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":63,"./eq":195}],60:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq');
 
 /**
@@ -53795,7 +54681,7 @@ function assocIndexOf(array, key) {
 
 module.exports = assocIndexOf;
 
-},{"./eq":183}],60:[function(_dereq_,module,exports){
+},{"./eq":195}],61:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keys = _dereq_('./keys');
 
@@ -53814,7 +54700,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"./_copyObject":106,"./keys":208}],61:[function(_dereq_,module,exports){
+},{"./_copyObject":114,"./keys":220}],62:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -53833,7 +54719,7 @@ function baseAssignIn(object, source) {
 
 module.exports = baseAssignIn;
 
-},{"./_copyObject":106,"./keysIn":209}],62:[function(_dereq_,module,exports){
+},{"./_copyObject":114,"./keysIn":221}],63:[function(_dereq_,module,exports){
 var defineProperty = _dereq_('./_defineProperty');
 
 /**
@@ -53860,7 +54746,7 @@ function baseAssignValue(object, key, value) {
 
 module.exports = baseAssignValue;
 
-},{"./_defineProperty":113}],63:[function(_dereq_,module,exports){
+},{"./_defineProperty":121}],64:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     arrayEach = _dereq_('./_arrayEach'),
     assignValue = _dereq_('./_assignValue'),
@@ -54033,7 +54919,7 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
 
 module.exports = baseClone;
 
-},{"./_Stack":46,"./_arrayEach":51,"./_assignValue":58,"./_baseAssign":60,"./_baseAssignIn":61,"./_cloneBuffer":100,"./_copyArray":105,"./_copySymbols":107,"./_copySymbolsIn":108,"./_getAllKeys":118,"./_getAllKeysIn":119,"./_getTag":127,"./_initCloneArray":135,"./_initCloneByTag":136,"./_initCloneObject":137,"./isArray":189,"./isBuffer":192,"./isMap":198,"./isObject":202,"./isSet":205,"./keys":208}],64:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_arrayEach":51,"./_assignValue":59,"./_baseAssign":61,"./_baseAssignIn":62,"./_cloneBuffer":108,"./_copyArray":113,"./_copySymbols":115,"./_copySymbolsIn":116,"./_getAllKeys":126,"./_getAllKeysIn":127,"./_getTag":135,"./_initCloneArray":144,"./_initCloneByTag":145,"./_initCloneObject":146,"./isArray":201,"./isBuffer":204,"./isMap":210,"./isObject":214,"./isSet":217,"./keys":220}],65:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /** Built-in value references. */
@@ -54065,7 +54951,7 @@ var baseCreate = (function() {
 
 module.exports = baseCreate;
 
-},{"./isObject":202}],65:[function(_dereq_,module,exports){
+},{"./isObject":214}],66:[function(_dereq_,module,exports){
 var baseForOwn = _dereq_('./_baseForOwn'),
     createBaseEach = _dereq_('./_createBaseEach');
 
@@ -54081,7 +54967,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./_baseForOwn":68,"./_createBaseEach":111}],66:[function(_dereq_,module,exports){
+},{"./_baseForOwn":70,"./_createBaseEach":119}],67:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach');
 
 /**
@@ -54104,7 +54990,33 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"./_baseEach":65}],67:[function(_dereq_,module,exports){
+},{"./_baseEach":66}],68:[function(_dereq_,module,exports){
+/**
+ * The base implementation of `_.findIndex` and `_.findLastIndex` without
+ * support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} predicate The function invoked per iteration.
+ * @param {number} fromIndex The index to search from.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseFindIndex(array, predicate, fromIndex, fromRight) {
+  var length = array.length,
+      index = fromIndex + (fromRight ? 1 : -1);
+
+  while ((fromRight ? index-- : ++index < length)) {
+    if (predicate(array[index], index, array)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = baseFindIndex;
+
+},{}],69:[function(_dereq_,module,exports){
 var createBaseFor = _dereq_('./_createBaseFor');
 
 /**
@@ -54122,7 +55034,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./_createBaseFor":112}],68:[function(_dereq_,module,exports){
+},{"./_createBaseFor":120}],70:[function(_dereq_,module,exports){
 var baseFor = _dereq_('./_baseFor'),
     keys = _dereq_('./keys');
 
@@ -54140,7 +55052,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"./_baseFor":67,"./keys":208}],69:[function(_dereq_,module,exports){
+},{"./_baseFor":69,"./keys":220}],71:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     toKey = _dereq_('./_toKey');
 
@@ -54166,7 +55078,7 @@ function baseGet(object, path) {
 
 module.exports = baseGet;
 
-},{"./_castPath":98,"./_toKey":178}],70:[function(_dereq_,module,exports){
+},{"./_castPath":103,"./_toKey":189}],72:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     isArray = _dereq_('./isArray');
 
@@ -54188,7 +55100,7 @@ function baseGetAllKeys(object, keysFunc, symbolsFunc) {
 
 module.exports = baseGetAllKeys;
 
-},{"./_arrayPush":55,"./isArray":189}],71:[function(_dereq_,module,exports){
+},{"./_arrayPush":55,"./isArray":201}],73:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     getRawTag = _dereq_('./_getRawTag'),
     objectToString = _dereq_('./_objectToString');
@@ -54218,7 +55130,7 @@ function baseGetTag(value) {
 
 module.exports = baseGetTag;
 
-},{"./_Symbol":47,"./_getRawTag":124,"./_objectToString":162}],72:[function(_dereq_,module,exports){
+},{"./_Symbol":47,"./_getRawTag":132,"./_objectToString":171}],74:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.hasIn` without support for deep paths.
  *
@@ -54233,7 +55145,29 @@ function baseHasIn(object, key) {
 
 module.exports = baseHasIn;
 
-},{}],73:[function(_dereq_,module,exports){
+},{}],75:[function(_dereq_,module,exports){
+var baseFindIndex = _dereq_('./_baseFindIndex'),
+    baseIsNaN = _dereq_('./_baseIsNaN'),
+    strictIndexOf = _dereq_('./_strictIndexOf');
+
+/**
+ * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseIndexOf(array, value, fromIndex) {
+  return value === value
+    ? strictIndexOf(array, value, fromIndex)
+    : baseFindIndex(array, baseIsNaN, fromIndex);
+}
+
+module.exports = baseIndexOf;
+
+},{"./_baseFindIndex":68,"./_baseIsNaN":81,"./_strictIndexOf":186}],76:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -54253,7 +55187,7 @@ function baseIsArguments(value) {
 
 module.exports = baseIsArguments;
 
-},{"./_baseGetTag":71,"./isObjectLike":203}],74:[function(_dereq_,module,exports){
+},{"./_baseGetTag":73,"./isObjectLike":215}],77:[function(_dereq_,module,exports){
 var baseIsEqualDeep = _dereq_('./_baseIsEqualDeep'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -54283,7 +55217,7 @@ function baseIsEqual(value, other, bitmask, customizer, stack) {
 
 module.exports = baseIsEqual;
 
-},{"./_baseIsEqualDeep":75,"./isObjectLike":203}],75:[function(_dereq_,module,exports){
+},{"./_baseIsEqualDeep":78,"./isObjectLike":215}],78:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     equalArrays = _dereq_('./_equalArrays'),
     equalByTag = _dereq_('./_equalByTag'),
@@ -54368,7 +55302,7 @@ function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = baseIsEqualDeep;
 
-},{"./_Stack":46,"./_equalArrays":114,"./_equalByTag":115,"./_equalObjects":116,"./_getTag":127,"./isArray":189,"./isBuffer":192,"./isTypedArray":207}],76:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_equalArrays":122,"./_equalByTag":123,"./_equalObjects":124,"./_getTag":135,"./isArray":201,"./isBuffer":204,"./isTypedArray":219}],79:[function(_dereq_,module,exports){
 var getTag = _dereq_('./_getTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -54388,7 +55322,7 @@ function baseIsMap(value) {
 
 module.exports = baseIsMap;
 
-},{"./_getTag":127,"./isObjectLike":203}],77:[function(_dereq_,module,exports){
+},{"./_getTag":135,"./isObjectLike":215}],80:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     baseIsEqual = _dereq_('./_baseIsEqual');
 
@@ -54452,7 +55386,21 @@ function baseIsMatch(object, source, matchData, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"./_Stack":46,"./_baseIsEqual":74}],78:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_baseIsEqual":77}],81:[function(_dereq_,module,exports){
+/**
+ * The base implementation of `_.isNaN` without support for number objects.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is `NaN`, else `false`.
+ */
+function baseIsNaN(value) {
+  return value !== value;
+}
+
+module.exports = baseIsNaN;
+
+},{}],82:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isMasked = _dereq_('./_isMasked'),
     isObject = _dereq_('./isObject'),
@@ -54501,7 +55449,7 @@ function baseIsNative(value) {
 
 module.exports = baseIsNative;
 
-},{"./_isMasked":142,"./_toSource":179,"./isFunction":196,"./isObject":202}],79:[function(_dereq_,module,exports){
+},{"./_isMasked":151,"./_toSource":190,"./isFunction":208,"./isObject":214}],83:[function(_dereq_,module,exports){
 var getTag = _dereq_('./_getTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -54521,7 +55469,7 @@ function baseIsSet(value) {
 
 module.exports = baseIsSet;
 
-},{"./_getTag":127,"./isObjectLike":203}],80:[function(_dereq_,module,exports){
+},{"./_getTag":135,"./isObjectLike":215}],84:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isLength = _dereq_('./isLength'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -54583,7 +55531,7 @@ function baseIsTypedArray(value) {
 
 module.exports = baseIsTypedArray;
 
-},{"./_baseGetTag":71,"./isLength":197,"./isObjectLike":203}],81:[function(_dereq_,module,exports){
+},{"./_baseGetTag":73,"./isLength":209,"./isObjectLike":215}],85:[function(_dereq_,module,exports){
 var baseMatches = _dereq_('./_baseMatches'),
     baseMatchesProperty = _dereq_('./_baseMatchesProperty'),
     identity = _dereq_('./identity'),
@@ -54616,7 +55564,7 @@ function baseIteratee(value) {
 
 module.exports = baseIteratee;
 
-},{"./_baseMatches":85,"./_baseMatchesProperty":86,"./identity":187,"./isArray":189,"./property":215}],82:[function(_dereq_,module,exports){
+},{"./_baseMatches":89,"./_baseMatchesProperty":90,"./identity":199,"./isArray":201,"./property":227}],86:[function(_dereq_,module,exports){
 var isPrototype = _dereq_('./_isPrototype'),
     nativeKeys = _dereq_('./_nativeKeys');
 
@@ -54648,7 +55596,7 @@ function baseKeys(object) {
 
 module.exports = baseKeys;
 
-},{"./_isPrototype":143,"./_nativeKeys":159}],83:[function(_dereq_,module,exports){
+},{"./_isPrototype":152,"./_nativeKeys":168}],87:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject'),
     isPrototype = _dereq_('./_isPrototype'),
     nativeKeysIn = _dereq_('./_nativeKeysIn');
@@ -54683,7 +55631,7 @@ function baseKeysIn(object) {
 
 module.exports = baseKeysIn;
 
-},{"./_isPrototype":143,"./_nativeKeysIn":160,"./isObject":202}],84:[function(_dereq_,module,exports){
+},{"./_isPrototype":152,"./_nativeKeysIn":169,"./isObject":214}],88:[function(_dereq_,module,exports){
 var baseEach = _dereq_('./_baseEach'),
     isArrayLike = _dereq_('./isArrayLike');
 
@@ -54707,7 +55655,7 @@ function baseMap(collection, iteratee) {
 
 module.exports = baseMap;
 
-},{"./_baseEach":65,"./isArrayLike":190}],85:[function(_dereq_,module,exports){
+},{"./_baseEach":66,"./isArrayLike":202}],89:[function(_dereq_,module,exports){
 var baseIsMatch = _dereq_('./_baseIsMatch'),
     getMatchData = _dereq_('./_getMatchData'),
     matchesStrictComparable = _dereq_('./_matchesStrictComparable');
@@ -54731,7 +55679,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./_baseIsMatch":77,"./_getMatchData":121,"./_matchesStrictComparable":156}],86:[function(_dereq_,module,exports){
+},{"./_baseIsMatch":80,"./_getMatchData":129,"./_matchesStrictComparable":165}],90:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual'),
     get = _dereq_('./get'),
     hasIn = _dereq_('./hasIn'),
@@ -54766,7 +55714,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"./_baseIsEqual":74,"./_isKey":140,"./_isStrictComparable":144,"./_matchesStrictComparable":156,"./_toKey":178,"./get":185,"./hasIn":186}],87:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":77,"./_isKey":149,"./_isStrictComparable":153,"./_matchesStrictComparable":165,"./_toKey":189,"./get":197,"./hasIn":198}],91:[function(_dereq_,module,exports){
 var Stack = _dereq_('./_Stack'),
     assignMergeValue = _dereq_('./_assignMergeValue'),
     baseFor = _dereq_('./_baseFor'),
@@ -54810,7 +55758,7 @@ function baseMerge(object, source, srcIndex, customizer, stack) {
 
 module.exports = baseMerge;
 
-},{"./_Stack":46,"./_assignMergeValue":57,"./_baseFor":67,"./_baseMergeDeep":88,"./_safeGet":166,"./isObject":202,"./keysIn":209}],88:[function(_dereq_,module,exports){
+},{"./_Stack":46,"./_assignMergeValue":58,"./_baseFor":69,"./_baseMergeDeep":92,"./_safeGet":175,"./isObject":214,"./keysIn":221}],92:[function(_dereq_,module,exports){
 var assignMergeValue = _dereq_('./_assignMergeValue'),
     cloneBuffer = _dereq_('./_cloneBuffer'),
     cloneTypedArray = _dereq_('./_cloneTypedArray'),
@@ -54906,7 +55854,7 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
 
 module.exports = baseMergeDeep;
 
-},{"./_assignMergeValue":57,"./_cloneBuffer":100,"./_cloneTypedArray":104,"./_copyArray":105,"./_initCloneObject":137,"./_safeGet":166,"./isArguments":188,"./isArray":189,"./isArrayLikeObject":191,"./isBuffer":192,"./isFunction":196,"./isObject":202,"./isPlainObject":204,"./isTypedArray":207,"./toPlainObject":219}],89:[function(_dereq_,module,exports){
+},{"./_assignMergeValue":58,"./_cloneBuffer":108,"./_cloneTypedArray":112,"./_copyArray":113,"./_initCloneObject":146,"./_safeGet":175,"./isArguments":200,"./isArray":201,"./isArrayLikeObject":203,"./isBuffer":204,"./isFunction":208,"./isObject":214,"./isPlainObject":216,"./isTypedArray":219,"./toPlainObject":231}],93:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -54922,7 +55870,7 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],90:[function(_dereq_,module,exports){
+},{}],94:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -54940,7 +55888,7 @@ function basePropertyDeep(path) {
 
 module.exports = basePropertyDeep;
 
-},{"./_baseGet":69}],91:[function(_dereq_,module,exports){
+},{"./_baseGet":71}],95:[function(_dereq_,module,exports){
 var identity = _dereq_('./identity'),
     overRest = _dereq_('./_overRest'),
     setToString = _dereq_('./_setToString');
@@ -54959,7 +55907,7 @@ function baseRest(func, start) {
 
 module.exports = baseRest;
 
-},{"./_overRest":164,"./_setToString":170,"./identity":187}],92:[function(_dereq_,module,exports){
+},{"./_overRest":173,"./_setToString":179,"./identity":199}],96:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     castPath = _dereq_('./_castPath'),
     isIndex = _dereq_('./_isIndex'),
@@ -55008,7 +55956,7 @@ function baseSet(object, path, value, customizer) {
 
 module.exports = baseSet;
 
-},{"./_assignValue":58,"./_castPath":98,"./_isIndex":138,"./_toKey":178,"./isObject":202}],93:[function(_dereq_,module,exports){
+},{"./_assignValue":59,"./_castPath":103,"./_isIndex":147,"./_toKey":189,"./isObject":214}],97:[function(_dereq_,module,exports){
 var constant = _dereq_('./constant'),
     defineProperty = _dereq_('./_defineProperty'),
     identity = _dereq_('./identity');
@@ -55032,7 +55980,40 @@ var baseSetToString = !defineProperty ? identity : function(func, string) {
 
 module.exports = baseSetToString;
 
-},{"./_defineProperty":113,"./constant":182,"./identity":187}],94:[function(_dereq_,module,exports){
+},{"./_defineProperty":121,"./constant":194,"./identity":199}],98:[function(_dereq_,module,exports){
+/**
+ * The base implementation of `_.slice` without an iteratee call guard.
+ *
+ * @private
+ * @param {Array} array The array to slice.
+ * @param {number} [start=0] The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the slice of `array`.
+ */
+function baseSlice(array, start, end) {
+  var index = -1,
+      length = array.length;
+
+  if (start < 0) {
+    start = -start > length ? 0 : (length + start);
+  }
+  end = end > length ? length : end;
+  if (end < 0) {
+    end += length;
+  }
+  length = start > end ? 0 : ((end - start) >>> 0);
+  start >>>= 0;
+
+  var result = Array(length);
+  while (++index < length) {
+    result[index] = array[index + start];
+  }
+  return result;
+}
+
+module.exports = baseSlice;
+
+},{}],99:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.times` without support for iteratee shorthands
  * or max array length checks.
@@ -55054,7 +56035,7 @@ function baseTimes(n, iteratee) {
 
 module.exports = baseTimes;
 
-},{}],95:[function(_dereq_,module,exports){
+},{}],100:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     arrayMap = _dereq_('./_arrayMap'),
     isArray = _dereq_('./isArray'),
@@ -55093,7 +56074,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{"./_Symbol":47,"./_arrayMap":54,"./isArray":189,"./isSymbol":206}],96:[function(_dereq_,module,exports){
+},{"./_Symbol":47,"./_arrayMap":54,"./isArray":201,"./isSymbol":218}],101:[function(_dereq_,module,exports){
 /**
  * The base implementation of `_.unary` without support for storing metadata.
  *
@@ -55109,7 +56090,7 @@ function baseUnary(func) {
 
 module.exports = baseUnary;
 
-},{}],97:[function(_dereq_,module,exports){
+},{}],102:[function(_dereq_,module,exports){
 /**
  * Checks if a `cache` value for `key` exists.
  *
@@ -55124,7 +56105,7 @@ function cacheHas(cache, key) {
 
 module.exports = cacheHas;
 
-},{}],98:[function(_dereq_,module,exports){
+},{}],103:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isKey = _dereq_('./_isKey'),
     stringToPath = _dereq_('./_stringToPath'),
@@ -55147,7 +56128,70 @@ function castPath(value, object) {
 
 module.exports = castPath;
 
-},{"./_isKey":140,"./_stringToPath":177,"./isArray":189,"./toString":220}],99:[function(_dereq_,module,exports){
+},{"./_isKey":149,"./_stringToPath":188,"./isArray":201,"./toString":232}],104:[function(_dereq_,module,exports){
+var baseSlice = _dereq_('./_baseSlice');
+
+/**
+ * Casts `array` to a slice if it's needed.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {number} start The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the cast slice.
+ */
+function castSlice(array, start, end) {
+  var length = array.length;
+  end = end === undefined ? length : end;
+  return (!start && end >= length) ? array : baseSlice(array, start, end);
+}
+
+module.exports = castSlice;
+
+},{"./_baseSlice":98}],105:[function(_dereq_,module,exports){
+var baseIndexOf = _dereq_('./_baseIndexOf');
+
+/**
+ * Used by `_.trim` and `_.trimEnd` to get the index of the last string symbol
+ * that is not found in the character symbols.
+ *
+ * @private
+ * @param {Array} strSymbols The string symbols to inspect.
+ * @param {Array} chrSymbols The character symbols to find.
+ * @returns {number} Returns the index of the last unmatched string symbol.
+ */
+function charsEndIndex(strSymbols, chrSymbols) {
+  var index = strSymbols.length;
+
+  while (index-- && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1) {}
+  return index;
+}
+
+module.exports = charsEndIndex;
+
+},{"./_baseIndexOf":75}],106:[function(_dereq_,module,exports){
+var baseIndexOf = _dereq_('./_baseIndexOf');
+
+/**
+ * Used by `_.trim` and `_.trimStart` to get the index of the first string symbol
+ * that is not found in the character symbols.
+ *
+ * @private
+ * @param {Array} strSymbols The string symbols to inspect.
+ * @param {Array} chrSymbols The character symbols to find.
+ * @returns {number} Returns the index of the first unmatched string symbol.
+ */
+function charsStartIndex(strSymbols, chrSymbols) {
+  var index = -1,
+      length = strSymbols.length;
+
+  while (++index < length && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1) {}
+  return index;
+}
+
+module.exports = charsStartIndex;
+
+},{"./_baseIndexOf":75}],107:[function(_dereq_,module,exports){
 var Uint8Array = _dereq_('./_Uint8Array');
 
 /**
@@ -55165,7 +56209,7 @@ function cloneArrayBuffer(arrayBuffer) {
 
 module.exports = cloneArrayBuffer;
 
-},{"./_Uint8Array":48}],100:[function(_dereq_,module,exports){
+},{"./_Uint8Array":48}],108:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Detect free variable `exports`. */
@@ -55202,7 +56246,7 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-},{"./_root":165}],101:[function(_dereq_,module,exports){
+},{"./_root":174}],109:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -55220,7 +56264,7 @@ function cloneDataView(dataView, isDeep) {
 
 module.exports = cloneDataView;
 
-},{"./_cloneArrayBuffer":99}],102:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":107}],110:[function(_dereq_,module,exports){
 /** Used to match `RegExp` flags from their coerced string values. */
 var reFlags = /\w*$/;
 
@@ -55239,7 +56283,7 @@ function cloneRegExp(regexp) {
 
 module.exports = cloneRegExp;
 
-},{}],103:[function(_dereq_,module,exports){
+},{}],111:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used to convert symbols to primitives and strings. */
@@ -55259,7 +56303,7 @@ function cloneSymbol(symbol) {
 
 module.exports = cloneSymbol;
 
-},{"./_Symbol":47}],104:[function(_dereq_,module,exports){
+},{"./_Symbol":47}],112:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer');
 
 /**
@@ -55277,7 +56321,7 @@ function cloneTypedArray(typedArray, isDeep) {
 
 module.exports = cloneTypedArray;
 
-},{"./_cloneArrayBuffer":99}],105:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":107}],113:[function(_dereq_,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -55299,7 +56343,7 @@ function copyArray(source, array) {
 
 module.exports = copyArray;
 
-},{}],106:[function(_dereq_,module,exports){
+},{}],114:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     baseAssignValue = _dereq_('./_baseAssignValue');
 
@@ -55341,7 +56385,7 @@ function copyObject(source, props, object, customizer) {
 
 module.exports = copyObject;
 
-},{"./_assignValue":58,"./_baseAssignValue":62}],107:[function(_dereq_,module,exports){
+},{"./_assignValue":59,"./_baseAssignValue":63}],115:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbols = _dereq_('./_getSymbols');
 
@@ -55359,7 +56403,7 @@ function copySymbols(source, object) {
 
 module.exports = copySymbols;
 
-},{"./_copyObject":106,"./_getSymbols":125}],108:[function(_dereq_,module,exports){
+},{"./_copyObject":114,"./_getSymbols":133}],116:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     getSymbolsIn = _dereq_('./_getSymbolsIn');
 
@@ -55377,7 +56421,7 @@ function copySymbolsIn(source, object) {
 
 module.exports = copySymbolsIn;
 
-},{"./_copyObject":106,"./_getSymbolsIn":126}],109:[function(_dereq_,module,exports){
+},{"./_copyObject":114,"./_getSymbolsIn":134}],117:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /** Used to detect overreaching core-js shims. */
@@ -55385,7 +56429,7 @@ var coreJsData = root['__core-js_shared__'];
 
 module.exports = coreJsData;
 
-},{"./_root":165}],110:[function(_dereq_,module,exports){
+},{"./_root":174}],118:[function(_dereq_,module,exports){
 var baseRest = _dereq_('./_baseRest'),
     isIterateeCall = _dereq_('./_isIterateeCall');
 
@@ -55424,7 +56468,7 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"./_baseRest":91,"./_isIterateeCall":139}],111:[function(_dereq_,module,exports){
+},{"./_baseRest":95,"./_isIterateeCall":148}],119:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike');
 
 /**
@@ -55458,7 +56502,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./isArrayLike":190}],112:[function(_dereq_,module,exports){
+},{"./isArrayLike":202}],120:[function(_dereq_,module,exports){
 /**
  * Creates a base function for methods like `_.forIn` and `_.forOwn`.
  *
@@ -55485,7 +56529,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{}],113:[function(_dereq_,module,exports){
+},{}],121:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 var defineProperty = (function() {
@@ -55498,7 +56542,7 @@ var defineProperty = (function() {
 
 module.exports = defineProperty;
 
-},{"./_getNative":122}],114:[function(_dereq_,module,exports){
+},{"./_getNative":130}],122:[function(_dereq_,module,exports){
 var SetCache = _dereq_('./_SetCache'),
     arraySome = _dereq_('./_arraySome'),
     cacheHas = _dereq_('./_cacheHas');
@@ -55583,7 +56627,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalArrays;
 
-},{"./_SetCache":45,"./_arraySome":56,"./_cacheHas":97}],115:[function(_dereq_,module,exports){
+},{"./_SetCache":45,"./_arraySome":56,"./_cacheHas":102}],123:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol'),
     Uint8Array = _dereq_('./_Uint8Array'),
     eq = _dereq_('./eq'),
@@ -55697,7 +56741,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalByTag;
 
-},{"./_Symbol":47,"./_Uint8Array":48,"./_equalArrays":114,"./_mapToArray":155,"./_setToArray":169,"./eq":183}],116:[function(_dereq_,module,exports){
+},{"./_Symbol":47,"./_Uint8Array":48,"./_equalArrays":122,"./_mapToArray":164,"./_setToArray":178,"./eq":195}],124:[function(_dereq_,module,exports){
 var getAllKeys = _dereq_('./_getAllKeys');
 
 /** Used to compose bitmasks for value comparisons. */
@@ -55788,7 +56832,7 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
 
 module.exports = equalObjects;
 
-},{"./_getAllKeys":118}],117:[function(_dereq_,module,exports){
+},{"./_getAllKeys":126}],125:[function(_dereq_,module,exports){
 (function (global){
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
@@ -55796,7 +56840,7 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 module.exports = freeGlobal;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],118:[function(_dereq_,module,exports){
+},{}],126:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbols = _dereq_('./_getSymbols'),
     keys = _dereq_('./keys');
@@ -55814,7 +56858,7 @@ function getAllKeys(object) {
 
 module.exports = getAllKeys;
 
-},{"./_baseGetAllKeys":70,"./_getSymbols":125,"./keys":208}],119:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":72,"./_getSymbols":133,"./keys":220}],127:[function(_dereq_,module,exports){
 var baseGetAllKeys = _dereq_('./_baseGetAllKeys'),
     getSymbolsIn = _dereq_('./_getSymbolsIn'),
     keysIn = _dereq_('./keysIn');
@@ -55833,7 +56877,7 @@ function getAllKeysIn(object) {
 
 module.exports = getAllKeysIn;
 
-},{"./_baseGetAllKeys":70,"./_getSymbolsIn":126,"./keysIn":209}],120:[function(_dereq_,module,exports){
+},{"./_baseGetAllKeys":72,"./_getSymbolsIn":134,"./keysIn":221}],128:[function(_dereq_,module,exports){
 var isKeyable = _dereq_('./_isKeyable');
 
 /**
@@ -55853,7 +56897,7 @@ function getMapData(map, key) {
 
 module.exports = getMapData;
 
-},{"./_isKeyable":141}],121:[function(_dereq_,module,exports){
+},{"./_isKeyable":150}],129:[function(_dereq_,module,exports){
 var isStrictComparable = _dereq_('./_isStrictComparable'),
     keys = _dereq_('./keys');
 
@@ -55879,7 +56923,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"./_isStrictComparable":144,"./keys":208}],122:[function(_dereq_,module,exports){
+},{"./_isStrictComparable":153,"./keys":220}],130:[function(_dereq_,module,exports){
 var baseIsNative = _dereq_('./_baseIsNative'),
     getValue = _dereq_('./_getValue');
 
@@ -55898,7 +56942,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"./_baseIsNative":78,"./_getValue":128}],123:[function(_dereq_,module,exports){
+},{"./_baseIsNative":82,"./_getValue":136}],131:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /** Built-in value references. */
@@ -55906,7 +56950,7 @@ var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 module.exports = getPrototype;
 
-},{"./_overArg":163}],124:[function(_dereq_,module,exports){
+},{"./_overArg":172}],132:[function(_dereq_,module,exports){
 var Symbol = _dereq_('./_Symbol');
 
 /** Used for built-in method references. */
@@ -55954,7 +56998,7 @@ function getRawTag(value) {
 
 module.exports = getRawTag;
 
-},{"./_Symbol":47}],125:[function(_dereq_,module,exports){
+},{"./_Symbol":47}],133:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     stubArray = _dereq_('./stubArray');
 
@@ -55986,7 +57030,7 @@ var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbols;
 
-},{"./_arrayFilter":52,"./stubArray":217}],126:[function(_dereq_,module,exports){
+},{"./_arrayFilter":52,"./stubArray":229}],134:[function(_dereq_,module,exports){
 var arrayPush = _dereq_('./_arrayPush'),
     getPrototype = _dereq_('./_getPrototype'),
     getSymbols = _dereq_('./_getSymbols'),
@@ -56013,7 +57057,7 @@ var getSymbolsIn = !nativeGetSymbols ? stubArray : function(object) {
 
 module.exports = getSymbolsIn;
 
-},{"./_arrayPush":55,"./_getPrototype":123,"./_getSymbols":125,"./stubArray":217}],127:[function(_dereq_,module,exports){
+},{"./_arrayPush":55,"./_getPrototype":131,"./_getSymbols":133,"./stubArray":229}],135:[function(_dereq_,module,exports){
 var DataView = _dereq_('./_DataView'),
     Map = _dereq_('./_Map'),
     Promise = _dereq_('./_Promise'),
@@ -56073,7 +57117,7 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 module.exports = getTag;
 
-},{"./_DataView":38,"./_Map":41,"./_Promise":43,"./_Set":44,"./_WeakMap":49,"./_baseGetTag":71,"./_toSource":179}],128:[function(_dereq_,module,exports){
+},{"./_DataView":38,"./_Map":41,"./_Promise":43,"./_Set":44,"./_WeakMap":49,"./_baseGetTag":73,"./_toSource":190}],136:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key` of `object`.
  *
@@ -56088,7 +57132,7 @@ function getValue(object, key) {
 
 module.exports = getValue;
 
-},{}],129:[function(_dereq_,module,exports){
+},{}],137:[function(_dereq_,module,exports){
 var castPath = _dereq_('./_castPath'),
     isArguments = _dereq_('./isArguments'),
     isArray = _dereq_('./isArray'),
@@ -56129,7 +57173,35 @@ function hasPath(object, path, hasFunc) {
 
 module.exports = hasPath;
 
-},{"./_castPath":98,"./_isIndex":138,"./_toKey":178,"./isArguments":188,"./isArray":189,"./isLength":197}],130:[function(_dereq_,module,exports){
+},{"./_castPath":103,"./_isIndex":147,"./_toKey":189,"./isArguments":200,"./isArray":201,"./isLength":209}],138:[function(_dereq_,module,exports){
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsZWJ = '\\u200d';
+
+/** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
+var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
+
+/**
+ * Checks if `string` contains Unicode symbols.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {boolean} Returns `true` if a symbol is found, else `false`.
+ */
+function hasUnicode(string) {
+  return reHasUnicode.test(string);
+}
+
+module.exports = hasUnicode;
+
+},{}],139:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /**
@@ -56146,7 +57218,7 @@ function hashClear() {
 
 module.exports = hashClear;
 
-},{"./_nativeCreate":158}],131:[function(_dereq_,module,exports){
+},{"./_nativeCreate":167}],140:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the hash.
  *
@@ -56165,7 +57237,7 @@ function hashDelete(key) {
 
 module.exports = hashDelete;
 
-},{}],132:[function(_dereq_,module,exports){
+},{}],141:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -56197,7 +57269,7 @@ function hashGet(key) {
 
 module.exports = hashGet;
 
-},{"./_nativeCreate":158}],133:[function(_dereq_,module,exports){
+},{"./_nativeCreate":167}],142:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used for built-in method references. */
@@ -56222,7 +57294,7 @@ function hashHas(key) {
 
 module.exports = hashHas;
 
-},{"./_nativeCreate":158}],134:[function(_dereq_,module,exports){
+},{"./_nativeCreate":167}],143:[function(_dereq_,module,exports){
 var nativeCreate = _dereq_('./_nativeCreate');
 
 /** Used to stand-in for `undefined` hash values. */
@@ -56247,7 +57319,7 @@ function hashSet(key, value) {
 
 module.exports = hashSet;
 
-},{"./_nativeCreate":158}],135:[function(_dereq_,module,exports){
+},{"./_nativeCreate":167}],144:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -56275,7 +57347,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],136:[function(_dereq_,module,exports){
+},{}],145:[function(_dereq_,module,exports){
 var cloneArrayBuffer = _dereq_('./_cloneArrayBuffer'),
     cloneDataView = _dereq_('./_cloneDataView'),
     cloneRegExp = _dereq_('./_cloneRegExp'),
@@ -56354,7 +57426,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./_cloneArrayBuffer":99,"./_cloneDataView":101,"./_cloneRegExp":102,"./_cloneSymbol":103,"./_cloneTypedArray":104}],137:[function(_dereq_,module,exports){
+},{"./_cloneArrayBuffer":107,"./_cloneDataView":109,"./_cloneRegExp":110,"./_cloneSymbol":111,"./_cloneTypedArray":112}],146:[function(_dereq_,module,exports){
 var baseCreate = _dereq_('./_baseCreate'),
     getPrototype = _dereq_('./_getPrototype'),
     isPrototype = _dereq_('./_isPrototype');
@@ -56374,7 +57446,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{"./_baseCreate":64,"./_getPrototype":123,"./_isPrototype":143}],138:[function(_dereq_,module,exports){
+},{"./_baseCreate":65,"./_getPrototype":131,"./_isPrototype":152}],147:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -56401,7 +57473,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],139:[function(_dereq_,module,exports){
+},{}],148:[function(_dereq_,module,exports){
 var eq = _dereq_('./eq'),
     isArrayLike = _dereq_('./isArrayLike'),
     isIndex = _dereq_('./_isIndex'),
@@ -56433,7 +57505,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"./_isIndex":138,"./eq":183,"./isArrayLike":190,"./isObject":202}],140:[function(_dereq_,module,exports){
+},{"./_isIndex":147,"./eq":195,"./isArrayLike":202,"./isObject":214}],149:[function(_dereq_,module,exports){
 var isArray = _dereq_('./isArray'),
     isSymbol = _dereq_('./isSymbol');
 
@@ -56464,7 +57536,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"./isArray":189,"./isSymbol":206}],141:[function(_dereq_,module,exports){
+},{"./isArray":201,"./isSymbol":218}],150:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is suitable for use as unique object key.
  *
@@ -56481,7 +57553,7 @@ function isKeyable(value) {
 
 module.exports = isKeyable;
 
-},{}],142:[function(_dereq_,module,exports){
+},{}],151:[function(_dereq_,module,exports){
 var coreJsData = _dereq_('./_coreJsData');
 
 /** Used to detect methods masquerading as native. */
@@ -56503,7 +57575,7 @@ function isMasked(func) {
 
 module.exports = isMasked;
 
-},{"./_coreJsData":109}],143:[function(_dereq_,module,exports){
+},{"./_coreJsData":117}],152:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -56523,7 +57595,7 @@ function isPrototype(value) {
 
 module.exports = isPrototype;
 
-},{}],144:[function(_dereq_,module,exports){
+},{}],153:[function(_dereq_,module,exports){
 var isObject = _dereq_('./isObject');
 
 /**
@@ -56540,7 +57612,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"./isObject":202}],145:[function(_dereq_,module,exports){
+},{"./isObject":214}],154:[function(_dereq_,module,exports){
 /**
  * Removes all key-value entries from the list cache.
  *
@@ -56555,7 +57627,7 @@ function listCacheClear() {
 
 module.exports = listCacheClear;
 
-},{}],146:[function(_dereq_,module,exports){
+},{}],155:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /** Used for built-in method references. */
@@ -56592,7 +57664,7 @@ function listCacheDelete(key) {
 
 module.exports = listCacheDelete;
 
-},{"./_assocIndexOf":59}],147:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":60}],156:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -56613,7 +57685,7 @@ function listCacheGet(key) {
 
 module.exports = listCacheGet;
 
-},{"./_assocIndexOf":59}],148:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":60}],157:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -56631,7 +57703,7 @@ function listCacheHas(key) {
 
 module.exports = listCacheHas;
 
-},{"./_assocIndexOf":59}],149:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":60}],158:[function(_dereq_,module,exports){
 var assocIndexOf = _dereq_('./_assocIndexOf');
 
 /**
@@ -56659,7 +57731,7 @@ function listCacheSet(key, value) {
 
 module.exports = listCacheSet;
 
-},{"./_assocIndexOf":59}],150:[function(_dereq_,module,exports){
+},{"./_assocIndexOf":60}],159:[function(_dereq_,module,exports){
 var Hash = _dereq_('./_Hash'),
     ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map');
@@ -56682,7 +57754,7 @@ function mapCacheClear() {
 
 module.exports = mapCacheClear;
 
-},{"./_Hash":39,"./_ListCache":40,"./_Map":41}],151:[function(_dereq_,module,exports){
+},{"./_Hash":39,"./_ListCache":40,"./_Map":41}],160:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -56702,7 +57774,7 @@ function mapCacheDelete(key) {
 
 module.exports = mapCacheDelete;
 
-},{"./_getMapData":120}],152:[function(_dereq_,module,exports){
+},{"./_getMapData":128}],161:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -56720,7 +57792,7 @@ function mapCacheGet(key) {
 
 module.exports = mapCacheGet;
 
-},{"./_getMapData":120}],153:[function(_dereq_,module,exports){
+},{"./_getMapData":128}],162:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -56738,7 +57810,7 @@ function mapCacheHas(key) {
 
 module.exports = mapCacheHas;
 
-},{"./_getMapData":120}],154:[function(_dereq_,module,exports){
+},{"./_getMapData":128}],163:[function(_dereq_,module,exports){
 var getMapData = _dereq_('./_getMapData');
 
 /**
@@ -56762,7 +57834,7 @@ function mapCacheSet(key, value) {
 
 module.exports = mapCacheSet;
 
-},{"./_getMapData":120}],155:[function(_dereq_,module,exports){
+},{"./_getMapData":128}],164:[function(_dereq_,module,exports){
 /**
  * Converts `map` to its key-value pairs.
  *
@@ -56782,7 +57854,7 @@ function mapToArray(map) {
 
 module.exports = mapToArray;
 
-},{}],156:[function(_dereq_,module,exports){
+},{}],165:[function(_dereq_,module,exports){
 /**
  * A specialized version of `matchesProperty` for source values suitable
  * for strict equality comparisons, i.e. `===`.
@@ -56804,7 +57876,7 @@ function matchesStrictComparable(key, srcValue) {
 
 module.exports = matchesStrictComparable;
 
-},{}],157:[function(_dereq_,module,exports){
+},{}],166:[function(_dereq_,module,exports){
 var memoize = _dereq_('./memoize');
 
 /** Used as the maximum memoize cache size. */
@@ -56832,7 +57904,7 @@ function memoizeCapped(func) {
 
 module.exports = memoizeCapped;
 
-},{"./memoize":213}],158:[function(_dereq_,module,exports){
+},{"./memoize":225}],167:[function(_dereq_,module,exports){
 var getNative = _dereq_('./_getNative');
 
 /* Built-in method references that are verified to be native. */
@@ -56840,7 +57912,7 @@ var nativeCreate = getNative(Object, 'create');
 
 module.exports = nativeCreate;
 
-},{"./_getNative":122}],159:[function(_dereq_,module,exports){
+},{"./_getNative":130}],168:[function(_dereq_,module,exports){
 var overArg = _dereq_('./_overArg');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -56848,7 +57920,7 @@ var nativeKeys = overArg(Object.keys, Object);
 
 module.exports = nativeKeys;
 
-},{"./_overArg":163}],160:[function(_dereq_,module,exports){
+},{"./_overArg":172}],169:[function(_dereq_,module,exports){
 /**
  * This function is like
  * [`Object.keys`](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
@@ -56870,7 +57942,7 @@ function nativeKeysIn(object) {
 
 module.exports = nativeKeysIn;
 
-},{}],161:[function(_dereq_,module,exports){
+},{}],170:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `exports`. */
@@ -56902,7 +57974,7 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-},{"./_freeGlobal":117}],162:[function(_dereq_,module,exports){
+},{"./_freeGlobal":125}],171:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
 
@@ -56926,7 +57998,7 @@ function objectToString(value) {
 
 module.exports = objectToString;
 
-},{}],163:[function(_dereq_,module,exports){
+},{}],172:[function(_dereq_,module,exports){
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -56943,7 +58015,7 @@ function overArg(func, transform) {
 
 module.exports = overArg;
 
-},{}],164:[function(_dereq_,module,exports){
+},{}],173:[function(_dereq_,module,exports){
 var apply = _dereq_('./_apply');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -56981,7 +58053,7 @@ function overRest(func, start, transform) {
 
 module.exports = overRest;
 
-},{"./_apply":50}],165:[function(_dereq_,module,exports){
+},{"./_apply":50}],174:[function(_dereq_,module,exports){
 var freeGlobal = _dereq_('./_freeGlobal');
 
 /** Detect free variable `self`. */
@@ -56992,7 +58064,7 @@ var root = freeGlobal || freeSelf || Function('return this')();
 
 module.exports = root;
 
-},{"./_freeGlobal":117}],166:[function(_dereq_,module,exports){
+},{"./_freeGlobal":125}],175:[function(_dereq_,module,exports){
 /**
  * Gets the value at `key`, unless `key` is "__proto__".
  *
@@ -57009,7 +58081,7 @@ function safeGet(object, key) {
 
 module.exports = safeGet;
 
-},{}],167:[function(_dereq_,module,exports){
+},{}],176:[function(_dereq_,module,exports){
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
 
@@ -57030,7 +58102,7 @@ function setCacheAdd(value) {
 
 module.exports = setCacheAdd;
 
-},{}],168:[function(_dereq_,module,exports){
+},{}],177:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is in the array cache.
  *
@@ -57046,7 +58118,7 @@ function setCacheHas(value) {
 
 module.exports = setCacheHas;
 
-},{}],169:[function(_dereq_,module,exports){
+},{}],178:[function(_dereq_,module,exports){
 /**
  * Converts `set` to an array of its values.
  *
@@ -57066,7 +58138,7 @@ function setToArray(set) {
 
 module.exports = setToArray;
 
-},{}],170:[function(_dereq_,module,exports){
+},{}],179:[function(_dereq_,module,exports){
 var baseSetToString = _dereq_('./_baseSetToString'),
     shortOut = _dereq_('./_shortOut');
 
@@ -57082,7 +58154,7 @@ var setToString = shortOut(baseSetToString);
 
 module.exports = setToString;
 
-},{"./_baseSetToString":93,"./_shortOut":171}],171:[function(_dereq_,module,exports){
+},{"./_baseSetToString":97,"./_shortOut":180}],180:[function(_dereq_,module,exports){
 /** Used to detect hot functions by number of calls within a span of milliseconds. */
 var HOT_COUNT = 800,
     HOT_SPAN = 16;
@@ -57121,7 +58193,7 @@ function shortOut(func) {
 
 module.exports = shortOut;
 
-},{}],172:[function(_dereq_,module,exports){
+},{}],181:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache');
 
 /**
@@ -57138,7 +58210,7 @@ function stackClear() {
 
 module.exports = stackClear;
 
-},{"./_ListCache":40}],173:[function(_dereq_,module,exports){
+},{"./_ListCache":40}],182:[function(_dereq_,module,exports){
 /**
  * Removes `key` and its value from the stack.
  *
@@ -57158,7 +58230,7 @@ function stackDelete(key) {
 
 module.exports = stackDelete;
 
-},{}],174:[function(_dereq_,module,exports){
+},{}],183:[function(_dereq_,module,exports){
 /**
  * Gets the stack value for `key`.
  *
@@ -57174,7 +58246,7 @@ function stackGet(key) {
 
 module.exports = stackGet;
 
-},{}],175:[function(_dereq_,module,exports){
+},{}],184:[function(_dereq_,module,exports){
 /**
  * Checks if a stack value for `key` exists.
  *
@@ -57190,7 +58262,7 @@ function stackHas(key) {
 
 module.exports = stackHas;
 
-},{}],176:[function(_dereq_,module,exports){
+},{}],185:[function(_dereq_,module,exports){
 var ListCache = _dereq_('./_ListCache'),
     Map = _dereq_('./_Map'),
     MapCache = _dereq_('./_MapCache');
@@ -57226,7 +58298,52 @@ function stackSet(key, value) {
 
 module.exports = stackSet;
 
-},{"./_ListCache":40,"./_Map":41,"./_MapCache":42}],177:[function(_dereq_,module,exports){
+},{"./_ListCache":40,"./_Map":41,"./_MapCache":42}],186:[function(_dereq_,module,exports){
+/**
+ * A specialized version of `_.indexOf` which performs strict equality
+ * comparisons of values, i.e. `===`.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} value The value to search for.
+ * @param {number} fromIndex The index to search from.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function strictIndexOf(array, value, fromIndex) {
+  var index = fromIndex - 1,
+      length = array.length;
+
+  while (++index < length) {
+    if (array[index] === value) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+module.exports = strictIndexOf;
+
+},{}],187:[function(_dereq_,module,exports){
+var asciiToArray = _dereq_('./_asciiToArray'),
+    hasUnicode = _dereq_('./_hasUnicode'),
+    unicodeToArray = _dereq_('./_unicodeToArray');
+
+/**
+ * Converts `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function stringToArray(string) {
+  return hasUnicode(string)
+    ? unicodeToArray(string)
+    : asciiToArray(string);
+}
+
+module.exports = stringToArray;
+
+},{"./_asciiToArray":57,"./_hasUnicode":138,"./_unicodeToArray":191}],188:[function(_dereq_,module,exports){
 var memoizeCapped = _dereq_('./_memoizeCapped');
 
 /** Used to match property names within property paths. */
@@ -57255,7 +58372,7 @@ var stringToPath = memoizeCapped(function(string) {
 
 module.exports = stringToPath;
 
-},{"./_memoizeCapped":157}],178:[function(_dereq_,module,exports){
+},{"./_memoizeCapped":166}],189:[function(_dereq_,module,exports){
 var isSymbol = _dereq_('./isSymbol');
 
 /** Used as references for various `Number` constants. */
@@ -57278,7 +58395,7 @@ function toKey(value) {
 
 module.exports = toKey;
 
-},{"./isSymbol":206}],179:[function(_dereq_,module,exports){
+},{"./isSymbol":218}],190:[function(_dereq_,module,exports){
 /** Used for built-in method references. */
 var funcProto = Function.prototype;
 
@@ -57306,7 +58423,49 @@ function toSource(func) {
 
 module.exports = toSource;
 
-},{}],180:[function(_dereq_,module,exports){
+},{}],191:[function(_dereq_,module,exports){
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange,
+    rsVarRange = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsAstral = '[' + rsAstralRange + ']',
+    rsCombo = '[' + rsComboRange + ']',
+    rsFitz = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier = '(?:' + rsCombo + '|' + rsFitz + ')',
+    rsNonAstral = '[^' + rsAstralRange + ']',
+    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsZWJ = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var reOptMod = rsModifier + '?',
+    rsOptVar = '[' + rsVarRange + ']?',
+    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
+    rsSeq = rsOptVar + reOptMod + rsOptJoin,
+    rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
+
+/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+var reUnicode = RegExp(rsFitz + '(?=' + rsFitz + ')|' + rsSymbol + rsSeq, 'g');
+
+/**
+ * Converts a Unicode `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function unicodeToArray(string) {
+  return string.match(reUnicode) || [];
+}
+
+module.exports = unicodeToArray;
+
+},{}],192:[function(_dereq_,module,exports){
 var assignValue = _dereq_('./_assignValue'),
     copyObject = _dereq_('./_copyObject'),
     createAssigner = _dereq_('./_createAssigner'),
@@ -57366,7 +58525,7 @@ var assign = createAssigner(function(object, source) {
 
 module.exports = assign;
 
-},{"./_assignValue":58,"./_copyObject":106,"./_createAssigner":110,"./_isPrototype":143,"./isArrayLike":190,"./keys":208}],181:[function(_dereq_,module,exports){
+},{"./_assignValue":59,"./_copyObject":114,"./_createAssigner":118,"./_isPrototype":152,"./isArrayLike":202,"./keys":220}],193:[function(_dereq_,module,exports){
 var baseClone = _dereq_('./_baseClone');
 
 /** Used to compose bitmasks for cloning. */
@@ -57397,7 +58556,7 @@ function cloneDeep(value) {
 
 module.exports = cloneDeep;
 
-},{"./_baseClone":63}],182:[function(_dereq_,module,exports){
+},{"./_baseClone":64}],194:[function(_dereq_,module,exports){
 /**
  * Creates a function that returns `value`.
  *
@@ -57425,7 +58584,7 @@ function constant(value) {
 
 module.exports = constant;
 
-},{}],183:[function(_dereq_,module,exports){
+},{}],195:[function(_dereq_,module,exports){
 /**
  * Performs a
  * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
@@ -57464,7 +58623,7 @@ function eq(value, other) {
 
 module.exports = eq;
 
-},{}],184:[function(_dereq_,module,exports){
+},{}],196:[function(_dereq_,module,exports){
 var arrayFilter = _dereq_('./_arrayFilter'),
     baseFilter = _dereq_('./_baseFilter'),
     baseIteratee = _dereq_('./_baseIteratee'),
@@ -57514,7 +58673,7 @@ function filter(collection, predicate) {
 
 module.exports = filter;
 
-},{"./_arrayFilter":52,"./_baseFilter":66,"./_baseIteratee":81,"./isArray":189}],185:[function(_dereq_,module,exports){
+},{"./_arrayFilter":52,"./_baseFilter":67,"./_baseIteratee":85,"./isArray":201}],197:[function(_dereq_,module,exports){
 var baseGet = _dereq_('./_baseGet');
 
 /**
@@ -57549,7 +58708,7 @@ function get(object, path, defaultValue) {
 
 module.exports = get;
 
-},{"./_baseGet":69}],186:[function(_dereq_,module,exports){
+},{"./_baseGet":71}],198:[function(_dereq_,module,exports){
 var baseHasIn = _dereq_('./_baseHasIn'),
     hasPath = _dereq_('./_hasPath');
 
@@ -57585,7 +58744,7 @@ function hasIn(object, path) {
 
 module.exports = hasIn;
 
-},{"./_baseHasIn":72,"./_hasPath":129}],187:[function(_dereq_,module,exports){
+},{"./_baseHasIn":74,"./_hasPath":137}],199:[function(_dereq_,module,exports){
 /**
  * This method returns the first argument it receives.
  *
@@ -57608,7 +58767,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],188:[function(_dereq_,module,exports){
+},{}],200:[function(_dereq_,module,exports){
 var baseIsArguments = _dereq_('./_baseIsArguments'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -57646,7 +58805,7 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
 
 module.exports = isArguments;
 
-},{"./_baseIsArguments":73,"./isObjectLike":203}],189:[function(_dereq_,module,exports){
+},{"./_baseIsArguments":76,"./isObjectLike":215}],201:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is classified as an `Array` object.
  *
@@ -57674,7 +58833,7 @@ var isArray = Array.isArray;
 
 module.exports = isArray;
 
-},{}],190:[function(_dereq_,module,exports){
+},{}],202:[function(_dereq_,module,exports){
 var isFunction = _dereq_('./isFunction'),
     isLength = _dereq_('./isLength');
 
@@ -57709,7 +58868,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./isFunction":196,"./isLength":197}],191:[function(_dereq_,module,exports){
+},{"./isFunction":208,"./isLength":209}],203:[function(_dereq_,module,exports){
 var isArrayLike = _dereq_('./isArrayLike'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -57744,7 +58903,7 @@ function isArrayLikeObject(value) {
 
 module.exports = isArrayLikeObject;
 
-},{"./isArrayLike":190,"./isObjectLike":203}],192:[function(_dereq_,module,exports){
+},{"./isArrayLike":202,"./isObjectLike":215}],204:[function(_dereq_,module,exports){
 var root = _dereq_('./_root'),
     stubFalse = _dereq_('./stubFalse');
 
@@ -57784,7 +58943,7 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-},{"./_root":165,"./stubFalse":218}],193:[function(_dereq_,module,exports){
+},{"./_root":174,"./stubFalse":230}],205:[function(_dereq_,module,exports){
 var baseKeys = _dereq_('./_baseKeys'),
     getTag = _dereq_('./_getTag'),
     isArguments = _dereq_('./isArguments'),
@@ -57863,7 +59022,7 @@ function isEmpty(value) {
 
 module.exports = isEmpty;
 
-},{"./_baseKeys":82,"./_getTag":127,"./_isPrototype":143,"./isArguments":188,"./isArray":189,"./isArrayLike":190,"./isBuffer":192,"./isTypedArray":207}],194:[function(_dereq_,module,exports){
+},{"./_baseKeys":86,"./_getTag":135,"./_isPrototype":152,"./isArguments":200,"./isArray":201,"./isArrayLike":202,"./isBuffer":204,"./isTypedArray":219}],206:[function(_dereq_,module,exports){
 var baseIsEqual = _dereq_('./_baseIsEqual');
 
 /**
@@ -57900,7 +59059,7 @@ function isEqual(value, other) {
 
 module.exports = isEqual;
 
-},{"./_baseIsEqual":74}],195:[function(_dereq_,module,exports){
+},{"./_baseIsEqual":77}],207:[function(_dereq_,module,exports){
 var root = _dereq_('./_root');
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
@@ -57938,7 +59097,7 @@ function isFinite(value) {
 
 module.exports = isFinite;
 
-},{"./_root":165}],196:[function(_dereq_,module,exports){
+},{"./_root":174}],208:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObject = _dereq_('./isObject');
 
@@ -57977,7 +59136,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./_baseGetTag":71,"./isObject":202}],197:[function(_dereq_,module,exports){
+},{"./_baseGetTag":73,"./isObject":214}],209:[function(_dereq_,module,exports){
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -58014,7 +59173,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],198:[function(_dereq_,module,exports){
+},{}],210:[function(_dereq_,module,exports){
 var baseIsMap = _dereq_('./_baseIsMap'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -58043,7 +59202,7 @@ var isMap = nodeIsMap ? baseUnary(nodeIsMap) : baseIsMap;
 
 module.exports = isMap;
 
-},{"./_baseIsMap":76,"./_baseUnary":96,"./_nodeUtil":161}],199:[function(_dereq_,module,exports){
+},{"./_baseIsMap":79,"./_baseUnary":101,"./_nodeUtil":170}],211:[function(_dereq_,module,exports){
 var isNumber = _dereq_('./isNumber');
 
 /**
@@ -58083,7 +59242,7 @@ function isNaN(value) {
 
 module.exports = isNaN;
 
-},{"./isNumber":201}],200:[function(_dereq_,module,exports){
+},{"./isNumber":213}],212:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is `null` or `undefined`.
  *
@@ -58110,7 +59269,7 @@ function isNil(value) {
 
 module.exports = isNil;
 
-},{}],201:[function(_dereq_,module,exports){
+},{}],213:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -58150,7 +59309,7 @@ function isNumber(value) {
 
 module.exports = isNumber;
 
-},{"./_baseGetTag":71,"./isObjectLike":203}],202:[function(_dereq_,module,exports){
+},{"./_baseGetTag":73,"./isObjectLike":215}],214:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is the
  * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -58183,7 +59342,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],203:[function(_dereq_,module,exports){
+},{}],215:[function(_dereq_,module,exports){
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
  * and has a `typeof` result of "object".
@@ -58214,7 +59373,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],204:[function(_dereq_,module,exports){
+},{}],216:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     getPrototype = _dereq_('./_getPrototype'),
     isObjectLike = _dereq_('./isObjectLike');
@@ -58278,7 +59437,7 @@ function isPlainObject(value) {
 
 module.exports = isPlainObject;
 
-},{"./_baseGetTag":71,"./_getPrototype":123,"./isObjectLike":203}],205:[function(_dereq_,module,exports){
+},{"./_baseGetTag":73,"./_getPrototype":131,"./isObjectLike":215}],217:[function(_dereq_,module,exports){
 var baseIsSet = _dereq_('./_baseIsSet'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -58307,7 +59466,7 @@ var isSet = nodeIsSet ? baseUnary(nodeIsSet) : baseIsSet;
 
 module.exports = isSet;
 
-},{"./_baseIsSet":79,"./_baseUnary":96,"./_nodeUtil":161}],206:[function(_dereq_,module,exports){
+},{"./_baseIsSet":83,"./_baseUnary":101,"./_nodeUtil":170}],218:[function(_dereq_,module,exports){
 var baseGetTag = _dereq_('./_baseGetTag'),
     isObjectLike = _dereq_('./isObjectLike');
 
@@ -58338,7 +59497,7 @@ function isSymbol(value) {
 
 module.exports = isSymbol;
 
-},{"./_baseGetTag":71,"./isObjectLike":203}],207:[function(_dereq_,module,exports){
+},{"./_baseGetTag":73,"./isObjectLike":215}],219:[function(_dereq_,module,exports){
 var baseIsTypedArray = _dereq_('./_baseIsTypedArray'),
     baseUnary = _dereq_('./_baseUnary'),
     nodeUtil = _dereq_('./_nodeUtil');
@@ -58367,7 +59526,7 @@ var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedA
 
 module.exports = isTypedArray;
 
-},{"./_baseIsTypedArray":80,"./_baseUnary":96,"./_nodeUtil":161}],208:[function(_dereq_,module,exports){
+},{"./_baseIsTypedArray":84,"./_baseUnary":101,"./_nodeUtil":170}],220:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeys = _dereq_('./_baseKeys'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -58406,7 +59565,7 @@ function keys(object) {
 
 module.exports = keys;
 
-},{"./_arrayLikeKeys":53,"./_baseKeys":82,"./isArrayLike":190}],209:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":53,"./_baseKeys":86,"./isArrayLike":202}],221:[function(_dereq_,module,exports){
 var arrayLikeKeys = _dereq_('./_arrayLikeKeys'),
     baseKeysIn = _dereq_('./_baseKeysIn'),
     isArrayLike = _dereq_('./isArrayLike');
@@ -58440,7 +59599,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"./_arrayLikeKeys":53,"./_baseKeysIn":83,"./isArrayLike":190}],210:[function(_dereq_,module,exports){
+},{"./_arrayLikeKeys":53,"./_baseKeysIn":87,"./isArrayLike":202}],222:[function(_dereq_,module,exports){
 (function (global){
 /**
  * @license
@@ -75549,7 +76708,7 @@ module.exports = keysIn;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],211:[function(_dereq_,module,exports){
+},{}],223:[function(_dereq_,module,exports){
 var arrayMap = _dereq_('./_arrayMap'),
     baseIteratee = _dereq_('./_baseIteratee'),
     baseMap = _dereq_('./_baseMap'),
@@ -75604,7 +76763,7 @@ function map(collection, iteratee) {
 
 module.exports = map;
 
-},{"./_arrayMap":54,"./_baseIteratee":81,"./_baseMap":84,"./isArray":189}],212:[function(_dereq_,module,exports){
+},{"./_arrayMap":54,"./_baseIteratee":85,"./_baseMap":88,"./isArray":201}],224:[function(_dereq_,module,exports){
 var baseAssignValue = _dereq_('./_baseAssignValue'),
     baseForOwn = _dereq_('./_baseForOwn'),
     baseIteratee = _dereq_('./_baseIteratee');
@@ -75649,7 +76808,7 @@ function mapValues(object, iteratee) {
 
 module.exports = mapValues;
 
-},{"./_baseAssignValue":62,"./_baseForOwn":68,"./_baseIteratee":81}],213:[function(_dereq_,module,exports){
+},{"./_baseAssignValue":63,"./_baseForOwn":70,"./_baseIteratee":85}],225:[function(_dereq_,module,exports){
 var MapCache = _dereq_('./_MapCache');
 
 /** Error message constants. */
@@ -75724,7 +76883,7 @@ memoize.Cache = MapCache;
 
 module.exports = memoize;
 
-},{"./_MapCache":42}],214:[function(_dereq_,module,exports){
+},{"./_MapCache":42}],226:[function(_dereq_,module,exports){
 var baseMerge = _dereq_('./_baseMerge'),
     createAssigner = _dereq_('./_createAssigner');
 
@@ -75765,7 +76924,7 @@ var merge = createAssigner(function(object, source, srcIndex) {
 
 module.exports = merge;
 
-},{"./_baseMerge":87,"./_createAssigner":110}],215:[function(_dereq_,module,exports){
+},{"./_baseMerge":91,"./_createAssigner":118}],227:[function(_dereq_,module,exports){
 var baseProperty = _dereq_('./_baseProperty'),
     basePropertyDeep = _dereq_('./_basePropertyDeep'),
     isKey = _dereq_('./_isKey'),
@@ -75799,7 +76958,7 @@ function property(path) {
 
 module.exports = property;
 
-},{"./_baseProperty":89,"./_basePropertyDeep":90,"./_isKey":140,"./_toKey":178}],216:[function(_dereq_,module,exports){
+},{"./_baseProperty":93,"./_basePropertyDeep":94,"./_isKey":149,"./_toKey":189}],228:[function(_dereq_,module,exports){
 var baseSet = _dereq_('./_baseSet');
 
 /**
@@ -75836,7 +76995,7 @@ function set(object, path, value) {
 
 module.exports = set;
 
-},{"./_baseSet":92}],217:[function(_dereq_,module,exports){
+},{"./_baseSet":96}],229:[function(_dereq_,module,exports){
 /**
  * This method returns a new empty array.
  *
@@ -75861,7 +77020,7 @@ function stubArray() {
 
 module.exports = stubArray;
 
-},{}],218:[function(_dereq_,module,exports){
+},{}],230:[function(_dereq_,module,exports){
 /**
  * This method returns `false`.
  *
@@ -75881,7 +77040,7 @@ function stubFalse() {
 
 module.exports = stubFalse;
 
-},{}],219:[function(_dereq_,module,exports){
+},{}],231:[function(_dereq_,module,exports){
 var copyObject = _dereq_('./_copyObject'),
     keysIn = _dereq_('./keysIn');
 
@@ -75915,7 +77074,7 @@ function toPlainObject(value) {
 
 module.exports = toPlainObject;
 
-},{"./_copyObject":106,"./keysIn":209}],220:[function(_dereq_,module,exports){
+},{"./_copyObject":114,"./keysIn":221}],232:[function(_dereq_,module,exports){
 var baseToString = _dereq_('./_baseToString');
 
 /**
@@ -75945,7 +77104,58 @@ function toString(value) {
 
 module.exports = toString;
 
-},{"./_baseToString":95}],221:[function(_dereq_,module,exports){
+},{"./_baseToString":100}],233:[function(_dereq_,module,exports){
+var baseToString = _dereq_('./_baseToString'),
+    castSlice = _dereq_('./_castSlice'),
+    charsEndIndex = _dereq_('./_charsEndIndex'),
+    charsStartIndex = _dereq_('./_charsStartIndex'),
+    stringToArray = _dereq_('./_stringToArray'),
+    toString = _dereq_('./toString');
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/**
+ * Removes leading and trailing whitespace or specified characters from `string`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to trim.
+ * @param {string} [chars=whitespace] The characters to trim.
+ * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
+ * @returns {string} Returns the trimmed string.
+ * @example
+ *
+ * _.trim('  abc  ');
+ * // => 'abc'
+ *
+ * _.trim('-_-abc-_-', '_-');
+ * // => 'abc'
+ *
+ * _.map(['  foo  ', '  bar  '], _.trim);
+ * // => ['foo', 'bar']
+ */
+function trim(string, chars, guard) {
+  string = toString(string);
+  if (string && (guard || chars === undefined)) {
+    return string.replace(reTrim, '');
+  }
+  if (!string || !(chars = baseToString(chars))) {
+    return string;
+  }
+  var strSymbols = stringToArray(string),
+      chrSymbols = stringToArray(chars),
+      start = charsStartIndex(strSymbols, chrSymbols),
+      end = charsEndIndex(strSymbols, chrSymbols) + 1;
+
+  return castSlice(strSymbols, start, end).join('');
+}
+
+module.exports = trim;
+
+},{"./_baseToString":100,"./_castSlice":104,"./_charsEndIndex":105,"./_charsStartIndex":106,"./_stringToArray":187,"./toString":232}],234:[function(_dereq_,module,exports){
 //! moment.js
 
 ;(function (global, factory) {
@@ -80453,7 +81663,7 @@ module.exports = toString;
 
 })));
 
-},{}],222:[function(_dereq_,module,exports){
+},{}],235:[function(_dereq_,module,exports){
 (function (global,setImmediate){
 /*! Native Promise Only
     v0.8.1 (c) Kyle Simpson
@@ -80830,7 +82040,7 @@ module.exports = toString;
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},_dereq_("timers").setImmediate)
-},{"timers":230}],223:[function(_dereq_,module,exports){
+},{"timers":243}],236:[function(_dereq_,module,exports){
 /*
  * ngDialog - easy modals and popup windows
  * http://github.com/likeastore/ngDialog
@@ -81785,7 +82995,7 @@ module.exports = toString;
     return m;
 }));
 
-},{"angular":10}],224:[function(_dereq_,module,exports){
+},{"angular":10}],237:[function(_dereq_,module,exports){
 /**!
  * AngularJS file upload directives and services. Supports: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
@@ -84685,10 +85895,10 @@ ngFileUpload.service('UploadExif', ['UploadResize', '$q', function (UploadResize
 }]);
 
 
-},{}],225:[function(_dereq_,module,exports){
+},{}],238:[function(_dereq_,module,exports){
 _dereq_('./dist/ng-file-upload-all');
 module.exports = 'ngFileUpload';
-},{"./dist/ng-file-upload-all":224}],226:[function(_dereq_,module,exports){
+},{"./dist/ng-file-upload-all":237}],239:[function(_dereq_,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -84874,7 +86084,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],227:[function(_dereq_,module,exports){
+},{}],240:[function(_dereq_,module,exports){
 module.exports = function (obj) {
     if (!obj || typeof obj !== 'object') return obj;
     
@@ -84911,7 +86121,7 @@ var isArray = Array.isArray || function (xs) {
     return {}.toString.call(xs) === '[object Array]';
 };
 
-},{}],228:[function(_dereq_,module,exports){
+},{}],241:[function(_dereq_,module,exports){
 /*!
  * Signature Pad v2.3.2
  * https://github.com/szimek/signature_pad
@@ -85523,9 +86733,9 @@ return SignaturePad;
 
 })));
 
-},{}],229:[function(_dereq_,module,exports){
+},{}],242:[function(_dereq_,module,exports){
 !function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.textMaskAddons=t():e.textMaskAddons=t()}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var i=n[r]={exports:{},id:r,loaded:!1};return e[r].call(i.exports,i,i.exports,t),i.loaded=!0,i.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var i=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(i).default}});var o=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(o).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy",t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},n=t.minYear,o=void 0===n?1:n,u=t.maxYear,a=void 0===u?9999:u,c=e.split(/[^dmyHMS]+/).sort(function(e,t){return i.indexOf(e)-i.indexOf(t)});return function(t){var n=[],i={dd:31,mm:12,yy:99,yyyy:a,HH:23,MM:59,SS:59},u={dd:1,mm:1,yy:0,yyyy:o,HH:0,MM:0,SS:0},l=t.split("");c.forEach(function(t){var r=e.indexOf(t),o=parseInt(i[t].toString().substr(0,1),10);parseInt(l[r],10)>o&&(l[r+1]=l[r],l[r]=0,n.push(r))});var s=0,d=c.some(function(n){var c=e.indexOf(n),l=n.length,d=t.substr(c,l).replace(/\D/g,""),f=parseInt(d,10);"mm"===n&&(s=f||0);var p="dd"===n?r[s]:i[n];if("yyyy"===n&&(1!==o||9999!==a)){var v=parseInt(i[n].toString().substring(0,d.length),10),y=parseInt(u[n].toString().substring(0,d.length),10);return f<y||f>v}return f>p||d.length===l&&f<u[n]});return!d&&{value:l.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var r=[31,31,29,31,30,31,30,31,31,30,31,30,31],i=["yyyy","yy","mm","dd","HH","MM","SS"]},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:a,t=e.length;if(e===a||e[0]===g[0]&&1===t)return g.split(a).concat([v]).concat(h.split(a));if(e===P&&_)return g.split(a).concat(["0",P,v]).concat(h.split(a));var n=e[0]===s&&D;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),c=u!==-1,l=void 0,m=void 0,b=void 0;if(e.slice($*-1)===h&&(e=e.slice(0,$*-1)),c&&(_||I)?(l=e.slice(e.slice(0,N)===g?N:0,u),m=e.slice(u+1,t),m=r(m.replace(f,a))):l=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":o(L))===p){var O="."===S?"[.]":""+S,M=(l.match(new RegExp(O,"g"))||[]).length;l=l.slice(0,L+M*V)}return l=l.replace(f,a),R||(l=l.replace(/^0+(0$|[^0])/,"$1")),l=x?i(l,S):l,b=r(l),(c&&_||I===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),m&&(("undefined"==typeof C?"undefined":o(C))===p&&(m=m.slice(0,C)),b=b.concat(m)),I===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(a).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),h.length>0&&(b=b.concat(h.split(a))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,m=t.suffix,h=void 0===m?a:m,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,S=void 0===O?c:O,M=t.allowDecimal,_=void 0!==M&&M,j=t.decimalSymbol,P=void 0===j?l:j,w=t.decimalLimit,C=void 0===w?2:w,H=t.requireDecimal,I=void 0!==H&&H,k=t.allowNegative,D=void 0!==k&&k,E=t.allowLeadingZeroes,R=void 0!==E&&E,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=h&&h.length||0,V=S&&S.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(a).map(function(e){return v.test(e)?v:e})}function i(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",a="",c=",",l=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function i(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,i=e.indexOf(y),s=e.lastIndexOf(p),d=s<i?-1:s,f=o(e,i+1,y),g=o(e,d-1,p),m=u(e,i,n),h=a(e,i,d,n),b=c(e,d,n,r);m=l(m),h=l(h),b=l(b,!0);var x=m.concat(f).concat(h).concat(g).concat(b);return x}function o(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function a(e,t,n,r){var i=v;return t!==-1&&(i=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),i=i.replace(new RegExp("[\\s"+r+"]",h),v),i===y?f:i.length<1?m:i[i.length-1]===p?i.slice(0,i.length-1):i}function c(e,t,n,r){var i=v;return t!==-1&&(i=e.slice(t+1,e.length)),i=i.replace(new RegExp("[\\s"+n+".]",h),v),0===i.length?e[t-1]===p&&r!==e.length?f:v:i}function l(e,t){return e.split(v).map(function(e){return e===m?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",m=" ",h="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:i,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,o=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(a),g=null===o.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(l)!==-1||y!==-1&&n!==y+1||o.indexOf(i)===-1&&f!==u&&o.indexOf(c)!==-1)return!1;var m=v.indexOf(i),h=v.slice(m+1,v.length);return(h.match(d)||s).length>1&&v.substr(-1)===c&&n!==o.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(o,function(){return t++,1===t?i:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var i="@",o=/@/g,u="",a="@.",c=".",l="..",s=[],d=/\./g}])});
-},{}],230:[function(_dereq_,module,exports){
+},{}],243:[function(_dereq_,module,exports){
 (function (setImmediate,clearImmediate){
 var nextTick = _dereq_('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -85604,7 +86814,7 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
   delete immediateIds[id];
 };
 }).call(this,_dereq_("timers").setImmediate,_dereq_("timers").clearImmediate)
-},{"process/browser.js":226,"timers":230}],231:[function(_dereq_,module,exports){
+},{"process/browser.js":239,"timers":243}],244:[function(_dereq_,module,exports){
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
@@ -88032,9 +89242,9 @@ $templateCache.put("selectize/match.tpl.html","<div ng-hide=\"$select.searchEnab
 $templateCache.put("selectize/no-choice.tpl.html","<div class=\"ui-select-no-choice selectize-dropdown\" ng-show=\"$select.items.length == 0\"><div class=\"selectize-dropdown-content\"><div data-selectable=\"\" ng-transclude=\"\"></div></div></div>");
 $templateCache.put("selectize/select-multiple.tpl.html","<div class=\"ui-select-container selectize-control multi plugin-remove_button\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" placeholder=\"{{$selectMultiple.getPlaceholder()}}\" ng-model=\"$select.search\" ng-disabled=\"$select.disabled\" aria-expanded=\"{{$select.open}}\" aria-label=\"{{ $select.baseTitle }}\" ondrop=\"return false;\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");
 $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container selectize-control single\" ng-class=\"{\'open\': $select.open}\"><div class=\"selectize-input\" ng-class=\"{\'focus\': $select.open, \'disabled\': $select.disabled, \'selectize-focus\' : $select.focus}\" ng-click=\"$select.open && !$select.searchEnabled ? $select.toggle($event) : $select.activate()\"><div class=\"ui-select-match\"></div><input type=\"search\" autocomplete=\"off\" tabindex=\"-1\" class=\"ui-select-search ui-select-toggle\" ng-class=\"{\'ui-select-search-hidden\':!$select.searchEnabled}\" ng-click=\"$select.toggle($event)\" placeholder=\"{{$select.placeholder}}\" ng-model=\"$select.search\" ng-hide=\"!$select.isEmpty() && !$select.open\" ng-disabled=\"$select.disabled\" aria-label=\"{{ $select.baseTitle }}\"></div><div class=\"ui-select-choices\"></div><div class=\"ui-select-no-choice\"></div></div>");}]);
-},{}],232:[function(_dereq_,module,exports){
+},{}],245:[function(_dereq_,module,exports){
 !function(e,r){"object"==typeof exports&&"object"==typeof module?module.exports=r():"function"==typeof define&&define.amd?define([],r):"object"==typeof exports?exports.vanillaTextMask=r():e.vanillaTextMask=r()}(this,function(){return function(e){function r(n){if(t[n])return t[n].exports;var o=t[n]={exports:{},id:n,loaded:!1};return e[n].call(o.exports,o,o.exports,r),o.loaded=!0,o.exports}var t={};return r.m=e,r.c=t,r.p="",r(0)}([function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r=e.inputElement,t=(0,u.default)(e),n=function(e){var r=e.target.value;return t.update(r)};return r.addEventListener("input",n),t.update(r.value),{textMaskInputElement:t,destroy:function(){r.removeEventListener("input",n)}}}Object.defineProperty(r,"__esModule",{value:!0}),r.conformToMask=void 0,r.maskInput=o;var i=t(2);Object.defineProperty(r,"conformToMask",{enumerable:!0,get:function(){return n(i).default}});var a=t(5),u=n(a);r.default=o},function(e,r){"use strict";Object.defineProperty(r,"__esModule",{value:!0}),r.placeholderChar="_",r.strFunction="function"},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:l,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:u,t=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};if(!(0,i.isArray)(r)){if(("undefined"==typeof r?"undefined":o(r))!==a.strFunction)throw new Error("Text-mask:conformToMask; The mask property must be an array.");r=r(e,t),r=(0,i.processCaretTraps)(r).maskWithoutCaretTraps}var n=t.guide,s=void 0===n||n,f=t.previousConformedValue,d=void 0===f?l:f,c=t.placeholderChar,p=void 0===c?a.placeholderChar:c,v=t.placeholder,h=void 0===v?(0,i.convertMaskToPlaceholder)(r,p):v,m=t.currentCaretPosition,y=t.keepCharPositions,g=s===!1&&void 0!==d,b=e.length,C=d.length,k=h.length,x=r.length,P=b-C,T=P>0,O=m+(T?-P:0),M=O+Math.abs(P);if(y===!0&&!T){for(var w=l,S=O;S<M;S++)h[S]===p&&(w+=p);e=e.slice(0,O)+w+e.slice(O,b)}for(var _=e.split(l).map(function(e,r){return{char:e,isNew:r>=O&&r<M}}),j=b-1;j>=0;j--){var V=_[j].char;if(V!==p){var A=j>=O&&C===x;V===h[A?j-P:j]&&_.splice(j,1)}}var E=l,N=!1;e:for(var F=0;F<k;F++){var I=h[F];if(I===p){if(_.length>0)for(;_.length>0;){var L=_.shift(),R=L.char,J=L.isNew;if(R===p&&g!==!0){E+=p;continue e}if(r[F].test(R)){if(y===!0&&J!==!1&&d!==l&&s!==!1&&T){for(var W=_.length,q=null,z=0;z<W;z++){var B=_[z];if(B.char!==p&&B.isNew===!1)break;if(B.char===p){q=z;break}}null!==q?(E+=R,_.splice(q,1)):F--}else E+=R;continue e}N=!0}g===!1&&(E+=h.substr(F,k));break}E+=I}if(g&&T===!1){for(var D=null,G=0;G<E.length;G++)h[G]===p&&(D=G);E=null!==D?E.substr(0,D+1):l}return{conformedValue:E,meta:{someCharsRejected:N}}}Object.defineProperty(r,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=n;var i=t(3),a=t(1),u=[],l=""},function(e,r,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:s,r=arguments.length>1&&void 0!==arguments[1]?arguments[1]:l.placeholderChar;if(!o(e))throw new Error("Text-mask:convertMaskToPlaceholder; The mask property must be an array.");if(e.indexOf(r)!==-1)throw new Error("Placeholder character must not be used as part of the mask. Please specify a character that is not present in your mask as your placeholder character.\n\n"+("The placeholder character that was received is: "+JSON.stringify(r)+"\n\n")+("The mask that was received is: "+JSON.stringify(e)));return e.map(function(e){return e instanceof RegExp?r:e}).join("")}function o(e){return Array.isArray&&Array.isArray(e)||e instanceof Array}function i(e){return"string"==typeof e||e instanceof String}function a(e){return"number"==typeof e&&void 0===e.length&&!isNaN(e)}function u(e){for(var r=[],t=void 0;t=e.indexOf(f),t!==-1;)r.push(t),e.splice(t,1);return{maskWithoutCaretTraps:e,indexes:r}}Object.defineProperty(r,"__esModule",{value:!0}),r.convertMaskToPlaceholder=n,r.isArray=o,r.isString=i,r.isNumber=a,r.processCaretTraps=u;var l=t(1),s=[],f="[]"},function(e,r){"use strict";function t(e){var r=e.previousConformedValue,t=void 0===r?o:r,i=e.previousPlaceholder,a=void 0===i?o:i,u=e.currentCaretPosition,l=void 0===u?0:u,s=e.conformedValue,f=e.rawValue,d=e.placeholderChar,c=e.placeholder,p=e.indexesOfPipedChars,v=void 0===p?n:p,h=e.caretTrapIndexes,m=void 0===h?n:h;if(0===l||!f.length)return 0;var y=f.length,g=t.length,b=c.length,C=s.length,k=y-g,x=k>0,P=0===g,T=k>1&&!x&&!P;if(T)return l;var O=x&&(t===s||s===c),M=0,w=void 0,S=void 0;if(O)M=l-k;else{var _=s.toLowerCase(),j=f.toLowerCase(),V=j.substr(0,l).split(o),A=V.filter(function(e){return _.indexOf(e)!==-1});S=A[A.length-1];var E=a.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,N=c.substr(0,A.length).split(o).filter(function(e){return e!==d}).length,F=N!==E,I=void 0!==a[A.length-1]&&void 0!==c[A.length-2]&&a[A.length-1]!==d&&a[A.length-1]!==c[A.length-1]&&a[A.length-1]===c[A.length-2];!x&&(F||I)&&E>0&&c.indexOf(S)>-1&&void 0!==f[l]&&(w=!0,S=f[l]);for(var L=v.map(function(e){return _[e]}),R=L.filter(function(e){return e===S}).length,J=A.filter(function(e){return e===S}).length,W=c.substr(0,c.indexOf(d)).split(o).filter(function(e,r){return e===S&&f[r]!==e}).length,q=W+J+R+(w?1:0),z=0,B=0;B<C;B++){var D=_[B];if(M=B+1,D===S&&z++,z>=q)break}}if(x){for(var G=M,H=M;H<=b;H++)if(c[H]===d&&(G=H),c[H]===d||m.indexOf(H)!==-1||H===b)return G}else if(w){for(var K=M-1;K>=0;K--)if(s[K]===S||m.indexOf(K)!==-1||0===K)return K}else for(var Q=M;Q>=0;Q--)if(c[Q-1]===d||m.indexOf(Q)!==-1||0===Q)return Q}Object.defineProperty(r,"__esModule",{value:!0}),r.default=t;var n=[],o=""},function(e,r,t){"use strict";function n(e){return e&&e.__esModule?e:{default:e}}function o(e){var r={previousConformedValue:void 0,previousPlaceholder:void 0};return{state:r,update:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:e,o=n.inputElement,s=n.mask,d=n.guide,m=n.pipe,g=n.placeholderChar,b=void 0===g?v.placeholderChar:g,C=n.keepCharPositions,k=void 0!==C&&C,x=n.showMask,P=void 0!==x&&x;if("undefined"==typeof t&&(t=o.value),t!==r.previousConformedValue){("undefined"==typeof s?"undefined":l(s))===y&&void 0!==s.pipe&&void 0!==s.mask&&(m=s.pipe,s=s.mask);var T=void 0,O=void 0;if(s instanceof Array&&(T=(0,p.convertMaskToPlaceholder)(s,b)),s!==!1){var M=a(t),w=o.selectionEnd,S=r.previousConformedValue,_=r.previousPlaceholder,j=void 0;if(("undefined"==typeof s?"undefined":l(s))===v.strFunction){if(O=s(M,{currentCaretPosition:w,previousConformedValue:S,placeholderChar:b}),O===!1)return;var V=(0,p.processCaretTraps)(O),A=V.maskWithoutCaretTraps,E=V.indexes;O=A,j=E,T=(0,p.convertMaskToPlaceholder)(O,b)}else O=s;var N={previousConformedValue:S,guide:d,placeholderChar:b,pipe:m,placeholder:T,currentCaretPosition:w,keepCharPositions:k},F=(0,c.default)(M,O,N),I=F.conformedValue,L=("undefined"==typeof m?"undefined":l(m))===v.strFunction,R={};L&&(R=m(I,u({rawValue:M},N)),R===!1?R={value:S,rejected:!0}:(0,p.isString)(R)&&(R={value:R}));var J=L?R.value:I,W=(0,f.default)({previousConformedValue:S,previousPlaceholder:_,conformedValue:J,placeholder:T,rawValue:M,currentCaretPosition:w,placeholderChar:b,indexesOfPipedChars:R.indexesOfPipedChars,caretTrapIndexes:j}),q=J===T&&0===W,z=P?T:h,B=q?z:J;r.previousConformedValue=B,r.previousPlaceholder=T,o.value!==B&&(o.value=B,i(o,W))}}}}}function i(e,r){document.activeElement===e&&(g?b(function(){return e.setSelectionRange(r,r,m)},0):e.setSelectionRange(r,r,m))}function a(e){if((0,p.isString)(e))return e;if((0,p.isNumber)(e))return String(e);if(void 0===e||null===e)return h;throw new Error("The 'value' provided to Text Mask needs to be a string or a number. The value received was:\n\n "+JSON.stringify(e))}Object.defineProperty(r,"__esModule",{value:!0});var u=Object.assign||function(e){for(var r=1;r<arguments.length;r++){var t=arguments[r];for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&(e[n]=t[n])}return e},l="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};r.default=o;var s=t(4),f=n(s),d=t(2),c=n(d),p=t(3),v=t(1),h="",m="none",y="object",g="undefined"!=typeof navigator&&/Android/i.test(navigator.userAgent),b="undefined"!=typeof requestAnimationFrame?requestAnimationFrame:setTimeout}])});
-},{}],233:[function(_dereq_,module,exports){
+},{}],246:[function(_dereq_,module,exports){
 (function(self) {
   'use strict';
 
@@ -88502,7 +89712,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
   self.fetch.polyfill = true
 })(typeof self !== 'undefined' ? self : this);
 
-},{}],234:[function(_dereq_,module,exports){
+},{}],247:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -88610,7 +89820,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],235:[function(_dereq_,module,exports){
+},{}],248:[function(_dereq_,module,exports){
 "use strict";
 
 var _merge = _dereq_('lodash/merge');
@@ -88851,7 +90061,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/merge":214}],236:[function(_dereq_,module,exports){
+},{"lodash/merge":226}],249:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -88935,7 +90145,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],237:[function(_dereq_,module,exports){
+},{}],250:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -89029,7 +90239,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],238:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],251:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.provider('formioComponents', function() {
@@ -89101,7 +90311,7 @@ module.exports = function(app) {
   }]);
 };
 
-},{}],239:[function(_dereq_,module,exports){
+},{}],252:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -89173,7 +90383,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],240:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],253:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -89202,7 +90412,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],241:[function(_dereq_,module,exports){
+},{}],254:[function(_dereq_,module,exports){
 "use strict";
 
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -89290,7 +90500,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":185,"lodash/isNil":200,"text-mask-addons":229}],242:[function(_dereq_,module,exports){
+},{"lodash/get":197,"lodash/isNil":212,"text-mask-addons":242}],255:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -89318,7 +90528,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],243:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],256:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils').default;
@@ -89352,7 +90562,7 @@ module.exports = function(app) {
                 : {};
               if (info.tableView) {
                 // Reset the tableChild value for datagrids, so that components have headers.
-                view += '<td>' + info.tableView(row[component.key] || '', {
+                view += '<td>' + info.tableView((row && row[component.key]) || '', {
                   component: component,
                   $interpolate: options.$interpolate,
                   componentInfo: options.componentInfo,
@@ -89365,7 +90575,7 @@ module.exports = function(app) {
                 if (component.prefix) {
                   view += component.prefix;
                 }
-                view += row[component.key] || '';
+                view += (row && row[component.key]) || '';
                 if (component.suffix) {
                   view += ' ' + component.suffix;
                 }
@@ -89455,7 +90665,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":34}],244:[function(_dereq_,module,exports){
+},{"formiojs/utils":34}],257:[function(_dereq_,module,exports){
 "use strict";
 
 var _get = _dereq_('lodash/get');
@@ -89573,7 +90783,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":185}],245:[function(_dereq_,module,exports){
+},{"lodash/get":197}],258:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -89825,7 +91035,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],246:[function(_dereq_,module,exports){
+},{}],259:[function(_dereq_,module,exports){
 "use strict";
 
 var formioUtils = _dereq_('formiojs/utils').default;
@@ -89854,7 +91064,7 @@ module.exports = function(app) {
             view += '<tr>';
             formioUtils.eachComponent(options.component.components, function(component) {
               // Don't render disabled fields, or fields with undefined data.
-              if (!component.tableView || row[component.key] === undefined) {
+              if (!component.tableView || !row || row[component.key] === undefined) {
                 return;
               }
 
@@ -89864,7 +91074,7 @@ module.exports = function(app) {
                 : {};
               if (info.tableView) {
                 // Reset the tableChild value for datagrids, so that components have headers.
-                view += '<td>' + info.tableView(row[component.key] || '', {
+                view += '<td>' + info.tableView((row && row[component.key]) || '', {
                   component: component,
                   $interpolate: options.$interpolate,
                   componentInfo: options.componentInfo,
@@ -89877,7 +91087,7 @@ module.exports = function(app) {
                 if (component.prefix) {
                   view += component.prefix;
                 }
-                view += row[component.key] || '';
+                view += (row && row[component.key]) || '';
                 if (component.suffix) {
                   view += ' ' + component.suffix;
                 }
@@ -90251,7 +91461,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"formiojs/utils":34}],247:[function(_dereq_,module,exports){
+},{"formiojs/utils":34}],260:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -90286,7 +91496,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],248:[function(_dereq_,module,exports){
+},{}],261:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -90348,7 +91558,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],249:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],262:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -90693,7 +91903,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],250:[function(_dereq_,module,exports){
+},{}],263:[function(_dereq_,module,exports){
 "use strict";
 
 var isEmpty = _dereq_('lodash/isEmpty');
@@ -90883,7 +92093,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288,"lodash/isEmpty":193}],251:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301,"lodash/isEmpty":205}],264:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -90919,7 +92129,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],252:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],265:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -91013,7 +92223,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],253:[function(_dereq_,module,exports){
+},{}],266:[function(_dereq_,module,exports){
 "use strict";
 var app = angular.module('formio');
 
@@ -91058,7 +92268,7 @@ _dereq_('./panel')(app);
 _dereq_('./table')(app);
 _dereq_('./well')(app);
 
-},{"./address":234,"./button":235,"./checkbox":236,"./columns":237,"./components":238,"./container":239,"./content":240,"./currency":241,"./custom":242,"./datagrid":243,"./datetime":244,"./day":245,"./editgrid":246,"./email":247,"./fieldset":248,"./file":249,"./form":250,"./hidden":251,"./htmlelement":252,"./number":254,"./page":255,"./panel":256,"./password":257,"./phonenumber":258,"./radio":259,"./resource":260,"./select":261,"./selectboxes":262,"./signature":263,"./survey":264,"./table":265,"./textarea":266,"./textfield":267,"./time":268,"./well":269}],254:[function(_dereq_,module,exports){
+},{"./address":247,"./button":248,"./checkbox":249,"./columns":250,"./components":251,"./container":252,"./content":253,"./currency":254,"./custom":255,"./datagrid":256,"./datetime":257,"./day":258,"./editgrid":259,"./email":260,"./fieldset":261,"./file":262,"./form":263,"./hidden":264,"./htmlelement":265,"./number":267,"./page":268,"./panel":269,"./password":270,"./phonenumber":271,"./radio":272,"./resource":273,"./select":274,"./selectboxes":275,"./signature":276,"./survey":277,"./table":278,"./textarea":279,"./textfield":280,"./time":281,"./well":282}],267:[function(_dereq_,module,exports){
 "use strict";
 
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -91155,7 +92365,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/get":185,"lodash/isNil":200,"text-mask-addons":229}],255:[function(_dereq_,module,exports){
+},{"lodash/get":197,"lodash/isNil":212,"text-mask-addons":242}],268:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -91182,7 +92392,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],256:[function(_dereq_,module,exports){
+},{}],269:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -91245,7 +92455,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],257:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],270:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -91277,7 +92487,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],258:[function(_dereq_,module,exports){
+},{}],271:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function(app) {
   app.config([
@@ -91314,7 +92524,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],259:[function(_dereq_,module,exports){
+},{}],272:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -91367,7 +92577,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],260:[function(_dereq_,module,exports){
+},{}],273:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -91617,7 +92827,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],261:[function(_dereq_,module,exports){
+},{}],274:[function(_dereq_,module,exports){
 "use strict";
 /*eslint max-depth: ["error", 6]*/
 
@@ -92232,7 +93442,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"lodash/assign":180,"lodash/cloneDeep":181,"lodash/get":185,"lodash/isEqual":194,"lodash/isNil":200,"lodash/mapValues":212,"lodash/set":216}],262:[function(_dereq_,module,exports){
+},{"lodash/assign":192,"lodash/cloneDeep":193,"lodash/get":197,"lodash/isEqual":206,"lodash/isNil":212,"lodash/mapValues":224,"lodash/set":228}],275:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -92358,7 +93568,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],263:[function(_dereq_,module,exports){
+},{}],276:[function(_dereq_,module,exports){
 "use strict";
 
 var SignaturePad = _dereq_('signature_pad');
@@ -92500,7 +93710,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"signature_pad":228}],264:[function(_dereq_,module,exports){
+},{"signature_pad":241}],277:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -92561,7 +93771,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],265:[function(_dereq_,module,exports){
+},{}],278:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -92647,7 +93857,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],266:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],279:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function(app) {
@@ -92788,7 +93998,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],267:[function(_dereq_,module,exports){
+},{}],280:[function(_dereq_,module,exports){
 "use strict";
 
 
@@ -92851,7 +94061,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{}],268:[function(_dereq_,module,exports){
+},{}],281:[function(_dereq_,module,exports){
 "use strict";
 
 var moment = _dereq_('moment');
@@ -92924,7 +94134,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"moment":221}],269:[function(_dereq_,module,exports){
+},{"moment":234}],282:[function(_dereq_,module,exports){
 "use strict";
 
 var GridUtils = _dereq_('../factories/GridUtils')();
@@ -92984,7 +94194,7 @@ module.exports = function(app) {
   ]);
 };
 
-},{"../factories/GridUtils":288}],270:[function(_dereq_,module,exports){
+},{"../factories/GridUtils":301}],283:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -93062,7 +94272,7 @@ module.exports = function() {
   };
 };
 
-},{}],271:[function(_dereq_,module,exports){
+},{}],284:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -93629,7 +94839,7 @@ module.exports = function() {
   };
 };
 
-},{}],272:[function(_dereq_,module,exports){
+},{}],285:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile) {
   return {
@@ -93646,7 +94856,7 @@ module.exports = ['$sce', '$parse', '$compile', function($sce, $parse, $compile)
   };
 }];
 
-},{}],273:[function(_dereq_,module,exports){
+},{}],286:[function(_dereq_,module,exports){
 "use strict";
 var _get = _dereq_('lodash/get');
 var moment = _dereq_('moment');
@@ -94021,7 +95231,7 @@ module.exports = [
   }
 ];
 
-},{"lodash/get":185,"moment":221}],274:[function(_dereq_,module,exports){
+},{"lodash/get":197,"moment":234}],287:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94037,7 +95247,7 @@ module.exports = function() {
   };
 };
 
-},{}],275:[function(_dereq_,module,exports){
+},{}],288:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioComponents',
@@ -94110,7 +95320,7 @@ module.exports = [
   }
 ];
 
-},{}],276:[function(_dereq_,module,exports){
+},{}],289:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94195,7 +95405,7 @@ module.exports = function() {
   };
 };
 
-},{}],277:[function(_dereq_,module,exports){
+},{}],290:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$compile',
@@ -94214,7 +95424,7 @@ module.exports = [
   }
 ];
 
-},{}],278:[function(_dereq_,module,exports){
+},{}],291:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94224,7 +95434,7 @@ module.exports = function() {
   };
 };
 
-},{}],279:[function(_dereq_,module,exports){
+},{}],292:[function(_dereq_,module,exports){
 "use strict";
 var maskInput = _dereq_('vanilla-text-mask').default;
 var createNumberMask = _dereq_('text-mask-addons').createNumberMask;
@@ -94409,7 +95619,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"formiojs/utils":34,"lodash":210,"text-mask-addons":229,"vanilla-text-mask":232}],280:[function(_dereq_,module,exports){
+},{"formiojs/utils":34,"lodash":222,"text-mask-addons":242,"vanilla-text-mask":245}],293:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94436,7 +95646,7 @@ module.exports = function() {
     }
   };
 };
-},{}],281:[function(_dereq_,module,exports){
+},{}],294:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94464,7 +95674,7 @@ module.exports = function() {
   };
 };
 
-},{}],282:[function(_dereq_,module,exports){
+},{}],295:[function(_dereq_,module,exports){
 "use strict";
 var _map = _dereq_('lodash/map');
 // Javascript editor directive
@@ -94540,7 +95750,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
   };
 }];
 
-},{"lodash/map":211}],283:[function(_dereq_,module,exports){
+},{"lodash/map":223}],296:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94572,7 +95782,7 @@ module.exports = function() {
   };
 };
 
-},{}],284:[function(_dereq_,module,exports){
+},{}],297:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   return {
@@ -94628,7 +95838,7 @@ module.exports = function() {
   };
 };
 
-},{}],285:[function(_dereq_,module,exports){
+},{}],298:[function(_dereq_,module,exports){
 "use strict";
 var isNaN = _dereq_('lodash/isNaN');
 var isFinite = _dereq_('lodash/isFinite');
@@ -95270,7 +96480,7 @@ module.exports = function() {
   };
 };
 
-},{"lodash/isEmpty":193,"lodash/isFinite":195,"lodash/isNaN":199}],286:[function(_dereq_,module,exports){
+},{"lodash/isEmpty":205,"lodash/isFinite":207,"lodash/isNaN":211}],299:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -95467,7 +96677,7 @@ module.exports = [
   }
 ];
 
-},{}],287:[function(_dereq_,module,exports){
+},{}],300:[function(_dereq_,module,exports){
 "use strict";
 var formioUtils = _dereq_('formiojs/utils').default;
 var conformToMask = _dereq_('vanilla-text-mask').conformToMask;
@@ -95959,7 +97169,7 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/utils":34,"lodash/filter":184,"lodash/get":185,"vanilla-text-mask":232}],288:[function(_dereq_,module,exports){
+},{"formiojs/utils":34,"lodash/filter":196,"lodash/get":197,"vanilla-text-mask":245}],301:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   var generic = function(data, options) {
@@ -96086,7 +97296,7 @@ module.exports = function() {
   };
 };
 
-},{}],289:[function(_dereq_,module,exports){
+},{}],302:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$q',
@@ -96135,7 +97345,7 @@ module.exports = [
   }
 ];
 
-},{}],290:[function(_dereq_,module,exports){
+},{}],303:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'Formio',
@@ -96181,7 +97391,7 @@ module.exports = [
   }
 ];
 
-},{}],291:[function(_dereq_,module,exports){
+},{}],304:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -96190,7 +97400,7 @@ module.exports = [
   }
 ];
 
-},{}],292:[function(_dereq_,module,exports){
+},{}],305:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$sce',
@@ -96203,7 +97413,7 @@ module.exports = [
   }
 ];
 
-},{}],293:[function(_dereq_,module,exports){
+},{}],306:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
     return function(label, shortcut) {
@@ -96225,7 +97435,7 @@ module.exports = function() {
     };
   }
   
-},{}],294:[function(_dereq_,module,exports){
+},{}],307:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   function() {
@@ -96244,7 +97454,7 @@ module.exports = [
   }
 ];
 
-},{}],295:[function(_dereq_,module,exports){
+},{}],308:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'formioTableView',
@@ -96257,7 +97467,7 @@ module.exports = [
   }
 ];
 
-},{}],296:[function(_dereq_,module,exports){
+},{}],309:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   'FormioUtils',
@@ -96272,7 +97482,7 @@ module.exports = [
   }
 ];
 
-},{}],297:[function(_dereq_,module,exports){
+},{}],310:[function(_dereq_,module,exports){
 "use strict";
 module.exports = [
   '$filter',
@@ -96329,7 +97539,7 @@ module.exports = [
   }
 ];
 
-},{}],298:[function(_dereq_,module,exports){
+},{}],311:[function(_dereq_,module,exports){
 "use strict";
 module.exports = ['$sce', function($sce) {
   return function(val) {
@@ -96337,7 +97547,7 @@ module.exports = ['$sce', function($sce) {
   };
 }];
 
-},{}],299:[function(_dereq_,module,exports){
+},{}],312:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('ui-select/dist/select');
 _dereq_('angular-moment');
@@ -96352,7 +97562,7 @@ _dereq_('ng-dialog');
 _dereq_('angular-ui-ace/src/ui-ace');
 _dereq_('./formio');
 
-},{"./formio":300,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"ng-dialog":223,"ng-file-upload":225,"ui-select/dist/select":231}],300:[function(_dereq_,module,exports){
+},{"./formio":313,"angular-ckeditor":1,"angular-file-saver":2,"angular-moment":3,"angular-sanitize":5,"angular-ui-ace/src/ui-ace":6,"angular-ui-bootstrap":8,"bootstrap":12,"bootstrap-ui-datetime-picker/dist/datetime-picker":11,"ng-dialog":236,"ng-file-upload":238,"ui-select/dist/select":244}],313:[function(_dereq_,module,exports){
 "use strict";
 _dereq_('./polyfills/polyfills');
 
@@ -96516,7 +97726,7 @@ app.run([
 
 _dereq_('./components');
 
-},{"./components":253,"./directives/customValidator":270,"./directives/formio":271,"./directives/formioBindHtml.js":272,"./directives/formioComponent":273,"./directives/formioComponentTooltip":274,"./directives/formioComponentView":275,"./directives/formioDelete":276,"./directives/formioElement":277,"./directives/formioErrors":278,"./directives/formioMask":279,"./directives/formioMax":280,"./directives/formioMin":281,"./directives/formioScriptEditor":282,"./directives/formioSubmission":283,"./directives/formioSubmissions":284,"./directives/formioWizard":285,"./factories/FormioScope":286,"./factories/FormioUtils":287,"./factories/formioInterceptor":289,"./factories/formioTableView":290,"./filters/flattenComponents":291,"./filters/safehtml":292,"./filters/shortcut":293,"./filters/tableComponents":294,"./filters/tableFieldView":295,"./filters/tableView":296,"./filters/translate":297,"./filters/trusturl":298,"./polyfills/polyfills":302,"./providers/Formio":303}],301:[function(_dereq_,module,exports){
+},{"./components":266,"./directives/customValidator":283,"./directives/formio":284,"./directives/formioBindHtml.js":285,"./directives/formioComponent":286,"./directives/formioComponentTooltip":287,"./directives/formioComponentView":288,"./directives/formioDelete":289,"./directives/formioElement":290,"./directives/formioErrors":291,"./directives/formioMask":292,"./directives/formioMax":293,"./directives/formioMin":294,"./directives/formioScriptEditor":295,"./directives/formioSubmission":296,"./directives/formioSubmissions":297,"./directives/formioWizard":298,"./factories/FormioScope":299,"./factories/FormioUtils":300,"./factories/formioInterceptor":302,"./factories/formioTableView":303,"./filters/flattenComponents":304,"./filters/safehtml":305,"./filters/shortcut":306,"./filters/tableComponents":307,"./filters/tableFieldView":308,"./filters/tableView":309,"./filters/translate":310,"./filters/trusturl":311,"./polyfills/polyfills":315,"./providers/Formio":316}],314:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
@@ -96547,13 +97757,13 @@ if (typeof Object.assign != 'function') {
   })();
 }
 
-},{}],302:[function(_dereq_,module,exports){
+},{}],315:[function(_dereq_,module,exports){
 "use strict";
 'use strict';
 
 _dereq_('./Object.assign');
 
-},{"./Object.assign":301}],303:[function(_dereq_,module,exports){
+},{"./Object.assign":314}],316:[function(_dereq_,module,exports){
 "use strict";
 module.exports = function() {
   // The formio class.
@@ -96634,5 +97844,5 @@ module.exports = function() {
   };
 };
 
-},{"formiojs/Formio":27}]},{},[299])(299)
+},{"formiojs/Formio":27}]},{},[312])(312)
 });
