@@ -39,17 +39,7 @@ docker run -itd \
           <label for="pdfserver">PDF Server URL</label>
           <input type="text" class="form-control" id="pdfserver" ng-model="currentProject.settings.pdfserver" placeholder="https://files.form.io" />
         </div>
-        <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
-      </div>
-    </div>
-    <div class="panel panel-default" ng-if="currentProject.settings.pdfserver">
-      <div class="panel-heading">Project PDF Token</div>
-      <div class="panel-body">
-        <div class="form-group">
-          <p>If your Remote server has trouble with Unauthorized requests, then it may be because the following PDF Token does not match the one above. If this is the case, then please send an email to <strong>support@form.io</strong> and we will resolve the issue.</p>
-          <label for="pdfserver">Project PDF Token</label>
-          <input readonly type="text" class="form-control" id="filetoken" ng-model="currentProject.settings.filetoken" />
-        </div>
+        <button class="btn btn-primary" ng-click="savePDFProject()">Save Settings</button>
       </div>
     </div>
   </div>

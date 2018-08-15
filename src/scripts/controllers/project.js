@@ -68,7 +68,7 @@ app.directive('uniqueChecker', ['$http', '$q', 'Formio', function($http, $q, For
           return $q.reject();
         }
 
-        return $http.post(Formio.getBaseUrl() + $scope.url, req)
+        return $http.post($scope.url, req)
           .then(function(response) {
             if(!response.data.available) {
               return $q.reject('unavailable');
@@ -326,14 +326,18 @@ app.controller('ProjectController', [
         return;
       }
 
-      // If the remote project name changes, be sure to update the link as well.
+      // If the remote project name or title changes, be sure to update the link as well.
       if(($scope.localProject.hasOwnProperty('remote') &&
           $scope.localProject.remote &&
         $scope.localProject.remote.hasOwnProperty('project')) &&
         $scope.localProject._id !== $scope.currentProject._id &&
         $scope.localProject.remote.project._id === project._id &&
-        $scope.localProject.remote.project.name !== project.name
+        (
+          $scope.localProject.remote.project.name !== project.name ||
+          $scope.localProject.title !== project.title
+        )
       ) {
+        $scope.localProject.title = project.title;
         $scope.localProject.remote.project.name = project.name;
         $scope.localFormio.saveProject($scope.localProject);
       }
@@ -393,12 +397,12 @@ app.controller('ProjectController', [
         $scope.formio = new Formio($scope.projectUrl, {
           base: $scope.localProject.remote.url
         });
-        formioReady.resolve($scope.formio);
         promiseResult = $http({
           method: 'GET',
           url: $scope.localProjectUrl + '/access/remote'
         })
           .then(function(response) {
+            RemoteTokens.setRemoteToken($scope.baseUrl, response.data);
             RemoteTokens.setRemoteToken($scope.projectUrl, response.data);
             // Set remote token for projectId url as well.
             RemoteTokens.setRemoteToken($scope.projectUrl.replace($scope.localProject.remote.project.name, 'project/' + $scope.localProject.remote.project._id), response.data);
@@ -409,6 +413,7 @@ app.controller('ProjectController', [
               .then(function(currentProject) {
                 $scope.currentProject = currentProject;
                 $scope.loadRoles();
+                formioReady.resolve($scope.formio);
                 return currentProject;
               });
           });
@@ -2259,7 +2264,7 @@ app.controller('ProjectRemoteController', [
                   if (result && result.data && result.data.version && semver.satisfies(result.data.version.split('-')[0], '>=5.0.0')) {
                     $http({
                       method: 'GET',
-                      url: $scope.remote.url + '/project',
+                      url: $scope.remote.url + '/project?limit=10000&select=title,name',
                       headers: {
                         'x-remote-token': $scope.remoteToken
                       },
@@ -2662,23 +2667,29 @@ app.controller('ProjectDeleteController', [
   'GoogleAnalytics',
   'PrimaryProject',
   'Formio',
+  '$q',
   function(
     $scope,
     $state,
     FormioAlerts,
     GoogleAnalytics,
     PrimaryProject,
-    Formio
+    Formio,
+    $q
   ) {
     $scope.primaryProjectPromise.then(function(primaryProject) {
       var isProject = ($scope.currentProject._id === primaryProject._id);
       var type = (isProject ? 'Project' : 'Stage');
-      $scope.deleteProject = function() {
+      $scope.deleteProject = function(deleteRemote) {
+        var deletePromises = [];
         if (!$scope.currentProject || !$scope.currentProject._id) { return; }
         $scope.isBusy = true;
         var localFormio = new Formio('/project/' + $scope.localProject._id);
-        localFormio.deleteProject()
-          .then(function() {
+        deletePromises.push(localFormio.deleteProject());
+        if (deleteRemote) {
+          deletePromises.push($scope.formio.deleteProject());
+        }
+        $q.all(deletePromises).then(function() {
             FormioAlerts.addAlert({
               type: 'success',
               message: type + ' was deleted!'

@@ -402,8 +402,8 @@ app.controller('FormController', [
         var filePath = '/pdf/' + project._id + '/file';
         var pdfServer = AppConfig.pdfServer;
         PDFServer.ensureFileToken(project).then(function(project) {
-          if (project.settings.pdfserver) {
-            pdfServer = project.settings.pdfserver;
+          if ($scope.currentProject.settings.pdfserver) {
+            pdfServer = $scope.currentProject.settings.pdfserver;
           }
           Upload.upload({
             url: pdfServer + filePath,

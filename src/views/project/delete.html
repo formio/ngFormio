@@ -1,9 +1,19 @@
 <div class="project-section-inner-content">
   <form class="form-horizontal" role="form">
     <h2>Are you sure you wish to delete the {{ (currentProject._id === primaryProject._id ? 'Project' : 'Environment') }} <strong>{{ currentProject.title }} ({{ currentProject.name }})</strong>?</h2>
-    <div class="btn-toolbar">
-      <button ng-click="deleteProject()" class="btn btn-danger" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Yes</button>
-      <button ng-click="back('home')" class="btn btn-default">No</button>
+    <div ng-if="currentProject._id !== localProject._id">
+      <div class="well">This project is hosted on premise which means the main data is on your own server. You can delete only the stage or delete both the stage and the on premise project as well.</div>
+      <div class="btn-toolbar">
+        <button ng-click="deleteProject()" class="btn btn-warning" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Remove stage from Form.io only</button>
+        <button ng-click="deleteProject(true)" class="btn btn-danger" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Remove stage and delete all on premise forms and data</button>
+        <button ng-click="back('home')" class="btn btn-default">Cancel</button>
+      </div>
+    </div>
+    <div ng-if="currentProject._id === localProject._id">
+      <div class="btn-toolbar">
+        <button ng-click="deleteProject()" class="btn btn-danger" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Yes</button>
+        <button ng-click="back('home')" class="btn btn-default">No</button>
+      </div>
     </div>
   </form>
 </div>
