@@ -1,4 +1,4 @@
-/*! ng-formio v2.35.6 | https://unpkg.com/ng-formio@2.35.6/LICENSE.txt */
+/*! ng-formio v2.36.0 | https://unpkg.com/ng-formio@2.36.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -50537,8 +50537,8 @@ var Formio = function () {
 
   }, {
     key: 'getToken',
-    value: function getToken() {
-      return Formio.getToken();
+    value: function getToken(options) {
+      return Formio.getToken(options);
     }
 
     /**
@@ -50547,8 +50547,8 @@ var Formio = function () {
 
   }, {
     key: 'getTempToken',
-    value: function getTempToken(expire, allowed) {
-      var token = Formio.getToken();
+    value: function getTempToken(expire, allowed, options) {
+      var token = Formio.getToken(options);
       if (!token) {
         return _nativePromiseOnly2.default.reject('You must be authenticated to generate a temporary auth token.');
       }
@@ -50807,6 +50807,8 @@ var Formio = function () {
       }
 
       var requestArgs = Formio.getRequestArgs(formio, type, url, method, data, opts);
+      requestArgs.opts = requestArgs.opts || {};
+      requestArgs.opts.formio = formio;
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
         return Formio.pluginGet('request', requestArgs).then(function (result) {
           if (isNil(result)) {
@@ -50848,7 +50850,7 @@ var Formio = function () {
         'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8'
       });
-      var token = Formio.getToken();
+      var token = Formio.getToken(opts);
       if (token && !opts.noToken) {
         headers.append('x-jwt-token', token);
       }
@@ -50864,6 +50866,9 @@ var Formio = function () {
 
       // Allow plugins to alter the options.
       options = Formio.pluginAlter('requestOptions', options, url);
+      if (options.namespace) {
+        opts.namespace = options.namespace;
+      }
 
       var requestToken = options.headers.get('x-jwt-token');
       return fetch(url, options).then(function (response) {
@@ -50872,7 +50877,7 @@ var Formio = function () {
 
         if (!response.ok) {
           if (response.status === 440) {
-            Formio.setToken(null);
+            Formio.setToken(null, opts);
             Formio.events.emit('formio.sessionExpired', response.body);
           } else if (response.status === 401) {
             Formio.events.emit('formio.unauthorized', response.body);
@@ -50897,7 +50902,7 @@ var Formio = function () {
         }
 
         if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
-          Formio.setToken(token);
+          Formio.setToken(token, opts);
         }
         // 204 is no content. Don't try to .json() it.
         if (response.status === 204) {
@@ -50958,7 +50963,7 @@ var Formio = function () {
         return resultCopy;
       }).catch(function (err) {
         if (err === 'Bad Token') {
-          Formio.setToken(null);
+          Formio.setToken(null, opts);
           Formio.events.emit('formio.badToken', err);
         }
         if (err.message) {
@@ -50968,71 +50973,91 @@ var Formio = function () {
         return _nativePromiseOnly2.default.reject(err);
       });
     }
+
+    // Needed to maintain reverse compatability...
+
   }, {
     key: 'setToken',
-    value: function setToken(token) {
+    value: function setToken(token, opts) {
       token = token || '';
-      if (token === this.token) {
+      opts = typeof opts === 'string' ? { namespace: opts } : opts || {};
+      var tokenName = (opts.namespace || 'formio') + 'Token';
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      if (Formio.tokens[tokenName] === token) {
         return;
       }
-      this.token = token;
+
+      Formio.tokens[tokenName] = token;
       if (!token) {
-        Formio.setUser(null);
+        Formio.setUser(null, opts);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioToken');
+          return localStorage.removeItem(tokenName);
         } catch (err) {
-          return _browserCookies2.default.erase('formioToken', { path: '/' });
+          return _browserCookies2.default.erase(tokenName, { path: '/' });
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioToken', token);
+        localStorage.setItem(tokenName, token);
       } catch (err) {
-        _browserCookies2.default.set('formioToken', token, { path: '/' });
+        _browserCookies2.default.set(tokenName, token, { path: '/' });
       }
-      return Formio.currentUser(); // Run this so user is updated if null
+      return Formio.currentUser(opts.formio, opts); // Run this so user is updated if null
     }
   }, {
     key: 'getToken',
-    value: function getToken() {
-      if (this.token) {
-        return this.token;
+    value: function getToken(options) {
+      options = typeof options === 'string' ? { namespace: options } : options || {};
+      var tokenName = (options.namespace || 'formio') + 'Token';
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      if (Formio.tokens[tokenName]) {
+        return Formio.tokens[tokenName];
       }
       try {
-        this.token = localStorage.getItem('formioToken') || '';
-        return this.token;
+        Formio.tokens[tokenName] = localStorage.getItem(tokenName) || '';
+        return Formio.tokens[tokenName];
       } catch (e) {
-        this.token = _browserCookies2.default.get('formioToken');
-        return this.token;
+        Formio.tokens[tokenName] = _browserCookies2.default.get(tokenName);
+        return Formio.tokens[tokenName];
       }
     }
   }, {
     key: 'setUser',
-    value: function setUser(user) {
+    value: function setUser(user, opts) {
+      opts = opts || {};
+      var userName = (opts.namespace || 'formio') + 'User';
       if (!user) {
-        this.setToken(null);
+        this.setToken(null, opts);
         // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
         try {
-          return localStorage.removeItem('formioUser');
+          return localStorage.removeItem(userName);
         } catch (err) {
-          return _browserCookies2.default.erase('formioUser', { path: '/' });
+          return _browserCookies2.default.erase(userName, { path: '/' });
         }
       }
       // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
       try {
-        localStorage.setItem('formioUser', JSON.stringify(user));
+        localStorage.setItem(userName, JSON.stringify(user));
       } catch (err) {
-        _browserCookies2.default.set('formioUser', JSON.stringify(user), { path: '/' });
+        _browserCookies2.default.set(userName, JSON.stringify(user), { path: '/' });
       }
     }
   }, {
     key: 'getUser',
-    value: function getUser() {
+    value: function getUser(options) {
+      options = options || {};
+      var userName = (options.namespace || 'formio') + 'User';
       try {
-        return JSON.parse(localStorage.getItem('formioUser') || null);
+        return JSON.parse(localStorage.getItem(userName) || null);
       } catch (e) {
-        return JSON.parse(_browserCookies2.default.get('formioUser'));
+        return JSON.parse(_browserCookies2.default.get(userName));
       }
     }
   }, {
@@ -51212,7 +51237,7 @@ var Formio = function () {
     value: function currentUser(formio, options) {
       var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
       projectUrl += '/current';
-      var user = this.getUser();
+      var user = this.getUser(options);
       if (user) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(user), {
           url: projectUrl,
@@ -51220,7 +51245,8 @@ var Formio = function () {
           options: options
         });
       }
-      if ((!options || !options.external) && !Formio.getToken()) {
+      var token = Formio.getToken(options);
+      if ((!options || !options.external) && !token) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
           url: projectUrl,
           method: 'GET',
@@ -51228,15 +51254,17 @@ var Formio = function () {
         });
       }
       return Formio.makeRequest(formio, 'currentUser', projectUrl, 'GET', null, options).then(function (response) {
-        Formio.setUser(response);
+        Formio.setUser(response, options);
         return response;
       });
     }
   }, {
     key: 'logout',
-    value: function logout(formio) {
-      Formio.setToken(null);
-      Formio.setUser(null);
+    value: function logout(formio, options) {
+      options = options || {};
+      options.formio = formio;
+      Formio.setToken(null, options);
+      Formio.setUser(null, options);
       Formio.clearCache();
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
       return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
@@ -51381,6 +51409,25 @@ var Formio = function () {
       }
 
       return _nativePromiseOnly2.default.reject(name + ' library was not required.');
+    }
+  }, {
+    key: 'token',
+    get: function get() {
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      return Formio.tokens.formioToken ? Formio.tokens.formioToken : '';
+    }
+
+    // Needed to maintain reverse compatability...
+    ,
+    set: function set(token) {
+      if (!Formio.tokens) {
+        Formio.tokens = {};
+      }
+
+      return Formio.tokens.formioToken = token || '';
     }
   }]);
 
@@ -52068,6 +52115,9 @@ function eachComponent(components, fn, includeAll, path, parent) {
   if (!components) return;
   path = path || '';
   components.forEach(function (component) {
+    if (!component) {
+      return;
+    }
     var hasColumns = component.columns && Array.isArray(component.columns);
     var hasRows = component.rows && Array.isArray(component.rows);
     var hasComps = component.components && Array.isArray(component.components);
@@ -52153,7 +52203,7 @@ function matchComponent(component, query) {
 function getComponent(components, key, includeAll) {
   var result = void 0;
   eachComponent(components, function (component, path) {
-    if (matchComponent(component, key)) {
+    if (path === key) {
       component.path = path;
       result = component;
       return true;
@@ -52655,9 +52705,16 @@ function getNumberSeparators() {
   var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
 
   var formattedNumberString = 12345.6789.toLocaleString(lang);
+  var delimeters = formattedNumberString.match(/..(.)...(.)../);
+  if (!delimeters) {
+    return {
+      delimiter: ',',
+      decimalSeparator: '.'
+    };
+  }
   return {
-    delimiter: formattedNumberString.match(/12(.*)345/)[1],
-    decimalSeparator: formattedNumberString.match(/345(.*)67/)[1]
+    delimiter: delimeters.length > 1 ? delimeters[1] : ',',
+    decimalSeparator: delimeters.length > 2 ? delimeters[2] : '.'
   };
 }
 
@@ -85467,7 +85524,7 @@ return SignaturePad;
 })));
 
 },{}],229:[function(_dereq_,module,exports){
-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.textMaskAddons=t():e.textMaskAddons=t()}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var o=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(o).default}});var i=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(i).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy";return function(t){var n=[],r=e.split(/[^dmyHMS]+/),o={dd:31,mm:12,yy:99,yyyy:9999,HH:23,MM:59,SS:59},i={dd:1,mm:1,yy:0,yyyy:1,HH:0,MM:0,SS:0},u=t.split("");r.forEach(function(t){var r=e.indexOf(t),i=parseInt(o[t].toString().substr(0,1),10);parseInt(u[r],10)>i&&(u[r+1]=u[r],u[r]=0,n.push(r))});var c=r.some(function(n){var r=e.indexOf(n),u=n.length,c=t.substr(r,u).replace(/\D/g,""),l=parseInt(c,10);return l>o[n]||c.length===u&&l<i[n]});return!c&&{value:u.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:c,t=e.length;if(e===c||e[0]===g[0]&&1===t)return g.split(c).concat([v]).concat(m.split(c));if(e===P&&_)return g.split(c).concat(["0",P,v]).concat(m.split(c));var n=e[0]===s&&H;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),l=u!==-1,a=void 0,h=void 0,b=void 0;if(e.slice($*-1)===m&&(e=e.slice(0,$*-1)),l&&(_||D)?(a=e.slice(e.slice(0,N)===g?N:0,u),h=e.slice(u+1,t),h=r(h.replace(f,c))):a=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":i(L))===p){var O="."===M?"[.]":""+M,S=(a.match(new RegExp(O,"g"))||[]).length;a=a.slice(0,L+S*V)}return a=a.replace(f,c),R||(a=a.replace(/^0+(0$|[^0])/,"$1")),a=x?o(a,M):a,b=r(a),(l&&_||D===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),h&&(("undefined"==typeof C?"undefined":i(C))===p&&(h=h.slice(0,C)),b=b.concat(h)),D===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(c).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),m.length>0&&(b=b.concat(m.split(c))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,h=t.suffix,m=void 0===h?c:h,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,M=void 0===O?l:O,S=t.allowDecimal,_=void 0!==S&&S,j=t.decimalSymbol,P=void 0===j?a:j,w=t.decimalLimit,C=void 0===w?2:w,k=t.requireDecimal,D=void 0!==k&&k,E=t.allowNegative,H=void 0!==E&&E,I=t.allowLeadingZeroes,R=void 0!==I&&I,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=m&&m.length||0,V=M&&M.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(c).map(function(e){return v.test(e)?v:e})}function o(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",c="",l=",",a=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function o(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,o=e.indexOf(y),s=e.lastIndexOf(p),d=s<o?-1:s,f=i(e,o+1,y),g=i(e,d-1,p),h=u(e,o,n),m=c(e,o,d,n),b=l(e,d,n,r);h=a(h),m=a(m),b=a(b,!0);var x=h.concat(f).concat(m).concat(g).concat(b);return x}function i(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function c(e,t,n,r){var o=v;return t!==-1&&(o=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),o=o.replace(new RegExp("[\\s"+r+"]",m),v),o===y?f:o.length<1?h:o[o.length-1]===p?o.slice(0,o.length-1):o}function l(e,t,n,r){var o=v;return t!==-1&&(o=e.slice(t+1,e.length)),o=o.replace(new RegExp("[\\s"+n+".]",m),v),0===o.length?e[t-1]===p&&r!==e.length?f:v:o}function a(e,t){return e.split(v).map(function(e){return e===h?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",h=" ",m="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:o,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,i=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(c),g=null===i.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(a)!==-1||y!==-1&&n!==y+1||i.indexOf(o)===-1&&f!==u&&i.indexOf(l)!==-1)return!1;var h=v.indexOf(o),m=v.slice(h+1,v.length);return(m.match(d)||s).length>1&&v.substr(-1)===l&&n!==i.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(i,function(){return t++,1===t?o:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var o="@",i=/@/g,u="",c="@.",l=".",a="..",s=[],d=/\./g}])});
+!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.textMaskAddons=t():e.textMaskAddons=t()}(this,function(){return function(e){function t(r){if(n[r])return n[r].exports;var i=n[r]={exports:{},id:r,loaded:!1};return e[r].call(i.exports,i,i.exports,t),i.loaded=!0,i.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}Object.defineProperty(t,"__esModule",{value:!0});var i=n(1);Object.defineProperty(t,"createAutoCorrectedDatePipe",{enumerable:!0,get:function(){return r(i).default}});var o=n(2);Object.defineProperty(t,"createNumberMask",{enumerable:!0,get:function(){return r(o).default}});var u=n(3);Object.defineProperty(t,"emailMask",{enumerable:!0,get:function(){return r(u).default}})},function(e,t){"use strict";function n(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"mm dd yyyy",t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},n=t.minYear,o=void 0===n?1:n,u=t.maxYear,a=void 0===u?9999:u,c=e.split(/[^dmyHMS]+/).sort(function(e,t){return i.indexOf(e)-i.indexOf(t)});return function(t){var n=[],i={dd:31,mm:12,yy:99,yyyy:a,HH:23,MM:59,SS:59},u={dd:1,mm:1,yy:0,yyyy:o,HH:0,MM:0,SS:0},l=t.split("");c.forEach(function(t){var r=e.indexOf(t),o=parseInt(i[t].toString().substr(0,1),10);parseInt(l[r],10)>o&&(l[r+1]=l[r],l[r]=0,n.push(r))});var s=0,d=c.some(function(n){var c=e.indexOf(n),l=n.length,d=t.substr(c,l).replace(/\D/g,""),f=parseInt(d,10);"mm"===n&&(s=f||0);var p="dd"===n?r[s]:i[n];if("yyyy"===n&&(1!==o||9999!==a)){var v=parseInt(i[n].toString().substring(0,d.length),10),y=parseInt(u[n].toString().substring(0,d.length),10);return f<y||f>v}return f>p||d.length===l&&f<u[n]});return!d&&{value:l.join(""),indexesOfPipedChars:n}}}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var r=[31,31,29,31,30,31,30,31,31,30,31,30,31],i=["yyyy","yy","mm","dd","HH","MM","SS"]},function(e,t){"use strict";function n(){function e(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:a,t=e.length;if(e===a||e[0]===g[0]&&1===t)return g.split(a).concat([v]).concat(h.split(a));if(e===P&&_)return g.split(a).concat(["0",P,v]).concat(h.split(a));var n=e[0]===s&&D;n&&(e=e.toString().substr(1));var u=e.lastIndexOf(P),c=u!==-1,l=void 0,m=void 0,b=void 0;if(e.slice($*-1)===h&&(e=e.slice(0,$*-1)),c&&(_||I)?(l=e.slice(e.slice(0,N)===g?N:0,u),m=e.slice(u+1,t),m=r(m.replace(f,a))):l=e.slice(0,N)===g?e.slice(N):e,L&&("undefined"==typeof L?"undefined":o(L))===p){var O="."===S?"[.]":""+S,M=(l.match(new RegExp(O,"g"))||[]).length;l=l.slice(0,L+M*V)}return l=l.replace(f,a),R||(l=l.replace(/^0+(0$|[^0])/,"$1")),l=x?i(l,S):l,b=r(l),(c&&_||I===!0)&&(e[u-1]!==P&&b.push(y),b.push(P,y),m&&(("undefined"==typeof C?"undefined":o(C))===p&&(m=m.slice(0,C)),b=b.concat(m)),I===!0&&e[u-1]===P&&b.push(v)),N>0&&(b=g.split(a).concat(b)),n&&(b.length===N&&b.push(v),b=[d].concat(b)),h.length>0&&(b=b.concat(h.split(a))),b}var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},n=t.prefix,g=void 0===n?u:n,m=t.suffix,h=void 0===m?a:m,b=t.includeThousandsSeparator,x=void 0===b||b,O=t.thousandsSeparatorSymbol,S=void 0===O?c:O,M=t.allowDecimal,_=void 0!==M&&M,j=t.decimalSymbol,P=void 0===j?l:j,w=t.decimalLimit,C=void 0===w?2:w,H=t.requireDecimal,I=void 0!==H&&H,k=t.allowNegative,D=void 0!==k&&k,E=t.allowLeadingZeroes,R=void 0!==E&&E,A=t.integerLimit,L=void 0===A?null:A,N=g&&g.length||0,$=h&&h.length||0,V=S&&S.length||0;return e.instanceOf="createNumberMask",e}function r(e){return e.split(a).map(function(e){return v.test(e)?v:e})}function i(e,t){return e.replace(/\B(?=(\d{3})+(?!\d))/g,t)}Object.defineProperty(t,"__esModule",{value:!0});var o="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};t.default=n;var u="$",a="",c=",",l=".",s="-",d=/-/,f=/\D+/g,p="number",v=/\d/,y="[]"},function(e,t,n){"use strict";function r(e){return e&&e.__esModule?e:{default:e}}function i(e,t){e=e.replace(O,v);var n=t.placeholderChar,r=t.currentCaretPosition,i=e.indexOf(y),s=e.lastIndexOf(p),d=s<i?-1:s,f=o(e,i+1,y),g=o(e,d-1,p),m=u(e,i,n),h=a(e,i,d,n),b=c(e,d,n,r);m=l(m),h=l(h),b=l(b,!0);var x=m.concat(f).concat(h).concat(g).concat(b);return x}function o(e,t,n){var r=[];return e[t]===n?r.push(n):r.push(g,n),r.push(g),r}function u(e,t){return t===-1?e:e.slice(0,t)}function a(e,t,n,r){var i=v;return t!==-1&&(i=n===-1?e.slice(t+1,e.length):e.slice(t+1,n)),i=i.replace(new RegExp("[\\s"+r+"]",h),v),i===y?f:i.length<1?m:i[i.length-1]===p?i.slice(0,i.length-1):i}function c(e,t,n,r){var i=v;return t!==-1&&(i=e.slice(t+1,e.length)),i=i.replace(new RegExp("[\\s"+n+".]",h),v),0===i.length?e[t-1]===p&&r!==e.length?f:v:i}function l(e,t){return e.split(v).map(function(e){return e===m?e:t?x:b})}Object.defineProperty(t,"__esModule",{value:!0});var s=n(4),d=r(s),f="*",p=".",v="",y="@",g="[]",m=" ",h="g",b=/[^\s]/,x=/[^.\s]/,O=/\s/g;t.default={mask:i,pipe:d.default}},function(e,t){"use strict";function n(e,t){var n=t.currentCaretPosition,o=t.rawValue,f=t.previousConformedValue,p=t.placeholderChar,v=e;v=r(v);var y=v.indexOf(a),g=null===o.match(new RegExp("[^@\\s."+p+"]"));if(g)return u;if(v.indexOf(l)!==-1||y!==-1&&n!==y+1||o.indexOf(i)===-1&&f!==u&&o.indexOf(c)!==-1)return!1;var m=v.indexOf(i),h=v.slice(m+1,v.length);return(h.match(d)||s).length>1&&v.substr(-1)===c&&n!==o.length&&(v=v.slice(0,v.length-1)),v}function r(e){var t=0;return e.replace(o,function(){return t++,1===t?i:u})}Object.defineProperty(t,"__esModule",{value:!0}),t.default=n;var i="@",o=/@/g,u="",a="@.",c=".",l="..",s=[],d=/\./g}])});
 },{}],230:[function(_dereq_,module,exports){
 (function (setImmediate,clearImmediate){
 var nextTick = _dereq_('process/browser.js').nextTick;
@@ -90570,14 +90627,7 @@ module.exports = function(app) {
             };
             var dir = $scope.component.dir || '';
             dir = $interpolate(dir)({data: $scope.data, row: $scope.row});
-            var formio = null;
-            if ($scope.formio) {
-              formio = $scope.formio;
-            }
-            else {
-              $scope.fileUploads[fileName].status = 'error';
-              $scope.fileUploads[fileName].message = 'File Upload URL not provided.';
-            }
+            var formio = $scope.formio || new Formio();
 
             if (formio) {
               formio.uploadFile($scope.component.storage, file, fileName, dir, function processNotify(evt) {
