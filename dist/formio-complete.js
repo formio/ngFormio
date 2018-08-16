@@ -1,4 +1,4 @@
-/*! ng-formio v2.36.1 | https://unpkg.com/ng-formio@2.36.1/LICENSE.txt */
+/*! ng-formio v2.36.2 | https://unpkg.com/ng-formio@2.36.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -52727,6 +52727,8 @@ exports.getNumberDecimalLimit = getNumberDecimalLimit;
 exports.getCurrencyAffixes = getCurrencyAffixes;
 exports.fieldData = fieldData;
 exports.delay = delay;
+exports.iterateKey = iterateKey;
+exports.uniqueKey = uniqueKey;
 
 var _lodash = _dereq_('lodash');
 
@@ -53709,6 +53711,40 @@ function delay(fn) {
   earlyCall.cancel = cancel;
 
   return earlyCall;
+}
+
+/**
+ * Iterate the given key to make it unique.
+ *
+ * @param {String} key
+ *   Modify the component key to be unique.
+ *
+ * @returns {String}
+ *   The new component key.
+ */
+function iterateKey(key) {
+  if (!key.match(/(\d+)$/)) {
+    return key + '2';
+  }
+
+  return key.replace(/(\d+)$/, function (suffix) {
+    return Number(suffix) + 1;
+  });
+}
+
+/**
+ * Determines a unique key within a map provided the base key.
+ *
+ * @param map
+ * @param base
+ * @return {*}
+ */
+function uniqueKey(map, base) {
+  var newKey = base;
+  while (map.hasOwnProperty(newKey)) {
+    newKey = iterateKey(newKey);
+  }
+  return newKey;
 }
 },{"./jsonlogic/operators":35,"json-logic-js":37,"lodash":222,"moment":234}],37:[function(_dereq_,module,exports){
 /* globals define,module */
