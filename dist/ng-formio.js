@@ -7964,7 +7964,7 @@ var Webform = function (_NestedComponent) {
       return this.onElement.then(function () {
         _this9.clear();
         _this9.showElement(false);
-        _this9.build();
+        clearTimeout(_this9.build());
         _this9.isBuilt = true;
         _this9.on('resetForm', function () {
           return _this9.resetValue();
@@ -8001,6 +8001,10 @@ var Webform = function (_NestedComponent) {
     key: 'setAlert',
     value: function setAlert(type, message) {
       if (!type && this.submitted) {
+        if (this.alert) {
+          this.removeChild(this.alert);
+          this.alert = null;
+        }
         return;
       }
       if (this.options.noAlerts) {
@@ -8049,6 +8053,9 @@ var Webform = function (_NestedComponent) {
       this.on('requestUrl', function (args) {
         return _this10.submitUrl(args.url, args.headers);
       });
+      return setTimeout(function () {
+        _this10.onChange();
+      }, 1);
     }
 
     /**
@@ -14388,21 +14395,17 @@ exports.default = [{
   key: 'tags'
 }, {
   weight: 200,
-  type: 'datagrid',
+  type: 'datamap',
   label: 'Custom Properties',
   tooltip: 'This allows you to configure any custom properties for this component.',
   key: 'properties',
-  components: [{
-    type: 'textfield',
-    key: 'key',
-    label: 'Key',
-    input: true
-  }, {
+  valueComponent: {
     type: 'textfield',
     key: 'value',
     label: 'Value',
+    defaultValue: 'Value',
     input: true
-  }]
+  }
 }];
 
 /***/ }),
@@ -15255,6 +15258,10 @@ var _DataGrid = __webpack_require__(/*! ./datagrid/DataGrid.form */ "./node_modu
 
 var _DataGrid2 = _interopRequireDefault(_DataGrid);
 
+var _DataMap = __webpack_require__(/*! ./datamap/DataMap.form */ "./node_modules/formiojs/components/datamap/DataMap.form.js");
+
+var _DataMap2 = _interopRequireDefault(_DataMap);
+
 var _DateTime = __webpack_require__(/*! ./datetime/DateTime.form */ "./node_modules/formiojs/components/datetime/DateTime.form.js");
 
 var _DateTime2 = _interopRequireDefault(_DateTime);
@@ -15373,6 +15380,7 @@ _2.default.container.editForm = _Container2.default;
 _2.default.content.editForm = _Content2.default;
 _2.default.currency.editForm = _Currency2.default;
 _2.default.datagrid.editForm = _DataGrid2.default;
+_2.default.datamap.editForm = _DataMap2.default;
 _2.default.datetime.editForm = _DateTime2.default;
 _2.default.day.editForm = _Day2.default;
 _2.default.editgrid.editForm = _EditGrid2.default;
@@ -18024,6 +18032,442 @@ exports.default = [{
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/datamap/DataMap.form.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/components/datamap/DataMap.form.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function () {
+  for (var _len = arguments.length, extend = Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Base2.default.apply(undefined, [[{
+    key: 'display',
+    components: _DataMapEdit2.default
+  }]].concat(extend));
+};
+
+var _Base = __webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js");
+
+var _Base2 = _interopRequireDefault(_Base);
+
+var _DataMapEdit = __webpack_require__(/*! ./editForm/DataMap.edit.display */ "./node_modules/formiojs/components/datamap/editForm/DataMap.edit.display.js");
+
+var _DataMapEdit2 = _interopRequireDefault(_DataMapEdit);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/datamap/DataMap.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/components/datamap/DataMap.js ***!
+  \*************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js");
+
+var _Base2 = _interopRequireDefault(_Base);
+
+var _NestedComponent2 = __webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js");
+
+var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
+
+var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DataMapComponent = function (_NestedComponent) {
+  _inherits(DataMapComponent, _NestedComponent);
+
+  _createClass(DataMapComponent, [{
+    key: 'schema',
+    get: function get() {
+      var schema = _get(DataMapComponent.prototype.__proto__ || Object.getPrototypeOf(DataMapComponent.prototype), 'schema', this);
+      schema.valueComponent = this.components[this.components.length - 1].schema;
+      return _lodash2.default.omit(schema, 'components');
+    }
+  }], [{
+    key: 'schema',
+    value: function schema() {
+      for (var _len = arguments.length, extend = Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _Base2.default.schema.apply(_Base2.default, [{
+        label: 'Data Map',
+        key: 'dataMap',
+        type: 'datamap',
+        clearOnHide: true,
+        addAnother: 'Add Another',
+        disableAddingRemovingRows: false,
+        keyBeforeValue: true,
+        valueComponent: {
+          type: 'textfield',
+          key: 'value',
+          label: 'Value',
+          defaultValue: 'Value',
+          input: true
+        },
+        input: true,
+        validate: {
+          maxLength: 0,
+          minLength: 0
+        }
+      }].concat(extend));
+    }
+  }, {
+    key: 'builderInfo',
+    get: function get() {
+      return {
+        title: 'Data Map',
+        icon: 'fa fa-th-list',
+        group: 'data',
+        documentation: 'http://help.form.io/userguide/#datamap',
+        weight: 25,
+        schema: DataMapComponent.schema()
+      };
+    }
+  }]);
+
+  function DataMapComponent(component, options, data) {
+    _classCallCheck(this, DataMapComponent);
+
+    var _this = _possibleConstructorReturn(this, (DataMapComponent.__proto__ || Object.getPrototypeOf(DataMapComponent)).call(this, component, options, data));
+
+    _this.type = 'datamap';
+    _this.rows = {};
+    return _this;
+  }
+
+  _createClass(DataMapComponent, [{
+    key: 'hasAddButton',
+    value: function hasAddButton() {
+      var maxLength = _lodash2.default.get(this.component, 'validate.maxLength');
+      return !this.component.disableAddingRemovingRows && !this.shouldDisable && !this.options.builder && !this.options.preview && (!maxLength || Object.keys(this.dataValue).length < maxLength);
+    }
+  }, {
+    key: 'hasRemoveButtons',
+    value: function hasRemoveButtons() {
+      return !this.component.disableAddingRemovingRows && !this.shouldDisable && !this.options.builder && Object.keys(this.dataValue).length > _lodash2.default.get(this.component, 'validate.minLength', 0);
+    }
+  }, {
+    key: 'hasChanged',
+    value: function hasChanged(before, after) {
+      return !_lodash2.default.isEqual(before, after);
+    }
+  }, {
+    key: 'build',
+    value: function build() {
+      var _this2 = this;
+
+      if (this.options.builder) {
+        return _get(DataMapComponent.prototype.__proto__ || Object.getPrototypeOf(DataMapComponent.prototype), 'build', this).call(this, true);
+      }
+      this.createElement();
+      this.createLabel(this.element);
+      var tableClass = 'table datagrid-table table-bordered form-group formio-data-map ';
+      _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
+        if (_this2.component[prop]) {
+          tableClass += 'table-' + prop + ' ';
+        }
+      });
+      this.tableElement = this.ce('table', {
+        class: tableClass
+      });
+      this.buildRows();
+      this.element.appendChild(this.tableElement);
+      this.createDescription(this.element);
+    }
+  }, {
+    key: 'addKeyButton',
+    value: function addKeyButton() {
+      var _this3 = this;
+
+      if (!this.hasAddButton()) {
+        return null;
+      }
+      var addButton = this.ce('button', {
+        class: 'btn btn-primary formio-button-add-row'
+      });
+      this.addEventListener(addButton, 'click', function (event) {
+        event.preventDefault();
+        _this3.addRow();
+      });
+
+      addButton.appendChild(this.ce('i', {
+        class: this.iconClass('plus')
+      }));
+      addButton.appendChild(this.text(this.component.addAnother || ' Add Another'));
+      return addButton;
+    }
+  }, {
+    key: 'removeKeyButton',
+    value: function removeKeyButton(key) {
+      var _this4 = this;
+
+      var removeButton = this.ce('button', {
+        type: 'button',
+        class: 'btn btn-default btn-secondary formio-button-remove-row'
+      });
+
+      this.addEventListener(removeButton, 'click', function (event) {
+        event.preventDefault();
+        _this4.removeRow(key);
+      });
+      removeButton.appendChild(this.ce('i', {
+        class: this.iconClass('remove-circle')
+      }));
+      return removeButton;
+    }
+
+    // Build the header.
+
+  }, {
+    key: 'createHeader',
+    value: function createHeader() {
+      var valueHeader = this.ce('th', {
+        'class': 'col-9 col-sm-8'
+      }, this.text(this.component.valueComponent.label));
+      if (this.component.valueComponent.tooltip) {
+        this.createTooltip(valueHeader, {
+          tooltip: this.t(this.component.valueComponent.tooltip)
+        });
+      }
+      var keyHeader = this.ce('th', {
+        'class': 'col-2 col-sm-3'
+      }, this.text('Key'));
+      this.createTooltip(keyHeader, {
+        tooltip: this.t('Enter the map "key" for this value.')
+      });
+      return this.ce('thead', null, this.ce('tr', {
+        class: 'd-flex'
+      }, [this.component.keyBeforeValue ? keyHeader : valueHeader, this.component.keyBeforeValue ? valueHeader : keyHeader, this.hasRemoveButtons() ? this.ce('th', { 'class': 'col-1 col-sm-1' }, null) : null]));
+    }
+  }, {
+    key: 'buildRows',
+    value: function buildRows() {
+      var _this5 = this;
+
+      // Do not builder rows when in builder mode.
+      if (this.options.builder) {
+        return;
+      }
+
+      // Destroy all value components before they are recreated.
+      this.destroyComponents();
+      _lodash2.default.each(this.rows, function (row) {
+        return row.value.destroy();
+      });
+      this.rows = {};
+      this.empty(this.tableElement);
+      var tableRows = [];
+      _lodash2.default.each(this.dataValue, function (value, key) {
+        return tableRows.push(_this5.buildRow(value, key));
+      });
+      this.tableElement.appendChild(this.createHeader());
+      this.tableElement.appendChild(this.ce('tbody', null, tableRows));
+      this.tableElement.appendChild(this.ce('tfoot', null, this.ce('tr', null, this.ce('td', { colspan: this.hasRemoveButtons() ? 3 : 2 }, this.addKeyButton()))));
+    }
+  }, {
+    key: 'createValueComponent',
+    value: function createValueComponent() {
+      var _this6 = this;
+
+      var container = this.ce('td', {
+        class: 'col-9 col-sm-8'
+      });
+      var schema = this.component.valueComponent;
+      schema.hideLabel = true;
+      var value = this.addComponent(schema, container, {}, null, null);
+      value.on('change', function () {
+        return _this6.updateValue();
+      });
+      return { value: value, container: container };
+    }
+  }, {
+    key: 'buildRow',
+    value: function buildRow(value, key) {
+      if (!this.rows[key]) {
+        this.rows[key] = this.createValueComponent();
+      }
+      var row = this.rows[key];
+
+      var lastColumn = null;
+      if (this.hasRemoveButtons()) {
+        row.remove = this.removeKeyButton(key);
+        lastColumn = this.ce('td', { class: 'col-1 col-sm-1' }, row.remove);
+      }
+      row.element = this.ce('tr', {
+        class: 'd-flex',
+        id: this.component.id + '-row-' + key
+      });
+
+      // Create our key input.
+      row.keyInput = this.ce('input', {
+        type: 'text',
+        class: 'form-control',
+        id: this.component.id + '-value-' + key,
+        value: key
+      });
+      this.addInput(row.keyInput);
+      if (this.component.keyBeforeValue) {
+        row.element.appendChild(this.ce('td', { class: 'col-2 col-sm-3' }, row.keyInput));
+        row.element.appendChild(row.container);
+      } else {
+        row.element.appendChild(row.container);
+        row.element.appendChild(this.ce('td', null, row.keyInput));
+      }
+      row.element.appendChild(lastColumn);
+
+      // Set the value on the value component.
+      row.value.setValue(value);
+      return row.element;
+    }
+  }, {
+    key: 'addRow',
+    value: function addRow() {
+      var component = this.createValueComponent();
+      var key = (0, _utils.uniqueKey)(this.dataValue, _lodash2.default.camelCase(component.value.defaultValue) || 'key');
+      this.rows[key] = component;
+      this.dataValue[key] = component.value.defaultValue;
+      this.buildRows();
+      this.triggerChange();
+    }
+  }, {
+    key: 'removeRow',
+    value: function removeRow(key) {
+      var value = this.dataValue;
+      delete value[key];
+      this.dataValue = value;
+      this.buildRows();
+      this.triggerChange();
+    }
+  }, {
+    key: 'updateValue',
+    value: function updateValue(flags, value) {
+      return _Base2.default.prototype.updateValue.call(this, flags, value);
+    }
+  }, {
+    key: 'setValue',
+    value: function setValue(value) {
+      var changed = this.hasChanged(value, this.dataValue);
+      this.dataValue = value;
+      this.buildRows();
+      return changed;
+    }
+
+    /**
+     * Get the value of this component.
+     *
+     * @returns {*}
+     */
+
+  }, {
+    key: 'getValue',
+    value: function getValue() {
+      var value = {};
+      _lodash2.default.each(this.rows, function (row) {
+        value[row.keyInput.value] = row.value.getValue();
+      });
+      return value;
+    }
+  }, {
+    key: 'defaultSchema',
+    get: function get() {
+      return DataMapComponent.schema();
+    }
+  }, {
+    key: 'emptyValue',
+    get: function get() {
+      return {};
+    }
+  }, {
+    key: 'componentComponents',
+    get: function get() {
+      return [this.component.valueComponent];
+    }
+  }]);
+
+  return DataMapComponent;
+}(_NestedComponent3.default);
+
+exports.default = DataMapComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/datamap/editForm/DataMap.edit.display.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/datamap/editForm/DataMap.edit.display.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = [{
+  type: 'checkbox',
+  label: 'Disable Adding / Removing Rows',
+  key: 'disableAddingRemovingRows',
+  tooltip: 'Check if you want to hide Add Another button and Remove Row button',
+  weight: 405,
+  input: true
+}, {
+  type: 'checkbox',
+  label: 'Show key column before value',
+  key: 'keyBeforeValue',
+  tooltip: 'Check if you would like to show the Key before the Value column.',
+  weight: 406,
+  input: true
+}, {
+  type: 'textfield',
+  label: 'Add Another Text',
+  key: 'addAnother',
+  tooltip: 'Set the text of the Add Another button.',
+  placeholder: 'Add Another',
+  weight: 410,
+  input: true,
+  customConditional: 'show = !data.disableAddingRemovingRows'
+}];
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/datetime/DateTime.form.js":
 /*!********************************************************************!*\
   !*** ./node_modules/formiojs/components/datetime/DateTime.form.js ***!
@@ -18367,6 +18811,11 @@ var DateTimeComponent = function (_BaseComponent) {
   }, {
     key: 'localeFormat',
     get: function get() {
+      var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(this.options.language);
+      this.defaultFormat = this.defaultFormat || {
+        date: dateFormatInfo.dayFirst ? 'd/m/Y ' : 'm/d/Y ',
+        time: 'h:i K'
+      };
       var format = '';
 
       if (this.component.enableDate) {
@@ -18382,7 +18831,7 @@ var DateTimeComponent = function (_BaseComponent) {
   }, {
     key: 'dateTimeFormat',
     get: function get() {
-      return this.component.useLocaleSettings ? this.localeFormat() : (0, _utils.convertFormatToFlatpickr)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
+      return this.component.useLocaleSettings ? this.localeFormat : (0, _utils.convertFormatToFlatpickr)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
     }
   }, {
     key: 'timezone',
@@ -22065,6 +22514,10 @@ var _DataGrid = __webpack_require__(/*! ./datagrid/DataGrid */ "./node_modules/f
 
 var _DataGrid2 = _interopRequireDefault(_DataGrid);
 
+var _DataMap = __webpack_require__(/*! ./datamap/DataMap */ "./node_modules/formiojs/components/datamap/DataMap.js");
+
+var _DataMap2 = _interopRequireDefault(_DataMap);
+
 var _DateTime = __webpack_require__(/*! ./datetime/DateTime */ "./node_modules/formiojs/components/datetime/DateTime.js");
 
 var _DateTime2 = _interopRequireDefault(_DateTime);
@@ -22206,6 +22659,7 @@ exports.default = {
   content: _Content2.default,
   container: _Container2.default,
   datagrid: _DataGrid2.default,
+  datamap: _DataMap2.default,
   datetime: _DateTime2.default,
   day: _Day2.default,
   htmlelement: _HTML2.default,
@@ -29794,26 +30248,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.default = {
   /**
-   * Iterate the given key to make it unique.
-   *
-   * @param {String} key
-   *   Modify the component key to be unique.
-   *
-   * @returns {String}
-   *   The new component key.
-   */
-  iterateKey: function iterateKey(key) {
-    if (!key.match(/(\d+)$/)) {
-      return key + '2';
-    }
-
-    return key.replace(/(\d+)$/, function (suffix) {
-      return Number(suffix) + 1;
-    });
-  },
-
-
-  /**
    * Appends a number to a component.key to keep it unique
    *
    * @param {Object} form
@@ -29822,8 +30256,6 @@ exports.default = {
    *   The component to uniquify
    */
   uniquify: function uniquify(form, component) {
-    var _this = this;
-
     var changed = false;
     var formKeys = {};
     (0, _utils.eachComponent)(form.components, function (comp) {
@@ -29837,8 +30269,9 @@ exports.default = {
         return;
       }
 
-      while (formKeys.hasOwnProperty(component.key)) {
-        component.key = _this.iterateKey(component.key);
+      var newKey = (0, _utils.uniqueKey)(formKeys, component.key);
+      if (newKey !== component.key) {
+        component.key = newKey;
         changed = true;
       }
     }, true);
@@ -30019,6 +30452,8 @@ exports.getNumberDecimalLimit = getNumberDecimalLimit;
 exports.getCurrencyAffixes = getCurrencyAffixes;
 exports.fieldData = fieldData;
 exports.delay = delay;
+exports.iterateKey = iterateKey;
+exports.uniqueKey = uniqueKey;
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
@@ -31001,6 +31436,40 @@ function delay(fn) {
   earlyCall.cancel = cancel;
 
   return earlyCall;
+}
+
+/**
+ * Iterate the given key to make it unique.
+ *
+ * @param {String} key
+ *   Modify the component key to be unique.
+ *
+ * @returns {String}
+ *   The new component key.
+ */
+function iterateKey(key) {
+  if (!key.match(/(\d+)$/)) {
+    return key + '2';
+  }
+
+  return key.replace(/(\d+)$/, function (suffix) {
+    return Number(suffix) + 1;
+  });
+}
+
+/**
+ * Determines a unique key within a map provided the base key.
+ *
+ * @param map
+ * @param base
+ * @return {*}
+ */
+function uniqueKey(map, base) {
+  var newKey = base;
+  while (map.hasOwnProperty(newKey)) {
+    newKey = iterateKey(newKey);
+  }
+  return newKey;
 }
 
 /***/ }),
