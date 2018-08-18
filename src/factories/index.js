@@ -1,1 +1,2 @@
-require('./formioTableView');
+import './FormioScope';
+import './formioTableView';
