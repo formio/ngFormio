@@ -1470,7 +1470,7 @@ app.controller('FormDeleteController', [
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
-      $scope.back('project.' + $scope.formInfo.type + '.form.view');
+      $scope.back('project.' + $scope.formInfo.type + 'Index');
     });
 
     $scope.$on('cancel', function(event) {
@@ -1994,6 +1994,10 @@ app.controller('FormSubmissionsController', [
             value = val.toJSON();
           }
 
+          var submissionTimezone = '';
+          if (dataItem && dataItem.metadata && dataItem.metadata.timezone) {
+            submissionTimezone = dataItem.metadata.timezone;
+          }
           var componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
           if (!componentInfo || !componentInfo.tableView) {
             if (value === undefined) {
@@ -2009,6 +2013,9 @@ app.controller('FormSubmissionsController', [
             angular.forEach(value, function(arrayValue) {
               arrayValue = componentInfo.tableView(arrayValue, {
                 component: component,
+                options: {
+                  submissionTimezone: submissionTimezone
+                },
                 $interpolate: $interpolate,
                 componentInfo: formioComponents,
                 util: FormioUtils
@@ -2022,6 +2029,9 @@ app.controller('FormSubmissionsController', [
           }
           value = componentInfo.tableView(value, {
             component: component,
+            options: {
+              submissionTimezone: submissionTimezone
+            },
             $interpolate: $interpolate,
             componentInfo: formioComponents,
             util: FormioUtils
