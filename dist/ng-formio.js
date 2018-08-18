@@ -18821,7 +18821,7 @@ var DateTimeComponent = function (_BaseComponent) {
         type: 'datetime',
         label: 'Date / Time',
         key: 'dateTime',
-        format: 'yyyy-MM-dd HH:mm a',
+        format: DateTimeComponent.DEFAULT_FORMAT,
         useLocaleSettings: false,
         allowInput: true,
         enableDate: true,
@@ -18850,6 +18850,11 @@ var DateTimeComponent = function (_BaseComponent) {
           arrowkeys: true
         }
       }].concat(extend));
+    }
+  }, {
+    key: 'DEFAULT_FORMAT',
+    get: function get() {
+      return 'yyyy-MM-dd hh:mm a';
     }
   }, {
     key: 'builderInfo',
@@ -18885,7 +18890,7 @@ var DateTimeComponent = function (_BaseComponent) {
     value: function elementInfo() {
       // Default the placeholder to the format if none is present.
       if (!this.component.placeholder) {
-        this.component.placeholder = (0, _utils.convertFlatpickrToFormat)(this.dateTimeFormat);
+        this.component.placeholder = this.dateFormat;
       }
       var info = _get(DateTimeComponent.prototype.__proto__ || Object.getPrototypeOf(DateTimeComponent.prototype), 'elementInfo', this).call(this);
       info.type = 'input';
@@ -18974,7 +18979,7 @@ var DateTimeComponent = function (_BaseComponent) {
       if (!value) {
         return '';
       }
-      return (0, _utils.formatDate)(value, _lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'), this.timezone);
+      return (0, _utils.formatDate)(value, this.dateFormat, this.timezone);
     }
   }, {
     key: 'setValueAt',
@@ -19006,6 +19011,11 @@ var DateTimeComponent = function (_BaseComponent) {
     key: 'defaultSchema',
     get: function get() {
       return DateTimeComponent.schema();
+    }
+  }, {
+    key: 'dateFormat',
+    get: function get() {
+      return _lodash2.default.get(this.component, 'format', DateTimeComponent.DEFAULT_FORMAT);
     }
   }, {
     key: 'defaultValue',
@@ -19062,7 +19072,7 @@ var DateTimeComponent = function (_BaseComponent) {
   }, {
     key: 'dateTimeFormat',
     get: function get() {
-      return this.component.useLocaleSettings ? this.localeFormat : (0, _utils.convertFormatToFlatpickr)(_lodash2.default.get(this.component, 'format', 'yyyy-MM-dd HH:mm a'));
+      return this.component.useLocaleSettings ? this.localeFormat : (0, _utils.convertFormatToFlatpickr)(this.dateFormat);
     }
   }, {
     key: 'timezone',
@@ -19361,7 +19371,8 @@ exports.default = [{
   key: 'format',
   label: 'Format',
   placeholder: 'Format',
-  tooltip: 'The moment.js format for saving the value of this field.',
+  description: 'Use formats formats provided by <a href="https://github.com/angular-ui/bootstrap/tree/master/src/dateparser/docs#uibdateparsers-format-codes" target="_blank">DateParser Codes</a>',
+  tooltip: 'The date format for saving the value of this field. You can use formats provided by <a href="https://github.com/angular-ui/bootstrap/tree/master/src/dateparser/docs#uibdateparsers-format-codes" target="_blank">DateParser Codes</a>',
   weight: 52
 }];
 
@@ -30719,7 +30730,6 @@ exports.formatDate = formatDate;
 exports.formatOffset = formatOffset;
 exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
 exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
-exports.convertFlatpickrToFormat = convertFlatpickrToFormat;
 exports.convertFormatToMoment = convertFormatToMoment;
 exports.getInputMask = getInputMask;
 exports.matchInputMask = matchInputMask;
@@ -30750,6 +30760,10 @@ var _jstimezonedetect = __webpack_require__(/*! jstimezonedetect */ "./node_modu
 var _jstimezonedetect2 = _interopRequireDefault(_jstimezonedetect);
 
 var _operators = __webpack_require__(/*! ./jsonlogic/operators */ "./node_modules/formiojs/utils/jsonlogic/operators.js");
+
+var _nativePromiseOnly = __webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js");
+
+var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -31453,11 +31467,11 @@ function offsetDate(date, timezone) {
 function loadZones(timezone) {
   if (timezone === currentTimezone()) {
     // Return non-resolving promise.
-    return new Promise();
+    return new _nativePromiseOnly2.default(_lodash2.default.noop);
   }
   if (timezone === 'UTC') {
     // Return non-resolving promise.
-    return new Promise();
+    return new _nativePromiseOnly2.default(_lodash2.default.noop);
   }
 
   if (_momentTimezone2.default.zonesPromise) {
@@ -31582,24 +31596,6 @@ function convertFormatToFlatpickr(format) {
 
   // Hours, minutes, seconds
   .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
-}
-
-function convertFlatpickrToFormat(format) {
-  return format
-  // Year conversion.
-  .replace('Y', 'YYYY').replace('y', 'YY')
-
-  // Month conversion.
-  .replace('F', 'MMMM').replace('M', 'MMM').replace('m', 'MM').replace('n', 'M')
-
-  // Day in month.
-  .replace('d', 'dd').replace('j', 'd')
-
-  // Day in week.
-  .replace('l', 'EEEE').replace('D', 'EEE')
-
-  // Hours, minutes, seconds
-  .replace('H', 'HH').replace('h', 'H').replace('i', 'mm').replace('S', 'ss').replace('K', 'a');
 }
 
 /**
