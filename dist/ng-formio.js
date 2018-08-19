@@ -30314,6 +30314,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var trim = function trim(text) {
   return (0, _trim3.default)(text, '/');
 };
+var path = function path(items) {
+  return items.filter(function (item) {
+    return !!item;
+  }).map(trim).join('/');
+};
 var s3 = function s3(formio) {
   return {
     uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
@@ -30341,7 +30346,7 @@ var s3 = function s3(formio) {
             }
 
             response.data.fileName = fileName;
-            response.data.key = trim(response.data.key) + '/' + trim(dir) + '/' + trim(fileName);
+            response.data.key = path([response.data.key, dir, fileName]);
 
             // Fire on network error.
             xhr.onerror = function (err) {
@@ -30356,7 +30361,7 @@ var s3 = function s3(formio) {
                   name: fileName,
                   bucket: response.bucket,
                   key: response.data.key,
-                  url: trim(response.url) + '/' + trim(response.data.key),
+                  url: path([response.url, response.data.key]),
                   acl: response.data.acl,
                   size: file.size,
                   type: file.type
@@ -30395,7 +30400,7 @@ var s3 = function s3(formio) {
         }
 
         pre.send(JSON.stringify({
-          name: trim(trim(dir) + '/' + trim(fileName)),
+          name: path([dir, fileName]),
           size: file.size,
           type: file.type
         }));
