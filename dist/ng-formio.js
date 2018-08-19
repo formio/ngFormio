@@ -19335,7 +19335,7 @@ exports.default = [{
   defaultValue: 'viewer',
   dataSrc: 'values',
   data: {
-    values: [{ label: 'of Viewer', value: 'viewer' }, { label: 'of Submission', value: 'submission' }, { label: 'of Location', value: 'location' }, { label: 'of UTC', value: 'utc' }]
+    values: [{ label: 'of Viewer', value: 'viewer' }, { label: 'of Submission', value: 'submission' }, { label: 'of Location', value: 'location' }, { label: 'UTC', value: 'utc' }]
   }
 }, {
   type: 'select',
@@ -31532,7 +31532,7 @@ function formatDate(value, format, timezone) {
   }
   if (timezone === 'UTC') {
     var offset = offsetDate(momentDate.toDate(), 'UTC');
-    return (0, _momentTimezone2.default)(offset).format(convertFormatToMoment(format)) + ' UTC';
+    return (0, _momentTimezone2.default)(offset.date).format(convertFormatToMoment(format)) + ' UTC';
   }
 
   // Return the timezoneText.
