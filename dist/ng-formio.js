@@ -13696,6 +13696,9 @@ var BaseComponent = function () {
 
       // Lazy load the quill library.
       return _Formio2.default.requireLibrary('quill', 'Quill', 'https://cdn.quilljs.com/1.3.6/quill.min.js', true).then(function () {
+        if (!element.parentNode) {
+          return _nativePromiseOnly2.default.reject();
+        }
         _this19.quill = new Quill(element, settings);
 
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
@@ -17436,20 +17439,21 @@ var ContentComponent = function (_BaseComponent) {
 
       if (this.options.builder) {
         var editorElement = this.ce('div');
+        this.element.appendChild(editorElement);
         this.addQuill(editorElement, this.wysiwygDefault, function (element) {
           _this2.component.html = element.value;
         }).then(function (editor) {
           editor.setContents(editor.clipboard.convert(_this2.component.html));
+        }).catch(function (err) {
+          return console.warn(err);
         });
-        this.element.appendChild(editorElement);
       } else {
         this.setHTML();
-      }
-
-      if (this.component.refreshOnChange) {
-        this.on('change', function () {
-          return _this2.setHTML();
-        });
+        if (this.component.refreshOnChange) {
+          this.on('change', function () {
+            return _this2.setHTML();
+          });
+        }
       }
     }
   }, {
@@ -28746,6 +28750,8 @@ var TextAreaComponent = function (_TextFieldComponent) {
         }
 
         return quill;
+      }).catch(function (err) {
+        return console.warn(err);
       });
 
       return this.input;
