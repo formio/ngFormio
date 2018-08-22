@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm install -g bower mocha gulp
+          command: sudo npm install -g bower mocha gulp
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "bower.json" }}
       - run:
