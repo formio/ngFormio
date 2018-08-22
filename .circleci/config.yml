@@ -69,13 +69,20 @@ jobs:
     environment:
       AWS_DEFAULT_REGION: "us-west-2"
     docker:
-      - image: circleci/node:8.11-browsers
+      - image: circleci/python:2.7-jessie
     steps:
-      - checkout
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
       - attach_workspace:
           at:
-            build
-      - run: echo 'ok'
+            dist
+      - run:
+          name: Build tgz
+          command: cd dist && tar -czvf ../${CIRCLE_TAG}.tgz *
+      - run:
+          name: Upload to s3
+          command: aws s3 cp ${CIRCLE_TAG}.tgz s3://formio-app-releases/${CIRCLE_TAG}.tgz
 
 workflows:
   version: 2
