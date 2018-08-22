@@ -1,6 +1,17 @@
 <div class="well">
-  <h4>S3 Storage</h4>
+  <h4>Amazon S3 / Minio</h4>
   <p>You can use any S3 compatible storage system for files. Enter the s3 information below.</p>
+</div>
+<div class="form-group">
+  <label for="minio">
+    <input ng-model="currentProject.settings.storage.s3.minio" id="minio" name="minio" type="checkbox"> Use <a href="https://minio.io" target="_blank">Minio Server</a>
+  </label>
+  <p class="text-muted">Provides a way to upload files to either <strong>On-Premise</strong> or <strong>Private Cloud</strong> hosting.</p>
+</div>
+<div class="form-group" ng-if="currentProject.settings.storage.s3.minio">
+  <label for="bucketUrl">Minio Server URL</label>
+  <input ng-model="currentProject.settings.storage.s3.bucketUrl" type="text" class="form-control" id="bucketUrl" name="bucketUrl" placeholder="Enter the Minio Server URL">
+  <p class="text-muted">Example <strong>http://minio.yourserver.com:9000</strong></p>
 </div>
 <div class="form-group">
   <label for="AWSAccessKeyId">Access Key ID</label>
@@ -14,21 +25,39 @@
   <label for="bucket">Bucket Name - Enter the name of your s3 bucket.</label>
   <input ng-model="currentProject.settings.storage.s3.bucket" type="text" class="form-control" id="bucket" name="bucket" placeholder="Enter the bucket name">
 </div>
-<div class="form-group">
+<div class="form-group" ng-if="!currentProject.settings.storage.s3.minio">
   <label for="bucketUrl">Bucket URL - The url of the bucket endpoints.</label>
   <input ng-model="currentProject.settings.storage.s3.bucketUrl" type="text" class="form-control" id="bucketUrl" name="bucketUrl" placeholder="Enter the bucket url">
+</div>
+<div class="form-group" ng-if="!currentProject.settings.storage.s3.minio">
+  <label for="region">Bucket Region (optional)</label>
+  <input ng-model="currentProject.settings.storage.s3.region" type="text" class="form-control" id="region" name="region" placeholder="us-east-1">
+  <p class="text-muted">If empty, and the Bucket URL does not contain the bucket region, then this will cause a redirect and will fail to upload.</p>
 </div>
 <div class="form-group">
   <label for="startsWith">Starts With (optional) - Put all files in a folder such as "uploads/"</label>
   <input ng-model="currentProject.settings.storage.s3.startsWith" type="text" class="form-control" id="startsWith" name="startsWith" placeholder="Enter a folder">
 </div>
-<div class="form-group">
+<div class="form-group" ng-if="!currentProject.settings.storage.s3.minio">
   <label for="acl">Access Control List (optional) - Require all files uploaded to this bucket to have this access level.</label>
   <select ng-model="currentProject.settings.storage.s3.acl" class="form-control" id="acl" name="acl" placeholder="Select an Access Control List">
     <option value="">Any</option>
     <option value="public-read">Public</option>
     <option value="private">Private</option>
   </select>
+</div>
+<div class="form-group" ng-if="!currentProject.settings.storage.s3.minio">
+  <label for="encryption">S3 Encryption (optional)</label>
+  <select ng-model="currentProject.settings.storage.s3.encryption" class="form-control" id="encryption" name="encryption" placeholder="Select an Encryption">
+    <option value="">None</option>
+    <option value="aes">AES-256</option>
+    <option value="kms">AWS-KMS</option>
+  </select>
+</div>
+<div class="form-group" ng-if="currentProject.settings.storage.s3.encryption === 'kms' && !currentProject.settings.storage.s3.minio">
+  <label for="kmsKey">KMS Key ID</label>
+  <input ng-model="currentProject.settings.storage.s3.kmsKey" type="text" class="form-control" id="kmsKey" name="kmsKey" placeholder="Enter the KMS Key ID">
+  <p class="text-muted">Specifies the ID of the AWS Key Management Service (KMS) master encryption key.</p>
 </div>
 <div class="form-group">
   <label for="maxSize">Max Size (optional) - The maximum file size (in bytes). Defaults to 100MB.</label>
