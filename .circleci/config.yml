@@ -61,6 +61,8 @@ jobs:
       - run:
           name: Test
           command: npm test
+      - store_artifacts:
+          path: ./test/screenshots
       - run: # wait for Sauce Connect to close the tunnel
           command: killall --wait sc
   deploy:
