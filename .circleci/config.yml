@@ -38,6 +38,8 @@ jobs:
       - checkout
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "bower.json" }}
+      - attach_workspace:
+          at: .
       - run:
           name: Start Server
           background: true
