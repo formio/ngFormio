@@ -27,7 +27,7 @@ dependencies:
     - sed -i "s|APP_VERSION|${TAG}|g" dist/config.js
 test:
   override:
-    - sc-4.3.13-linux/bin/sc -u travist -k 1c32baf7-f790-4a41-ae31-49c0972e13e7 --readyfile ~/sauce_is_ready:
+    - sc-4.3.13-linux/bin/sc -u ${SAUCELABS_USER} -k ${SAUCELABS_KEY} --readyfile ~/sauce_is_ready:
         background: true
       pwd: sc-*-linux
     # Wait for tunnel to be ready
