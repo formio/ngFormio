@@ -191,6 +191,7 @@ exports.default = app.directive('formio', function () {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
+      noSubmit: '=?',
       options: '<?'
     },
     link: function link(scope, element) {
@@ -198,6 +199,7 @@ exports.default = app.directive('formio', function () {
       scope.formioReady = false;
       scope.initialized = false;
       scope.options = scope.options || {};
+      scope.noSubmit = !!scope.noSubmit;
     },
     controller: ['$scope', '$q', function ($scope, $q) {
       $scope.onLoad = $q.defer();
@@ -215,6 +217,7 @@ exports.default = app.directive('formio', function () {
         if ($scope.src || $scope.form) {
           $scope.initialized = true;
           _formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(function (formio) {
+            formio.nosubmit = $scope.noSubmit;
             $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
             $scope.formio = formio;
             $scope.setupForm();
@@ -228,7 +231,7 @@ exports.default = app.directive('formio', function () {
         }
         if ($scope.url) {
           $scope.formio.url = $scope.url;
-          $scope.formio.nosubmit = false;
+          $scope.formio.nosubmit = $scope.noSubmit || false;
         }
         $scope.formio.events.onAny(function () {
           // Keep backwards compatibility by firing old events as well.
@@ -251,7 +254,7 @@ exports.default = app.directive('formio', function () {
               break;
             case 'submit':
               var submission = args[1];
-              args[0] = submission.saved ? 'formSubmit' : 'formSubmission';
+              args[0] = submission.saved ? 'formSubmission' : 'formSubmit';
               break;
             case 'submitDone':
               args[0] = 'formSubmission';
@@ -302,13 +305,13 @@ exports.default = app.directive('formio', function () {
         }
         if ($scope.formioReady) {
           $scope.formio.url = url;
-          $scope.formio.nosubmit = false;
+          $scope.formio.nosubmit = $scope.noSubmit || false;
         } else if (!$scope.initialized) {
           $scope.initializeForm();
         } else {
           $scope.onFormio.then(function () {
             $scope.formio.url = url;
-            $scope.formio.nosubmit = false;
+            $scope.formio.nosubmit = $scope.noSubmit || false;
           });
         }
       });
@@ -7625,11 +7628,18 @@ var Webform = function (_NestedComponent) {
     _this2.nosubmit = false;
 
     /**
-     * If the form has tried to be submitted, error or not.
+     * Determines if the form has tried to be submitted, error or not.
      *
      * @type {boolean}
      */
     _this2.submitted = false;
+
+    /**
+     * Determines if the form is being submitted at the moment.
+     *
+     * @type {boolean}
+     */
+    _this2.submitting = false;
 
     /**
      * The Formio instance for this form.
@@ -8242,13 +8252,6 @@ var Webform = function (_NestedComponent) {
   }, {
     key: 'setAlert',
     value: function setAlert(type, message) {
-      if (!type && this.submitted) {
-        if (this.alert) {
-          this.removeChild(this.alert);
-          this.alert = null;
-        }
-        return;
-      }
       if (this.options.noAlerts) {
         if (!message) {
           this.emit('error', false);
@@ -8323,14 +8326,9 @@ var Webform = function (_NestedComponent) {
         this.setAlert(false);
         return;
       }
-      var message = '<p>' + this.t('error') + '</p><ul>';
-      _lodash2.default.each(errors, function (err) {
-        if (err) {
-          var errorMessage = err.message || err;
-          message += '<li><strong>' + errorMessage + '</strong></li>';
-        }
-      });
-      message += '</ul>';
+      var message = '\n      <p>' + this.t('error') + '</p>\n      <ul>\n        ' + errors.map(function (err) {
+        return err ? '<li><strong>' + (err.message || err) + '</strong></li>' : '';
+      }).join('') + '\n      </ul>\n    ';
       this.setAlert('danger', message);
       if (triggerEvent) {
         this.emit('error', errors);
@@ -8350,6 +8348,7 @@ var Webform = function (_NestedComponent) {
     key: 'onSubmit',
     value: function onSubmit(submission, saved) {
       this.loading = false;
+      this.submitting = false;
       this.setPristine(true);
       this.setValue(submission, {
         noValidate: true,
@@ -8386,6 +8385,7 @@ var Webform = function (_NestedComponent) {
         }
       }
 
+      this.submitting = false;
       this.setPristine(false);
       return this.showErrors(error, true);
     }
@@ -8523,6 +8523,7 @@ var Webform = function (_NestedComponent) {
       var _this13 = this;
 
       this.submitted = true;
+      this.submitting = true;
       return this.submitForm(options).then(function (result) {
         return _this13.onSubmit(result.submission, result.saved);
       }).catch(function (err) {
@@ -8807,6 +8808,10 @@ var _dragula = __webpack_require__(/*! dragula */ "./node_modules/dragula/dragul
 
 var _dragula2 = _interopRequireDefault(_dragula);
 
+var _tooltip = __webpack_require__(/*! tooltip.js */ "./node_modules/tooltip.js/dist/esm/tooltip.js");
+
+var _tooltip2 = _interopRequireDefault(_tooltip);
+
 var _Components = __webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js");
 
 var _Components2 = _interopRequireDefault(_Components);
@@ -8898,6 +8903,11 @@ var WebformBuilder = function (_Webform) {
         _this.addEventListener(removeButton, 'click', function () {
           return _this.deleteComponent(comp);
         });
+        new _tooltip2.default(removeButton, {
+          trigger: 'hover',
+          placement: 'top',
+          title: _this.t('Remove')
+        });
 
         var editButton = _this.ce('div', {
           class: 'btn btn-xxs btn-default component-settings-button component-settings-button-edit'
@@ -8905,11 +8915,47 @@ var WebformBuilder = function (_Webform) {
         _this.addEventListener(editButton, 'click', function () {
           return _this.editComponent(comp);
         });
+        new _tooltip2.default(editButton, {
+          trigger: 'hover',
+          placement: 'top',
+          title: _this.t('Edit')
+        });
+
+        var copyButton = _this.ce('div', {
+          class: 'btn btn-xxs btn-default component-settings-button component-settings-button-copy'
+        }, _this.getIcon('copy'));
+        _this.addEventListener(copyButton, 'click', function () {
+          return _this.copyComponent(comp);
+        });
+        new _tooltip2.default(copyButton, {
+          trigger: 'hover',
+          placement: 'top',
+          title: _this.t('Copy')
+        });
+
+        var pasteButton = _this.ce('div', {
+          class: 'btn btn-xxs btn-default component-settings-button component-settings-button-paste'
+        }, _this.getIcon('save'));
+        var pasteTooltip = new _tooltip2.default(pasteButton, {
+          trigger: 'hover',
+          placement: 'top',
+          title: _this.t('Paste below')
+        });
+        _this.addEventListener(pasteButton, 'click', function () {
+          pasteTooltip.hide();
+          _this.pasteComponent(comp);
+        });
+
+        // Set in paste mode if we have an item in our clipboard.
+        var data = window.sessionStorage.getItem('formio.clipboard');
+        if (data) {
+          _this.addClass(_this.element, 'builder-paste-mode');
+        }
 
         // Add the edit buttons to the component.
         comp.prepend(_this.ce('div', {
           class: 'component-btn-group'
-        }, [removeButton, editButton]));
+        }, [removeButton, editButton, copyButton, pasteButton]));
       }
 
       if (!container.noDrop) {
@@ -9161,6 +9207,38 @@ var WebformBuilder = function (_Webform) {
 
       // Called when we edit a component.
       this.emit('editComponent', component);
+    }
+
+    /**
+     * Creates copy of component schema and stores it under sessionStorage.
+     * @param {Component} component
+     * @return {*}
+     */
+
+  }, {
+    key: 'copyComponent',
+    value: function copyComponent(component) {
+      this.addClass(this.element, 'builder-paste-mode');
+      var copy = _lodash2.default.cloneDeep(component.schema);
+      window.sessionStorage.setItem('formio.clipboard', JSON.stringify(copy));
+    }
+
+    /**
+     * Paste copied component after the current component.
+     * @param {Component} component
+     * @return {*}
+     */
+
+  }, {
+    key: 'pasteComponent',
+    value: function pasteComponent(component) {
+      this.removeClass(this.element, 'builder-paste-mode');
+      var data = window.sessionStorage.getItem('formio.clipboard');
+      if (data) {
+        var schema = JSON.parse(data);
+        window.sessionStorage.removeItem('formio.clipboard');
+        component.parent.addComponent(schema, false, false, component.element.nextSibling);
+      }
     }
   }, {
     key: 'destroy',
@@ -9678,19 +9756,29 @@ var Wizard = function (_Webform) {
   }
 
   _createClass(Wizard, [{
-    key: 'eachPage',
-    value: function eachPage(cb) {
+    key: 'getPages',
+    value: function getPages() {
       var _this2 = this;
 
       var pageOptions = _lodash2.default.clone(this.options);
-      _lodash2.default.each(this.pages, function (page) {
-        return cb(_this2.createComponent(page, pageOptions));
+      var components = _lodash2.default.clone(this.components);
+
+      // We shouldn't recreate a components on the page we currently on to avoid duplicate inputs desync.
+      return this.pages.map(function (page, index) {
+        return _this2.createComponent(page, Object.assign({}, pageOptions, {
+          components: index === _this2.page ? components : null
+        }));
       });
+    }
+  }, {
+    key: 'getComponents',
+    value: function getComponents() {
+      return this.submitting ? this.getPages() : _get(Wizard.prototype.__proto__ || Object.getPrototypeOf(Wizard.prototype), 'getComponents', this).call(this);
     }
   }, {
     key: 'resetValue',
     value: function resetValue() {
-      this.eachPage(function (page) {
+      this.getPages().forEach(function (page) {
         return page.resetValue();
       });
       this.setPristine(true);
@@ -9750,12 +9838,10 @@ var Wizard = function (_Webform) {
   }, {
     key: 'beforeSubmit',
     value: function beforeSubmit() {
-      var ops = [];
-      this.eachPage(function (page) {
+      return _nativePromiseOnly2.default.all(this.getPages().map(function (page) {
         page.options.beforeSubmit = true;
-        ops.push(page.beforeSubmit());
-      });
-      return _nativePromiseOnly2.default.all(ops);
+        return page.beforeSubmit();
+      }));
     }
   }, {
     key: 'nextPage',
@@ -9811,8 +9897,8 @@ var Wizard = function (_Webform) {
     key: 'getPageIndexByKey',
     value: function getPageIndexByKey(key) {
       var pageIndex = 0;
-      _lodash2.default.each(this.pages, function (_page, index) {
-        if (_page.key === key) {
+      this.pages.forEach(function (page, index) {
+        if (page.key === key) {
           pageIndex = index;
           return false;
         }
@@ -9855,7 +9941,7 @@ var Wizard = function (_Webform) {
       } while (pageIndex);
 
       // Add all other components.
-      _lodash2.default.each(this.wizard.components, function (component) {
+      this.wizard.components.forEach(function (component) {
         if (component.type !== 'panel') {
           wizard.components.push(component);
         }
@@ -9874,10 +9960,11 @@ var Wizard = function (_Webform) {
       var _this5 = this;
 
       this.pages = [];
-      _lodash2.default.each(form.components, function (component) {
+      form.components.forEach(function (component) {
         if (component.type === 'panel') {
           // Ensure that this page can be seen.
           if ((0, _utils.checkCondition)(component, _this5.data, _this5.data, _this5.wizard, _this5)) {
+            component.internal = true;
             _this5.pages.push(component);
           }
         } else if (component.type === 'hidden') {
@@ -9972,7 +10059,7 @@ var Wizard = function (_Webform) {
       this.prepend(this.wizardHeader);
 
       var showHistory = currentPage.breadcrumb.toLowerCase() === 'history';
-      _lodash2.default.each(this.pages, function (page, i) {
+      this.pages.forEach(function (page, i) {
         // See if this page is in our history.
         if (showHistory && _this7.page !== i && !(_this7.history.indexOf(i) !== -1)) {
           return;
@@ -10034,7 +10121,7 @@ var Wizard = function (_Webform) {
       // Only rebuild if there is a page change.
       var pageIndex = 0;
       var rebuild = false;
-      _lodash2.default.each(this.wizard.components, function (component) {
+      this.wizard.components.forEach(function (component) {
         if (component.type !== 'panel') {
           return;
         }
@@ -10082,7 +10169,7 @@ var Wizard = function (_Webform) {
         class: 'list-inline'
       });
       this.element.appendChild(this.wizardNav);
-      _lodash2.default.each([{ name: 'cancel', method: 'cancel', class: 'btn btn-default btn-secondary' }, { name: 'previous', method: 'prevPage', class: 'btn btn-primary' }, { name: 'next', method: 'nextPage', class: 'btn btn-primary' }, { name: 'submit', method: 'submit', class: 'btn btn-primary' }], function (button) {
+      [{ name: 'cancel', method: 'cancel', class: 'btn btn-default btn-secondary' }, { name: 'previous', method: 'prevPage', class: 'btn btn-primary' }, { name: 'next', method: 'nextPage', class: 'btn btn-primary' }, { name: 'submit', method: 'submit', class: 'btn btn-primary' }].forEach(function (button) {
         if (!_this9.hasButton(button.name, nextPage)) {
           return;
         }
@@ -12574,6 +12661,8 @@ var BaseComponent = function () {
         return spinning ? 'glyphicon glyphicon-' + name + ' glyphicon-spin' : 'glyphicon glyphicon-' + name;
       }
       switch (name) {
+        case 'save':
+          return 'fa fa-download';
         case 'zoom-in':
           return 'fa fa-search-plus';
         case 'zoom-out':
@@ -13469,6 +13558,33 @@ var BaseComponent = function () {
     }
 
     /**
+     * Checks to see if a separate component is in the "context" of this component. This is determined by first checking
+     * if they share the same "data" object. It will then walk up the parent tree and compare its parents data objects
+     * with the components data and returns true if they are in the same context.
+     *
+     * Different rows of the same EditGrid, for example, are in different contexts.
+     *
+     * @param component
+     */
+
+  }, {
+    key: 'inContext',
+    value: function inContext(component) {
+      if (component.data === this.data) {
+        return true;
+      }
+      var parent = this.parent;
+      while (parent) {
+        if (parent.data === component.data) {
+          return true;
+        }
+        parent = parent.parent;
+      }
+
+      return false;
+    }
+
+    /**
      * Hide or Show an element.
      *
      * @param show
@@ -14073,7 +14189,7 @@ var BaseComponent = function () {
         this.removeClass(this.element, 'has-error');
         this.error = null;
       }
-      _lodash2.default.each(this.inputs, function (input) {
+      this.inputs.forEach(function (input) {
         input = _this20.performInputMapping(input);
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
@@ -20290,6 +20406,7 @@ var EditGridComponent = function (_NestedComponent) {
         input: true,
         tree: true,
         defaultOpen: false,
+        removeRow: '',
         components: [],
         templates: {
           header: this.defaultHeaderTemplate,
@@ -20363,12 +20480,15 @@ var EditGridComponent = function (_NestedComponent) {
     }
   }, {
     key: 'buildTable',
-    value: function buildTable() {
+    value: function buildTable(fromBuild) {
       var _this3 = this;
 
       // Do not show the table when in builder mode.
       if (this.options.builder) {
         return;
+      }
+      if (!fromBuild && !this.editRows.length && this.component.defaultOpen) {
+        return this.addRow(true);
       }
       var tableClass = 'editgrid-listgroup list-group ';
       _lodash2.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
@@ -20382,6 +20502,15 @@ var EditGridComponent = function (_NestedComponent) {
         this.element.replaceChild(tableElement, this.tableElement);
       } else {
         this.element.appendChild(tableElement);
+      }
+      //add open class to the element if any edit grid row is open
+      var isAnyRowOpen = _lodash2.default.some(this.editRows, function (row) {
+        return row.isOpen;
+      });
+      if (isAnyRowOpen) {
+        this.addClass(this.element, 'formio-component-' + this.component.type + '-row-open');
+      } else {
+        this.removeClass(this.element, 'formio-component-' + this.component.type + '-row-open');
       }
       this.tableElement = tableElement;
     }
@@ -20524,7 +20653,7 @@ var EditGridComponent = function (_NestedComponent) {
     }
   }, {
     key: 'addRow',
-    value: function addRow() {
+    value: function addRow(fromBuild) {
       if (this.options.readOnly) {
         return;
       }
@@ -20537,7 +20666,7 @@ var EditGridComponent = function (_NestedComponent) {
         component: this.component,
         row: this.editRows[this.editRows.length - 1]
       });
-      this.buildTable();
+      this.buildTable(fromBuild);
     }
   }, {
     key: 'editRow',
@@ -20546,6 +20675,13 @@ var EditGridComponent = function (_NestedComponent) {
       this.editRows[rowIndex].isOpen = true;
       this.editRows[rowIndex].editing = true;
       this.editRows[rowIndex].data = _lodash2.default.cloneDeep(this.dataValue[rowIndex]);
+      this.buildTable();
+    }
+  }, {
+    key: 'updateGrid',
+    value: function updateGrid() {
+      this.updateValue();
+      this.triggerChange();
       this.buildTable();
     }
   }, {
@@ -20565,8 +20701,7 @@ var EditGridComponent = function (_NestedComponent) {
         this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
         this.editRows.splice(rowIndex, 1);
       }
-      this.buildTable();
-      this.checkValidity(this.data, true);
+      this.updateGrid();
     }
   }, {
     key: 'saveRow',
@@ -20594,10 +20729,7 @@ var EditGridComponent = function (_NestedComponent) {
       }
       this.editRows[rowIndex].dirty = false;
       this.editRows[rowIndex].isOpen = false;
-      this.updateValue();
-      this.triggerChange();
-      this.buildTable();
-      this.checkValidity(this.data, true);
+      this.updateGrid();
     }
   }, {
     key: 'removeRow',
@@ -20608,10 +20740,7 @@ var EditGridComponent = function (_NestedComponent) {
       this.splice(rowIndex);
       this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
       this.editRows.splice(rowIndex, 1);
-      this.updateValue();
-      this.triggerChange();
-      this.buildTable();
-      this.checkValidity(this.data, true);
+      this.updateGrid();
     }
   }, {
     key: 'removeRowComponents',
@@ -22211,6 +22340,14 @@ var FormComponent = function (_BaseComponent) {
 
       return _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'calculateValue', this).call(this, data, flags);
     }
+  }, {
+    key: 'setPristine',
+    value: function setPristine(pristine) {
+      _get(FormComponent.prototype.__proto__ || Object.getPrototypeOf(FormComponent.prototype), 'setPristine', this).call(this, pristine);
+      if (this.subForm) {
+        this.subForm.setPristine(pristine);
+      }
+    }
 
     /**
      * Submit the form before the next page is triggered.
@@ -23645,24 +23782,28 @@ var NestedComponent = function (_BaseComponent) {
      * @param element
      * @param data
      */
-    value: function addComponents(element, data) {
+    value: function addComponents(element, data, options) {
       var _this4 = this;
 
       element = element || this.getContainer();
       data = data || this.data;
-      var components = this.hook('addComponents', this.componentComponents, this);
-      _lodash2.default.each(components, function (component) {
-        return _this4.addComponent(component, element, data);
-      });
+      options = options || this.options;
+
+      if (options.components) {
+        this.components = options.components;
+      } else {
+        var components = this.hook('addComponents', this.componentComponents, this);
+        components.forEach(function (component) {
+          return _this4.addComponent(component, element, data);
+        });
+      }
     }
   }, {
     key: 'updateValue',
     value: function updateValue(flags) {
-      var changed = false;
-      _lodash2.default.each(this.components, function (comp) {
-        changed |= comp.updateValue(flags);
-      });
-      return changed;
+      return this.components.reduce(function (changed, comp) {
+        return comp.updateValue(flags) || changed;
+      }, false);
     }
   }, {
     key: 'hasChanged',
@@ -23693,7 +23834,7 @@ var NestedComponent = function (_BaseComponent) {
       });
 
       // Iterate through all components and check conditions, and calculate values.
-      _lodash2.default.each(this.getComponents(), function (comp) {
+      this.getComponents().forEach(function (comp) {
         changed |= comp.calculateValue(data, {
           noUpdateEvent: true
         });
@@ -23733,6 +23874,7 @@ var NestedComponent = function (_BaseComponent) {
       var shown = _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'show', this).call(this, _show);
       var forceShow = this.options.show && this.options.show[this.component.key];
       var forceHide = this.options.hide && this.options.hide[this.component.key];
+
       if (forceShow || forceHide) {
         this.getComponents().forEach(function (component) {
           if (forceShow) {
@@ -23754,11 +23896,9 @@ var NestedComponent = function (_BaseComponent) {
   }, {
     key: 'beforeNext',
     value: function beforeNext() {
-      var ops = [];
-      _lodash2.default.each(this.getComponents(), function (comp) {
-        return ops.push(comp.beforeNext());
-      });
-      return _nativePromiseOnly2.default.all(ops);
+      return _nativePromiseOnly2.default.all(this.getComponents().map(function (comp) {
+        return comp.beforeNext();
+      }));
     }
 
     /**
@@ -23770,29 +23910,23 @@ var NestedComponent = function (_BaseComponent) {
   }, {
     key: 'beforeSubmit',
     value: function beforeSubmit() {
-      var ops = [];
-      _lodash2.default.each(this.getComponents(), function (comp) {
-        return ops.push(comp.beforeSubmit());
-      });
-      return _nativePromiseOnly2.default.all(ops);
+      return _nativePromiseOnly2.default.all(this.getComponents().map(function (comp) {
+        return comp.beforeSubmit();
+      }));
     }
   }, {
     key: 'calculateValue',
     value: function calculateValue(data, flags) {
-      var changed = _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'calculateValue', this).call(this, data, flags);
-      _lodash2.default.each(this.getComponents(), function (comp) {
-        changed |= comp.calculateValue(data, flags);
-      });
-      return changed;
+      return this.getComponents().reduce(function (changed, comp) {
+        return comp.calculateValue(data, flags) || changed;
+      }, _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'calculateValue', this).call(this, data, flags));
     }
   }, {
     key: 'isValid',
     value: function isValid(data, dirty) {
-      var valid = _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'isValid', this).call(this, data, dirty);
-      _lodash2.default.each(this.getComponents(), function (comp) {
-        valid &= comp.isValid(data, dirty);
-      });
-      return valid;
+      return this.getComponents().reduce(function (valid, comp) {
+        return comp.isValid(data, dirty) && valid;
+      }, _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'isValid', this).call(this, data, dirty));
     }
   }, {
     key: 'checkValidity',
@@ -23802,17 +23936,15 @@ var NestedComponent = function (_BaseComponent) {
         return true;
       }
 
-      var check = _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'checkValidity', this).call(this, data, dirty);
-      _lodash2.default.each(this.getComponents(), function (comp) {
-        check &= comp.checkValidity(data, dirty);
-      });
-      return check;
+      return this.getComponents().reduce(function (check, comp) {
+        return comp.checkValidity(data, dirty) && check;
+      }, _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'checkValidity', this).call(this, data, dirty));
     }
   }, {
     key: 'setPristine',
     value: function setPristine(pristine) {
       _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'setPristine', this).call(this, pristine);
-      _lodash2.default.each(this.getComponents(), function (comp) {
+      this.getComponents().forEach(function (comp) {
         return comp.setPristine(pristine);
       });
     }
@@ -23827,20 +23959,12 @@ var NestedComponent = function (_BaseComponent) {
     value: function destroyComponents() {
       var _this5 = this;
 
-      var components = _lodash2.default.clone(this.components);
-      _lodash2.default.each(components, function (comp) {
+      var components = this.components.slice();
+      components.forEach(function (comp) {
         return _this5.removeComponent(comp, _this5.components);
       });
       this.components = [];
       this.hidden = [];
-    }
-  }, {
-    key: 'setCustomValidity',
-    value: function setCustomValidity(message, dirty) {
-      _get(NestedComponent.prototype.__proto__ || Object.getPrototypeOf(NestedComponent.prototype), 'setCustomValidity', this).call(this, message, dirty);
-      _lodash2.default.each(this.getComponents(), function (comp) {
-        return comp.setCustomValidity(message, dirty);
-      });
     }
   }, {
     key: 'setHidden',
@@ -23873,7 +23997,7 @@ var NestedComponent = function (_BaseComponent) {
   }, {
     key: 'resetValue',
     value: function resetValue() {
-      _lodash2.default.each(this.getComponents(), function (comp) {
+      this.getComponents().forEach(function (comp) {
         return comp.resetValue();
       });
       _lodash2.default.unset(this.data, this.key);
@@ -23886,22 +24010,20 @@ var NestedComponent = function (_BaseComponent) {
         return false;
       }
       flags = this.getFlags.apply(this, arguments);
-      var changed = false;
-      this.getComponents().forEach(function (component) {
+      return this.getComponents().reduce(function (changed, component) {
         if (component.type === 'button') {
           return;
         }
 
         if (component.type === 'components') {
-          changed |= component.setValue(value, flags);
+          return component.setValue(value, flags) || changed;
         } else if (value && component.hasValue(value)) {
-          changed |= component.setValue(_lodash2.default.get(value, component.key), flags);
+          return component.setValue(_lodash2.default.get(value, component.key), flags) || changed;
         } else {
           flags.noValidate = true;
-          changed |= component.setValue(component.defaultValue, flags);
+          return component.setValue(component.defaultValue, flags) || changed;
         }
-      });
-      return changed;
+      }, false);
     }
   }, {
     key: 'setCollapseHeader',
@@ -23961,21 +24083,16 @@ var NestedComponent = function (_BaseComponent) {
   }, {
     key: 'disabled',
     set: function set(disabled) {
-      _lodash2.default.each(this.components, function (component) {
+      this.components.forEach(function (component) {
         return component.disabled = disabled;
       });
     }
   }, {
     key: 'errors',
     get: function get() {
-      var errors = [];
-      _lodash2.default.each(this.getAllComponents(), function (comp) {
-        var compErrors = comp.errors;
-        if (compErrors.length) {
-          errors = errors.concat(compErrors);
-        }
-      });
-      return errors;
+      return this.getAllComponents().reduce(function (errors, comp) {
+        return errors.concat(comp.errors || []);
+      }, []);
     }
   }, {
     key: 'value',
@@ -23985,11 +24102,9 @@ var NestedComponent = function (_BaseComponent) {
   }, {
     key: 'dataReady',
     get: function get() {
-      var promises = [];
-      _lodash2.default.each(this.getComponents(), function (component) {
-        return promises.push(component.dataReady);
-      });
-      return _nativePromiseOnly2.default.all(promises);
+      return _nativePromiseOnly2.default.all(this.getComponents().map(function (component) {
+        return component.dataReady;
+      }));
     }
   }]);
 
@@ -25532,6 +25647,7 @@ var SelectComponent = function (_BaseComponent) {
         valueProperty: '',
         refreshOn: '',
         filter: '',
+        clearOnRefresh: false,
         searchEnabled: true,
         searchField: '',
         minSearch: 0,
@@ -25582,7 +25698,7 @@ var SelectComponent = function (_BaseComponent) {
     key: 'refreshItems',
     value: function refreshItems() {
       this.triggerUpdate();
-      if (this.component.clearOnRefresh) {
+      if (this.component.clearOnRefresh && this.refreshOnChanged) {
         this.setValue(null);
       }
     }
@@ -25978,10 +26094,27 @@ var SelectComponent = function (_BaseComponent) {
       this.refreshItems();
     }
   }, {
-    key: 'addInput',
+    key: 'refreshValue',
 
+
+    /**
+     * Sets the value of the refresh dependency and keep track if it has changed.
+     *
+     * @param value
+     */
+    value: function refreshValue(value) {
+      if (this.hasOwnProperty('refreshOnValue')) {
+        this.refreshOnChanged = !_lodash2.default.isEqual(value, this.refreshOnValue);
+      } else {
+        this.refreshOnChanged = true;
+      }
+      this.refreshOnValue = value;
+    }
 
     /* eslint-disable max-statements */
+
+  }, {
+    key: 'addInput',
     value: function addInput(input, container) {
       var _this5 = this;
 
@@ -25991,8 +26124,13 @@ var SelectComponent = function (_BaseComponent) {
       if (this.component.refreshOn) {
         this.on('change', function (event) {
           if (_this5.component.refreshOn === 'data') {
+            _this5.refreshValue(_this5.data);
             _this5.refreshItems();
-          } else if (event.changed && event.changed.component && event.changed.component.key === _this5.component.refreshOn) {
+          } else if (event.changed && event.changed.component && event.changed.component.key === _this5.component.refreshOn &
+          // Make sure the changed component is not in a different "context". Solves issues where refreshOn being set
+          // in fields inside EditGrids could alter their state from other rows (which is bad).
+          _this5.inContext(event.changed.instance)) {
+            _this5.refreshValue(event.changed.value);
             _this5.refreshItems();
           }
         });
@@ -26859,6 +26997,9 @@ var SelectBoxesComponent = function (_RadioComponent) {
       info.attr.class = 'form-check-input';
       return info;
     }
+  }, {
+    key: 'isEmpty',
+
 
     /**
      * Only empty if the values are all false.
@@ -26866,9 +27007,6 @@ var SelectBoxesComponent = function (_RadioComponent) {
      * @param value
      * @return {boolean}
      */
-
-  }, {
-    key: 'isEmpty',
     value: function isEmpty(value) {
       var empty = true;
       for (var key in value) {
@@ -26934,6 +27072,14 @@ var SelectBoxesComponent = function (_RadioComponent) {
     key: 'defaultSchema',
     get: function get() {
       return SelectBoxesComponent.schema();
+    }
+  }, {
+    key: 'emptyValue',
+    get: function get() {
+      return this.component.values.reduce(function (prev, value) {
+        prev[value.value] = false;
+        return prev;
+      }, {});
     }
   }]);
 
@@ -28782,8 +28928,11 @@ var TextAreaComponent = function (_TextFieldComponent) {
     value: function setValue(value, flags) {
       var _this3 = this;
 
-      if (_lodash2.default.isEqual(value, this.getValue())) {
-        //don't do anything if new value is equal to current
+      //should set value if new value is not equal to current
+      var shouldSetValue = !_lodash2.default.isEqual(value, this.getValue());
+      //should set value if is in read only mode
+      shouldSetValue = shouldSetValue || this.options.readOnly;
+      if (!shouldSetValue) {
         return;
       }
       value = value || '';
@@ -28945,7 +29094,7 @@ exports.default = [{
   tooltip: 'Enter the WYSIWYG editor JSON configuration.',
   key: 'wysiwyg',
   customDefaultValue: function customDefaultValue(value, component, row, data, instance) {
-    return instance.wysiwygDefault();
+    return instance.wysiwygDefault;
   },
 
   conditional: {
@@ -31192,16 +31341,20 @@ function checkSimpleConditional(component, condition, row, data) {
   if (_lodash2.default.isNil(value)) {
     value = '';
   }
+
+  var eq = String(condition.eq);
+  var show = String(condition.show);
+
   // Special check for selectboxes component.
   if (_lodash2.default.isObject(value) && _lodash2.default.has(value, condition.eq)) {
-    return value[condition.eq].toString() === condition.show.toString();
+    return String(value[condition.eq]) === show;
   }
   // FOR-179 - Check for multiple values.
-  if (Array.isArray(value) && value.indexOf(condition.eq) !== -1) {
-    return condition.show.toString() === 'true';
+  if (Array.isArray(value) && value.map(String).indexOf(eq) !== -1) {
+    return show === 'true';
   }
 
-  return value.toString() === condition.eq.toString() === (condition.show.toString() === 'true');
+  return String(value) === eq === (show === 'true');
 }
 
 /**

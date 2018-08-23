@@ -4,10 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 3.3.6
+### Added
+ - Ability to pass nosubmit flag to core renderer
+ 
+### Fixed
+ - Issue where submit events were getting mixed up.
+
+### 3.x
+### Changed
+ - This version is a wrapper around the Core JavaScript renderer @ https://github.com/formio/formio.js
+
+
 ### Added
  - Time component.
- - Ability to pass nosubmit flag to core renderer
 ### Fixed
  - ngFormioGrid display being broken
  - View not being updated when inner submission fields are changed
