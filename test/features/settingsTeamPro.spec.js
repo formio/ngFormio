@@ -307,9 +307,9 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('File Storage');
       actions.iDonotSeeText('Upgrade your project to a paid plan to access file storage settings.');
-      actions.iSeeText('S3 Storage');
+      actions.iSeeText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.iSeeText('Dropbox');
-      actions.clickOnElementWithText('S3 Storage');
+      actions.clickOnElementWithText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.enterTextInField('#bucket','testbucket');
       actions.iSeeValueIn('#bucketUrl','https://testbucket.s3.amazonaws.com/');
       actions.clickOnClass('#acl');

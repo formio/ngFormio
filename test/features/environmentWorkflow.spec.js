@@ -36,7 +36,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('File Storage');
-      actions.clickOnElementWithText('S3 Storage');
+      actions.clickOnElementWithText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.enterTextInField('#AWSAccessKeyId', 'AWSAccessKeyId');
       actions.clickOnElementWithText('Save Settings');
       actions.clickOnClass('.toast-message');
@@ -70,7 +70,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('SendGrid Settings');
       actions.iDonotSeeText('sendGridPassword');
       actions.clickOnElementWithText('File Storage');
-      actions.clickOnElementWithText('S3 Storage');
+      actions.clickOnElementWithText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.iDonotSeeText('AWSAccessKeyId');
       actions.clickOnElementWithText('Data Connections');
       actions.clickOnElementWithText('Kickbox');

@@ -51,6 +51,7 @@ module.exports = function (actions,tags) {
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="form-group-name"]/div[1]/input');
       actions.enterTextInField('#form-group-name>div.input-group.ng-scope>input','${random-name>test.name}');
+      actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText(' Save Stage');
       actions.waitForActionToComplete(500);
       actions.clickOnElementWithText('Forms');
@@ -361,9 +362,9 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Integrations');
       actions.clickOnElementWithText('File Storage');
       actions.iDonotSeeText('Upgrade your project to a paid plan to access file storage settings.');
-      actions.iSeeText('S3 Storage');
+      actions.iSeeText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.iSeeText('Dropbox');
-      actions.clickOnElementWithText('S3 Storage');
+      actions.clickOnElementWithText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.enterTextInField('#bucket', 'testbucket');
       actions.iSeeValueIn('#bucketUrl', 'https://testbucket.s3.amazonaws.com/');
       actions.clickOnClass('#acl');

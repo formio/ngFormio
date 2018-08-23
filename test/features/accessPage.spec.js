@@ -121,7 +121,7 @@ module.exports = function (actions,tags) {
       actions.clickOnClassWithIndex('.ui-select-search', 0);
       actions.clickOnElementWithText('Updated TestingRole');
       actions.clickOnClass('.toast-message');
-      actions.iSeeTextCount('Updated TestingRole',3);
+      actions.iSeeTextCount('Updated TestingRole',2);
       actions.clickOnElementWithText(' Edit Form Access');
       actions.checkingUrlEndsWith('/permission');
       actions.iSeeText('User Login Form ');

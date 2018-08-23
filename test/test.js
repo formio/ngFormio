@@ -59,7 +59,6 @@ describe("Formio Tests", function () {
   require('./features/welcomePage.spec')(actions,tags);
   require('./features/overview.spec')(actions,tags);
   require('./features/onPremise.spec')(actions,tags);
-  // require('./features/skynurses.spec')(actions,tags);
 });
 afterEach(function () {
     if (this.currentTest.state !== 'passed') {
