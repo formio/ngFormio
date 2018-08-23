@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - View not being updated when inner submission fields are changed
  - Buttons with 'event' action firing events twice
  - Watchers not firing when input is changed on the form
+ - Submit event names being mixed up
 
 ## 2.19.5
 ### Changed

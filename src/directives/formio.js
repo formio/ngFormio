@@ -73,7 +73,7 @@ export default app.directive('formio', function() {
                 break;
               case 'submit':
                 const submission = args[1];
-                args[0] = submission.saved ? 'formSubmit' : 'formSubmission';
+                args[0] = submission.saved ? 'formSubmission' : 'formSubmit';
                 break;
               case 'submitDone':
                 args[0] = 'formSubmission';
