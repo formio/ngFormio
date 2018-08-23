@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-4">
       <ng-include src="'views/project/settings/menu.html'" />
-      <div ng-if="['basic', 'trial'].indexOf(selectedPlan.name) === -1">
+      <div ng-if="(['basic', 'trial'].indexOf(selectedPlan.name) === -1) || (pdfInfo.plan === 'hosted')">
         <div ng-if="!paymentInfoLoading && !paymentInfo" class="cc-form">
           <h5 class="text-muted">Enter your credit card info.<br>Your first month will be billed on a prorated basis.</h5>
           <formio src="paymentForm" form-action="'/payeezy'"></formio>
