@@ -10,6 +10,7 @@ export default app.directive('formio', function() {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
+      noSubmit: '=?',
       options: '<?'
     },
     link: function (scope, element) {
@@ -17,6 +18,7 @@ export default app.directive('formio', function() {
       scope.formioReady = false;
       scope.initialized = false;
       scope.options = scope.options || {};
+      scope.noSubmit = !!scope.noSubmit;
     },
     controller: [
       '$scope',
@@ -37,6 +39,7 @@ export default app.directive('formio', function() {
           if ($scope.src || $scope.form) {
             $scope.initialized = true;
             Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(formio => {
+              formio.nosubmit = $scope.noSubmit;
               $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
               $scope.formio = formio;
               $scope.setupForm();
@@ -50,7 +53,7 @@ export default app.directive('formio', function() {
           }
           if ($scope.url) {
             $scope.formio.url = $scope.url;
-            $scope.formio.nosubmit = false;
+            $scope.formio.nosubmit = $scope.noSubmit || false;
           }
           $scope.formio.events.onAny(function() {
             // Keep backwards compatibility by firing old events as well.
@@ -124,7 +127,7 @@ export default app.directive('formio', function() {
           }
           if ($scope.formioReady) {
             $scope.formio.url = url;
-            $scope.formio.nosubmit = false;
+            $scope.formio.nosubmit = $scope.noSubmit || false;
           }
           else if (!$scope.initialized) {
             $scope.initializeForm();
@@ -132,7 +135,7 @@ export default app.directive('formio', function() {
           else {
             $scope.onFormio.then(() => {
               $scope.formio.url = url;
-              $scope.formio.nosubmit = false;
+              $scope.formio.nosubmit = $scope.noSubmit || false;
             });
           }
         });

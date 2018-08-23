@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Added
  - Time component.
+ - Ability to pass nosubmit flag to core renderer
 ### Fixed
  - ngFormioGrid display being broken
  - View not being updated when inner submission fields are changed
