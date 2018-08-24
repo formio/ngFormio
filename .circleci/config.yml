@@ -64,7 +64,7 @@ jobs:
       - store_artifacts:
           path: ./test/screenshots
       - run: # wait for Sauce Connect to close the tunnel
-          command: pkill --wait sc
+          command: pkill sc
   deploy:
     environment:
       AWS_DEFAULT_REGION: "us-west-2"
