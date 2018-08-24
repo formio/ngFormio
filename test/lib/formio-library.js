@@ -352,8 +352,8 @@ module.exports = function (config) {
 
     return new Promise(function (resolve, reject) {
       browser.wait(function () {
-          return ele.isPresent();
-        }, timeout)
+        return ele.isPresent();
+      }, timeout)
         .then(function () {
           resolve(ele);
         })
@@ -402,9 +402,8 @@ module.exports = function (config) {
   this.enterTextInField = function (field, text) {
     text=replacements(text);
     it('I enter ' + text + ' in ' + field + ' field', function (done) {
-      //console.log(text);
-      //var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(field));
-      var ele = element(by.css(field));
+      var ele = field.startsWith("xpath:") ? element(by.xpath(field.substring(field.indexOf(':') + 1))) : element.all(by.css(field)).first();
+      //var ele = element(by.css(field));
       //console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
@@ -471,6 +470,7 @@ module.exports = function (config) {
   };
 
   this.iDonotSeeText = function (text) {
+    text = replacements(text);
     it('I do not see "' + text + '"', function (next) {
       try {
         var ele = element(by.xpath("//*[text()='" + text + "']"));
@@ -493,19 +493,14 @@ module.exports = function (config) {
   };
 
   this.iSeeText = function (text) {
+    text=replacements(text);
     it('I see text "' + text + '"', function (next) {
       try {
         var xpath = '//*[contains(text(),"' + replacements(text) + '")]';
         browser.wait(function () {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
-          element.all(by.xpath(xpath)).isDisplayed().then(function (visible) {
-            if (typeof (visible) == 'object') {
-              assert.equal(visible.indexOf(true) > -1, true);
-            } else {
-              assert.equal(visible, true);
-            }
-          });
+          assert.equal(result, true);
           next();
         });
       } catch (err) {
@@ -516,7 +511,7 @@ module.exports = function (config) {
 
   this.enableAngular = function(text){
     it('Angular is enabled '+ text,function(){
-        browser.waitForAngularEnabled(text);
+      browser.waitForAngularEnabled(text);
     });
   };
 
@@ -535,7 +530,7 @@ module.exports = function (config) {
   };
 
   this.clickOnElementWithTextIndex = function (text,index) {
-    it('I click on the ' + replacements(text.toString()) + ' text ', function (next) {
+    it('I click on the ' + replacements(text.toString()) + ' text with index ' + index, function (next) {
       var ele =  element.all(by.xpath('//*[text()="' + replacements(text.toString()) + '"]')).get(index);
       browser.wait(function () {
         return ele.isPresent();
@@ -595,19 +590,7 @@ module.exports = function (config) {
       });
     });
   };
-  this.clickOnClass = function (className) {
-    it('I click on the ' + className + ' class', function (next) {
-      var ele =  element.all(by.css(replacements(className.toString()))).first();
-      browser.wait(function () {
-        return ele.isPresent();
-      }, timeout).then(function (res) {
-        scrollTo(ele)
-          .then(function() {
-            ele.click().then(next).catch(next);
-          });
-      });
-    });
-  };
+
 
   this.iGoToEnv = function (env) {
     it('I go to environment ' + env, function(next) {
@@ -648,7 +631,20 @@ module.exports = function (config) {
       });
     });
   };
-
+  this.selectOptionWithID = function(select, option) {
+    it('Selects ' + option + ' in ' + select, function(next) {
+      var sel = element(by.xpath('//select[contains(@id, "' + select + '")]'));
+      //var sel = element(by.css(select));
+      browser.wait(function() {
+        return sel.isPresent();
+      }, timeout).then(function() {
+        sel.click().then(function() {
+          var opt = element(by.xpath('//select[contains(@id, "' + select + '")]/option[@label="' + option + '"]'));
+          opt.click().then(next);
+        });
+      });
+    });
+  };
   this.iSeeEnv = function (env) {
     it('I see environment ' + env, function(next) {
       var envTab = element(by.xpath('//a[contains(@class, "environment-tab") and contains(text(),"' + env + '")]'));
@@ -673,24 +669,7 @@ module.exports = function (config) {
     });
   };
 
-  this.iSeeTextIn = function (ele, text) {
-    text = replacements(text);
-    it('I see text', function (next) {
-      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
-      browser.wait(function () {
-        return ele.isPresent();
-      }, timeout).then(function () {
-        try {
-          var temp=ele.getText();
-          var temp1=temp.then(function(tx) {return tx.trim();})
-          config.expect(temp1).to.eventually.equal(text.trim());
-          next();
-        } catch (err) {
-          next(err);
-        }
-      });
-    });
-  };
+
 
   this.userExistsWith = function (username, email, password) {
     username = replacements(username);
@@ -773,14 +752,29 @@ module.exports = function (config) {
       }
     });
   };
-
+  this.clickOnClass = function (className) {
+    it('I click on the ' + className + ' class', function (next) {
+      var ele =  element.all(by.css(replacements(className.toString()))).first();
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
+      });
+    });
+  };
   this.clickOnElement = function (text) {
     it('I click on the ' + text, function (next) {
       var ele = text.startsWith("xpath:") ? element(by.xpath(text.substring(text.indexOf(':') + 1))) : element(by.css(text));
       browser.wait(function () {
         return ele.isPresent();
-      }, timeout).then(function () {
-        ele.click().then(next).catch(next);
+      }, timeout).then(function (res) {
+        scrollTo(ele)
+          .then(function() {
+            ele.click().then(next).catch(next);
+          });
       });
     });
   };
@@ -924,16 +918,64 @@ module.exports = function (config) {
 
   this.iSeeValueIn = function (ele, text) {
     text = replacements(text.toString());
-    it('I see text ' + text + ' in ' + ele, function (next) {
+    it('I see value ' + text + ' in ' + ele, function (next) {
       var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).first();
       browser.wait(function () {
         return ele1.isPresent();
       }, timeout).then(function () {
         ele1.getAttribute('value').then(function (value) {
-          config.expect(value === text);
+          assert.equal(value,text);
           next();
         })
           .catch(next);
+      });
+    });
+  };
+  this.iSeeValueInContains = function (ele, text) {
+    text = replacements(text.toString());
+    it('I see value ' + text + ' in ' + ele, function (next) {
+      var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).first();
+      browser.wait(function () {
+        return ele1.isPresent();
+      }, timeout).then(function () {
+        ele1.getAttribute('value').then(function (value) {
+          config.expect(value).contain(text);
+          next();
+        })
+          .catch(next);
+      });
+    });
+  };
+  this.iSeeValueInIndex = function (ele, text,index) {
+    text = replacements(text.toString());
+    it('I see value ' + text + ' in ' + ele, function (next) {
+      var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).get(index);
+      browser.wait(function () {
+        return ele1.isPresent();
+      }, timeout).then(function () {
+        ele1.getAttribute('value').then(function (value) {
+          assert.equal(value,text);
+          next();
+        })
+          .catch(next);
+      });
+    });
+  };
+  this.iSeeTextIn = function (ele, text) {
+    text = replacements(text);
+    it('I see text', function (next) {
+      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        try {
+          var temp=ele.getText();
+          var temp1=temp.then(function(tx) {return tx.trim();})
+          config.expect(temp1).to.eventually.equal(text.trim());
+          next();
+        } catch (err) {
+          next(err);
+        }
       });
     });
   };
@@ -1227,7 +1269,7 @@ module.exports = function (config) {
         next(err);
       }
     });
-    };
+  };
 
   this.checkElementIsNotDisabled = function (ele) {
     it('I see ' + ele + ' is not disabled', function (next) {
@@ -1272,14 +1314,14 @@ module.exports = function (config) {
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
-            ele.getAttribute('class').then(function(value){
-            try {
-              config.expect(value.split(" ")).contain('disabled');
-              next();
-            } catch (err) {
-              next(err);
-            }
-          });
+        ele.getAttribute('class').then(function(value){
+          try {
+            config.expect(value.split(" ")).contain('disabled');
+            next();
+          } catch (err) {
+            next(err);
+          }
+        });
       });
     });
   };
@@ -1416,9 +1458,7 @@ module.exports = function (config) {
   };
   this.pageReload = function () {
     it('Reload Page', function (next) {
-      browser.getCurrentUrl().then(function (url) {
-        browser.get(url).then(next).catch(next);
-      });
+      browser.refresh().then(next).catch(next);
     });
   };
 
@@ -1433,7 +1473,26 @@ module.exports = function (config) {
           return element(by.xpath(xpath)).isPresent();
         }, timeout).then(function (result) {
           element.all(by.xpath(xpath)).count().then(function (c) {
-              assert.equal(c,count);
+            assert.equal(c,count);
+          });
+          next();
+        });
+      } catch (err) {
+        next(err);
+      }
+    });
+  };
+  this.iSeeTextCountAtleast = function (text,count) {
+    text = replacements(text.toString());
+    it('I see text ' + text +' atleast ' +count + ' times ', function (next) {
+      try {
+        var xpath = '//*[contains(text(),"'+text+'")]';
+        browser.wait(function () {
+          return element(by.xpath(xpath)).isPresent();
+        }, timeout).then(function (result) {
+          element.all(by.xpath(xpath)).count().then(function (c) {
+            config.expect(c).not.to.be.lessThan(count);
+            // assert.equal(c,count);
           });
           next();
         });
@@ -1443,8 +1502,8 @@ module.exports = function (config) {
     });
   };
   this.enterTextInFieldIndex = function (field,index, text) {
+    text=replacements(text);
     it('I enter ' + text + ' in ' + field + ' field', function (next) {
-      text = replacements(text.toString());
       var ele = element.all(by.css(field)).get(index);
       browser.wait(function () {
         return ele.isPresent();
@@ -1469,6 +1528,25 @@ module.exports = function (config) {
   this.goToPageURL = function (url) {
     it('I go to ' + url, function (next) {
       browser.get(url).then(next).catch(next);
+    });
+  };
+  this.acceptAlert = function () {
+    it('Accept Alert', function (next) {
+      browser.wait(protractor.ExpectedConditions.alertIsPresent(), 10000);
+      browser.switchTo().alert().accept();
+    });
+  };
+  this.goBack = function () {
+    it('Going to previous page.', function (next) {
+      browser.navigate().back().then(next).catch(next);
+    });
+  };
+  this.clickSettings = function () {
+    it('Click Settings', function (next) {
+      var EC = protractor.ExpectedConditions;
+      var ele = element.all(by.xpath('//*[@class="glyphicon glyphicon-cog"]')).get(2);
+      browser.wait(EC.visibilityOf(ele), 5000);
+      ele.click().then();
     });
   };
 };
