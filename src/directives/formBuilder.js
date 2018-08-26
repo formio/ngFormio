@@ -4,6 +4,7 @@ export default angular.module('formio').directive('formBuilder', function() {
     restrict: 'E',
     replace: true,
     scope: {
+      url: '=?',
       form: '=?',
       options: '<'
     },
@@ -35,7 +36,12 @@ export default angular.module('formio').directive('formBuilder', function() {
         // Detect when the display changes.
         $scope.$watch('form.display', display => {
           if (builderReady && display) {
-            builderReady.then(() => builder.setDisplay(display));
+            builderReady.then(() => {
+              builder.setDisplay(display);
+              if ($scope.url) {
+                builder.instance.url = $scope.url;
+              }
+            });
           }
         });
 
