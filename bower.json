@@ -22,7 +22,7 @@
     "ng-dialog": "^1.4.0",
     "angular-swagger-ui": "https://github.com/randallknutson/angular-swagger-ui.git#master",
     "number-abbreviate": "^2.0.0",
-    "ng-formio": "^3.3.6",
+    "ng-formio": "^3.4.0",
     "ng-tags-input": "^3.2.0",
     "chance": "^1.0.13",
     "ng-file-upload": "^12.2.13",
