@@ -19549,31 +19549,33 @@ var BaseComponent = function (_Component) {
   }, {
     key: 'createLabel',
     value: function createLabel(container) {
-      if (this.labelIsHidden()) {
-        return;
-      }
+      var isLabelHidden = this.labelIsHidden();
       var className = 'control-label';
       var style = '';
+      if (!isLabelHidden) {
+        var labelPosition = this.component.labelPosition;
 
-      var labelPosition = this.component.labelPosition;
+        // Determine label styles/classes depending on position.
 
-      // Determine label styles/classes depending on position.
+        if (labelPosition === 'bottom') {
+          className += ' control-label--bottom';
+        } else if (labelPosition && labelPosition !== 'top') {
+          var labelWidth = this.getLabelWidth();
+          var labelMargin = this.getLabelMargin();
 
-      if (labelPosition === 'bottom') {
-        className += ' control-label--bottom';
-      } else if (labelPosition && labelPosition !== 'top') {
-        var labelWidth = this.getLabelWidth();
-        var labelMargin = this.getLabelMargin();
-
-        // Label is on the left or right.
-        if (this.labelOnTheLeft(labelPosition)) {
-          style += 'float: left; width: ' + labelWidth + '%; margin-right: ' + labelMargin + '%; ';
-        } else if (this.labelOnTheRight(labelPosition)) {
-          style += 'float: right; width: ' + labelWidth + '%; margin-left: ' + labelMargin + '%; ';
+          // Label is on the left or right.
+          if (this.labelOnTheLeft(labelPosition)) {
+            style += 'float: left; width: ' + labelWidth + '%; margin-right: ' + labelMargin + '%; ';
+          } else if (this.labelOnTheRight(labelPosition)) {
+            style += 'float: right; width: ' + labelWidth + '%; margin-left: ' + labelMargin + '%; ';
+          }
+          if (this.rightAlignedLabel(labelPosition)) {
+            style += 'text-align: right; ';
+          }
         }
-        if (this.rightAlignedLabel(labelPosition)) {
-          style += 'text-align: right; ';
-        }
+      } else {
+        this.addClass(container, 'formio-component-label-hidden');
+        className += ' control-label--hidden';
       }
 
       if (this.hasInput && this.component.validate && this.component.validate.required) {
@@ -19583,11 +19585,13 @@ var BaseComponent = function (_Component) {
         class: className,
         style: style
       });
-      if (this.info.attr.id) {
-        this.labelElement.setAttribute('for', this.info.attr.id);
+      if (!isLabelHidden) {
+        if (this.info.attr.id) {
+          this.labelElement.setAttribute('for', this.info.attr.id);
+        }
+        this.labelElement.appendChild(this.text(this.component.label));
+        this.createTooltip(this.labelElement);
       }
-      this.labelElement.appendChild(this.text(this.component.label));
-      this.createTooltip(this.labelElement);
       container.appendChild(this.labelElement);
     }
   }, {
@@ -20562,7 +20566,9 @@ var BaseComponent = function (_Component) {
   }, {
     key: 'calculateValue',
     value: function calculateValue(data, flags) {
-      if (!this.component.calculateValue) {
+      // If no calculated value or
+      // hidden and set to clearOnHide (Don't calculate a value for a hidden field set to clear when hidden)
+      if (!this.component.calculateValue || (!this.visible || this.component.hidden) && this.component.clearOnHide) {
         return false;
       }
 
@@ -21725,6 +21731,7 @@ exports.default = [{
           label: 'When the form component:',
           key: 'conditional.when',
           dataSrc: 'custom',
+          valueProperty: 'value',
           data: {
             custom: '\n                        utils.eachComponent(instance.root.editForm.components, function(component, path) {\n                          if (component.key !== data.key) {\n                            values.push({\n                              label: component.label || component.key,\n                              value: path\n                            });\n                          }\n                        });\n                      '
           }
@@ -21823,7 +21830,7 @@ exports.default = [{
             type: 'boolean'
           }, {
             label: 'required',
-            value: 'validation.required',
+            value: 'validate.required',
             type: 'boolean'
           }, {
             label: 'Disabled',
@@ -23196,10 +23203,7 @@ var CheckBoxComponent = function (_BaseComponent) {
   }, {
     key: 'createLabel',
     value: function createLabel(container, input) {
-      if (this.labelIsHidden()) {
-        return null;
-      }
-
+      var isLabelHidden = this.labelIsHidden();
       var className = 'control-label form-check-label';
       if (this.component.input && !this.options.inputsOnly && this.component.validate && this.component.validate.required) {
         className += ' field-required';
@@ -23211,22 +23215,22 @@ var CheckBoxComponent = function (_BaseComponent) {
       this.addShortcut();
 
       var labelOnTheTopOrOnTheLeft = this.labelOnTheTopOrLeft();
+      if (!isLabelHidden) {
+        // Create the SPAN around the textNode for better style hooks
+        this.labelSpan = this.ce('span');
 
-      // Create the SPAN around the textNode for better style hooks
-      this.labelSpan = this.ce('span');
-
-      if (this.info.attr.id) {
-        this.labelElement.setAttribute('for', this.info.attr.id);
+        if (this.info.attr.id) {
+          this.labelElement.setAttribute('for', this.info.attr.id);
+        }
       }
-      if (!this.labelIsHidden() && labelOnTheTopOrOnTheLeft) {
+      if (!isLabelHidden && labelOnTheTopOrOnTheLeft) {
         this.setInputLabelStyle(this.labelElement);
         this.setInputStyle(input);
         this.labelSpan.appendChild(this.text(this.component.label));
         this.labelElement.appendChild(this.labelSpan);
       }
       this.addInput(input, this.labelElement);
-
-      if (!this.labelIsHidden() && !labelOnTheTopOrOnTheLeft) {
+      if (!isLabelHidden && !labelOnTheTopOrOnTheLeft) {
         this.setInputLabelStyle(this.labelElement);
         this.setInputStyle(input);
         this.labelSpan.appendChild(this.text(this.addShortcutToLabel()));
@@ -23766,12 +23770,13 @@ var ColumnsComponent = function (_NestedComponent) {
     value: function checkConditions(data) {
       if (this.component.autoAdjust) {
         var before = this.nbVisible;
-        _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
+        var result = _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
         if (before !== this.nbVisible) {
           this.justify();
         }
+        return result;
       } else {
-        _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
+        return _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
       }
     }
   }, {
@@ -27828,35 +27833,106 @@ var FileComponent = function (_BaseComponent) {
       // Declare Camera Instace
       var Camera = void 0;
       // Implement Camera file upload for WebView Apps.
-      if ((navigator.camera || Camera) && this.component.image) {
-        var camera = navigator.camera || Camera;
-        return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
-          class: 'fileSelector'
-        }, [this.ce('button', {
-          class: 'btn btn-primary',
-          onClick: function onClick(event) {
-            event.preventDefault();
-            camera.getPicture(function (success) {
-              window.resolveLocalFileSystemURL(success, function (fileEntry) {
-                fileEntry.file(function (file) {
-                  _this7.upload([file]);
+      if (this.component.image) {
+        if (navigator.camera || Camera) {
+          var camera = navigator.camera || Camera;
+          return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
+            class: 'fileSelector'
+          }, [this.ce('button', { class: 'btn btn-primary',
+            onClick: function onClick(event) {
+              event.preventDefault();
+              camera.getPicture(function (success) {
+                window.resolveLocalFileSystemURL(success, function (fileEntry) {
+                  fileEntry.file(function (file) {
+                    _this7.upload([file]);
+                  });
                 });
-              });
-            }, null, { sourceType: camera.PictureSourceType.PHOTOLIBRARY });
-          }
-        }, [this.ce('i', { class: this.iconClass('book') }), this.text('Gallery')]), this.ce('button', {
-          class: 'btn btn-primary',
-          onClick: function onClick(event) {
-            event.preventDefault();
-            camera.getPicture(function (success) {
-              window.resolveLocalFileSystemURL(success, function (fileEntry) {
-                fileEntry.file(function (file) {
-                  _this7.upload([file]);
+              }, null, { sourceType: camera.PictureSourceType.PHOTOLIBRARY });
+            }
+          }, [this.ce('i', { class: this.iconClass('book') }), this.text('Gallery')]), this.ce('button', { class: 'btn btn-primary',
+            onClick: function onClick(event) {
+              event.preventDefault();
+              camera.getPicture(function (success) {
+                window.resolveLocalFileSystemURL(success, function (fileEntry) {
+                  fileEntry.file(function (file) {
+                    _this7.upload([file]);
+                  });
                 });
+              }, null, {
+                sourceType: camera.PictureSourceType.CAMERA,
+                encodingType: camera.EncodingType.PNG,
+                mediaType: camera.MediaType.PICTURE,
+                saveToPhotoAlbum: true,
+                correctOrientation: false
               });
+            }
+          }, [this.ce('i', { class: this.iconClass('camera') }), this.text('Camera')])]) : this.ce('div'));
+        } else {
+          var streaming = false;
+          var getMedia = function getMedia() {
+            var video = document.querySelector('#video');
+            var canvas = document.querySelector('#canvas');
+            var photo = document.querySelector('#photo');
+            var width = 320;
+            var height = 0;
+            navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+            navigator.getMedia({
+              video: true,
+              audio: false
+            }, function (stream) {
+              if (navigator.mozGetUserMedia) {
+                video.mozSrcObject = stream;
+              } else {
+                video.srcObject = stream;
+                video.play();
+              }
+            }, function (err) {
+              console.log(err);
             });
-          }
-        }, [this.ce('i', { class: this.iconClass('camera') }), this.text('Camera')])]) : this.ce('div'));
+            if (!streaming) {
+              height = video.videoHeight / (video.videoWidth / width);
+              video.setAttribute('width', width);
+              video.setAttribute('height', height);
+              canvas.setAttribute('width', width);
+              canvas.setAttribute('height', height);
+            }
+            _this7.takepicture = function () {
+              canvas.width = width;
+              canvas.height = height;
+              canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+              var data = canvas.toDataURL('image/png');
+              photo.setAttribute('src', data);
+            };
+          };
+
+          return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
+            class: 'fileSelector'
+          }, [this.ce('button', { class: 'btn btn-primary text-white',
+            onClick: function onClick(event) {
+              event.preventDefault();
+            }
+          }, [this.text('Use'), this.buildBrowseLink()]), this.ce('button', { class: 'btn btn-primary',
+            onClick: function onClick(event) {
+              streaming = true;
+              getMedia();
+              event.preventDefault();
+            }
+          }, [this.ce('i', { class: this.iconClass('camera') }), this.text('Web Cam')]), this.ce('video', {
+            class: 'video',
+            id: 'video',
+            autoplay: true
+          }), this.ce('button', { class: 'btn btn-primary',
+            onClick: function onClick(event) {
+              _this7.takepicture();
+              event.preventDefault();
+            }
+          }, [this.ce('i', { class: this.iconClass('camera'), id: 'startbutton' }), this.text('Take Photo')]), this.ce('canvas', {
+            id: 'canvas'
+          }), this.ce('img', {
+            src: '',
+            id: 'photo'
+          })]) : this.ce('div'));
+        }
       }
       // If this is disabled or a single value with a value, don't show the upload div.
       return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
@@ -71438,7 +71514,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var popper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js");
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.2.0
+ * @version 1.3.0
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -71526,7 +71602,9 @@ var DEFAULT_OPTIONS = {
   title: '',
   template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
   trigger: 'hover focus',
-  offset: 0
+  offset: 0,
+  arrowSelector: '.tooltip-arrow, .tooltip__arrow',
+  innerSelector: '.tooltip-inner, .tooltip__inner'
 };
 
 var Tooltip = function () {
@@ -71535,16 +71613,17 @@ var Tooltip = function () {
    * @class Tooltip
    * @param {HTMLElement} reference - The DOM node used as reference of the tooltip (it can be a jQuery element).
    * @param {Object} options
-   * @param {String|PlacementFunction} options.placement=top
+   * @param {String} options.placement='top'
    *      Placement of the popper accepted values: `top(-start, -end), right(-start, -end), bottom(-start, -end),
    *      left(-start, -end)`
+   * @param {String} options.arrowSelector='.tooltip-arrow, .tooltip__arrow' - className used to locate the DOM arrow element in the tooltip.
+   * @param {String} options.innerSelector='.tooltip-inner, .tooltip__inner' - className used to locate the DOM inner element in the tooltip.
    * @param {HTMLElement|String|false} options.container=false - Append the tooltip to a specific element.
    * @param {Number|Object} options.delay=0
    *      Delay showing and hiding the tooltip (ms) - does not apply to manual trigger type.
    *      If a number is supplied, delay is applied to both hide/show.
    *      Object structure is: `{ show: 500, hide: 100 }`
    * @param {Boolean} options.html=false - Insert HTML into the tooltip. If false, the content will inserted with `textContent`.
-   * @param {String|PlacementFunction} options.placement='top' - One of the allowed placements, or a function returning one of them.
    * @param {String} [options.template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>']
    *      Base HTML to used when creating the tooltip.
    *      The tooltip's `title` will be injected into the `.tooltip-inner` or `.tooltip__inner`.
@@ -71554,6 +71633,7 @@ var Tooltip = function () {
    * @param {String} [options.trigger='hover focus']
    *      How tooltip is triggered - click, hover, focus, manual.
    *      You may pass multiple triggers; separate them with a space. `manual` cannot be combined with any other trigger.
+   * @param {Boolean} options.closeOnClickOutside=false - Close a popper on click outside of the popper and reference element. This has effect only when options.trigger is 'click'.
    * @param {String|HTMLElement} options.boundariesElement
    *      The element used as boundaries for the tooltip. For more information refer to Popper.js'
    *      [boundariesElement docs](https://popper.js.org/popper-documentation.html)
@@ -71632,11 +71712,6 @@ var Tooltip = function () {
 
 
   //
-  // Defaults
-  //
-
-
-  //
   // Private methods
   //
 
@@ -71667,7 +71742,7 @@ var Tooltip = function () {
       tooltipNode.setAttribute('aria-hidden', 'false');
 
       // add title to tooltip
-      var titleNode = tooltipGenerator.querySelector(this.innerSelector);
+      var titleNode = tooltipGenerator.querySelector(this.options.innerSelector);
       this._addTitleContent(reference, title, allowHtml, titleNode);
 
       // return the generated tooltip node
@@ -71700,7 +71775,7 @@ var Tooltip = function () {
 
       // if the tooltipNode already exists, just show it
       if (this._tooltipNode) {
-        this._tooltipNode.style.display = '';
+        this._tooltipNode.style.visibility = 'visible';
         this._tooltipNode.setAttribute('aria-hidden', 'false');
         this.popperInstance.update();
         return this;
@@ -71731,7 +71806,7 @@ var Tooltip = function () {
 
       this._popperOptions.modifiers = _extends({}, this._popperOptions.modifiers, {
         arrow: {
-          element: this.arrowSelector
+          element: this.options.arrowSelector
         },
         offset: {
           offset: options.offset
@@ -71761,7 +71836,7 @@ var Tooltip = function () {
       this._isOpen = false;
 
       // hide tooltipNode
-      this._tooltipNode.style.display = 'none';
+      this._tooltipNode.style.visibility = 'hidden';
       this._tooltipNode.setAttribute('aria-hidden', 'true');
 
       return this;
@@ -71868,6 +71943,18 @@ var Tooltip = function () {
         };
         _this2._events.push({ event: event, func: func });
         reference.addEventListener(event, func);
+        if (event === 'click' && options.closeOnClickOutside) {
+          document.addEventListener('mousedown', function (e) {
+            if (!_this2._isOpening) {
+              return;
+            }
+            var popper = _this2.popperInstance.popper;
+            if (reference.contains(e.target) || popper.contains(e.target)) {
+              return;
+            }
+            func(e);
+          }, true);
+        }
       });
     }
   }, {
@@ -71923,7 +72010,7 @@ var Tooltip = function () {
         }
         return;
       }
-      var titleNode = this._tooltipNode.parentNode.querySelector(this.innerSelector);
+      var titleNode = this._tooltipNode.parentNode.querySelector(this.options.innerSelector);
       this._clearTitleContent(titleNode, this.options.html, this.reference.getAttribute('title') || this.options.title);
       this._addTitleContent(this.reference, title, this.options.html, titleNode);
       this.options.title = title;
@@ -71941,15 +72028,6 @@ var Tooltip = function () {
   }]);
   return Tooltip;
 }();
-
-/**
- * Placement function, its context is the Tooltip instance.
- * @memberof Tooltip
- * @callback PlacementFunction
- * @param {HTMLElement} tooltip - tooltip DOM node.
- * @param {HTMLElement} reference - reference DOM node.
- * @return {String} placement - One of the allowed placement options.
- */
 
 /**
  * Title function, its context is the Tooltip instance.
@@ -71986,8 +72064,6 @@ var _initialiseProps = function _initialiseProps() {
     return _this5._updateTitleContent(title);
   };
 
-  this.arrowSelector = '.tooltip-arrow, .tooltip__arrow';
-  this.innerSelector = '.tooltip-inner, .tooltip__inner';
   this._events = [];
 
   this._setTooltipNodeEvent = function (evt, reference, delay, options) {
