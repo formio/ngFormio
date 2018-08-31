@@ -11,7 +11,7 @@
   "main": "./index.js",
   "devDependencies": {
     "autoprefixer-core": "^6.0.1",
-    "browser-sync": "^2.24.6",
+    "browser-sync": "^2.24.7",
     "chance": "^1.0.16",
     "del": "^3.0.0",
     "gulp": "^3.6.0",
