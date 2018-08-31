@@ -1,4 +1,4 @@
-/*! ng-formio v3.4.0 | https://unpkg.com/ngFormio@3.4.0/LICENSE.txt */
+/*! ng-formio v3.4.1 | https://unpkg.com/ngFormio@3.4.1/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3664,6 +3664,26 @@ body.formio-dialog-open, html.formio-dialog-open {
 .control-label--bottom {
   margin-bottom: 0;
   margin-top: 5px; }
+
+.formio-component-label-hidden {
+  position: relative; }
+
+.control-label--hidden.field-required {
+  position: absolute;
+  top: 6px;
+  right: 5px;
+  font-size: 1.5em; }
+
+.formio-component-datetime .control-label--hidden.field-required {
+  right: 45px;
+  z-index: 3; }
+
+.formio-component-selectboxes .control-label--hidden.field-required, .formio-component-survey .control-label--hidden.field-required {
+  top: 0; }
+
+.formio-component-resource .control-label--hidden.field-required, .formio-component-select .control-label--hidden.field-required {
+  right: 40px;
+  z-index: 2; }
 
 .checkbox-inline label, .radio-inline label {
   font-weight: 400;

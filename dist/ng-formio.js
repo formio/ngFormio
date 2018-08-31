@@ -344,10 +344,6 @@ exports.default = app.directive('formio', function () {
         });
       }, true);
 
-      $scope.$on('componentChange', function () {
-        $scope.$apply();
-      });
-
       // Clean up the Form from DOM.
       $scope.$on('$destroy', function () {
         if ($scope.formio) {
@@ -15342,7 +15338,10 @@ var Webform = function (_NestedComponent) {
               saved: false
             });
           }
-          submitFormio.saveSubmission(submission).then(function (result) {
+
+          // If this is an actionUrl, then make sure to save the action and not the submission.
+          var submitMethod = submitFormio.actionUrl ? 'saveAction' : 'saveSubmission';
+          submitFormio[submitMethod](submission).then(function (result) {
             return resolve({
               submission: result,
               saved: true
@@ -15781,9 +15780,11 @@ var WebformBuilder = function (_Webform) {
         });
 
         // Set in paste mode if we have an item in our clipboard.
-        var data = window.sessionStorage.getItem('formio.clipboard');
-        if (data) {
-          _this.addClass(_this.element, 'builder-paste-mode');
+        if (window.sessionStorage) {
+          var data = window.sessionStorage.getItem('formio.clipboard');
+          if (data) {
+            _this.addClass(_this.element, 'builder-paste-mode');
+          }
         }
 
         // Add the edit buttons to the component.
@@ -16052,6 +16053,9 @@ var WebformBuilder = function (_Webform) {
   }, {
     key: 'copyComponent',
     value: function copyComponent(component) {
+      if (!window.sessionStorage) {
+        return console.log('Session storage is not supported in this browser.');
+      }
       this.addClass(this.element, 'builder-paste-mode');
       var copy = _lodash2.default.cloneDeep(component.schema);
       window.sessionStorage.setItem('formio.clipboard', JSON.stringify(copy));
@@ -16066,6 +16070,9 @@ var WebformBuilder = function (_Webform) {
   }, {
     key: 'pasteComponent',
     value: function pasteComponent(component) {
+      if (!window.sessionStorage) {
+        return console.log('Session storage is not supported in this browser.');
+      }
       this.removeClass(this.element, 'builder-paste-mode');
       var data = window.sessionStorage.getItem('formio.clipboard');
       if (data) {
@@ -19549,31 +19556,33 @@ var BaseComponent = function (_Component) {
   }, {
     key: 'createLabel',
     value: function createLabel(container) {
-      if (this.labelIsHidden()) {
-        return;
-      }
+      var isLabelHidden = this.labelIsHidden();
       var className = 'control-label';
       var style = '';
+      if (!isLabelHidden) {
+        var labelPosition = this.component.labelPosition;
 
-      var labelPosition = this.component.labelPosition;
+        // Determine label styles/classes depending on position.
 
-      // Determine label styles/classes depending on position.
+        if (labelPosition === 'bottom') {
+          className += ' control-label--bottom';
+        } else if (labelPosition && labelPosition !== 'top') {
+          var labelWidth = this.getLabelWidth();
+          var labelMargin = this.getLabelMargin();
 
-      if (labelPosition === 'bottom') {
-        className += ' control-label--bottom';
-      } else if (labelPosition && labelPosition !== 'top') {
-        var labelWidth = this.getLabelWidth();
-        var labelMargin = this.getLabelMargin();
-
-        // Label is on the left or right.
-        if (this.labelOnTheLeft(labelPosition)) {
-          style += 'float: left; width: ' + labelWidth + '%; margin-right: ' + labelMargin + '%; ';
-        } else if (this.labelOnTheRight(labelPosition)) {
-          style += 'float: right; width: ' + labelWidth + '%; margin-left: ' + labelMargin + '%; ';
+          // Label is on the left or right.
+          if (this.labelOnTheLeft(labelPosition)) {
+            style += 'float: left; width: ' + labelWidth + '%; margin-right: ' + labelMargin + '%; ';
+          } else if (this.labelOnTheRight(labelPosition)) {
+            style += 'float: right; width: ' + labelWidth + '%; margin-left: ' + labelMargin + '%; ';
+          }
+          if (this.rightAlignedLabel(labelPosition)) {
+            style += 'text-align: right; ';
+          }
         }
-        if (this.rightAlignedLabel(labelPosition)) {
-          style += 'text-align: right; ';
-        }
+      } else {
+        this.addClass(container, 'formio-component-label-hidden');
+        className += ' control-label--hidden';
       }
 
       if (this.hasInput && this.component.validate && this.component.validate.required) {
@@ -19583,11 +19592,13 @@ var BaseComponent = function (_Component) {
         class: className,
         style: style
       });
-      if (this.info.attr.id) {
-        this.labelElement.setAttribute('for', this.info.attr.id);
+      if (!isLabelHidden) {
+        if (this.info.attr.id) {
+          this.labelElement.setAttribute('for', this.info.attr.id);
+        }
+        this.labelElement.appendChild(this.text(this.component.label));
+        this.createTooltip(this.labelElement);
       }
-      this.labelElement.appendChild(this.text(this.component.label));
-      this.createTooltip(this.labelElement);
       container.appendChild(this.labelElement);
     }
   }, {
@@ -20562,7 +20573,9 @@ var BaseComponent = function (_Component) {
   }, {
     key: 'calculateValue',
     value: function calculateValue(data, flags) {
-      if (!this.component.calculateValue) {
+      // If no calculated value or
+      // hidden and set to clearOnHide (Don't calculate a value for a hidden field set to clear when hidden)
+      if (!this.component.calculateValue || (!this.visible || this.component.hidden) && this.component.clearOnHide) {
         return false;
       }
 
@@ -21723,8 +21736,9 @@ exports.default = [{
           type: 'select',
           input: true,
           label: 'When the form component:',
-          key: 'conditional.when',
+          key: 'when',
           dataSrc: 'custom',
+          valueProperty: 'value',
           data: {
             custom: '\n                        utils.eachComponent(instance.root.editForm.components, function(component, path) {\n                          if (component.key !== data.key) {\n                            values.push({\n                              label: component.label || component.key,\n                              value: path\n                            });\n                          }\n                        });\n                      '
           }
@@ -21823,7 +21837,7 @@ exports.default = [{
             type: 'boolean'
           }, {
             label: 'required',
-            value: 'validation.required',
+            value: 'validate.required',
             type: 'boolean'
           }, {
             label: 'Disabled',
@@ -23196,10 +23210,7 @@ var CheckBoxComponent = function (_BaseComponent) {
   }, {
     key: 'createLabel',
     value: function createLabel(container, input) {
-      if (this.labelIsHidden()) {
-        return null;
-      }
-
+      var isLabelHidden = this.labelIsHidden();
       var className = 'control-label form-check-label';
       if (this.component.input && !this.options.inputsOnly && this.component.validate && this.component.validate.required) {
         className += ' field-required';
@@ -23211,22 +23222,22 @@ var CheckBoxComponent = function (_BaseComponent) {
       this.addShortcut();
 
       var labelOnTheTopOrOnTheLeft = this.labelOnTheTopOrLeft();
+      if (!isLabelHidden) {
+        // Create the SPAN around the textNode for better style hooks
+        this.labelSpan = this.ce('span');
 
-      // Create the SPAN around the textNode for better style hooks
-      this.labelSpan = this.ce('span');
-
-      if (this.info.attr.id) {
-        this.labelElement.setAttribute('for', this.info.attr.id);
+        if (this.info.attr.id) {
+          this.labelElement.setAttribute('for', this.info.attr.id);
+        }
       }
-      if (!this.labelIsHidden() && labelOnTheTopOrOnTheLeft) {
+      if (!isLabelHidden && labelOnTheTopOrOnTheLeft) {
         this.setInputLabelStyle(this.labelElement);
         this.setInputStyle(input);
         this.labelSpan.appendChild(this.text(this.component.label));
         this.labelElement.appendChild(this.labelSpan);
       }
       this.addInput(input, this.labelElement);
-
-      if (!this.labelIsHidden() && !labelOnTheTopOrOnTheLeft) {
+      if (!isLabelHidden && !labelOnTheTopOrOnTheLeft) {
         this.setInputLabelStyle(this.labelElement);
         this.setInputStyle(input);
         this.labelSpan.appendChild(this.text(this.addShortcutToLabel()));
@@ -23766,12 +23777,13 @@ var ColumnsComponent = function (_NestedComponent) {
     value: function checkConditions(data) {
       if (this.component.autoAdjust) {
         var before = this.nbVisible;
-        _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
+        var result = _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
         if (before !== this.nbVisible) {
           this.justify();
         }
+        return result;
       } else {
-        _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
+        return _get(ColumnsComponent.prototype.__proto__ || Object.getPrototypeOf(ColumnsComponent.prototype), 'checkConditions', this).call(this, data);
       }
     }
   }, {
@@ -23900,6 +23912,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
@@ -23909,6 +23923,10 @@ var _lodash2 = _interopRequireDefault(_lodash);
 var _NestedComponent2 = __webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js");
 
 var _NestedComponent3 = _interopRequireDefault(_NestedComponent2);
+
+var _Base = __webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js");
+
+var _Base2 = _interopRequireDefault(_Base);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23984,39 +24002,35 @@ var ContainerComponent = function (_NestedComponent) {
   }, {
     key: 'getValue',
     value: function getValue() {
-      if (this.viewOnly) {
-        return this.dataValue;
-      }
-      var value = {};
-      _lodash2.default.each(this.components, function (component) {
-        return _lodash2.default.set(value, component.key, component.getValue());
-      });
-      return value;
+      return this.dataValue;
+    }
+  }, {
+    key: 'updateValue',
+    value: function updateValue(flags, value) {
+      // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
+      return _Base2.default.prototype.updateValue.call(this, flags, value);
     }
   }, {
     key: 'setValue',
     value: function setValue(value, flags) {
+      var _this2 = this;
+
       flags = this.getFlags.apply(this, arguments);
       if (!value || !_lodash2.default.isObject(value)) {
         return;
       }
-      if (this.hasValue() && _lodash2.default.isEmpty(this.dataValue)) {
+      var hasValue = this.hasValue();
+      if (hasValue && _lodash2.default.isEmpty(this.dataValue)) {
         flags.noValidate = true;
       }
-      var changed = this.hasChanged(value, this.dataValue);
-      this.dataValue = value;
-      _lodash2.default.each(this.components, function (component) {
-        if (component.type === 'components') {
-          component.setValue(value, flags);
-        } else if (_lodash2.default.has(value, component.key)) {
-          component.setValue(_lodash2.default.get(value, component.key), flags);
-        } else {
-          component.data = value;
-          component.setValue(component.defaultValue, flags);
-        }
-      });
-      this.updateValue(flags);
-      return changed;
+      if (!hasValue) {
+        // Set the data value and then reset each component to use the new data object.
+        this.dataValue = {};
+        this.getComponents().forEach(function (component) {
+          return component.data = _this2.dataValue;
+        });
+      }
+      return _get(ContainerComponent.prototype.__proto__ || Object.getPrototypeOf(ContainerComponent.prototype), 'setValue', this).call(this, value, flags);
     }
   }, {
     key: 'defaultSchema',
@@ -24772,6 +24786,8 @@ var DataGridComponent = function (_NestedComponent) {
   }, {
     key: 'setValue',
     value: function setValue(value, flags) {
+      var _this9 = this;
+
       flags = this.getFlags.apply(this, arguments);
       if (!value) {
         this.buildRows();
@@ -24821,25 +24837,16 @@ var DataGridComponent = function (_NestedComponent) {
           }
         }
       }
-
       this.dataValue = value;
       if (shouldBuildRows) {
         this.buildRows();
       }
-
       _lodash2.default.each(this.rows, function (row, index) {
         if (value.length <= index) {
           return;
         }
-        _lodash2.default.each(row, function (col, key) {
-          if (col.type === 'components') {
-            col.setValue(value[index], flags);
-          } else if (value[index].hasOwnProperty(key)) {
-            col.setValue(value[index][key], flags);
-          } else {
-            col.data = value[index];
-            col.setValue(col.defaultValue, flags);
-          }
+        _lodash2.default.each(row, function (component) {
+          return _this9.setNestedValue(component, value[index], flags);
         });
       });
       return changed;
@@ -27596,6 +27603,26 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+// canvas.toBlob polyfill.
+if (!HTMLCanvasElement.prototype.toBlob) {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
+    value: function value(callback, type, quality) {
+      var canvas = this;
+      setTimeout(function () {
+        var binStr = atob(canvas.toDataURL(type, quality).split(',')[1]),
+            len = binStr.length,
+            arr = new Uint8Array(len);
+
+        for (var i = 0; i < len; i++) {
+          arr[i] = binStr.charCodeAt(i);
+        }
+
+        callback(new Blob([arr], { type: type || 'image/png' }));
+      });
+    }
+  });
+}
+
 var FileComponent = function (_BaseComponent) {
   _inherits(FileComponent, _BaseComponent);
 
@@ -27819,16 +27846,57 @@ var FileComponent = function (_BaseComponent) {
       }) : null]));
     }
   }, {
+    key: 'startVideo',
+    value: function startVideo() {
+      var _this7 = this;
+
+      var width = 320;
+      var height = 240;
+      navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+      navigator.getMedia({
+        video: true,
+        audio: false
+      }, function (stream) {
+        if (navigator.mozGetUserMedia) {
+          _this7.video.mozSrcObject = stream;
+        } else {
+          _this7.video.srcObject = stream;
+          _this7.video.play();
+        }
+        // height = this.video.videoHeight / (this.video.videoWidth / width);
+        _this7.video.setAttribute('width', width);
+        _this7.video.setAttribute('height', height);
+        _this7.canvas.setAttribute('width', width);
+        _this7.canvas.setAttribute('height', height);
+      }, function (err) {
+        console.log(err);
+      });
+    }
+  }, {
+    key: 'takePicture',
+    value: function takePicture() {
+      var _this8 = this;
+
+      var width = 320;
+      var height = this.video.videoHeight / (this.video.videoWidth / width);
+      this.canvas.getContext('2d').drawImage(this.video, 0, 0, width, height);
+      this.canvas.toBlob(function (blob) {
+        blob.name = 'photo-' + Date.now() + '.png';
+        _this8.upload([blob]);
+      });
+    }
+  }, {
     key: 'buildUpload',
     value: function buildUpload() {
-      var _this7 = this;
+      var _this9 = this;
 
       // Drop event must change this pointer so need a reference to parent this.
       var element = this;
       // Declare Camera Instace
       var Camera = void 0;
       // Implement Camera file upload for WebView Apps.
-      if ((navigator.camera || Camera) && this.component.image) {
+      if (this.component.image && (navigator.camera || Camera)) {
         var camera = navigator.camera || Camera;
         return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
           class: 'fileSelector'
@@ -27839,7 +27907,7 @@ var FileComponent = function (_BaseComponent) {
             camera.getPicture(function (success) {
               window.resolveLocalFileSystemURL(success, function (fileEntry) {
                 fileEntry.file(function (file) {
-                  _this7.upload([file]);
+                  _this9.upload([file]);
                 });
               });
             }, null, { sourceType: camera.PictureSourceType.PHOTOLIBRARY });
@@ -27851,15 +27919,22 @@ var FileComponent = function (_BaseComponent) {
             camera.getPicture(function (success) {
               window.resolveLocalFileSystemURL(success, function (fileEntry) {
                 fileEntry.file(function (file) {
-                  _this7.upload([file]);
+                  _this9.upload([file]);
                 });
               });
+            }, null, {
+              sourceType: camera.PictureSourceType.CAMERA,
+              encodingType: camera.EncodingType.PNG,
+              mediaType: camera.MediaType.PICTURE,
+              saveToPhotoAlbum: true,
+              correctOrientation: false
             });
           }
         }, [this.ce('i', { class: this.iconClass('camera') }), this.text('Camera')])]) : this.ce('div'));
       }
+
       // If this is disabled or a single value with a value, don't show the upload div.
-      return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? this.ce('div', {
+      return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? !this.cameraMode || !this.component.image ? [this.ce('div', {
         class: 'fileSelector',
         onDragover: function onDragover(event) {
           this.className = 'fileSelector fileDragOver';
@@ -27875,12 +27950,33 @@ var FileComponent = function (_BaseComponent) {
           element.upload(event.dataTransfer.files);
           return false;
         }
-      }, [this.ce('i', { class: this.iconClass('cloud-upload') }), this.text(' Drop files to attach, or '), this.buildBrowseLink()]) : this.ce('div'));
+      }, [this.ce('i', { class: this.iconClass('cloud-upload') }), this.text(' Drop files to attach, or '), this.buildBrowseLink()]), this.component.image ? this.ce('div', {
+        class: 'btn btn-default',
+        onClick: function onClick() {
+          _this9.cameraMode = !_this9.cameraMode;
+          _this9.refreshDOM();
+          _this9.startVideo();
+        }
+      }, 'Use Camera') : null] : [this.ce('div', {}, [this.video = this.ce('video', {
+        class: 'video',
+        autoplay: true
+      }), this.canvas = this.ce('canvas', { style: 'display: none;' }), this.photo = this.ce('img')]), this.ce('div', {
+        class: 'btn btn-primary',
+        onClick: function onClick() {
+          _this9.takePicture();
+        }
+      }, 'Take Photo'), this.ce('div', {
+        class: 'btn btn-default',
+        onClick: function onClick() {
+          _this9.cameraMode = !_this9.cameraMode;
+          _this9.refreshDOM();
+        }
+      }, 'Switch to file upload')] : this.ce('div'));
     }
   }, {
     key: 'buildBrowseLink',
     value: function buildBrowseLink() {
-      var _this8 = this;
+      var _this10 = this;
 
       this.browseLink = this.ce('a', {
         href: '#',
@@ -27888,10 +27984,10 @@ var FileComponent = function (_BaseComponent) {
           event.preventDefault();
           // There is no direct way to trigger a file dialog. To work around this, create an input of type file and trigger
           // a click event on it.
-          if (typeof _this8.hiddenFileInputElement.trigger === 'function') {
-            _this8.hiddenFileInputElement.trigger('click');
+          if (typeof _this10.hiddenFileInputElement.trigger === 'function') {
+            _this10.hiddenFileInputElement.trigger('click');
           } else {
-            _this8.hiddenFileInputElement.click();
+            _this10.hiddenFileInputElement.click();
           }
         },
         class: 'browse'
@@ -27944,18 +28040,19 @@ var FileComponent = function (_BaseComponent) {
     value: function fileSize(a, b, c, d, e) {
       return (b = Math, c = b.log, d = 1024, e = c(a) / c(d) | 0, a / b.pow(d, e)).toFixed(2) + ' ' + (e ? 'kMGTPEZY'[--e] + 'B' : 'Bytes');
     }
+
     /* eslint-enable max-len */
 
   }, {
     key: 'createUploadStatus',
     value: function createUploadStatus(fileUpload) {
-      var _this9 = this;
+      var _this11 = this;
 
       var container = void 0;
       return container = this.ce('div', { class: 'file' + (fileUpload.status === 'error' ? ' has-error' : '') }, [this.ce('div', { class: 'row' }, [this.ce('div', { class: 'fileName control-label col-sm-10' }, [fileUpload.originalName, this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick() {
-          return _this9.removeChildFrom(container, _this9.uploadStatusList);
+          return _this11.removeChildFrom(container, _this11.uploadStatusList);
         }
       })]), this.ce('div', { class: 'fileSize control-label col-sm-2 text-right' }, this.fileSize(fileUpload.size))]), this.ce('div', { class: 'row' }, [this.ce('div', { class: 'col-sm-12' }, [fileUpload.status === 'progress' ? this.ce('div', { class: 'progress' }, this.ce('div', {
         class: 'progress-bar',
@@ -28004,6 +28101,7 @@ var FileComponent = function (_BaseComponent) {
       }
       return { regexp: regexp, excludes: excludes };
     }
+
     /* eslint-enable max-depth */
 
   }, {
@@ -28060,7 +28158,7 @@ var FileComponent = function (_BaseComponent) {
   }, {
     key: 'upload',
     value: function upload(files) {
-      var _this10 = this;
+      var _this12 = this;
 
       // Only allow one upload if not multiple.
       if (!this.component.multiple) {
@@ -28079,55 +28177,55 @@ var FileComponent = function (_BaseComponent) {
           };
 
           // Check file pattern
-          if (_this10.component.filePattern && !_this10.validatePattern(file, _this10.component.filePattern)) {
+          if (_this12.component.filePattern && !_this12.validatePattern(file, _this12.component.filePattern)) {
             fileUpload.status = 'error';
-            fileUpload.message = 'File is the wrong type; it must be ' + _this10.component.filePattern;
+            fileUpload.message = 'File is the wrong type; it must be ' + _this12.component.filePattern;
           }
 
           // Check file minimum size
-          if (_this10.component.fileMinSize && !_this10.validateMinSize(file, _this10.component.fileMinSize)) {
+          if (_this12.component.fileMinSize && !_this12.validateMinSize(file, _this12.component.fileMinSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = 'File is too small; it must be at least ' + _this10.component.fileMinSize;
+            fileUpload.message = 'File is too small; it must be at least ' + _this12.component.fileMinSize;
           }
 
           // Check file maximum size
-          if (_this10.component.fileMaxSize && !_this10.validateMaxSize(file, _this10.component.fileMaxSize)) {
+          if (_this12.component.fileMaxSize && !_this12.validateMaxSize(file, _this12.component.fileMaxSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = 'File is too big; it must be at most ' + _this10.component.fileMaxSize;
+            fileUpload.message = 'File is too big; it must be at most ' + _this12.component.fileMaxSize;
           }
 
           // Get a unique name for this file to keep file collisions from occurring.
-          var dir = _this10.interpolate(_this10.component.dir || '');
-          var fileService = _this10.fileService;
+          var dir = _this12.interpolate(_this12.component.dir || '');
+          var fileService = _this12.fileService;
           if (!fileService) {
             fileUpload.status = 'error';
             fileUpload.message = 'File Service not provided.';
           }
 
-          var uploadStatus = _this10.createUploadStatus(fileUpload);
-          _this10.uploadStatusList.appendChild(uploadStatus);
+          var uploadStatus = _this12.createUploadStatus(fileUpload);
+          _this12.uploadStatusList.appendChild(uploadStatus);
 
           if (fileUpload.status !== 'error') {
-            fileService.uploadFile(_this10.component.storage, file, fileName, dir, function (evt) {
+            fileService.uploadFile(_this12.component.storage, file, fileName, dir, function (evt) {
               fileUpload.status = 'progress';
               fileUpload.progress = parseInt(100.0 * evt.loaded / evt.total);
               delete fileUpload.message;
               var originalStatus = uploadStatus;
-              uploadStatus = _this10.createUploadStatus(fileUpload);
-              _this10.uploadStatusList.replaceChild(uploadStatus, originalStatus);
-            }, _this10.component.url).then(function (fileInfo) {
-              _this10.removeChildFrom(uploadStatus, _this10.uploadStatusList);
+              uploadStatus = _this12.createUploadStatus(fileUpload);
+              _this12.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+            }, _this12.component.url).then(function (fileInfo) {
+              _this12.removeChildFrom(uploadStatus, _this12.uploadStatusList);
               fileInfo.originalName = file.name;
-              _this10.dataValue.push(fileInfo);
-              _this10.refreshDOM();
-              _this10.triggerChange();
+              _this12.dataValue.push(fileInfo);
+              _this12.refreshDOM();
+              _this12.triggerChange();
             }).catch(function (response) {
               fileUpload.status = 'error';
               fileUpload.message = response;
               delete fileUpload.progress;
               var originalStatus = uploadStatus;
-              uploadStatus = _this10.createUploadStatus(fileUpload);
-              _this10.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+              uploadStatus = _this12.createUploadStatus(fileUpload);
+              _this12.uploadStatusList.replaceChild(uploadStatus, originalStatus);
             });
           }
         });
@@ -30249,36 +30347,43 @@ var NestedComponent = function (_BaseComponent) {
       this.setPristine(true);
     }
   }, {
+    key: 'setNestedValue',
+    value: function setNestedValue(component, value, flags, changed) {
+      if (component.type === 'button') {
+        return false;
+      }
+
+      if (component.type === 'components') {
+        return component.setValue(value, flags) || changed;
+      } else if (value && component.hasValue(value)) {
+        return component.setValue(_lodash2.default.get(value, component.key), flags) || changed;
+      } else {
+        flags.noValidate = true;
+        return component.setValue(component.defaultValue, flags) || changed;
+      }
+    }
+  }, {
     key: 'setValue',
     value: function setValue(value, flags) {
+      var _this7 = this;
+
       if (!value) {
         return false;
       }
       flags = this.getFlags.apply(this, arguments);
       return this.getComponents().reduce(function (changed, component) {
-        if (component.type === 'button') {
-          return;
-        }
-
-        if (component.type === 'components') {
-          return component.setValue(value, flags) || changed;
-        } else if (value && component.hasValue(value)) {
-          return component.setValue(_lodash2.default.get(value, component.key), flags) || changed;
-        } else {
-          flags.noValidate = true;
-          return component.setValue(component.defaultValue, flags) || changed;
-        }
+        return _this7.setNestedValue(component, value, flags, changed);
       }, false);
     }
   }, {
     key: 'setCollapseHeader',
     value: function setCollapseHeader(header) {
-      var _this7 = this;
+      var _this8 = this;
 
       if (this.component.collapsible) {
         this.addClass(header, 'formio-clickable');
         this.addEventListener(header, 'click', function () {
-          return _this7.toggleCollapse();
+          return _this8.toggleCollapse();
         });
       }
     }
@@ -30338,11 +30443,6 @@ var NestedComponent = function (_BaseComponent) {
       return this.getAllComponents().reduce(function (errors, comp) {
         return errors.concat(comp.errors || []);
       }, []);
-    }
-  }, {
-    key: 'value',
-    get: function get() {
-      return this.data;
     }
   }, {
     key: 'dataReady',
@@ -71438,7 +71538,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var popper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js");
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.2.0
+ * @version 1.3.0
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -71526,7 +71626,9 @@ var DEFAULT_OPTIONS = {
   title: '',
   template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
   trigger: 'hover focus',
-  offset: 0
+  offset: 0,
+  arrowSelector: '.tooltip-arrow, .tooltip__arrow',
+  innerSelector: '.tooltip-inner, .tooltip__inner'
 };
 
 var Tooltip = function () {
@@ -71535,16 +71637,17 @@ var Tooltip = function () {
    * @class Tooltip
    * @param {HTMLElement} reference - The DOM node used as reference of the tooltip (it can be a jQuery element).
    * @param {Object} options
-   * @param {String|PlacementFunction} options.placement=top
+   * @param {String} options.placement='top'
    *      Placement of the popper accepted values: `top(-start, -end), right(-start, -end), bottom(-start, -end),
    *      left(-start, -end)`
+   * @param {String} options.arrowSelector='.tooltip-arrow, .tooltip__arrow' - className used to locate the DOM arrow element in the tooltip.
+   * @param {String} options.innerSelector='.tooltip-inner, .tooltip__inner' - className used to locate the DOM inner element in the tooltip.
    * @param {HTMLElement|String|false} options.container=false - Append the tooltip to a specific element.
    * @param {Number|Object} options.delay=0
    *      Delay showing and hiding the tooltip (ms) - does not apply to manual trigger type.
    *      If a number is supplied, delay is applied to both hide/show.
    *      Object structure is: `{ show: 500, hide: 100 }`
    * @param {Boolean} options.html=false - Insert HTML into the tooltip. If false, the content will inserted with `textContent`.
-   * @param {String|PlacementFunction} options.placement='top' - One of the allowed placements, or a function returning one of them.
    * @param {String} [options.template='<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>']
    *      Base HTML to used when creating the tooltip.
    *      The tooltip's `title` will be injected into the `.tooltip-inner` or `.tooltip__inner`.
@@ -71554,6 +71657,7 @@ var Tooltip = function () {
    * @param {String} [options.trigger='hover focus']
    *      How tooltip is triggered - click, hover, focus, manual.
    *      You may pass multiple triggers; separate them with a space. `manual` cannot be combined with any other trigger.
+   * @param {Boolean} options.closeOnClickOutside=false - Close a popper on click outside of the popper and reference element. This has effect only when options.trigger is 'click'.
    * @param {String|HTMLElement} options.boundariesElement
    *      The element used as boundaries for the tooltip. For more information refer to Popper.js'
    *      [boundariesElement docs](https://popper.js.org/popper-documentation.html)
@@ -71632,11 +71736,6 @@ var Tooltip = function () {
 
 
   //
-  // Defaults
-  //
-
-
-  //
   // Private methods
   //
 
@@ -71667,7 +71766,7 @@ var Tooltip = function () {
       tooltipNode.setAttribute('aria-hidden', 'false');
 
       // add title to tooltip
-      var titleNode = tooltipGenerator.querySelector(this.innerSelector);
+      var titleNode = tooltipGenerator.querySelector(this.options.innerSelector);
       this._addTitleContent(reference, title, allowHtml, titleNode);
 
       // return the generated tooltip node
@@ -71700,7 +71799,7 @@ var Tooltip = function () {
 
       // if the tooltipNode already exists, just show it
       if (this._tooltipNode) {
-        this._tooltipNode.style.display = '';
+        this._tooltipNode.style.visibility = 'visible';
         this._tooltipNode.setAttribute('aria-hidden', 'false');
         this.popperInstance.update();
         return this;
@@ -71731,7 +71830,7 @@ var Tooltip = function () {
 
       this._popperOptions.modifiers = _extends({}, this._popperOptions.modifiers, {
         arrow: {
-          element: this.arrowSelector
+          element: this.options.arrowSelector
         },
         offset: {
           offset: options.offset
@@ -71761,7 +71860,7 @@ var Tooltip = function () {
       this._isOpen = false;
 
       // hide tooltipNode
-      this._tooltipNode.style.display = 'none';
+      this._tooltipNode.style.visibility = 'hidden';
       this._tooltipNode.setAttribute('aria-hidden', 'true');
 
       return this;
@@ -71868,6 +71967,18 @@ var Tooltip = function () {
         };
         _this2._events.push({ event: event, func: func });
         reference.addEventListener(event, func);
+        if (event === 'click' && options.closeOnClickOutside) {
+          document.addEventListener('mousedown', function (e) {
+            if (!_this2._isOpening) {
+              return;
+            }
+            var popper = _this2.popperInstance.popper;
+            if (reference.contains(e.target) || popper.contains(e.target)) {
+              return;
+            }
+            func(e);
+          }, true);
+        }
       });
     }
   }, {
@@ -71923,7 +72034,7 @@ var Tooltip = function () {
         }
         return;
       }
-      var titleNode = this._tooltipNode.parentNode.querySelector(this.innerSelector);
+      var titleNode = this._tooltipNode.parentNode.querySelector(this.options.innerSelector);
       this._clearTitleContent(titleNode, this.options.html, this.reference.getAttribute('title') || this.options.title);
       this._addTitleContent(this.reference, title, this.options.html, titleNode);
       this.options.title = title;
@@ -71941,15 +72052,6 @@ var Tooltip = function () {
   }]);
   return Tooltip;
 }();
-
-/**
- * Placement function, its context is the Tooltip instance.
- * @memberof Tooltip
- * @callback PlacementFunction
- * @param {HTMLElement} tooltip - tooltip DOM node.
- * @param {HTMLElement} reference - reference DOM node.
- * @return {String} placement - One of the allowed placement options.
- */
 
 /**
  * Title function, its context is the Tooltip instance.
@@ -71986,8 +72088,6 @@ var _initialiseProps = function _initialiseProps() {
     return _this5._updateTitleContent(title);
   };
 
-  this.arrowSelector = '.tooltip-arrow, .tooltip__arrow';
-  this.innerSelector = '.tooltip-inner, .tooltip__inner';
   this._events = [];
 
   this._setTooltipNodeEvent = function (evt, reference, delay, options) {

@@ -162,10 +162,6 @@ export default app.directive('formio', function() {
           $scope.onFormio.then(() => ($scope.formio.submission = submission));
         }, true);
 
-        $scope.$on('componentChange', function(){
-          $scope.$apply();
-        });
-
         // Clean up the Form from DOM.
         $scope.$on('$destroy', function () {
           if ($scope.formio) {
