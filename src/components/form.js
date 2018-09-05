@@ -171,7 +171,7 @@ module.exports = function(app) {
         ],
         tableView: function(data, options) {
           // Include only form data.
-          return GridUtils.generic(data.data, options);
+          return data ? GridUtils.generic(data.data, options) : '';
         }
       });
     }
