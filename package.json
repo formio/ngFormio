@@ -46,7 +46,7 @@
     "protractor-helpers": "^1.1.473",
     "require-dir": "^1.0.0",
     "run-sequence": "^2.2.1",
-    "selenium-server-standalone-jar": "^3.13.0",
+    "selenium-server-standalone-jar": "^3.14.0",
     "ternary-stream": "^2.0.0",
     "vinyl-paths": "^2.1.0",
     "webdriverio": "^4.13.2",
@@ -69,7 +69,7 @@
     "seamless": "^1.0.0",
     "signature_pad": "^2.3.2",
     "swagger-ui": "^3.18.2",
-    "validator": "^10.7.0",
+    "validator": "^10.7.1",
     "vhost": "^3.0.1",
     "webdriverjs-angular": "^0.1.3"
   },
