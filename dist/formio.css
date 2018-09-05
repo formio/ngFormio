@@ -1,4 +1,4 @@
-/*! ng-formio v3.4.4 | https://unpkg.com/ngFormio@3.4.4/LICENSE.txt */
+/*! ng-formio v3.4.5 | https://unpkg.com/ngFormio@3.4.5/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3668,7 +3668,7 @@ body.formio-dialog-open, html.formio-dialog-open {
 .formio-component-label-hidden {
   position: relative; }
 
-.control-label--hidden.field-required {
+.control-label--hidden {
   position: absolute;
   top: 6px;
   right: 5px;

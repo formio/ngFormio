@@ -4,8 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 3.4.5
+### Fixed
  - FOR-1656: fixed submission field watchers not firing when making manual change on the form
+
+### Changed
+ - Upgraded dependencies and core renderer.
 
 ## 3.3.6
 ### Added

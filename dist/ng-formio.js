@@ -344,6 +344,10 @@ exports.default = app.directive('formio', function () {
         });
       }, true);
 
+      $scope.$on('componentChange', function () {
+        $scope.$apply();
+      });
+
       // Clean up the Form from DOM.
       $scope.$on('$destroy', function () {
         if ($scope.formio) {
@@ -9211,7 +9215,7 @@ module.exports = dragula;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.1, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.2, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
@@ -9450,8 +9454,12 @@ module.exports = dragula;
           _ref$l10n = _ref.l10n,
           l10n = _ref$l10n === void 0 ? english : _ref$l10n;
       return function (dateObj, frmt, overrideLocale) {
-        if (config.formatDate !== undefined) return config.formatDate(dateObj, frmt);
         var locale = overrideLocale || l10n;
+
+        if (config.formatDate !== undefined) {
+          return config.formatDate(dateObj, frmt, locale);
+        }
+
         return frmt.split("").map(function (c, i, arr) {
           return formats[c] && arr[i - 1] !== "\\" ? formats[c](dateObj, locale, config) : c !== "\\" ? c : "";
         }).join("");
@@ -9541,6 +9549,7 @@ module.exports = dragula;
       DAY: 86400000
     };
 
+    var HOOKS = ["onChange", "onClose", "onDayCreate", "onDestroy", "onKeyDown", "onMonthChange", "onOpen", "onParseConfig", "onReady", "onValueUpdate", "onYearChange", "onPreCalendarPosition"];
     var defaults = {
       _disable: [],
       _enable: [],
@@ -10138,7 +10147,7 @@ module.exports = dragula;
       }
 
       function focusOnDay(current, offset) {
-        var dayFocused = isInView(document.activeElement);
+        var dayFocused = isInView(document.activeElement || document.body);
         var startElem = current !== undefined ? current : dayFocused ? document.activeElement : self.selectedDateElem !== undefined && isInView(self.selectedDateElem) ? self.selectedDateElem : self.todayDateElem !== undefined && isInView(self.todayDateElem) ? self.todayDateElem : getFirstAvailableDay(offset > 0 ? 1 : -1);
         if (startElem === undefined) return self._input.focus();
         if (!dayFocused) return focusOnDayElem(startElem);
@@ -10203,7 +10212,7 @@ module.exports = dragula;
         var yearInput = createNumberInput("cur-year", {
           tabindex: "-1"
         });
-        var yearElement = yearInput.childNodes[0];
+        var yearElement = yearInput.getElementsByTagName("input")[0];
         yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
         if (self.config.minDate) yearElement.setAttribute("data-min", self.config.minDate.getFullYear().toString());
 
@@ -10281,9 +10290,9 @@ module.exports = dragula;
         self.timeContainer.tabIndex = -1;
         var separator = createElement("span", "flatpickr-time-separator", ":");
         var hourInput = createNumberInput("flatpickr-hour");
-        self.hourElement = hourInput.childNodes[0];
+        self.hourElement = hourInput.getElementsByTagName("input")[0];
         var minuteInput = createNumberInput("flatpickr-minute");
-        self.minuteElement = minuteInput.childNodes[0];
+        self.minuteElement = minuteInput.getElementsByTagName("input")[0];
         self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
         self.hourElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getHours() : self.config.time_24hr ? self.config.defaultHour : military2ampm(self.config.defaultHour));
         self.minuteElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getMinutes() : self.config.defaultMinute);
@@ -10301,7 +10310,7 @@ module.exports = dragula;
         if (self.config.enableSeconds) {
           self.timeContainer.classList.add("hasSeconds");
           var secondInput = createNumberInput("flatpickr-second");
-          self.secondElement = secondInput.childNodes[0];
+          self.secondElement = secondInput.getElementsByTagName("input")[0];
           self.secondElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getSeconds() : self.config.defaultSeconds);
           self.secondElement.setAttribute("data-step", self.minuteElement.getAttribute("data-step"));
           self.secondElement.setAttribute("data-min", self.minuteElement.getAttribute("data-min"));
@@ -10427,11 +10436,13 @@ module.exports = dragula;
             var wrapper = self.calendarContainer.parentNode;
             wrapper.lastChild && wrapper.removeChild(wrapper.lastChild);
 
-            while (wrapper.firstChild) {
-              wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
-            }
+            if (wrapper.parentNode) {
+              while (wrapper.firstChild) {
+                wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+              }
 
-            wrapper.parentNode.removeChild(wrapper);
+              wrapper.parentNode.removeChild(wrapper);
+            }
           } else self.calendarContainer.parentNode.removeChild(self.calendarContainer);
         }
 
@@ -10581,7 +10592,7 @@ module.exports = dragula;
               e.preventDefault();
               var delta = e.keyCode === 40 ? 1 : -1;
 
-              if (self.daysContainer) {
+              if (self.daysContainer && e.target.$i !== undefined) {
                 if (e.ctrlKey) {
                   changeYear(self.currentYear - delta);
                   focusOnDay(getFirstAvailableDay(1), 0);
@@ -10596,7 +10607,11 @@ module.exports = dragula;
               break;
 
             case 9:
-              if (!isTimeObj) break;
+              if (!isTimeObj) {
+                self.element.focus();
+                break;
+              }
+
               var elems = [self.hourElement, self.minuteElement, self.secondElement, self.amPM].filter(function (x) {
                 return x;
               });
@@ -10608,6 +10623,8 @@ module.exports = dragula;
                 if (target !== undefined) {
                   e.preventDefault();
                   target.focus();
+                } else {
+                  self.element.focus();
                 }
               }
 
@@ -10712,9 +10729,11 @@ module.exports = dragula;
             e.target && e.target.blur();
           }
 
-          setTimeout(function () {
-            self.mobileInput !== undefined && self.mobileInput.focus();
-          }, 0);
+          if (self.mobileInput !== undefined) {
+            self.mobileInput.focus();
+            self.mobileInput.click();
+          }
+
           triggerEvent("onOpen");
           return;
         }
@@ -10774,7 +10793,6 @@ module.exports = dragula;
 
       function parseConfig() {
         var boolOpts = ["wrap", "weekNumbers", "allowInput", "clickOpens", "time_24hr", "enableTime", "noCalendar", "altInput", "shorthandCurrentMonth", "inline", "static", "enableSeconds", "disableMobile"];
-        var hooks = ["onChange", "onClose", "onDayCreate", "onDestroy", "onKeyDown", "onMonthChange", "onOpen", "onParseConfig", "onReady", "onValueUpdate", "onYearChange", "onPreCalendarPosition"];
         var userConfig = Object.assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
         var formats$$1 = {};
         self.config.parseDate = userConfig.parseDate;
@@ -10848,19 +10866,18 @@ module.exports = dragula;
           self.config[boolOpts[i]] = self.config[boolOpts[i]] === true || self.config[boolOpts[i]] === "true";
         }
 
-        for (var _i = hooks.length; _i--;) {
-          if (self.config[hooks[_i]] !== undefined) {
-            self.config[hooks[_i]] = arrayify(self.config[hooks[_i]] || []).map(bindToInstance);
-          }
-        }
-
+        HOOKS.filter(function (hook) {
+          return self.config[hook] !== undefined;
+        }).forEach(function (hook) {
+          self.config[hook] = arrayify(self.config[hook] || []).map(bindToInstance);
+        });
         self.isMobile = !self.config.disableMobile && !self.config.inline && self.config.mode === "single" && !self.config.disable.length && !self.config.enable.length && !self.config.weekNumbers && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-        for (var _i2 = 0; _i2 < self.config.plugins.length; _i2++) {
-          var pluginConf = self.config.plugins[_i2](self) || {};
+        for (var _i = 0; _i < self.config.plugins.length; _i++) {
+          var pluginConf = self.config.plugins[_i](self) || {};
 
           for (var key in pluginConf) {
-            if (~hooks.indexOf(key)) {
+            if (HOOKS.indexOf(key) > -1) {
               self.config[key] = arrayify(pluginConf[key]).map(bindToInstance).concat(self.config[key]);
             } else if (typeof userConfig[key] === "undefined") self.config[key] = pluginConf[key];
           }
@@ -10997,10 +11014,11 @@ module.exports = dragula;
           self.config[option] = value;
           if (CALLBACKS[option] !== undefined) CALLBACKS[option].forEach(function (x) {
             return x();
-          });
+          });else if (HOOKS.indexOf(option) > -1) self.config[option] = arrayify(value);
         }
         self.redraw();
         jumpToDate();
+        updateValue(false);
       }
 
       function setSelectedDate(inputDate, format) {
@@ -11164,6 +11182,7 @@ module.exports = dragula;
       }
 
       function triggerEvent(event, data) {
+        if (self.config === undefined) return;
         var hooks = self.config[event];
 
         if (hooks !== undefined && hooks.length > 0) {
@@ -11209,6 +11228,14 @@ module.exports = dragula;
         self._hideNextMonthArrow = self.config.maxDate !== undefined && (self.currentYear === self.config.maxDate.getFullYear() ? self.currentMonth + 1 > self.config.maxDate.getMonth() : self.currentYear > self.config.maxDate.getFullYear());
       }
 
+      function getDateStr(format) {
+        return self.selectedDates.map(function (dObj) {
+          return self.formatDate(dObj, format);
+        }).filter(function (d, i, arr) {
+          return self.config.mode !== "range" || self.config.enableTime || arr.indexOf(d) === i;
+        }).join(self.config.mode !== "range" ? self.config.conjunction : self.l10n.rangeSeparator);
+      }
+
       function updateValue(triggerChange) {
         if (triggerChange === void 0) {
           triggerChange = true;
@@ -11220,15 +11247,10 @@ module.exports = dragula;
           self.mobileInput.value = self.latestSelectedDateObj !== undefined ? self.formatDate(self.latestSelectedDateObj, self.mobileFormatStr) : "";
         }
 
-        var joinChar = self.config.mode !== "range" ? self.config.conjunction : self.l10n.rangeSeparator;
-        self.input.value = self.selectedDates.map(function (dObj) {
-          return self.formatDate(dObj, self.config.dateFormat);
-        }).join(joinChar);
+        self.input.value = getDateStr(self.config.dateFormat);
 
         if (self.altInput !== undefined) {
-          self.altInput.value = self.selectedDates.map(function (dObj) {
-            return self.formatDate(dObj, self.config.altFormat);
-          }).join(joinChar);
+          self.altInput.value = getDateStr(self.config.altFormat);
         }
 
         if (triggerChange !== false) triggerEvent("onValueUpdate");
@@ -12790,7 +12812,19 @@ var Formio = function () {
   }, {
     key: 'getToken',
     value: function getToken(options) {
-      return Formio.getToken(options);
+      return Formio.getToken(Object.assign({ formio: this }, this.options, options));
+    }
+
+    /**
+     * Sets the JWT token for this instance.
+     *
+     * @return {*}
+     */
+
+  }, {
+    key: 'setToken',
+    value: function setToken(token, options) {
+      return Formio.setToken(token, Object.assign({ formio: this }, this.options, options));
     }
 
     /**
@@ -16191,14 +16225,12 @@ var WebformBuilder = function (_Webform) {
 
       var groupBodyClass = 'panel-collapse collapse';
       if (info.default) {
-        groupBodyClass += ' in';
-        if (!hasBootstrapJS) {
-          groupBodyClass += ' show';
-        }
+        groupBodyClass += ' in show';
       }
 
       info.panel = this.ce('div', {
         class: groupBodyClass,
+        'data-parent': '#' + container.id,
         id: 'group-' + info.key
       }, info.body);
 
@@ -18939,7 +18971,7 @@ var BaseComponent = function (_Component) {
           if (!_lodash2.default.isEmpty(subModified)) {
             modified[key] = subModified;
           }
-        } else if (key === 'type' || key === 'key' || key === 'label' || key === 'input' || !defaultSchema.hasOwnProperty(key) || _lodash2.default.isArray(val) || val !== defaultSchema[key]) {
+        } else if (key === 'type' || key === 'key' || key === 'label' || key === 'input' || key === 'tableView' || !defaultSchema.hasOwnProperty(key) || _lodash2.default.isArray(val) || val !== defaultSchema[key]) {
           modified[key] = val;
         }
       });
@@ -27850,8 +27882,8 @@ var FileComponent = function (_BaseComponent) {
     value: function startVideo() {
       var _this7 = this;
 
-      var width = 320;
-      var height = 240;
+      var width = parseInt(this.component.webcamSize) || 320;
+      var height = width * 3 / 4;
       navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
       navigator.getMedia({
@@ -27878,7 +27910,7 @@ var FileComponent = function (_BaseComponent) {
     value: function takePicture() {
       var _this8 = this;
 
-      var width = 320;
+      var width = parseInt(this.component.webcamSize) || 320;
       var height = this.video.videoHeight / (this.video.videoWidth / width);
       this.canvas.getContext('2d').drawImage(this.video, 0, 0, width, height);
       this.canvas.toBlob(function (blob) {
@@ -27934,7 +27966,7 @@ var FileComponent = function (_BaseComponent) {
       }
 
       // If this is disabled or a single value with a value, don't show the upload div.
-      return this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? !this.cameraMode || !this.component.image ? [this.ce('div', {
+      var render = this.ce('div', {}, !this.disabled && (this.component.multiple || this.dataValue.length === 0) ? !this.cameraMode ? [this.ce('div', {
         class: 'fileSelector',
         onDragover: function onDragover(event) {
           this.className = 'fileSelector fileDragOver';
@@ -27950,14 +27982,15 @@ var FileComponent = function (_BaseComponent) {
           element.upload(event.dataTransfer.files);
           return false;
         }
-      }, [this.ce('i', { class: this.iconClass('cloud-upload') }), this.text(' Drop files to attach, or '), this.buildBrowseLink()]), this.component.image ? this.ce('div', {
-        class: 'btn btn-default',
-        onClick: function onClick() {
+      }, [this.ce('i', { class: this.iconClass('cloud-upload') }), this.text(' Drop files to attach, or '), this.buildBrowseLink(), this.component.webcam ? [this.text(', or '), this.ce('a', {
+        href: '#',
+        title: 'Use Web Camera',
+        onClick: function onClick(event) {
+          event.preventDefault();
           _this9.cameraMode = !_this9.cameraMode;
           _this9.refreshDOM();
-          _this9.startVideo();
         }
-      }, 'Use Camera') : null] : [this.ce('div', {}, [this.video = this.ce('video', {
+      }, this.ce('i', { class: this.iconClass('camera') }))] : null])] : [this.ce('div', {}, [this.video = this.ce('video', {
         class: 'video',
         autoplay: true
       }), this.canvas = this.ce('canvas', { style: 'display: none;' }), this.photo = this.ce('img')]), this.ce('div', {
@@ -27972,6 +28005,10 @@ var FileComponent = function (_BaseComponent) {
           _this9.refreshDOM();
         }
       }, 'Switch to file upload')] : this.ce('div'));
+      if (this.cameraMode) {
+        this.startVideo();
+      }
+      return render;
     }
   }, {
     key: 'buildBrowseLink',
@@ -28377,6 +28414,24 @@ exports.default = [{
   weight: 40,
   conditional: {
     json: { '==': [{ var: 'data.image' }, true] }
+  }
+}, {
+  type: 'checkbox',
+  input: true,
+  key: 'webcam',
+  label: 'Enable web camera',
+  tooltip: 'This will allow using an attached camera to directly take a picture instead of uploading an existing file.',
+  weight: 32
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'webcamSize',
+  label: 'Webcam Width',
+  placeholder: '320',
+  tooltip: 'The webcam size for taking pictures.',
+  weight: 38,
+  conditional: {
+    json: { '==': [{ var: 'data.webcam' }, true] }
   }
 }, {
   type: 'textfield',
@@ -30029,7 +30084,6 @@ var NestedComponent = function (_BaseComponent) {
       if (noAdd) {
         return comp;
       }
-      this.setHidden(comp);
       element = this.hook('addComponent', element, comp, this);
       var compElement = comp.getElement();
       if (!compElement) {
@@ -30041,6 +30095,7 @@ var NestedComponent = function (_BaseComponent) {
       } else {
         element.appendChild(compElement);
       }
+      this.setHidden(comp);
       return comp;
     }
 
@@ -33576,7 +33631,7 @@ var SignatureComponent = function (_BaseComponent) {
 
       // Create the refresh button.
       this.refresh = this.ce('a', {
-        class: 'btn btn-sm btn-default btn-secondary signature-pad-refresh'
+        class: 'btn btn-sm btn-default btn-light signature-pad-refresh'
       });
       var refreshIcon = this.getIcon('refresh');
       this.refresh.appendChild(refreshIcon);
@@ -35134,7 +35189,7 @@ var TextAreaComponent = function (_TextFieldComponent) {
       this.addCounter(container);
 
       if (this.component.editor === 'ace') {
-        this.editorReady = _Formio2.default.requireLibrary('ace', 'ace', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.3.0/ace.js', true).then(function () {
+        this.editorReady = _Formio2.default.requireLibrary('ace', 'ace', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js', true).then(function () {
           var mode = _this2.component.as || 'javascript';
           _this2.editor = ace.edit(_this2.input);
           _this2.editor.on('change', function () {
@@ -39988,7 +40043,12 @@ var Translator = function (_EventEmitter) {
       // fallback value
       if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
         usedDefault = true;
-        res = options.defaultValue;
+
+        if (options.count !== undefined) {
+          var suffix = this.pluralResolver.getSuffix(lng, options.count);
+          res = options['defaultValue' + suffix];
+        }
+        if (!res) res = options.defaultValue;
       }
       if (!this.isValidLookup(res)) {
         usedKey = true;
