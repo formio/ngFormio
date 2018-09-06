@@ -13871,6 +13871,9 @@ var PDF = function (_Webform) {
               return;
             }
             if (!_this4.downloadButton) {
+              if (_this4.options.primaryProject) {
+                url += '&project=' + _this4.options.primaryProject;
+              }
               _this4.downloadButton = _this4.ce('a', {
                 href: url,
                 target: '_blank',
@@ -15127,7 +15130,7 @@ var Webform = function (_NestedComponent) {
           this.removeChild(this.alert);
           this.alert = null;
         } catch (err) {
-          // ingore
+          // ignore
         }
       }
       if (message) {
@@ -15657,7 +15660,7 @@ Webform.setAppUrl = _Formio2.default.setAppUrl;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15707,7 +15710,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* global $ */
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 __webpack_require__(/*! ./components/builder */ "./node_modules/formiojs/components/builder.js");
 
@@ -15748,8 +15751,8 @@ var WebformBuilder = function (_Webform) {
           type: 'htmlelement',
           internal: true,
           tag: 'div',
-          className: 'alert alert-info',
-          attrs: [{ attr: 'id', value: parent.id + '-placeholder' }, { attr: 'style', value: 'text-align:center; margin-bottom: 0px;' }, { attr: 'role', value: 'alert' }],
+          className: 'drag-and-drop-alert alert alert-info',
+          attrs: [{ attr: 'id', value: parent.id + '-placeholder' }, { attr: 'style', value: 'text-align:center;' }, { attr: 'role', value: 'alert' }],
           content: 'Drag and Drop a form component'
         }];
       }
@@ -15864,6 +15867,12 @@ var WebformBuilder = function (_Webform) {
         _this2.addClass(_this2.element, 'col-xs-8 col-sm-9 col-md-10 formarea');
         _this2.element.component = _this2;
       });
+    }
+  }, {
+    key: 'setForm',
+    value: function setForm(form) {
+      this.emit('change', form);
+      return _get(WebformBuilder.prototype.__proto__ || Object.getPrototypeOf(WebformBuilder.prototype), 'setForm', this).call(this, form);
     }
   }, {
     key: 'deleteComponent',
@@ -15983,8 +15992,8 @@ var WebformBuilder = function (_Webform) {
         class: 'card panel panel-default preview-panel'
       }, [this.ce('div', {
         class: 'card-header panel-heading'
-      }, this.ce('h3', {
-        class: 'card-title panel-title'
+      }, this.ce('h4', {
+        class: 'card-title panel-title mb-0'
       }, this.t('Preview'))), this.ce('div', {
         class: 'card-body panel-body'
       }, this.componentPreview)]), this.ce('div', {
@@ -16174,11 +16183,8 @@ var WebformBuilder = function (_Webform) {
         'data-target': '#group-' + info.key
       }, this.text(info.title));
 
-      // See if we have bootstrap.js installed.
-      var hasBootstrapJS = typeof $ === 'function' && typeof $().collapse === 'function';
-
       // Add a listener when it is clicked.
-      if (!hasBootstrapJS) {
+      if (!(0, _utils.bootstrapVersion)()) {
         this.addEventListener(groupAnchor, 'click', function (event) {
           event.preventDefault();
           var clickedGroupId = event.target.getAttribute('data-target').replace('#group-', '');
@@ -16225,7 +16231,17 @@ var WebformBuilder = function (_Webform) {
 
       var groupBodyClass = 'panel-collapse collapse';
       if (info.default) {
-        groupBodyClass += ' in show';
+        switch ((0, _utils.bootstrapVersion)()) {
+          case 4:
+            groupBodyClass += ' show';
+            break;
+          case 3:
+            groupBodyClass += ' in';
+            break;
+          default:
+            groupBodyClass += ' in show';
+            break;
+        }
       }
 
       info.panel = this.ce('div', {
@@ -16556,7 +16572,6 @@ var WebformBuilder = function (_Webform) {
 }(_Webform3.default);
 
 exports.default = WebformBuilder;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
 /***/ }),
 
@@ -16662,7 +16677,7 @@ var Wizard = function (_Webform) {
       if (!this.wizard.full && num >= 0 && num < this.pages.length) {
         this.page = num;
         return _get(Wizard.prototype.__proto__ || Object.getPrototypeOf(Wizard.prototype), 'setForm', this).call(this, this.currentPage());
-      } else if (this.wizard.full) {
+      } else if (this.wizard.full || !this.pages.length) {
         return _get(Wizard.prototype.__proto__ || Object.getPrototypeOf(Wizard.prototype), 'setForm', this).call(this, this.getWizard());
       }
       return _nativePromiseOnly2.default.reject('Page not found');
@@ -17225,9 +17240,9 @@ var WizardBuilder = function (_WebformBuilder) {
 
       this.empty(this.pageBar);
       _lodash2.default.each(pages, function (page, index) {
-        var pageLink = _this4.ce('a', {
+        var pageLink = _this4.ce('span', {
           title: page.title,
-          class: index === _this4.currentPage ? 'label label-primary' : 'label label-info'
+          class: index === _this4.currentPage ? 'mr-2 badge badge-primary label label-primary wizard-page-label' : 'mr-2 badge badge-info label label-info wizard-page-label'
         }, _this4.text(page.title));
         _this4.pageBar.appendChild(_this4.ce('li', null, pageLink));
         _this4.addEventListener(pageLink, 'click', function (event) {
@@ -17236,9 +17251,9 @@ var WizardBuilder = function (_WebformBuilder) {
         });
       });
 
-      var newPage = this.ce('a', {
+      var newPage = this.ce('span', {
         title: this.t('Create Page'),
-        class: 'label label-success'
+        class: 'mr-2 badge badge-success label label-success wizard-page-label'
       }, [this.getIcon('plus'), this.text(' PAGE')]);
 
       this.addEventListener(newPage, 'click', function (event) {
@@ -20466,7 +20481,9 @@ var BaseComponent = function (_Component) {
   }, {
     key: 'deleteValue',
     value: function deleteValue() {
-      this.setValue(null);
+      this.setValue(null, {
+        noUpdateEvent: true
+      });
       _lodash2.default.unset(this.data, this.key);
     }
 
@@ -24748,7 +24765,7 @@ var DataGridComponent = function (_NestedComponent) {
     value: function buildComponent(col, colIndex, row, rowIndex) {
       var container;
       var isVisible = this.visibleColumns && (!this.visibleColumns.hasOwnProperty(col.key) || this.visibleColumns[col.key]);
-      if (isVisible) {
+      if (isVisible || this.options.builder) {
         container = this.ce('td');
         container.noDrop = true;
       }
@@ -24763,7 +24780,7 @@ var DataGridComponent = function (_NestedComponent) {
       comp.rowIndex = rowIndex;
       this.hook('addComponent', container, comp, this);
       this.rows[rowIndex][column.key] = comp;
-      if (isVisible) {
+      if (isVisible || this.options.builder) {
         container.appendChild(comp.getElement());
         return container;
       }
@@ -26969,6 +26986,16 @@ var EditGridComponent = function (_NestedComponent) {
       this.buildTable();
     }
   }, {
+    key: 'clearErrors',
+    value: function clearErrors(rowIndex) {
+      if (this.editRows[rowIndex] && Array.isArray(this.editRows[rowIndex].components)) {
+        this.editRows[rowIndex].components.forEach(function (comp) {
+          comp.setPristine(true);
+          comp.setCustomValidity('');
+        });
+      }
+    }
+  }, {
     key: 'cancelRow',
     value: function cancelRow(rowIndex) {
       if (this.options.readOnly) {
@@ -26981,7 +27008,9 @@ var EditGridComponent = function (_NestedComponent) {
         this.editRows[rowIndex].dirty = false;
         this.editRows[rowIndex].isOpen = false;
         this.editRows[rowIndex].data = this.dataValue[rowIndex];
+        this.clearErrors(rowIndex);
       } else {
+        this.clearErrors(rowIndex);
         this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
         this.editRows.splice(rowIndex, 1);
       }
@@ -30282,6 +30311,12 @@ var NestedComponent = function (_BaseComponent) {
           }
         });
       }
+      // If hiding a nested component, clear all errors below.
+      if (!shown) {
+        this.getAllComponents().forEach(function (component) {
+          component.error = '';
+        });
+      }
       return shown;
     }
 
@@ -30367,9 +30402,7 @@ var NestedComponent = function (_BaseComponent) {
   }, {
     key: 'setHidden',
     value: function setHidden(component) {
-      if (component.components && component.components.length) {
-        component.hideComponents(this.hidden);
-      } else if (component.component.hidden) {
+      if (component.component.hidden) {
         component.visible = false;
       } else if (this.hidden && this.hidden.indexOf(component.key) !== -1) {
         component.visible = false;
@@ -30927,7 +30960,7 @@ var PanelComponent = function (_NestedComponent) {
     key: 'build',
     value: function build() {
       this.component.theme = this.component.theme || 'default';
-      var panelClass = 'card border-' + this.bootstrap4Theme(this.component.theme) + ' ';
+      var panelClass = 'mb-2 card border-' + this.bootstrap4Theme(this.component.theme) + ' ';
       panelClass += 'panel panel-' + this.component.theme + ' ';
       panelClass += this.component.customClass;
       this.element = this.ce('div', {
@@ -37206,7 +37239,7 @@ var lodashOperators = exports.lodashOperators = [
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function($) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -37263,6 +37296,7 @@ exports.fieldData = fieldData;
 exports.delay = delay;
 exports.iterateKey = iterateKey;
 exports.uniqueKey = uniqueKey;
+exports.bootstrapVersion = bootstrapVersion;
 
 var _lodash = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 
@@ -37290,7 +37324,7 @@ var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global $ */
 
 // Configure JsonLogic
 _operators.lodashOperators.forEach(function (name) {
@@ -38389,6 +38423,19 @@ function uniqueKey(map, base) {
   }
   return newKey;
 }
+
+/**
+ * Determines the major version number of bootstrap.
+ *
+ * @return {number}
+ */
+function bootstrapVersion() {
+  if (typeof $ === 'function' && typeof $().collapse === 'function') {
+    return parseInt($.fn.collapse.Constructor.VERSION.split('.')[0], 10);
+  }
+  return 0;
+}
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
 /***/ }),
 

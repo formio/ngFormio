@@ -1,4 +1,4 @@
-/*! ng-formio v3.4.5 | https://unpkg.com/ngFormio@3.4.5/LICENSE.txt */
+/*! ng-formio v3.4.6 | https://unpkg.com/ngFormio@3.4.6/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3818,5 +3818,11 @@ body.formio-dialog-open, html.formio-dialog-open {
 
 .builder-paste-mode .component-settings-button-paste {
   display: inherit; }
+
+.wizard-page-label {
+  cursor: pointer; }
+
+.panel-body .drag-and-drop-alert {
+  margin-bottom: 0; }
 
 /*# sourceMappingURL=formio.css.map*/
