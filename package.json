@@ -19,7 +19,7 @@
     "gulp-concat": "^2.5.2",
     "gulp-csso": "^3.0.1",
     "gulp-debug": "^4.0.0",
-    "gulp-htmlmin": "^4.0.0",
+    "gulp-htmlmin": "^5.0.1",
     "gulp-if": "^2.0.2",
     "gulp-imagemin": "^4.1.0",
     "gulp-inject": "^4.3.2",
@@ -51,7 +51,7 @@
     "vinyl-paths": "^2.1.0",
     "webdriverio": "^4.13.2",
     "wiredep": "^4.0.0",
-    "yargs": "^12.0.1"
+    "yargs": "^12.0.2"
   },
   "dependencies": {
     "chai": "^4.0.2",
@@ -68,7 +68,7 @@
     "request": "^2.88.0",
     "seamless": "^1.0.0",
     "signature_pad": "^2.3.2",
-    "swagger-ui": "^3.18.2",
+    "swagger-ui": "^3.18.3",
     "validator": "^10.7.1",
     "vhost": "^3.0.1",
     "webdriverjs-angular": "^0.1.3"
