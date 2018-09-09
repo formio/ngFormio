@@ -359,10 +359,16 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
         }
       });
 
-      $scope.savePDFProject = function() {
-        $scope.currentProject.settings.filetoken = $scope.pdfInfo.data.token;
-        return $scope.saveProject();
-      };
+      // Set the filetoken if it isn't set.
+      $scope.formioReady.then(function() {
+        if (
+          $scope.currentProject &&
+          $scope.currentProject.settings &&
+          !$scope.currentProject.settings.filetoken
+        ) {
+          $scope.currentProject.settings.filetoken = $scope.pdfInfo.data.token;
+        }
+      });
 
       // Get all of the forms that have a pdf attached to them.
       $http.get(AppConfig.apiBase + '/project/' + $stateParams.projectId + '/form', {
