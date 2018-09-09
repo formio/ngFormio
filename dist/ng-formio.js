@@ -14345,12 +14345,6 @@ function (_WebformBuilder) {
       this.builderReadyResolve();
     }
   }, {
-    key: "destroy",
-    value: function destroy() {
-      this.removeEventListeners();
-      this.destroyComponents();
-    }
-  }, {
     key: "build",
     value: function build() {
       var _this5 = this;
@@ -14363,9 +14357,7 @@ function (_WebformBuilder) {
         this.addClass(this.pdfForm.element, 'formio-pdf-builder');
       }
 
-      this.pdfForm.removeEventListeners(true);
-      this.pdfForm.events.removeAllListeners();
-      this.pdfForm.destroyComponents();
+      this.pdfForm.destroy();
       this.pdfForm.on('iframe-elementUpdate', function (schema) {
         var component = _this5.getComponentById(schema.id);
 
