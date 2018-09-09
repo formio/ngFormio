@@ -39,7 +39,11 @@ docker run -itd \
           <label for="pdfserver">PDF Server URL</label>
           <input type="text" class="form-control" id="pdfserver" ng-model="currentProject.settings.pdfserver" placeholder="https://files.form.io" />
         </div>
-        <button class="btn btn-primary" ng-click="savePDFProject()">Save Settings</button>
+        <div class="form-group">
+          <label for="pdfserver">PDF Token</label>
+          <input type="text" class="form-control" id="filetoken" ng-model="currentProject.settings.filetoken" placeholder="https://files.form.io" />
+        </div>
+        <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
       </div>
     </div>
   </div>
