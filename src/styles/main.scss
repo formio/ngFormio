@@ -1865,6 +1865,10 @@ footer {
   }
 }
 
+.alert-danger {
+  background-color: $alert-danger-bg;
+}
+
 .caret {
   border-top: 4px dashed;
 }
