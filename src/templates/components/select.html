@@ -21,8 +21,9 @@
   tabindex="{{ component.tabindex || 0 }}"
   ng-style="getInputGroupStyles(component)"
 >
-  <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:options.building }}">
+  <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:options.building }}" allow-clear="!component.validate.required">
     <formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>
+    <span ng-if="!component.multiple && !component.validate.required" class="close ui-select-match-close" ng-hide="$select.disabled" ng-click="clearSelected($event)" style="position:absolute;top:3px;right:1.2em;width:auto;">×</span>
   </ui-select-match>
   <ui-select-choices class="ui-select-choices" repeat="getSelectItem(item) as item in selectItems | filter: $select.search" refresh="refreshItems($select.search)" refresh-delay="250">
     <formio-select-item template="component.template" item="item" select="$select"></formio-select-item>

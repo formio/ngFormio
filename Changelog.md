@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.36.6
+### Added
+ - A way to deleted a non-required Select dropdown field.
+
 ## 2.36.5
 ### Fixed
  - Form component `tableView`.

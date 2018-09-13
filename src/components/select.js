@@ -173,6 +173,12 @@ module.exports = function(app) {
               $scope.refreshItems(input, url);
             });
 
+            $scope.clearSelected = function(event) {
+              event.stopPropagation();
+              event.preventDefault();
+              delete $scope.data[$scope.component.key];
+            };
+
             var refreshing = false;
             var refreshValue = function() {
               if (refreshing) {

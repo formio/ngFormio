@@ -1,4 +1,4 @@
-/*! ng-formio v2.36.5 | https://unpkg.com/ng-formio@2.36.5/LICENSE.txt */
+/*! ng-formio v2.36.6 | https://unpkg.com/ng-formio@2.36.6/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -882,68 +882,60 @@ exports.all = function() {
 }).call(this,_dereq_('_process'))
 },{"_process":214}],3:[function(_dereq_,module,exports){
 (function (global){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _nativePromiseOnly = _interopRequireDefault(_dereq_("native-promise-only"));
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* globals OktaAuth */
+_dereq_("whatwg-fetch");
 
-// Intentionally use native-promise-only here... Other promise libraries (es6-promise)
-// duck-punch the global Promise definition which messes up Angular 2 since it
-// also duck-punches the global Promise definition. For now, keep native-promise-only.
+var _eventemitter = _dereq_("eventemitter2");
 
+var _browserCookies = _interopRequireDefault(_dereq_("browser-cookies"));
 
-var _nativePromiseOnly = _dereq_('native-promise-only');
+var _shallowCopy = _interopRequireDefault(_dereq_("shallow-copy"));
 
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
+var providers = _interopRequireWildcard(_dereq_("./providers"));
 
-_dereq_('whatwg-fetch');
+var _get2 = _interopRequireDefault(_dereq_("lodash/get"));
 
-var _eventemitter = _dereq_('eventemitter2');
-
-var _browserCookies = _dereq_('browser-cookies');
-
-var _browserCookies2 = _interopRequireDefault(_browserCookies);
-
-var _shallowCopy = _dereq_('shallow-copy');
-
-var _shallowCopy2 = _interopRequireDefault(_shallowCopy);
-
-var _providers = _dereq_('./providers');
-
-var providers = _interopRequireWildcard(_providers);
-
-var _get2 = _dereq_('lodash/get');
-
-var _get3 = _interopRequireDefault(_get2);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 var isBoolean = function isBoolean(val) {
-  return (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === _typeof(true);
+  return _typeof(val) === _typeof(true);
 };
+
 var isNil = function isNil(val) {
   return val === null || val === undefined;
 };
-var isObject = function isObject(val) {
-  return val && (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object';
-};
 
+var isObject = function isObject(val) {
+  return val && _typeof(val) === 'object';
+};
 /**
  * The Formio interface class.
  *
  *   let formio = new Formio('https://examples.form.io/example');
  */
 
-var Formio = function () {
+
+var Formio =
+/*#__PURE__*/
+function () {
   /* eslint-disable max-statements */
   function Formio(path) {
     var _this = this;
@@ -955,9 +947,9 @@ var Formio = function () {
     // Ensure we have an instance of Formio.
     if (!(this instanceof Formio)) {
       return new Formio(path);
-    }
+    } // Initialize our variables.
 
-    // Initialize our variables.
+
     this.base = '';
     this.projectsUrl = '';
     this.projectUrl = '';
@@ -974,9 +966,8 @@ var Formio = function () {
     this.vsUrl = '';
     this.vId = '';
     this.vUrl = '';
-    this.query = '';
+    this.query = ''; // Store the original path and options.
 
-    // Store the original path and options.
     this.path = path;
     this.options = options;
 
@@ -991,8 +982,8 @@ var Formio = function () {
     if (!path) {
       // Allow user to create new projects if this was instantiated without
       // a url
-      this.projectUrl = this.base + '/project';
-      this.projectsUrl = this.base + '/project';
+      this.projectUrl = "".concat(this.base, "/project");
+      this.projectsUrl = "".concat(this.base, "/project");
       this.projectId = false;
       this.query = '';
       return;
@@ -1004,16 +995,15 @@ var Formio = function () {
 
     var project = this.projectUrl || Formio.projectUrl;
     var projectRegEx = /(^|\/)(project)($|\/[^/]+)/;
-    var isProjectUrl = path.search(projectRegEx) !== -1;
-
-    // The baseURL is the same as the projectUrl, and does not contain "/project/MONGO_ID" in
+    var isProjectUrl = path.search(projectRegEx) !== -1; // The baseURL is the same as the projectUrl, and does not contain "/project/MONGO_ID" in
     // its domain. This is almost certainly against the Open Source server.
+
     if (project && this.base === project && !isProjectUrl) {
       this.noProject = true;
       this.projectUrl = this.base;
-    }
+    } // Normalize to an absolute path.
 
-    // Normalize to an absolute path.
+
     if (path.indexOf('http') !== 0 && path.indexOf('//') !== 0) {
       path = this.base + path;
     }
@@ -1023,29 +1013,33 @@ var Formio = function () {
     var hostName = hostparts[1] + hostparts[2];
     path = hostparts.length > 3 ? hostparts[3] : '';
     var queryparts = path.split('?');
+
     if (queryparts.length > 1) {
       path = queryparts[0];
-      this.query = '?' + queryparts[1];
-    }
+      this.query = "?".concat(queryparts[1]);
+    } // Register a specific path.
 
-    // Register a specific path.
+
     var registerPath = function registerPath(name, base) {
-      _this[name + 'sUrl'] = base + '/' + name;
-      var regex = new RegExp('/' + name + '/([^/]+)');
+      _this["".concat(name, "sUrl")] = "".concat(base, "/").concat(name);
+      var regex = new RegExp("/".concat(name, "/([^/]+)"));
+
       if (path.search(regex) !== -1) {
         parts = path.match(regex);
-        _this[name + 'Url'] = parts ? base + parts[0] : '';
-        _this[name + 'Id'] = parts.length > 1 ? parts[1] : '';
+        _this["".concat(name, "Url")] = parts ? base + parts[0] : '';
+        _this["".concat(name, "Id")] = parts.length > 1 ? parts[1] : '';
         base += parts[0];
       }
-      return base;
-    };
 
-    // Register an array of items.
+      return base;
+    }; // Register an array of items.
+
+
     var registerItems = function registerItems(items, base, staticBase) {
       for (var i in items) {
         if (items.hasOwnProperty(i)) {
           var item = items[i];
+
           if (Array.isArray(item)) {
             registerItems(item, base, true);
           } else {
@@ -1071,21 +1065,23 @@ var Formio = function () {
         if (hostparts.length > 3 && path.split('/').length > 1) {
           var pathParts = path.split('/');
           pathParts.shift(); // Throw away the first /.
+
           this.projectId = pathParts.shift();
-          path = '/' + pathParts.join('/');
-          this.projectUrl = hostName + '/' + this.projectId;
+          path = "/".concat(pathParts.join('/'));
+          this.projectUrl = "".concat(hostName, "/").concat(this.projectId);
         }
       } else {
         // Get project id from subdomain.
-        if (hostparts.length > 2 && (hostparts[2].split('.').length > 2 || hostName.indexOf('localhost') !== -1)) {
+        if (hostparts.length > 2 && (hostparts[2].split('.').length > 2 || hostName.includes('localhost'))) {
           this.projectUrl = hostName;
           this.projectId = hostparts[2].split('.')[0];
         }
       }
-      this.projectsUrl = this.projectsUrl || this.base + '/project';
-    }
 
-    // Configure Form urls and form ids.
+      this.projectsUrl = this.projectsUrl || "".concat(this.base, "/project");
+    } // Configure Form urls and form ids.
+
+
     if (path.search(/(^|\/)(form)($|\/)/) !== -1) {
       registerItems(['form', ['submission', 'action', 'v']], this.projectUrl);
     } else {
@@ -1094,107 +1090,125 @@ var Formio = function () {
       this.pathType = subs && subs.length > 1 ? subs[1] : '';
       path = path.replace(subRegEx, '');
       path = path.replace(/\/$/, '');
-      this.formsUrl = this.projectUrl + '/form';
+      this.formsUrl = "".concat(this.projectUrl, "/form");
       this.formUrl = path ? this.projectUrl + path : '';
       this.formId = path.replace(/^\/+|\/+$/g, '');
       var items = ['submission', 'action', 'v'];
+
       for (var i in items) {
         if (items.hasOwnProperty(i)) {
           var item = items[i];
-          this[item + 'sUrl'] = this.projectUrl + path + '/' + item;
+          this["".concat(item, "sUrl")] = "".concat(this.projectUrl + path, "/").concat(item);
+
           if (this.pathType === item && subs.length > 2 && subs[2]) {
-            this[item + 'Id'] = subs[2].replace(/^\/+|\/+$/g, '');
-            this[item + 'Url'] = this.projectUrl + path + subs[0];
+            this["".concat(item, "Id")] = subs[2].replace(/^\/+|\/+$/g, '');
+            this["".concat(item, "Url")] = this.projectUrl + path + subs[0];
           }
         }
       }
-    }
+    } // Set the app url if it is not set.
 
-    // Set the app url if it is not set.
+
     if (!Formio.projectUrlSet) {
       Formio.projectUrl = this.projectUrl;
     }
   }
   /* eslint-enable max-statements */
 
+
   _createClass(Formio, [{
-    key: 'delete',
+    key: "delete",
     value: function _delete(type, opts) {
-      var _id = type + 'Id';
-      var _url = type + 'Url';
+      var _id = "".concat(type, "Id");
+
+      var _url = "".concat(type, "Url");
+
       if (!this[_id]) {
-        _nativePromiseOnly2.default.reject('Nothing to delete');
+        _nativePromiseOnly.default.reject('Nothing to delete');
       }
+
       Formio.cache = {};
       return this.makeRequest(type, this[_url], 'delete', null, opts);
     }
   }, {
-    key: 'index',
+    key: "index",
     value: function index(type, query, opts) {
-      var _url = type + 'Url';
+      var _url = "".concat(type, "Url");
+
       query = query || '';
+
       if (query && isObject(query)) {
-        query = '?' + Formio.serialize(query.params);
+        query = "?".concat(Formio.serialize(query.params));
       }
+
       return this.makeRequest(type, this[_url] + query, 'get', null, opts);
     }
   }, {
-    key: 'save',
+    key: "save",
     value: function save(type, data, opts) {
-      var _id = type + 'Id';
-      var _url = type + 'Url';
+      var _id = "".concat(type, "Id");
+
+      var _url = "".concat(type, "Url");
+
       var method = this[_id] || data._id ? 'put' : 'post';
-      var reqUrl = this[_id] ? this[_url] : this[type + 'sUrl'];
-      if (!this[_id] && data._id && method === 'put' && !(reqUrl.indexOf(data._id) !== -1)) {
-        reqUrl += '/' + data._id;
+      var reqUrl = this[_id] ? this[_url] : this["".concat(type, "sUrl")];
+
+      if (!this[_id] && data._id && method === 'put' && !reqUrl.includes(data._id)) {
+        reqUrl += "/".concat(data._id);
       }
+
       Formio.cache = {};
       return this.makeRequest(type, reqUrl + this.query, method, data, opts);
     }
   }, {
-    key: 'load',
+    key: "load",
     value: function load(type, query, opts) {
-      var _id = type + 'Id';
-      var _url = type + 'Url';
+      var _id = "".concat(type, "Id");
+
+      var _url = "".concat(type, "Url");
+
       if (query && isObject(query)) {
         query = Formio.serialize(query.params);
       }
+
       if (query) {
-        query = this.query ? this.query + '&' + query : '?' + query;
+        query = this.query ? "".concat(this.query, "&").concat(query) : "?".concat(query);
       } else {
         query = this.query;
       }
+
       if (!this[_id]) {
-        return _nativePromiseOnly2.default.reject('Missing ' + _id);
+        return _nativePromiseOnly.default.reject("Missing ".concat(_id));
       }
+
       return this.makeRequest(type, this[_url] + query, 'get', null, opts);
     }
   }, {
-    key: 'makeRequest',
+    key: "makeRequest",
     value: function makeRequest() {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
 
       return Formio.makeRequest.apply(Formio, [this].concat(args));
     }
   }, {
-    key: 'loadProject',
+    key: "loadProject",
     value: function loadProject(query, opts) {
       return this.load('project', query, opts);
     }
   }, {
-    key: 'saveProject',
+    key: "saveProject",
     value: function saveProject(data, opts) {
       return this.save('project', data, opts);
     }
   }, {
-    key: 'deleteProject',
+    key: "deleteProject",
     value: function deleteProject(opts) {
       return this.delete('project', opts);
     }
   }, {
-    key: 'loadForm',
+    key: "loadForm",
     value: function loadForm(query, opts) {
       var _this2 = this;
 
@@ -1202,119 +1216,124 @@ var Formio = function () {
         // Check to see if there isn't a number in vId.
         if (!currentForm.revisions || isNaN(parseInt(_this2.vId))) {
           return currentForm;
-        }
-        // If a submission already exists but form is marked to load current version of form.
+        } // If a submission already exists but form is marked to load current version of form.
+
+
         if (currentForm.revisions === 'current' && _this2.submissionId) {
           return currentForm;
-        }
-        // If they specified a revision form, load the revised form components.
+        } // If they specified a revision form, load the revised form components.
+
+
         if (query && isObject(query)) {
           query = Formio.serialize(query.params);
         }
+
         if (query) {
-          query = _this2.query ? _this2.query + '&' + query : '?' + query;
+          query = _this2.query ? "".concat(_this2.query, "&").concat(query) : "?".concat(query);
         } else {
           query = _this2.query;
         }
+
         return _this2.makeRequest('form', _this2.vUrl + query, 'get', null, opts).then(function (revisionForm) {
-          currentForm.components = revisionForm.components;
-          // Using object.assign so we don't cross polinate multiple form loads.
+          currentForm.components = revisionForm.components; // Using object.assign so we don't cross polinate multiple form loads.
+
           return Object.assign({}, currentForm);
-        })
-        // If we couldn't load the revision, just return the original form.
+        }) // If we couldn't load the revision, just return the original form.
         .catch(function () {
           return Object.assign({}, currentForm);
         });
       });
     }
   }, {
-    key: 'saveForm',
+    key: "saveForm",
     value: function saveForm(data, opts) {
       return this.save('form', data, opts);
     }
   }, {
-    key: 'deleteForm',
+    key: "deleteForm",
     value: function deleteForm(opts) {
       return this.delete('form', opts);
     }
   }, {
-    key: 'loadForms',
+    key: "loadForms",
     value: function loadForms(query, opts) {
       return this.index('forms', query, opts);
     }
   }, {
-    key: 'loadSubmission',
+    key: "loadSubmission",
     value: function loadSubmission(query, opts) {
       var _this3 = this;
 
       return this.load('submission', query, opts).then(function (submission) {
         _this3.vId = submission._fvid;
-        _this3.vUrl = _this3.formUrl + '/v/' + _this3.vId;
+        _this3.vUrl = "".concat(_this3.formUrl, "/v/").concat(_this3.vId);
         return submission;
       });
     }
   }, {
-    key: 'saveSubmission',
+    key: "saveSubmission",
     value: function saveSubmission(data, opts) {
       if (!isNaN(parseInt(this.vId))) {
         data._fvid = this.vId;
       }
+
       return this.save('submission', data, opts);
     }
   }, {
-    key: 'deleteSubmission',
+    key: "deleteSubmission",
     value: function deleteSubmission(opts) {
       return this.delete('submission', opts);
     }
   }, {
-    key: 'loadSubmissions',
+    key: "loadSubmissions",
     value: function loadSubmissions(query, opts) {
       return this.index('submissions', query, opts);
     }
   }, {
-    key: 'loadAction',
+    key: "loadAction",
     value: function loadAction(query, opts) {
       return this.load('action', query, opts);
     }
   }, {
-    key: 'saveAction',
+    key: "saveAction",
     value: function saveAction(data, opts) {
       return this.save('action', data, opts);
     }
   }, {
-    key: 'deleteAction',
+    key: "deleteAction",
     value: function deleteAction(opts) {
       return this.delete('action', opts);
     }
   }, {
-    key: 'loadActions',
+    key: "loadActions",
     value: function loadActions(query, opts) {
       return this.index('actions', query, opts);
     }
   }, {
-    key: 'availableActions',
+    key: "availableActions",
     value: function availableActions() {
-      return this.makeRequest('availableActions', this.formUrl + '/actions');
+      return this.makeRequest('availableActions', "".concat(this.formUrl, "/actions"));
     }
   }, {
-    key: 'actionInfo',
+    key: "actionInfo",
     value: function actionInfo(name) {
-      return this.makeRequest('actionInfo', this.formUrl + '/actions/' + name);
+      return this.makeRequest('actionInfo', "".concat(this.formUrl, "/actions/").concat(name));
     }
   }, {
-    key: 'isObjectId',
+    key: "isObjectId",
     value: function isObjectId(id) {
       var checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
       return checkForHexRegExp.test(id);
     }
   }, {
-    key: 'getProjectId',
+    key: "getProjectId",
     value: function getProjectId() {
       if (!this.projectId) {
-        return _nativePromiseOnly2.default.resolve('');
+        return _nativePromiseOnly.default.resolve('');
       }
+
       if (this.isObjectId(this.projectId)) {
-        return _nativePromiseOnly2.default.resolve(this.projectId);
+        return _nativePromiseOnly.default.resolve(this.projectId);
       } else {
         return this.loadProject().then(function (project) {
           return project._id;
@@ -1322,13 +1341,14 @@ var Formio = function () {
       }
     }
   }, {
-    key: 'getFormId',
+    key: "getFormId",
     value: function getFormId() {
       if (!this.formId) {
-        return _nativePromiseOnly2.default.resolve('');
+        return _nativePromiseOnly.default.resolve('');
       }
+
       if (this.isObjectId(this.formId)) {
-        return _nativePromiseOnly2.default.resolve(this.formId);
+        return _nativePromiseOnly.default.resolve(this.formId);
       } else {
         return this.loadForm().then(function (form) {
           return form._id;
@@ -1336,16 +1356,15 @@ var Formio = function () {
       }
     }
   }, {
-    key: 'currentUser',
+    key: "currentUser",
     value: function currentUser(options) {
       return Formio.currentUser(this, options);
     }
   }, {
-    key: 'accessInfo',
+    key: "accessInfo",
     value: function accessInfo() {
       return Formio.accessInfo(this);
     }
-
     /**
      * Returns the JWT token for this instance.
      *
@@ -1353,11 +1372,12 @@ var Formio = function () {
      */
 
   }, {
-    key: 'getToken',
+    key: "getToken",
     value: function getToken(options) {
-      return Formio.getToken(Object.assign({ formio: this }, this.options, options));
+      return Formio.getToken(Object.assign({
+        formio: this
+      }, this.options, options));
     }
-
     /**
      * Sets the JWT token for this instance.
      *
@@ -1365,23 +1385,26 @@ var Formio = function () {
      */
 
   }, {
-    key: 'setToken',
+    key: "setToken",
     value: function setToken(token, options) {
-      return Formio.setToken(token, Object.assign({ formio: this }, this.options, options));
+      return Formio.setToken(token, Object.assign({
+        formio: this
+      }, this.options, options));
     }
-
     /**
      * Returns a temporary authentication token for single purpose token generation.
      */
 
   }, {
-    key: 'getTempToken',
+    key: "getTempToken",
     value: function getTempToken(expire, allowed, options) {
       var token = Formio.getToken(options);
+
       if (!token) {
-        return _nativePromiseOnly2.default.reject('You must be authenticated to generate a temporary auth token.');
+        return _nativePromiseOnly.default.reject('You must be authenticated to generate a temporary auth token.');
       }
-      return this.makeRequest('tempToken', this.projectUrl + '/token', 'GET', null, {
+
+      return this.makeRequest('tempToken', "".concat(this.projectUrl, "/token"), 'GET', null, {
         ignoreCache: true,
         header: new Headers({
           'x-expire': expire,
@@ -1389,7 +1412,6 @@ var Formio = function () {
         })
       });
     }
-
     /**
      * Get a download url for a submission PDF of this submission.
      *
@@ -1397,12 +1419,12 @@ var Formio = function () {
      */
 
   }, {
-    key: 'getDownloadUrl',
+    key: "getDownloadUrl",
     value: function getDownloadUrl(form) {
       var _this4 = this;
 
       if (!this.submissionId) {
-        return _nativePromiseOnly2.default.resolve('');
+        return _nativePromiseOnly.default.resolve('');
       }
 
       if (!form) {
@@ -1411,19 +1433,19 @@ var Formio = function () {
           if (!_form) {
             return '';
           }
+
           return _this4.getDownloadUrl(_form);
         });
       }
 
-      var apiUrl = '/project/' + form.project;
-      apiUrl += '/form/' + form._id;
-      apiUrl += '/submission/' + this.submissionId;
+      var apiUrl = "/project/".concat(form.project);
+      apiUrl += "/form/".concat(form._id);
+      apiUrl += "/submission/".concat(this.submissionId);
       apiUrl += '/download';
-
       var download = this.base + apiUrl;
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
-        _this4.getTempToken(3600, 'GET:' + apiUrl).then(function (tempToken) {
-          download += '?token=' + tempToken.key;
+      return new _nativePromiseOnly.default(function (resolve, reject) {
+        _this4.getTempToken(3600, "GET:".concat(apiUrl)).then(function (tempToken) {
+          download += "?token=".concat(tempToken.key);
           resolve(download);
         }, function () {
           resolve(download);
@@ -1431,7 +1453,7 @@ var Formio = function () {
       });
     }
   }, {
-    key: 'uploadFile',
+    key: "uploadFile",
     value: function uploadFile(storage, file, fileName, dir, progressCallback, url) {
       var _this5 = this;
 
@@ -1452,14 +1474,16 @@ var Formio = function () {
               throw 'Storage provider not found';
             }
           }
-          return result || { url: '' };
+
+          return result || {
+            url: ''
+          };
         });
       });
-
       return Formio.pluginAlter('wrapFileRequestPromise', request, requestArgs);
     }
   }, {
-    key: 'downloadFile',
+    key: "downloadFile",
     value: function downloadFile(file) {
       var _this6 = this;
 
@@ -1467,7 +1491,6 @@ var Formio = function () {
         method: 'download',
         file: file
       };
-
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
         return Formio.pluginGet('fileRequest', requestArgs).then(function (result) {
           if (file.storage && isNil(result)) {
@@ -1478,33 +1501,35 @@ var Formio = function () {
               throw 'Storage provider not found';
             }
           }
-          return result || { url: '' };
+
+          return result || {
+            url: ''
+          };
         });
       });
-
       return Formio.pluginAlter('wrapFileRequestPromise', request, requestArgs);
-    }
-
-    // Determine if the user can submit the form.
+    } // Determine if the user can submit the form.
 
   }, {
-    key: 'canSubmit',
+    key: "canSubmit",
     value: function canSubmit() {
       /* eslint-disable max-statements, max-depth */
-      return _nativePromiseOnly2.default.all([this.loadForm(), this.currentUser(), this.accessInfo()]).then(function (results) {
+      return _nativePromiseOnly.default.all([this.loadForm(), this.currentUser(), this.accessInfo()]).then(function (results) {
         var form = results.shift();
         var user = results.shift();
-        var access = results.shift();
+        var access = results.shift(); // Get the anonymous and admin roles.
 
-        // Get the anonymous and admin roles.
         var anonRole = {};
         var adminRole = {};
+
         for (var roleName in access.roles) {
           if (access.roles.hasOwnProperty(roleName)) {
             var role = access.roles[roleName];
+
             if (role.default) {
               anonRole = role;
             }
+
             if (role.admin) {
               adminRole = role;
             }
@@ -1512,87 +1537,98 @@ var Formio = function () {
         }
 
         var canSubmit = false;
-        var canSubmitAnonymously = false;
+        var canSubmitAnonymously = false; // If the user is an admin, then they can submit this form.
 
-        // If the user is an admin, then they can submit this form.
-        if (user && user.roles.indexOf(adminRole._id) !== -1) {
+        if (user && user.roles.includes(adminRole._id)) {
           return true;
         }
 
         for (var i in form.submissionAccess) {
           if (form.submissionAccess.hasOwnProperty(i)) {
             var subRole = form.submissionAccess[i];
+
             if (subRole.type === 'create_all' || subRole.type === 'create_own') {
               for (var j in subRole.roles) {
                 if (subRole.roles.hasOwnProperty(j)) {
                   // Check if anonymous is allowed.
                   if (anonRole._id === subRole.roles[j]) {
                     canSubmitAnonymously = true;
-                  }
-                  // Check if the logged in user has the appropriate role.
-                  if (user && user.roles.indexOf(subRole.roles[j]) !== -1) {
+                  } // Check if the logged in user has the appropriate role.
+
+
+                  if (user && user.roles.includes(subRole.roles[j])) {
                     canSubmit = true;
                     break;
                   }
                 }
               }
+
               if (canSubmit) {
                 break;
               }
             }
           }
-        }
-        // If their user cannot submit, but anonymous can, then delete token and allow submission.
+        } // If their user cannot submit, but anonymous can, then delete token and allow submission.
+
+
         if (!canSubmit && canSubmitAnonymously) {
           canSubmit = true;
           Formio.setUser(null);
         }
+
         return canSubmit;
       });
       /* eslint-enable max-statements, max-depth */
     }
   }, {
-    key: 'getUrlParts',
+    key: "getUrlParts",
     value: function getUrlParts(url) {
       return Formio.getUrlParts(url, this);
     }
   }], [{
-    key: 'loadProjects',
+    key: "loadProjects",
     value: function loadProjects(query, opts) {
       query = query || '';
+
       if (isObject(query)) {
-        query = '?' + Formio.serialize(query.params);
+        query = "?".concat(Formio.serialize(query.params));
       }
-      return Formio.makeStaticRequest(Formio.baseUrl + '/project' + query, 'GET', null, opts);
+
+      return Formio.makeStaticRequest("".concat(Formio.baseUrl, "/project").concat(query), 'GET', null, opts);
     }
   }, {
-    key: 'getUrlParts',
+    key: "getUrlParts",
     value: function getUrlParts(url, formio) {
       var base = formio && formio.base ? formio.base : Formio.baseUrl;
       var regex = '^(http[s]?:\\/\\/)';
+
       if (base && url.indexOf(base) === 0) {
-        regex += '(' + base.replace(/^http[s]?:\/\//, '') + ')';
+        regex += "(".concat(base.replace(/^http[s]?:\/\//, ''), ")");
       } else {
         regex += '([^/]+)';
       }
+
       regex += '($|\\/.*)';
       return url.match(new RegExp(regex));
     }
   }, {
-    key: 'serialize',
+    key: "serialize",
     value: function serialize(obj) {
       var str = [];
+
       for (var p in obj) {
         if (obj.hasOwnProperty(p)) {
-          str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+          str.push("".concat(encodeURIComponent(p), "=").concat(encodeURIComponent(obj[p])));
         }
       }
+
       return str.join('&');
     }
   }, {
-    key: 'getRequestArgs',
+    key: "getRequestArgs",
     value: function getRequestArgs(formio, type, url, method, data, opts) {
       method = (method || 'GET').toUpperCase();
+
       if (!opts || !isObject(opts)) {
         opts = {};
       }
@@ -1611,10 +1647,11 @@ var Formio = function () {
       if (formio) {
         requestArgs.formio = formio;
       }
+
       return requestArgs;
     }
   }, {
-    key: 'makeStaticRequest',
+    key: "makeStaticRequest",
     value: function makeStaticRequest(url, method, data, opts) {
       var requestArgs = Formio.getRequestArgs(null, '', url, method, data, opts);
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
@@ -1622,14 +1659,14 @@ var Formio = function () {
           if (isNil(result)) {
             return Formio.request(url, method, requestArgs.data, requestArgs.opts.header, requestArgs.opts);
           }
+
           return result;
         });
       });
-
       return Formio.pluginAlter('wrapStaticRequestPromise', request, requestArgs);
     }
   }, {
-    key: 'makeRequest',
+    key: "makeRequest",
     value: function makeRequest(formio, type, url, method, data, opts) {
       if (!formio) {
         return Formio.makeStaticRequest(url, method, data, opts);
@@ -1643,43 +1680,46 @@ var Formio = function () {
           if (isNil(result)) {
             return Formio.request(url, method, requestArgs.data, requestArgs.opts.header, requestArgs.opts);
           }
+
           return result;
         });
       });
-
       return Formio.pluginAlter('wrapRequestPromise', request, requestArgs);
     }
   }, {
-    key: 'request',
+    key: "request",
     value: function request(url, method, data, header, opts) {
       if (!url) {
-        return _nativePromiseOnly2.default.reject('No url provided');
+        return _nativePromiseOnly.default.reject('No url provided');
       }
-      method = (method || 'GET').toUpperCase();
 
-      // For reverse compatibility, if they provided the ignoreCache parameter,
+      method = (method || 'GET').toUpperCase(); // For reverse compatibility, if they provided the ignoreCache parameter,
       // then change it back to the options format where that is a parameter.
+
       if (isBoolean(opts)) {
-        opts = { ignoreCache: opts };
+        opts = {
+          ignoreCache: opts
+        };
       }
+
       if (!opts || !isObject(opts)) {
         opts = {};
-      }
+      } // Generate a cachekey.
 
-      // Generate a cachekey.
-      var cacheKey = btoa(url);
 
-      // Get the cached promise to save multiple loads.
+      var cacheKey = btoa(url); // Get the cached promise to save multiple loads.
+
       if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
-        return _nativePromiseOnly2.default.resolve(Formio.cache[cacheKey]);
-      }
+        return _nativePromiseOnly.default.resolve(Formio.cache[cacheKey]);
+      } // Set up and fetch request
 
-      // Set up and fetch request
+
       var headers = header || new Headers(opts.headers || {
         'Accept': 'application/json',
         'Content-type': 'application/json; charset=UTF-8'
       });
       var token = Formio.getToken(opts);
+
       if (token && !opts.noToken) {
         headers.append('x-jwt-token', token);
       }
@@ -1689,12 +1729,14 @@ var Formio = function () {
         headers: headers,
         mode: 'cors'
       };
+
       if (data) {
         options.body = JSON.stringify(data);
-      }
+      } // Allow plugins to alter the options.
 
-      // Allow plugins to alter the options.
+
       options = Formio.pluginAlter('requestOptions', options, url);
+
       if (options.namespace) {
         opts.namespace = options.namespace;
       }
@@ -1710,45 +1752,50 @@ var Formio = function () {
             Formio.events.emit('formio.sessionExpired', response.body);
           } else if (response.status === 401) {
             Formio.events.emit('formio.unauthorized', response.body);
-          }
-          // Parse and return the error as a rejected promise to reject this promise
-          return (response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text()).then(function (error) {
-            return _nativePromiseOnly2.default.reject(error);
+          } // Parse and return the error as a rejected promise to reject this promise
+
+
+          return (response.headers.get('content-type').includes('application/json') ? response.json() : response.text()).then(function (error) {
+            return _nativePromiseOnly.default.reject(error);
           });
-        }
+        } // Handle fetch results
 
-        // Handle fetch results
-        var token = response.headers.get('x-jwt-token');
 
-        // In some strange cases, the fetch library will return an x-jwt-token without sending
+        var token = response.headers.get('x-jwt-token'); // In some strange cases, the fetch library will return an x-jwt-token without sending
         // one to the server. This has even been debugged on the server to verify that no token
         // was introduced with the request, but the response contains a token. This is an Invalid
         // case where we do not send an x-jwt-token and get one in return for any GET request.
+
         var tokenIntroduced = false;
-        if (method === 'GET' && !requestToken && token && !opts.external && !(url.indexOf('token=') !== -1) && !(url.indexOf('x-jwt-token=') !== -1)) {
+
+        if (method === 'GET' && !requestToken && token && !opts.external && !url.includes('token=') && !url.includes('x-jwt-token=')) {
           console.warn('Token was introduced in request.');
           tokenIntroduced = true;
         }
 
         if (response.status >= 200 && response.status < 300 && token && token !== '' && !tokenIntroduced) {
           Formio.setToken(token, opts);
-        }
-        // 204 is no content. Don't try to .json() it.
+        } // 204 is no content. Don't try to .json() it.
+
+
         if (response.status === 204) {
           return {};
         }
 
-        var getResult = response.headers.get('content-type').indexOf('application/json') !== -1 ? response.json() : response.text();
+        var getResult = response.headers.get('content-type').includes('application/json') ? response.json() : response.text();
         return getResult.then(function (result) {
           // Add some content-range metadata to the result here
           var range = response.headers.get('content-range');
+
           if (range && isObject(result)) {
             range = range.split('/');
+
             if (range[0] !== '*') {
               var skipLimit = range[0].split('-');
               result.skip = Number(skipLimit[0]);
               result.limit = skipLimit[1] - skipLimit[0] + 1;
             }
+
             result.serverCount = range[1] === '*' ? range[1] : Number(range[1]);
           }
 
@@ -1759,9 +1806,8 @@ var Formio = function () {
           var headers = {};
           response.headers.forEach(function (item, key) {
             headers[key] = item;
-          });
+          }); // Return the result with the headers.
 
-          // Return the result with the headers.
           return {
             result: result,
             headers: headers
@@ -1772,19 +1818,18 @@ var Formio = function () {
           return result;
         }
 
-        var resultCopy = {};
+        var resultCopy = {}; // Shallow copy result so modifications don't end up in cache
 
-        // Shallow copy result so modifications don't end up in cache
         if (Array.isArray(result)) {
-          resultCopy = result.map(_shallowCopy2.default);
+          resultCopy = result.map(_shallowCopy.default);
           resultCopy.skip = result.skip;
           resultCopy.limit = result.limit;
           resultCopy.serverCount = result.serverCount;
         } else {
-          resultCopy = (0, _shallowCopy2.default)(result);
-        }
+          resultCopy = (0, _shallowCopy.default)(result);
+        } // Cache the response.
 
-        // Cache the response.
+
         if (method === 'GET') {
           Formio.cache[cacheKey] = resultCopy;
         }
@@ -1795,22 +1840,25 @@ var Formio = function () {
           Formio.setToken(null, opts);
           Formio.events.emit('formio.badToken', err);
         }
+
         if (err.message) {
-          err.message = 'Could not connect to API server (' + err.message + ')';
+          err.message = "Could not connect to API server (".concat(err.message, ")");
           err.networkError = true;
         }
-        return _nativePromiseOnly2.default.reject(err);
-      });
-    }
 
-    // Needed to maintain reverse compatability...
+        return _nativePromiseOnly.default.reject(err);
+      });
+    } // Needed to maintain reverse compatability...
 
   }, {
-    key: 'setToken',
+    key: "setToken",
     value: function setToken(token, opts) {
       token = token || '';
-      opts = typeof opts === 'string' ? { namespace: opts } : opts || {};
-      var tokenName = (opts.namespace || 'formio') + 'Token';
+      opts = typeof opts === 'string' ? {
+        namespace: opts
+      } : opts || {};
+      var tokenName = "".concat(opts.namespace || 'formio', "Token");
+
       if (!Formio.tokens) {
         Formio.tokens = {};
       }
@@ -1820,28 +1868,38 @@ var Formio = function () {
       }
 
       Formio.tokens[tokenName] = token;
+
       if (!token) {
-        Formio.setUser(null, opts);
-        // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+        Formio.setUser(null, opts); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+
         try {
           return localStorage.removeItem(tokenName);
         } catch (err) {
-          return _browserCookies2.default.erase(tokenName, { path: '/' });
+          return _browserCookies.default.erase(tokenName, {
+            path: '/'
+          });
         }
-      }
-      // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+      } // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+
+
       try {
         localStorage.setItem(tokenName, token);
       } catch (err) {
-        _browserCookies2.default.set(tokenName, token, { path: '/' });
+        _browserCookies.default.set(tokenName, token, {
+          path: '/'
+        });
       }
+
       return Formio.currentUser(opts.formio, opts); // Run this so user is updated if null
     }
   }, {
-    key: 'getToken',
+    key: "getToken",
     value: function getToken(options) {
-      options = typeof options === 'string' ? { namespace: options } : options || {};
-      var tokenName = (options.namespace || 'formio') + 'Token';
+      options = typeof options === 'string' ? {
+        namespace: options
+      } : options || {};
+      var tokenName = "".concat(options.namespace || 'formio', "Token");
+
       if (!Formio.tokens) {
         Formio.tokens = {};
       }
@@ -1849,108 +1907,117 @@ var Formio = function () {
       if (Formio.tokens[tokenName]) {
         return Formio.tokens[tokenName];
       }
+
       try {
         Formio.tokens[tokenName] = localStorage.getItem(tokenName) || '';
         return Formio.tokens[tokenName];
       } catch (e) {
-        Formio.tokens[tokenName] = _browserCookies2.default.get(tokenName);
+        Formio.tokens[tokenName] = _browserCookies.default.get(tokenName);
         return Formio.tokens[tokenName];
       }
     }
   }, {
-    key: 'setUser',
+    key: "setUser",
     value: function setUser(user, opts) {
       opts = opts || {};
-      var userName = (opts.namespace || 'formio') + 'User';
+      var userName = "".concat(opts.namespace || 'formio', "User");
+
       if (!user) {
-        this.setToken(null, opts);
-        // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+        this.setToken(null, opts); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+
         try {
           return localStorage.removeItem(userName);
         } catch (err) {
-          return _browserCookies2.default.erase(userName, { path: '/' });
+          return _browserCookies.default.erase(userName, {
+            path: '/'
+          });
         }
-      }
-      // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+      } // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+
+
       try {
         localStorage.setItem(userName, JSON.stringify(user));
       } catch (err) {
-        _browserCookies2.default.set(userName, JSON.stringify(user), { path: '/' });
+        _browserCookies.default.set(userName, JSON.stringify(user), {
+          path: '/'
+        });
       }
     }
   }, {
-    key: 'getUser',
+    key: "getUser",
     value: function getUser(options) {
       options = options || {};
-      var userName = (options.namespace || 'formio') + 'User';
+      var userName = "".concat(options.namespace || 'formio', "User");
+
       try {
         return JSON.parse(localStorage.getItem(userName) || null);
       } catch (e) {
-        return JSON.parse(_browserCookies2.default.get(userName));
+        return JSON.parse(_browserCookies.default.get(userName));
       }
     }
   }, {
-    key: 'setBaseUrl',
+    key: "setBaseUrl",
     value: function setBaseUrl(url) {
       Formio.baseUrl = url;
+
       if (!Formio.projectUrlSet) {
         Formio.projectUrl = url;
       }
     }
   }, {
-    key: 'getBaseUrl',
+    key: "getBaseUrl",
     value: function getBaseUrl() {
       return Formio.baseUrl;
     }
   }, {
-    key: 'setApiUrl',
+    key: "setApiUrl",
     value: function setApiUrl(url) {
       return Formio.setBaseUrl(url);
     }
   }, {
-    key: 'getApiUrl',
+    key: "getApiUrl",
     value: function getApiUrl() {
       return Formio.getBaseUrl();
     }
   }, {
-    key: 'setAppUrl',
+    key: "setAppUrl",
     value: function setAppUrl(url) {
       console.warn('Formio.setAppUrl() is deprecated. Use Formio.setProjectUrl instead.');
       Formio.projectUrl = url;
       Formio.projectUrlSet = true;
     }
   }, {
-    key: 'setProjectUrl',
+    key: "setProjectUrl",
     value: function setProjectUrl(url) {
       Formio.projectUrl = url;
       Formio.projectUrlSet = true;
     }
   }, {
-    key: 'getAppUrl',
+    key: "getAppUrl",
     value: function getAppUrl() {
       console.warn('Formio.getAppUrl() is deprecated. Use Formio.getProjectUrl instead.');
       return Formio.projectUrl;
     }
   }, {
-    key: 'getProjectUrl',
+    key: "getProjectUrl",
     value: function getProjectUrl() {
       return Formio.projectUrl;
     }
   }, {
-    key: 'clearCache',
+    key: "clearCache",
     value: function clearCache() {
       Formio.cache = {};
     }
   }, {
-    key: 'noop',
+    key: "noop",
     value: function noop() {}
   }, {
-    key: 'identity',
+    key: "identity",
     value: function identity(value) {
       return value;
     }
   }, {
-    key: 'deregisterPlugin',
+    key: "deregisterPlugin",
     value: function deregisterPlugin(plugin) {
       var beforeLength = Formio.plugins.length;
       Formio.plugins = Formio.plugins.filter(function (p) {
@@ -1964,7 +2031,7 @@ var Formio = function () {
       return beforeLength !== Formio.plugins.length;
     }
   }, {
-    key: 'registerPlugin',
+    key: "registerPlugin",
     value: function registerPlugin(plugin, name) {
       Formio.plugins.push(plugin);
       Formio.plugins.sort(function (a, b) {
@@ -1974,7 +2041,7 @@ var Formio = function () {
       (plugin.init || Formio.noop).call(plugin, Formio);
     }
   }, {
-    key: 'getPlugin',
+    key: "getPlugin",
     value: function getPlugin(name) {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -1993,7 +2060,7 @@ var Formio = function () {
         _iteratorError = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
+          if (!_iteratorNormalCompletion && _iterator.return != null) {
             _iterator.return();
           }
         } finally {
@@ -2006,22 +2073,22 @@ var Formio = function () {
       return null;
     }
   }, {
-    key: 'pluginWait',
+    key: "pluginWait",
     value: function pluginWait(pluginFn) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
         args[_key2 - 1] = arguments[_key2];
       }
 
-      return _nativePromiseOnly2.default.all(Formio.plugins.map(function (plugin) {
+      return _nativePromiseOnly.default.all(Formio.plugins.map(function (plugin) {
         var _ref;
 
         return (_ref = plugin[pluginFn] || Formio.noop).call.apply(_ref, [plugin].concat(args));
       }));
     }
   }, {
-    key: 'pluginGet',
+    key: "pluginGet",
     value: function pluginGet(pluginFn) {
-      for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+      for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
         args[_key3 - 1] = arguments[_key3];
       }
 
@@ -2031,10 +2098,10 @@ var Formio = function () {
         var plugin = Formio.plugins[index];
 
         if (!plugin) {
-          return _nativePromiseOnly2.default.resolve(null);
+          return _nativePromiseOnly.default.resolve(null);
         }
 
-        return _nativePromiseOnly2.default.resolve((_ref2 = plugin[pluginFn] || Formio.noop).call.apply(_ref2, [plugin].concat(args))).then(function (result) {
+        return _nativePromiseOnly.default.resolve((_ref2 = plugin[pluginFn] || Formio.noop).call.apply(_ref2, [plugin].concat(args))).then(function (result) {
           if (!isNil(result)) {
             return result;
           }
@@ -2042,53 +2109,58 @@ var Formio = function () {
           return callPlugin(index + 1);
         });
       };
+
       return callPlugin(0);
     }
   }, {
-    key: 'pluginAlter',
+    key: "pluginAlter",
     value: function pluginAlter(pluginFn, value) {
-      for (var _len4 = arguments.length, args = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
+      for (var _len4 = arguments.length, args = new Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
         args[_key4 - 2] = arguments[_key4];
       }
 
       return Formio.plugins.reduce(function (value, plugin) {
-        return (plugin[pluginFn] || Formio.identity).apply(undefined, [value].concat(args));
+        return (plugin[pluginFn] || Formio.identity).apply(void 0, [value].concat(args));
       }, value);
     }
   }, {
-    key: 'accessInfo',
+    key: "accessInfo",
     value: function accessInfo(formio) {
       var projectUrl = formio ? formio.projectUrl : Formio.projectUrl;
-      return Formio.makeRequest(formio, 'accessInfo', projectUrl + '/access');
+      return Formio.makeRequest(formio, 'accessInfo', "".concat(projectUrl, "/access"));
     }
   }, {
-    key: 'currentUser',
+    key: "currentUser",
     value: function currentUser(formio, options) {
       var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
       projectUrl += '/current';
       var user = this.getUser(options);
+
       if (user) {
-        return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(user), {
+        return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly.default.resolve(user), {
           url: projectUrl,
           method: 'GET',
           options: options
         });
       }
+
       var token = Formio.getToken(options);
+
       if ((!options || !options.external) && !token) {
-        return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly2.default.resolve(null), {
+        return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly.default.resolve(null), {
           url: projectUrl,
           method: 'GET',
           options: options
         });
       }
+
       return Formio.makeRequest(formio, 'currentUser', projectUrl, 'GET', null, options).then(function (response) {
         Formio.setUser(response, options);
         return response;
       });
     }
   }, {
-    key: 'logout',
+    key: "logout",
     value: function logout(formio, options) {
       options = options || {};
       options.formio = formio;
@@ -2096,36 +2168,39 @@ var Formio = function () {
       Formio.setUser(null, options);
       Formio.clearCache();
       var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
-      return Formio.makeRequest(formio, 'logout', projectUrl + '/logout');
+      return Formio.makeRequest(formio, 'logout', "".concat(projectUrl, "/logout"));
     }
   }, {
-    key: 'oAuthCurrentUser',
+    key: "oAuthCurrentUser",
     value: function oAuthCurrentUser(formio, token) {
       return Formio.currentUser(formio, {
         external: true,
         headers: {
-          Authorization: 'Bearer ' + token
+          Authorization: "Bearer ".concat(token)
         }
       });
     }
   }, {
-    key: 'oktaInit',
+    key: "oktaInit",
     value: function oktaInit(options) {
       options = options || {};
-      if ((typeof OktaAuth === 'undefined' ? 'undefined' : _typeof(OktaAuth)) !== undefined) {
+
+      if ((typeof OktaAuth === "undefined" ? "undefined" : _typeof(OktaAuth)) !== undefined) {
         options.OktaAuth = OktaAuth;
       }
 
       if (_typeof(options.OktaAuth) === undefined) {
         var errorMessage = 'Cannot find OktaAuth. Please include the Okta JavaScript SDK within your application. See https://developer.okta.com/code/javascript/okta_auth_sdk for an example.';
         console.warn(errorMessage);
-        return _nativePromiseOnly2.default.reject(errorMessage);
+        return _nativePromiseOnly.default.reject(errorMessage);
       }
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
+
+      return new _nativePromiseOnly.default(function (resolve, reject) {
         var Okta = options.OktaAuth;
         delete options.OktaAuth;
         var authClient = new Okta(options);
         var accessToken = authClient.tokenManager.get('accessToken');
+
         if (accessToken) {
           resolve(Formio.oAuthCurrentUser(options.formio, accessToken.accessToken));
         } else if (location.hash) {
@@ -2146,36 +2221,37 @@ var Formio = function () {
       });
     }
   }, {
-    key: 'ssoInit',
+    key: "ssoInit",
     value: function ssoInit(type, options) {
       switch (type) {
         case 'okta':
           return Formio.oktaInit(options);
+
         default:
           console.warn('Unknown SSO type');
-          return _nativePromiseOnly2.default.reject('Unknown SSO type');
+          return _nativePromiseOnly.default.reject('Unknown SSO type');
       }
     }
   }, {
-    key: 'requireLibrary',
+    key: "requireLibrary",
     value: function requireLibrary(name, property, src, polling) {
       if (!Formio.libraries.hasOwnProperty(name)) {
         Formio.libraries[name] = {};
-        Formio.libraries[name].ready = new _nativePromiseOnly2.default(function (resolve, reject) {
+        Formio.libraries[name].ready = new _nativePromiseOnly.default(function (resolve, reject) {
           Formio.libraries[name].resolve = resolve;
           Formio.libraries[name].reject = reject;
         });
-
-        var callbackName = name + 'Callback';
+        var callbackName = "".concat(name, "Callback");
 
         if (!polling && !window[callbackName]) {
           window[callbackName] = function () {
             return Formio.libraries[name].resolve();
           };
-        }
+        } // See if the plugin already exists.
 
-        // See if the plugin already exists.
-        var plugin = (0, _get3.default)(window, property);
+
+        var plugin = (0, _get2.default)(window, property);
+
         if (plugin) {
           Formio.libraries[name].resolve(plugin);
         } else {
@@ -2183,12 +2259,14 @@ var Formio = function () {
           src.forEach(function (lib) {
             var attrs = {};
             var elementType = '';
+
             if (typeof lib === 'string') {
               lib = {
                 type: 'script',
                 src: lib
               };
             }
+
             switch (lib.type) {
               case 'script':
                 elementType = 'script';
@@ -2199,6 +2277,7 @@ var Formio = function () {
                   async: true
                 };
                 break;
+
               case 'styles':
                 elementType = 'link';
                 attrs = {
@@ -2206,20 +2285,22 @@ var Formio = function () {
                   rel: 'stylesheet'
                 };
                 break;
-            }
+            } // Add the script to the top page.
 
-            // Add the script to the top page.
+
             var script = document.createElement(elementType);
+
             for (var attr in attrs) {
               script.setAttribute(attr, attrs[attr]);
             }
-            document.getElementsByTagName('head')[0].appendChild(script);
-          });
 
-          // if no callback is provided, then check periodically for the script.
+            document.getElementsByTagName('head')[0].appendChild(script);
+          }); // if no callback is provided, then check periodically for the script.
+
           if (polling) {
             var interval = setInterval(function () {
-              var plugin = (0, _get3.default)(window, property);
+              var plugin = (0, _get2.default)(window, property);
+
               if (plugin) {
                 clearInterval(interval);
                 Formio.libraries[name].resolve(plugin);
@@ -2228,28 +2309,27 @@ var Formio = function () {
           }
         }
       }
+
       return Formio.libraries[name].ready;
     }
   }, {
-    key: 'libraryReady',
+    key: "libraryReady",
     value: function libraryReady(name) {
       if (Formio.libraries.hasOwnProperty(name) && Formio.libraries[name].ready) {
         return Formio.libraries[name].ready;
       }
 
-      return _nativePromiseOnly2.default.reject(name + ' library was not required.');
+      return _nativePromiseOnly.default.reject("".concat(name, " library was not required."));
     }
   }, {
-    key: 'token',
+    key: "token",
     get: function get() {
       if (!Formio.tokens) {
         Formio.tokens = {};
       }
 
       return Formio.tokens.formioToken ? Formio.tokens.formioToken : '';
-    }
-
-    // Needed to maintain reverse compatability...
+    } // Needed to maintain reverse compatability...
     ,
     set: function set(token) {
       if (!Formio.tokens) {
@@ -2261,14 +2341,12 @@ var Formio = function () {
   }]);
 
   return Formio;
-}();
-
-// Define all the static properties.
+}(); // Define all the static properties.
 
 
 exports.default = Formio;
 Formio.libraries = {};
-Formio.Promise = _nativePromiseOnly2.default;
+Formio.Promise = _nativePromiseOnly.default;
 Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
@@ -2281,35 +2359,35 @@ Formio.events = new _eventemitter.EventEmitter2({
   maxListeners: 0
 });
 
-if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object' && !global.Formio) {
+if ((typeof global === "undefined" ? "undefined" : _typeof(global)) === 'object' && !global.Formio) {
   global.Formio = Formio;
 }
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./providers":4,"browser-cookies":1,"eventemitter2":2,"lodash/get":174,"native-promise-only":213,"shallow-copy":215,"whatwg-fetch":220}],4:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.storage = undefined;
+Object.defineProperty(exports, "storage", {
+  enumerable: true,
+  get: function get() {
+    return _storage2.default;
+  }
+});
 
-var _storage2 = _dereq_('./storage');
-
-var _storage3 = _interopRequireDefault(_storage2);
+var _storage2 = _interopRequireDefault(_dereq_("./storage"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.storage = _storage3.default;
 },{"./storage":7}],5:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
+var _nativePromiseOnly = _interopRequireDefault(_dereq_("native-promise-only"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2321,8 +2399,7 @@ var base64 = function base64() {
       var _this = this;
 
       var reader = new FileReader();
-
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
+      return new _nativePromiseOnly.default(function (resolve, reject) {
         reader.onload = function (event) {
           var url = event.target.result;
           resolve({
@@ -2331,7 +2408,7 @@ var base64 = function base64() {
             url: url,
             size: file.size,
             type: file.type,
-            data: url.replace('data:' + file.type + ';base64,', '')
+            data: url.replace("data:".concat(file.type, ";base64,"), '')
           });
         };
 
@@ -2344,30 +2421,30 @@ var base64 = function base64() {
     },
     downloadFile: function downloadFile(file) {
       // Return the original as there is nothing to do.
-      return _nativePromiseOnly2.default.resolve(file);
+      return _nativePromiseOnly.default.resolve(file);
     }
   };
 };
 
 base64.title = 'Base64';
-exports.default = base64;
+var _default = base64;
+exports.default = _default;
 },{"native-promise-only":213}],6:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
+var _nativePromiseOnly = _interopRequireDefault(_dereq_("native-promise-only"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var dropbox = function dropbox(formio) {
   return {
     uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
+      return new _nativePromiseOnly.default(function (resolve, reject) {
         // Send the file with data.
         var xhr = new XMLHttpRequest();
 
@@ -2378,9 +2455,8 @@ var dropbox = function dropbox(formio) {
         var fd = new FormData();
         fd.append('name', fileName);
         fd.append('dir', dir);
-        fd.append('file', file);
+        fd.append('file', file); // Fire on network error.
 
-        // Fire on network error.
         xhr.onerror = function (err) {
           err.networkError = true;
           reject(err);
@@ -2400,89 +2476,83 @@ var dropbox = function dropbox(formio) {
         };
 
         xhr.onabort = reject;
-
-        xhr.open('POST', formio.formUrl + '/storage/dropbox');
+        xhr.open('POST', "".concat(formio.formUrl, "/storage/dropbox"));
         var token = formio.getToken();
+
         if (token) {
           xhr.setRequestHeader('x-jwt-token', token);
         }
+
         xhr.send(fd);
       });
     },
     downloadFile: function downloadFile(file) {
       var token = formio.getToken();
-      file.url = formio.formUrl + '/storage/dropbox?path_lower=' + file.path_lower + (token ? '&x-jwt-token=' + token : '');
-      return _nativePromiseOnly2.default.resolve(file);
+      file.url = "".concat(formio.formUrl, "/storage/dropbox?path_lower=").concat(file.path_lower).concat(token ? "&x-jwt-token=".concat(token) : '');
+      return _nativePromiseOnly.default.resolve(file);
     }
   };
 };
 
 dropbox.title = 'Dropbox';
-exports.default = dropbox;
+var _default = dropbox;
+exports.default = _default;
 },{"native-promise-only":213}],7:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _base = _dereq_('./base64');
+var _base = _interopRequireDefault(_dereq_("./base64"));
 
-var _base2 = _interopRequireDefault(_base);
+var _dropbox = _interopRequireDefault(_dereq_("./dropbox"));
 
-var _dropbox = _dereq_('./dropbox');
+var _s = _interopRequireDefault(_dereq_("./s3"));
 
-var _dropbox2 = _interopRequireDefault(_dropbox);
-
-var _s = _dereq_('./s3');
-
-var _s2 = _interopRequireDefault(_s);
-
-var _url = _dereq_('./url');
-
-var _url2 = _interopRequireDefault(_url);
+var _url = _interopRequireDefault(_dereq_("./url"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = {
-  base64: _base2.default,
-  dropbox: _dropbox2.default,
-  s3: _s2.default,
-  url: _url2.default
+var _default = {
+  base64: _base.default,
+  dropbox: _dropbox.default,
+  s3: _s.default,
+  url: _url.default
 };
+exports.default = _default;
 },{"./base64":5,"./dropbox":6,"./s3":8,"./url":9}],8:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nativePromiseOnly = _dereq_('native-promise-only');
+var _nativePromiseOnly = _interopRequireDefault(_dereq_("native-promise-only"));
 
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
-
-var _trim2 = _dereq_('lodash/trim');
-
-var _trim3 = _interopRequireDefault(_trim2);
+var _trim2 = _interopRequireDefault(_dereq_("lodash/trim"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var trim = function trim(text) {
-  return (0, _trim3.default)(text, '/');
+  return (0, _trim2.default)(text, '/');
 };
+
 var path = function path(items) {
   return items.filter(function (item) {
     return !!item;
   }).map(trim).join('/');
 };
+
 var s3 = function s3(formio) {
   return {
     uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
+      return new _nativePromiseOnly.default(function (resolve, reject) {
         // Send the pre response to sign the upload.
-        var pre = new XMLHttpRequest();
+        var pre = new XMLHttpRequest(); // This only fires on a network error.
 
-        // This only fires on a network error.
         pre.onerror = function (err) {
           err.networkError = true;
           reject(err);
@@ -2492,9 +2562,8 @@ var s3 = function s3(formio) {
 
         pre.onload = function () {
           if (pre.status >= 200 && pre.status < 300) {
-            var response = JSON.parse(pre.response);
+            var response = JSON.parse(pre.response); // Send the file with data.
 
-            // Send the file with data.
             var xhr = new XMLHttpRequest();
 
             if (typeof progressCallback === 'function') {
@@ -2502,9 +2571,8 @@ var s3 = function s3(formio) {
             }
 
             response.data.fileName = fileName;
-            response.data.key = path([response.data.key, dir, fileName]);
+            response.data.key = path([response.data.key, dir, fileName]); // Fire on network error.
 
-            // Fire on network error.
             xhr.onerror = function (err) {
               err.networkError = true;
               reject(err);
@@ -2528,15 +2596,18 @@ var s3 = function s3(formio) {
             };
 
             xhr.onabort = reject;
+
             if (response.signed) {
               xhr.open('PUT', response.signed);
               xhr.setRequestHeader('Content-Type', file.type);
               xhr.send(file);
             } else {
               var fd = new FormData();
+
               for (var key in response.data) {
                 fd.append(key, response.data[key]);
               }
+
               fd.append('file', file);
               xhr.open('POST', response.url);
               xhr.send(fd);
@@ -2546,11 +2617,11 @@ var s3 = function s3(formio) {
           }
         };
 
-        pre.open('POST', formio.formUrl + '/storage/s3');
-
+        pre.open('POST', "".concat(formio.formUrl, "/storage/s3"));
         pre.setRequestHeader('Accept', 'application/json');
         pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
         var token = formio.getToken();
+
         if (token) {
           pre.setRequestHeader('x-jwt-token', token);
         }
@@ -2564,26 +2635,26 @@ var s3 = function s3(formio) {
     },
     downloadFile: function downloadFile(file) {
       if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', formio.formUrl + '/storage/s3?bucket=' + trim(file.bucket) + '&key=' + trim(file.key), 'GET');
+        return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/s3?bucket=").concat(trim(file.bucket), "&key=").concat(trim(file.key)), 'GET');
       } else {
-        return _nativePromiseOnly2.default.resolve(file);
+        return _nativePromiseOnly.default.resolve(file);
       }
     }
   };
 };
 
 s3.title = 'S3';
-exports.default = s3;
+var _default = s3;
+exports.default = _default;
 },{"lodash/trim":210,"native-promise-only":213}],9:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
+var _nativePromiseOnly = _interopRequireDefault(_dereq_("native-promise-only"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2592,14 +2663,13 @@ var url = function url(formio) {
     title: 'Url',
     name: 'url',
     uploadFile: function uploadFile(file, fileName, dir, progressCallback, url) {
-      return new _nativePromiseOnly2.default(function (resolve, reject) {
+      return new _nativePromiseOnly.default(function (resolve, reject) {
         var data = {
           dir: dir,
           file: file,
           name: fileName
-        };
+        }; // Send the file with data.
 
-        // Send the file with data.
         var xhr = new XMLHttpRequest();
 
         if (typeof progressCallback === 'function') {
@@ -2607,6 +2677,7 @@ var url = function url(formio) {
         }
 
         var fd = new FormData();
+
         for (var key in data) {
           fd.append(key, data[key]);
         }
@@ -2615,6 +2686,7 @@ var url = function url(formio) {
           if (xhr.status >= 200 && xhr.status < 300) {
             // Need to test if xhr.response is decoded or not.
             var respData = {};
+
             try {
               respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
               respData = respData && respData.data ? respData.data : respData;
@@ -2622,7 +2694,8 @@ var url = function url(formio) {
               respData = {};
             }
 
-            var _url = respData.hasOwnProperty('url') ? respData.url : xhr.responseURL + '/' + fileName;
+            var _url = respData.hasOwnProperty('url') ? respData.url : "".concat(xhr.responseURL, "/").concat(fileName);
+
             resolve({
               storage: 'url',
               name: fileName,
@@ -2634,9 +2707,9 @@ var url = function url(formio) {
           } else {
             reject(xhr.response || 'Unable to upload file');
           }
-        };
+        }; // Fire on network error.
 
-        // Fire on network error.
+
         xhr.onerror = function () {
           return reject(xhr);
         };
@@ -2647,81 +2720,73 @@ var url = function url(formio) {
 
         xhr.open('POST', url);
         var token = formio.getToken();
+
         if (token) {
           xhr.setRequestHeader('x-jwt-token', token);
         }
+
         xhr.send(fd);
       });
     },
     downloadFile: function downloadFile(file) {
       // Return the original as there is nothing to do.
-      return _nativePromiseOnly2.default.resolve(file);
+      return _nativePromiseOnly.default.resolve(file);
     }
   };
 };
 
 url.title = 'Url';
-exports.default = url;
+var _default = url;
+exports.default = _default;
 },{"native-promise-only":213}],10:[function(_dereq_,module,exports){
 (function (global){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var FormioUtils = _interopRequireWildcard(_dereq_("./utils"));
 
-var _utils = _dereq_('./utils');
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-var FormioUtils = _interopRequireWildcard(_utils);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-if ((typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object') {
+if ((typeof global === "undefined" ? "undefined" : _typeof(global)) === 'object') {
   global.FormioUtils = FormioUtils;
 }
-exports.default = FormioUtils;
+
+var _default = FormioUtils;
+exports.default = _default;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./utils":12}],11:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.lodashOperators = void 0;
 // Use only immutable useful functions from Lodash.
 // Visit https://lodash.com/docs for more info.
-var lodashOperators = exports.lodashOperators = [
-// Array
-'chunk', 'compact', 'concat', 'difference', 'differenceBy', 'differenceWith', 'drop', 'dropRight', 'dropRightWhile', 'dropWhile', 'findIndex', 'findLastIndex', 'first', 'flatten', 'flattenDeep', 'flattenDepth', 'fromPairs', 'head', 'indexOf', 'initial', 'intersection', 'intersectionBy', 'intersectionWith', 'join', 'last', 'lastIndexOf', 'nth', 'slice', 'sortedIndex', 'sortedIndexBy', 'sortedIndexOf', 'sortedLastIndex', 'sortedLastIndexBy', 'sortedLastIndexOf', 'sortedUniq', 'sortedUniqBy', 'tail', 'take', 'takeRight', 'takeRightWhile', 'takeWhile', 'union', 'unionBy', 'unionWith', 'uniq', 'uniqBy', 'uniqWith', 'unzip', 'unzipWith', 'without', 'xor', 'xorBy', 'xorWith', 'zip', 'zipObject', 'zipObjectDeep', 'zipWith',
-// Collection
-'countBy', 'every', 'filter', 'find', 'findLast', 'flatMap', 'flatMapDeep', 'flatMapDepth', 'groupBy', 'includes', 'invokeMap', 'keyBy', 'map', 'orderBy', 'partition', 'reduce', 'reduceRight', 'reject', 'sample', 'sampleSize', 'shuffle', 'size', 'some', 'sortBy',
-// Date
-'now',
-// Function
-'flip', 'negate', 'overArgs', 'partial', 'partialRight', 'rearg', 'rest', 'spread',
-// Lang
-'castArray', 'clone', 'cloneDeep', 'cloneDeepWith', 'cloneDeep', 'conformsTo', 'eq', 'gt', 'gte', 'isArguments', 'isArray', 'isArrayBuffer', 'isArrayLike', 'isArrayLikeObject', 'isBoolean', 'isBuffer', 'isDate', 'isElement', 'isEmpty', 'isEqual', 'isEqualWith', 'isError', 'isFinite', 'isFunction', 'isInteger', 'isLength', 'isMap', 'isMatch', 'isMatchWith', 'isNaN', 'isNative', 'isNil', 'isNull', 'isNumber', 'isObject', 'isObjectLike', 'isPlainObject', 'isRegExp', 'isSafeInteger', 'isSet', 'isString', 'isSymbol', 'isTypedArray', 'isUndefined', 'isWeakMap', 'isWeakSet', 'lt', 'lte', 'toArray', 'toFinite', 'toInteger', 'toLength', 'toNumber', 'toPlainObject', 'toSafeInteger', 'toString',
-// Math
-'add', 'ceil', 'divide', 'floor', 'max', 'maxBy', 'mean', 'meanBy', 'min', 'minBy', 'multiply', 'round', 'subtract', 'sum', 'sumBy',
-// Number
-'clamp', 'inRange', 'random',
-// Object
-'at', 'entries', 'entriesIn', 'findKey', 'findLastKey', 'functions', 'functionsIn', 'get', 'has', 'hasIn', 'invert', 'invertBy', 'invoke', 'keys', 'keysIn', 'mapKeys', 'mapValues', 'omit', 'omitBy', 'pick', 'pickBy', 'result', 'toPairs', 'toPairsIn', 'transform', 'values', 'valuesIn',
-// String
-'camelCase', 'capitalize', 'deburr', 'endsWith', 'escape', 'escapeRegExp', 'kebabCase', 'lowerCase', 'lowerFirst', 'pad', 'padEnd', 'padStart', 'parseInt', 'repeat', 'replace', 'snakeCase', 'split', 'startCase', 'startsWith', 'toLower', 'toUpper', 'trim', 'trimEnd', 'trimStart', 'truncate', 'unescape', 'upperCase', 'upperFirst', 'words',
-// Util
+var lodashOperators = [// Array
+'chunk', 'compact', 'concat', 'difference', 'differenceBy', 'differenceWith', 'drop', 'dropRight', 'dropRightWhile', 'dropWhile', 'findIndex', 'findLastIndex', 'first', 'flatten', 'flattenDeep', 'flattenDepth', 'fromPairs', 'head', 'indexOf', 'initial', 'intersection', 'intersectionBy', 'intersectionWith', 'join', 'last', 'lastIndexOf', 'nth', 'slice', 'sortedIndex', 'sortedIndexBy', 'sortedIndexOf', 'sortedLastIndex', 'sortedLastIndexBy', 'sortedLastIndexOf', 'sortedUniq', 'sortedUniqBy', 'tail', 'take', 'takeRight', 'takeRightWhile', 'takeWhile', 'union', 'unionBy', 'unionWith', 'uniq', 'uniqBy', 'uniqWith', 'unzip', 'unzipWith', 'without', 'xor', 'xorBy', 'xorWith', 'zip', 'zipObject', 'zipObjectDeep', 'zipWith', // Collection
+'countBy', 'every', 'filter', 'find', 'findLast', 'flatMap', 'flatMapDeep', 'flatMapDepth', 'groupBy', 'includes', 'invokeMap', 'keyBy', 'map', 'orderBy', 'partition', 'reduce', 'reduceRight', 'reject', 'sample', 'sampleSize', 'shuffle', 'size', 'some', 'sortBy', // Date
+'now', // Function
+'flip', 'negate', 'overArgs', 'partial', 'partialRight', 'rearg', 'rest', 'spread', // Lang
+'castArray', 'clone', 'cloneDeep', 'cloneDeepWith', 'cloneDeep', 'conformsTo', 'eq', 'gt', 'gte', 'isArguments', 'isArray', 'isArrayBuffer', 'isArrayLike', 'isArrayLikeObject', 'isBoolean', 'isBuffer', 'isDate', 'isElement', 'isEmpty', 'isEqual', 'isEqualWith', 'isError', 'isFinite', 'isFunction', 'isInteger', 'isLength', 'isMap', 'isMatch', 'isMatchWith', 'isNaN', 'isNative', 'isNil', 'isNull', 'isNumber', 'isObject', 'isObjectLike', 'isPlainObject', 'isRegExp', 'isSafeInteger', 'isSet', 'isString', 'isSymbol', 'isTypedArray', 'isUndefined', 'isWeakMap', 'isWeakSet', 'lt', 'lte', 'toArray', 'toFinite', 'toInteger', 'toLength', 'toNumber', 'toPlainObject', 'toSafeInteger', 'toString', // Math
+'add', 'ceil', 'divide', 'floor', 'max', 'maxBy', 'mean', 'meanBy', 'min', 'minBy', 'multiply', 'round', 'subtract', 'sum', 'sumBy', // Number
+'clamp', 'inRange', 'random', // Object
+'at', 'entries', 'entriesIn', 'findKey', 'findLastKey', 'functions', 'functionsIn', 'get', 'has', 'hasIn', 'invert', 'invertBy', 'invoke', 'keys', 'keysIn', 'mapKeys', 'mapValues', 'omit', 'omitBy', 'pick', 'pickBy', 'result', 'toPairs', 'toPairsIn', 'transform', 'values', 'valuesIn', // String
+'camelCase', 'capitalize', 'deburr', 'endsWith', 'escape', 'escapeRegExp', 'kebabCase', 'lowerCase', 'lowerFirst', 'pad', 'padEnd', 'padStart', 'parseInt', 'repeat', 'replace', 'snakeCase', 'split', 'startCase', 'startsWith', 'toLower', 'toUpper', 'trim', 'trimEnd', 'trimStart', 'truncate', 'unescape', 'upperCase', 'upperFirst', 'words', // Util
 'cond', 'conforms', 'constant', 'defaultTo', 'flow', 'flowRight', 'identity', 'iteratee', 'matches', 'matchesProperty', 'method', 'methodOf', 'nthArg', 'over', 'overEvery', 'overSome', 'property', 'propertyOf', 'range', 'rangeRight', 'stubArray', 'stubFalse', 'stubObject', 'stubString', 'stubTrue', 'times', 'toPath', 'uniqueId'];
+exports.lodashOperators = lodashOperators;
 },{}],12:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.jsonLogic = undefined;
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 exports.evaluate = evaluate;
 exports.getRandomComponentId = getRandomComponentId;
 exports.getPropertyValue = getPropertyValue;
@@ -2771,56 +2836,64 @@ exports.delay = delay;
 exports.iterateKey = iterateKey;
 exports.uniqueKey = uniqueKey;
 exports.bootstrapVersion = bootstrapVersion;
+Object.defineProperty(exports, "jsonLogic", {
+  enumerable: true,
+  get: function get() {
+    return _jsonLogicJs.default;
+  }
+});
 
-var _lodash = _dereq_('lodash');
+var _lodash = _interopRequireDefault(_dereq_("lodash"));
 
-var _lodash2 = _interopRequireDefault(_lodash);
+_dereq_("whatwg-fetch");
 
-_dereq_('whatwg-fetch');
+var _jsonLogicJs = _interopRequireDefault(_dereq_("json-logic-js"));
 
-var _jsonLogicJs = _dereq_('json-logic-js');
+var _momentTimezone = _interopRequireDefault(_dereq_("moment-timezone/moment-timezone"));
 
-var _jsonLogicJs2 = _interopRequireDefault(_jsonLogicJs);
+var _jstimezonedetect = _interopRequireDefault(_dereq_("jstimezonedetect"));
 
-var _momentTimezone = _dereq_('moment-timezone/moment-timezone');
+var _operators = _dereq_("./jsonlogic/operators");
 
-var _momentTimezone2 = _interopRequireDefault(_momentTimezone);
-
-var _jstimezonedetect = _dereq_('jstimezonedetect');
-
-var _jstimezonedetect2 = _interopRequireDefault(_jstimezonedetect);
-
-var _operators = _dereq_('./jsonlogic/operators');
-
-var _nativePromiseOnly = _dereq_('native-promise-only');
-
-var _nativePromiseOnly2 = _interopRequireDefault(_nativePromiseOnly);
+var _nativePromiseOnly = _interopRequireDefault(_dereq_("native-promise-only"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global $ */
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 // Configure JsonLogic
 _operators.lodashOperators.forEach(function (name) {
-  return _jsonLogicJs2.default.add_operation('_' + name, _lodash2.default[name]);
-});
+  return _jsonLogicJs.default.add_operation("_".concat(name), _lodash.default[name]);
+}); // Retrieve Any Date
 
-// Retrieve Any Date
-_jsonLogicJs2.default.add_operation('getDate', function (date) {
-  return (0, _momentTimezone2.default)(date).toISOString();
-});
 
-// Set Relative Minimum Date
-_jsonLogicJs2.default.add_operation('relativeMinDate', function (relativeMinDate) {
-  return (0, _momentTimezone2.default)().subtract(relativeMinDate, 'days').toISOString();
-});
+_jsonLogicJs.default.add_operation('getDate', function (date) {
+  return (0, _momentTimezone.default)(date).toISOString();
+}); // Set Relative Minimum Date
 
-// Set Relative Maximum Date
-_jsonLogicJs2.default.add_operation('relativeMaxDate', function (relativeMaxDate) {
-  return (0, _momentTimezone2.default)().add(relativeMaxDate, 'days').toISOString();
-});
 
-exports.jsonLogic = _jsonLogicJs2.default;
+_jsonLogicJs.default.add_operation('relativeMinDate', function (relativeMinDate) {
+  return (0, _momentTimezone.default)().subtract(relativeMinDate, 'days').toISOString();
+}); // Set Relative Maximum Date
+
+
+_jsonLogicJs.default.add_operation('relativeMaxDate', function (relativeMaxDate) {
+  return (0, _momentTimezone.default)().add(relativeMaxDate, 'days').toISOString();
+});
 
 /**
  * Evaluate a method.
@@ -2829,66 +2902,71 @@ exports.jsonLogic = _jsonLogicJs2.default;
  * @param args
  * @return {*}
  */
-
 function evaluate(func, args, ret, tokenize) {
   var returnVal = null;
-  var component = args.component ? args.component : { key: 'unknown' };
+  var component = args.component ? args.component : {
+    key: 'unknown'
+  };
+
   if (!args.form && args.instance) {
-    args.form = _lodash2.default.get(args.instance, 'root._form', {});
+    args.form = _lodash.default.get(args.instance, 'root._form', {});
   }
+
   if (typeof func === 'string') {
     if (ret) {
-      func += ';return ' + ret;
+      func += ";return ".concat(ret);
     }
-    var params = _lodash2.default.keys(args);
+
+    var params = _lodash.default.keys(args);
 
     if (tokenize) {
       // Replace all {{ }} references with actual data.
       func = func.replace(/({{\s+(.*)\s+}})/, function (match, $1, $2) {
         if ($2.indexOf('data.') === 0) {
-          return _lodash2.default.get(args.data, $2.replace('data.', ''));
+          return _lodash.default.get(args.data, $2.replace('data.', ''));
         } else if ($2.indexOf('row.') === 0) {
-          return _lodash2.default.get(args.row, $2.replace('row.', ''));
-        }
+          return _lodash.default.get(args.row, $2.replace('row.', ''));
+        } // Support legacy...
 
-        // Support legacy...
-        return _lodash2.default.get(args.data, $2);
+
+        return _lodash.default.get(args.data, $2);
       });
     }
 
     try {
-      func = new (Function.prototype.bind.apply(Function, [null].concat(_toConsumableArray(params), [func])))();
-      args = _lodash2.default.values(args);
+      func = _construct(Function, _toConsumableArray(params).concat([func]));
+      args = _lodash.default.values(args);
     } catch (err) {
-      console.warn('An error occured within the custom function for ' + component.key, err);
+      console.warn("An error occured within the custom function for ".concat(component.key), err);
       returnVal = null;
       func = false;
     }
   }
+
   if (typeof func === 'function') {
     try {
-      returnVal = Array.isArray(args) ? func.apply(undefined, _toConsumableArray(args)) : func(args);
+      returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
     } catch (err) {
       returnVal = null;
-      console.warn('An error occured within custom function for ' + component.key, err);
+      console.warn("An error occured within custom function for ".concat(component.key), err);
     }
-  } else if ((typeof func === 'undefined' ? 'undefined' : _typeof(func)) === 'object') {
+  } else if (_typeof(func) === 'object') {
     try {
-      returnVal = _jsonLogicJs2.default.apply(func, args);
+      returnVal = _jsonLogicJs.default.apply(func, args);
     } catch (err) {
       returnVal = null;
-      console.warn('An error occured within custom function for ' + component.key, err);
+      console.warn("An error occured within custom function for ".concat(component.key), err);
     }
   } else if (func) {
-    console.warn('Unknown function type for ' + component.key);
+    console.warn("Unknown function type for ".concat(component.key));
   }
+
   return returnVal;
 }
 
 function getRandomComponentId() {
-  return 'e' + Math.random().toString(36).substring(7);
+  return "e".concat(Math.random().toString(36).substring(7));
 }
-
 /**
  * Get a property value of an element.
  *
@@ -2896,18 +2974,21 @@ function getRandomComponentId() {
  * @param prop
  * @return {number}
  */
+
+
 function getPropertyValue(style, prop) {
   var value = style.getPropertyValue(prop);
   value = value ? value.replace(/[^0-9.]/g, '') : '0';
   return parseFloat(value);
 }
-
 /**
  * Get an elements bounding rectagle.
  *
  * @param element
  * @return {{x: string, y: string, width: string, height: string}}
  */
+
+
 function getElementRect(element) {
   var style = window.getComputedStyle(element, null);
   return {
@@ -2917,32 +2998,33 @@ function getElementRect(element) {
     height: getPropertyValue(style, 'height')
   };
 }
-
 /**
  * Determines the boolean value of a setting.
  *
  * @param value
  * @return {boolean}
  */
+
+
 function boolValue(value) {
-  if (_lodash2.default.isBoolean(value)) {
+  if (_lodash.default.isBoolean(value)) {
     return value;
-  } else if (_lodash2.default.isString(value)) {
+  } else if (_lodash.default.isString(value)) {
     return value.toLowerCase() === 'true';
   } else {
     return !!value;
   }
 }
-
 /**
  * Check to see if an ID is a mongoID.
  * @param text
  * @return {Array|{index: number, input: string}|Boolean|*}
  */
+
+
 function isMongoId(text) {
   return text.toString().match(/^[0-9a-fA-F]{24}$/);
 }
-
 /**
  * Determine if a component is a layout component or not.
  *
@@ -2952,10 +3034,11 @@ function isMongoId(text) {
  * @returns {Boolean}
  *   Whether or not the component is a layout component.
  */
+
+
 function isLayoutComponent(component) {
   return Boolean(component.columns && Array.isArray(component.columns) || component.rows && Array.isArray(component.rows) || component.components && Array.isArray(component.components));
 }
-
 /**
  * Iterate through each component within a form.
  *
@@ -2970,6 +3053,8 @@ function isLayoutComponent(component) {
  * @param {Object} parent
  *   The parent object.
  */
+
+
 function eachComponent(components, fn, includeAll, path, parent) {
   if (!components) return;
   path = path || '';
@@ -2977,16 +3062,16 @@ function eachComponent(components, fn, includeAll, path, parent) {
     if (!component) {
       return;
     }
+
     var hasColumns = component.columns && Array.isArray(component.columns);
     var hasRows = component.rows && Array.isArray(component.rows);
     var hasComps = component.components && Array.isArray(component.components);
     var noRecurse = false;
-    var newPath = component.key ? path ? path + '.' + component.key : component.key : '';
+    var newPath = component.key ? path ? "".concat(path, ".").concat(component.key) : component.key : ''; // Keep track of parent references.
 
-    // Keep track of parent references.
     if (parent) {
       // Ensure we don't create infinite JSON structures.
-      component.parent = _lodash2.default.clone(parent);
+      component.parent = _lodash.default.clone(parent);
       delete component.parent.components;
       delete component.parent.componentMap;
       delete component.parent.columns;
@@ -2998,11 +3083,12 @@ function eachComponent(components, fn, includeAll, path, parent) {
     }
 
     var subPath = function subPath() {
-      if (component.key && !(['panel', 'table', 'well', 'columns', 'fieldset', 'tabs', 'form'].indexOf(component.type) !== -1) && (['datagrid', 'container', 'editgrid'].indexOf(component.type) !== -1 || component.tree)) {
+      if (component.key && !['panel', 'table', 'well', 'columns', 'fieldset', 'tabs', 'form'].includes(component.type) && (['datagrid', 'container', 'editgrid'].includes(component.type) || component.tree)) {
         return newPath;
       } else if (component.key && component.type === 'form') {
-        return newPath + '.data';
+        return "".concat(newPath, ".data");
       }
+
       return path;
     };
 
@@ -3025,7 +3111,6 @@ function eachComponent(components, fn, includeAll, path, parent) {
     }
   });
 }
-
 /**
  * Matches if a component matches the query.
  *
@@ -3033,21 +3118,25 @@ function eachComponent(components, fn, includeAll, path, parent) {
  * @param query
  * @return {boolean}
  */
+
+
 function matchComponent(component, query) {
-  if (_lodash2.default.isString(query)) {
+  if (_lodash.default.isString(query)) {
     return component.key === query;
   } else {
     var matches = false;
-    _lodash2.default.forOwn(query, function (value, key) {
-      matches = _lodash2.default.get(component, key) === value;
+
+    _lodash.default.forOwn(query, function (value, key) {
+      matches = _lodash.default.get(component, key) === value;
+
       if (!matches) {
         return false;
       }
     });
+
     return matches;
   }
 }
-
 /**
  * Get a component by its key
  *
@@ -3059,8 +3148,10 @@ function matchComponent(component, query) {
  * @returns {Object}
  *   The component that matches the given key, or undefined if not found.
  */
+
+
 function getComponent(components, key, includeAll) {
-  var result = void 0;
+  var result;
   eachComponent(components, function (component, path) {
     if (path === key) {
       component.path = path;
@@ -3070,7 +3161,6 @@ function getComponent(components, key, includeAll) {
   }, includeAll);
   return result;
 }
-
 /**
  * Finds a component provided a query of properties of that component.
  *
@@ -3078,6 +3168,8 @@ function getComponent(components, key, includeAll) {
  * @param query
  * @return {*}
  */
+
+
 function findComponents(components, query) {
   var results = [];
   eachComponent(components, function (component, path) {
@@ -3088,7 +3180,6 @@ function findComponents(components, query) {
   }, true);
   return results;
 }
-
 /**
  * Flatten the form components for data manipulation.
  *
@@ -3100,6 +3191,8 @@ function findComponents(components, query) {
  * @returns {Object}
  *   The flattened components map.
  */
+
+
 function flattenComponents(components, includeAll) {
   var flattened = {};
   eachComponent(components, function (component, path) {
@@ -3107,7 +3200,6 @@ function flattenComponents(components, includeAll) {
   }, includeAll);
   return flattened;
 }
-
 /**
  * Returns if this component has a conditional statement.
  *
@@ -3115,10 +3207,11 @@ function flattenComponents(components, includeAll) {
  *
  * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
  */
+
+
 function hasCondition(component) {
   return Boolean(component.customConditional || component.conditional && component.conditional.when || component.conditional && component.conditional.json);
 }
-
 /**
  * Extension of standard #parseFloat(value) function, that also clears input string.
  *
@@ -3128,10 +3221,11 @@ function hasCondition(component) {
  * @returns {Number}
  *   Parsed value.
  */
-function parseFloatExt(value) {
-  return parseFloat(_lodash2.default.isString(value) ? value.replace(/[^\de.+-]/gi, '') : value);
-}
 
+
+function parseFloatExt(value) {
+  return parseFloat(_lodash.default.isString(value) ? value.replace(/[^\de.+-]/gi, '') : value);
+}
 /**
  * Formats provided value in way how Currency component uses it.
  *
@@ -3141,21 +3235,23 @@ function parseFloatExt(value) {
  * @returns {String}
  *   Value formatted for Currency component.
  */
+
+
 function formatAsCurrency(value) {
   var parsedValue = parseFloatExt(value);
 
-  if (_lodash2.default.isNaN(parsedValue)) {
+  if (_lodash.default.isNaN(parsedValue)) {
     return '';
   }
 
-  var parts = _lodash2.default.round(parsedValue, 2).toString().split('.');
-  parts[0] = _lodash2.default.chunk(Array.from(parts[0]).reverse(), 3).reverse().map(function (part) {
+  var parts = _lodash.default.round(parsedValue, 2).toString().split('.');
+
+  parts[0] = _lodash.default.chunk(Array.from(parts[0]).reverse(), 3).reverse().map(function (part) {
     return part.reverse().join('');
   }).join(',');
-  parts[1] = _lodash2.default.pad(parts[1], 2, '0');
+  parts[1] = _lodash.default.pad(parts[1], 2, '0');
   return parts.join('.');
 }
-
 /**
  * Escapes RegEx characters in provided String value.
  *
@@ -3164,10 +3260,11 @@ function formatAsCurrency(value) {
  * @returns {string}
  *   String with escaped RegEx characters.
  */
+
+
 function escapeRegExCharacters(value) {
   return value.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
 }
-
 /**
  * Checks the calculated value for a provided component and data.
  *
@@ -3178,10 +3275,12 @@ function escapeRegExCharacters(value) {
  * @param data
  *   The full submission data.
  */
+
+
 function checkCalculated(component, submission, rowData) {
   // Process calculated value stuff if present.
   if (component.calculateValue) {
-    _lodash2.default.set(rowData, component.key, evaluate(component.calculateValue, {
+    _lodash.default.set(rowData, component.key, evaluate(component.calculateValue, {
       value: undefined,
       data: submission ? submission.data : rowData,
       row: rowData,
@@ -3190,7 +3289,6 @@ function checkCalculated(component, submission, rowData) {
     }, 'value'));
   }
 }
-
 /**
  * Check if a simple conditional evaluates to true.
  *
@@ -3200,34 +3298,42 @@ function checkCalculated(component, submission, rowData) {
  * @param data
  * @returns {boolean}
  */
+
+
 function checkSimpleConditional(component, condition, row, data) {
   var value = null;
+
   if (row) {
-    value = getValue({ data: row }, condition.when);
+    value = getValue({
+      data: row
+    }, condition.when);
   }
-  if (data && _lodash2.default.isNil(value)) {
-    value = getValue({ data: data }, condition.when);
-  }
-  // FOR-400 - Fix issue where falsey values were being evaluated as show=true
-  if (_lodash2.default.isNil(value)) {
+
+  if (data && _lodash.default.isNil(value)) {
+    value = getValue({
+      data: data
+    }, condition.when);
+  } // FOR-400 - Fix issue where falsey values were being evaluated as show=true
+
+
+  if (_lodash.default.isNil(value)) {
     value = '';
   }
 
   var eq = String(condition.eq);
-  var show = String(condition.show);
+  var show = String(condition.show); // Special check for selectboxes component.
 
-  // Special check for selectboxes component.
-  if (_lodash2.default.isObject(value) && _lodash2.default.has(value, condition.eq)) {
+  if (_lodash.default.isObject(value) && _lodash.default.has(value, condition.eq)) {
     return String(value[condition.eq]) === show;
-  }
-  // FOR-179 - Check for multiple values.
-  if (Array.isArray(value) && value.map(String).indexOf(eq) !== -1) {
+  } // FOR-179 - Check for multiple values.
+
+
+  if (Array.isArray(value) && value.map(String).includes(eq)) {
     return show === 'true';
   }
 
   return String(value) === eq === (show === 'true');
 }
-
 /**
  * Check custom javascript conditional.
  *
@@ -3237,31 +3343,39 @@ function checkSimpleConditional(component, condition, row, data) {
  * @param data
  * @returns {*}
  */
+
+
 function checkCustomConditional(component, custom, row, data, form, variable, onError, instance) {
   if (typeof custom === 'string') {
-    custom = 'var ' + variable + ' = true; ' + custom + '; return ' + variable + ';';
+    custom = "var ".concat(variable, " = true; ").concat(custom, "; return ").concat(variable, ";");
   }
-  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, { row: row, data: data, form: form });
+
+  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, {
+    row: row,
+    data: data,
+    form: form
+  });
+
   if (value === null) {
     return onError;
   }
+
   return value;
 }
 
 function checkJsonConditional(component, json, row, data, form, onError) {
   try {
-    return _jsonLogicJs2.default.apply(json, {
+    return _jsonLogicJs.default.apply(json, {
       data: data,
       row: row,
       form: form,
-      _: _lodash2.default
+      _: _lodash.default
     });
   } catch (err) {
-    console.warn('An error occurred in jsonLogic advanced condition for ' + component.key, err);
+    console.warn("An error occurred in jsonLogic advanced condition for ".concat(component.key), err);
     return onError;
   }
 }
-
 /**
  * Checks the conditions for a provided component and data.
  *
@@ -3274,6 +3388,8 @@ function checkJsonConditional(component, json, row, data, form, onError) {
  *
  * @returns {boolean}
  */
+
+
 function checkCondition(component, row, data, form, instance) {
   if (component.customConditional) {
     return checkCustomConditional(component, component.customConditional, row, data, form, 'show', true, instance);
@@ -3281,12 +3397,11 @@ function checkCondition(component, row, data, form, instance) {
     return checkSimpleConditional(component, component.conditional, row, data, true);
   } else if (component.conditional && component.conditional.json) {
     return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
-  }
+  } // Default to show.
 
-  // Default to show.
+
   return true;
 }
-
 /**
  * Test a trigger on a component.
  *
@@ -3296,26 +3411,33 @@ function checkCondition(component, row, data, form, instance) {
  * @param row
  * @returns {mixed}
  */
+
+
 function checkTrigger(component, trigger, row, data, form, instance) {
   switch (trigger.type) {
     case 'simple':
       return checkSimpleConditional(component, trigger.simple, row, data);
+
     case 'javascript':
       return checkCustomConditional(component, trigger.javascript, row, data, form, 'result', false, instance);
+
     case 'json':
       return checkJsonConditional(component, trigger.json, row, data, form, false);
-  }
-  // If none of the types matched, don't fire the trigger.
+  } // If none of the types matched, don't fire the trigger.
+
+
   return false;
 }
 
 function setActionProperty(component, action, row, data, result, instance) {
   switch (action.property.type) {
     case 'boolean':
-      if (_lodash2.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
-        _lodash2.default.set(component, action.property.value, action.state.toString() === 'true');
+      if (_lodash.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
+        _lodash.default.set(component, action.property.value, action.state.toString() === 'true');
       }
+
       break;
+
     case 'string':
       {
         var evalData = {
@@ -3325,15 +3447,17 @@ function setActionProperty(component, action, row, data, result, instance) {
           result: result
         };
         var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
-        if (newValue !== _lodash2.default.get(component, action.property.value, '')) {
-          _lodash2.default.set(component, action.property.value, newValue);
+
+        if (newValue !== _lodash.default.get(component, action.property.value, '')) {
+          _lodash.default.set(component, action.property.value, newValue);
         }
+
         break;
       }
   }
+
   return component;
 }
-
 /**
  * Get the value for a component key, in the given submission.
  *
@@ -3342,18 +3466,21 @@ function setActionProperty(component, action, row, data, result, instance) {
  * @param {String} key
  *   A for components API key to search for.
  */
+
+
 function getValue(submission, key) {
   var search = function search(data) {
-    if (_lodash2.default.isPlainObject(data)) {
-      if (_lodash2.default.has(data, key)) {
+    if (_lodash.default.isPlainObject(data)) {
+      if (_lodash.default.has(data, key)) {
         return data[key];
       }
 
       var value = null;
 
-      _lodash2.default.forOwn(data, function (prop) {
+      _lodash.default.forOwn(data, function (prop) {
         var result = search(prop);
-        if (!_lodash2.default.isNil(result)) {
+
+        if (!_lodash.default.isNil(result)) {
           value = result;
           return false;
         }
@@ -3367,7 +3494,6 @@ function getValue(submission, key) {
 
   return search(submission.data);
 }
-
 /**
  * Interpolate a string and add data replacements.
  *
@@ -3375,29 +3501,33 @@ function getValue(submission, key) {
  * @param data
  * @returns {XML|string|*|void}
  */
+
+
 function interpolate(string, data) {
   var templateSettings = {
     evaluate: /\{%(.+?)%\}/g,
     interpolate: /\{\{(.+?)\}\}/g,
     escape: /\{\{\{(.+?)\}\}\}/g
   };
+
   try {
-    return _lodash2.default.template(string, templateSettings)(data);
+    return _lodash.default.template(string, templateSettings)(data);
   } catch (err) {
     console.warn('Error interpolating template', err, string, data);
   }
 }
-
 /**
  * Make a filename guaranteed to be unique.
  * @param name
  * @returns {string}
  */
+
+
 function uniqueName(name) {
   var parts = name.toLowerCase().replace(/[^0-9a-z.]/g, '').split('.');
   var fileName = parts[0];
-  var ext = parts.length > 1 ? '.' + _lodash2.default.last(parts) : '';
-  return fileName.substr(0, 10) + '-' + guid() + ext;
+  var ext = parts.length > 1 ? ".".concat(_lodash.default.last(parts)) : '';
+  return "".concat(fileName.substr(0, 10), "-").concat(guid()).concat(ext);
 }
 
 function guid() {
@@ -3407,15 +3537,16 @@ function guid() {
     return v.toString(16);
   });
 }
-
 /**
  * Return a translated date setting.
  *
  * @param date
  * @return {*}
  */
+
+
 function getDateSetting(date) {
-  if (_lodash2.default.isNil(date) || _lodash2.default.isNaN(date) || date === '') {
+  if (_lodash.default.isNil(date) || _lodash.default.isNaN(date) || date === '') {
     return null;
   }
 
@@ -3425,20 +3556,23 @@ function getDateSetting(date) {
     return date.isValid() ? date.toDate() : null;
   }
 
-  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _momentTimezone2.default)(date) : null;
+  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _momentTimezone.default)(date) : null;
+
   if (dateSetting && dateSetting.isValid()) {
     return dateSetting.toDate();
   }
 
   dateSetting = null;
+
   try {
-    var value = new Function('moment', 'return ' + date + ';')(_momentTimezone2.default);
+    var value = new Function('moment', "return ".concat(date, ";"))(_momentTimezone.default);
+
     if (typeof value === 'string') {
-      dateSetting = (0, _momentTimezone2.default)(value);
+      dateSetting = (0, _momentTimezone.default)(value);
     } else if (typeof value.toDate === 'function') {
-      dateSetting = (0, _momentTimezone2.default)(value.toDate().toUTCString());
+      dateSetting = (0, _momentTimezone.default)(value.toDate().toUTCString());
     } else if (value instanceof Date) {
-      dateSetting = (0, _momentTimezone2.default)(value);
+      dateSetting = (0, _momentTimezone.default)(value);
     }
   } catch (e) {
     return null;
@@ -3446,9 +3580,9 @@ function getDateSetting(date) {
 
   if (!dateSetting) {
     return null;
-  }
+  } // Ensure this is a date.
 
-  // Ensure this is a date.
+
   if (!dateSetting.isValid()) {
     return null;
   }
@@ -3457,22 +3591,23 @@ function getDateSetting(date) {
 }
 
 function isValidDate(date) {
-  return _lodash2.default.isDate(date) && !_lodash2.default.isNaN(date.getDate());
+  return _lodash.default.isDate(date) && !_lodash.default.isNaN(date.getDate());
 }
-
 /**
  * Get the current timezone string.
  *
  * @return {string}
  */
-function currentTimezone() {
-  if (_momentTimezone2.default.currentTimezone) {
-    return _momentTimezone2.default.currentTimezone;
-  }
-  _momentTimezone2.default.currentTimezone = _jstimezonedetect2.default.determine().name();
-  return _momentTimezone2.default.currentTimezone;
-}
 
+
+function currentTimezone() {
+  if (_momentTimezone.default.currentTimezone) {
+    return _momentTimezone.default.currentTimezone;
+  }
+
+  _momentTimezone.default.currentTimezone = _jstimezonedetect.default.determine().name();
+  return _momentTimezone.default.currentTimezone;
+}
 /**
  * Get an offset date provided a date object and timezone object.
  *
@@ -3480,6 +3615,8 @@ function currentTimezone() {
  * @param timezone
  * @return {Date}
  */
+
+
 function offsetDate(date, timezone) {
   if (timezone === 'UTC') {
     return {
@@ -3487,39 +3624,43 @@ function offsetDate(date, timezone) {
       abbr: 'UTC'
     };
   }
-  var dateMoment = (0, _momentTimezone2.default)(date).tz(timezone);
+
+  var dateMoment = (0, _momentTimezone.default)(date).tz(timezone);
   return {
     date: new Date(date.getTime() + (dateMoment.utcOffset() + date.getTimezoneOffset()) * 60000),
     abbr: dateMoment.format('z')
   };
 }
-
 /**
  * Externally load the timezone data.
  *
  * @return {Promise<any> | *}
  */
+
+
 function loadZones(timezone) {
   if (timezone === currentTimezone()) {
     // Return non-resolving promise.
-    return new _nativePromiseOnly2.default(_lodash2.default.noop);
-  }
-  if (timezone === 'UTC') {
-    // Return non-resolving promise.
-    return new _nativePromiseOnly2.default(_lodash2.default.noop);
+    return new _nativePromiseOnly.default(_lodash.default.noop);
   }
 
-  if (_momentTimezone2.default.zonesPromise) {
-    return _momentTimezone2.default.zonesPromise;
+  if (timezone === 'UTC') {
+    // Return non-resolving promise.
+    return new _nativePromiseOnly.default(_lodash.default.noop);
   }
-  return _momentTimezone2.default.zonesPromise = fetch('https://cdn.rawgit.com/moment/moment-timezone/develop/data/packed/latest.json').then(function (resp) {
+
+  if (_momentTimezone.default.zonesPromise) {
+    return _momentTimezone.default.zonesPromise;
+  }
+
+  return _momentTimezone.default.zonesPromise = fetch('https://cdn.rawgit.com/moment/moment-timezone/develop/data/packed/latest.json').then(function (resp) {
     return resp.json().then(function (zones) {
-      _momentTimezone2.default.tz.load(zones);
-      _momentTimezone2.default.zonesLoaded = true;
+      _momentTimezone.default.tz.load(zones);
+
+      _momentTimezone.default.zonesLoaded = true;
     });
   });
 }
-
 /**
  * Set the timezone text and replace once timezones have loaded.
  *
@@ -3527,25 +3668,31 @@ function loadZones(timezone) {
  * @param stdFormat
  * @return {*}
  */
+
+
 function timezoneText(offsetFormat, stdFormat) {
   loadZones();
-  if (_momentTimezone2.default.zonesLoaded) {
+
+  if (_momentTimezone.default.zonesLoaded) {
     return offsetFormat();
   }
+
   var id = getRandomComponentId();
   var tries = 0;
-  _momentTimezone2.default.zonesPromise.then(function replaceZone() {
+
+  _momentTimezone.default.zonesPromise.then(function replaceZone() {
     var element = document.getElementById(id);
+
     if (element) {
       element.innerHTML = offsetFormat();
     } else if (tries++ < 5) {
       setTimeout(replaceZone, 100);
     }
-  });
-  // For now just return the current format, and replace once zones are loaded.
-  return '<span id=\'' + id + '\'>' + stdFormat() + '</span>';
-}
+  }); // For now just return the current format, and replace once zones are loaded.
 
+
+  return "<span id='".concat(id, "'>").concat(stdFormat(), "</span>");
+}
 /**
  * Format a date provided a value, format, and timezone object.
  *
@@ -3554,8 +3701,11 @@ function timezoneText(offsetFormat, stdFormat) {
  * @param timezone
  * @return {string}
  */
+
+
 function formatDate(value, format, timezone) {
-  var momentDate = (0, _momentTimezone2.default)(value);
+  var momentDate = (0, _momentTimezone.default)(value);
+
   if (timezone === currentTimezone()) {
     // See if our format contains a "z" timezone character.
     if (format.match(/\s(z$|z\s)/)) {
@@ -3565,24 +3715,24 @@ function formatDate(value, format, timezone) {
       }, function () {
         return momentDate.format(convertFormatToMoment(format.replace(/\s(z$|z\s)/, '')));
       });
-    }
+    } // Return the standard format.
 
-    // Return the standard format.
+
     return momentDate.format(convertFormatToMoment(format));
   }
+
   if (timezone === 'UTC') {
     var offset = offsetDate(momentDate.toDate(), 'UTC');
-    return (0, _momentTimezone2.default)(offset.date).format(convertFormatToMoment(format)) + ' UTC';
-  }
+    return "".concat((0, _momentTimezone.default)(offset.date).format(convertFormatToMoment(format)), " UTC");
+  } // Return the timezoneText.
 
-  // Return the timezoneText.
+
   return timezoneText(function () {
-    return momentDate.tz(timezone).format(convertFormatToMoment(format) + ' z');
+    return momentDate.tz(timezone).format("".concat(convertFormatToMoment(format), " z"));
   }, function () {
     return momentDate.format(convertFormatToMoment(format));
   });
 }
-
 /**
  * Pass a format function to format within a timezone.
  *
@@ -3592,18 +3742,21 @@ function formatDate(value, format, timezone) {
  * @param timezone
  * @return {string}
  */
+
+
 function formatOffset(formatFn, date, format, timezone) {
   if (timezone === currentTimezone()) {
     return formatFn(date, format);
   }
-  if (timezone === 'UTC') {
-    return formatFn(offsetDate(date, 'UTC').date, format) + ' UTC';
-  }
 
-  // Return the timezone text.
+  if (timezone === 'UTC') {
+    return "".concat(formatFn(offsetDate(date, 'UTC').date, format), " UTC");
+  } // Return the timezone text.
+
+
   return timezoneText(function () {
     var offset = offsetDate(date, timezone);
-    return formatFn(offset.date, format) + ' ' + offset.abbr;
+    return "".concat(formatFn(offset.date, format), " ").concat(offset.abbr);
   }, function () {
     return formatFn(date, format);
   });
@@ -3611,102 +3764,91 @@ function formatOffset(formatFn, date, format, timezone) {
 
 function getLocaleDateFormatInfo(locale) {
   var formatInfo = {};
-
   var day = 21;
   var exampleDate = new Date(2017, 11, day);
   var localDateString = exampleDate.toLocaleDateString(locale);
-
   formatInfo.dayFirst = localDateString.slice(0, 2) === day.toString();
-
   return formatInfo;
 }
-
 /**
  * Convert the format from the angular-datepicker module to flatpickr format.
  * @param format
  * @return {string}
  */
+
+
 function convertFormatToFlatpickr(format) {
-  return format
-  // Remove the Z timezone offset, not supported by flatpickr.
-  .replace(/Z/g, '')
-
-  // Year conversion.
-  .replace(/y/g, 'Y').replace('YYYY', 'Y').replace('YY', 'y')
-
-  // Month conversion.
-  .replace('MMMM', 'F').replace(/M/g, 'n').replace('nnn', 'M').replace('nn', 'm')
-
-  // Day in month.
-  .replace(/d/g, 'j').replace(/jj/g, 'd')
-
-  // Day in week.
-  .replace('EEEE', 'l').replace('EEE', 'D')
-
-  // Hours, minutes, seconds
+  return format // Remove the Z timezone offset, not supported by flatpickr.
+  .replace(/Z/g, '') // Year conversion.
+  .replace(/y/g, 'Y').replace('YYYY', 'Y').replace('YY', 'y') // Month conversion.
+  .replace('MMMM', 'F').replace(/M/g, 'n').replace('nnn', 'M').replace('nn', 'm') // Day in month.
+  .replace(/d/g, 'j').replace(/jj/g, 'd') // Day in week.
+  .replace('EEEE', 'l').replace('EEE', 'D') // Hours, minutes, seconds
   .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
 }
-
 /**
  * Convert the format from the angular-datepicker module to moment format.
  * @param format
  * @return {string}
  */
+
+
 function convertFormatToMoment(format) {
-  return format
-  // Year conversion.
-  .replace(/y/g, 'Y')
-  // Day in month.
-  .replace(/d/g, 'D')
-  // Day in week.
-  .replace(/E/g, 'd')
-  // AM/PM marker
+  return format // Year conversion.
+  .replace(/y/g, 'Y') // Day in month.
+  .replace(/d/g, 'D') // Day in week.
+  .replace(/E/g, 'd') // AM/PM marker
   .replace(/a/g, 'A');
 }
 
 function convertFormatToMask(format) {
-  return format
-  // Short and long month replacement.
-  .replace(/(MMM|MMMM)/g, 'MM')
-  // Year conversion
-  .replace(/[ydhmsHM]/g, '9')
-  // AM/PM conversion
+  return format // Short and long month replacement.
+  .replace(/(MMM|MMMM)/g, 'MM') // Year conversion
+  .replace(/[ydhmsHM]/g, '9') // AM/PM conversion
   .replace(/a/g, 'AA');
 }
-
 /**
  * Returns an input mask that is compatible with the input mask library.
  * @param {string} mask - The Form.io input mask.
  * @returns {Array} - The input mask for the mask library.
  */
+
+
 function getInputMask(mask) {
   if (mask instanceof Array) {
     return mask;
   }
+
   var maskArray = [];
   maskArray.numeric = true;
+
   for (var i = 0; i < mask.length; i++) {
     switch (mask[i]) {
       case '9':
         maskArray.push(/\d/);
         break;
+
       case 'A':
         maskArray.numeric = false;
         maskArray.push(/[a-zA-Z]/);
         break;
+
       case 'a':
         maskArray.numeric = false;
         maskArray.push(/[a-z]/);
         break;
+
       case '*':
         maskArray.numeric = false;
         maskArray.push(/[a-zA-Z0-9]/);
         break;
+
       default:
         maskArray.push(mask[i]);
         break;
     }
   }
+
   return maskArray;
 }
 
@@ -3714,11 +3856,12 @@ function matchInputMask(value, inputMask) {
   if (!inputMask) {
     return true;
   }
+
   for (var i = 0; i < inputMask.length; i++) {
     var char = value[i];
     var charPart = inputMask[i];
 
-    if (!(_lodash2.default.isRegExp(charPart) && charPart.test(char) || charPart === char)) {
+    if (!(_lodash.default.isRegExp(charPart) && charPart.test(char) || charPart === char)) {
       return false;
     }
   }
@@ -3728,15 +3871,16 @@ function matchInputMask(value, inputMask) {
 
 function getNumberSeparators() {
   var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
-
   var formattedNumberString = 12345.6789.toLocaleString(lang);
   var delimeters = formattedNumberString.match(/..(.)...(.)../);
+
   if (!delimeters) {
     return {
       delimiter: ',',
       decimalSeparator: '.'
     };
   }
+
   return {
     delimiter: delimeters.length > 1 ? delimeters[1] : ',',
     decimalSeparator: delimeters.length > 2 ? delimeters[2] : '.'
@@ -3746,10 +3890,12 @@ function getNumberSeparators() {
 function getNumberDecimalLimit(component) {
   // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
   var decimalLimit = 20;
-  var step = _lodash2.default.get(component, 'validate.step', 'any');
+
+  var step = _lodash.default.get(component, 'validate.step', 'any');
 
   if (step !== 'any') {
     var parts = step.toString().split('.');
+
     if (parts.length > 1) {
       decimalLimit = parts[1].length;
     }
@@ -3760,16 +3906,17 @@ function getNumberDecimalLimit(component) {
 
 function getCurrencyAffixes(_ref) {
   var _ref$currency = _ref.currency,
-      currency = _ref$currency === undefined ? 'USD' : _ref$currency,
+      currency = _ref$currency === void 0 ? 'USD' : _ref$currency,
       decimalLimit = _ref.decimalLimit,
       decimalSeparator = _ref.decimalSeparator,
       lang = _ref.lang;
-
   // Get the prefix and suffix from the localized string.
   var regex = '(.*)?100';
+
   if (decimalLimit) {
-    regex += (decimalSeparator === '.' ? '\\.' : decimalSeparator) + '0{' + decimalLimit + '}';
+    regex += "".concat(decimalSeparator === '.' ? '\\.' : decimalSeparator, "0{").concat(decimalLimit, "}");
   }
+
   regex += '(.*)?';
   var parts = 100 .toLocaleString(lang, {
     style: 'currency',
@@ -3783,7 +3930,6 @@ function getCurrencyAffixes(_ref) {
     suffix: parts[2] || ''
   };
 }
-
 /**
  * Fetch the field data provided a component.
  *
@@ -3791,48 +3937,53 @@ function getCurrencyAffixes(_ref) {
  * @param component
  * @return {*}
  */
+
+
 function fieldData(data, component) {
   if (!data) {
     return '';
   }
+
   if (!component || !component.key) {
     return data;
   }
-  if (component.key.indexOf('.') !== -1) {
+
+  if (component.key.includes('.')) {
     var value = data;
     var parts = component.key.split('.');
     var key = '';
-    for (var i = 0; i < parts.length; i++) {
-      key = parts[i];
 
-      // Handle nested resources
+    for (var i = 0; i < parts.length; i++) {
+      key = parts[i]; // Handle nested resources
+
       if (value.hasOwnProperty('_id')) {
         value = value.data;
-      }
+      } // Return if the key is not found on the value.
 
-      // Return if the key is not found on the value.
+
       if (!value.hasOwnProperty(key)) {
         return;
-      }
+      } // Convert old single field data in submissions to multiple
 
-      // Convert old single field data in submissions to multiple
+
       if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
         value[key] = [value[key]];
-      }
+      } // Set the value of this key.
 
-      // Set the value of this key.
+
       value = value[key];
     }
+
     return value;
   } else {
     // Convert old single field data in submissions to multiple
     if (component.multiple && !Array.isArray(data[component.key])) {
       data[component.key] = [data[component.key]];
     }
+
     return data[component.key];
   }
 }
-
 /**
  * Delays function execution with possibility to execute function synchronously or cancel it.
  *
@@ -3840,14 +3991,16 @@ function fieldData(data, component) {
  * @param delay Delay time
  * @return {*}
  */
+
+
 function delay(fn) {
-  for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
     args[_key - 2] = arguments[_key];
   }
 
-  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-  var timer = setTimeout.apply(undefined, [fn, delay].concat(args));
+  var timer = setTimeout.apply(void 0, [fn, delay].concat(args));
 
   function cancel() {
     clearTimeout(timer);
@@ -3855,15 +4008,13 @@ function delay(fn) {
 
   function earlyCall() {
     cancel();
-    return fn.apply(undefined, args);
+    return fn.apply(void 0, args);
   }
 
   earlyCall.timer = timer;
   earlyCall.cancel = cancel;
-
   return earlyCall;
 }
-
 /**
  * Iterate the given key to make it unique.
  *
@@ -3873,16 +4024,17 @@ function delay(fn) {
  * @returns {String}
  *   The new component key.
  */
+
+
 function iterateKey(key) {
   if (!key.match(/(\d+)$/)) {
-    return key + '2';
+    return "".concat(key, "2");
   }
 
   return key.replace(/(\d+)$/, function (suffix) {
     return Number(suffix) + 1;
   });
 }
-
 /**
  * Determines a unique key within a map provided the base key.
  *
@@ -3890,23 +4042,29 @@ function iterateKey(key) {
  * @param base
  * @return {*}
  */
+
+
 function uniqueKey(map, base) {
   var newKey = base;
+
   while (map.hasOwnProperty(newKey)) {
     newKey = iterateKey(newKey);
   }
+
   return newKey;
 }
-
 /**
  * Determines the major version number of bootstrap.
  *
  * @return {number}
  */
+
+
 function bootstrapVersion() {
   if (typeof $ === 'function' && typeof $().collapse === 'function') {
     return parseInt($.fn.collapse.Constructor.VERSION.split('.')[0], 10);
   }
+
   return 0;
 }
 },{"./jsonlogic/operators":11,"json-logic-js":13,"jstimezonedetect":14,"lodash":199,"moment-timezone/moment-timezone":211,"native-promise-only":213,"whatwg-fetch":220}],13:[function(_dereq_,module,exports){
@@ -7469,7 +7627,7 @@ function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, sta
       if (isArguments(objValue)) {
         newValue = toPlainObject(objValue);
       }
-      else if (!isObject(objValue) || (srcIndex && isFunction(objValue))) {
+      else if (!isObject(objValue) || isFunction(objValue)) {
         newValue = initCloneObject(srcValue);
       }
     }
@@ -9708,9 +9866,11 @@ module.exports = root;
  * @returns {*} Returns the property value.
  */
 function safeGet(object, key) {
-  return key == '__proto__'
-    ? undefined
-    : object[key];
+  if (key == '__proto__') {
+    return;
+  }
+
+  return object[key];
 }
 
 module.exports = safeGet;
@@ -11249,7 +11409,7 @@ module.exports = keysIn;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.10';
+  var VERSION = '4.17.11';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -11513,7 +11673,7 @@ module.exports = keysIn;
   var reHasUnicode = RegExp('[' + rsZWJ + rsAstralRange  + rsComboRange + rsVarRange + ']');
 
   /** Used to detect strings that need a more robust regexp to match words. */
-  var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
+  var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
 
   /** Used to assign default `context` object properties. */
   var contextProps = [
@@ -12459,20 +12619,6 @@ module.exports = keysIn;
       }
     }
     return result;
-  }
-
-  /**
-   * Gets the value at `key`, unless `key` is "__proto__".
-   *
-   * @private
-   * @param {Object} object The object to query.
-   * @param {string} key The key of the property to get.
-   * @returns {*} Returns the property value.
-   */
-  function safeGet(object, key) {
-    return key == '__proto__'
-      ? undefined
-      : object[key];
   }
 
   /**
@@ -14932,7 +15078,7 @@ module.exports = keysIn;
           if (isArguments(objValue)) {
             newValue = toPlainObject(objValue);
           }
-          else if (!isObject(objValue) || (srcIndex && isFunction(objValue))) {
+          else if (!isObject(objValue) || isFunction(objValue)) {
             newValue = initCloneObject(srcValue);
           }
         }
@@ -17853,6 +17999,22 @@ module.exports = keysIn;
         array[length] = isIndex(index, arrLength) ? oldArray[index] : undefined;
       }
       return array;
+    }
+
+    /**
+     * Gets the value at `key`, unless `key` is "__proto__".
+     *
+     * @private
+     * @param {Object} object The object to query.
+     * @param {string} key The key of the property to get.
+     * @returns {*} Returns the property value.
+     */
+    function safeGet(object, key) {
+      if (key == '__proto__') {
+        return;
+      }
+
+      return object[key];
     }
 
     /**
@@ -38967,6 +39129,12 @@ module.exports = function(app) {
               $scope.refreshItems(input, url);
             });
 
+            $scope.clearSelected = function(event) {
+              event.stopPropagation();
+              event.preventDefault();
+              delete $scope.data[$scope.component.key];
+            };
+
             var refreshing = false;
             var refreshValue = function() {
               if (refreshing) {
@@ -39394,7 +39562,7 @@ module.exports = function(app) {
     '$templateCache',
     function($templateCache) {
       $templateCache.put('formio/components/select.html',
-        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" id=\"{{ componentId+'Label' }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\"\n       ng-style=\"getLabelStyles(component)\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  name=\"{{ componentId }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  id=\"{{ componentId }}\"\n  theme=\"bootstrap\"\n  custom-validator=\"component.validate.custom\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-style=\"getInputGroupStyles(component)\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"selectLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span id=\"{{ componentId+'Desc' }}\">{{ component.description }}</span>\n</div>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
+        "<label ng-if=\"labelVisible() && (component.labelPosition !== 'bottom')\" for=\"{{ componentId }}\" id=\"{{ componentId+'Label' }}\" class=\"control-label\" ng-class=\"{'field-required': isRequired(component)}\"\n       ng-style=\"getLabelStyles(component)\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<span ng-if=\"!component.label && isRequired(component)\" class=\"glyphicon glyphicon-asterisk form-control-feedback field-required-inline\" aria-hidden=\"true\"></span>\n<ui-select\n  ui-select-required\n  ng-model=\"data[component.key]\"\n  ng-model-options=\"{allowInvalid: true}\"\n  safe-multiple-to-single\n  auto-focus=\"true\"\n  aria-labelledby=\"{{ componentId +'Label'}}\"\n  aria-describedby=\"{{componentId + 'Desc'}}\"\n  name=\"{{ componentId }}\"\n  ng-disabled=\"readOnly\"\n  ng-required=\"isRequired(component)\"\n  id=\"{{ componentId }}\"\n  theme=\"bootstrap\"\n  custom-validator=\"component.validate.custom\"\n  tabindex=\"{{ component.tabindex || 0 }}\"\n  ng-style=\"getInputGroupStyles(component)\"\n>\n  <ui-select-match class=\"ui-select-match\" placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\" allow-clear=\"!component.validate.required\">\n    <formio-select-item template=\"component.template\" item=\"$item || $select.selected\" select=\"$select\"></formio-select-item>\n    <span ng-if=\"!component.multiple && !component.validate.required\" class=\"close ui-select-match-close\" ng-hide=\"$select.disabled\" ng-click=\"clearSelected($event)\" style=\"position:absolute;top:3px;right:1.2em;width:auto;\">×</span>\n  </ui-select-match>\n  <ui-select-choices class=\"ui-select-choices\" repeat=\"getSelectItem(item) as item in selectItems | filter: $select.search\" refresh=\"refreshItems($select.search)\" refresh-delay=\"250\">\n    <formio-select-item template=\"component.template\" item=\"item\" select=\"$select\"></formio-select-item>\n    <button ng-if=\"hasNextPage && ($index == $select.items.length-1)\" class=\"btn btn-success btn-block\" ng-click=\"loadMoreItems($select, $event)\" ng-disabled=\"selectLoading\">Load more...</button>\n  </ui-select-choices>\n</ui-select>\n<label ng-if=\"labelVisible() && (component.labelPosition === 'bottom')\" for=\"{{ componentId }}\" class=\"control-label control-label--bottom\" ng-class=\"{'field-required': isRequired(component)}\">\n  {{ component.label | formioTranslate:null:options.building }}\n  <formio-component-tooltip></formio-component-tooltip>\n</label>\n<div ng-if=\"!!component.description\" class=\"help-block\">\n  <span id=\"{{ componentId+'Desc' }}\">{{ component.description }}</span>\n</div>\n<formio-errors ng-if=\"::!options.building\"></formio-errors>\n"
       );
 
       // Change the ui-select to ui-select multiple.
