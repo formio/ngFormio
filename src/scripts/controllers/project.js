@@ -306,11 +306,13 @@ app.controller('ProjectController', [
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
-      return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
-        $scope.currentProjectRoles = result.data;
-        $scope.rolesLoading = false;
+      return $scope.loadProjectPromise.then(function() {
+        return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
+          $scope.currentProjectRoles = result.data;
+          $scope.rolesLoading = false;
 
-        return $scope.currentProjectRoles;
+          return $scope.currentProjectRoles;
+        });
       });
     };
 
@@ -2170,10 +2172,6 @@ app.controller('ProjectSettingsController', [
 ]);
 
 app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
-  $http.get($scope.formio.projectUrl + '/role')
-    .then(function(result) {
-      $scope.roles = result.data;
-    });
   $scope.$watch('currentProject.settings.oauth.openid', function() {
     var openIdData = getOpenIdData();
     if (!openIdData) {
