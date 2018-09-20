@@ -15262,7 +15262,9 @@ function (_NestedComponent) {
         });
 
         setTimeout(function () {
-          _this9.onChange();
+          _this9.onChange({
+            noEmit: true
+          });
 
           _this9.emit('render');
         }, 1);
@@ -15337,7 +15339,9 @@ function (_NestedComponent) {
         return _this10.submitUrl(args.url, args.headers);
       });
       return setTimeout(function () {
-        _this10.onChange();
+        _this10.onChange({
+          noEmit: true
+        });
       }, 1);
     }
     /**
@@ -15453,7 +15457,10 @@ function (_NestedComponent) {
       value.isValid = this.checkData(value.data, flags);
       this.showElement(true);
       this.loading = false;
-      this.emit('change', value);
+
+      if (!flags || !flags.noEmit) {
+        this.emit('change', value);
+      }
     }
   }, {
     key: "checkData",
@@ -19354,24 +19361,7 @@ function (_Component) {
 
 
       _this.info = _this.elementInfo();
-    }
-
-    _this.logic.forEach(function (logic) {
-      if (logic.trigger.type === 'event') {
-        _this.root.on(logic.trigger.event, function () {
-          var newComponent = _lodash.default.cloneDeep(_this.originalComponent);
-
-          if (_this.applyActions(logic.actions, logic.trigger.event, _this.data, newComponent)) {
-            // If component definition changed, replace it.
-            if (!_lodash.default.isEqual(_this.component, newComponent)) {
-              _this.component = newComponent;
-            }
-
-            _this.redraw();
-          }
-        });
-      }
-    }); // Allow anyone to hook into the component creation.
+    } // Allow anyone to hook into the component creation.
 
 
     _this.hook('component');
@@ -19527,6 +19517,8 @@ function (_Component) {
         this.attachRefreshOn();
         this.autofocus();
       }
+
+      this.attachLogic();
     }
   }, {
     key: "attachRefreshOn",
@@ -20435,7 +20427,7 @@ function (_Component) {
   }, {
     key: "conditionallyVisible",
     value: function conditionallyVisible(data) {
-      if (!this.hasCondition()) {
+      if (this.options.builder || !this.hasCondition()) {
         return true;
       }
 
@@ -20605,9 +20597,9 @@ function (_Component) {
   }, {
     key: "show",
     value: function show(_show, noClear) {
-      if (this.options.hide && this.options.hide[this.component.key]) {
+      if (!this.options.builder && this.options.hide && this.options.hide[this.component.key]) {
         _show = false;
-      } else if (this.options.show && this.options.show[this.component.key]) {
+      } else if (this.options.builder || this.options.show && this.options.show[this.component.key]) {
         _show = true;
       } // Execute only if visibility changes or if we are in builder mode or if hidden fields should be shown.
 
@@ -21517,6 +21509,30 @@ function (_Component) {
       this.removeChildFrom(element, this.element);
     }
   }, {
+    key: "attachLogic",
+    value: function attachLogic() {
+      var _this20 = this;
+
+      this.logic.forEach(function (logic) {
+        if (logic.trigger.type === 'event') {
+          var event = _this20.interpolate(logic.trigger.event);
+
+          _this20.on(event, function () {
+            var newComponent = _lodash.default.cloneDeep(_this20.originalComponent);
+
+            if (_this20.applyActions(logic.actions, event, _this20.data, newComponent)) {
+              // If component definition changed, replace it.
+              if (!_lodash.default.isEqual(_this20.component, newComponent)) {
+                _this20.component = newComponent;
+              }
+
+              _this20.redraw();
+            }
+          });
+        }
+      });
+    }
+  }, {
     key: "hasInput",
     get: function get() {
       return this.component.input || this.inputs.length;
@@ -21796,7 +21812,7 @@ function (_Component) {
      */
     ,
     set: function set(disabled) {
-      var _this20 = this;
+      var _this21 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable) {
@@ -21813,7 +21829,7 @@ function (_Component) {
 
 
       _lodash.default.each(this.inputs, function (input) {
-        return _this20.setDisabled(_this20.performInputMapping(input), disabled);
+        return _this21.setDisabled(_this21.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -23076,6 +23092,9 @@ function (_BaseComponent) {
         }));
       }
 
+      var onChange = null;
+      var onError = null;
+
       if (this.component.action === 'submit') {
         var message = this.ce('div');
         this.on('submitButton', function () {
@@ -23098,13 +23117,8 @@ function (_BaseComponent) {
 
           _this.append(message);
         });
-        this.on('change', function (value) {
-          _this.loading = false;
 
-          var isValid = _this.root.isValid(value.data, true);
-
-          _this.disabled = _this.options.readOnly || _this.component.disableOnInvalid && !isValid;
-
+        onChange = function onChange(value, isValid) {
           _this.removeClass(_this.buttonElement, 'btn-success submit-success');
 
           _this.removeClass(_this.buttonElement, 'btn-danger submit-fail');
@@ -23120,9 +23134,9 @@ function (_BaseComponent) {
 
             _this.removeClass(message, 'has-error');
           }
-        });
-        this.on('error', function () {
-          _this.loading = false;
+        };
+
+        onError = function onError() {
           _this.hasError = true;
 
           _this.removeClass(_this.buttonElement, 'btn-success submit-success');
@@ -23136,7 +23150,7 @@ function (_BaseComponent) {
           _this.addClass(message, 'has-error');
 
           _this.append(message);
-        });
+        };
       }
 
       if (this.component.action === 'url') {
@@ -23148,15 +23162,24 @@ function (_BaseComponent) {
           _this.loading = false;
           _this.disabled = false;
         });
-        this.on('change', function (value) {
-          _this.loading = false;
-          _this.disabled = _this.component.disableOnInvalid && !_this.root.isValid(value.data, true);
-        });
-        this.on('error', function () {
-          _this.loading = false;
-        });
       }
 
+      this.on('change', function (value) {
+        _this.loading = false;
+        var isValid = value.hasOwnProperty('isValid') ? value.isValid : _this.root.isValid(value.data, true);
+        _this.disabled = _this.options.readOnly || _this.component.disableOnInvalid && !isValid;
+
+        if (onChange) {
+          onChange(value, isValid);
+        }
+      });
+      this.on('error', function () {
+        _this.loading = false;
+
+        if (onError) {
+          onError();
+        }
+      });
       this.addEventListener(this.buttonElement, 'click', function (event) {
         _this.dataValue = true;
 
@@ -23177,12 +23200,12 @@ function (_BaseComponent) {
             break;
 
           case 'event':
-            _this.emit(_this.component.event, _this.data);
+            _this.emit(_this.interpolate(_this.component.event), _this.data);
 
-            _this.events.emit(_this.component.event, _this.data);
+            _this.events.emit(_this.interpolate(_this.component.event), _this.data);
 
             _this.emit('customEvent', {
-              type: _this.component.event,
+              type: _this.interpolate(_this.component.event),
               component: _this.component,
               data: _this.data,
               event: event
@@ -23289,6 +23312,7 @@ function (_BaseComponent) {
       }
 
       this.autofocus();
+      this.attachLogic();
     }
     /* eslint-enable max-statements */
 
@@ -23855,6 +23879,7 @@ function (_BaseComponent) {
       }
 
       this.autofocus();
+      this.attachLogic();
     }
   }, {
     key: "createElement",
@@ -24823,6 +24848,8 @@ function (_NestedComponent) {
       if (labelAtTheBottom) {
         this.createLabel(this.element);
       }
+
+      this.attachLogic();
     }
   }, {
     key: "hasChanged",
@@ -25003,6 +25030,8 @@ function (_BaseComponent) {
           });
         }
       }
+
+      this.attachLogic();
     }
   }, {
     key: "defaultSchema",
@@ -25458,6 +25487,7 @@ function (_NestedComponent) {
       this.errorContainer = this.element;
       this.restoreValue();
       this.createDescription(this.element);
+      this.attachLogic();
     }
   }, {
     key: "setVisibleComponents",
@@ -26077,6 +26107,7 @@ function (_NestedComponent) {
       this.buildRows(state);
       this.element.appendChild(this.tableElement);
       this.createDescription(this.element);
+      this.attachLogic();
     }
   }, {
     key: "addKeyButton",
@@ -26438,6 +26469,10 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -26548,8 +26583,17 @@ function (_BaseComponent) {
   }
 
   _createClass(DateTimeComponent, [{
+    key: "isEmpty",
+    value: function isEmpty(value) {
+      if (value.toString() === 'Invalid Date') {
+        return true;
+      }
+
+      return _get(_getPrototypeOf(DateTimeComponent.prototype), "isEmpty", this).call(this, value);
+    } // This select component can handle multiple items on its own.
+
+  }, {
     key: "createWrapper",
-    // This select component can handle multiple items on its own.
     value: function createWrapper() {
       return false;
     }
@@ -27799,6 +27843,7 @@ function (_NestedComponent) {
       this.element.appendChild(this.errorContainer = this.ce('div', {
         class: 'has-error'
       }));
+      this.attachLogic();
     }
   }, {
     key: "buildTable",
@@ -28652,6 +28697,7 @@ function (_NestedComponent) {
       this.addComponents(null, null, null, state);
       this.element.appendChild(this.body);
       this.setCollapsed();
+      this.attachLogic();
     }
   }, {
     key: "defaultSchema",
@@ -28944,6 +28990,8 @@ function (_BaseComponent) {
       if (this.shouldDisable) {
         this.disabled = true;
       }
+
+      this.attachLogic();
     }
   }, {
     key: "refreshDOM",
@@ -30140,6 +30188,8 @@ function (_BaseComponent) {
       if (!this.options.beforeSubmit) {
         this.restoreValue();
       }
+
+      this.attachLogic();
     }
   }, {
     key: "setValue",
@@ -30505,6 +30555,8 @@ function (_BaseComponent) {
           return _this.setHTML();
         });
       }
+
+      this.attachLogic();
     }
   }, {
     key: "defaultSchema",
@@ -30919,6 +30971,7 @@ function (_BaseComponent) {
         style: 'min-height: 300px; height: calc(100vh - 600px);'
       });
       this.element.appendChild(gmapElement);
+      this.attachLogic();
     }
   }, {
     key: "setValue",
@@ -31234,6 +31287,7 @@ function (_BaseComponent) {
       }
 
       this.addComponents(null, null, null, state);
+      this.attachLogic();
     }
   }, {
     key: "getComponents",
@@ -31814,7 +31868,7 @@ function (_BaseComponent) {
   }, {
     key: "setCollapsed",
     value: function setCollapsed(element) {
-      if (!this.component.collapsible) {
+      if (!this.component.collapsible || this.options.builder) {
         return;
       }
 
@@ -31902,7 +31956,9 @@ exports.default = _default;
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
 
-var _NumberEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.validation */ "./node_modules/formiojs/components/number/editForm/Number.edit.validation.js"));
+var _NumberEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.data */ "./node_modules/formiojs/components/number/editForm/Number.edit.data.js"));
+
+var _NumberEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.validation */ "./node_modules/formiojs/components/number/editForm/Number.edit.validation.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -31912,8 +31968,11 @@ function _default() {
   }
 
   return _Base.default.apply(void 0, [[{
-    key: 'validation',
+    key: 'data',
     components: _NumberEdit.default
+  }, {
+    key: 'validation',
+    components: _NumberEdit2.default
   }]].concat(extend));
 }
 
@@ -32014,14 +32073,14 @@ function (_BaseComponent) {
     _this = _possibleConstructorReturn(this, _getPrototypeOf(NumberComponent).call(this, component, options, data));
     _this.validators = _this.validators.concat(['min', 'max']);
     var separators = (0, _utils.getNumberSeparators)(_this.options.language);
-    _this.decimalSeparator = options.decimalSeparator = options.decimalSeparator || separators.decimalSeparator;
+    _this.decimalSeparator = _this.options.decimalSeparator = _this.options.decimalSeparator || separators.decimalSeparator;
 
     if (_this.component.delimiter) {
-      if (options.hasOwnProperty('thousandsSeparator')) {
+      if (_this.options.hasOwnProperty('thousandsSeparator')) {
         console.warn("Property 'thousandsSeparator' is deprecated. Please use i18n to specify delimiter.");
       }
 
-      _this.delimiter = options.thousandsSeparator || separators.delimiter;
+      _this.delimiter = _this.options.thousandsSeparator || separators.delimiter;
     } else {
       _this.delimiter = '';
     }
@@ -32059,6 +32118,7 @@ function (_BaseComponent) {
         mask: (0, _textMaskAddons.createNumberMask)({
           prefix: '',
           suffix: '',
+          requireDecimal: _lodash.default.get(this.component, 'requireDecimal', false),
           thousandsSeparatorSymbol: _lodash.default.get(this.component, 'thousandsSeparator', this.delimiter),
           decimalSymbol: _lodash.default.get(this.component, 'decimalSymbol', this.decimalSeparator),
           decimalLimit: _lodash.default.get(this.component, 'decimalLimit', this.decimalLimit),
@@ -32143,6 +32203,46 @@ exports.default = NumberComponent;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/number/editForm/Number.edit.data.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/formiojs/components/number/editForm/Number.edit.data.js ***!
+  \******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  type: 'checkbox',
+  input: true,
+  weight: 70,
+  key: 'delimiter',
+  label: 'Use Delimiter',
+  tooltip: 'Separate thousands by local delimiter.'
+}, {
+  type: 'number',
+  input: true,
+  weight: 80,
+  key: 'decimalLimit',
+  label: 'Decimal Places',
+  tooltip: 'The maximum number of decimal places.'
+}, {
+  type: 'checkbox',
+  input: true,
+  weight: 90,
+  key: 'requireDecimal',
+  label: 'Require Decimal',
+  tooltip: 'Always show decimals, even if trailing zeros.'
+}];
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/number/editForm/Number.edit.validation.js":
 /*!************************************************************************************!*\
   !*** ./node_modules/formiojs/components/number/editForm/Number.edit.validation.js ***!
@@ -32158,12 +32258,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _default = [{
-  weight: 100,
-  type: 'checkbox',
-  label: 'Unique',
-  tooltip: 'Makes sure the data submitted for this field is unique, and has not been submitted before.',
   key: 'validate.unique',
-  input: true,
   ignore: true
 }, {
   type: 'number',
@@ -32314,6 +32409,24 @@ function (_NestedComponent) {
       return this.panelBody;
     }
   }, {
+    key: "getCollapseIcon",
+    value: function getCollapseIcon() {
+      var collapseIcon = this.getIcon(this.collapsed ? 'plus' : 'minus');
+      this.addClass(collapseIcon, 'formio-collapse-icon');
+      return collapseIcon;
+    }
+  }, {
+    key: "setCollapsed",
+    value: function setCollapsed(element) {
+      _get(_getPrototypeOf(PanelComponent.prototype), "setCollapsed", this).call(this, element);
+
+      if (this.collapseIcon) {
+        var newIcon = this.getCollapseIcon();
+        this.panelTitle.replaceChild(newIcon, this.collapseIcon);
+        this.collapseIcon = newIcon;
+      }
+    }
+  }, {
     key: "build",
     value: function build(state) {
       this.component.theme = this.component.theme || 'default';
@@ -32333,12 +32446,20 @@ function (_NestedComponent) {
         var heading = this.ce('div', {
           class: "card-header bg-".concat(this.component.theme, " panel-heading")
         });
-        var title = this.ce('h4', {
+        this.panelTitle = this.ce('h4', {
           class: 'mb-0 card-title panel-title'
         });
-        title.appendChild(this.text(this.component.title));
-        this.createTooltip(title);
-        heading.appendChild(title);
+        var titleText = this.component.title;
+
+        if (this.component.collapsible) {
+          this.collapseIcon = this.getCollapseIcon();
+          this.panelTitle.appendChild(this.collapseIcon);
+          titleText = " ".concat(titleText);
+        }
+
+        this.panelTitle.appendChild(this.text(titleText));
+        this.createTooltip(this.panelTitle);
+        heading.appendChild(this.panelTitle);
         this.setCollapseHeader(heading);
         this.element.appendChild(heading);
       } else {
@@ -32348,6 +32469,7 @@ function (_NestedComponent) {
       this.addComponents(null, null, null, state);
       this.element.appendChild(this.panelBody);
       this.setCollapsed();
+      this.attachLogic();
     }
   }, {
     key: "defaultSchema",
@@ -32445,6 +32567,27 @@ var _default = [{
       label: 'No',
       value: 'none'
     }]
+  }
+}, {
+  weight: 650,
+  type: 'checkbox',
+  label: 'Collapsible',
+  tooltip: 'If checked, this will turn this Panel into a collapsible panel.',
+  key: 'collapsible',
+  input: true
+}, {
+  weight: 651,
+  type: 'checkbox',
+  label: 'Initially Collapsed',
+  tooltip: 'Determines the initial collapsed state of this Panel.',
+  key: 'collapsed',
+  input: true,
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.collapsible'
+      }, true]
+    }
   }
 }];
 exports.default = _default;
@@ -35264,10 +35407,15 @@ function (_BaseComponent) {
 
       _get(_getPrototypeOf(SignatureComponent.prototype), "setValue", this).call(this, value, flags);
 
-      if (value && !flags.noSign && this.signaturePad) {
-        this.signaturePad.fromDataURL(value);
-        this.signatureImage.setAttribute('src', value);
-        this.showCanvas(false);
+      if (this.signaturePad) {
+        if (value && !flags.noSign) {
+          this.signatureImage.setAttribute('src', value);
+          this.showCanvas(false);
+        }
+
+        if (!value) {
+          this.signaturePad.clear();
+        }
       }
     }
   }, {
@@ -35373,14 +35521,17 @@ function (_BaseComponent) {
         _this2.showCanvas(true);
 
         _this2.signaturePad.clear();
+
+        _this2.setValue(null);
       });
 
       this.signaturePad.onEnd = function () {
         return _this2.setValue(_this2.signaturePad.toDataURL(), {
           noSign: true
         });
-      }; // Ensure the signature is always the size of its container.
+      };
 
+      this.signatureImage.setAttribute('src', this.signaturePad.toDataURL()); // Ensure the signature is always the size of its container.
 
       this.addEventListener(window, 'resize', _lodash.default.debounce(function () {
         return _this2.checkSize();
@@ -35400,6 +35551,7 @@ function (_BaseComponent) {
       }
 
       this.autofocus();
+      this.attachLogic();
     }
     /* eslint-enable max-statements */
 
@@ -35655,7 +35807,7 @@ function (_BaseComponent) {
 
             var input = _this.ce('input', {
               type: 'radio',
-              name: "data[".concat(_this.key, "][").concat(question.value, "]"),
+              name: _this.getInputName(question),
               value: value.value,
               id: "".concat(_this.id, "-").concat(question.value, "-").concat(value.value)
             });
@@ -35685,6 +35837,8 @@ function (_BaseComponent) {
 
         this.autofocus();
       }
+
+      this.attachLogic();
     }
   }, {
     key: "setValue",
@@ -35697,11 +35851,9 @@ function (_BaseComponent) {
         return;
       }
 
-      var key = "data[".concat(this.key, "]");
-
       _lodash.default.each(this.component.questions, function (question) {
         _lodash.default.each(_this2.inputs, function (input) {
-          if (input.name === "".concat(key, "[").concat(question.value, "]")) {
+          if (input.name === _this2.getInputName(question)) {
             input.checked = input.value === value[question.value];
           }
         });
@@ -35719,11 +35871,10 @@ function (_BaseComponent) {
       }
 
       var value = {};
-      var key = "data[".concat(this.key, "]");
 
       _lodash.default.each(this.component.questions, function (question) {
         _lodash.default.each(_this3.inputs, function (input) {
-          if (input.checked && input.name === "".concat(key, "[").concat(question.value, "]")) {
+          if (input.checked && input.name === _this3.getInputName(question)) {
             value[question.value] = input.value;
             return false;
           }
@@ -35777,6 +35928,11 @@ function (_BaseComponent) {
 
       table.appendChild(tbody);
       return table.outerHTML;
+    }
+  }, {
+    key: "getInputName",
+    value: function getInputName(question) {
+      return "".concat(this.options.name, "[").concat(question.value, "]");
     }
   }, {
     key: "defaultSchema",
@@ -36083,6 +36239,7 @@ function (_NestedComponent) {
       this.addComponents(null, null, null, state);
       this.table.appendChild(this.tbody);
       this.element.appendChild(this.table);
+      this.attachLogic();
     }
   }, {
     key: "defaultSchema",
@@ -38115,13 +38272,13 @@ function (_TextFieldComponent) {
     key: "getValueAt",
     value: function getValueAt(index) {
       if (!this.inputs.length || !this.inputs[index]) {
-        return null;
+        return this.emptyValue;
       }
 
       var val = this.inputs[index].value;
 
       if (!val) {
-        return null;
+        return this.emptyValue;
       }
 
       return (0, _moment.default)(val, this.component.format).format('HH:mm:ss');
