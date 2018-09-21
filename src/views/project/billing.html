@@ -75,7 +75,16 @@
           </div>
         </li>
       </ul>
-      <span class="btn btn-success pull-right" ng-if="primaryProject.plan !== selectedPlan.name || servers.api !== primaryProject.billing.servers.api || servers.pdf !== primaryProject.billing.servers.pdf || pdfInfo.plan !== pdfInfoOriginalPlan" ng-disabled="selectedPlan.price !== 0 && !paymentInfo" ng-click="changePlan()"><i ng-if="planLoading" class="fa fa-spinner fa-pulse"></i> Confirm Billing Change</span>
+      <button
+        class="btn btn-success pull-right"
+        ng-if="primaryProject.plan !== selectedPlan.name
+         || servers.api !== primaryProject.billing.servers.api
+         || servers.pdf !== primaryProject.billing.servers.pdf
+         || pdfInfo.plan !== pdfInfoOriginalPlan"
+        ng-disabled="(selectedPlan.price !== 0 || pdfInfo.plan === 'hosted') && !paymentInfo"
+        ng-click="changePlan()">
+        <i ng-if="planLoading" class="fa fa-spinner fa-pulse"></i> Confirm Billing Change
+    </button>
     </div>
     <div class="col-sm-8" style="padding: 0 20px 40px 0;">
       <div class="panel panel-success">
