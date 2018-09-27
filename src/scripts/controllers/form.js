@@ -863,7 +863,7 @@ app.controller('FormViewController', [
           }
         })
         .catch(function(err) {
-          _.each(err.details, function(errDetails) {
+          _.each(_.isString(err) ? [err] : err.details, function(errDetails) {
             FormioAlerts.onError.call(FormioAlerts, errDetails);
             $scope.$broadcast('submitError', err);
           });
