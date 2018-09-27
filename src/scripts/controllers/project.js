@@ -1674,6 +1674,18 @@ app.controller('ProjectFormioController', [
       });
     };
 
+    $scope.getLicense = function() {
+      Formio.request('https://license.form.io/generate/' + $scope.input.license, 'GET')
+        .then(function(license) {
+          $scope.currentLicense = license;
+          $scope.$apply();
+        })
+        .catch(function(err) {
+          $scope.currentLicense = 'Unable to get license. Please check the license id.';
+          $scope.$apply();
+        })
+    };
+
     $scope.inputUser = {deleted: null};
     $scope.searchUser = {
       data: null,
