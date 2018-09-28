@@ -26061,7 +26061,7 @@ function (_Component) {
       }
 
       if (this.component.multiple && !Array.isArray(value)) {
-        value = [value];
+        value = value ? [value] : [];
       }
 
       this.buildRows(value);
@@ -26515,8 +26515,7 @@ function (_Component) {
       }
 
       if (!this.hasValue()) {
-        var emptyValue = this.emptyValue;
-        this.dataValue = this.component.multiple ? [emptyValue] : emptyValue;
+        this.dataValue = this.component.multiple ? [] : this.emptyValue;
       }
 
       return _lodash.default.get(this.data, this.key);
@@ -39508,7 +39507,7 @@ function (_BaseComponent) {
       var previousValue = this.dataValue;
 
       if (this.component.multiple && !Array.isArray(value)) {
-        value = [value];
+        value = value ? [value] : [];
       }
 
       var hasPreviousValue = Array.isArray(previousValue) ? previousValue.length : previousValue;
@@ -42563,7 +42562,7 @@ function (_TextFieldComponent) {
         return this.dataValue;
       }
 
-      return this.component.multiple ? [''] : '';
+      return this.component.multiple ? [] : '';
     }
   }, {
     key: "elementInfo",
