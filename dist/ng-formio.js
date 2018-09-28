@@ -19754,6 +19754,7 @@ function (_NestedComponent) {
         this.options.components = form.settings.components;
       }
 
+      this.initialized = false;
       return this.createForm(form).then(function () {
         _this6.emit('formLoad', form);
 
@@ -19870,6 +19871,10 @@ function (_NestedComponent) {
 
         _this8.setValue(_this8.submission);
 
+        if (!_this8.changing) {
+          _this8.triggerChange();
+        }
+
         return form;
       }).catch(function (err) {
         console.warn(err);
@@ -19908,11 +19913,7 @@ function (_NestedComponent) {
         }, true);
 
         setTimeout(function () {
-          _this9.onChange({
-            noEmit: true
-          });
-
-          _this9.emit('render');
+          return _this9.emit('render');
         }, 1);
       });
     }
@@ -20106,6 +20107,12 @@ function (_NestedComponent) {
 
       if (!flags || !flags.noEmit) {
         this.emit('change', value);
+      } // The form is initialized after the first change event occurs.
+
+
+      if (!this.initialized) {
+        this.emit('initialized');
+        this.initialized = true;
       }
     }
   }, {
@@ -24078,12 +24085,29 @@ function (_Component) {
      * @type {function} - Call to trigger a change in this component.
      */
 
-    _this.triggerChange = _lodash.default.debounce(_this.onChange.bind(_assertThisInitialized(_assertThisInitialized(_this))), 100);
+    var _triggerChange = _lodash.default.debounce(function () {
+      var _this2;
+
+      if (_this.root) {
+        _this.root.changing = false;
+      }
+
+      return (_this2 = _this).onChange.apply(_this2, arguments);
+    }, 100);
+
+    _this.triggerChange = function () {
+      if (_this.root) {
+        _this.root.changing = true;
+      }
+
+      return _triggerChange.apply(void 0, arguments);
+    };
     /**
      * Used to trigger a redraw event within this component.
      *
      * @type {Function}
      */
+
 
     _this.triggerRedraw = _lodash.default.debounce(_this.redraw.bind(_assertThisInitialized(_assertThisInitialized(_this))), 100); // To force this component to be invalid.
 
@@ -24124,7 +24148,7 @@ function (_Component) {
      * @param defaultSchema
      */
     value: function getModifiedSchema(schema, defaultSchema) {
-      var _this2 = this;
+      var _this3 = this;
 
       var modified = {};
 
@@ -24134,7 +24158,7 @@ function (_Component) {
 
       _lodash.default.each(schema, function (val, key) {
         if (!_lodash.default.isArray(val) && _lodash.default.isObject(val) && defaultSchema.hasOwnProperty(key)) {
-          var subModified = _this2.getModifiedSchema(val, defaultSchema[key]);
+          var subModified = _this3.getModifiedSchema(val, defaultSchema[key]);
 
           if (!_lodash.default.isEmpty(subModified)) {
             modified[key] = subModified;
@@ -24266,17 +24290,17 @@ function (_Component) {
   }, {
     key: "attachRefreshOn",
     value: function attachRefreshOn() {
-      var _this3 = this;
+      var _this4 = this;
 
       // If they wish to refresh on a value, then add that here.
       if (this.component.refreshOn) {
         this.on('change', function (event) {
-          if (_this3.component.refreshOn === 'data') {
-            _this3.refresh(_this3.data);
-          } else if (event.changed && event.changed.component && event.changed.component.key === _this3.component.refreshOn & // Make sure the changed component is not in a different "context". Solves issues where refreshOn being set
+          if (_this4.component.refreshOn === 'data') {
+            _this4.refresh(_this4.data);
+          } else if (event.changed && event.changed.component && event.changed.component.key === _this4.component.refreshOn & // Make sure the changed component is not in a different "context". Solves issues where refreshOn being set
           // in fields inside EditGrids could alter their state from other rows (which is bad).
-          _this3.inContext(event.changed.instance)) {
-            _this3.refresh(event.changed.value);
+          _this4.inContext(event.changed.instance)) {
+            _this4.refresh(event.changed.value);
           }
         }, true);
       }
@@ -24365,7 +24389,7 @@ function (_Component) {
   }, {
     key: "createModal",
     value: function createModal() {
-      var _this4 = this;
+      var _this5 = this;
 
       var modalBody = this.ce('div');
       var modalOverlay = this.ce('div', {
@@ -24389,7 +24413,7 @@ function (_Component) {
         dialog.close();
       });
       this.addEventListener(dialog, 'close', function () {
-        _this4.removeChildFrom(dialog, document.body);
+        _this5.removeChildFrom(dialog, document.body);
       });
       document.body.appendChild(dialog);
       dialog.body = modalBody;
@@ -24397,7 +24421,7 @@ function (_Component) {
       dialog.close = function () {
         dialog.dispatchEvent(new CustomEvent('close'));
 
-        _this4.removeChildFrom(dialog, document.body);
+        _this5.removeChildFrom(dialog, document.body);
       };
 
       return dialog;
@@ -24560,7 +24584,7 @@ function (_Component) {
   }, {
     key: "buildRows",
     value: function buildRows(values) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!this.tbody) {
         return;
@@ -24571,22 +24595,22 @@ function (_Component) {
       values = values || this.dataValue;
 
       _lodash.default.each(values, function (value, index) {
-        var tr = _this5.ce('tr');
+        var tr = _this6.ce('tr');
 
-        var td = _this5.ce('td');
+        var td = _this6.ce('td');
 
-        _this5.buildInput(td, value, index);
+        _this6.buildInput(td, value, index);
 
         tr.appendChild(td);
 
-        if (!_this5.shouldDisable) {
-          var tdAdd = _this5.ce('td');
+        if (!_this6.shouldDisable) {
+          var tdAdd = _this6.ce('td');
 
-          tdAdd.appendChild(_this5.removeButton(index));
+          tdAdd.appendChild(_this6.removeButton(index));
           tr.appendChild(tdAdd);
         }
 
-        _this5.tbody.appendChild(tr);
+        _this6.tbody.appendChild(tr);
       });
 
       if (!this.shouldDisable) {
@@ -24617,7 +24641,7 @@ function (_Component) {
   }, {
     key: "addButton",
     value: function addButton(justIcon) {
-      var _this6 = this;
+      var _this7 = this;
 
       var addButton = this.ce('button', {
         class: 'btn btn-primary formio-button-add-row'
@@ -24625,7 +24649,7 @@ function (_Component) {
       this.addEventListener(addButton, 'click', function (event) {
         event.preventDefault();
 
-        _this6.addValue();
+        _this7.addValue();
       });
       var addIcon = this.ce('i', {
         class: this.iconClass('plus')
@@ -24665,7 +24689,7 @@ function (_Component) {
   }, {
     key: "removeButton",
     value: function removeButton(index) {
-      var _this7 = this;
+      var _this8 = this;
 
       var removeButton = this.ce('button', {
         type: 'button',
@@ -24674,7 +24698,7 @@ function (_Component) {
       this.addEventListener(removeButton, 'click', function (event) {
         event.preventDefault();
 
-        _this7.removeValue(index);
+        _this8.removeValue(index);
       });
       var removeIcon = this.ce('i', {
         class: this.iconClass('remove-circle')
@@ -25051,7 +25075,7 @@ function (_Component) {
      * @return {null}
      */
     value: function createWidget() {
-      var _this8 = this;
+      var _this9 = this;
 
       // Return null if no widget is found.
       if (!this.component.widget) {
@@ -25070,10 +25094,10 @@ function (_Component) {
 
       var widget = new _widgets.default[settings.type](settings, this.component);
       widget.on('update', function () {
-        return _this8.updateValue();
+        return _this9.updateValue();
       }, true);
       widget.on('redraw', function () {
-        return _this8.redraw();
+        return _this9.redraw();
       }, true);
       this._widget = widget;
       return widget;
@@ -25091,10 +25115,10 @@ function (_Component) {
   }, {
     key: "destroyInputs",
     value: function destroyInputs() {
-      var _this9 = this;
+      var _this10 = this;
 
       _lodash.default.each(this.inputs, function (input) {
-        input = _this9.performInputMapping(input);
+        input = _this10.performInputMapping(input);
 
         if (input.mask) {
           input.mask.destroy();
@@ -25212,7 +25236,7 @@ function (_Component) {
      * @param data
      */
     value: function fieldLogic(data) {
-      var _this10 = this;
+      var _this11 = this;
 
       var logics = this.logic; // If there aren't logic, don't go further.
 
@@ -25223,10 +25247,10 @@ function (_Component) {
       var newComponent = _lodash.default.cloneDeep(this.originalComponent);
 
       var changed = logics.reduce(function (changed, logic) {
-        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this10.data, data, _this10.root ? _this10.root._form : {}, _this10);
+        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this11.data, data, _this11.root ? _this11.root._form : {}, _this11);
 
         if (result) {
-          changed |= _this10.applyActions(logic.actions, result, data, newComponent);
+          changed |= _this11.applyActions(logic.actions, result, data, newComponent);
         }
 
         return changed;
@@ -25242,19 +25266,19 @@ function (_Component) {
   }, {
     key: "applyActions",
     value: function applyActions(actions, result, data, newComponent) {
-      var _this11 = this;
+      var _this12 = this;
 
       return actions.reduce(function (changed, action) {
         switch (action.type) {
           case 'property':
-            FormioUtils.setActionProperty(newComponent, action, _this11.data, data, newComponent, result, _this11);
+            FormioUtils.setActionProperty(newComponent, action, _this12.data, data, newComponent, result, _this12);
             break;
 
           case 'value':
             {
-              var oldValue = _this11.getValue();
+              var oldValue = _this12.getValue();
 
-              var newValue = _this11.evaluate(action.value, {
+              var newValue = _this12.evaluate(action.value, {
                 value: _lodash.default.clone(oldValue),
                 data: data,
                 component: newComponent,
@@ -25262,7 +25286,7 @@ function (_Component) {
               }, 'value');
 
               if (!_lodash.default.isEqual(oldValue, newValue)) {
-                _this11.setValue(newValue);
+                _this12.setValue(newValue);
 
                 changed = true;
               }
@@ -25288,7 +25312,7 @@ function (_Component) {
   }, {
     key: "addInputError",
     value: function addInputError(message, dirty) {
-      var _this12 = this;
+      var _this13 = this;
 
       if (!message) {
         return;
@@ -25305,7 +25329,7 @@ function (_Component) {
 
       this.addClass(this.element, 'has-error');
       this.inputs.forEach(function (input) {
-        return _this12.addClass(_this12.performInputMapping(input), 'is-invalid');
+        return _this13.addClass(_this13.performInputMapping(input), 'is-invalid');
       });
 
       if (dirty && this.options.highlightErrors) {
@@ -25453,7 +25477,7 @@ function (_Component) {
   }, {
     key: "addInputSubmitListener",
     value: function addInputSubmitListener(input) {
-      var _this13 = this;
+      var _this14 = this;
 
       if (!this.options.submitOnEnter) {
         return;
@@ -25466,7 +25490,7 @@ function (_Component) {
           event.preventDefault();
           event.stopPropagation();
 
-          _this13.emit('submitButton');
+          _this14.emit('submitButton');
         }
       });
     }
@@ -25479,10 +25503,10 @@ function (_Component) {
   }, {
     key: "addInputEventListener",
     value: function addInputEventListener(input) {
-      var _this14 = this;
+      var _this15 = this;
 
       this.addEventListener(input, this.info.changeEvent, function () {
-        return _this14.updateValue();
+        return _this15.updateValue();
       });
     }
     /**
@@ -25514,45 +25538,45 @@ function (_Component) {
   }, {
     key: "addFocusBlurEvents",
     value: function addFocusBlurEvents(element) {
-      var _this15 = this;
+      var _this16 = this;
 
       this.addEventListener(element, 'focus', function () {
-        if (_this15.root.focusedComponent !== _this15) {
-          if (_this15.root.pendingBlur) {
-            _this15.root.pendingBlur();
+        if (_this16.root.focusedComponent !== _this16) {
+          if (_this16.root.pendingBlur) {
+            _this16.root.pendingBlur();
           }
 
-          _this15.root.focusedComponent = _this15;
+          _this16.root.focusedComponent = _this16;
 
-          _this15.emit('focus', _this15);
-        } else if (_this15.root.focusedComponent === _this15 && _this15.root.pendingBlur) {
-          _this15.root.pendingBlur.cancel();
+          _this16.emit('focus', _this16);
+        } else if (_this16.root.focusedComponent === _this16 && _this16.root.pendingBlur) {
+          _this16.root.pendingBlur.cancel();
 
-          _this15.root.pendingBlur = null;
+          _this16.root.pendingBlur = null;
         }
       });
       this.addEventListener(element, 'blur', function () {
-        _this15.root.pendingBlur = FormioUtils.delay(function () {
-          _this15.emit('blur', _this15);
+        _this16.root.pendingBlur = FormioUtils.delay(function () {
+          _this16.emit('blur', _this16);
 
-          if (_this15.component.validateOn === 'blur') {
-            _this15.root.triggerChange({}, {
-              instance: _this15,
-              component: _this15.component,
-              value: _this15.dataValue,
+          if (_this16.component.validateOn === 'blur') {
+            _this16.root.triggerChange({}, {
+              instance: _this16,
+              component: _this16.component,
+              value: _this16.dataValue,
               flags: {}
             });
           }
 
-          _this15.root.focusedComponent = null;
-          _this15.root.pendingBlur = null;
+          _this16.root.focusedComponent = null;
+          _this16.root.pendingBlur = null;
         });
       });
     }
   }, {
     key: "addQuill",
     value: function addQuill(element, settings, onChange) {
-      var _this16 = this;
+      var _this17 = this;
 
       settings = _lodash.default.isEmpty(settings) ? this.wysiwygDefault : settings; // Lazy load the quill css.
 
@@ -25567,22 +25591,22 @@ function (_Component) {
           return _nativePromiseOnly.default.reject();
         }
 
-        _this16.quill = new Quill(element, settings);
+        _this17.quill = new Quill(element, settings);
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
 
         var txtArea = document.createElement('textarea');
         txtArea.setAttribute('class', 'quill-source-code');
 
-        _this16.quill.addContainer('ql-custom').appendChild(txtArea);
+        _this17.quill.addContainer('ql-custom').appendChild(txtArea);
 
         var qlSource = element.parentNode.querySelector('.ql-source');
 
         if (qlSource) {
-          _this16.addEventListener(qlSource, 'click', function (event) {
+          _this17.addEventListener(qlSource, 'click', function (event) {
             event.preventDefault();
 
             if (txtArea.style.display === 'inherit') {
-              _this16.quill.setContents(_this16.quill.clipboard.convert(txtArea.value));
+              _this17.quill.setContents(_this17.quill.clipboard.convert(txtArea.value));
             }
 
             txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
@@ -25592,8 +25616,8 @@ function (_Component) {
         // Make sure to select cursor when they click on the element.
 
 
-        _this16.addEventListener(element, 'click', function () {
-          return _this16.quill.focus();
+        _this17.addEventListener(element, 'click', function () {
+          return _this17.quill.focus();
         }); // Allows users to skip toolbar items when tabbing though form
 
 
@@ -25603,12 +25627,12 @@ function (_Component) {
           elm[i].setAttribute('tabindex', '-1');
         }
 
-        _this16.quill.on('text-change', function () {
-          txtArea.value = _this16.quill.root.innerHTML;
+        _this17.quill.on('text-change', function () {
+          txtArea.value = _this17.quill.root.innerHTML;
           onChange(txtArea);
         });
 
-        return _this16.quill;
+        return _this17.quill;
       });
     }
     /**
@@ -25916,7 +25940,7 @@ function (_Component) {
   }, {
     key: "setCustomValidity",
     value: function setCustomValidity(message, dirty) {
-      var _this17 = this;
+      var _this18 = this;
 
       if (this.errorElement && this.errorContainer) {
         this.errorElement.innerHTML = '';
@@ -25933,7 +25957,7 @@ function (_Component) {
         this.addInputError(message, dirty);
       } else {
         this.inputs.forEach(function (input) {
-          return _this17.removeClass(_this17.performInputMapping(input), 'is-invalid');
+          return _this18.removeClass(_this18.performInputMapping(input), 'is-invalid');
         });
 
         if (this.options.highlightErrors) {
@@ -25945,7 +25969,7 @@ function (_Component) {
       }
 
       this.inputs.forEach(function (input) {
-        input = _this17.performInputMapping(input);
+        input = _this18.performInputMapping(input);
 
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
@@ -26121,7 +26145,7 @@ function (_Component) {
   }, {
     key: "selectOptions",
     value: function selectOptions(select, tag, options, defaultValue) {
-      var _this18 = this;
+      var _this19 = this;
 
       _lodash.default.each(options, function (option) {
         var attrs = {
@@ -26132,9 +26156,9 @@ function (_Component) {
           attrs.selected = 'selected';
         }
 
-        var optionElement = _this18.ce('option', attrs);
+        var optionElement = _this19.ce('option', attrs);
 
-        optionElement.appendChild(_this18.text(option.label));
+        optionElement.appendChild(_this19.text(option.label));
         select.appendChild(optionElement);
       });
     }
@@ -26202,11 +26226,11 @@ function (_Component) {
   }, {
     key: "autofocus",
     value: function autofocus() {
-      var _this19 = this;
+      var _this20 = this;
 
       if (this.component.autofocus) {
         this.on('render', function () {
-          return _this19.focus();
+          return _this20.focus();
         }, true);
       }
     }
@@ -26264,22 +26288,22 @@ function (_Component) {
   }, {
     key: "attachLogic",
     value: function attachLogic() {
-      var _this20 = this;
+      var _this21 = this;
 
       this.logic.forEach(function (logic) {
         if (logic.trigger.type === 'event') {
-          var event = _this20.interpolate(logic.trigger.event);
+          var event = _this21.interpolate(logic.trigger.event);
 
-          _this20.on(event, function () {
-            var newComponent = _lodash.default.cloneDeep(_this20.originalComponent);
+          _this21.on(event, function () {
+            var newComponent = _lodash.default.cloneDeep(_this21.originalComponent);
 
-            if (_this20.applyActions(logic.actions, event, _this20.data, newComponent)) {
+            if (_this21.applyActions(logic.actions, event, _this21.data, newComponent)) {
               // If component definition changed, replace it.
-              if (!_lodash.default.isEqual(_this20.component, newComponent)) {
-                _this20.component = newComponent;
+              if (!_lodash.default.isEqual(_this21.component, newComponent)) {
+                _this21.component = newComponent;
               }
 
-              _this20.redraw();
+              _this21.redraw();
             }
           }, true);
         }
@@ -26491,7 +26515,8 @@ function (_Component) {
       }
 
       if (!this.hasValue()) {
-        this.dataValue = this.emptyValue;
+        var emptyValue = this.emptyValue;
+        this.dataValue = this.component.multiple ? [emptyValue] : emptyValue;
       }
 
       return _lodash.default.get(this.data, this.key);
@@ -26569,7 +26594,7 @@ function (_Component) {
      */
     ,
     set: function set(disabled) {
-      var _this21 = this;
+      var _this22 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable) {
@@ -26586,7 +26611,7 @@ function (_Component) {
 
 
       _lodash.default.each(this.inputs, function (input) {
-        return _this21.setDisabled(_this21.performInputMapping(input), disabled);
+        return _this22.setDisabled(_this22.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -27959,7 +27984,7 @@ function (_BaseComponent) {
 
       this.on('change', function (value) {
         _this.loading = false;
-        var isValid = value.hasOwnProperty('isValid') ? value.isValid : _this.root.isValid(value.data, true);
+        var isValid = _this.root ? _this.root.isValid(value.data, true) : value.isValid;
         _this.disabled = _this.options.readOnly || _this.component.disableOnInvalid && !isValid;
 
         if (onChange) {
@@ -30602,7 +30627,7 @@ function (_NestedComponent) {
 
       var changed = this.hasChanged(value, this.dataValue); //always should build if not built yet OR is trying to set empty value (in order to prevent deleting last row)
 
-      var shouldBuildRows = !this.isBuilt || _lodash.default.isEqual(this.emptyValue, value); //check if visible columns changed
+      var shouldBuildRows = !this.isBuilt || changed || _lodash.default.isEqual(this.emptyValue, value); //check if visible columns changed
 
 
       var visibleColumnsAmount = 0;
@@ -65627,6 +65652,12 @@ function (_InputWidget) {
       _set(_getPrototypeOf(CalendarWidget.prototype), "disabled", disabled, this, true);
 
       if (this.calendar) {
+        if (disabled) {
+          this.calendar._input.setAttribute('disabled', 'disabled');
+        } else {
+          this.calendar._input.removeAttribute('disabled');
+        }
+
         this.calendar.close();
         this.calendar.redraw();
       }
