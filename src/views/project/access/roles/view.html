@@ -8,7 +8,7 @@
           <h4 ng-if="currentProject.protect">{{ role.title }}</h4>
         </div>
         <div class="col-xs-7">
-          <div class="button-group pull-right" style="display:flex;">
+          <div class="button-group pull-right" style="display:flex;" ng-if="projectPermissions.write">
             <a ui-sref="project.roles.edit({roleId: role._id})" class="btn btn-default btn-xs" ng-class="{disabled: currentProject.protect}"><span class="glyphicon glyphicon-edit"></span> Edit</a>&nbsp;
             <a ui-sref="project.roles.delete({roleId: role._id})" class="btn btn-default btn-xs" ng-class="{disabled: currentProject.protect}"><span class="glyphicon glyphicon-trash"></span></a>
           </div>
@@ -23,6 +23,6 @@
   </tr>
   </tbody>
 </table>
-<div class="text-right">
+<div class="text-right" ng-if="projectPermissions.write">
   <a ui-sref="project.roles.edit()" class="btn btn-primary" ng-class="{disabled: currentProject.protect}"><span class="glyphicon glyphicon-plus"></span> New Role</a>
 </div>

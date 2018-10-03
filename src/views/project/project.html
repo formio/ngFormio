@@ -16,16 +16,16 @@
     <li><h2 class="project-title"><a ui-sref="project.overview">{{ primaryProject.title }}</a></h2></li>
     <li ng-if="currentSection.title"><h2>›</h2></li>
     <li ng-if="currentSection.title"><h2><i class="{{ currentSection.icon }}"></i> {{ currentSection.title }}</h2></li>
-    <li><a class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ui-sref="project.billing({projectId: primaryProject._id})">{{ getPlanName(primaryProject.plan) }}</a> <span ng-if="primaryProject.plan === 'trial'" class="project-trial-remaining"><strong>{{trialDaysRemaining}}</strong> Days remaining <a class="" ui-sref="project.billing({projectId: primaryProject._id})"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a></span>
+    <li><a class="project-plan {{ getPlanLabel(primaryProject.plan) }}" ng-disabled="!projectSettingsVisible()" ui-sref="project.billing({projectId: primaryProject._id})">{{ getPlanName(primaryProject.plan) }}</a> <span ng-if="primaryProject.plan === 'trial'" class="project-trial-remaining"><strong>{{trialDaysRemaining}}</strong> Days remaining <a class="" ui-sref="project.billing({projectId: primaryProject._id})" ng-if="projectPermissions.admin"><i class="fa fa-arrow-circle-up"></i> Upgrade Now</a></span>
     </li>
   </ul>
   <ul class="nav nav-tabs project-nav">
     <li ng-class="{ active: localProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)" class="environment-tab"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }} <span class="badge" ng-if="environment.tag !== '0.0.0'">{{ environment.tag }}</span></a></li>
     <li ng-class="{ active: localProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)" class="environment-tab"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live <span class="badge" ng-if="primaryProject.tag !== '0.0.0'">{{ primaryProject.tag }}</span></a></li>
-    <li ng-if="environments.length < 9"><a ui-sref="project.environment">+ New Stage</a></li>
+    <li ng-if="environments.length < 9 && projectPermissions.admin"><a ui-sref="project.environment">+ New Stage</a></li>
   </ul>
 </div>
-<div class="project-container">
+<div class="project-container" ng-if="projectPermissions.read">
   <div class="project-sidebar sidebar">
     <ul class="nav nav-sidebar">
       <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-sitemap"></i><br/><span>Overview</span></a></li>
@@ -36,7 +36,7 @@
       <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
       <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
       <!--<li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>-->
-      <li ng-class="{active: isActive('project.env')}"><a
+      <li ng-class="{active: isActive('project.env')}" ng-if="projectPermissions.admin"><a
         ui-sref="project.env.settings.info"><i
         class="fa fa-gear"></i><br /><span>Settings</span></a></li></li>
     </ul>
@@ -57,5 +57,12 @@
       </div>
     </div>
     <div class="project-content" ui-view></div>
+  </div>
+</div>
+<div class="project-container" ng-if="!projectPermissions.read">
+  <div class="container" style="margin-top: 20px;">
+    <div class="well">
+      You have been granted access to this project in order to access some stages. Please use the stages tabs to access a stage you have access to.
+    </div>
   </div>
 </div>

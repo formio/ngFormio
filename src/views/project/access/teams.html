@@ -1,0 +1,57 @@
+<div style="padding: 20px 0;" ng-if="primaryProject._id !== localProject._id" ng-controller="StageTeamController">
+  <i ng-if="projectTeamsLoading" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+  <div ng-if="!projectTeamsLoading">
+    <upgrade-warning ng-if="!minPlan('team')" warning="Upgrade your project to Team Pro or above to enable teams."></upgrade-warning>
+    <div class="panel panel-default">
+      <div class="panel-heading clearfix">
+        <h4 class="panel-titles">Stage Teams</h4>
+        <div class="text-muted">
+          In order for a team to have stage permissions, they must be added to the Project Teams and be assigned at least "Project Access" permissions. If not, the project will not show up in their list.
+        </div>
+        {{}}
+      </div>
+      <ul class="list-group">
+        <li ng-if="!projectTeamsLoading && stageProjectTeams.length" class="list-group-item" ng-repeat="team in stageProjectTeams">
+          <div class="row">
+            <div class="col-sm-5 ellipsis">
+              <h4><a ui-sref="team.view({teamId: team._id})">{{ team.data.name }}</a></h4>
+              <p>{{ team.data.members.length + team.data.admins.length }} Members</p>
+            </div>
+            <div class="col-sm-5">
+              <select class="form-controls" ng-model="team.permission" ng-options="permission.value as permission.label for permission in teamPermissions" ng-change="updateTeam(team, team.permission)" ng-required="true" placeholder="Select a team" ng-disabled="!projectPermissions.admin" />
+            </div>
+            <div class="col-sm-2">
+              <div class="button-group pull-right" style="display:flex;" ng-if="projectPermissions.admin">
+                <a ng-click="removeTeam(team)" class=""><span class="fa fa-times" aria-hidden="true"></span></a>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li ng-if="!projectTeamsLoading && !primaryProjectTeams.length" class="list-group-item">
+          <div>
+            No Teams Added
+          </div>
+        </li>
+      </ul>
+      <div class="panel-footer" ng-if="projectPermissions.write">
+        <div class="row">
+          <div class="col col-sm-3">
+            <div class="input-group">
+              <span class="input-group-addon">Add a team:</span>
+              <ui-select name="addTeam" class="" ng-model="added.team" theme="bootstrap" ng-change="addTeam(added.team)">
+                <ui-select-match>{{$select.selected.data.name}}</ui-select-match>
+                <ui-select-choices repeat="teamOption in uniqueEligibleTeams | filter:$select.search" value="teamOption">
+                  <h4>{{ teamOption.data.name }}</h4>
+                  <div>{{ teamOption.data.members.length + teamOption.data.admins.length }} Members</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div ng-if="primaryProject._id === localProject._id">
+  Stage Teams for your live project are managed by the Project Teams
+</div>
