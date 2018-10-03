@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Fixed
  - Redirect after form submitting when form doesn't have Save Submission action.
+ - Webhook validation.
  - Confirm billing plan change button.
 
 ## 5.7.0
