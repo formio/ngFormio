@@ -579,15 +579,19 @@ app.controller('ProjectController', [
               $scope.projectPermissions.write = false;
               $scope.projectPermissions.read = false;
 
+              // Permissions are fallthrough so allow to pass.
               switch ($scope.highestRole) {
                 case 'owner':
+                  /* falls through */
                 case 'team_admin':
                   $scope.projectPermissions.admin = true;
+                  /* falls through */
                 case 'team_write':
                   $scope.projectPermissions.write = true;
+                  /* falls through */
                 case 'team_read':
                   $scope.projectPermissions.read = true;
-
+                  /* falls through */
               }
             });
           });
