@@ -11,10 +11,10 @@
         <p>To embed a form within your react application, import the Formio library and add it to the render tree.</p>
     <pre><code>import React from 'react';
       import ReactDOM from 'react-dom';
-      import { Formio } from 'react-formio';
+      import { Form } from 'react-formio';
 
       ReactDOM.render(
-      &nbsp;&nbsp;&lt;Formio src="{{ variables.projectUrl }}/demographics" onSubmitDone={function(submission)} { // do something }" /&gt;, document.getElementById('example')
+      &nbsp;&nbsp;&lt;Form src="{{ variables.projectUrl }}/demographics" onSubmitDone={function(submission)} { // do something }" /&gt;, document.getElementById('example')
       );</code></pre>      </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
@@ -24,7 +24,7 @@
         <p>A controlled embed is where the loading and saving are controlled outside of the actual element. Typically this is done with flux or redux.</p>
     <pre><code>import React from 'react';
       import ReactDOM from 'react-dom';
-      import { Formio } from 'react-formio';
+      import { Form } from 'react-formio';
 
       // These are typically loaded from flux or redux in a controlled component.
       var form = {};
@@ -33,7 +33,7 @@
       };
 
       ReactDOM.render(
-      &nbsp;&nbsp;&lt;Formio form={form} submission={submission} onChange={function() {}} onSubmit={function() {}} /&gt;, document.getElementById('example')
+      &nbsp;&nbsp;&lt;Form form={form} submission={submission} onChange={function() {}} onSubmit={function() {}} /&gt;, document.getElementById('example')
       );</code></pre>      </li>
       </li>
       <!--<li class="list-group-item">-->
