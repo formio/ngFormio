@@ -306,7 +306,7 @@ app.controller('ProjectController', [
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
-      return $scope.primaryProjectPromise.then(function() {
+      return $scope.loadProjectPromise.then(function() {
         return $scope.highestRoleLoaded.then(function() {
           if ($scope.projectPermissions.read) {
             return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
