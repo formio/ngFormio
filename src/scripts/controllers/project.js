@@ -1757,7 +1757,7 @@ app.controller('ProjectFormioController', [
         .catch(function(err) {
           $scope.currentLicense = 'Unable to get license. Please check the license id.';
           $scope.$apply();
-        })
+        });
     };
 
     $scope.inputUser = {deleted: null};
