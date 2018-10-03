@@ -40502,6 +40502,7 @@ module.exports = function() {
             form.projectUrl = $scope.formio.projectUrl;
             form.url = $scope.formio.formUrl;
             form.base = $scope.formio.base;
+            sendIframeMessage({name: 'token', data: Formio.getToken()});
           }
           sendIframeMessage({name: 'form', data: form});
         };
