@@ -845,6 +845,7 @@ angular
     'Formio',
     'AppConfig',
     'GoogleAnalytics',
+    'PrimaryProject',
     '$location',
     '$window',
     '$http',
@@ -857,6 +858,7 @@ angular
       Formio,
       AppConfig,
       GoogleAnalytics,
+      PrimaryProject,
       $location,
       $window,
       $http,
@@ -1032,6 +1034,7 @@ angular
 
       // Logout of form.io and go to login page.
       $rootScope.logout = function() {
+        PrimaryProject.clear();
         Formio.logout().then(function() {
           $rootScope.currentProject = null;
           $rootScope.currentForm = null;

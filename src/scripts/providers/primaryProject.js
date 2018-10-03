@@ -65,24 +65,30 @@ app.factory('PrimaryProject', [
 
 
             scope.projectPermissions = {
-              read: true,
-              write: true,
-              admin: true
+              read: false,
+              write: false,
+              admin: false
             };
             if (_.has($scope.user, '_id') && _.has($scope.localProject, 'owner') && ($scope.user._id === $scope.localProject.owner)) {
               highestRole = 'owner';
+              scope.projectPermissions.admin = true;
+              scope.projectPermissions.write = true;
+              scope.projectPermissions.read = true;
             }
             else if (hasRoles('team_admin')) {
               highestRole = 'team_admin';
+              scope.projectPermissions.admin = true;
+              scope.projectPermissions.write = true;
+              scope.projectPermissions.read = true;
             }
             else if (hasRoles('team_write')) {
               highestRole = 'team_write';
-              scope.projectPermissions.admin = false;
+              scope.projectPermissions.write = true;
+              scope.projectPermissions.read = true;
             }
             else if (hasRoles('team_read')) {
               highestRole = 'team_read';
-              scope.projectPermissions.admin = false;
-              scope.projectPermissions.write = false;
+              scope.projectPermissions.read = true;
             }
             else {
               highestRole = 'anonymous';
