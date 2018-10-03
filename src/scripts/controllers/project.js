@@ -316,6 +316,7 @@ app.controller('ProjectController', [
               return $scope.currentProjectRoles;
             });
           }
+          return [];
         });
       });
     };
@@ -1747,6 +1748,18 @@ app.controller('ProjectFormioController', [
       });
     };
 
+    $scope.getLicense = function() {
+      Formio.request('https://license.form.io/generate/' + $scope.input.license, 'GET')
+        .then(function(license) {
+          $scope.currentLicense = license;
+          $scope.$apply();
+        })
+        .catch(function(err) {
+          $scope.currentLicense = 'Unable to get license. Please check the license id.';
+          $scope.$apply();
+        })
+    };
+
     $scope.inputUser = {deleted: null};
     $scope.searchUser = {
       data: null,
@@ -2243,10 +2256,6 @@ app.controller('ProjectSettingsController', [
 ]);
 
 app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
-  $http.get($scope.formio.projectUrl + '/role')
-    .then(function(result) {
-      $scope.roles = result.data;
-    });
   $scope.$watch('currentProject.settings.oauth.openid', function() {
     var openIdData = getOpenIdData();
     if (!openIdData) {

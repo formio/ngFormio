@@ -6,7 +6,7 @@
     <div class="col-sm-9" style="padding: 0 20px 40px 0;">
       <ng-form>
         <i id="project-loader" ng-if="!currentProject" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
-        <div ng-if="currentProject" ui-view></div>
+        <div wait-for="loadProjectPromise" ui-view></div>
       </ng-form>
     </div>
   </div>

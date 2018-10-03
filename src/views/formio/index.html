@@ -140,6 +140,27 @@
 
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
+          Get License
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-8">
+              <input type="text" class="form-control" ng-model="input.license" placeholder="License _id to get">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-primary btn-block" ng-click="getLicense()">Get</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              {{currentLicense}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default control-panel">
+        <div class="panel-heading">
           Find User
         </div>
         <div class="panel-body">
