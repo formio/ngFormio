@@ -49,7 +49,7 @@
           <input ng-model="row.value" type="text" class="form-control">
         </div>
         <div class="col-md-3">
-          <select class="form-control" ng-model="row.role" ng-options="role._id as role.title for role in roles"></select>
+          <select class="form-control" ng-model="row.role" ng-options="role._id as role.title for role in currentProjectRoles"></select>
         </div>
         <div class="col-md-1"><span class="btn btn-default" ng-click="removeRow($index)"><i class="glyphicon glyphicon-remove-circle"></i></span></div>
       </div>
