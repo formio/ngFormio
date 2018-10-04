@@ -24,6 +24,11 @@ jobs:
       - run:
           name: Build
           command: gulp
+      - run:
+          name: Tag version
+          command: |
+            echo ${CIRCLE_TAG} > dist/version.txt
+            sed -i '' "s/APP_VERSION/${CIRCLE_TAG}/g" dist/config.js
       - persist_to_workspace:
           root: .
           paths: dist
@@ -76,10 +81,10 @@ jobs:
           command: sudo pip install awscli
       - attach_workspace:
           at:
-            dist
+            .
       - run:
           name: Build tgz
-          command: cd dist/dist && tar -czvf ../../${CIRCLE_TAG}.tgz *
+          command: cd dist && tar -czvf ../${CIRCLE_TAG}.tgz *
       - run:
           name: Upload to s3
           command: aws s3 cp ${CIRCLE_TAG}.tgz s3://formio-app-releases/${CIRCLE_TAG}.tgz
