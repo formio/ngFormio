@@ -553,7 +553,7 @@ module.exports = function (actions,tags) {
         actions.clickOnElementWithText(' Create Project');
         actions.clickOnElementWithText('Trial');
         actions.upgradeToPlan("Enterprise");
-        actions.clickOnElementWithText(' Confirm Billing Change');
+        actions.clickOnButton(' Confirm Billing Change');
         actions.waitForActionToComplete(2000);
         actions.iSeeTextIn("a.project-plan.label-commercial","Enterprise");
         actions.clickOnLink('Settings');

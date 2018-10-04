@@ -23,13 +23,13 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Create Project');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Teams');
       actions.iSeeText('Upgrade your project to Team Pro or above to enable teams.');
       actions.clickOnElementWithText('Plan and Pricing');
       actions.upgradeToPlan("Independent");
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Teams');
       actions.iSeeText('Upgrade your project to Team Pro or above to enable teams.');
@@ -227,7 +227,7 @@ module.exports = function (actions) {
       actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-info","Basic");
       actions.clickOnElementWithText(' Teams');

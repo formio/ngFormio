@@ -51,7 +51,7 @@ module.exports = function (actions,tags) {
       actions.iSeeTextCount('Upgrade',4);
       actions.clickOnElementWithText("Downgrade");
       actions.upgradeToPlan("Basic");
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextCount('Upgrade',3);
       actions.iSeeTextCount('Downgrade',1);
@@ -82,12 +82,12 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('projectPayment');
       actions.clickOnElementWithText('Basic');
       actions.clickOnElementWithText('Downgrade');
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-trial","Trial");
       actions.waitForActionToComplete(2000);
       actions.upgradeToPlan('Basic');
       actions.iDonotSeeText('Payments will be charged to:');
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-info","Basic");
       actions.iSeeText('$0/month');
       actions.upgradeToPlan('Independent');
@@ -95,7 +95,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
       actions.iSeeText('Name on Card: Test');
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-warning","Independent");
       actions.iSeeText('$15/month');
       actions.upgradeToPlan('Team Pro');
@@ -103,7 +103,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
       actions.iSeeText('Name on Card: Test');
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-success","Team Pro");
       actions.iSeeText('$100/month');
       actions.enterTextInFieldIndex('input.form-control',0,'1');
@@ -128,7 +128,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Visa ending in 1111');
       actions.iSeeText('Expires on 01/25');
       actions.iSeeText('Name on Card: Test');
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-commercial","Enterprise");
       actions.iSeeText('$250/month');
       actions.enterTextInFieldIndex('input.form-control',0,'1');
@@ -156,7 +156,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Select');
       actions.iSeeText('Hosted PDF');
       actions.iSeeText('$65/month');
-      // actions.clickOnElementWithText(' Confirm Billing Change');
+      // actions.clickOnButton(' Confirm Billing Change');
       // actions.waitForActionToComplete(1000);
       // actions.iSeeText('Hosted PDF');
       // actions.iSeeText('$65/month');
@@ -172,7 +172,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Select');
       actions.iSeeText('$15/month');
       actions.iDonotSeeText('Hosted PDF');
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(1000);
       actions.iDonotSeeText('Hosted PDF');
       actions.iSeeText('$15/month');

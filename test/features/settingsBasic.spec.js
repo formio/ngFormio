@@ -22,7 +22,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('basicProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-info","Basic");
       actions.clickOnElementWithText('Overview');
@@ -137,7 +137,7 @@ module.exports = function (actions,tags) {
       // actions.iSeeText('$0/month');
       // actions.clickOnElementWithText('Select');
       // actions.iSeeText('$50/month');
-      // actions.clickOnElementWithText(' Confirm Billing Change');
+      // actions.clickOnButton(' Confirm Billing Change');
       // actions.waitForActionToComplete(4000);
       // actions.iSeeText('$50/month');
       // actions.clickOnElementWithText('Settings');

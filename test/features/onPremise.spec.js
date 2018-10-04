@@ -24,7 +24,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('onPremiseProject');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Enterprise");
-      actions.clickOnElementWithText(' Confirm Billing Change');
+      actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-commercial", "Enterprise");
       actions.clickOnElementWithText('Settings');
@@ -262,7 +262,7 @@ module.exports = function (actions,tags) {
       // actions.iSeeText('$15/month');
       // actions.clickOnElementWithText('Select');
       // actions.iSeeText('$65/month');
-      // actions.clickOnElementWithText(' Confirm Billing Change');
+      // actions.clickOnButton(' Confirm Billing Change');
       // actions.waitForActionToComplete(4000);
       // actions.iSeeText('$65/month');
       // actions.clickOnElementWithText('Settings');
