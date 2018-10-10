@@ -1152,7 +1152,7 @@ app.controller('FormImportController', [
           $state.go('project.' + form.type + '.create', { components: form.components});
         })
         .catch(function(error) {
-          FormioAlerts.warn('Error fetching form: ' + error);
+          FormioAlerts.warn('Error fetching form: ' + _.escape(error));
         });
     };
   }
@@ -1330,7 +1330,7 @@ app.factory('FormioAlerts', [
             if(e.message || _.isString(e)) {
               this.addAlert({
                 type: 'danger',
-                message: e.message || e,
+                message: _.escape(e.message || e),
                 element: e.path
               });
             }
@@ -1339,14 +1339,14 @@ app.factory('FormioAlerts', [
         else if (error.message) {
           this.addAlert({
             type: 'danger',
-            message: error.message,
+            message: _.escape(error.message),
             element: error.path
           });
         }
         else {
           this.addAlert({
             type: 'danger',
-            message: error
+            message: _.escape(error)
           });
         }
       }
@@ -1910,10 +1910,10 @@ app.controller('FormSubmissionsController', [
         default: filterable = true;
       }
 
-      var field = path ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]' : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
+      var field = '["data.' + path ? path + '.' : '' + component.key.replace(/\./g, '.data.') + '"]';
       return {
         field: field,
-        title: component.label || component.key,
+        title: _.escape(component.label) || component.key,
         template: function(dataItem) {
           var val = dataItem.data;
           if (path && _.has(val, path)) {
@@ -1931,9 +1931,9 @@ app.controller('FormSubmissionsController', [
               return '';
             }
             if (component.multiple) {
-              return value.join(', ');
+              return _.escape(value.join(', '));
             }
-            return value;
+            return _.escape(value);
           }
           if (component.multiple && (value.length > 0)) {
             var values = [];
@@ -1949,7 +1949,7 @@ app.controller('FormSubmissionsController', [
               }
               values.push(arrayValue);
             });
-            return values.join(', ');
+            return _.escape(values.join(', '));
           }
           value = componentInfo.tableView(value, {
             component: component,
@@ -1960,7 +1960,7 @@ app.controller('FormSubmissionsController', [
           if (value === undefined) {
             return '';
           }
-          return value;
+          return _.escape(value);
         },
         // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
         width: '200px',
