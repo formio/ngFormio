@@ -727,6 +727,17 @@ app.controller('ProjectTagCreateController', [
         });
       }
       $scope.isBusy = true;
+
+      var tagDone = function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Project Tag was created.'
+        });
+        $scope.isBusy = false;
+        PrimaryProject.clear();
+        $state.reload();
+      };
+
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
         .then(function(template) {
           Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
@@ -740,8 +751,20 @@ app.controller('ProjectTagCreateController', [
                 message: 'Project Tag was created.'
               });
               $scope.isBusy = false;
-              PrimaryProject.clear();
-              $state.reload();
+
+              // Make sure we update the remote project version if it exists as well.
+              if ($scope.localProject.remote && $scope.localProject.remote.url) {
+                $scope.currentProject.tag = tag;
+                $scope.saveProject().then(function() {
+                  tagDone();
+                }).catch(function(err) {
+                  $scope.isBusy = false;
+                  FormioAlerts.onError(err);
+                });
+              }
+              else {
+                tagDone();
+              }
             })
             .catch(function(err) {
               $scope.isBusy = false;
