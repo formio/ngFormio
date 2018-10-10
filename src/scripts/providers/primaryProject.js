@@ -20,8 +20,8 @@ app.factory('PrimaryProject', [
         scope = {};
 
         scope.primaryProject = project;
-        var highestRoleQ = $q.defer();
-        scope.highestRoleLoaded = highestRoleQ.promise;
+        scope.highestRoleLoaded = $scope.highestRoleLoaded;
+        scope.highestRoleQ = $scope.highestRoleQ;
 
         // Load project environments
         $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function (result) {
@@ -96,7 +96,7 @@ app.factory('PrimaryProject', [
 
             scope.highestRole = highestRole;
             _.assign($scope, scope);
-            highestRoleQ.resolve();
+            $scope.highestRoleQ.resolve();
           });
         });
         return _.assign($scope, scope);

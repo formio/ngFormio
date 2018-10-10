@@ -382,6 +382,8 @@ app.controller('ProjectController', [
     $scope.formioReady = formioReady.promise;
     $scope.primaryProjectPromise = primaryProjectQ.promise;
     PDFServer.setPrimaryProject(primaryProjectQ.promise);
+    $scope.highestRoleQ = $q.defer();
+    $scope.highestRoleLoaded = $scope.highestRoleQ.promise;
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.localProject = result;
@@ -2727,9 +2729,7 @@ app.controller('StageTeamController', [
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.localProject, team, 'stage_read');
-      $scope.saveLocalProject().then(function(project) {
-        $scope.localProject = project;
-      });
+      $scope.saveLocalProject();
       _.remove($scope.uniqueEligibleTeams, { _id: team._id });
       team.permission = 'stage_read';
       $scope.stageProjectTeams.push(team);
@@ -2738,9 +2738,7 @@ app.controller('StageTeamController', [
 
     $scope.removeTeam = function(team) {
       setTeamPermission($scope.localProject, team);
-      $scope.saveLocalProject().then(function(project) {
-        $scope.localProject = project;
-      });
+      $scope.saveLocalProject();
       _.remove($scope.stageProjectTeams, { _id: team._id });
       delete team.permission;
       $scope.uniqueEligibleTeams.push(team);
@@ -2748,9 +2746,7 @@ app.controller('StageTeamController', [
 
     $scope.updateTeam = function(team, permission) {
       setTeamPermission($scope.localProject, team, permission);
-      $scope.saveLocalProject().then(function(project) {
-        $scope.localProject = project;
-      });
+      $scope.saveLocalProject();
     };
   }
 ]);
