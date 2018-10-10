@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Form custom properties fixed to be compatible with beta.
  - Embed walkthrough for vue.
  - Roles not reloading properly on refresh of page.
+ - Fixed Form custom properties section.
 
 ## 5.7.0
 ### Fixed
