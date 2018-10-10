@@ -62,6 +62,7 @@
     "express": "^4.16.3",
     "lodash": "^4.17.11",
     "mocha": "^5.2.0",
+    "mocha-tags": "^1.0.1",
     "ng-file-upload": "^12.2.13",
     "protobufjs": "^6.8.8",
     "protractor": "^5.4.1",

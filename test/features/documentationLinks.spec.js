@@ -1,16 +1,5 @@
-module.exports = function (actions) {
-  describe('Documentation Links ',function () {
-    // describe('Expanding the ‘Documentation’ button',function(){
-    //  actions.goToPage('#/auth');
-    //  actions.clickOnElementWithText(' Docs');
-    //  var listElements = ['.fa-rocket','.fa-info-circle','.fa-laptop',
-    //    '.fa-server','.fa-book','.fa-code','.fa-cloud-upload','.fa-github','.fa-cubes','.fa-terminal',
-    //    '.fa-check-square-o','.fa-envelope','.fa-file','.fa-user','.fa-amazon','.fa-copy','.fa-cogs',
-    //    '.fa-wifi','.fa-exchange','.fa-cloud'];
-    //   listElements.forEach(function(listElement){
-    //     actions.iSeeElement(listElement);
-    //   });
-    //  });
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Documentation Links ',function () {
      describe('Collapsing the ‘Documentation’ button',function(){
         actions.goToPage('#/auth');
         actions.clickOnElementWithText(' Docs');

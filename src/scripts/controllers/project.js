@@ -309,11 +309,18 @@ app.controller('ProjectController', [
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
-      return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
-        $scope.currentProjectRoles = result.data;
-        $scope.rolesLoading = false;
+      return $scope.loadProjectPromise.then(function() {
+        return $scope.highestRoleLoaded.then(function() {
+          if ($scope.projectPermissions.read) {
+            return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
+              $scope.currentProjectRoles = result.data;
+              $scope.rolesLoading = false;
 
-        return $scope.currentProjectRoles;
+              return $scope.currentProjectRoles;
+            });
+          }
+          return [];
+        });
       });
     };
 
@@ -526,6 +533,73 @@ app.controller('ProjectController', [
         document.body.className += ' ' + 'project-' + primaryProject.plan;
 
         PrimaryProject.set(primaryProject, $scope);
+        $scope.highestRoleLoaded.then(function() {
+          // If they already have a high role, skip this.
+          if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
+            return;
+          }
+
+          // If any stage roles exist, override the project role.
+          return $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function (result) {
+            $scope.stageProjectTeams = result.data;
+            $scope.projectTeamsLoading = false;
+
+            // Calculate the users highest role within the project.
+            $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
+              var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+              var teams = _($scope.userTeams ? $scope.userTeams : [])
+                .map('_id')
+                .filter()
+                .value();
+              var allRoles = _(roles.concat(teams)).filter().value();
+
+              /**
+               * Determine if the user contains a role of the given type.
+               *
+               * @param {String} type
+               *   The type of role to search for.
+               * @returns {boolean}
+               *   If the current user has the role or not.
+               */
+              var hasRoles = function (type) {
+                if ($scope.stageProjectTeams) {
+                  var potential = _($scope.stageProjectTeams)
+                    .filter({permission: type})
+                    .map('_id')
+                    .value();
+                  return (_.intersection(allRoles, potential).length > 0);
+                }
+              };
+
+              if (hasRoles('stage_write')) {
+                $scope.highestRole = 'team_write';
+              }
+              else if (hasRoles('stage_read')) {
+                $scope.highestRole = 'team_read';
+              }
+
+              // Reassign permissions.
+              $scope.projectPermissions.admin = false;
+              $scope.projectPermissions.write = false;
+              $scope.projectPermissions.read = false;
+
+              // Permissions are fallthrough so allow to pass.
+              switch ($scope.highestRole) {
+                case 'owner':
+                  /* falls through */
+                case 'team_admin':
+                  $scope.projectPermissions.admin = true;
+                  /* falls through */
+                case 'team_write':
+                  $scope.projectPermissions.write = true;
+                  /* falls through */
+                case 'team_read':
+                  $scope.projectPermissions.read = true;
+                  /* falls through */
+              }
+            });
+          });
+        });
       });
 
       $scope.projectSettingsVisible = function() {
@@ -1677,6 +1751,18 @@ app.controller('ProjectFormioController', [
       });
     };
 
+    $scope.getLicense = function() {
+      Formio.request('https://license.form.io/generate/' + $scope.input.license, 'GET')
+        .then(function(license) {
+          $scope.currentLicense = license;
+          $scope.$apply();
+        })
+        .catch(function(err) {
+          $scope.currentLicense = 'Unable to get license. Please check the license id.';
+          $scope.$apply();
+        });
+    };
+
     $scope.inputUser = {deleted: null};
     $scope.searchUser = {
       data: null,
@@ -2173,10 +2259,6 @@ app.controller('ProjectSettingsController', [
 ]);
 
 app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
-  $http.get($scope.formio.projectUrl + '/role')
-    .then(function(result) {
-      $scope.roles = result.data;
-    });
   $scope.$watch('currentProject.settings.oauth.openid', function() {
     var openIdData = getOpenIdData();
     if (!openIdData) {
@@ -2483,6 +2565,11 @@ app.controller('ProjectTeamController', [
 
     $scope.teamPermissions = [
       {
+        value: 'team_access',
+        label: 'Project Access',
+        description: 'Provides only access to the project without permission to read or edit anything'
+      },
+      {
         value: 'team_read',
         label: 'Project Read',
         description: ''
@@ -2528,6 +2615,121 @@ app.controller('ProjectTeamController', [
       setTeamPermission($scope.primaryProject, team, permission);
       $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
+      });
+    };
+  }
+]);
+
+app.controller('StageTeamController', [
+  '$scope',
+  '$http',
+  'AppConfig',
+  'Formio',
+  'FormioAlerts',
+  'TeamPermissions',
+  'GoogleAnalytics',
+  function(
+    $scope,
+    $http,
+    AppConfig,
+    Formio,
+    FormioAlerts,
+    TeamPermissions,
+    GoogleAnalytics
+  ) {
+    $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
+
+    $scope.loadProjectPromise.then(function() {
+      $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function(result) {
+        $scope.stageProjectTeams = result.data;
+
+        $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
+          $scope.userTeams = result.data;
+          $scope.userTeamsLoading = false;
+        });
+
+        $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
+          $scope.stageProjectEligibleTeams = result.data;
+          $scope.uniqueEligibleTeams = _.filter($scope.stageProjectEligibleTeams, function(team) {
+            return _.findIndex($scope.stageProjectTeams, { _id: team._id }) === -1;
+          });
+        });
+      });
+    });
+
+    var setTeamPermission = function(project, team, newPermission) {
+      var access = project.access ||  [];
+      var found = false;
+
+      // Search the present permissions to add the new permission.
+      access = _.forEach(access, function(permission) {
+        // Remove all the old permissions.
+        permission.roles = permission.roles || [];
+        permission.roles = _.without(permission.roles, team._id);
+
+        // Add the given role to the new permission type.
+        if (permission && permission.type === newPermission) {
+          found = true;
+
+          permission.roles = permission.roles || [];
+          permission.roles.push(team._id);
+        }
+      });
+
+      // This team permission was not found, add it.
+      if(!found && newPermission) {
+        access.push({
+          type: newPermission,
+          roles: [team._id]
+        });
+      }
+
+      // Update the current project access with the new team access.
+      project.access = access;
+    };
+
+    $scope.teamPermissions = [
+      {
+        value: 'stage_read',
+        label: 'Stage Read',
+        description: ''
+      },
+      {
+        value: 'stage_write',
+        label: 'Stage Write',
+        description: ''
+      }
+    ];
+
+    $scope.added = {
+      team: undefined
+    };
+
+    $scope.addTeam = function(team) {
+      setTeamPermission($scope.localProject, team, 'stage_read');
+      $scope.saveLocalProject().then(function(project) {
+        $scope.localProject = project;
+      });
+      _.remove($scope.uniqueEligibleTeams, { _id: team._id });
+      team.permission = 'stage_read';
+      $scope.stageProjectTeams.push(team);
+      $scope.added.team = undefined;
+    };
+
+    $scope.removeTeam = function(team) {
+      setTeamPermission($scope.localProject, team);
+      $scope.saveLocalProject().then(function(project) {
+        $scope.localProject = project;
+      });
+      _.remove($scope.stageProjectTeams, { _id: team._id });
+      delete team.permission;
+      $scope.uniqueEligibleTeams.push(team);
+    };
+
+    $scope.updateTeam = function(team, permission) {
+      setTeamPermission($scope.localProject, team, permission);
+      $scope.saveLocalProject().then(function(project) {
+        $scope.localProject = project;
       });
     };
   }

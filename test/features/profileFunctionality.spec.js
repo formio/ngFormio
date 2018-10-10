@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('User Profile Functionality',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('User Profile Functionality',function(){
     describe('Profile navigation',function(){
       actions.logout();
       actions.iAmLoggedInFor('projuser8');
@@ -9,8 +9,6 @@ module.exports = function (actions) {
       actions.clickOnElementWithText(' Profile');
       actions.checkingUrlIamOn("#/profile/view");
       actions.iSeeText("User Profile");
-      actions.iSeeValueIn("#profile-username","Username: ${profileuser1.name}");
-      actions.iSeeValueIn("#profile-email","Email: ${profileuser1.email}");
       actions.clickOnElementWithText('Edit');
       actions.checkingUrlIamOn("#/profile/edit");
       actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',0,'Test');
@@ -20,16 +18,14 @@ module.exports = function (actions) {
       actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',1,'${random-name>profileuser1.name}');
       actions.clickOnElementWithText('Submit');
       actions.checkingUrlIamOn("#/profile/edit");
-      actions.iSeeValueInIndex('xpath://*[contains(@class, \'form-control\')]',1,'${profileuser1.name}');
-      actions.iSeeValueIn('#user-menu','${profileuser1.name}');
-      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',2,'${random-email>profileuser1.email}');
+      actions.iSeeValueIn('#name','${profileuser1.name}');
+      actions.enterTextInField('#email','${random-email>profileuser1.email}');
       actions.clickOnElementWithText('Submit');
       actions.checkingUrlIamOn("#/profile/edit");
       actions.iSeeValueInIndex('xpath://*[contains(@class, \'form-control\')]',2,'${profileuser1.email}');
       actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',3,'password');
       actions.clickOnElementWithText('Submit');
       actions.checkingUrlIamOn("#/profile/edit");
-      actions.iSeeValueInIndex('xpath://*[contains(@class, \'form-control\')]',3,'password');
       actions.logout();
       actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',0,'${profileuser1.email}');
       actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',1, 'password');
@@ -39,14 +35,12 @@ module.exports = function (actions) {
       actions.checkingUrlIamOn("#/profile/view");
       actions.clickOnElementWithText('Edit');
       actions.checkingUrlIamOn("#/profile/edit");
-      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',1,'${empty}');
-      actions.clickOnElementWithText('Submit');
-      actions.checkingUrlIamOn("#/profile/edit");
-      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',1,'${random-name>profileuser1.name}');
-      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',2,'${empty}');
-      actions.clickOnElementWithText('Submit');
-      actions.checkingUrlIamOn("#/profile/edit");
-      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',2,'${random-email>profileuser1.email}');
+      actions.enterTextInField('#name','');
+      actions.iSeeText('Username is required.');
+      actions.enterTextInField('#name','${random-name>profileuser1.name}');
+      actions.enterTextInField('#email','');
+      actions.iSeeText('Email is required.');
+      actions.enterTextInField('#email','${random-email>profileuser1.email}');
       actions.logout();
     });
   });

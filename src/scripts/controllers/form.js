@@ -961,7 +961,7 @@ app.controller('FormViewController', [
           }
         })
         .catch(function(err) {
-          _.each(err.details, function(errDetails) {
+          _.each(_.isString(err) ? [err] : err.details, function(errDetails) {
             FormioAlerts.onError.call(FormioAlerts, errDetails);
             $scope.$broadcast('submitError', err);
           });
@@ -1635,6 +1635,7 @@ app.controller('FormActionEditController', [
   'FormioUtils',
   'GoogleAnalytics',
   '$timeout',
+  'PDFServer',
   function(
     $scope,
     $stateParams,
@@ -1644,7 +1645,8 @@ app.controller('FormActionEditController', [
     ActionInfoLoader,
     FormioUtils,
     GoogleAnalytics,
-    $timeout
+    $timeout,
+    PDFServer
   ) {
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
@@ -1663,6 +1665,33 @@ app.controller('FormActionEditController', [
 
         // Email action missing transports (other than the default one).
         if(actionInfo && actionInfo.name === 'email') {
+          $scope.$watch('action.data.settings.attachPDF', function(attachPDF) {
+            if (attachPDF) {
+              // Load the PDFServer information.
+              PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
+                if (info.data.plan === 'hosted') {
+                  $timeout(function() {
+                    $(document.createElement('div'))
+                      .attr('id', 'attach-pdf-alert')
+                      .attr('role', 'alert')
+                      .addClass('alert alert-warning alert-dismissible')
+                      .html(
+                        '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                        '<span aria-hidden="true">&times;</span>' +
+                        '</button>' +
+                        '<strong>Warning:</strong> This project is currently on the <strong>Basic PDF plan</strong> which only allows for <strong>10</strong> submission PDF attachments per month. ' +
+                        'Please <a class="btn btn-default" href="/#/project/' + $scope.primaryProject._id + '/billing">Upgrade your PDF Plan</a> to remove this message.'
+                      )
+                      .insertBefore('#form-group-attachPDF');
+                  });
+                }
+              });
+            }
+            else {
+              $('#attach-pdf-alert').remove();
+            }
+          });
+
           var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
           if(transportComponent && transportComponent.data && JSON.parse(transportComponent.data.json).length <= 1) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/email">Stage Settings</a>, or you can use the default transport (charges may apply).');

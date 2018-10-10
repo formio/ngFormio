@@ -2,9 +2,9 @@
   "name": "formio-app",
   "private": true,
   "dependencies": {
-    "angular": "^1.7.3",
+    "angular": "^1.7.4",
     "angular-ui-router": "^0.4.2",
-    "angular-sanitize": "^1.7.3",
+    "angular-sanitize": "^1.7.4",
     "angular-bootstrap": "^2.5.0",
     "moment": "^2.22.2",
     "angular-moment": "^1.2.0",

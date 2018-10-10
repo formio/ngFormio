@@ -4,9 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 5.9.0
+### Added
+ - Ability to assign teams per stage.
+ - Warning when attaching files to pdfs if they haven't purchased a plan.
+ - License generator to formio project.
+
 ### Fixed
  - Redirect after form submitting when form doesn't have Save Submission action.
+ - Webhook validation.
+ - Confirm billing plan change button.
+ - Billing improvemens
+ - Form custom properties fixed to be compatible with beta.
+ - Embed walkthrough for vue.
+ - Roles not reloading properly on refresh of page.
 
 ## 5.7.0
 ### Fixed

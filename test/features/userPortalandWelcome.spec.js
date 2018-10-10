@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('User Portal Links and Welcome Module ',function(){
+module.exports = function (actions,tags) {
+  tags('smoke').describe('User Portal Links and Welcome Module ',function(){
     describe('Closing the Welcome Module',function(){
       actions.goToPage('#/');
       actions.logout();
@@ -29,18 +29,15 @@ module.exports = function (actions) {
       });
     });
     describe('Teams documentation on Portal',function(){
-      actions.iAmLoggedInFor('profileuser2');
-      actions.goToPage('#/');
-      actions.clickOnClassWithIndex('.fa.fa-info-circle',1);
-      actions.newWindow();
-      actions.checkingUrlIamOn('https://help.form.io/userguide/teams/');
-      actions.closeWindow();
-    });
-    describe('Teams messaging on portal',function(){
+      actions.logout();
       actions.iAmLoggedInFor('profileuser2');
       actions.goToPage('#/');
       actions.projectCount(0);
       actions.iSeeText("Want to work collaboratively? Create a team to allow others to help work on your project.");
+      actions.clickOnClassWithIndex('.fa.fa-info-circle',1);
+      actions.newWindow();
+      actions.checkingUrlIamOn('https://help.form.io/userguide/teams/');
+      actions.closeWindow();
       actions.logout();
     });
   });

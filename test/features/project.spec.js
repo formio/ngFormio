@@ -1,5 +1,5 @@
-module.exports = function (actions) {
-  describe('Project Settings Functionality', function () {
+module.exports = function (actions,tags) {
+  tags('smoke').describe('Project Settings Functionality', function () {
     describe('Navigating to the Project Settings', function () {
       actions.logout();
       actions.iAmLoggedInFor('projuser1');
@@ -12,6 +12,9 @@ module.exports = function (actions) {
       actions.clickOnButton('Create Project');
       actions.iSeeTextIn('.toast-message', 'New Project created!');
       actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Overview');
+      actions.iSeeText('Current Framework');
+      actions.iSeeText(' AngularJS ');
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', '${project1.title}');
       actions.iSeeValueIn('#description', '${project1.description}');
@@ -53,7 +56,7 @@ module.exports = function (actions) {
     });
     describe('Editing Project Framework type', function () {
       actions.clickOnClass('i.caret.pull-right');
-      actions.clickOnElementWithText('React.js');
+      actions.clickOnElementWithText('Angular');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
       actions.clickOnClass('.toast-message');
@@ -64,18 +67,59 @@ module.exports = function (actions) {
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title','Updated Title');
       actions.iSeeValueIn('#description','Updated Description');
-      actions.iSeeText('React.js');
+      actions.iSeeText('Angular');
+      actions.clickOnElementWithText('Forms');
+      actions.clickOnElementWithText(' Embed');
+      actions.iSeeText('angular-formio');
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnClass('i.caret.pull-right');
+      actions.clickOnElementWithText('React.js');
+      actions.clickOnButton(' Save Project');
+      actions.iSeeTextIn('.toast-message', 'Project settings saved.');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Forms');
+      actions.clickOnElementWithText(' Embed');
+      actions.iSeeText('react-formio');
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnClass('i.caret.pull-right');
+      actions.clickOnElementWithText('Vue.js');
+      actions.clickOnButton(' Save Project');
+      actions.iSeeTextIn('.toast-message', 'Project settings saved.');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Forms');
+      actions.clickOnElementWithText(' Embed');
+      actions.iSeeText('vue-formio');
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnClass('i.caret.pull-right');
+      actions.clickOnElementWithText('Stand-Alone Forms');
+      actions.clickOnButton(' Save Project');
+      actions.iSeeTextIn('.toast-message', 'Project settings saved.');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Forms');
+      actions.clickOnElementWithText(' Embed');
+      actions.iSeeText('iFrame Embed');
+      actions.clickOnClass('.fa.fa-cog');
+      actions.clickOnClass('i.caret.pull-right');
+      actions.clickOnElementWithText('Custom');
+      actions.clickOnButton(' Save Project');
+      actions.iSeeTextIn('.toast-message', 'Project settings saved.');
+      actions.clickOnClass('.toast-message');
+      actions.clickOnElementWithText('Forms');
+      actions.clickOnElementWithText(' Embed');
+      actions.iSeeText('Include Formio.js + Bootstrap');
+
     });
     describe('Deleting a Project', function () {
+      actions.clickOnClass('.fa.fa-cog');
       actions.iSeeText("To remove this project and all of it\'s environments, select this delete button.");
-      actions.iSeeValueIn('.btn.btn-danger.ng-binding', 'Delete Updated Title Project');
+      actions.iSeeTextIn('.btn.btn-danger.ng-binding', 'Delete Updated Title Project');
       actions.clickOnElementWithText('Delete Updated Title Project');
       actions.checkingUrlEndsWith('/delete');
       actions.iSeeText('Are you sure you wish to delete the Project ');
       actions.clickOnElementWithText('No');
       actions.checkingUrlEndsWith('/settings');
       actions.clickOnElementWithText('Delete Updated Title Project');
-      actions.iSeeValueIn('.btn.btn-danger', 'Yes');
+      actions.iSeeTextIn('.btn.btn-danger', 'Yes');
       actions.clickOnElementWithText(' Yes');
       actions.iSeeTextIn('.toast-message', 'Project was deleted!');
       actions.clickOnClass('.toast-message');
