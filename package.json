@@ -59,7 +59,7 @@
     "ckeditor": "^4.10.1",
     "debug": "^4.1.0",
     "dotenv": "^6.1.0",
-    "express": "^4.16.3",
+    "express": "^4.16.4",
     "lodash": "^4.17.11",
     "mocha": "^5.2.0",
     "mocha-tags": "^1.0.1",
