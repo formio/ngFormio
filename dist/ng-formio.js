@@ -24144,6 +24144,8 @@ function (_Component) {
      * @type {function} - Call to trigger a change in this component.
      */
 
+    var lastChanged = null;
+
     var _triggerChange = _lodash.default.debounce(function () {
       var _this2;
 
@@ -24151,10 +24153,26 @@ function (_Component) {
         _this.root.changing = false;
       }
 
-      return (_this2 = _this).onChange.apply(_this2, arguments);
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      if (!args[1] && lastChanged) {
+        // Set the changed component if one isn't provided.
+        args[1] = lastChanged;
+      }
+
+      lastChanged = null;
+      return (_this2 = _this).onChange.apply(_this2, args);
     }, 100);
 
     _this.triggerChange = function () {
+      if (arguments.length <= 1 ? undefined : arguments[1]) {
+        // Make sure that during the debounce that we always track lastChanged component, even if they
+        // don't provide one later.
+        lastChanged = arguments.length <= 1 ? undefined : arguments[1];
+      }
+
       if (_this.root) {
         _this.root.changing = true;
       }
@@ -26866,8 +26884,9 @@ var _default = [{
   weight: 110,
   tooltip: 'Refresh data when another field changes.',
   dataSrc: 'custom',
+  valueProperty: 'value',
   data: {
-    custom: "\n        values.push({label: 'Any Change', key: 'data'});\n        utils.eachComponent(instance.root.editForm.components, function(component, path) {\n          if (component.key !== data.key) {\n            values.push({\n              label: component.label || component.key,\n              value: path\n            });\n          }\n        });\n      "
+    custom: "\n        values.push({label: 'Any Change', value: 'data'});\n        utils.eachComponent(instance.root.editForm.components, function(component, path) {\n          if (component.key !== data.key) {\n            values.push({\n              label: component.label || component.key,\n              value: path\n            });\n          }\n        });\n      "
   }
 }, {
   type: 'checkbox',
@@ -39668,6 +39687,13 @@ function (_BaseComponent) {
       return value;
     }
   }, {
+    key: "redraw",
+    value: function redraw() {
+      _get(_getPrototypeOf(SelectComponent.prototype), "redraw", this).call(this);
+
+      this.triggerUpdate();
+    }
+  }, {
     key: "setValue",
     value: function setValue(value, flags) {
       var _this7 = this;
@@ -40029,7 +40055,7 @@ var _default = [{
   template: '<span>{{ item.title }}</span>',
   valueProperty: '_id',
   label: 'Resource',
-  key: 'resource',
+  key: 'data.resource',
   weight: 10,
   tooltip: 'The resource to be used with this field.',
   conditional: {
@@ -40046,7 +40072,7 @@ var _default = [{
   key: 'valueProperty',
   tooltip: 'The field to use as the value.',
   weight: 11,
-  refreshOn: 'resource',
+  refreshOn: 'data.resource',
   template: '<span>{{ item.label }}</span>',
   valueProperty: 'key',
   dataSrc: 'url',
