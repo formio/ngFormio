@@ -1,5 +1,24 @@
 var fs = require('fs');
+var _get = require('lodash/get');
+var _trimEnd = require('lodash/trimEnd');
 module.exports = function(app) {
+  var getDateParts = function(component, value) {
+    var showDay = !_get(component, 'fields.day.hide', false);
+    var showMonth = !_get(component, 'fields.month.hide', false);
+    var showYear = !_get(component, 'fields.year.hide', false);
+    var parts = (typeof value === 'string') ? value.split('/') : value;
+    if (parts instanceof Array) {
+      return {
+        day: showDay ? Number(parts[(component.dayFirst ? 0 : 1)]) : 0,
+        month: showMonth ? Number(parts[(component.dayFirst ? 1 : 0)]) : 0,
+        year: showYear ? Number(parts[parts.length - 1]) : 0
+      };
+    }
+    else {
+      return null;
+    }
+  };
+
   app.directive('dayInput', function() {
     return {
       restrict: 'E',
@@ -86,13 +105,11 @@ module.exports = function(app) {
         scope.$watch('ngModel', function() {
           // Only update on load.
           if (ngModel.$viewValue && !ngModel.$dirty) {
-            var parts = typeof ngModel.$viewValue === 'string'
-              ? ngModel.$viewValue.split('/')
-              : ngModel.$viewValue;
-            if ((parts instanceof Array) && parts.length === 3) {
-              scope.date.day = Number(parts[(scope.component.dayFirst ? 0 : 1)]);
-              scope.date.month = parts[(scope.component.dayFirst ? 1 : 0)];
-              scope.date.year = Number(parts[2]);
+            var dateParts = getDateParts(scope.component, ngModel.$viewValue);
+            if (dateParts) {
+              scope.date.day = dateParts.day;
+              scope.date.month = padLeft(dateParts.month.toString(), 2);
+              scope.date.year = dateParts.year;
             }
           }
         });
@@ -110,36 +127,54 @@ module.exports = function(app) {
           var day = padLeft(scope.date.day, 2);
           var month = padLeft(scope.date.month, 2);
           var year = padLeft(scope.date.year, 4);
-          var value = scope.component.dayFirst ? day : month;
-          value += '/';
-          value += scope.component.dayFirst ? month : day;
-          value += '/' + year;
-          ngModel.$setViewValue(value);
+          var value = '';
+          var showDay = !_get(scope.component, 'fields.day.hide', false);
+          var showMonth = !_get(scope.component, 'fields.month.hide', false);
+          var showYear = !_get(scope.component, 'fields.year.hide', false);
+          if (showDay && scope.component.dayFirst) {
+            value += day + '/';
+          }
+          else if (showMonth && !scope.component.dayFirst) {
+            value += month + '/';
+          }
+
+          if (showDay && !scope.component.dayFirst) {
+            value += day + '/';
+          }
+          else if (showMonth && scope.component.dayFirst) {
+            value += month + '/';
+          }
+
+          if (showYear) {
+            value += year;
+          }
+          ngModel.$setViewValue(_trimEnd(value, '/'));
         };
 
         ngModel.$validators.day = function(modelValue, viewValue) {
           var value = modelValue || viewValue;
-          var required = scope.component.fields.day.required || scope.component.fields.month.required || scope.component.fields.year.required;
-
+          var showDay = !_get(scope.component, 'fields.day.hide', false);
+          var showMonth = !_get(scope.component, 'fields.month.hide', false);
+          var showYear = !_get(scope.component, 'fields.year.hide', false);
+          var dayRequired = showDay && _get(scope.component, 'fields.day.required', false);
+          var monthRequired = showMonth && _get(scope.component, 'fields.month.required', false);
+          var yearRequired = showYear && _get(scope.component, 'fields.year.required', false);
+          var required = dayRequired || monthRequired || yearRequired;
           if (!required) {
             return true;
           }
           if (!value && required) {
             return false;
           }
-          var parts = value.split('/');
-          if (scope.component.fields.day.required) {
-            if (parts[(scope.component.dayFirst ? 0 : 1)] === '00') {
+          var dateParts = getDateParts(scope.component, value);
+          if (dateParts) {
+            if (dayRequired && !dateParts.day) {
               return false;
             }
-          }
-          if (scope.component.fields.month.required) {
-            if (parts[(scope.component.dayFirst ? 1 : 0)] === '00') {
+            if (monthRequired && !dateParts.month) {
               return false;
             }
-          }
-          if (scope.component.fields.year.required) {
-            if (parts[2] === '0000') {
+            if (yearRequired && !dateParts.year) {
               return false;
             }
           }
