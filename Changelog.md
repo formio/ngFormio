@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.36.8
+### Fixed
+ - FOR-1763: Fixed issues with the day component data collecting.
+
 ## 2.36.7
 ### Fixed
  - Token issue for iframe.
