@@ -382,6 +382,8 @@ app.controller('ProjectController', [
     $scope.formioReady = formioReady.promise;
     $scope.primaryProjectPromise = primaryProjectQ.promise;
     PDFServer.setPrimaryProject(primaryProjectQ.promise);
+    $scope.highestRoleQ = $q.defer();
+    $scope.highestRoleLoaded = $scope.highestRoleQ.promise;
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.localProject = result;
@@ -727,6 +729,17 @@ app.controller('ProjectTagCreateController', [
         });
       }
       $scope.isBusy = true;
+
+      var tagDone = function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Project Tag was created.'
+        });
+        $scope.isBusy = false;
+        PrimaryProject.clear();
+        $state.reload();
+      };
+
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
         .then(function(template) {
           Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
@@ -740,8 +753,20 @@ app.controller('ProjectTagCreateController', [
                 message: 'Project Tag was created.'
               });
               $scope.isBusy = false;
-              PrimaryProject.clear();
-              $state.reload();
+
+              // Make sure we update the remote project version if it exists as well.
+              if ($scope.localProject.remote && $scope.localProject.remote.url) {
+                $scope.currentProject.tag = tag;
+                $scope.saveProject().then(function() {
+                  tagDone();
+                }).catch(function(err) {
+                  $scope.isBusy = false;
+                  FormioAlerts.onError(err);
+                });
+              }
+              else {
+                tagDone();
+              }
             })
             .catch(function(err) {
               $scope.isBusy = false;
@@ -2704,9 +2729,7 @@ app.controller('StageTeamController', [
 
     $scope.addTeam = function(team) {
       setTeamPermission($scope.localProject, team, 'stage_read');
-      $scope.saveLocalProject().then(function(project) {
-        $scope.localProject = project;
-      });
+      $scope.saveLocalProject();
       _.remove($scope.uniqueEligibleTeams, { _id: team._id });
       team.permission = 'stage_read';
       $scope.stageProjectTeams.push(team);
@@ -2715,9 +2738,7 @@ app.controller('StageTeamController', [
 
     $scope.removeTeam = function(team) {
       setTeamPermission($scope.localProject, team);
-      $scope.saveLocalProject().then(function(project) {
-        $scope.localProject = project;
-      });
+      $scope.saveLocalProject();
       _.remove($scope.stageProjectTeams, { _id: team._id });
       delete team.permission;
       $scope.uniqueEligibleTeams.push(team);
@@ -2725,9 +2746,7 @@ app.controller('StageTeamController', [
 
     $scope.updateTeam = function(team, permission) {
       setTeamPermission($scope.localProject, team, permission);
-      $scope.saveLocalProject().then(function(project) {
-        $scope.localProject = project;
-      });
+      $scope.saveLocalProject();
     };
   }
 ]);
