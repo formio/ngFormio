@@ -28,6 +28,7 @@ jobs:
           name: Tag version
           command: |
             echo ${CIRCLE_TAG} > dist/version.txt
+            cp src/config.js dist/
             sed -i "s/APP_VERSION/${CIRCLE_TAG}/g" dist/config.js
       - persist_to_workspace:
           root: .
