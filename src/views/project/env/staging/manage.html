@@ -1,0 +1,47 @@
+<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Enterprise to enable version tags." />
+<div>
+  <h3>Manage Version tags</h3>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="pull-right" role="group" aria-label="Actions">
+        <a type="button" class="btn btn-warning" ui-sref="project.env.staging.delete({tags: selectedTags})">Delete</a>
+        <a type="button" class="btn btn-primary" ng-click="deploy()">Deploy</a>
+        <a type="button" class="btn btn-default" ui-sref="project.env.staging.create">Create Version Tag</a>
+      </div>
+      <div class="clearfix" style="margin-bottom: 10px;"></div>
+      <ul class="list-group list-group-striped">
+        <li class="list-group-item list-group-heading">
+          <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-3"><strong>Version Tag</strong></div>
+            <div class="col-md-4"><strong>Description</strong></div>
+            <div class="col-md-4"><strong>Date Created</strong></div>
+          </div>
+        </li>
+        <li ng-repeat="tag in tags track by $index" class="list-group-item">
+          <div class="row">
+            <div class="col-md-1">
+              <input
+                type="checkbox"
+                name="selectedTags[]"
+                value="{{tag}}"
+                ng-checked="selectedTags.indexOf(tag) > -1"
+                ng-click="toggleSelection(tag)"
+              >
+            </div>
+            <div class="col-md-2">{{tag.tag}}</div>
+            <div class="col-md-5">{{tag.description}}</div>
+            <div class="col-md-4">{{tag.created | date: 'medium'}}</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <bgf-pagination
+      collection="tags"
+      url="tagsUrl"
+      url-params="tagsParams"
+      per-page="10"
+      template-url="/views/partials/pager.html"
+    />
+  </div>
+</div>

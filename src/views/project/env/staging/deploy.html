@@ -3,12 +3,17 @@
   <h3>Deploy to {{ environmentName }}</h3>
   <div class="row">
     <div class="col-md-8">
-      <h4>Select Version Tag</h4>
       <div ng-if="tags.length">
+        <h4>Select Version Tag</h4>
         <p><select class="form-control tags" ng-model="deployTagOption" ng-options="selectTag as selectTag.tag for selectTag in tags"></select></p>
         <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
       </div>
-      <div ng-if="!tags.length">
+      <div ng-if="tag">
+        <h4>Version Tag</h4>
+        <p><strong ng-if="tag">{{ tag.tag }}</strong></p>
+        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
+      </div>
+      <div ng-if="!tags.length && !tag">
         <p>No version tags exist. <a ui-sref="project.env.staging.create">Create</a> a new version tag in the source stage before deploying.</p>
       </div>
     </div>

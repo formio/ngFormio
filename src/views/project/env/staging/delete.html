@@ -1,0 +1,16 @@
+<upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Enterprise to enable version tags." />
+<div>
+  <h3>Delete Version tags</h3>
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Are you sure you want to delete the following tags?</h2>
+      <div ng-repeat="tag in tags track by $index">
+        <strong>{{tag.tag}}</strong>
+      </div>
+      <div style="margin-top: 20px;">
+        <a class="btn btn-danger" ng-click="delete()">Delete</a>
+        <a class="btn btn-default" ui-sref="project.env.staging.manage">Cancel</a>
+      </div>
+    </div>
+  </div>
+</div>

@@ -663,9 +663,18 @@ app.controller('ProjectDeployController', [
         });
     };
 
-    $scope.primaryProjectPromise.then(loadTags);
+    if ($stateParams.tag) {
+      Formio.makeStaticRequest($scope.projectUrl + '/tag/' + $stateParams.tag._id, 'GET')
+        .then(function(tag) {
+          $scope.tag = tag;
+        });
+    }
+    else {
+      $scope.primaryProjectPromise.then(loadTags);
+    }
 
     $scope.deployTag = function(tag) {
+      tag = tag || $scope.tag;
       if (!tag) {
         return FormioAlerts.addAlert({
           type: 'warning',
@@ -778,6 +787,83 @@ app.controller('ProjectTagCreateController', [
           FormioAlerts.onError(err);
         });
     };
+  }
+]);
+
+app.controller('ProjectTagManageController', [
+  '$scope',
+  '$state',
+  'Formio',
+  'FormioAlerts',
+  'AppConfig',
+  function($scope, $state, Formio, FormioAlerts, AppConfig) {
+    $scope.primaryProjectPromise.then(function(project) {
+      $scope.tagsParams = {
+        sort: '-created'
+      };
+      $scope.tagsUrl = AppConfig.apiBase + '/project/' + project._id + '/tag?sort=-created';
+    });
+
+    $scope.selectedTags = [];
+
+    $scope.toggleSelection = function(tag) {
+      var index = $scope.selectedTags.indexOf(tag);
+
+      if (index > -1) {
+        $scope.selectedTags.splice(index, 1);
+      }
+      else {
+        $scope.selectedTags.push(tag);
+      }
+    };
+
+    $scope.deploy = function() {
+      if (!$scope.selectedTags.length) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please select a tag to deploy'
+        });
+      }
+
+      if ($scope.selectedTags.length > 1) {
+        return FormioAlerts.addAlert({
+          type: 'warning',
+          message: 'Please select only one tag to deploy'
+        });
+      }
+
+      $state.go('project.env.staging.deploy', {tag: $scope.selectedTags[0]});
+    };
+  }
+]);
+
+app.controller('ProjectTagDeleteController', [
+  '$scope',
+  '$state',
+  '$stateParams',
+  '$http',
+  function(
+    $scope,
+    $state,
+    $stateParams,
+    $http
+  ) {
+    if (!$stateParams.tags || !$stateParams.tags.length) {
+      $state.go('project.env.staging.manage');
+    }
+
+    $scope.tags = $stateParams.tags;
+
+    $scope.delete = function() {
+      Promise.all($scope.tags.map(
+        function(tag) {
+          return $http.delete($scope.formio.projectUrl + '/tag/' + tag._id)
+        })
+      ).then(function() {
+        $state.go('project.env.staging.manage');
+      });
+
+    }
   }
 ]);
 
