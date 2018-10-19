@@ -691,7 +691,7 @@ app.controller('ProjectDeployController', [
           $scope.deployTagOption = '';
           FormioAlerts.addAlert({
             type: 'success',
-            message: 'Project tag ' + tag.tag + ' deployed to ' + $scope.currentProject.title + '.'
+            message: 'Project tag ' + _.escape(tag.tag) + ' deployed to ' + _.escape($scope.currentProject.title) + '.'
           });
           Formio.clearCache();
           // If Remote, update the local project as well.
@@ -939,7 +939,7 @@ app.controller('ProjectImportController', [
           $scope.importFile = null;
           FormioAlerts.addAlert({
             type: 'success',
-            message: 'Project template imported to ' + $scope.currentProject.title + '.'
+            message: 'Project template imported to ' + _.escape($scope.currentProject.title) + '.'
           });
         })
         .catch(function(err) {
