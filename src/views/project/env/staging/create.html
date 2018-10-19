@@ -4,9 +4,46 @@
   <div class="row">
     <div class="col-md-8">
       <h4>Create a version tag from current stage</h4>
-      <input id="tag" class="form-control" placeholder="0.0.0" ng-model="tag" />
+      <label for="tag">Version Tag Name</label>
+      <input id="tag" class="form-control" placeholder="0.0.0" ng-model="tag.tag" />
       <br />
-      <span class="btn btn-default" ng-click="addTag(tag)"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Create version tag</span>
+      <label for="description">Description</label>
+      <input id="description" class="form-control" placeholder="A short description of the tag" ng-model="tag.description" />
+      <br />
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <h3 class="panel-title">Components</h3>
+        </div>
+        <div class="panel-body">
+          <label for="includeAll">
+            <input type="checkbox" id="includeAll" ng-model="includeAll"> Include all
+          </label>
+
+          <div ng-if="!includeAll">
+            <div ng-repeat="section in sections track by $index" class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{section.label}}</h3>
+              </div>
+              <div class="panel-body">
+                <span class="label label-default" style="display: inline-block; margin: 3px; border-radius: 3px;" ng-repeat="(key, item) in template[section.key] track by key">
+                  <label for="{{section.key}}-{{key}}" style="margin-bottom: 0">
+                    <input
+                      type="checkbox"
+                      id="{{section.key}}-{{key}}"
+                      name="{{section.key}}-{{key}}"
+                      value="{{item}}"
+                      ng-checked="tag.template[section.key].hasOwnProperty(key)"
+                      ng-click="toggleItem(section, key, item)"
+                    >
+                    {{item.title}} ({{key}})
+                  </label>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="btn btn-default" ng-click="addTag()"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Create version tag</span>
     </div>
     <div class="col-md-4">
       <div class="panel panel-primary">

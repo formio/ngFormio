@@ -730,57 +730,98 @@ app.controller('ProjectTagCreateController', [
     PrimaryProject
   ) {
     $scope.isBusy = false;
-    $scope.addTag = function(tag) {
-      if (!tag) {
+
+    $scope.primaryProjectPromise.then(function(project) {
+      Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
+        .then(function(template) {
+          // Make a copy so we know the full list of forms.
+          $scope.template = angular.copy(template);
+
+          $scope.tag = {
+            tag: '',
+            description: '',
+            project: $scope.primaryProject._id,
+            template: template
+          };
+        });
+    });
+
+    $scope.sections = [
+      {
+        key: 'forms',
+        label: 'Forms'
+      },
+      {
+        key: 'resources',
+        label: 'Resources'
+      },
+      {
+        key: 'actions',
+        label: 'Actions'
+      },
+      {
+        key: 'roles',
+        label: 'Roles'
+      },
+    ];
+
+    $scope.includeAll = true;
+
+    $scope.toggleItem = function(section, key, item) {
+      if ($scope.tag.template[section.key].hasOwnProperty(key)) {
+        delete $scope.tag.template[section.key][key];
+      }
+      else {
+        $scope.tag.template[section.key][key] = item;
+      }
+    };
+
+    $scope.addTag = function() {
+      if (!$scope.tag.tag) {
         return FormioAlerts.addAlert({
           type: 'warning',
           message: 'Please enter a tag identifier.'
         });
       }
+
+      // If includeAll is checked, be sure to use original template.
+      if ($scope.includeAll) {
+        $scope.tag.template = $scope.template;
+      }
+
       $scope.isBusy = true;
 
       var tagDone = function() {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Project Tag was created.'
-        });
         $scope.isBusy = false;
         PrimaryProject.clear();
         $state.reload();
       };
 
-      Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
-        .then(function(template) {
-          Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
-              project: $scope.primaryProject._id,
-              tag: tag,
-              template: template
-            })
-            .then(function() {
-              FormioAlerts.addAlert({
-                type: 'success',
-                message: 'Project Tag was created.'
-              });
-              $scope.isBusy = false;
+      // Strip extra data.
+      $scope.tag.tag = $scope.tag.tag.substr(0, 32);
+      $scope.tag.description = $scope.tag.description.substr(0, 256);
 
-              // Make sure we update the remote project version if it exists as well.
-              if ($scope.localProject.remote && $scope.localProject.remote.url) {
-                $scope.currentProject.tag = tag;
-                $scope.saveProject().then(function() {
-                  tagDone();
-                }).catch(function(err) {
-                  $scope.isBusy = false;
-                  FormioAlerts.onError(err);
-                });
-              }
-              else {
-                tagDone();
-              }
-            })
-            .catch(function(err) {
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', $scope.tag)
+        .then(function() {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Project Tag was created.'
+          });
+          $scope.isBusy = false;
+
+          // Make sure we update the remote project version if it exists as well.
+          if ($scope.localProject.remote && $scope.localProject.remote.url) {
+            $scope.currentProject.tag = $scope.tag.tag;
+            $scope.saveProject().then(function() {
+              tagDone();
+            }).catch(function(err) {
               $scope.isBusy = false;
               FormioAlerts.onError(err);
             });
+          }
+          else {
+            tagDone();
+          }
         })
         .catch(function(err) {
           $scope.isBusy = false;
