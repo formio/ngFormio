@@ -19140,6 +19140,8 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
@@ -19289,6 +19291,7 @@ function (_NestedComponent) {
     _this2._loading = false;
     _this2._submission = {};
     _this2._form = {};
+    _this2.customErrors = [];
     /**
      * Determines if this form should submit the API on submit.
      * @type {boolean}
@@ -19986,7 +19989,7 @@ function (_NestedComponent) {
         return _this10.submit(false, options);
       }, true);
       this.on('checkValidity', function (data) {
-        return _this10.checkValidity(data, true);
+        return _this10.checkValidity(null, true, data);
       }, true);
       this.addComponents(null, null, null, state);
       this.on('requestUrl', function (args) {
@@ -20008,6 +20011,8 @@ function (_NestedComponent) {
   }, {
     key: "showErrors",
     value: function showErrors(error, triggerEvent) {
+      var _this11 = this;
+
       this.loading = false;
       var errors = this.errors;
 
@@ -20019,11 +20024,23 @@ function (_NestedComponent) {
         }
       }
 
+      errors = errors.concat(this.customErrors);
+
       if (!errors.length) {
         this.setAlert(false);
         return;
-      }
+      } // Mark any components as invalid if in a custom message.
 
+
+      this.customErrors.forEach(function (err) {
+        if (err.component) {
+          var component = _this11.getComponent(err.component);
+
+          if (component) {
+            component.setCustomValidity(err.message, true);
+          }
+        }
+      });
       var message = "\n      <p>".concat(this.t('error'), "</p>\n      <ul>\n        ").concat(errors.map(function (err) {
         return err ? "<li><strong>".concat(err.message || err, "</strong></li>") : '';
       }).join(''), "\n      </ul>\n    ");
@@ -20103,6 +20120,13 @@ function (_NestedComponent) {
   }, {
     key: "onChange",
     value: function onChange(flags, changed) {
+      // For any change events, clear any custom errors for that component.
+      if (changed && changed.component) {
+        this.customErrors = this.customErrors.filter(function (err) {
+          return err.component && err.component !== changed.component.key;
+        });
+      }
+
       _get(_getPrototypeOf(Webform.prototype), "onChange", this).call(this, flags, true);
 
       var value = _lodash.default.clone(this._submission);
@@ -20140,12 +20164,12 @@ function (_NestedComponent) {
   }, {
     key: "deleteSubmission",
     value: function deleteSubmission() {
-      var _this11 = this;
+      var _this12 = this;
 
       return this.formio.deleteSubmission().then(function () {
-        _this11.emit('submissionDeleted', _this11.submission);
+        _this12.emit('submissionDeleted', _this12.submission);
 
-        _this11.resetValue();
+        _this12.resetValue();
       });
     }
     /**
@@ -20167,25 +20191,25 @@ function (_NestedComponent) {
   }, {
     key: "submitForm",
     value: function submitForm() {
-      var _this12 = this;
+      var _this13 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       return new _nativePromiseOnly.default(function (resolve, reject) {
         // Read-only forms should never submit.
-        if (_this12.options.readOnly) {
+        if (_this13.options.readOnly) {
           return resolve({
-            submission: _this12.submission,
+            submission: _this13.submission,
             saved: false
           });
         }
 
-        var submission = _this12.submission || {}; // Add in metadata about client submitting the form
+        var submission = _this13.submission || {}; // Add in metadata about client submitting the form
 
         submission.metadata = submission.metadata || {};
 
         _lodash.default.defaults(submission.metadata, {
-          timezone: _lodash.default.get(_this12, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
-          offset: parseInt(_lodash.default.get(_this12, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
+          timezone: _lodash.default.get(_this13, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
+          offset: parseInt(_lodash.default.get(_this13, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
           referrer: document.referrer,
           browserName: navigator.appName,
           userAgent: navigator.userAgent,
@@ -20196,7 +20220,7 @@ function (_NestedComponent) {
         submission.state = options.state || 'submitted';
         var isDraft = submission.state === 'draft';
 
-        _this12.hook('beforeSubmit', submission, function (err) {
+        _this13.hook('beforeSubmit', submission, function (err) {
           if (err) {
             return reject(err);
           }
@@ -20205,47 +20229,64 @@ function (_NestedComponent) {
             return reject('Invalid Submission');
           }
 
-          if (!isDraft && !_this12.checkValidity(submission.data, true)) {
+          if (!isDraft && !_this13.checkValidity(submission.data, true)) {
             return reject();
           }
 
-          _this12.loading = true; // Use the form action to submit the form if available.
-
-          var submitFormio = _this12.formio;
-
-          if (_this12._form && _this12._form.action) {
-            submitFormio = new _Formio.default(_this12._form.action, _this12.formio ? _this12.formio.options : {});
-          }
-
-          if (_this12.nosubmit || !submitFormio) {
-            return resolve({
-              submission: submission,
-              saved: false
-            });
-          } // If this is an actionUrl, then make sure to save the action and not the submission.
+          _this13.hook('customValidation', submission, function (err) {
+            if (err) {
+              // If string is returned, cast to object.
+              if (typeof err === 'string') {
+                err = {
+                  message: err
+                };
+              } // Ensure err is an array.
 
 
-          var submitMethod = submitFormio.actionUrl ? 'saveAction' : 'saveSubmission';
-          submitFormio[submitMethod](submission).then(function (result) {
-            return resolve({
-              submission: result,
-              saved: true
-            });
-          }).catch(reject);
+              err = Array.isArray(err) ? err : [err]; // Set as custom errors.
+
+              _this13.customErrors = err;
+              return reject();
+            }
+
+            _this13.loading = true; // Use the form action to submit the form if available.
+
+            var submitFormio = _this13.formio;
+
+            if (_this13._form && _this13._form.action) {
+              submitFormio = new _Formio.default(_this13._form.action, _this13.formio ? _this13.formio.options : {});
+            }
+
+            if (_this13.nosubmit || !submitFormio) {
+              return resolve({
+                submission: submission,
+                saved: false
+              });
+            } // If this is an actionUrl, then make sure to save the action and not the submission.
+
+
+            var submitMethod = submitFormio.actionUrl ? 'saveAction' : 'saveSubmission';
+            submitFormio[submitMethod](submission).then(function (result) {
+              return resolve({
+                submission: result,
+                saved: true
+              });
+            }).catch(reject);
+          });
         });
       });
     }
   }, {
     key: "executeSubmit",
     value: function executeSubmit(options) {
-      var _this13 = this;
+      var _this14 = this;
 
       this.submitted = true;
       this.submitting = true;
       return this.submitForm(options).then(function (result) {
-        return _this13.onSubmit(result.submission, result.saved);
+        return _this14.onSubmit(result.submission, result.saved);
       }).catch(function (err) {
-        return _nativePromiseOnly.default.reject(_this13.onSubmissionError(err));
+        return _nativePromiseOnly.default.reject(_this14.onSubmissionError(err));
       });
     }
     /**
@@ -20272,11 +20313,11 @@ function (_NestedComponent) {
   }, {
     key: "submit",
     value: function submit(before, options) {
-      var _this14 = this;
+      var _this15 = this;
 
       if (!before) {
         return this.beforeSubmit(options).then(function () {
-          return _this14.executeSubmit(options);
+          return _this15.executeSubmit(options);
         });
       } else {
         return this.executeSubmit(options);
@@ -20285,7 +20326,7 @@ function (_NestedComponent) {
   }, {
     key: "submitUrl",
     value: function submitUrl(URL, headers) {
-      var _this15 = this;
+      var _this16 = this;
 
       if (!URL) {
         return console.warn('Missing URL argument');
@@ -20309,9 +20350,9 @@ function (_NestedComponent) {
       if (API_URL && settings) {
         try {
           _Formio.default.makeStaticRequest(API_URL, settings.method, submission, settings.headers).then(function () {
-            _this15.emit('requestDone');
+            _this16.emit('requestDone');
 
-            _this15.setAlert('success', '<p> Success </p>');
+            _this16.setAlert('success', '<p> Success </p>');
           });
         } catch (e) {
           this.showErrors("".concat(e.statusText, " ").concat(e.status));
@@ -20327,10 +20368,10 @@ function (_NestedComponent) {
   }, {
     key: "language",
     set: function set(lang) {
-      var _this16 = this;
+      var _this17 = this;
 
       return new _nativePromiseOnly.default(function (resolve, reject) {
-        _this16.options.language = lang;
+        _this17.options.language = lang;
 
         try {
           _i18next.default.changeLanguage(lang, function (err) {
@@ -20338,7 +20379,7 @@ function (_NestedComponent) {
               return reject(err);
             }
 
-            _this16.redraw();
+            _this17.redraw();
 
             resolve();
           });
@@ -20378,10 +20419,10 @@ function (_NestedComponent) {
   }, {
     key: "ready",
     get: function get() {
-      var _this17 = this;
+      var _this18 = this;
 
       return this.formReady.then(function () {
-        return _this17.loadingSubmission ? _this17.submissionReady : true;
+        return _this18.loadingSubmission ? _this18.submissionReady : true;
       });
     }
     /**
@@ -24262,7 +24303,7 @@ function (_Component) {
      */
     value: function t(text, params) {
       params = params || {};
-      params.data = this.root ? this.root.data : this.data;
+      params.data = this.rootValue;
       params.row = this.data;
       params.component = this.component;
       return _get(_getPrototypeOf(BaseComponent.prototype), "t", this).call(this, text, params);
@@ -24584,7 +24625,7 @@ function (_Component) {
         component: this.component,
         row: this.data,
         rowIndex: this.rowIndex,
-        data: this.root ? this.root.data : this.data,
+        data: this.rootValue,
         submission: this.root ? this.root._submission : {},
         form: this.root ? this.root._form : {}
       }, additional));
@@ -24634,7 +24675,7 @@ function (_Component) {
     value: function addValue() {
       this.addNewValue();
       this.buildRows();
-      this.checkConditions(this.root ? this.root.data : this.data);
+      this.checkConditions();
       this.restoreValue();
 
       if (this.root) {
@@ -25281,15 +25322,27 @@ function (_Component) {
   }, {
     key: "conditionallyVisible",
     value: function conditionallyVisible(data) {
+      data = data || this.rootValue;
+
       if (this.options.builder || !this.hasCondition()) {
         return true;
       }
 
-      if (!data) {
-        data = this.root ? this.root.data : {};
-      }
+      return this.checkCondition(null, data);
+    }
+    /**
+     * Checks the condition of this component.
+     *
+     * @param row - The row contextual data.
+     * @param data - The global data object.
+     *
+     * @return {boolean} - True if the condition applies to this component.
+     */
 
-      return FormioUtils.checkCondition(this.component, this.data, data, this.root ? this.root._form : {}, this);
+  }, {
+    key: "checkCondition",
+    value: function checkCondition(row, data) {
+      return FormioUtils.checkCondition(this.component, row || this.data, data || this.rootValue, this.root ? this.root._form : {}, this);
     }
     /**
      * Check for conditionals and hide/show the element based on those conditions.
@@ -25298,7 +25351,7 @@ function (_Component) {
   }, {
     key: "checkConditions",
     value: function checkConditions(data) {
-      data = data || (this.root ? this.root.data : {}); // Check advanced conditions
+      data = data || this.rootValue; // Check advanced conditions
 
       var result = this.show(this.conditionallyVisible(data));
 
@@ -25319,6 +25372,7 @@ function (_Component) {
     value: function fieldLogic(data) {
       var _this11 = this;
 
+      data = data || this.rootValue;
       var logics = this.logic; // If there aren't logic, don't go further.
 
       if (logics.length === 0) {
@@ -25981,7 +26035,7 @@ function (_Component) {
     key: "invalidMessage",
     value: function invalidMessage(data, dirty, ignoreCondition) {
       // Force valid if component is conditionally hidden.
-      if (!ignoreCondition && !FormioUtils.checkCondition(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!ignoreCondition && !this.checkCondition(null, data)) {
         return '';
       } // See if this is forced invalid.
 
@@ -26012,9 +26066,9 @@ function (_Component) {
     }
   }, {
     key: "checkValidity",
-    value: function checkValidity(data, dirty) {
+    value: function checkValidity(data, dirty, rowData) {
       // Force valid if component is conditionally hidden.
-      if (!FormioUtils.checkCondition(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!this.checkCondition(rowData, data)) {
         this.setCustomValidity('');
         return true;
       }
@@ -26615,6 +26669,17 @@ function (_Component) {
       return this.dataValue;
     }
     /**
+     * Get the data value at the root level.
+     *
+     * @return {*}
+     */
+
+  }, {
+    key: "rootValue",
+    get: function get() {
+      return this.root ? this.root.data : this.data;
+    }
+    /**
      * Get the static value of this component.
      * @return {*}
      */
@@ -26708,7 +26773,7 @@ function (_Component) {
       var _this22 = this;
 
       // Do not allow a component to be disabled if it should be always...
-      if (!disabled && this.shouldDisable) {
+      if (!disabled && this.shouldDisable || disabled && !this.shouldDisable) {
         return;
       }
 
@@ -32359,6 +32424,69 @@ function (_BaseComponent) {
      */
 
   }, {
+    key: "getDate",
+
+    /**
+     * Return the date for this component.
+     *
+     * @param value
+     * @return {*}
+     */
+    value: function getDate(value) {
+      var options = {};
+      var defaults = []; // Map positions to identifiers
+
+      var _ref = this.component.dayFirst ? [0, 1, 2] : [1, 0, 2],
+          _ref2 = _slicedToArray(_ref, 3),
+          DAY = _ref2[0],
+          MONTH = _ref2[1],
+          YEAR = _ref2[2];
+
+      var defaultValue = value || this.component.defaultValue;
+
+      if (defaultValue) {
+        defaults = defaultValue.split('/').map(function (x) {
+          return parseInt(x, 10);
+        });
+      }
+
+      var day = this.showDay && this.dayInput ? parseInt(this.dayInput.value, 10) : NaN;
+
+      if (!_lodash.default.isNaN(day)) {
+        options.day = day;
+      } else if (defaults[DAY] && !_lodash.default.isNaN(defaults[DAY])) {
+        options.day = defaults[DAY];
+      }
+
+      var month = this.showMonth && this.monthInput ? parseInt(this.monthInput.value, 10) : NaN;
+
+      if (!_lodash.default.isNaN(month) && month > 0) {
+        // Months are 0 indexed.
+        options.month = month - 1;
+      } else if (defaults[MONTH] && !_lodash.default.isNaN(defaults[MONTH])) {
+        options.month = defaults[MONTH] - 1;
+      }
+
+      var year = this.showYear && this.yearInput ? parseInt(this.yearInput.value) : NaN;
+
+      if (!_lodash.default.isNaN(year)) {
+        options.year = year;
+      } else if (defaults[YEAR] && !_lodash.default.isNaN(defaults[YEAR])) {
+        options.year = defaults[YEAR];
+      }
+
+      if (_lodash.default.isEmpty(options)) {
+        return null;
+      }
+
+      return (0, _moment.default)(options);
+    }
+    /**
+     * Return the date object for this component.
+     * @returns {Date}
+     */
+
+  }, {
     key: "getValueAt",
 
     /**
@@ -32378,10 +32506,17 @@ function (_BaseComponent) {
         return null;
       }
     }
+    /**
+     * Get the view of the date.
+     *
+     * @param value
+     * @return {null}
+     */
+
   }, {
     key: "getView",
-    value: function getView() {
-      var date = this.date;
+    value: function getView(value) {
+      var date = this.getDate(value);
 
       if (!date) {
         return null;
@@ -32522,63 +32657,16 @@ function (_BaseComponent) {
 
       if (this.showYear) {
         format += 'YYYY';
+        return format;
+      } else {
+        // Trim off the "/" from the end of the format string.
+        return format.length ? format.substring(0, format.length - 1) : format;
       }
-
-      return format;
     }
-    /**
-     * Return the date object for this component.
-     * @returns {Date}
-     */
-
   }, {
     key: "date",
     get: function get() {
-      var options = {};
-      var defaults = []; // Map positions to identifiers
-
-      var _ref = this.component.dayFirst ? [0, 1, 2] : [1, 0, 2],
-          _ref2 = _slicedToArray(_ref, 3),
-          DAY = _ref2[0],
-          MONTH = _ref2[1],
-          YEAR = _ref2[2];
-
-      if (this.component.defaultValue) {
-        defaults = this.component.defaultValue.split('/').map(function (x) {
-          return parseInt(x, 10);
-        });
-      }
-
-      var day = this.showDay ? parseInt(this.dayInput.value, 10) : NaN;
-
-      if (!_lodash.default.isNaN(day)) {
-        options.day = day;
-      } else if (defaults[DAY] && !_lodash.default.isNaN(defaults[DAY])) {
-        options.day = defaults[DAY];
-      }
-
-      var month = this.showMonth ? parseInt(this.monthInput.value, 10) : NaN;
-
-      if (!_lodash.default.isNaN(month) && month > 0) {
-        // Months are 0 indexed.
-        options.month = month - 1;
-      } else if (defaults[MONTH] && !_lodash.default.isNaN(defaults[MONTH])) {
-        options.month = defaults[MONTH] - 1;
-      }
-
-      var year = this.showYear ? parseInt(this.yearInput.value) : NaN;
-
-      if (!_lodash.default.isNaN(year)) {
-        options.year = year;
-      } else if (defaults[YEAR] && !_lodash.default.isNaN(defaults[YEAR])) {
-        options.year = defaults[YEAR];
-      }
-
-      if (_lodash.default.isEmpty(options)) {
-        return null;
-      }
-
-      return (0, _moment.default)(options);
+      return this.getDate();
     }
     /**
      * Return the raw value.
@@ -32846,8 +32934,6 @@ var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! ../Components */ "./node_modules/formiojs/components/Components.js"));
-
-var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33145,10 +33231,10 @@ function (_NestedComponent) {
         changed |= comp.calculateValue(data, {
           noUpdateEvent: true
         });
-        comp.checkConditions(_this5.editRows[index].data);
+        comp.checkConditions(data);
 
         if (!flags.noValidate) {
-          valid &= comp.checkValidity(_this5.editRows[index].data, !_this5.editRows[index].isOpen);
+          valid &= comp.checkValidity(data, !_this5.editRows[index].isOpen);
         }
       });
       valid &= this.validateRow(index); // Trigger the change if the values changed.
@@ -33309,7 +33395,7 @@ function (_NestedComponent) {
       var isDirty = dirty || !!this.editRows[rowIndex].dirty;
       this.editRows[rowIndex].components.forEach(function (comp) {
         comp.setPristine(!isDirty);
-        check &= comp.checkValidity(_this7.editRows[rowIndex].data, isDirty);
+        check &= comp.checkValidity(null, isDirty, _this7.editRows[rowIndex].data);
       });
 
       if (this.component.validate && this.component.validate.row) {
@@ -33339,7 +33425,7 @@ function (_NestedComponent) {
     value: function checkValidity(data, dirty) {
       var _this8 = this;
 
-      if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!this.checkCondition(null, data)) {
         this.setCustomValidity('');
         return true;
       }
@@ -36432,8 +36518,6 @@ var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_m
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
-
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! ../Components */ "./node_modules/formiojs/components/Components.js"));
@@ -36954,7 +37038,7 @@ function (_BaseComponent) {
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
-      if (!(0, _utils.checkCondition)(this.component, data, this.data, this.root ? this.root._form : {}, this)) {
+      if (!this.checkCondition(null, data)) {
         this.setCustomValidity('');
         return true;
       }
@@ -70364,7 +70448,7 @@ var Interpolator = function () {
     this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
   };
 
-  Interpolator.prototype.interpolate = function interpolate(str, data, lng) {
+  Interpolator.prototype.interpolate = function interpolate(str, data, lng, options) {
     var _this = this;
 
     var match = void 0;
@@ -70387,6 +70471,8 @@ var Interpolator = function () {
 
     this.resetRegExp();
 
+    var missingInterpolationHandler = options && options.missingInterpolationHandler || this.options.missingInterpolationHandler;
+
     replaces = 0;
     // unescape if has unescapePrefix/Suffix
     /* eslint no-cond-assign: 0 */
@@ -70405,8 +70491,8 @@ var Interpolator = function () {
     while (match = this.regexp.exec(str)) {
       value = handleFormat(match[1].trim());
       if (value === undefined) {
-        if (typeof this.options.missingInterpolationHandler === 'function') {
-          var temp = this.options.missingInterpolationHandler(str, match);
+        if (typeof missingInterpolationHandler === 'function') {
+          var temp = missingInterpolationHandler(str, match);
           value = typeof temp === 'string' ? temp : '';
         } else {
           this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
@@ -71222,7 +71308,7 @@ var Translator = function (_EventEmitter) {
       // interpolate
       var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
       if (this.options.interpolation.defaultVariables) data = _extends({}, this.options.interpolation.defaultVariables, data);
-      res = this.interpolator.interpolate(res, data, options.lng || this.language);
+      res = this.interpolator.interpolate(res, data, options.lng || this.language, options);
 
       // nesting
       if (options.nest !== false) res = this.interpolator.nest(res, function () {
