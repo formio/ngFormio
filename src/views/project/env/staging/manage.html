@@ -4,9 +4,11 @@
   <div class="row">
     <div class="col-md-12">
       <div class="pull-right" role="group" aria-label="Actions">
-        <a type="button" class="btn btn-warning" ui-sref="project.env.staging.delete({tags: selectedTags})">Delete</a>
-        <a type="button" class="btn btn-primary" ng-click="deploy()">Deploy</a>
-        <a type="button" class="btn btn-default" ui-sref="project.env.staging.create">Create Version Tag</a>
+        <a type="button" class="btn btn-danger" ui-sref="project.env.staging.delete({tags: selectedTags})">Delete Tags</a>
+        <a type="button" class="btn btn-primary" ng-click="deploy()">Deploy to {{ environmentName }}</a>
+        <a type="button" class="btn btn-default" ui-sref="project.env.staging.export">Export Template</a>
+        <a type="button" class="btn btn-default" ui-sref="project.env.staging.import">Import Template</a>
+        <a type="button" class="btn btn-info" ui-sref="project.env.staging.create">Create Version Tag</a>
       </div>
       <div class="clearfix" style="margin-bottom: 10px;"></div>
       <ul class="list-group list-group-striped">

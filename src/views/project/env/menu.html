@@ -12,14 +12,8 @@
         <li role="presentation" ng-class="{active:($state.includes('project.env.settings.customjscss'))}"><a ui-sref="project.env.settings.customjscss">Custom JS and CSS</a></li>
       </ul>
     </li>
-    <li role="presentation" ng-class="{active:($state.includes('project.env.staging.deploy'))}">
-      <a ui-sref="project.env.staging.deploy">Staging</a>
-      <ul ng-if="$state.current.name.indexOf('project.env.staging') !== -1" class="nav nav-pills nav-stacked">
-        <li role="presentation" ng-class="{active:($state.includes('project.env.staging.create'))}"><a ui-sref="project.env.staging.create">Create Version Tag</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.staging.manage'))}"><a ui-sref="project.env.staging.manage">Manage Version Tags</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.staging.import'))}"><a ui-sref="project.env.staging.import">Import Template</a></li>
-        <li role="presentation" ng-class="{active:($state.includes('project.env.staging.export'))}"><a ui-sref="project.env.staging.export">Export Template</a></li>
-      </ul>
+    <li role="presentation" ng-class="{active:($state.current.name.indexOf('project.env.staging') !== -1)}">
+      <a ui-sref="project.env.staging.manage">Staging</a>
     </li>
     <!--<li role="presentation" ng-class="{active:($state.includes('project.env.database'))}">-->
       <!--<a ui-sref="project.env.database.clone">Database</a>-->
