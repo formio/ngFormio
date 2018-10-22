@@ -12,6 +12,7 @@
         <h4>Version Tag</h4>
         <p><strong ng-if="tag">{{ tag.tag }}</strong></p>
         <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
+        <span class="btn btn-default" ui-sref="project.env.staging.manage">Cancel</span>
       </div>
       <div ng-if="!tags.length && !tag">
         <p>No version tags exist. <a ui-sref="project.env.staging.create">Create</a> a new version tag in the source stage before deploying.</p>
