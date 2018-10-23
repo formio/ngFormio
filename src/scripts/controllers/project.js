@@ -707,12 +707,12 @@ app.controller('ProjectDeployController', [
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.reload();
+                $state.go('project.env.staging.manage', null, {reload: true, notify: true});
               });
           }
           else {
             PrimaryProject.clear();
-            $state.reload();
+            $state.go('project.env.staging.manage', null, {reload: true, notify: true});
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts))
@@ -739,7 +739,7 @@ app.controller('ProjectTagCreateController', [
     $scope.isBusy = false;
     $scope.addTag = function() {
       var tag = $scope.tag;
-      var description = $scope.description;
+      var description = $scope.description || '';
 
       if (!tag) {
         return FormioAlerts.addAlert({
@@ -756,7 +756,7 @@ app.controller('ProjectTagCreateController', [
         });
         $scope.isBusy = false;
         PrimaryProject.clear();
-        $state.go('project.env.staging.manage');
+        $state.go('project.env.staging.manage', null, {reload: true, notify: true});
       };
 
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
@@ -773,6 +773,7 @@ app.controller('ProjectTagCreateController', [
               // Make sure we update the remote project version if it exists as well.
               if ($scope.localProject.remote && $scope.localProject.remote.url) {
                 $scope.currentProject.tag = tag;
+                $scope.currentProject.lastDeploy = new Date().toISOString();
                 $scope.saveProject().then(function() {
                   tagDone();
                 }).catch(function(err) {
