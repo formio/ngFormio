@@ -9,7 +9,7 @@
     <div class="col-md-12">
       <div class="pull-right" role="group" aria-label="Actions">
         <a type="button" class="btn btn-info" ui-sref="project.env.staging.create">Create</a>
-        <a type="button" class="btn btn-primary" ng-click="deploy()">Deploy</a>
+        <a type="button" class="btn btn-primary" ng-click="deploy()" ng-disabled="selectedTags.length !== 1">Deploy</a>
         <a type="button" class="btn btn-danger" ui-sref="project.env.staging.delete({tags: selectedTags})">Delete</a>
       </div>
       <div class="clearfix" style="margin-bottom: 10px;"></div>
