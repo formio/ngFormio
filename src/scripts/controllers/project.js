@@ -707,12 +707,12 @@ app.controller('ProjectDeployController', [
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.go('project.env.staging.manage');
+                $state.reload();
               });
           }
           else {
             PrimaryProject.clear();
-            $state.go('project.env.staging.manage');
+            $state.reload();
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts))
