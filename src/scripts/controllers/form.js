@@ -370,6 +370,7 @@ app.controller('FormController', [
   'GoogleAnalytics',
   '$q',
   'ngDialog',
+  'PrimaryProject',
   'Upload',
   'PDFServer',
   '$http',
@@ -388,6 +389,7 @@ app.controller('FormController', [
     GoogleAnalytics,
     $q,
     ngDialog,
+    PrimaryProject,
     Upload,
     PDFServer,
     $http
@@ -769,6 +771,11 @@ app.controller('FormController', [
         // Reload page when a form is created or merged.
         if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
           $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        }
+        else {
+          // Recalculate project modified status.
+          PrimaryProject.clear();
+          $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
         }
       })
       .catch(function(err) {

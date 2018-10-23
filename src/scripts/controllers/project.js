@@ -321,6 +321,13 @@ app.controller('ProjectController', [
       });
     };
 
+    $scope.projectModified = function(project) {
+      if (project.lastDeploy) {
+        return new Date(project.modified) - new Date(project.lastDeploy) > 200;
+      }
+      return false;
+    };
+
     $scope.minPlan = function(plan, project) {
       var plans = ['basic', 'independent', 'team', 'commercial', 'trial'];
       var checkProject = project || $scope.primaryProject || { plan: 'none' };
@@ -664,7 +671,7 @@ app.controller('ProjectDeployController', [
     };
 
     if ($stateParams.tag) {
-      Formio.makeStaticRequest($scope.projectUrl + '/tag/' + $stateParams.tag._id, 'GET')
+      Formio.makeStaticRequest($scope.localProjectUrl + '/tag/' + $stateParams.tag._id, 'GET')
         .then(function(tag) {
           $scope.tag = tag;
         });

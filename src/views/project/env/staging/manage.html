@@ -1,25 +1,25 @@
 <upgrade-warning ng-if="!minPlan('commercial')" warning="Upgrade your project to Enterprise to enable version tags." />
 <div>
-  <h3>Manage Version tags</h3>
+  <h3>Manage Versions</h3>
   <div class="text-muted">
-    <p>Version tags can be used to migrate forms, resources, actions and roles from one stage to another.
+    <p>Versions can be used to migrate forms, resources, actions and roles from one stage to another.
       Create a new version tag and then deploy it. You can also export a project and import it to another project.</p>
   </div>
   <div class="row">
     <div class="col-md-12">
       <div class="pull-right" role="group" aria-label="Actions">
-        <a type="button" class="btn btn-danger" ui-sref="project.env.staging.delete({tags: selectedTags})">Delete Tags</a>
-        <a type="button" class="btn btn-primary" ng-click="deploy()">Deploy to {{ environmentName }}</a>
+        <a type="button" class="btn btn-info" ui-sref="project.env.staging.create">Create</a>
+        <a type="button" class="btn btn-primary" ng-click="deploy()">Deploy</a>
+        <a type="button" class="btn btn-danger" ui-sref="project.env.staging.delete({tags: selectedTags})">Delete</a>
         <a type="button" class="btn btn-default" ui-sref="project.env.staging.export">Export Template</a>
         <a type="button" class="btn btn-default" ui-sref="project.env.staging.import">Import Template</a>
-        <a type="button" class="btn btn-info" ui-sref="project.env.staging.create">Create Version Tag</a>
       </div>
       <div class="clearfix" style="margin-bottom: 10px;"></div>
       <ul class="list-group list-group-striped">
         <li class="list-group-item list-group-heading">
           <div class="row">
             <div class="col-md-1"></div>
-            <div class="col-md-3"><strong>Version Tag</strong></div>
+            <div class="col-md-3"><strong>Version</strong></div>
             <div class="col-md-4"><strong>Description</strong></div>
             <div class="col-md-4"><strong>Date Created</strong></div>
           </div>

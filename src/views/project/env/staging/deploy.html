@@ -4,24 +4,24 @@
   <div class="row">
     <div class="col-md-8">
       <div ng-if="tags.length">
-        <h4>Select Version Tag</h4>
+        <h4>Select Version</h4>
         <p><select class="form-control tags" ng-model="deployTagOption" ng-options="selectTag as selectTag.tag for selectTag in tags"></select></p>
-        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
+        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version to {{ environmentName }}</span>
       </div>
       <div ng-if="tag">
-        <h4>Version Tag</h4>
+        <h4>Version</h4>
         <p><strong ng-if="tag">{{ tag.tag }}</strong></p>
-        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version tag to {{ environmentName }}</span>
+        <span class="btn btn-primary" ng-click="deployTag(deployTagOption)" ng-disabled="isBusy"><i ng-if="isBusy" class="fa fa-spinner fa-pulse"></i> Deploy version to {{ environmentName }}</span>
         <span class="btn btn-default" ui-sref="project.env.staging.manage">Cancel</span>
       </div>
       <div ng-if="!tags.length && !tag">
-        <p>No version tags exist. <a ui-sref="project.env.staging.create">Create</a> a new version tag in the source stage before deploying.</p>
+        <p>No versions exist. <a ui-sref="project.env.staging.create">Create</a> a new version in the source stage before deploying.</p>
       </div>
     </div>
     <div class="col-md-4">
       <div class="panel panel-primary">
         <div class="panel-heading">
-          <h3 class="panel-title">Deploying a project tag</h3>
+          <h3 class="panel-title">Deploying a version</h3>
         </div>
         <div class="panel-body">
           <p>Deploying a version tag to a stage will replace all forms, resources, roles, actions and access settings with the ones in the version tag.</p>
