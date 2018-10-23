@@ -664,7 +664,7 @@ app.controller('ProjectDeployController', [
     PrimaryProject
   ) {
     var loadTags = function(project) {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag?limit=1000', 'GET', null, {ignoreCache: true})
+      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag?limit=10&sort=-created', 'GET', null, {ignoreCache: true})
         .then(function(tags) {
           $scope.tags = tags;
         });
@@ -707,12 +707,12 @@ app.controller('ProjectDeployController', [
             $scope.saveLocalProject()
               .then(function() {
                 PrimaryProject.clear();
-                $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
+                $state.go('project.env.staging.manage');
               });
           }
           else {
             PrimaryProject.clear();
-            $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
+            $state.go('project.env.staging.manage');
           }
         })
         .catch(FormioAlerts.onError.bind(FormioAlerts))
@@ -756,7 +756,7 @@ app.controller('ProjectTagCreateController', [
         });
         $scope.isBusy = false;
         PrimaryProject.clear();
-        $state.reload();
+        $state.go('project.env.staging.manage');
       };
 
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
@@ -768,10 +768,6 @@ app.controller('ProjectTagCreateController', [
             template: template
           })
             .then(function() {
-              FormioAlerts.addAlert({
-                type: 'success',
-                message: 'Project Tag was created.'
-              });
               $scope.isBusy = false;
 
               // Make sure we update the remote project version if it exists as well.
@@ -868,7 +864,7 @@ app.controller('ProjectTagDeleteController', [
     $scope.delete = function() {
       Promise.all($scope.tags.map(
         function(tag) {
-          return $http.delete($scope.formio.projectUrl + '/tag/' + tag._id)
+          return $http.delete($scope.localProjectUrl + '/tag/' + tag._id)
         })
       ).then(function() {
         $state.go('project.env.staging.manage');
