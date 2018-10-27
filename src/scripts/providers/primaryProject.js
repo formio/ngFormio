@@ -32,7 +32,7 @@ app.factory('PrimaryProject', [
           scope.environments.forEach(function(environment) {
             // If environment has a remote, load remote info for lastDeploy and modified.
             if (environment.remote) {
-              const remoteProjectUrl = $rootScope.projectPath(environment.remote.project, environment.remote.url, environment.remote.type);
+              var remoteProjectUrl = $rootScope.projectPath(environment.remote.project, environment.remote.url, environment.remote.type);
               $http.get(remoteProjectUrl).then(function(result) {
                 environment.modified = result.data.modified;
                 environment.lastDeploy = result.data.lastDeploy;

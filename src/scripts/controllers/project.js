@@ -1,6 +1,6 @@
 'use strict';
 
-/* globals NumberAbbreviate, chance, Chartist, semver, localStorage */
+/* globals NumberAbbreviate, chance, Chartist, semver, localStorage, Blob */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
@@ -850,11 +850,13 @@ app.controller('ProjectTagDeleteController', [
   '$state',
   '$stateParams',
   '$http',
+  '$q',
   function(
     $scope,
     $state,
     $stateParams,
-    $http
+    $http,
+    $q
   ) {
     if (!$stateParams.tags || !$stateParams.tags.length) {
       $state.go('project.env.staging.manage');
@@ -863,15 +865,14 @@ app.controller('ProjectTagDeleteController', [
     $scope.tags = $stateParams.tags;
 
     $scope.delete = function() {
-      Promise.all($scope.tags.map(
+      $q.all($scope.tags.map(
         function(tag) {
-          return $http.delete($scope.localProjectUrl + '/tag/' + tag._id)
+          return $http.delete($scope.localProjectUrl + '/tag/' + tag._id);
         })
       ).then(function() {
         $state.go('project.env.staging.manage');
       });
-
-    }
+    };
   }
 ]);
 
