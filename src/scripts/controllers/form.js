@@ -1894,6 +1894,13 @@ app.controller('FormSubmissionsController', [
         (component.tableView);
     };
 
+    // Refresh the grid when the timezones are done loading.
+    document.body.addEventListener('zonesLoaded', function() {
+      if ($scope.grid) {
+        $scope.grid.refresh();
+      }
+    });
+
     $scope.export = function(form, type) {
       $scope.isBusy = true;
       SubmissionExport.export($scope.formio, form, type)
