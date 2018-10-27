@@ -19420,6 +19420,7 @@ function (_NestedComponent) {
       _this2.language = _this2.options.language;
     });
 
+    _this2.component.clearOnHide = false;
     return _this2;
   }
   /* eslint-enable max-statements */
@@ -21278,14 +21279,16 @@ function (_Webform) {
     value: function addBuilderButton(info, container) {
       var _this7 = this;
 
+      var button;
       info.element = this.ce('div', {
         style: 'margin: 5px 0;'
-      }, this.ce('span', {
-        class: "btn btn-block ".concat(info.style || 'btn-default'),
-        onClick: function onClick() {
-          return _this7.emit(info.event);
-        }
-      }, info.title));
+      }, button = this.ce('span', {
+        class: "btn btn-block ".concat(info.style || 'btn-default')
+      }, info.title)); // Make sure it persists across refreshes.
+
+      this.addEventListener(button, 'click', function () {
+        return _this7.emit(info.event);
+      }, true);
       this.groups[info.key] = info;
       this.insertInOrder(info, this.groups, info.element, container);
     }
@@ -24365,6 +24368,12 @@ function (_Component) {
     value: function beforeSubmit() {
       return _nativePromiseOnly.default.resolve(true);
     }
+    /**
+     * Return the submission timezone.
+     *
+     * @return {*}
+     */
+
   }, {
     key: "build",
 
@@ -25946,7 +25955,7 @@ function (_Component) {
       } else {
         var defaultValue = this.defaultValue;
 
-        if (defaultValue) {
+        if (!_lodash.default.isNil(defaultValue)) {
           this.setValue(defaultValue, {
             noUpdateEvent: true
           });
@@ -26494,6 +26503,12 @@ function (_Component) {
     key: "schema",
     get: function get() {
       return this.getModifiedSchema(_lodash.default.omit(this.component, 'id'), this.defaultSchema);
+    }
+  }, {
+    key: "submissionTimezone",
+    get: function get() {
+      this.options.submissionTimezone = this.options.submissionTimezone || _lodash.default.get(this.root, 'options.submissionTimezone');
+      return this.options.submissionTimezone;
     }
   }, {
     key: "shouldDisable",
@@ -27249,6 +27264,7 @@ exports.default = void 0;
 
 /* eslint-disable quotes, max-len */
 var _default = [{
+  weight: 0,
   input: true,
   label: 'Advanced Logic',
   key: 'logic',
@@ -27261,6 +27277,7 @@ var _default = [{
   addAnother: 'Add Logic',
   saveRow: 'Save Logic',
   components: [{
+    weight: 0,
     input: true,
     inputType: 'text',
     label: 'Logic Name',
@@ -27270,12 +27287,15 @@ var _default = [{
     },
     type: 'textfield'
   }, {
+    weight: 10,
     key: 'triggerPanel',
     input: false,
     title: 'Trigger',
     components: [{
+      weight: 0,
       input: true,
       components: [{
+        weight: 0,
         input: true,
         label: 'Type',
         key: 'type',
@@ -27298,6 +27318,7 @@ var _default = [{
         template: '<span>{{ item.label }}</span>',
         type: 'select'
       }, {
+        weight: 10,
         label: '',
         key: 'simple',
         type: 'container',
@@ -27325,6 +27346,7 @@ var _default = [{
           key: 'eq'
         }]
       }, {
+        weight: 10,
         type: 'textarea',
         key: 'javascript',
         rows: 5,
@@ -27334,6 +27356,7 @@ var _default = [{
         description: '"row", "data", and "component" variables are available. Return "result".',
         customConditional: 'show = row.type === "javascript";'
       }, {
+        weight: 10,
         type: 'textarea',
         key: 'json',
         rows: 5,
@@ -27345,6 +27368,7 @@ var _default = [{
         description: '"row", "data", "component" and "_" variables are available. Return the result to be passed to the action if truthy.',
         customConditional: 'show = row.type === "json";'
       }, {
+        weight: 10,
         type: 'textfield',
         key: 'event',
         label: 'Event Name',
@@ -27357,6 +27381,7 @@ var _default = [{
     }],
     type: 'panel'
   }, {
+    weight: 20,
     input: true,
     label: 'Actions',
     key: 'actions',
@@ -27369,11 +27394,13 @@ var _default = [{
     addAnother: 'Add Action',
     saveRow: 'Save Action',
     components: [{
+      weight: 0,
       title: 'Action',
       input: false,
       key: 'actionPanel',
       type: 'panel',
       components: [{
+        weight: 0,
         input: true,
         inputType: 'text',
         label: 'Action Name',
@@ -27383,6 +27410,7 @@ var _default = [{
         },
         type: 'textfield'
       }, {
+        weight: 10,
         input: true,
         label: 'Type',
         key: 'type',
@@ -27402,6 +27430,7 @@ var _default = [{
         template: '<span>{{ item.label }}</span>',
         type: 'select'
       }, {
+        weight: 20,
         type: 'select',
         template: '<span>{{ item.label }}</span>',
         dataSrc: 'json',
@@ -27411,7 +27440,7 @@ var _default = [{
             value: 'hidden',
             type: 'boolean'
           }, {
-            label: 'required',
+            label: 'Required',
             value: 'validate.required',
             type: 'boolean'
           }, {
@@ -27454,6 +27483,7 @@ var _default = [{
         input: true,
         customConditional: 'show = row.type === "property";'
       }, {
+        weight: 30,
         input: true,
         label: 'Set State',
         key: 'state',
@@ -27471,14 +27501,16 @@ var _default = [{
         type: 'select',
         customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "boolean";'
       }, {
+        weight: 30,
         type: 'textfield',
         key: 'text',
         label: 'Text',
         inputType: 'text',
         input: true,
         description: 'Can use templating with {{ data.myfield }}. "data", "row", "component" and "result" variables are available.',
-        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string";'
+        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string" && !row.property.component;'
       }, {
+        weight: 20,
         input: true,
         label: 'Value (Javascript)',
         key: 'value',
@@ -29843,6 +29875,7 @@ function (_NestedComponent) {
       }
 
       return _NestedComponent2.default.schema.apply(_NestedComponent2.default, [{
+        label: 'Container',
         type: 'container',
         key: 'container',
         clearOnHide: true,
@@ -29978,6 +30011,8 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ 
 
 var _ContentEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Content.edit.display */ "./node_modules/formiojs/components/content/editForm/Content.edit.display.js"));
 
+var _ContentEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Content.edit.logic */ "./node_modules/formiojs/components/content/editForm/Content.edit.logic.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
@@ -29988,6 +30023,9 @@ function _default() {
   return _Base.default.apply(void 0, [[{
     key: 'display',
     components: _ContentEdit.default
+  }, {
+    key: 'logic',
+    components: _ContentEdit2.default
   }]].concat(extend));
 }
 
@@ -30103,6 +30141,7 @@ function (_BaseComponent) {
       }
 
       return _Base.default.schema.apply(_Base.default, [{
+        label: 'Content',
         type: 'content',
         key: 'content',
         input: false,
@@ -30159,6 +30198,96 @@ var _default = [{
   tooltip: 'Rerender the field whenever a value on the form changes.',
   key: 'refreshOnChange',
   input: true
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/content/editForm/Content.edit.logic.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/content/editForm/Content.edit.logic.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'logic',
+  components: [{
+    key: 'actions',
+    components: [{
+      key: 'actionPanel',
+      components: [{
+        data: {
+          json: [{
+            label: 'Hidden',
+            value: 'hidden',
+            type: 'boolean'
+          }, {
+            label: 'Required',
+            value: 'validate.required',
+            type: 'boolean'
+          }, {
+            label: 'Disabled',
+            value: 'disabled',
+            type: 'boolean'
+          }, {
+            label: 'Label',
+            value: 'label',
+            type: 'string'
+          }, {
+            label: 'Title',
+            value: 'title',
+            type: 'string'
+          }, {
+            label: 'Tooltip',
+            value: 'tooltip',
+            type: 'string'
+          }, {
+            label: 'Decription',
+            value: 'description',
+            type: 'string'
+          }, {
+            label: 'Paceholder',
+            value: 'placeholder',
+            type: 'string'
+          }, {
+            label: 'CSS Class',
+            value: 'className',
+            type: 'string'
+          }, {
+            label: 'Container Custom Class',
+            value: 'customClass',
+            type: 'string'
+          }, {
+            label: 'Content',
+            value: 'html',
+            type: 'string',
+            component: 'content'
+          }]
+        },
+        key: 'property'
+      }, {
+        type: 'textarea',
+        editor: 'ace',
+        rows: 10,
+        as: 'html',
+        label: 'Content',
+        tooltip: 'The content of this HTML element.',
+        defaultValue: '<div class="well">Content</div>',
+        key: 'content',
+        weight: 30,
+        input: true,
+        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string" && row.property.component === "content";'
+      }]
+    }]
+  }]
 }];
 exports.default = _default;
 
@@ -30549,13 +30678,11 @@ function (_NestedComponent) {
       this.createElement();
       this.createLabel(this.element);
       var tableClass = 'table datagrid-table table-bordered form-group formio-data-grid ';
-
-      _lodash.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
+      ['striped', 'bordered', 'hover', 'condensed'].forEach(function (prop) {
         if (_this2.component[prop]) {
           tableClass += "table-".concat(prop, " ");
         }
       });
-
       this.tableElement = this.ce('table', {
         class: tableClass
       });
@@ -30590,7 +30717,7 @@ function (_NestedComponent) {
         return this.visibleComponents;
       }
 
-      this.visibleComponents = _lodash.default.filter(this.component.components, function (comp) {
+      this.visibleComponents = this.component.components.filter(function (comp) {
         return _this3.visibleColumns[comp.key];
       });
       this.numColumns += this.visibleComponents.length;
@@ -30687,9 +30814,8 @@ function (_NestedComponent) {
 
       var state = {};
       state.rows = state.rows || {};
-
-      _lodash.default.each(this.rows, function (row, rowIndex) {
-        return _lodash.default.each(row, function (col) {
+      this.rows.forEach(function (row, rowIndex) {
+        return _lodash.default.forIn(row, function (col) {
           state.rows[rowIndex] = state.rows[rowIndex] || {};
 
           var compState = _this7.removeComponent(col, row);
@@ -30699,7 +30825,6 @@ function (_NestedComponent) {
           }
         });
       });
-
       this.rows = [];
       return state;
     }
@@ -30760,10 +30885,10 @@ function (_NestedComponent) {
         this.visibleColumns = {};
       }
 
-      _lodash.default.each(this.component.components, function (col) {
+      this.component.components.forEach(function (col) {
         var showColumn = false;
 
-        _lodash.default.each(_this8.rows, function (comps) {
+        _this8.rows.forEach(function (comps) {
           if (comps && comps[col.key] && typeof comps[col.key].checkConditions === 'function') {
             showColumn |= comps[col.key].checkConditions(data);
           }
@@ -30778,7 +30903,6 @@ function (_NestedComponent) {
         _this8.visibleColumns[col.key] = showColumn;
         show |= showColumn;
       }); // If a rebuild is needed, then rebuild the table.
-
 
       if (rebuild) {
         this.restoreValue();
@@ -30803,6 +30927,7 @@ function (_NestedComponent) {
       flags = this.getFlags.apply(this, arguments);
 
       if (!value) {
+        this.dataValue = this.defaultValue;
         this.buildRows();
         return;
       }
@@ -30864,16 +30989,15 @@ function (_NestedComponent) {
         this.buildRows();
       }
 
-      _lodash.default.each(this.rows, function (row, index) {
+      this.rows.forEach(function (row, index) {
         if (value.length <= index) {
           return;
         }
 
-        _lodash.default.each(row, function (component) {
+        _lodash.default.forIn(row, function (component) {
           return _this9.setNestedValue(component, value[index], flags);
         });
       });
-
       return changed;
     }
     /* eslint-enable max-statements */
@@ -30888,6 +31012,17 @@ function (_NestedComponent) {
     key: "getValue",
     value: function getValue() {
       return this.dataValue;
+    }
+  }, {
+    key: "restoreComponentsContext",
+    value: function restoreComponentsContext() {
+      var _this10 = this;
+
+      this.rows.forEach(function (row, index) {
+        return _lodash.default.forIn(row, function (component) {
+          return component.data = _this10.dataValue[index];
+        });
+      });
     }
   }, {
     key: "defaultSchema",
@@ -30909,7 +31044,7 @@ function (_NestedComponent) {
     get: function get() {
       var dataValue = _get(_getPrototypeOf(DataGridComponent.prototype), "dataValue", this);
 
-      if (!dataValue || !_lodash.default.isArray(dataValue)) {
+      if (!dataValue || !Array.isArray(dataValue)) {
         return this.emptyValue;
       }
 
@@ -30923,7 +31058,7 @@ function (_NestedComponent) {
     get: function get() {
       var value = _get(_getPrototypeOf(DataGridComponent.prototype), "defaultValue", this);
 
-      if (_lodash.default.isArray(value)) {
+      if (Array.isArray(value)) {
         return value;
       }
 
@@ -31661,9 +31796,6 @@ function (_BaseComponent) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(DateTimeComponent).call(this, component, options, data));
     var timezone = _this.component.timezone || _this.options.timezone;
-
-    var submissionTimezone = _this.options.submissionTimezone || _lodash.default.get(_this.root, 'options.submissionTimezone');
-
     var time24hr = !_lodash.default.get(_this.component, 'timePicker.showMeridian', true); // Change the format to map to the settings.
 
     if (!_this.component.enableDate) {
@@ -31682,7 +31814,7 @@ function (_BaseComponent) {
       type: 'calendar',
       timezone: timezone,
       displayInTimezone: _lodash.default.get(_this.component, 'displayInTimezone', 'viewer'),
-      submissionTimezone: submissionTimezone,
+      submissionTimezone: _this.submissionTimezone,
       language: _this.options.language,
       useLocaleSettings: _lodash.default.get(_this.component, 'useLocaleSettings', false),
       allowInput: _lodash.default.get(_this.component, 'allowInput', true),
@@ -31694,6 +31826,7 @@ function (_BaseComponent) {
       hourIncrement: _lodash.default.get(_this.component, 'timePicker.hourStep', 1),
       minuteIncrement: _lodash.default.get(_this.component, 'timePicker.minuteStep', 5),
       time_24hr: time24hr,
+      readOnly: _this.options.readOnly,
       minDate: _lodash.default.get(_this.component, 'datePicker.minDate'),
       maxDate: _lodash.default.get(_this.component, 'datePicker.maxDate')
     };
@@ -31706,6 +31839,15 @@ function (_BaseComponent) {
   }
 
   _createClass(DateTimeComponent, [{
+    key: "performInputMapping",
+    value: function performInputMapping(input) {
+      if (input.widget && this.widget.settings) {
+        input.widget.settings.submissionTimezone = this.submissionTimezone;
+      }
+
+      return input;
+    }
+  }, {
     key: "isEmpty",
     value: function isEmpty(value) {
       if (value.toString() === 'Invalid Date') {
@@ -32133,13 +32275,24 @@ function (_BaseComponent) {
       return info;
     }
   }, {
+    key: "getInputValue",
+    value: function getInputValue(input, defaultValue) {
+      if (_lodash.default.isObject(input)) {
+        if (!_lodash.default.isNaN(input.value)) {
+          return parseInt(input.value, 10);
+        }
+      }
+
+      return defaultValue;
+    }
+  }, {
     key: "validateRequired",
     value: function validateRequired(setting, value) {
-      var day = _lodash.default.isNaN(this.dayInput.value) ? 0 : parseInt(this.dayInput.value, 10);
-      var month = _lodash.default.isNaN(this.monthInput.value) ? -1 : parseInt(this.monthInput.value, 10) - 1;
-      var year = _lodash.default.isNaN(this.yearInput.value) ? 0 : parseInt(this.yearInput.value, 10);
+      var day = this.getInputValue(this.dayInput, 0);
+      var month = this.getInputValue(this.monthInput, 0) - 1;
+      var year = this.getInputValue(this.yearInput, 0);
 
-      if (this.dayRequired && !day) {
+      if (this.dayRequired && day === 0) {
         return false;
       }
 
@@ -32147,7 +32300,7 @@ function (_BaseComponent) {
         return false;
       }
 
-      if (this.yearRequired && !year) {
+      if (this.yearRequired && year === 0) {
         return false;
       }
 
@@ -33069,16 +33222,14 @@ function (_NestedComponent) {
       }
 
       var tableClass = 'editgrid-listgroup list-group ';
-
-      _lodash.default.each(['striped', 'bordered', 'hover', 'condensed'], function (prop) {
+      ['striped', 'bordered', 'hover', 'condensed'].forEach(function (prop) {
         if (_this3.component[prop]) {
           tableClass += "table-".concat(prop, " ");
         }
       });
-
       var tableElement = this.ce('ul', {
         class: tableClass
-      }, [this.headerElement = this.createHeader(), this.rowElements = _lodash.default.map(this.editRows, this.createRow.bind(this)), this.footerElement = this.createFooter()]);
+      }, [this.headerElement = this.createHeader(), this.rowElements = this.editRows.map(this.createRow.bind(this)), this.footerElement = this.createFooter()]);
 
       if (this.tableElement && this.element.contains(this.tableElement)) {
         this.element.replaceChild(tableElement, this.tableElement);
@@ -33087,7 +33238,7 @@ function (_NestedComponent) {
       } //add open class to the element if any edit grid row is open
 
 
-      var isAnyRowOpen = _lodash.default.some(this.editRows, function (row) {
+      var isAnyRowOpen = this.editRows.some(function (row) {
         return row.isOpen;
       });
 
@@ -33504,6 +33655,8 @@ function (_NestedComponent) {
       var _this9 = this;
 
       if (!value) {
+        this.editRows = this.defaultValue;
+        this.buildTable();
         return;
       }
 
@@ -33550,6 +33703,21 @@ function (_NestedComponent) {
     key: "getValue",
     value: function getValue() {
       return this.dataValue;
+    }
+  }, {
+    key: "clearOnHide",
+    value: function clearOnHide(show) {
+      _get(_getPrototypeOf(EditGridComponent.prototype), "clearOnHide", this).call(this, show);
+
+      if (!this.component.clearOnHide) {
+        // If some components set to clearOnHide we need to clear them.
+        this.buildTable();
+      }
+    }
+  }, {
+    key: "restoreComponentsContext",
+    value: function restoreComponentsContext() {
+      return;
     }
   }, {
     key: "defaultSchema",
@@ -35728,6 +35896,8 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ 
 
 var _HTMLEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/HTML.edit.display */ "./node_modules/formiojs/components/html/editForm/HTML.edit.display.js"));
 
+var _HTMLEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/HTML.edit.logic */ "./node_modules/formiojs/components/html/editForm/HTML.edit.logic.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
@@ -35738,6 +35908,9 @@ function _default() {
   return _Base.default.apply(void 0, [[{
     key: 'display',
     components: _HTMLEdit.default
+  }, {
+    key: 'logic',
+    components: _HTMLEdit2.default
   }]].concat(extend));
 }
 
@@ -35845,6 +36018,7 @@ function (_BaseComponent) {
       }
 
       return _Base.default.schema.apply(_Base.default, [{
+        label: 'HTML',
         type: 'htmlelement',
         tag: 'p',
         attrs: [],
@@ -35940,6 +36114,96 @@ var _default = [{
   tooltip: 'Rerender the field whenever a value on the form changes.',
   key: 'refreshOnChange',
   input: true
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/html/editForm/HTML.edit.logic.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/formiojs/components/html/editForm/HTML.edit.logic.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'logic',
+  components: [{
+    key: 'actions',
+    components: [{
+      key: 'actionPanel',
+      components: [{
+        data: {
+          json: [{
+            label: 'Hidden',
+            value: 'hidden',
+            type: 'boolean'
+          }, {
+            label: 'Required',
+            value: 'validate.required',
+            type: 'boolean'
+          }, {
+            label: 'Disabled',
+            value: 'disabled',
+            type: 'boolean'
+          }, {
+            label: 'Label',
+            value: 'label',
+            type: 'string'
+          }, {
+            label: 'Title',
+            value: 'title',
+            type: 'string'
+          }, {
+            label: 'Tooltip',
+            value: 'tooltip',
+            type: 'string'
+          }, {
+            label: 'Decription',
+            value: 'description',
+            type: 'string'
+          }, {
+            label: 'Paceholder',
+            value: 'placeholder',
+            type: 'string'
+          }, {
+            label: 'CSS Class',
+            value: 'className',
+            type: 'string'
+          }, {
+            label: 'Container Custom Class',
+            value: 'customClass',
+            type: 'string'
+          }, {
+            label: 'Content',
+            value: 'content',
+            type: 'string',
+            component: 'content'
+          }]
+        },
+        key: 'property'
+      }, {
+        type: 'textarea',
+        editor: 'ace',
+        rows: 10,
+        as: 'html',
+        label: 'Content',
+        tooltip: 'The content of this HTML element.',
+        defaultValue: '<div class="well">Content</div>',
+        key: 'content',
+        weight: 30,
+        input: true,
+        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string" && row.property.component === "content";'
+      }]
+    }]
+  }]
 }];
 exports.default = _default;
 
@@ -36708,6 +36972,10 @@ function (_BaseComponent) {
       options = options || this.options;
       data = data || this.data;
 
+      if (this.component.clearOnHide) {
+        component.clearOnHide = true;
+      }
+
       var comp = _Components.default.create(component, options, data, true);
 
       comp.parent = this;
@@ -36959,8 +37227,21 @@ function (_BaseComponent) {
     value: function clearOnHide(show) {
       _get(_getPrototypeOf(NestedComponent.prototype), "clearOnHide", this).call(this, show);
 
+      if (this.component.clearOnHide && this.hasValue()) {
+        this.restoreComponentsContext();
+      }
+
       this.getComponents().forEach(function (component) {
         return component.clearOnHide(show);
+      });
+    }
+  }, {
+    key: "restoreComponentsContext",
+    value: function restoreComponentsContext() {
+      var _this5 = this;
+
+      this.getComponents().forEach(function (component) {
+        return component.data = _this5.dataValue;
       });
     }
   }, {
@@ -37072,13 +37353,13 @@ function (_BaseComponent) {
   }, {
     key: "destroyComponents",
     value: function destroyComponents(state) {
-      var _this5 = this;
+      var _this6 = this;
 
       state = state || {};
       state.components = state.components || {};
       var components = this.components.slice();
       components.forEach(function (comp) {
-        var compState = _this5.removeComponent(comp, _this5.components);
+        var compState = _this6.removeComponent(comp, _this6.components);
 
         if (comp.key && compState) {
           state.components[comp.key] = compState;
@@ -37098,11 +37379,11 @@ function (_BaseComponent) {
   }, {
     key: "hideComponents",
     value: function hideComponents(hidden) {
-      var _this6 = this;
+      var _this7 = this;
 
       this.hidden = hidden;
       this.eachComponent(function (component) {
-        return _this6.setHidden(component);
+        return _this7.setHidden(component);
       });
     }
   }, {
@@ -37140,7 +37421,7 @@ function (_BaseComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this7 = this;
+      var _this8 = this;
 
       if (!value) {
         return false;
@@ -37148,18 +37429,18 @@ function (_BaseComponent) {
 
       flags = this.getFlags.apply(this, arguments);
       return this.getComponents().reduce(function (changed, component) {
-        return _this7.setNestedValue(component, value, flags, changed);
+        return _this8.setNestedValue(component, value, flags, changed);
       }, false);
     }
   }, {
     key: "setCollapseHeader",
     value: function setCollapseHeader(header) {
-      var _this8 = this;
+      var _this9 = this;
 
       if (this.component.collapsible) {
         this.addClass(header, 'formio-clickable');
         this.addEventListener(header, 'click', function () {
-          return _this8.toggleCollapse();
+          return _this9.toggleCollapse();
         });
       }
     }
@@ -46235,7 +46516,7 @@ module.exports = cloneArrayBuffer;
 /* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -48085,7 +48366,7 @@ module.exports = nativeKeysIn;
 /* WEBPACK VAR INJECTION */(function(module) {var freeGlobal = __webpack_require__(/*! ./_freeGlobal */ "./node_modules/formiojs/node_modules/lodash/_freeGlobal.js");
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -49115,7 +49396,7 @@ module.exports = isArrayLike;
     stubFalse = __webpack_require__(/*! ./stubFalse */ "./node_modules/formiojs/node_modules/lodash/stubFalse.js");
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -50254,7 +50535,7 @@ module.exports = keysIn;
   var root = freeGlobal || freeSelf || Function('return this')();
 
   /** Detect free variable `exports`. */
-  var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+  var freeExports =  true && exports && !exports.nodeType && exports;
 
   /** Detect free variable `module`. */
   var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -68444,8 +68725,10 @@ var _exportNames = {
   isValidDate: true,
   currentTimezone: true,
   offsetDate: true,
+  zonesLoaded: true,
+  shouldLoadZones: true,
   loadZones: true,
-  timezoneText: true,
+  momentDate: true,
   formatDate: true,
   formatOffset: true,
   getLocaleDateFormatInfo: true,
@@ -68462,7 +68745,8 @@ var _exportNames = {
   iterateKey: true,
   uniqueKey: true,
   bootstrapVersion: true,
-  jsonLogic: true
+  jsonLogic: true,
+  moment: true
 };
 exports.evaluate = evaluate;
 exports.getRandomComponentId = getRandomComponentId;
@@ -68484,8 +68768,10 @@ exports.getDateSetting = getDateSetting;
 exports.isValidDate = isValidDate;
 exports.currentTimezone = currentTimezone;
 exports.offsetDate = offsetDate;
+exports.zonesLoaded = zonesLoaded;
+exports.shouldLoadZones = shouldLoadZones;
 exports.loadZones = loadZones;
-exports.timezoneText = timezoneText;
+exports.momentDate = momentDate;
 exports.formatDate = formatDate;
 exports.formatOffset = formatOffset;
 exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
@@ -68506,6 +68792,12 @@ Object.defineProperty(exports, "jsonLogic", {
   enumerable: true,
   get: function get() {
     return _jsonLogicJs.default;
+  }
+});
+Object.defineProperty(exports, "moment", {
+  enumerable: true,
+  get: function get() {
+    return _momentTimezone.default;
   }
 });
 
@@ -68917,7 +69209,8 @@ function setActionProperty(component, action, row, data, result, instance) {
           component: component,
           result: result
         };
-        var newValue = instance && instance.interpolate ? instance.interpolate(action.text, evalData) : interpolate(action.text, evalData);
+        var textValue = action.property.component ? action[action.property.component] : action.text;
+        var newValue = instance && instance.interpolate ? instance.interpolate(textValue, evalData) : interpolate(textValue, evalData);
 
         if (newValue !== _lodash.default.get(component, action.property.value, '')) {
           _lodash.default.set(component, action.property.value, newValue);
@@ -69067,6 +69360,31 @@ function offsetDate(date, timezone) {
   };
 }
 /**
+ * Returns if the zones are loaded.
+ *
+ * @return {boolean}
+ */
+
+
+function zonesLoaded() {
+  return _momentTimezone.default.zonesLoaded;
+}
+/**
+ * Returns if we should load the zones.
+ *
+ * @param timezone
+ * @return {boolean}
+ */
+
+
+function shouldLoadZones(timezone) {
+  if (timezone === currentTimezone() || timezone === 'UTC') {
+    return false;
+  }
+
+  return true;
+}
+/**
  * Externally load the timezone data.
  *
  * @return {Promise<any> | *}
@@ -69074,12 +69392,7 @@ function offsetDate(date, timezone) {
 
 
 function loadZones(timezone) {
-  if (timezone === currentTimezone()) {
-    // Return non-resolving promise.
-    return new _nativePromiseOnly.default(_lodash.default.noop);
-  }
-
-  if (timezone === 'UTC') {
+  if (timezone && !shouldLoadZones(timezone)) {
     // Return non-resolving promise.
     return new _nativePromiseOnly.default(_lodash.default.noop);
   }
@@ -69092,41 +69405,38 @@ function loadZones(timezone) {
     return resp.json().then(function (zones) {
       _momentTimezone.default.tz.load(zones);
 
-      _momentTimezone.default.zonesLoaded = true;
+      _momentTimezone.default.zonesLoaded = true; // Trigger a global event that the timezones have finished loading.
+
+      if (document && document.createEvent && document.body && document.body.dispatchEvent) {
+        var event = document.createEvent('Event');
+        event.initEvent('zonesLoaded', true, true);
+        document.body.dispatchEvent(event);
+      }
     });
   });
 }
 /**
- * Set the timezone text and replace once timezones have loaded.
+ * Get the moment date object for translating dates with timezones.
  *
- * @param offsetFormat
- * @param stdFormat
+ * @param value
+ * @param format
+ * @param timezone
  * @return {*}
  */
 
 
-function timezoneText(offsetFormat, stdFormat) {
-  loadZones();
+function momentDate(value, format, timezone) {
+  var momentDate = (0, _momentTimezone.default)(value);
 
-  if (_momentTimezone.default.zonesLoaded) {
-    return offsetFormat();
+  if (timezone === 'UTC') {
+    timezone = 'Etc/UTC';
   }
 
-  var id = getRandomComponentId();
-  var tries = 0;
+  if ((timezone !== currentTimezone() || format && format.match(/\s(z$|z\s)/)) && _momentTimezone.default.zonesLoaded) {
+    return momentDate.tz(timezone);
+  }
 
-  _momentTimezone.default.zonesPromise.then(function replaceZone() {
-    var element = document.getElementById(id);
-
-    if (element) {
-      element.innerHTML = offsetFormat();
-    } else if (tries++ < 5) {
-      setTimeout(replaceZone, 100);
-    }
-  }); // For now just return the current format, and replace once zones are loaded.
-
-
-  return "<span id='".concat(id, "'>").concat(stdFormat(), "</span>");
+  return momentDate;
 }
 /**
  * Format a date provided a value, format, and timezone object.
@@ -69144,12 +69454,13 @@ function formatDate(value, format, timezone) {
   if (timezone === currentTimezone()) {
     // See if our format contains a "z" timezone character.
     if (format.match(/\s(z$|z\s)/)) {
-      // Return the timezoneText.
-      return timezoneText(function () {
+      loadZones();
+
+      if (_momentTimezone.default.zonesLoaded) {
         return momentDate.tz(timezone).format(convertFormatToMoment(format));
-      }, function () {
+      } else {
         return momentDate.format(convertFormatToMoment(format.replace(/\s(z$|z\s)/, '')));
-      });
+      }
     } // Return the standard format.
 
 
@@ -69159,14 +69470,16 @@ function formatDate(value, format, timezone) {
   if (timezone === 'UTC') {
     var offset = offsetDate(momentDate.toDate(), 'UTC');
     return "".concat((0, _momentTimezone.default)(offset.date).format(convertFormatToMoment(format)), " UTC");
-  } // Return the timezoneText.
+  } // Load the zones since we need timezone information.
 
 
-  return timezoneText(function () {
+  loadZones();
+
+  if (_momentTimezone.default.zonesLoaded) {
     return momentDate.tz(timezone).format("".concat(convertFormatToMoment(format), " z"));
-  }, function () {
+  } else {
     return momentDate.format(convertFormatToMoment(format));
-  });
+  }
 }
 /**
  * Pass a format function to format within a timezone.
@@ -69186,15 +69499,17 @@ function formatOffset(formatFn, date, format, timezone) {
 
   if (timezone === 'UTC') {
     return "".concat(formatFn(offsetDate(date, 'UTC').date, format), " UTC");
-  } // Return the timezone text.
+  } // Load the zones since we need timezone information.
 
 
-  return timezoneText(function () {
+  loadZones();
+
+  if (_momentTimezone.default.zonesLoaded) {
     var offset = offsetDate(date, timezone);
     return "".concat(formatFn(offset.date, format), " ").concat(offset.abbr);
-  }, function () {
+  } else {
     return formatFn(date, format);
-  });
+  }
 }
 
 function getLocaleDateFormatInfo(locale) {
@@ -69632,11 +69947,35 @@ function (_InputWidget) {
     _this.component.suffix = true;
     return _this;
   }
+  /**
+   * Load the timezones.
+   *
+   * @return {boolean} TRUE if the zones are loading, FALSE otherwise.
+   */
+
 
   _createClass(CalendarWidget, [{
+    key: "loadZones",
+    value: function loadZones() {
+      var _this2 = this;
+
+      var timezone = this.timezone;
+
+      if (!(0, _utils.zonesLoaded)() && (0, _utils.shouldLoadZones)(timezone)) {
+        (0, _utils.loadZones)(timezone).then(function () {
+          return _this2.emit('redraw');
+        }); // Return zones are loading.
+
+        return true;
+      } // Zones are already loaded.
+
+
+      return false;
+    }
+  }, {
     key: "attach",
     value: function attach(input) {
-      var _this2 = this;
+      var _this3 = this;
 
       _get(_getPrototypeOf(CalendarWidget.prototype), "attach", this).call(this, input);
 
@@ -69659,30 +69998,21 @@ function (_InputWidget) {
       this.settings.dateFormat = (0, _utils.convertFormatToFlatpickr)(this.settings.dateFormat);
 
       this.settings.onChange = function () {
-        return _this2.emit('update');
+        return _this3.emit('update');
       };
 
       this.settings.onClose = function () {
-        return _this2.closedOn = Date.now();
+        return _this3.closedOn = Date.now();
       };
 
       this.settings.formatDate = function (date, format) {
         // Only format this if this is the altFormat and the form is readOnly.
-        if (_this2.settings.readOnly && format === _this2.settings.altFormat) {
-          if (_this2.settings.saveAs === 'text') {
+        if (_this3.settings.readOnly && format === _this3.settings.altFormat) {
+          if (_this3.settings.saveAs === 'text' || _this3.loadZones()) {
             return _flatpickr.default.formatDate(date, format);
           }
 
-          if (!_moment.default.zonesLoaded) {
-            (0, _utils.loadZones)(_this2.timezone).then(function () {
-              return _this2.redraw();
-            });
-            return _flatpickr.default.formatDate(date, format);
-          }
-
-          return (0, _utils.formatOffset)(_flatpickr.default.formatDate.bind(_flatpickr.default), date, format, _this2.timezone, function () {
-            return _this2.emit('redraw');
-          });
+          return (0, _utils.formatOffset)(_flatpickr.default.formatDate.bind(_flatpickr.default), date, format, _this3.timezone);
         }
 
         return _flatpickr.default.formatDate(date, format);
@@ -69695,14 +70025,14 @@ function (_InputWidget) {
         this.setInputMask(this.calendar._input, (0, _utils.convertFormatToMask)(this.settings.format)); // Make sure we commit the value after a blur event occurs.
 
         this.addEventListener(this.calendar._input, 'blur', function () {
-          return _this2.calendar.setDate(_this2.calendar._input.value, true, _this2.settings.altFormat);
+          return _this3.calendar.setDate(_this3.calendar._input.value, true, _this3.settings.altFormat);
         });
       }
     }
   }, {
     key: "addSuffix",
     value: function addSuffix(container) {
-      var _this3 = this;
+      var _this4 = this;
 
       var suffix = this.ce('span', {
         class: 'input-group-addon',
@@ -69710,13 +70040,32 @@ function (_InputWidget) {
       });
       suffix.appendChild(this.getIcon(this.settings.enableDate ? 'calendar' : 'time'));
       this.addEventListener(suffix, 'click', function () {
-        if (_this3.calendar && !_this3.calendar.isOpen && Date.now() - _this3.closedOn > 200) {
-          _this3.calendar.open();
+        if (_this4.calendar && !_this4.calendar.isOpen && Date.now() - _this4.closedOn > 200) {
+          _this4.calendar.open();
         }
       });
       container.appendChild(suffix);
       return suffix;
     }
+  }, {
+    key: "getDateValue",
+
+    /**
+     * Return the date value.
+     *
+     * @param date
+     * @param format
+     * @return {string}
+     */
+    value: function getDateValue(date, format) {
+      return (0, _moment.default)(date).format((0, _utils.convertFormatToMoment)(format));
+    }
+    /**
+     * Return the value of the selected date.
+     *
+     * @return {*}
+     */
+
   }, {
     key: "getValue",
     value: function getValue() {
@@ -69730,11 +70079,20 @@ function (_InputWidget) {
 
       if (!dates || !dates.length) {
         return _get(_getPrototypeOf(CalendarWidget.prototype), "getValue", this).call(this);
-      } // Return a formatted version of the date to store in string format.
+      }
 
+      if (!(dates[0] instanceof Date)) {
+        return 'Invalid Date';
+      }
 
-      return dates[0] instanceof Date ? this.getView(dates[0], this.valueFormat) : 'Invalid Date';
+      return this.getDateValue(dates[0], this.valueFormat);
     }
+    /**
+     * Set the selected date value.
+     *
+     * @param value
+     */
+
   }, {
     key: "setValue",
     value: function setValue(value) {
@@ -69743,7 +70101,11 @@ function (_InputWidget) {
       }
 
       if (value) {
-        this.calendar.setDate((0, _moment.default)(value, this.valueMomentFormat).toDate(), false);
+        if (this.settings.saveAs !== 'text' && this.settings.readOnly && !this.loadZones()) {
+          this.calendar.setDate((0, _utils.momentDate)(value, this.valueFormat, this.timezone).toDate(), false);
+        } else {
+          this.calendar.setDate((0, _moment.default)(value, this.valueMomentFormat).toDate(), false);
+        }
       } else {
         this.calendar.clear(false);
       }
@@ -69754,7 +70116,7 @@ function (_InputWidget) {
       format = format || this.dateFormat;
 
       if (this.settings.saveAs === 'text') {
-        return (0, _moment.default)(value).format((0, _utils.convertFormatToMoment)(format));
+        return this.getDateValue(value, format);
       }
 
       return (0, _utils.formatDate)(value, format, this.timezone);
@@ -70722,7 +71084,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 // definition http://translate.sourceforge.net/wiki/l10n/pluralforms
 /* eslint-disable */
-var sets = [{ lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'], nr: [1, 2], fc: 1 }, { lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'he', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'], nr: [1, 2], fc: 2 }, { lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'], nr: [1], fc: 3 }, { lngs: ['be', 'bs', 'dz', 'hr', 'ru', 'sr', 'uk'], nr: [1, 2, 5], fc: 4 }, { lngs: ['ar'], nr: [0, 1, 2, 3, 11, 100], fc: 5 }, { lngs: ['cs', 'sk'], nr: [1, 2, 5], fc: 6 }, { lngs: ['csb', 'pl'], nr: [1, 2, 5], fc: 7 }, { lngs: ['cy'], nr: [1, 2, 3, 8], fc: 8 }, { lngs: ['fr'], nr: [1, 2], fc: 9 }, { lngs: ['ga'], nr: [1, 2, 3, 7, 11], fc: 10 }, { lngs: ['gd'], nr: [1, 2, 3, 20], fc: 11 }, { lngs: ['is'], nr: [1, 2], fc: 12 }, { lngs: ['jv'], nr: [0, 1], fc: 13 }, { lngs: ['kw'], nr: [1, 2, 3, 4], fc: 14 }, { lngs: ['lt'], nr: [1, 2, 10], fc: 15 }, { lngs: ['lv'], nr: [1, 2, 0], fc: 16 }, { lngs: ['mk'], nr: [1, 2], fc: 17 }, { lngs: ['mnk'], nr: [0, 1, 2], fc: 18 }, { lngs: ['mt'], nr: [1, 2, 11, 20], fc: 19 }, { lngs: ['or'], nr: [2, 1], fc: 2 }, { lngs: ['ro'], nr: [1, 2, 20], fc: 20 }, { lngs: ['sl'], nr: [5, 1, 2, 3], fc: 21 }];
+var sets = [{ lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'], nr: [1, 2], fc: 1 }, { lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'], nr: [1, 2], fc: 2 }, { lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'], nr: [1], fc: 3 }, { lngs: ['be', 'bs', 'dz', 'hr', 'ru', 'sr', 'uk'], nr: [1, 2, 5], fc: 4 }, { lngs: ['ar'], nr: [0, 1, 2, 3, 11, 100], fc: 5 }, { lngs: ['cs', 'sk'], nr: [1, 2, 5], fc: 6 }, { lngs: ['csb', 'pl'], nr: [1, 2, 5], fc: 7 }, { lngs: ['cy'], nr: [1, 2, 3, 8], fc: 8 }, { lngs: ['fr'], nr: [1, 2], fc: 9 }, { lngs: ['ga'], nr: [1, 2, 3, 7, 11], fc: 10 }, { lngs: ['gd'], nr: [1, 2, 3, 20], fc: 11 }, { lngs: ['is'], nr: [1, 2], fc: 12 }, { lngs: ['jv'], nr: [0, 1], fc: 13 }, { lngs: ['kw'], nr: [1, 2, 3, 4], fc: 14 }, { lngs: ['lt'], nr: [1, 2, 10], fc: 15 }, { lngs: ['lv'], nr: [1, 2, 0], fc: 16 }, { lngs: ['mk'], nr: [1, 2], fc: 17 }, { lngs: ['mnk'], nr: [0, 1, 2], fc: 18 }, { lngs: ['mt'], nr: [1, 2, 11, 20], fc: 19 }, { lngs: ['or'], nr: [2, 1], fc: 2 }, { lngs: ['ro'], nr: [1, 2, 20], fc: 20 }, { lngs: ['sl'], nr: [5, 1, 2, 3], fc: 21 }, { lngs: ['he'], nr: [1, 2, 20, 21], fc: 22 }];
 
 var _rulesPluralsTypes = {
   1: function _(n) {
@@ -70787,6 +71149,9 @@ var _rulesPluralsTypes = {
   },
   21: function _(n) {
     return Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0);
+  },
+  22: function _(n) {
+    return Number(n === 1 ? 0 : n === 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3);
   }
 };
 /* eslint-enable */
@@ -74133,9 +74498,9 @@ jstz.olson.dst_rules = {
         }
     ]
 };
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+if ( true && typeof module.exports !== 'undefined') {
     module.exports = jstz;
-} else if (("function" !== 'undefined' && __webpack_require__(/*! !webpack amd define */ "./node_modules/webpack/buildin/amd-define.js") !== null) && (__webpack_require__(/*! !webpack amd options */ "./node_modules/webpack/buildin/amd-options.js") != null)) {
+} else if (( true && __webpack_require__(/*! !webpack amd define */ "./node_modules/webpack/buildin/amd-define.js") !== null) && (__webpack_require__(/*! !webpack amd options */ "./node_modules/webpack/buildin/amd-options.js") != null)) {
     !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
         return jstz;
     }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
@@ -74169,7 +74534,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	"use strict";
 
 	/*global define*/
-	if (typeof module === 'object' && module.exports) {
+	if ( true && module.exports) {
 		module.exports = factory(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js")); // Node
 	} else if (true) {
 		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(/*! moment */ "./node_modules/moment/moment.js")], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
@@ -79309,7 +79674,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 (function UMD(name,context,definition){
 	// special form of UMD for polyfilling across evironments
 	context[name] = context[name] || definition();
-	if (typeof module != "undefined" && module.exports) { module.exports = context[name]; }
+	if ( true && module.exports) { module.exports = context[name]; }
 	else if (true) { !(__WEBPACK_AMD_DEFINE_RESULT__ = (function $AMD$(){ return context[name]; }).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)); }
 })("Promise",typeof global != "undefined" ? global : this,function DEF(){
