@@ -59,7 +59,7 @@
     <div class="project-content" ui-view></div>
   </div>
 </div>
-<div class="project-container" ng-if="!projectPermissions.read">
+<div class="project-container" ng-if="projectPermissions && !projectPermissions.read">
   <div class="container" style="margin-top: 20px;">
     <div class="well">
       You have been granted access to this project in order to access some stages. Please use the stages tabs to access a stage you have access to.
