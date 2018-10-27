@@ -350,17 +350,35 @@ angular
           abstract: true,
           parent: 'project.env'
         })
-        .state('project.env.staging.deploy', {
+        .state('project.env.staging.manage', {
           url: '/staging',
           parent: 'project.env',
+          templateUrl: 'views/project/env/staging/manage.html',
+          controller: 'ProjectTagManageController'
+        })
+        .state('project.env.staging.deploy', {
+          url: '/staging/deploy',
+          parent: 'project.env',
           templateUrl: 'views/project/env/staging/deploy.html',
-          controller: 'ProjectDeployController'
+          controller: 'ProjectDeployController',
+          params: {
+            tag: null
+          }
         })
         .state('project.env.staging.create', {
           url: '/staging/create',
           parent: 'project.env',
           templateUrl: 'views/project/env/staging/create.html',
           controller: 'ProjectTagCreateController'
+        })
+        .state('project.env.staging.delete', {
+          url: '/staging/delete',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/staging/delete.html',
+          controller: 'ProjectTagDeleteController',
+          params: {
+            tags: null
+          }
         })
         .state('project.env.staging.import', {
           url: '/staging/import',
