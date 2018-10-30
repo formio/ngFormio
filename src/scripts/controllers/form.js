@@ -740,11 +740,12 @@ app.controller('FormController', [
     //});
 
     // Save a form.
-    $scope.saveForm = function() {
+    $scope.saveForm = function(form) {
+      form = form || $scope.form;
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
-      return $scope.formio.saveForm(angular.copy($scope.form), {
+      return $scope.formio.saveForm(angular.copy(form), {
         getHeaders: true
       })
       .then(function(response) {
@@ -772,6 +773,10 @@ app.controller('FormController', [
         }
       })
       .catch(function(err) {
+        // Catch if a form is returned as an error. This is a conflict.
+        if (err._id && err.type) {
+          throw err;
+        }
         if (err) {
           FormioAlerts.onError.call(FormioAlerts, err);
         }
@@ -895,6 +900,7 @@ app.controller('FormEditController', [
   ) {
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
+      $scope.observer = jsonpatch.observe($scope.form);
     });
     $scope.dirty = false;
 
@@ -967,7 +973,21 @@ app.controller('FormEditController', [
     $scope.saveForm = function() {
       contentLoaded = false;
       $scope.dirty = false;
-      return parentSave();
+      return parentSave()
+        .catch(function(err) {
+          // Attempt to reapply patches.
+          const tmpForm = err;
+          try {
+            jsonpatch.applyPatch(tmpForm, jsonpatch.generate($scope.observer).filter(function(item) {return item.path.indexOf('hashKey') === -1}));
+            return parentSave(tmpForm)
+              .catch(function(err) {
+                console.log('error', err);
+              });
+          }
+          catch(err) {
+            console.log(err);
+          }
+        });
     };
 
     $scope.saveFormDraft = function() {
