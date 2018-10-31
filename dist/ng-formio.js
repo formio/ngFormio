@@ -10787,6 +10787,26 @@ if (!$Number(' 0o1') || !$Number('0b1') || $Number('+0x1')) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/es6.number.is-nan.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/core-js/modules/es6.number.is-nan.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 20.1.2.4 Number.isNaN(number)
+var $export = __webpack_require__(/*! ./_export */ "./node_modules/core-js/modules/_export.js");
+
+$export($export.S, 'Number', {
+  isNaN: function isNaN(number) {
+    // eslint-disable-next-line no-self-compare
+    return number != number;
+  }
+});
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/es6.object.assign.js":
 /*!***********************************************************!*\
   !*** ./node_modules/core-js/modules/es6.object.assign.js ***!
@@ -16363,9 +16383,12 @@ function () {
 
         if (placeholder) {
           input.setAttribute('placeholder', this.maskPlaceholder(mask));
-        }
+        } // prevent pushing undefined value to array in case of vanilla-text-mask error catched above
 
-        this.inputMasks.push(input.mask);
+
+        if (input.mask) {
+          this.inputMasks.push(input.mask);
+        }
       }
     }
     /**
@@ -22227,6 +22250,10 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
+
+__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
+
 var _WebformBuilder2 = _interopRequireDefault(__webpack_require__(/*! ./WebformBuilder */ "./node_modules/formiojs/WebformBuilder.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
@@ -22297,8 +22324,23 @@ function (_WebformBuilder) {
   }, {
     key: "deleteComponent",
     value: function deleteComponent(component) {
-      if (_get(_getPrototypeOf(WizardBuilder.prototype), "deleteComponent", this).call(this, component)) {
-        this.gotoPage(0);
+      var _this2 = this;
+
+      var cb;
+      var isPage = this.components.includes(component);
+
+      if (isPage) {
+        cb = function cb() {
+          return _this2.currentPage = 0;
+        };
+
+        this.on('deleteComponent', cb);
+      }
+
+      _get(_getPrototypeOf(WizardBuilder.prototype), "deleteComponent", this).call(this, component);
+
+      if (isPage) {
+        this.off('deleteComponent', cb);
       }
     }
   }, {
@@ -22315,19 +22357,18 @@ function (_WebformBuilder) {
       this.addComponent(newPage);
       this.emit('saveComponent', newPage);
       this.form = this.schema;
-      this.redraw();
     }
   }, {
     key: "addComponents",
     value: function addComponents(element, data, options, state) {
-      var _this2 = this;
+      var _this3 = this;
 
       element = element || this.getContainer();
       data = data || this.data;
       var components = this.hook('addComponents', this.componentComponents, this);
 
       _lodash.default.each(components, function (component, index) {
-        _this2.addComponent(component, element, data, null, index !== _this2.currentPage, state);
+        return _this3.addComponent(component, element, data, null, index !== _this3.currentPage, _this3.getComponentState(component, state));
       });
     }
   }, {
@@ -22345,7 +22386,7 @@ function (_WebformBuilder) {
   }, {
     key: "buildPageBar",
     value: function buildPageBar() {
-      var _this3 = this;
+      var _this4 = this;
 
       var pages = this.pages; // Always ensure we have a single page.
 
@@ -22356,17 +22397,17 @@ function (_WebformBuilder) {
       this.empty(this.pageBar);
 
       _lodash.default.each(pages, function (page, index) {
-        var pageLink = _this3.ce('span', {
+        var pageLink = _this4.ce('span', {
           title: page.title,
-          class: index === _this3.currentPage ? 'mr-2 badge badge-primary bg-primary label label-primary wizard-page-label' : 'mr-2 badge badge-info bg-info label label-info wizard-page-label'
-        }, _this3.text(page.title));
+          class: index === _this4.currentPage ? 'mr-2 badge badge-primary bg-primary label label-primary wizard-page-label' : 'mr-2 badge badge-info bg-info label label-info wizard-page-label'
+        }, _this4.text(page.title));
 
-        _this3.pageBar.appendChild(_this3.ce('li', null, pageLink));
+        _this4.pageBar.appendChild(_this4.ce('li', null, pageLink));
 
-        _this3.addEventListener(pageLink, 'click', function (event) {
+        _this4.addEventListener(pageLink, 'click', function (event) {
           event.preventDefault();
 
-          _this3.gotoPage(index);
+          _this4.gotoPage(index);
         });
       });
 
@@ -22377,19 +22418,19 @@ function (_WebformBuilder) {
       this.addEventListener(newPage, 'click', function (event) {
         event.preventDefault();
 
-        _this3.addPage();
+        _this4.addPage();
       });
       this.pageBar.appendChild(this.ce('li', null, newPage));
     }
   }, {
     key: "build",
-    value: function build() {
-      var _this4 = this;
+    value: function build(state) {
+      var _this5 = this;
 
-      _get(_getPrototypeOf(WizardBuilder.prototype), "build", this).call(this);
+      _get(_getPrototypeOf(WizardBuilder.prototype), "build", this).call(this, state);
 
       this.builderReady.then(function () {
-        return _this4.buildPageBar();
+        return _this5.buildPageBar();
       });
     }
   }, {
@@ -22536,6 +22577,10 @@ __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_module
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
+__webpack_require__(/*! core-js/modules/es6.number.constructor */ "./node_modules/core-js/modules/es6.number.constructor.js");
+
+__webpack_require__(/*! core-js/modules/es6.number.is-nan */ "./node_modules/core-js/modules/es6.number.is-nan.js");
+
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
@@ -22648,7 +22693,7 @@ var _default = {
       check: function check(component, setting, value) {
         var min = parseFloat(setting);
 
-        if (!min || !_lodash.default.isNumber(value)) {
+        if (Number.isNaN(min) || !_lodash.default.isNumber(value)) {
           return true;
         }
 
@@ -22667,7 +22712,7 @@ var _default = {
       check: function check(component, setting, value) {
         var max = parseFloat(setting);
 
-        if (!max || !_lodash.default.isNumber(value)) {
+        if (Number.isNaN(max) || !_lodash.default.isNumber(value)) {
           return true;
         }
 
@@ -26644,6 +26689,9 @@ function (_Component) {
         theme: 'snow',
         placeholder: this.t(this.component.placeholder),
         modules: {
+          clipboard: {
+            matchVisual: false
+          },
           toolbar: [[{
             'size': ['small', false, 'large', 'huge']
           }], // custom dropdown
@@ -28997,11 +29045,6 @@ function (_BaseComponent) {
       }
     }
   }, {
-    key: "isEmpty",
-    value: function isEmpty(value) {
-      return _get(_getPrototypeOf(CheckBoxComponent.prototype), "isEmpty", this).call(this, value) || value === false;
-    }
-  }, {
     key: "createLabel",
     value: function createLabel(container, input) {
       var isLabelHidden = this.labelIsHidden();
@@ -29142,7 +29185,7 @@ function (_BaseComponent) {
   }, {
     key: "emptyValue",
     get: function get() {
-      return false;
+      return undefined;
     }
   }, {
     key: "dataValue",
@@ -30050,6 +30093,10 @@ __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_mod
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
 
+__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30065,6 +30112,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
@@ -30093,6 +30144,9 @@ function (_BaseComponent) {
     value: function build() {
       var _this = this;
 
+      var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var _state$quill = state.quill,
+          quill = _state$quill === void 0 ? {} : _state$quill;
       this.createElement();
       this.htmlElement = this.ce('div', {
         id: this.id,
@@ -30106,7 +30160,21 @@ function (_BaseComponent) {
         this.addQuill(editorElement, this.wysiwygDefault, function (element) {
           _this.component.html = element.value;
         }).then(function (editor) {
-          editor.setContents(editor.clipboard.convert(_this.component.html));
+          var contents = quill.contents;
+
+          if (_lodash.default.isString(contents)) {
+            try {
+              contents = JSON.parse(contents);
+            } catch (err) {
+              console.warn(err);
+            }
+          }
+
+          if (_lodash.default.isObject(contents)) {
+            editor.setContents(contents);
+          } else {
+            editor.clipboard.dangerouslyPasteHTML(_this.component.html);
+          }
         }).catch(function (err) {
           return console.warn(err);
         });
@@ -30122,6 +30190,23 @@ function (_BaseComponent) {
 
       this.element.appendChild(this.htmlElement);
       this.attachLogic();
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      var state = _get(_getPrototypeOf(ContentComponent.prototype), "destroy", this).call(this);
+
+      if (this.quill) {
+        try {
+          state.quill = {
+            contents: JSON.stringify(this.quill.getContents())
+          };
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+
+      return state;
     }
   }, {
     key: "defaultSchema",
@@ -36774,6 +36859,8 @@ __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
+
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.find-index */ "./node_modules/core-js/modules/es6.array.find-index.js");
@@ -37151,15 +37238,24 @@ function (_BaseComponent) {
       } else {
         var components = this.hook('addComponents', this.componentComponents, this) || [];
         components.forEach(function (component) {
-          var compState = {};
-
-          if (state && state.components && state.components[component.key]) {
-            compState = state.components[component.key];
-          }
-
-          _this4.addComponent(component, element, data, null, null, compState);
+          return _this4.addComponent(component, element, data, null, null, _this4.getComponentState(component, state));
         });
       }
+    }
+  }, {
+    key: "getComponentState",
+    value: function getComponentState() {
+      var component = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var state = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var key = component.key;
+      var components = state.components;
+      var substate = {};
+
+      if (components) {
+        Object.assign(substate, components[key]);
+      }
+
+      return substate;
     }
   }, {
     key: "updateValue",
@@ -39904,9 +40000,12 @@ function (_BaseComponent) {
       } else {
         this.focusableElement = this.choices.containerInner;
         this.choices.containerOuter.setAttribute('tabIndex', '-1');
-        this.addEventListener(this.choices.containerOuter, 'focus', function () {
-          return _this5.focusableElement.focus();
-        });
+
+        if (useSearch) {
+          this.addEventListener(this.choices.containerOuter, 'focus', function () {
+            return _this5.focusableElement.focus();
+          });
+        }
       }
 
       this.addFocusBlurEvents(this.focusableElement);
@@ -74525,7 +74624,7 @@ if ( true && typeof module.exports !== 'undefined') {
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//! moment-timezone.js
-//! version : 0.5.21
+//! version : 0.5.23
 //! Copyright (c) JS Foundation and other contributors
 //! license : MIT
 //! github.com/moment/moment-timezone
@@ -74551,7 +74650,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	// 	return moment;
 	// }
 
-	var VERSION = "0.5.21",
+	var VERSION = "0.5.23",
 		zones = {},
 		links = {},
 		names = {},
