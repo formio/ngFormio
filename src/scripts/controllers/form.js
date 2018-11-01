@@ -968,25 +968,35 @@ app.controller('FormEditController', [
       $scope.dirty = true;
     });
 
+    const handleFormConflict = function(newForm) {
+      // Filter out bogus patches.
+      const patches = jsonpatch.generate($scope.observer)
+        .filter(function(item) {
+          return item.path.indexOf('hashKey') === -1 && item.path !== '/builder';
+        });
+      console.log(patches);
+
+      try {
+        const mergedForm = jsonpatch.applyPatch(newForm, patches, true).newDocument;
+        return parentSave(mergedForm)
+          .catch(handleFormConflict);
+      }
+      catch(err) {
+        console.log('catch', err);
+      }
+    };
+
     // Wrap saveForm in the editor to clear dirty when saved.
     var parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       contentLoaded = false;
       $scope.dirty = false;
       return parentSave()
-        .catch(function(err) {
-          // Attempt to reapply patches.
-          const tmpForm = err;
-          try {
-            jsonpatch.applyPatch(tmpForm, jsonpatch.generate($scope.observer).filter(function(item) {return item.path.indexOf('hashKey') === -1}));
-            return parentSave(tmpForm)
-              .catch(function(err) {
-                console.log('error', err);
-              });
-          }
-          catch(err) {
-            console.log(err);
-          }
+        .catch(handleFormConflict)
+        .then(function() {
+          // Reinitialize observer.
+          $scope.observer.unobserve();
+          $scope.observer = jsonpatch.observe($scope.form);
         });
     };
 

@@ -66,7 +66,7 @@ afterEach(function () {
       browser.manage().logs().get('browser')
         .then(function(logs) {
           if (logs.length) {
-            fs.writeFile(path + '.txt', JSON.stringify(logs));
+            fs.writeFile(path + '.txt', JSON.stringify(logs), error => {if (error) {console.log(error)}});
           }
         });
       browser.takeScreenshot().then(function (png) {
