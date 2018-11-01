@@ -974,7 +974,6 @@ app.controller('FormEditController', [
         .filter(function(item) {
           return item.path.indexOf('hashKey') === -1 && item.path !== '/builder';
         });
-      console.log(patches);
 
       try {
         const mergedForm = jsonpatch.applyPatch(newForm, patches, true).newDocument;
