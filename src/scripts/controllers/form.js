@@ -253,7 +253,8 @@ app.directive('formList', function() {
       formType: '=',
       numPerPage: '=?',
       listMode: '=',
-      protected: '=?'
+      protected: '=?',
+      formio: '=?'
     },
     controller: [
       '$scope',
@@ -284,7 +285,7 @@ app.directive('formList', function() {
         $scope.forms = [];
 
         var query = {params: {
-          select: '_id,title,type,path,modified',
+          select: '_id,title,type,path,modified,name',
           limit: $scope.numPerPage,
           skip: 0
         }};

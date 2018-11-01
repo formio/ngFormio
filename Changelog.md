@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [UNRELEASED]
 ### Fixed
  - XSS issues.
+ - FOR-1723: CSV export not working in Data section
 
 ## 5.9.0
 ### Added
