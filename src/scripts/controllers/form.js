@@ -902,6 +902,12 @@ app.controller('FormEditController', [
       $scope.form.builder = true;
       $scope.observer = jsonpatch.observe($scope.form);
     });
+
+    $scope.setForm = function(form) {
+      $scope.form = form;
+      $scope.observer = jsonpatch.observe($scope.form);
+    };
+
     $scope.dirty = false;
 
     $scope.formReady = false;
@@ -977,20 +983,31 @@ app.controller('FormEditController', [
 
       try {
         const mergedForm = jsonpatch.applyPatch(newForm, patches, true).newDocument;
-        return parentSave(mergedForm)
+        return $scope.parentSave(mergedForm)
           .catch(handleFormConflict);
       }
       catch(err) {
-        console.log('catch', err);
+        // If we get here, we weren't able to apply our changes to the new form. Need to decide whose to keep.
+        $scope.newForm = newForm;
+        ngDialog.open(
+          {
+            template: 'views/form/form-conflict.html',
+            controller: 'FormConflictController',
+            showClose: true,
+            className: 'ngdialog-theme-default',
+            scope: $scope,
+            height: '600px'
+          }
+        );
       }
     };
 
     // Wrap saveForm in the editor to clear dirty when saved.
-    var parentSave = $scope.saveForm;
+    $scope.parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       contentLoaded = false;
       $scope.dirty = false;
-      return parentSave()
+      return $scope.parentSave()
         .catch(handleFormConflict)
         .then(function() {
           // Reinitialize observer.
@@ -1108,6 +1125,37 @@ app.controller('FormEditController', [
         });
       });
     });
+  }
+]);
+
+app.controller('FormConflictController', [
+  '$scope',
+  'ngDialog',
+  function($scope, ngDialog) {
+    $scope.saveOurs = function() {
+      var form = angular.copy($scope.form);
+      delete form.modified;
+      $scope.parentSave(form);
+      ngDialog.close();
+    };
+
+    $scope.keepTheirs = function() {
+      $scope.setForm($scope.newForm);
+      ngDialog.close();
+    };
+
+    setTimeout(function() {
+      $('#mergely').mergely({
+        lhs: function(setValue) {
+          setValue(JSON.stringify($scope.form, null, 2));
+        },
+        rhs: function(setValue) {
+          setValue(JSON.stringify($scope.newForm, null, 2));
+        },
+        sidebar: false,
+        viewport: false
+      });
+    }, 1000);
   }
 ]);
 
