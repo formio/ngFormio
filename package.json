@@ -34,7 +34,7 @@
     "gulp-size": "^3.0.0",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-uglify": "^3.0.1",
-    "gulp-useref": "^3.1.5",
+    "gulp-useref": "^3.1.6",
     "gulp-watch": "^5.0.1",
     "gulp-wrapper": "^1.0.0",
     "html-dnd": "^1.2.0",
