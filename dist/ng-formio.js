@@ -15996,6 +15996,10 @@ __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/cor
 
 __webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
 
+__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
+
+__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_modules/core-js/modules/es6.regexp.constructor.js");
@@ -16182,6 +16186,8 @@ function () {
       } else if ('attachEvent' in obj) {
         obj.attachEvent("on".concat(type), func);
       }
+
+      return this;
     }
     /**
      * Remove an event listener from the object.
@@ -16207,6 +16213,8 @@ function () {
       if (indexes.length) {
         _lodash.default.pullAt(this.eventHandlers, indexes);
       }
+
+      return this;
     }
     /**
      * Removes all event listeners attached to this component.
@@ -16247,9 +16255,8 @@ function () {
   }, {
     key: "appendTo",
     value: function appendTo(element, container) {
-      if (container) {
-        container.appendChild(element);
-      }
+      container === null || container === void 0 ? void 0 : container.appendChild(element);
+      return this;
     }
     /**
      * Prepend an HTML DOM element to a container.
@@ -16273,6 +16280,8 @@ function () {
           container.appendChild(element);
         }
       }
+
+      return this;
     }
     /**
      * Removes an HTML DOM element from its bounding container.
@@ -16291,6 +16300,8 @@ function () {
           console.warn(err);
         }
       }
+
+      return this;
     }
     /**
      * Alias for document.createElement.
@@ -16330,13 +16341,15 @@ function () {
 
       if (Array.isArray(child)) {
         child.forEach(function (oneChild) {
-          _this4.appendChild(element, oneChild);
+          return _this4.appendChild(element, oneChild);
         });
       } else if (child instanceof HTMLElement || child instanceof Text) {
         element.appendChild(child);
       } else if (child) {
         element.appendChild(this.text(child.toString()));
       }
+
+      return this;
     }
     /**
      * Creates a new input mask placeholder.
@@ -16476,14 +16489,16 @@ function () {
     key: "addClass",
     value: function addClass(element, className) {
       if (!element) {
-        return;
+        return this;
       }
 
       var classes = element.getAttribute('class');
 
-      if (!classes || classes.indexOf(className) === -1) {
+      if (!(classes === null || classes === void 0 ? void 0 : classes.includes(className))) {
         element.setAttribute('class', "".concat(classes, " ").concat(className));
       }
+
+      return this;
     }
     /**
      * Remove a class from a DOM element.
@@ -16498,15 +16513,16 @@ function () {
     key: "removeClass",
     value: function removeClass(element, className) {
       if (!element) {
-        return;
+        return this;
       }
 
-      var cls = element.getAttribute('class');
+      var classes = element.getAttribute('class');
 
-      if (cls) {
-        cls = cls.replace(new RegExp(" ".concat(className), 'g'), '');
-        element.setAttribute('class', cls);
+      if (classes) {
+        element.setAttribute('class', classes.replace(new RegExp(" ".concat(className), 'g'), ''));
       }
+
+      return this;
     }
     /**
      * Empty's an HTML DOM element.
@@ -20404,6 +20420,8 @@ function (_NestedComponent) {
             }
 
             _this17.redraw();
+
+            _this17.emit('languageChanged');
 
             resolve();
           });
@@ -29424,10 +29442,12 @@ function (_NestedComponent) {
   _createClass(ColumnComponent, [{
     key: "conditionallyVisible",
     value: function conditionallyVisible(data) {
-      // Check children components for visibility.
-      var allChildrenHidden = _lodash.default.every(this.getComponents(), ['visible', false]);
+      if (!this.component.hideOnChildrenHidden) {
+        return _get(_getPrototypeOf(ColumnComponent.prototype), "conditionallyVisible", this).call(this, data);
+      } // Check children components for visibility.
 
-      if (allChildrenHidden) {
+
+      if (_lodash.default.every(this.getComponents(), ['visible', false])) {
         return false;
       }
 
@@ -29609,7 +29629,8 @@ function (_NestedComponent) {
         input: false,
         tableView: false,
         persistent: false,
-        autoAdjust: false
+        autoAdjust: false,
+        hideOnChildrenHidden: false
       }].concat(extend));
     }
   }, {
@@ -29717,6 +29738,7 @@ function (_NestedComponent) {
 
       _lodash.default.each(this.component.columns, function (column) {
         column.type = 'column';
+        column.hideOnChildrenHidden = _this4.component.hideOnChildrenHidden;
 
         _this4.addComponent(column, container, _this4.data, null, null, state);
       });
@@ -29727,14 +29749,9 @@ function (_NestedComponent) {
     key: "checkConditions",
     value: function checkConditions(data) {
       if (this.component.autoAdjust) {
-        var before = this.nbVisible;
-
         var result = _get(_getPrototypeOf(ColumnsComponent.prototype), "checkConditions", this).call(this, data);
 
-        if (before !== this.nbVisible) {
-          this.justify();
-        }
-
+        this.justify();
         return result;
       } else {
         return _get(_getPrototypeOf(ColumnsComponent.prototype), "checkConditions", this).call(this, data);
@@ -29821,6 +29838,13 @@ var _default = [{
   label: 'Auto adjust columns',
   tooltip: 'Will automatically adjust columns based on if nested components are hidden.',
   key: 'autoAdjust',
+  input: true
+}, {
+  weight: 161,
+  type: 'checkbox',
+  label: 'Hide Column when Children Hidden',
+  key: 'hideOnChildrenHidden',
+  tooltip: 'Check this if you would like to hide any column when the children within that column are also hidden',
   input: true
 }];
 exports.default = _default;
@@ -31891,6 +31915,8 @@ function (_BaseComponent) {
       _this.component.format = _this.component.format.replace(/ hh:mm a$/g, '');
     } else if (time24hr) {
       _this.component.format = _this.component.format.replace(/hh:mm a$/g, 'HH:mm');
+    } else {
+      _this.component.format = _this.component.format.replace(/HH:mm$/g, 'hh:mm a');
     }
     /* eslint-disable camelcase */
 
@@ -32085,7 +32111,7 @@ var _default = [{
   valueProperty: 'name',
   dataSrc: 'url',
   data: {
-    url: 'https://cdn.rawgit.com/travist/b8b3b3dd51c3ca01469ce18d8f00fd3e/raw/timezones.json'
+    url: 'https://formio.github.io/formio.js/resources/timezones.json'
   },
   template: '<span>{{ item.label }}</span>',
   conditional: {
@@ -33285,8 +33311,8 @@ function (_NestedComponent) {
         }
       });
       this.buildTable();
-      this.createDescription(this.element);
       this.createAddButton();
+      this.createDescription(this.element);
       this.element.appendChild(this.errorContainer = this.ce('div', {
         class: 'has-error'
       }));
@@ -34394,6 +34420,7 @@ function (_BaseComponent) {
         label: 'Upload',
         key: 'file',
         image: false,
+        privateDownload: false,
         imageSize: '200',
         filePattern: '*',
         fileMinSize: '0KB',
@@ -35067,6 +35094,10 @@ function (_BaseComponent) {
           _this12.uploadStatusList.appendChild(uploadStatus);
 
           if (fileUpload.status !== 'error') {
+            if (_this12.component.privateDownload) {
+              file.private = true;
+            }
+
             fileService.uploadFile(_this12.component.storage, file, fileName, dir, function (evt) {
               fileUpload.status = 'progress';
               fileUpload.progress = parseInt(100.0 * evt.loaded / evt.total);
@@ -35105,6 +35136,10 @@ function (_BaseComponent) {
 
       if (!fileService) {
         return alert('File Service not provided');
+      }
+
+      if (this.component.privateDownload) {
+        fileInfo.private = true;
       }
 
       fileService.downloadFile(fileInfo).then(function (file) {
@@ -35241,6 +35276,20 @@ var _default = [{
   label: 'Display as image(s)',
   tooltip: 'Instead of a list of linked files, images will be rendered in the view.',
   weight: 30
+}, {
+  type: 'checkbox',
+  input: true,
+  key: 'privateDownload',
+  label: 'Private Download',
+  tooltip: 'When this is checked, the file download will send a POST request to the download URL with the x-jwt-token header. This will allow your endpoint to create a Private download system.',
+  weight: 31,
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.storage'
+      }, 'url']
+    }
+  }
 }, {
   type: 'textfield',
   input: true,
@@ -39506,9 +39555,7 @@ function (_BaseComponent) {
 
     _this.triggerUpdate = _lodash.default.debounce(_this.updateItems.bind(_assertThisInitialized(_assertThisInitialized(_this))), 100); // Keep track of the select options.
 
-    _this.selectOptions = []; // See if this should use the template.
-
-    _this.useTemplate = _this.component.dataSrc !== 'values' && _this.component.template; // If this component has been activated.
+    _this.selectOptions = []; // If this component has been activated.
 
     _this.activated = false; // Determine when the items have been loaded.
 
@@ -39540,7 +39587,7 @@ function (_BaseComponent) {
       } // Perform a fast interpretation if we should not use the template.
 
 
-      if (data && !this.useTemplate) {
+      if (data && !this.component.template) {
         var itemLabel = data.label || data;
         return typeof itemLabel === 'string' ? this.t(itemLabel) : itemLabel;
       }
@@ -42296,7 +42343,7 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -42337,6 +42384,7 @@ function (_NestedComponent) {
       }
 
       return _NestedComponent2.default.schema.apply(_NestedComponent2.default, [{
+        label: 'Tabs',
         type: 'tabs',
         input: false,
         key: 'tabs',
@@ -42377,22 +42425,15 @@ function (_NestedComponent) {
     value: function createElement() {
       var _this2 = this;
 
-      this.tabBar = this.ce('ul', {
+      this.tabsBar = this.ce('ul', {
         class: 'nav nav-tabs'
       });
-      this.tabContent = this.ce('div', {
+      this.tabsContent = this.ce('div', {
         class: 'tab-content'
       });
-      this.tabs = [];
       this.tabLinks = [];
-
-      _lodash.default.each(this.component.components, function (tab, index) {
-        var tabPanel = _this2.ce('div', {
-          role: 'tabpanel',
-          class: 'tab-pane',
-          id: tab.key
-        });
-
+      this.tabs = [];
+      this.component.components.forEach(function (tab, index) {
         var tabLink = _this2.ce('a', {
           class: 'nav-link',
           href: "#".concat(tab.key)
@@ -42411,19 +42452,24 @@ function (_NestedComponent) {
 
         tabElement.tabLink = tabLink;
 
+        _this2.tabsBar.appendChild(tabElement);
+
         _this2.tabLinks.push(tabElement);
 
+        var tabPanel = _this2.ce('div', {
+          role: 'tabpanel',
+          class: 'tab-pane',
+          id: tab.key
+        });
+
+        _this2.tabsContent.appendChild(tabPanel);
+
         _this2.tabs.push(tabPanel);
-
-        _this2.tabBar.appendChild(tabElement);
-
-        _this2.tabContent.appendChild(tabPanel);
       });
-
       this.element = this.ce('div', {
         id: this.id,
         class: this.className
-      }, [this.tabBar, this.tabContent]);
+      }, [this.tabsBar, this.tabsContent]);
       this.element.component = this;
       return this.element;
     }
@@ -42444,39 +42490,26 @@ function (_NestedComponent) {
 
       this.currentTab = index; // Get the current tab.
 
-      var tab = this.component.components[this.currentTab];
-      this.empty(this.tabs[this.currentTab]);
-
-      _lodash.default.remove(this.components, function (comp) {
-        return comp.component.tab === _this3.currentTab;
-      });
-
+      var tab = this.component.components[index];
+      this.empty(this.tabs[index]);
+      this.components = [];
       var components = this.hook('addComponents', tab.components, this);
-
-      _lodash.default.each(components, function (component) {
-        return _this3.addComponent(component, _this3.tabs[_this3.currentTab], _this3.data, null, null, state);
+      components.forEach(function (component) {
+        return _this3.addComponent(component, _this3.tabs[index], _this3.data, null, null, state);
       });
-
       this.restoreValue();
 
       if (this.tabLinks.length <= index) {
         return;
       }
 
-      _lodash.default.each(this.tabLinks, function (tabLink) {
-        _this3.removeClass(tabLink, 'active');
-
-        _this3.removeClass(tabLink.tabLink, 'active');
+      this.tabLinks.forEach(function (tabLink) {
+        return _this3.removeClass(tabLink, 'active').removeClass(tabLink.tabLink, 'active');
       });
-
-      this.addClass(this.tabLinks[index], 'active');
-      this.addClass(this.tabLinks[index].tabLink, 'active');
-
-      _lodash.default.each(this.tabs, function (tab) {
-        _this3.removeClass(tab, 'active');
+      this.tabs.forEach(function (tab) {
+        return _this3.removeClass(tab, 'active');
       });
-
-      this.addClass(this.tabs[index], 'active');
+      this.addClass(this.tabLinks[index], 'active').addClass(this.tabLinks[index].tabLink, 'active').addClass(this.tabs[index], 'active');
       this.triggerChange();
     }
   }, {
@@ -42509,7 +42542,9 @@ function (_NestedComponent) {
   }, {
     key: "addComponents",
     value: function addComponents(element, data, options, state) {
-      var currentTab = state && state.currentTab ? state.currentTab : this.currentTab;
+      var _ref = state && state.currentTab ? state : this,
+          currentTab = _ref.currentTab;
+
       this.setTab(currentTab, state);
     }
   }, {
@@ -42520,23 +42555,19 @@ function (_NestedComponent) {
   }, {
     key: "schema",
     get: function get() {
+      var _this4 = this;
+
       var schema = _get(_getPrototypeOf(TabsComponent.prototype), "schema", this);
 
-      schema.components = [];
+      schema.components = this.component.components.map(function (tab, index) {
+        if (index === _this4.currentTab) {
+          tab.components = _this4.getComponents().map(function (component) {
+            return component.schema;
+          });
+        }
 
-      var allComponents = _lodash.default.groupBy(this.getComponents(), 'component.tab');
-
-      _lodash.default.each(this.component.components, function (tab, index) {
-        var tabSchema = tab;
-        tabSchema.components = [];
-
-        _lodash.default.each(allComponents[index], function (component) {
-          return tabSchema.components.push(component.schema);
-        });
-
-        schema.components.push(tabSchema);
+        return tab;
       });
-
       return schema;
     }
   }]);
@@ -43894,6 +43925,13 @@ var _default = [{
       label: 'Calendar',
       value: 'calendar'
     }]
+  },
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.type'
+      }, 'textfield']
+    }
   }
 }, {
   weight: 55,
@@ -44109,10 +44147,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
@@ -44123,6 +44157,10 @@ function _superPropBase(object, property) { while (!Object.prototype.hasOwnPrope
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -44132,10 +44170,39 @@ var TimeComponent =
 function (_TextFieldComponent) {
   _inherits(TimeComponent, _TextFieldComponent);
 
-  function TimeComponent() {
+  _createClass(TimeComponent, null, [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _TextField.default.schema.apply(_TextField.default, [{
+        type: 'time',
+        label: 'Time',
+        key: 'time',
+        inputType: 'time',
+        format: 'HH:mm'
+      }].concat(extend));
+    }
+  }]);
+
+  function TimeComponent(component, options, data) {
+    var _this;
+
     _classCallCheck(this, TimeComponent);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(TimeComponent).apply(this, arguments));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TimeComponent).call(this, component, options, data)); //check if <input type="time" /> is supported to fallback to input with mask (for Safari and IE)
+
+    var input = _this.ce('time');
+
+    _this.timeInputSupported = input.type === 'time';
+
+    if (!_this.timeInputSupported) {
+      _this.component.inputMask = '99:99';
+    }
+
+    return _this;
   }
 
   _createClass(TimeComponent, [{
@@ -44164,7 +44231,7 @@ function (_TextFieldComponent) {
   }, {
     key: "setValueAt",
     value: function setValueAt(index, value) {
-      this.inputs[index].value = (0, _moment.default)(value, 'HH:mm:ss').format(this.component.format);
+      this.inputs[index].value = value ? (0, _moment.default)(value, 'HH:mm:ss').format(this.component.format) : value;
     }
   }, {
     key: "defaultSchema",
@@ -44172,21 +44239,6 @@ function (_TextFieldComponent) {
       return TimeComponent.schema();
     }
   }], [{
-    key: "schema",
-    value: function schema() {
-      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
-        extend[_key] = arguments[_key];
-      }
-
-      return _TextField.default.schema.apply(_TextField.default, [{
-        type: 'time',
-        label: 'Time',
-        key: 'time',
-        inputType: 'time',
-        format: 'HH:mm'
-      }].concat(extend));
-    }
-  }, {
     key: "builderInfo",
     get: function get() {
       return {
@@ -68198,82 +68250,141 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var url = function url(formio) {
-  return {
-    title: 'Url',
-    name: 'url',
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback, url) {
-      return new _nativePromiseOnly.default(function (resolve, reject) {
-        var data = {
-          dir: dir,
-          file: file,
-          name: fileName
-        }; // Send the file with data.
+  var xhrRequest = function xhrRequest(url, name, query, data, onprogress) {
+    return new _nativePromiseOnly.default(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      var json = typeof data === 'string';
+      var fd = new FormData();
 
-        var xhr = new XMLHttpRequest();
+      if (typeof onprogress === 'function') {
+        xhr.upload.onprogress = onprogress;
+      }
 
-        if (typeof progressCallback === 'function') {
-          xhr.upload.onprogress = progressCallback;
-        }
-
-        var fd = new FormData();
-
+      if (!json) {
         for (var key in data) {
           fd.append(key, data[key]);
         }
+      }
 
-        xhr.onload = function () {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            // Need to test if xhr.response is decoded or not.
-            var respData = {};
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Need to test if xhr.response is decoded or not.
+          var respData = {};
 
-            try {
-              respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
-              respData = respData && respData.data ? respData.data : respData;
-            } catch (err) {
-              respData = {};
-            }
+          try {
+            respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
+            respData = respData && respData.data ? respData.data : respData;
+          } catch (err) {
+            respData = {};
+          } // Get the url of the file.
 
-            var _url = respData.hasOwnProperty('url') ? respData.url : "".concat(xhr.responseURL, "/").concat(fileName);
 
-            resolve({
-              storage: 'url',
-              name: fileName,
-              url: _url,
-              size: file.size,
-              type: file.type,
-              data: respData
-            });
-          } else {
-            reject(xhr.response || 'Unable to upload file');
+          var respUrl = respData.hasOwnProperty('url') ? respData.url : "".concat(xhr.responseURL, "/").concat(name); // If they provide relative url, then prepend the url.
+
+          if (respUrl && respUrl[0] === '/') {
+            respUrl = "".concat(url).concat(respUrl);
           }
-        }; // Fire on network error.
 
-
-        xhr.onerror = function () {
-          return reject(xhr);
-        };
-
-        xhr.onabort = function () {
-          return reject(xhr);
-        };
-
-        xhr.open('POST', url);
-        var token = formio.getToken();
-
-        if (token) {
-          xhr.setRequestHeader('x-jwt-token', token);
+          resolve({
+            url: respUrl,
+            data: respData
+          });
+        } else {
+          reject(xhr.response || 'Unable to upload file');
         }
+      };
 
-        xhr.send(fd);
-      });
+      xhr.onerror = function () {
+        return reject(xhr);
+      };
+
+      xhr.onabort = function () {
+        return reject(xhr);
+      };
+
+      var requestUrl = "".concat(url, "?");
+
+      for (var _key in query) {
+        requestUrl += "".concat(_key, "=").concat(query[_key], "&");
+      }
+
+      if (requestUrl[requestUrl.length - 1] === '&') {
+        requestUrl = requestUrl.substr(0, requestUrl.length - 1);
+      }
+
+      xhr.open('POST', requestUrl);
+
+      if (json) {
+        xhr.setRequestHeader('Content-Type', 'application/json');
+      }
+
+      var token = formio.getToken();
+
+      if (token) {
+        xhr.setRequestHeader('x-jwt-token', token);
+      }
+
+      xhr.send(json ? data : fd);
+    });
+  };
+
+  return {
+    title: 'Url',
+    name: 'url',
+    uploadFile: function uploadFile(file, name, dir, progressCallback, url) {
+      var uploadRequest = function uploadRequest(form) {
+        return xhrRequest(url, name, {
+          baseUrl: encodeURIComponent(formio.projectUrl),
+          project: form ? form.project : '',
+          form: form ? form._id : ''
+        }, {
+          file: file,
+          name: name,
+          dir: dir
+        }, progressCallback).then(function (response) {
+          // Store the project and form url along with the metadata.
+          response.data = response.data || {};
+          response.data.baseUrl = formio.projectUrl;
+          response.data.project = form ? form.project : '';
+          response.data.form = form ? form._id : '';
+          return {
+            storage: 'url',
+            name: name,
+            url: response.url,
+            size: file.size,
+            type: file.type,
+            data: response.data
+          };
+        });
+      };
+
+      if (file.private && formio.formId) {
+        return formio.loadForm().then(function (form) {
+          return uploadRequest(form);
+        });
+      } else {
+        return uploadRequest();
+      }
     },
     downloadFile: function downloadFile(file) {
-      // Return the original as there is nothing to do.
+      if (file.private) {
+        if (formio.submissionId && file.data) {
+          file.data.submission = formio.submissionId;
+        }
+
+        return xhrRequest(file.url, file.name, {}, JSON.stringify(file)).then(function (response) {
+          return response.data;
+        });
+      } // Return the original as there is nothing to do.
+
+
       return _nativePromiseOnly.default.resolve(file);
     }
   };
@@ -69500,7 +69611,7 @@ function loadZones(timezone) {
     return _momentTimezone.default.zonesPromise;
   }
 
-  return _momentTimezone.default.zonesPromise = fetch('https://cdn.rawgit.com/moment/moment-timezone/develop/data/packed/latest.json').then(function (resp) {
+  return _momentTimezone.default.zonesPromise = fetch('https://formio.github.io/formio.js/resources/latest.json').then(function (resp) {
     return resp.json().then(function (zones) {
       _momentTimezone.default.tz.load(zones);
 
