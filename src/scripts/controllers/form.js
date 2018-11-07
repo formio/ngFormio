@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, document: false, Promise: false */
+/* global _: false, document: false, Promise: false, jsonpatch: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
