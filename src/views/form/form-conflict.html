@@ -1,7 +1,9 @@
 <h3>Form Conflict During Save</h3>
-<p>Please review the difference between the server version and your version and choose which one to keep.</p>
-<div id="mergely"></div>
-<div style="clear: both; padding: 10px 0">
-  <div style="position:relative;width: 400px;float: left;margin-right: 30px" class="btn btn-primary" ng-click="saveOurs()">Save yours</div>
-  <div style="position:relative;width: 400px;float: left;" class="btn btn-primary" ng-click="keepTheirs()">Keep theirs</div>
-</div>
+<p>Another user modified this form while you were editing it. While we were able to apply most of your changes, a few were unable to be applied. This is usually because a move destination was deleted or two users updated the key of the same field.</p>
+<h4>Failed Changes</h4>
+<ul class="list-group">
+  <li class="list-group-item" ng-repeat="fail in failed">
+    {{fail.op}} - {{fail.key}}
+  </li>
+</ul>
+<div class="btn btn-default" ng-click="close()">Close</div>

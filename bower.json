@@ -36,8 +36,7 @@
     "angular-bootstrap-lightbox": "^0.12.0",
     "angular-ui-ace": "^0.2.3",
     "semver": "^4.3.4",
-    "fast-json-patch": "^2.0.7",
-    "mergely": "^3.3.6"
+    "fast-json-patch": "^2.0.7"
   },
   "overrides": {
     "kendo-ui": {
@@ -143,12 +142,6 @@
     "bootstrap-ui-datetime-picker": {
       "main": [
         "dist/datetime-picker.min.js"
-      ]
-    },
-    "mergely": {
-      "main": [
-        "mergely.js",
-        "mergely.css"
       ]
     }
   },
