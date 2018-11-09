@@ -30,7 +30,27 @@ module.exports = {
       },
       {
         test: /\.(woff2?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        loader: "file-loader?name=fonts/[name].[ext]"
+        exclude: /icons?\/|images?\/|imgs?\//,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            outputPath: 'fonts/',
+          }
+        }]
+      },
+      {
+        test: /icons?\/.*\.(gif|png|jpe?g|svg)$/i,
+        exclude: /fonts?\//,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'icons/',
+            }
+          }
+        ]
       },
       {
         test: /\.js$/,
