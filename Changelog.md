@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+ - FOR-1849: Fixed Number component value being 0 when customDefaultValue is empty string
+
 ## 2.36.8
 ### Fixed
  - FOR-1763: Fixed issues with the day component data collecting.
