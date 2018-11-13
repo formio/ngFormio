@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, document: false, Promise: false */
+/* global _: false, document: false, Promise: false, DOMPurify: false  */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -1938,9 +1938,9 @@ app.controller('FormSubmissionsController', [
               return '';
             }
             if (component.multiple) {
-              return _.escape(value.join(', '));
+              return DOMPurify.sanitize(value.join(', '));
             }
-            return _.escape(value);
+            return DOMPurify.sanitize(value);
           }
           if (component.multiple && (value.length > 0)) {
             var values = [];
@@ -1956,7 +1956,7 @@ app.controller('FormSubmissionsController', [
               }
               values.push(arrayValue);
             });
-            return _.escape(values.join(', '));
+            return DOMPurify.sanitize(values.join(', '));
           }
           value = componentInfo.tableView(value, {
             component: component,
@@ -1967,7 +1967,7 @@ app.controller('FormSubmissionsController', [
           if (value === undefined) {
             return '';
           }
-          return _.escape(value);
+          return DOMPurify.sanitize(value);
         },
         // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
         width: '200px',
