@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 5.11.0
+### Added
+ - Better form merging functionality
+ 
+### Fixed'
+ - CSV export not working in Data section
+
 ## 5.10.1
 ### Fixed
  - XSS breaking of kendo grid.
