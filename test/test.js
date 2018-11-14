@@ -52,7 +52,7 @@ describe("Formio Tests", function () {
   require('./features/settingsTeamPro.spec')(actions,tags);
   require('./features/settingsEnterprise.spec')(actions,tags);
   require('./features/environmentWorkflow.spec')(actions,tags);
-  require('./features/versioning.spec')(actions,tags);
+  //require('./features/versioning.spec')(actions,tags);
   require('./features/formRevisions.spec')(actions,tags);
   // require('./features/teams.spec')(actions,tags);
   require('./features/projectUpgradePayment.spec')(actions,tags);

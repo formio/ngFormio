@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, document: false, Promise: false, jsonpatch: false */
+/* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -253,7 +253,8 @@ app.directive('formList', function() {
       formType: '=',
       numPerPage: '=?',
       listMode: '=',
-      protected: '=?'
+      protected: '=?',
+      formio: '=?'
     },
     controller: [
       '$scope',
@@ -284,7 +285,7 @@ app.directive('formList', function() {
         $scope.forms = [];
 
         var query = {params: {
-          select: '_id,title,type,path,modified',
+          select: '_id,title,type,path,modified,name',
           limit: $scope.numPerPage,
           skip: 0
         }};
@@ -370,6 +371,7 @@ app.controller('FormController', [
   'GoogleAnalytics',
   '$q',
   'ngDialog',
+  'PrimaryProject',
   'Upload',
   'PDFServer',
   '$http',
@@ -388,6 +390,7 @@ app.controller('FormController', [
     GoogleAnalytics,
     $q,
     ngDialog,
+    PrimaryProject,
     Upload,
     PDFServer,
     $http
@@ -770,6 +773,11 @@ app.controller('FormController', [
         // Reload page when a form is created or merged.
         if (method === 'created' || headers.hasOwnProperty('x-form-merge')) {
           $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+        }
+        else {
+          // Recalculate project modified status.
+          PrimaryProject.clear();
+          $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
         }
       })
       .catch(function(err) {
@@ -2139,9 +2147,9 @@ app.controller('FormSubmissionsController', [
               return '';
             }
             if (component.multiple) {
-              return _.escape(value.join(', '));
+              return DOMPurify.sanitize(value.join(', '));
             }
-            return _.escape(value);
+            return DOMPurify.sanitize(value);
           }
           if (component.multiple && (value.length > 0)) {
             var values = [];
@@ -2157,7 +2165,7 @@ app.controller('FormSubmissionsController', [
               }
               values.push(arrayValue);
             });
-            return _.escape(values.join(', '));
+            return DOMPurify.sanitize(values.join(', '));
           }
           value = componentInfo.tableView(value, {
             component: component,
@@ -2168,7 +2176,7 @@ app.controller('FormSubmissionsController', [
           if (value === undefined) {
             return '';
           }
-          return _.escape(value);
+          return DOMPurify.sanitize(value);
         },
         // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
         width: '200px',

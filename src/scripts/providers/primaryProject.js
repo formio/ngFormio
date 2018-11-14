@@ -6,7 +6,8 @@ app.factory('PrimaryProject', [
   'AppConfig',
   '$q',
   '$http',
-  function (AppConfig, $q, $http) {
+  '$rootScope',
+  function (AppConfig, $q, $http, $rootScope) {
     var scope = false;
 
     return {
@@ -27,6 +28,17 @@ app.factory('PrimaryProject', [
         $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function (result) {
           scope.environments = result.data;
           _.assign($scope, scope);
+
+          scope.environments.forEach(function(environment) {
+            // If environment has a remote, load remote info for lastDeploy and modified.
+            if (environment.remote) {
+              var remoteProjectUrl = $rootScope.projectPath(environment.remote.project, environment.remote.url, environment.remote.type);
+              $http.get(remoteProjectUrl).then(function(result) {
+                environment.modified = result.data.modified;
+                environment.lastDeploy = result.data.lastDeploy;
+              });
+            }
+          });
         });
 
         // Load the projects teams.

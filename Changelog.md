@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 5.10.1
+### Fixed
+ - XSS breaking of kendo grid.
+
+## 5.10.0
 ### Fixed
  - XSS issues.
+ - FOR-1723: CSV export not working in Data section
 
 ## 5.9.0
 ### Added
