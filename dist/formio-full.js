@@ -112313,7 +112313,7 @@ module.exports = function() {
         data[component.key] = data[component.key].split(',');
         return done(true);
       }
-      else if (component.hasOwnProperty('customDefaultValue')) {
+      else if (component.customDefaultValue) {
         if (typeof component.customDefaultValue === 'string') {
           try {
             value = eval('(function(data) { var value = "";' + component.customDefaultValue + '; return value; })(data)');
