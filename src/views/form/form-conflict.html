@@ -1,0 +1,9 @@
+<h3>Form Conflict During Save</h3>
+<p>Another user modified this form while you were editing it. While we were able to apply most of your changes, a few were unable to be applied. This is usually because a move destination was deleted or two users updated the key of the same field.</p>
+<h4>Failed Changes</h4>
+<ul class="list-group">
+  <li class="list-group-item" ng-repeat="fail in failed">
+    {{fail.op}} - {{fail.key}}
+  </li>
+</ul>
+<div class="btn btn-default" ng-click="close()">Close</div>

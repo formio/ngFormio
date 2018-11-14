@@ -1,6 +1,6 @@
 'use strict';
 
-/* global _: false, document: false, Promise: false, DOMPurify: false  */
+/* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
 var app = angular.module('formioApp.controllers.form', [
   'ngDialog',
   'ui.bootstrap.tabs',
@@ -743,11 +743,12 @@ app.controller('FormController', [
     //});
 
     // Save a form.
-    $scope.saveForm = function() {
+    $scope.saveForm = function(form) {
+      form = form || $scope.form;
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
-      return $scope.formio.saveForm(angular.copy($scope.form), {
+      return $scope.formio.saveForm(angular.copy(form), {
         getHeaders: true
       })
       .then(function(response) {
@@ -780,6 +781,10 @@ app.controller('FormController', [
         }
       })
       .catch(function(err) {
+        // Catch if a form is returned as an error. This is a conflict.
+        if (err._id && err.type) {
+          throw err;
+        }
         if (err) {
           FormioAlerts.onError.call(FormioAlerts, err);
         }
@@ -904,6 +909,12 @@ app.controller('FormEditController', [
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
     });
+
+    $scope.setForm = function(form) {
+      $scope.builder = true;
+      $scope.form = form;
+    };
+
     $scope.dirty = false;
 
     $scope.formReady = false;
@@ -949,33 +960,220 @@ app.controller('FormEditController', [
       contentLoaded = true;
     }, 3000);
 
-    $scope.$on('formBuilder:add', function(event) {
+    $scope.changes = [];
+
+    $scope.$on('formBuilder:add', function(event, component, index, container, path) {
+      $scope.changes.push({
+        op: 'add',
+        key: component.key,
+        container: container.key,
+        path: path,
+        index: index,
+        component: angular.copy(component)
+      });
+
       // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (event.targetScope.formComponent.settings.type === 'content') {
+      if (component.type === 'content') {
+        $scope.dirty = true;
+      }
+    });
+
+    // Special case for content components
+    $scope.$on('formBuilder:update', function(event, component) {
+      // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
+      if (contentLoaded && component.type === 'content') {
+        var change = {
+          op: 'edit',
+          key: component.key,
+          patches: [{
+            op: 'replace',
+            path: '/html',
+            value: component.html
+          }]
+        };
+        // Since this gets fired a lot, clean up any exising changes to this component's html.
+        $scope.changes = $scope.changes.filter(function(change) {
+          return !(
+            change.op === 'edit' &&
+            change.key === component.key &&
+            change.patches &&
+            change.patches.length === 1 &&
+            change.patches[0].op === 'replace' &&
+            change.patches[0].path === '/html'
+          );
+        });
+
+        $scope.changes.push(change);
+
         $scope.dirty = true;
       }
 
     });
-    $scope.$on('formBuilder:update', function(event) {
-      // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (contentLoaded && event.targetScope.formComponent.settings.type === 'content') {
+
+    $scope.$on('formBuilder:remove', function(event, component, index, moved) {
+      if (!moved) {
+        $scope.changes.push({
+          op: 'remove',
+          key: component.key,
+        });
+      }
+      $scope.dirty = true;
+    });
+
+    $scope.$on('formBuilder:edit', function(event, newComponent, oldComponent) {
+      var change = {
+        op: 'edit',
+        key: oldComponent.key,
+        patches: jsonpatch.compare(angular.copy(oldComponent), angular.copy(newComponent))
+      };
+      // Don't save if nothing changed.
+      if (change.patches.length) {
+        $scope.changes.push(change);
         $scope.dirty = true;
       }
+    });
 
-    });
-    $scope.$on('formBuilder:remove', function() {
-      $scope.dirty = true;
-    });
-    $scope.$on('formBuilder:edit', function() {
-      $scope.dirty = true;
-    });
+    /*
+     * This function will find a component in a form and return the component AND THE PATH to the component in the form.
+     */
+    var findComponent = function(components, key, fn, path) {
+      if (!components) return;
+      path = path || [];
+
+      components.forEach(function(component, index) {
+        var newPath = path.slice();
+        newPath.push(index);
+        if (!component) return;
+
+        if (component.hasOwnProperty('columns') && Array.isArray(component.columns)) {
+          newPath.push('columns');
+          component.columns.forEach(function(column, index) {
+            var colPath = newPath.slice();
+            colPath.push(index);
+            colPath.push('components');
+            findComponent(column.components, key, fn, colPath);
+          });
+        }
+
+        if (component.hasOwnProperty('rows') && Array.isArray(component.rows)) {
+          newPath.push('rows');
+          component.rows.forEach(function(row, index) {
+            var rowPath = newPath.slice();
+            rowPath.push(index);
+            row.forEach(function(column, index) {
+              var colPath = rowPath.slice();
+              colPath.push(index);
+              colPath.push('components');
+              findComponent(column.components, key, fn, colPath);
+            });
+          });
+        }
+
+        if (component.hasOwnProperty('components') && Array.isArray(component.components)) {
+          newPath.push('components');
+          findComponent(component.components, key, fn, newPath);
+        }
+
+        if (component.key === key) {
+          fn(component, newPath);
+        }
+      });
+    };
+
+    var removeComponent = function(components, path) {
+      // Using _.unset() leave a null value. Use Array splice instead.
+      var index = path.pop();
+      if (path.length !== 0) {
+        components = _.get(components, path);
+      }
+      components.splice(index, 1);
+    };
+
+    var applyChanges = function(form) {
+      var failed = [];
+      $scope.changes.forEach(function(change) {
+        var found = false;
+        switch (change.op) {
+          case 'add':
+            var newComponent = change.component;
+
+            // Find the container to set the component in.
+            findComponent(form.components, change.container, function(parent) {
+
+              // A move will first run an add so remove any existing components with matching key before inserting.
+              findComponent(form.components, change.key, function(component, path) {
+                // If found, use the existing component. (If someone else edited it, the changes would be here)
+                newComponent = component;
+                removeComponent(form.components, path);
+              });
+
+              found = true;
+              var container = _.get(parent, change.path);
+              container.splice(change.index, 0, newComponent);
+            });
+            break;
+          case 'remove':
+            findComponent(form.components, change.key, function(component, path) {
+              found = true;
+              removeComponent(form.components, path);
+            });
+            break;
+          case 'edit':
+            findComponent(form.components, change.key, function(component, path) {
+              found = true;
+              try {
+                _.set(form.components, path, jsonpatch.applyPatch(component, change.patches).newDocument);
+              }
+              catch (err) {
+                failed.push(change);
+              }
+            });
+            break;
+          case 'move':
+            break;
+        }
+        if (!found) {
+          failed.push(change);
+        }
+      });
+
+      return {
+        form: form,
+        failed: failed
+      };
+    };
+
+    var handleFormConflict = function(newForm) {
+      var result = applyChanges(newForm);
+      return $scope.parentSave(result.form)
+        .then(function() {
+          if (result.failed.length) {
+            $scope.failed = result.failed;
+            ngDialog.open(
+              {
+                template: 'views/form/form-conflict.html',
+                controller: 'FormConflictController',
+                showClose: true,
+                className: 'ngdialog-theme-default',
+                scope: $scope,
+              }
+            );
+          }
+        })
+        .catch(handleFormConflict);
+    };
 
     // Wrap saveForm in the editor to clear dirty when saved.
-    var parentSave = $scope.saveForm;
+    $scope.parentSave = $scope.saveForm;
     $scope.saveForm = function() {
       contentLoaded = false;
       $scope.dirty = false;
-      return parentSave();
+      return $scope.parentSave()
+        .catch(handleFormConflict)
+        .then(function() {
+          // Clear changes.
+          $scope.changes = [];
+        });
     };
 
     $scope.saveFormDraft = function() {
@@ -1087,6 +1285,16 @@ app.controller('FormEditController', [
         });
       });
     });
+  }
+]);
+
+app.controller('FormConflictController', [
+  '$scope',
+  'ngDialog',
+  function($scope, ngDialog) {
+    $scope.close = function() {
+      ngDialog.close();
+    };
   }
 ]);
 

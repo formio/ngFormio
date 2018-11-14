@@ -36,6 +36,7 @@
     "angular-bootstrap-lightbox": "^0.12.0",
     "angular-ui-ace": "^0.2.3",
     "semver": "^4.3.4",
+    "fast-json-patch": "^2.0.7",
     "DOMPurify": "dompurify#^1.0.8"
   },
   "overrides": {
