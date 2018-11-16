@@ -776,8 +776,8 @@ app.controller('FormController', [
         }
         else {
           // Recalculate project modified status.
-          PrimaryProject.clear();
-          $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
+          // PrimaryProject.clear();
+          // $state.go($state.current, $stateParams, { reload: true, inherit: false, notify: true });
         }
       })
       .catch(function(err) {
@@ -967,7 +967,7 @@ app.controller('FormEditController', [
         op: 'add',
         key: component.key,
         container: container.key,
-        path: path,
+        path: path || 'components',
         index: index,
         component: angular.copy(component)
       });
@@ -1040,6 +1040,10 @@ app.controller('FormEditController', [
       if (!components) return;
       path = path || [];
 
+      if (!key) {
+        return fn(components);
+      }
+
       components.forEach(function(component, index) {
         var newPath = path.slice();
         newPath.push(index);
@@ -1099,6 +1103,9 @@ app.controller('FormEditController', [
 
             // Find the container to set the component in.
             findComponent(form.components, change.container, function(parent) {
+              if (!change.container) {
+                parent = form;
+              }
 
               // A move will first run an add so remove any existing components with matching key before inserting.
               findComponent(form.components, change.key, function(component, path) {
