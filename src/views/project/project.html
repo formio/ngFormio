@@ -25,7 +25,10 @@
     <li ng-if="environments.length < 9 && projectPermissions.admin"><a ui-sref="project.environment">+ New Stage</a></li>
   </ul>
 </div>
-<div class="project-container" ng-if="projectPermissions.read">
+<div class="well" style="min-height: 400px;" ng-if="!projectViewReady">
+  <i id="project-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i><span style="margin-left:1em;">Loading Project</span>
+</div>
+<div class="project-container" ng-if="projectViewReady && projectPermissions.read">
   <div class="project-sidebar sidebar">
     <ul class="nav nav-sidebar">
       <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-sitemap"></i><br/><span>Overview</span></a></li>
@@ -59,7 +62,7 @@
     <div class="project-content" ui-view></div>
   </div>
 </div>
-<div class="project-container" ng-if="projectPermissions && !projectPermissions.read">
+<div class="project-container" ng-if="projectViewReady && projectPermissions && !projectPermissions.read">
   <div class="container" style="margin-top: 20px;">
     <div class="well">
       You have been granted access to this project in order to access some stages. Please use the stages tabs to access a stage you have access to.
