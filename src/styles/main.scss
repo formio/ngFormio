@@ -992,25 +992,22 @@ pre code {
     font-style: normal
 }
 
-html {
-  height: 100%;
-}
-
 body {
   display: table;
   width: 100%;
-  height: 100%;
+  background-color: darken($brand-primary, 25%);
 }
 
 #content {
   display: table-row;
   height: auto;
+  background-color: #fff;
 }
 
 footer {
   color: #f0f0f0;
   text-align: center;
-  background-color: darken($brand-secondary, 2%);
+  background-color: darken($brand-primary, 25%);
   display: table-row;
   border-left: 85px solid darken($brand-primary, 25%);
   a {
