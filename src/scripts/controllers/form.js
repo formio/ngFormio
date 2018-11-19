@@ -1794,7 +1794,7 @@ app.controller('FormActionEditController', [
             if (attachPDF) {
               // Load the PDFServer information.
               PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
-                if (info.data.plan === 'hosted') {
+                if (info.data.plan === 'basic') {
                   $timeout(function() {
                     $(document.createElement('div'))
                       .attr('id', 'attach-pdf-alert')
