@@ -1188,7 +1188,7 @@ footer {
       padding: 0;
       position: relative;
       color: #666;
-      margin-bottom: 10px;
+      margin-bottom: 2px;
       .progress-bar-success {
         background-color: lighten($brand-secondary, 10%);
       }
@@ -1924,8 +1924,18 @@ footer {
   border: 1px solid #eee;
 }
 .overview {
-  .overview-content {
-
+  .progress {
+    height: 30px;
+    position: relative;
+    span {
+      position: absolute;
+      display: block;
+      font-size: 17px;
+      margin-top: 3px;
+      top: -1px;
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 

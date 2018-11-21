@@ -66,11 +66,24 @@
             <p class="project-framework"><strong>{{ getFrameworkTitle(project.framework) }}</strong></p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
             <div class="project-section-separator"></div>
-            <p class="progress-label text-center"><small>Monthly API Calls</small></p>
+            <!--<p class="progress-label text-center"><small>Monthly API Calls</small></p>-->
             <div class="progress">
-              <div class="progress-bar" role="progressbar" ng-style="{width: project.apiCalls.used / project.apiCalls.limit * 100 + '%'}" ng-class="getProgressBarClass(project.apiCalls)"></div>
-              <span><small>{{ project.apiCalls.used | number }} / {{ getAPICallsLimit(project.apiCalls) }}</small></span>
+              <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'forms')}" ng-class="getProgressBarClass(project.apiCalls, 'forms')"></div>
+              <span><small>{{ project.apiCalls.used.forms || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.forms) }} Forms</small></span>
             </div>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'formRequests')}" ng-class="getProgressBarClass(project.apiCalls, 'formRequests')"></div>
+              <span><small>{{ project.apiCalls.used.formRequests || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.formRequests) }} FR</small></span>
+            </div>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'submissionRequests')}" ng-class="getProgressBarClass(project.apiCalls, 'submissionRequests')"></div>
+              <span><small>{{ project.apiCalls.used.submissionRequests || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.submissionRequests) }} SR</small></span>
+            </div>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'emails')}" ng-class="getProgressBarClass(project.apiCalls, 'emails')"></div>
+              <span><small>{{ project.apiCalls.used.emails || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.emails) }} Emails</small></span>
+            </div>
+            <div class="project-section-separator"></div>
             <div class="row" style="z-index:1000;">
               <div class="col-sm-6 project-tile-button"><button ui-sref="project.overview({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
               <div class="col-sm-6 project-tile-button" ng-if="!onPrem"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
