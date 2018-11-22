@@ -237,6 +237,8 @@
 <script src="/bower_components/semver/semver.browser.js"></script>
 <script src="/bower_components/angular-ui-select/dist/select.js"></script>
 <script src="/bower_components/angular-ckeditor/angular-ckeditor.js"></script>
+<script src="/bower_components/fast-json-patch/dist/fast-json-patch.js"></script>
+<script src="/bower_components/DOMPurify/dist/purify.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
@@ -268,6 +270,9 @@
 <!-- build:js scripts/app.js -->
 <!-- inject:js -->
 <script src="scripts/app.js"></script>
+<script src="scripts/directives/header.js"></script>
+<script src="scripts/directives/objectBuilder.js"></script>
+<script src="scripts/directives/stepFlow.js"></script>
 <script src="scripts/controllers/access.js"></script>
 <script src="scripts/controllers/controllers.js"></script>
 <script src="scripts/controllers/feedback.js"></script>
@@ -278,9 +283,6 @@
 <script src="scripts/controllers/role.js"></script>
 <script src="scripts/controllers/team.js"></script>
 <script src="scripts/controllers/user.js"></script>
-<script src="scripts/directives/header.js"></script>
-<script src="scripts/directives/objectBuilder.js"></script>
-<script src="scripts/directives/stepFlow.js"></script>
 <script src="scripts/providers/ProjectFrameworkSteps.js"></script>
 <script src="scripts/providers/ProjectFrameworks.js"></script>
 <script src="scripts/providers/SubmissionExport.js"></script>

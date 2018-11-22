@@ -36,7 +36,9 @@
     "angular-ui-ace": "^0.2.3",
     "semver": "^4.3.4",
     "angular-ui-select": "^0.19.8",
-    "angular-ckeditor": "^1.0.3"
+    "angular-ckeditor": "^1.0.3",
+    "fast-json-patch": "^2.0.7",
+    "DOMPurify": "dompurify#^1.0.8"
   },
   "overrides": {
     "kendo-ui": {
@@ -142,6 +144,11 @@
     "bootstrap-ui-datetime-picker": {
       "main": [
         "dist/datetime-picker.min.js"
+      ]
+    },
+    "DOMPurify": {
+      "main": [
+        "dist/purify.js"
       ]
     }
   },

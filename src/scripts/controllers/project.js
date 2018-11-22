@@ -528,6 +528,7 @@ app.controller('ProjectController', [
         // This is the primary environment.
         primaryProjectQ.resolve($scope.localProject);
       }
+      $scope.projectViewReady = false;
       $scope.primaryProjectPromise.then(function(primaryProject) {
         var currTime = (new Date()).getTime();
         var trialTime = (new Date(primaryProject.trial.toString())).getTime();
@@ -545,6 +546,7 @@ app.controller('ProjectController', [
         $scope.highestRoleLoaded.then(function() {
           // If they already have a high role, skip this.
           if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
+            $scope.projectViewReady = true;
             return;
           }
 
@@ -606,6 +608,8 @@ app.controller('ProjectController', [
                   $scope.projectPermissions.read = true;
                   /* falls through */
               }
+
+              $scope.projectViewReady = true;
             });
           });
         });

@@ -4,9 +4,30 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [UNRELEASED]
+## 5.11.2
+### Fixed
+ - FOR-1799: Warning message displaying for wrong PDF plan
+
+## 5.11.1
+### Fixed
+ - Form merge not working on root level
+ - Remove reload on each form save.
+
+## 5.11.0
+### Added
+ - Better form merging functionality
+ 
+### Fixed'
+ - CSV export not working in Data section
+
+## 5.10.1
+### Fixed
+ - XSS breaking of kendo grid.
+
+## 5.10.0
 ### Fixed
  - XSS issues.
+ - FOR-1723: CSV export not working in Data section
 
 ## 5.9.0
 ### Added
