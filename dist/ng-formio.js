@@ -9307,6 +9307,33 @@ module.exports = function (that, searchString, NAME) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/_string-pad.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/core-js/modules/_string-pad.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+// https://github.com/tc39/proposal-string-pad-start-end
+var toLength = __webpack_require__(/*! ./_to-length */ "./node_modules/core-js/modules/_to-length.js");
+var repeat = __webpack_require__(/*! ./_string-repeat */ "./node_modules/core-js/modules/_string-repeat.js");
+var defined = __webpack_require__(/*! ./_defined */ "./node_modules/core-js/modules/_defined.js");
+
+module.exports = function (that, maxLength, fillString, left) {
+  var S = String(defined(that));
+  var stringLength = S.length;
+  var fillStr = fillString === undefined ? ' ' : String(fillString);
+  var intMaxLength = toLength(maxLength);
+  if (intMaxLength <= stringLength || fillStr == '') return S;
+  var fillLen = intMaxLength - stringLength;
+  var stringFiller = repeat.call(fillStr, Math.ceil(fillLen / fillStr.length));
+  if (stringFiller.length > fillLen) stringFiller = stringFiller.slice(0, fillLen);
+  return left ? stringFiller + S : S + stringFiller;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/_string-repeat.js":
 /*!********************************************************!*\
   !*** ./node_modules/core-js/modules/_string-repeat.js ***!
@@ -11880,6 +11907,30 @@ $export($export.P, 'Array', {
 });
 
 __webpack_require__(/*! ./_add-to-unscopables */ "./node_modules/core-js/modules/_add-to-unscopables.js")('includes');
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es7.string.pad-start.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/core-js/modules/es7.string.pad-start.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// https://github.com/tc39/proposal-string-pad-start-end
+var $export = __webpack_require__(/*! ./_export */ "./node_modules/core-js/modules/_export.js");
+var $pad = __webpack_require__(/*! ./_string-pad */ "./node_modules/core-js/modules/_string-pad.js");
+var userAgent = __webpack_require__(/*! ./_user-agent */ "./node_modules/core-js/modules/_user-agent.js");
+
+// https://github.com/zloirock/core-js/issues/280
+$export($export.P + $export.F * /Version\/10\.\d+(\.\d+)? Safari\//.test(userAgent), 'String', {
+  padStart: function padStart(maxLength /* , fillString = ' ' */) {
+    return $pad(this, maxLength, arguments.length > 1 ? arguments[1] : undefined, true);
+  }
+});
 
 
 /***/ }),
@@ -17861,8 +17912,8 @@ function () {
 
       options = Formio.pluginAlter('requestOptions', options, url);
 
-      if (options.namespace) {
-        opts.namespace = options.namespace;
+      if (options.namespace || Formio.namespace) {
+        opts.namespace = options.namespace || Formio.namespace;
       }
 
       var requestToken = options.headers.get('x-jwt-token');
@@ -17987,7 +18038,7 @@ function () {
       opts = typeof opts === 'string' ? {
         namespace: opts
       } : opts || {};
-      var tokenName = "".concat(opts.namespace || 'formio', "Token");
+      var tokenName = "".concat(opts.namespace || Formio.namespace || 'formio', "Token");
 
       if (!Formio.tokens) {
         Formio.tokens = {};
@@ -18028,7 +18079,7 @@ function () {
       options = typeof options === 'string' ? {
         namespace: options
       } : options || {};
-      var tokenName = "".concat(options.namespace || 'formio', "Token");
+      var tokenName = "".concat(options.namespace || Formio.namespace || 'formio', "Token");
 
       if (!Formio.tokens) {
         Formio.tokens = {};
@@ -18050,7 +18101,7 @@ function () {
     key: "setUser",
     value: function setUser(user) {
       var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var userName = "".concat(opts.namespace || 'formio', "User");
+      var userName = "".concat(opts.namespace || Formio.namespace || 'formio', "User");
 
       if (!user) {
         Formio.setToken(null, opts); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
@@ -18077,7 +18128,7 @@ function () {
     key: "getUser",
     value: function getUser(options) {
       options = options || {};
-      var userName = "".concat(options.namespace || 'formio', "User");
+      var userName = "".concat(options.namespace || Formio.namespace || 'formio', "User");
 
       try {
         return JSON.parse(localStorage.getItem(userName) || null);
@@ -18519,7 +18570,11 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-js/modules/es6.array.find.js");
+
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -18743,7 +18798,9 @@ function (_Webform) {
       }, true);
       this.appendChild(this.element, [this.zoomIn, this.zoomOut, this.iframe]);
 
-      if (!this.options.readOnly) {
+      if (!this.options.readOnly && _lodash.default.find(this.form.components, function (component) {
+        return component.type === 'button' && component.action === 'submit';
+      })) {
         this.submitButton = this.ce('button', {
           type: 'button',
           class: 'btn btn-primary'
@@ -20243,7 +20300,8 @@ function (_NestedComponent) {
           });
         }
 
-        var submission = _this13.submission || {}; // Add in metadata about client submitting the form
+        var submission = _lodash.default.cloneDeep(_this13.submission || {}); // Add in metadata about client submitting the form
+
 
         submission.metadata = submission.metadata || {};
 
@@ -20272,6 +20330,16 @@ function (_NestedComponent) {
           if (!isDraft && !_this13.checkValidity(submission.data, true)) {
             return reject();
           }
+
+          _this13.getAllComponents().forEach(function (comp) {
+            var _comp$component = comp.component,
+                persistent = _comp$component.persistent,
+                key = _comp$component.key;
+
+            if (persistent === 'client-only') {
+              delete submission.data[key];
+            }
+          });
 
           _this13.hook('customValidation', submission, function (err) {
             if (err) {
@@ -21644,23 +21712,23 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
-__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
-
-__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
-
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
 
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
-__webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
+__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
+
+__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Webform2 = _interopRequireDefault(__webpack_require__(/*! ./Webform */ "./node_modules/formiojs/Webform.js"));
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ./components/base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -21714,29 +21782,50 @@ function (_Webform) {
     _this.page = 0;
     _this.history = [];
     _this._nextPage = 0;
+    _this._seenPages = [0];
     return _this;
   }
 
   _createClass(Wizard, [{
+    key: "isLastPage",
+    value: function isLastPage() {
+      var next = this.getNextPage(this.submission.data, this.page);
+
+      if (_lodash.default.isNumber(next)) {
+        return 0 < next && next >= this.pages.length;
+      }
+
+      return _lodash.default.isNull(next);
+    }
+  }, {
     key: "getPages",
     value: function getPages() {
       var _this2 = this;
 
+      var args = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var _args$all = args.all,
+          all = _args$all === void 0 ? false : _args$all;
+
       var pageOptions = _lodash.default.clone(this.options);
 
-      var components = _lodash.default.clone(this.components); // We shouldn't recreate a components on the page we currently on to avoid duplicate inputs desync.
+      var components = _lodash.default.clone(this.components);
 
-
-      return this.pages.map(function (page, index) {
-        return _this2.createComponent(page, Object.assign({}, pageOptions, {
+      var pages = this.pages.filter(all ? _lodash.default.identity : function (p, index) {
+        return _this2._seenPages.includes(index);
+      }).map(function (page, index) {
+        return _this2.createComponent(page, _lodash.default.assign(pageOptions, {
           components: index === _this2.page ? components : null
         }));
       });
+      this.components = components;
+      return pages;
     }
   }, {
     key: "getComponents",
     value: function getComponents() {
-      return this.submitting ? this.getPages() : _get(_getPrototypeOf(Wizard.prototype), "getComponents", this).call(this);
+      return this.submitting ? this.getPages({
+        all: this.isLastPage()
+      }) : _get(_getPrototypeOf(Wizard.prototype), "getComponents", this).call(this);
     }
   }, {
     key: "resetValue",
@@ -21751,6 +21840,11 @@ function (_Webform) {
     value: function setPage(num) {
       if (!this.wizard.full && num >= 0 && num < this.pages.length) {
         this.page = num;
+
+        if (!this._seenPages.includes(num)) {
+          this._seenPages = this._seenPages.concat(num);
+        }
+
         return _get(_getPrototypeOf(Wizard.prototype), "setForm", this).call(this, this.currentPage());
       } else if (this.wizard.full || !this.pages.length) {
         return _get(_getPrototypeOf(Wizard.prototype), "setForm", this).call(this, this.getWizard());
@@ -21830,7 +21924,7 @@ function (_Webform) {
       } // Validate the form builed, before go to the next page
 
 
-      if (this.checkValidity(this.submission.data, true)) {
+      if (this.checkCurrentPageValidity(this.submission.data, true)) {
         this.checkData(this.submission.data, {
           noValidate: true
         });
@@ -22231,9 +22325,53 @@ function (_Webform) {
       });
     }
   }, {
+    key: "checkCurrentPageValidity",
+    value: function checkCurrentPageValidity() {
+      var _get2;
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return (_get2 = _get(_getPrototypeOf(Wizard.prototype), "checkValidity", this)).call.apply(_get2, [this].concat(args));
+    }
+  }, {
+    key: "checkPagesValidity",
+    value: function checkPagesValidity(pages) {
+      for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        args[_key2 - 1] = arguments[_key2];
+      }
+
+      var isValid = _Base.default.prototype.checkValidity.apply(this, args);
+
+      return pages.reduce(function (check, pageComp) {
+        return pageComp.checkValidity.apply(pageComp, args) && check;
+      }, isValid);
+    }
+  }, {
+    key: "checkValidity",
+    value: function checkValidity(data, dirty) {
+      return this.checkPagesValidity(this.getPages(), data, dirty);
+    }
+  }, {
     key: "schema",
     get: function get() {
       return this.wizard;
+    }
+  }, {
+    key: "errors",
+    get: function get() {
+      if (this.isLastPage()) {
+        var pages = this.getPages({
+          all: true
+        });
+        this.checkPagesValidity(pages, this.submission.data, true);
+        return pages.reduce(function (errors, pageComp) {
+          return errors.concat(pageComp.errors || []);
+        }, []);
+      }
+
+      return _get(_getPrototypeOf(Wizard.prototype), "errors", this);
     }
   }]);
 
@@ -22591,6 +22729,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_modules/core-js/modules/es6.regexp.constructor.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
@@ -22608,6 +22752,14 @@ var _utils = __webpack_require__(/*! ../utils/utils */ "./node_modules/formiojs/
 var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var _default = {
   get: _lodash.default.get,
@@ -22858,6 +23010,89 @@ var _default = {
         return value !== 'Invalid date';
       }
     },
+    day: {
+      message: function message(component) {
+        return component.t(component.errorMessage('invalid_day'), {
+          field: component.errorLabel,
+          data: component.data
+        });
+      },
+      check: function check(component, setting, value) {
+        if (!value) {
+          return true;
+        }
+
+        var _ref = component.dayFirst ? [0, 1, 2] : [1, 0, 2],
+            _ref2 = _slicedToArray(_ref, 3),
+            DAY = _ref2[0],
+            MONTH = _ref2[1],
+            YEAR = _ref2[2];
+
+        var values = value.split('/').map(function (x) {
+          return parseInt(x, 10);
+        }),
+            day = values[DAY],
+            month = values[MONTH],
+            year = values[YEAR],
+            maxDay = getDaysInMonthCount(month, year);
+
+        if (day < 0 || day > maxDay) {
+          return false;
+        }
+
+        if (month < 0 || month > 12) {
+          return false;
+        }
+
+        if (year < 0 || year > 9999) {
+          return false;
+        }
+
+        return true;
+
+        function isLeapYear(year) {
+          // Year is leap if it is evenly divisible by 400 or evenly divisible by 4 and not evenly divisible by 100.
+          return !(year % 400) || !!(year % 100) && !(year % 4);
+        }
+
+        function getDaysInMonthCount(month, year) {
+          switch (month) {
+            case 1: // January
+
+            case 3: // March
+
+            case 5: // May
+
+            case 7: // July
+
+            case 8: // August
+
+            case 10: // October
+
+            case 12:
+              // December
+              return 31;
+
+            case 4: // April
+
+            case 6: // June
+
+            case 9: // September
+
+            case 11:
+              // November
+              return 30;
+
+            case 2:
+              // February
+              return isLeapYear(year) ? 29 : 28;
+
+            default:
+              return 31;
+          }
+        }
+      }
+    },
     pattern: {
       key: 'validate.pattern',
       message: function message(component, setting) {
@@ -22963,6 +23198,11 @@ var _default = {
         });
       },
       check: function check(component, setting, value) {
+        //if any parts of day are missing, skip maxDate validation
+        if (component.isPartialDay && component.isPartialDay(value)) {
+          return true;
+        }
+
         var date = (0, _moment.default)(value);
         var maxDate = (0, _utils.getDateSetting)(setting);
 
@@ -22985,6 +23225,11 @@ var _default = {
         });
       },
       check: function check(component, setting, value) {
+        //if any parts of day are missing, skip minDate validation
+        if (component.isPartialDay && component.isPartialDay(value)) {
+          return true;
+        }
+
         var date = (0, _moment.default)(value);
         var minDate = (0, _utils.getDateSetting)(setting);
 
@@ -23939,9 +24184,11 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+var CKEDITOR = 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/master/build/ckeditor.js';
 /**
  * This is the BaseComponent class which all elements within the FormioForm derive from.
  */
+
 var BaseComponent =
 /*#__PURE__*/
 function (_Component) {
@@ -25427,7 +25674,7 @@ function (_Component) {
 
       var result = this.show(this.conditionallyVisible(data));
 
-      if (this.fieldLogic(data)) {
+      if (!this.options.builder && this.fieldLogic(data)) {
         this.redraw();
       }
 
@@ -25781,6 +26028,23 @@ function (_Component) {
       });
     }
   }, {
+    key: "addCKE",
+    value: function addCKE(element, settings, onChange) {
+      settings = _lodash.default.isEmpty(settings) ? null : settings;
+      return _Formio.default.requireLibrary('ckeditor', 'ClassicEditor', CKEDITOR, true).then(function () {
+        if (!element.parentNode) {
+          return _nativePromiseOnly.default.reject();
+        }
+
+        return ClassicEditor.create(element, settings).then(function (editor) {
+          editor.model.document.on('change', function () {
+            return onChange(editor.data.get());
+          });
+          return editor;
+        });
+      });
+    }
+  }, {
     key: "addQuill",
     value: function addQuill(element, settings, onChange) {
       var _this17 = this;
@@ -26004,14 +26268,14 @@ function (_Component) {
       this.updateOnChange(flags, changed);
       return changed;
     }
+  }, {
+    key: "restoreValue",
+
     /**
      * Restore the value of a control.
      */
-
-  }, {
-    key: "restoreValue",
     value: function restoreValue() {
-      if (this.hasValue() && !this.isEmpty(this.dataValue)) {
+      if (this.hasSetValue) {
         this.setValue(this.dataValue, {
           noUpdateEvent: true
         });
@@ -26800,6 +27064,11 @@ function (_Component) {
       return value;
     }
   }, {
+    key: "hasSetValue",
+    get: function get() {
+      return this.hasValue() && !this.isEmpty(this.dataValue);
+    }
+  }, {
     key: "label",
     get: function get() {
       return this.component.label;
@@ -27053,7 +27322,7 @@ var _default = [{
   type: 'checkbox',
   label: 'Encrypt',
   tooltip: 'Encrypt this field on the server. This is two way encryption which is not be suitable for passwords.',
-  key: 'autofocus',
+  key: 'encrypted',
   input: true
 }, {
   type: 'checkbox',
@@ -27237,31 +27506,42 @@ var _default = [{
   tooltip: 'Sets the tabindex attribute of this component to override the tab order of the form. See the <a href=\\\'https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex\\\'>MDN documentation</a> on tabindex for more information.'
 }, {
   weight: 700,
+  type: 'radio',
+  label: 'Persistent',
+  tooltip: 'A persistent field will be stored in database when the form is submitted.',
+  key: 'persistent',
+  input: true,
+  inline: true,
+  values: [{
+    label: 'None',
+    value: false
+  }, {
+    label: 'Server',
+    value: true
+  }, {
+    label: 'Client',
+    value: 'client-only'
+  }]
+}, {
+  weight: 800,
   type: 'checkbox',
   label: 'Multiple Values',
   tooltip: 'Allows multiple values to be entered for this field.',
   key: 'multiple',
   input: true
 }, {
-  weight: 800,
+  weight: 900,
   type: 'checkbox',
   label: 'Clear Value When Hidden',
   key: 'clearOnHide',
   tooltip: 'When a field is hidden, clear the value.',
   input: true
 }, {
-  weight: 900,
+  weight: 1000,
   type: 'checkbox',
   label: 'Protected',
   tooltip: 'A protected field will not be returned when queried via API.',
   key: 'protected',
-  input: true
-}, {
-  weight: 1000,
-  type: 'checkbox',
-  label: 'Persistent',
-  tooltip: 'A persistent field will be stored in database when the form is submitted.',
-  key: 'persistent',
   input: true
 }, {
   weight: 1100,
@@ -27305,6 +27585,13 @@ var _default = [{
   label: 'Table View',
   tooltip: 'Shows this value within the table view of the submissions.',
   key: 'tableView',
+  input: true
+}, {
+  weight: 1550,
+  type: 'checkbox',
+  label: 'Always enabled',
+  tooltip: 'Make this field always enabled, even if the form is disabled',
+  key: 'alwaysEnabled',
   input: true
 }];
 /* eslint-enable max-len */
@@ -28526,6 +28813,11 @@ function (_BaseComponent) {
   }, {
     key: "disabled",
     set: function set(disabled) {
+      // Do not allow a component to be disabled if it should be always...
+      if (!disabled && this.shouldDisable || disabled && !this.shouldDisable) {
+        return;
+      }
+
       _set(_getPrototypeOf(ButtonComponent.prototype), "disabled", disabled, this, true);
 
       this.setDisabled(this.buttonElement, disabled);
@@ -28998,6 +29290,11 @@ function (_BaseComponent) {
       this.attachLogic();
     }
   }, {
+    key: "isEmpty",
+    value: function isEmpty(value) {
+      return _get(_getPrototypeOf(CheckBoxComponent.prototype), "isEmpty", this).call(this, value) || value === false;
+    }
+  }, {
     key: "createElement",
     value: function createElement() {
       var className = "form-check ".concat(this.className);
@@ -29201,9 +29498,14 @@ function (_BaseComponent) {
       return this.component.name ? '' : (this.component.defaultValue || false).toString() === 'true';
     }
   }, {
+    key: "hasSetValue",
+    get: function get() {
+      return this.hasValue();
+    }
+  }, {
     key: "emptyValue",
     get: function get() {
-      return undefined;
+      return false;
     }
   }, {
     key: "dataValue",
@@ -30119,8 +30421,6 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
-
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30168,9 +30468,6 @@ function (_BaseComponent) {
     value: function build() {
       var _this = this;
 
-      var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var _state$quill = state.quill,
-          quill = _state$quill === void 0 ? {} : _state$quill;
       this.createElement();
       this.htmlElement = this.ce('div', {
         id: this.id,
@@ -30181,24 +30478,12 @@ function (_BaseComponent) {
       if (this.options.builder) {
         var editorElement = this.ce('div');
         this.element.appendChild(editorElement);
-        this.addQuill(editorElement, this.wysiwygDefault, function (element) {
-          _this.component.html = element.value;
+        this.addCKE(editorElement, null, function (html) {
+          _this.component.html = html;
         }).then(function (editor) {
-          var contents = quill.contents;
+          _this.editor = editor;
 
-          if (_lodash.default.isString(contents)) {
-            try {
-              contents = JSON.parse(contents);
-            } catch (err) {
-              console.warn(err);
-            }
-          }
-
-          if (_lodash.default.isObject(contents)) {
-            editor.setContents(contents);
-          } else {
-            editor.clipboard.dangerouslyPasteHTML(_this.component.html);
-          }
+          _this.editor.data.set(_this.component.html);
         }).catch(function (err) {
           return console.warn(err);
         });
@@ -30220,14 +30505,8 @@ function (_BaseComponent) {
     value: function destroy() {
       var state = _get(_getPrototypeOf(ContentComponent.prototype), "destroy", this).call(this);
 
-      if (this.quill) {
-        try {
-          state.quill = {
-            contents: JSON.stringify(this.quill.getContents())
-          };
-        } catch (err) {
-          console.warn(err);
-        }
+      if (this.editor) {
+        this.editor.destroy();
       }
 
       return state;
@@ -32260,6 +32539,10 @@ __webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es7.string.pad-start */ "./node_modules/core-js/modules/es7.string.pad-start.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
 __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
@@ -32267,8 +32550,6 @@ __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/co
 __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
-
-var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -32368,7 +32649,7 @@ function (_BaseComponent) {
     _classCallCheck(this, DayComponent);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(DayComponent).call(this, component, options, data));
-    _this.validators = _this.validators.concat(['date', 'maxDate', 'minDate']);
+    _this.validators = _this.validators.concat(['day', 'maxDate', 'minDate']);
     var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(_this.options.language);
     _this.dayFirst = _this.component.useLocaleSettings ? dateFormatInfo.dayFirst : _this.component.dayFirst;
     _this.hideInputLabels = _this.component.hideInputLabels;
@@ -32665,21 +32946,26 @@ function (_BaseComponent) {
       }
 
       var parts = value.split('/');
+      var day, month, year;
 
       if (this.component.dayFirst && this.showDay) {
-        this.dayInput.value = parseInt(parts.shift(), 10);
+        day = parts.shift();
+        this.dayInput.value = day === '00' ? undefined : parseInt(day, 10);
       }
 
       if (this.showMonth) {
-        this.monthInput.value = parseInt(parts.shift(), 10);
+        month = parts.shift();
+        this.monthInput.value = month === '00' ? undefined : parseInt(month, 10);
       }
 
       if (!this.component.dayFirst && this.showDay) {
-        this.dayInput.value = parseInt(parts.shift(), 10);
+        day = parts.shift();
+        this.dayInput.value = day === '00' ? undefined : parseInt(day, 10);
       }
 
       if (this.showYear) {
-        this.yearInput.value = parseInt(parts.shift(), 10);
+        year = parts.shift();
+        this.yearInput.value = year === '0000' ? undefined : parseInt(year, 10);
       }
     }
     /**
@@ -32697,8 +32983,10 @@ function (_BaseComponent) {
      * @return {*}
      */
     value: function getDate(value) {
-      var options = {};
-      var defaults = []; // Map positions to identifiers
+      var defaults = [],
+          day,
+          month,
+          year; // Map positions to identifiers to get default values for each part of day
 
       var _ref = this.component.dayFirst ? [0, 1, 2] : [1, 0, 2],
           _ref2 = _slicedToArray(_ref, 3),
@@ -32714,36 +33002,48 @@ function (_BaseComponent) {
         });
       }
 
-      var day = this.showDay && this.dayInput ? parseInt(this.dayInput.value, 10) : NaN;
-
-      if (!_lodash.default.isNaN(day)) {
-        options.day = day;
-      } else if (defaults[DAY] && !_lodash.default.isNaN(defaults[DAY])) {
-        options.day = defaults[DAY];
+      if (this.showDay && this.dayInput) {
+        day = parseInt(this.dayInput.value, 10);
       }
 
-      var month = this.showMonth && this.monthInput ? parseInt(this.monthInput.value, 10) : NaN;
-
-      if (!_lodash.default.isNaN(month) && month > 0) {
-        // Months are 0 indexed.
-        options.month = month - 1;
-      } else if (defaults[MONTH] && !_lodash.default.isNaN(defaults[MONTH])) {
-        options.month = defaults[MONTH] - 1;
+      if (day === undefined || _lodash.default.isNaN(day)) {
+        day = defaults[DAY] && !_lodash.default.isNaN(defaults[DAY]) ? defaults[DAY] : 0;
       }
 
-      var year = this.showYear && this.yearInput ? parseInt(this.yearInput.value) : NaN;
-
-      if (!_lodash.default.isNaN(year)) {
-        options.year = year;
-      } else if (defaults[YEAR] && !_lodash.default.isNaN(defaults[YEAR])) {
-        options.year = defaults[YEAR];
+      if (this.showMonth && this.monthInput) {
+        month = parseInt(this.monthInput.value, 10);
       }
 
-      if (_lodash.default.isEmpty(options)) {
-        return null;
+      if (month === undefined || _lodash.default.isNaN(month)) {
+        month = defaults[MONTH] && !_lodash.default.isNaN(defaults[MONTH]) ? defaults[MONTH] : 0;
       }
 
-      return (0, _moment.default)(options);
+      if (this.showYear && this.yearInput) {
+        year = parseInt(this.yearInput.value);
+      }
+
+      if (year === undefined || _lodash.default.isNaN(year)) {
+        year = defaults[YEAR] && !_lodash.default.isNaN(defaults[YEAR]) ? defaults[YEAR] : 0;
+      }
+
+      var result;
+
+      if (!day && !month && !year) {
+        return undefined;
+      } //add trailing zeros
+
+
+      day = day.toString().padStart(2, 0);
+      month = month.toString().padStart(2, 0);
+      year = year.toString().padStart(4, 0);
+
+      if (this.component.dayFirst) {
+        result = "".concat(day, "/").concat(month, "/").concat(year);
+      } else {
+        result = "".concat(month, "/").concat(day, "/").concat(year);
+      }
+
+      return result;
     }
     /**
      * Return the date object for this component.
@@ -32763,7 +33063,7 @@ function (_BaseComponent) {
       var date = this.date;
 
       if (date) {
-        this.inputs[index].value = date.format(this.format);
+        this.inputs[index].value = date;
         return this.inputs[index].value;
       } else {
         this.inputs[index].value = '';
@@ -32780,13 +33080,7 @@ function (_BaseComponent) {
   }, {
     key: "getView",
     value: function getView(value) {
-      var date = this.getDate(value);
-
-      if (!date) {
-        return null;
-      }
-
-      return date.isValid() ? date.format(this.format) : null;
+      return this.getDate(value);
     }
   }, {
     key: "focus",
@@ -32798,6 +33092,22 @@ function (_BaseComponent) {
       } else if (!this.showDay && !this.showDay && this.showYear) {
         this.yearInput.focus();
       }
+    }
+  }, {
+    key: "isPartialDay",
+    value: function isPartialDay(value) {
+      if (!value) {
+        return false;
+      }
+
+      var _ref3 = this.component.dayFirst ? [0, 1, 2] : [1, 0, 2],
+          _ref4 = _slicedToArray(_ref3, 3),
+          DAY = _ref4[0],
+          MONTH = _ref4[1],
+          YEAR = _ref4[2];
+
+      var values = value.split('/');
+      return values[DAY] === '00' || values[MONTH] === '00' || values[YEAR] === '0000';
     }
   }, {
     key: "dayRequired",
@@ -32842,7 +33152,7 @@ function (_BaseComponent) {
       }
 
       this._months = [{
-        value: 0,
+        value: undefined,
         label: _lodash.default.get(this.component, 'fields.month.placeholder') || (this.hideInputLabels ? this.t('Month') : '')
       }, {
         value: 1,
@@ -32941,13 +33251,7 @@ function (_BaseComponent) {
   }, {
     key: "validationValue",
     get: function get() {
-      var date = this.date;
-
-      if (!date) {
-        return null;
-      }
-
-      return date.format();
+      return this.date;
     }
   }]);
 
@@ -33272,7 +33576,7 @@ function (_NestedComponent) {
   }, {
     key: "defaultRowTemplate",
     get: function get() {
-      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">\n      {{ getView(component, row[component.key]) }}\n    </div>\n  {% }) %}\n  <div class=\"col-sm-2\">\n    <div class=\"btn-group pull-right\">\n      <button class=\"btn btn-default btn-sm editRow\">Edit</button>\n      <button class=\"btn btn-danger btn-sm removeRow\">Delete</button>\n    </div>\n  </div>\n</div>";
+      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">\n      {{ getView(component, row[component.key]) }}\n    </div>\n  {% }) %}\n  {% if (!instance.options.readOnly) { %}\n    <div class=\"col-sm-2\">\n      <div class=\"btn-group pull-right\">\n        <button class=\"btn btn-default btn-sm editRow\">Edit</button>\n        <button class=\"btn btn-danger btn-sm removeRow\">Delete</button>\n      </div>\n    </div>\n  {% } %}\n</div>";
     }
   }]);
 
@@ -34552,10 +34856,12 @@ function (_BaseComponent) {
       }, [this.ce('div', {
         class: 'col-md-1'
       }), this.ce('div', {
-        class: 'col-md-9'
+        class: "col-md-".concat(this.hasTypes ? '7' : '9')
       }, this.ce('strong', {}, this.text('File Name'))), this.ce('div', {
         class: 'col-md-2'
-      }, this.ce('strong', {}, this.text('Size')))])), this.dataValue.map(function (fileInfo, index) {
+      }, this.ce('strong', {}, this.text('Size'))), this.hasTypes ? this.ce('div', {
+        class: 'col-md-2'
+      }, this.ce('strong', {}, this.text('Type'))) : null])), this.dataValue.map(function (fileInfo, index) {
         return _this2.createFileListItem(fileInfo, index);
       })]);
     }
@@ -34603,10 +34909,12 @@ function (_BaseComponent) {
           _this4.refreshDOM();
         }
       }) : null), this.ce('div', {
-        class: 'col-md-9'
+        class: "col-md-".concat(this.hasTypes ? '7' : '9')
       }, this.createFileLink(fileInfo)), this.ce('div', {
         class: 'col-md-2'
-      }, this.fileSize(fileInfo.size))]));
+      }, this.fileSize(fileInfo.size)), this.hasTypes ? this.ce('div', {
+        class: 'col-md-2'
+      }, this.createTypeSelect(fileInfo)) : null]));
     }
   }, {
     key: "createFileLink",
@@ -34622,18 +34930,38 @@ function (_BaseComponent) {
       }, file.originalName || file.name);
     }
   }, {
-    key: "buildImageList",
-    value: function buildImageList() {
+    key: "createTypeSelect",
+    value: function createTypeSelect(file) {
       var _this5 = this;
 
+      return this.ce('select', {
+        class: 'file-type',
+        onChange: function onChange(event) {
+          file.fileType = event.target.value;
+
+          _this5.triggerChange();
+        }
+      }, this.component.fileTypes.map(function (type) {
+        return _this5.ce('option', {
+          value: type.value,
+          class: 'test',
+          selected: type.value === file.fileType ? 'selected' : undefined
+        }, type.label);
+      }));
+    }
+  }, {
+    key: "buildImageList",
+    value: function buildImageList() {
+      var _this6 = this;
+
       return this.ce('div', {}, this.dataValue.map(function (fileInfo, index) {
-        return _this5.createImageListItem(fileInfo, index);
+        return _this6.createImageListItem(fileInfo, index);
       }));
     }
   }, {
     key: "createImageListItem",
     value: function createImageListItem(fileInfo, index) {
-      var _this6 = this;
+      var _this7 = this;
 
       var image;
       var fileService = this.fileService;
@@ -34651,22 +34979,22 @@ function (_BaseComponent) {
       }), !this.disabled ? this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick(event) {
-          if (fileInfo && _this6.component.storage === 'url') {
+          if (fileInfo && _this7.component.storage === 'url') {
             fileService.makeRequest('', fileInfo.url, 'delete');
           }
 
           event.preventDefault();
 
-          _this6.splice(index);
+          _this7.splice(index);
 
-          _this6.refreshDOM();
+          _this7.refreshDOM();
         }
       }) : null]));
     }
   }, {
     key: "startVideo",
     value: function startVideo() {
-      var _this7 = this;
+      var _this8 = this;
 
       navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
       navigator.getMedia({
@@ -34686,16 +35014,16 @@ function (_BaseComponent) {
         audio: false
       }, function (stream) {
         if (navigator.mozGetUserMedia) {
-          _this7.video.mozSrcObject = stream;
+          _this8.video.mozSrcObject = stream;
         } else {
-          _this7.video.srcObject = stream;
+          _this8.video.srcObject = stream;
         }
 
-        var width = parseInt(_this7.component.webcamSize) || 320;
+        var width = parseInt(_this8.component.webcamSize) || 320;
 
-        _this7.video.setAttribute('width', width);
+        _this8.video.setAttribute('width', width);
 
-        _this7.video.play();
+        _this8.video.play();
       }, function (err) {
         console.log(err);
       });
@@ -34703,7 +35031,7 @@ function (_BaseComponent) {
   }, {
     key: "takePicture",
     value: function takePicture() {
-      var _this8 = this;
+      var _this9 = this;
 
       this.canvas.setAttribute('width', this.video.videoWidth);
       this.canvas.setAttribute('height', this.video.videoHeight);
@@ -34711,13 +35039,13 @@ function (_BaseComponent) {
       this.canvas.toBlob(function (blob) {
         blob.name = "photo-".concat(Date.now(), ".png");
 
-        _this8.upload([blob]);
+        _this9.upload([blob]);
       });
     }
   }, {
     key: "buildUpload",
     value: function buildUpload() {
-      var _this9 = this;
+      var _this10 = this;
 
       // Drop event must change this pointer so need a reference to parent this.
       var element = this; // Declare Camera Instace
@@ -34735,7 +35063,7 @@ function (_BaseComponent) {
             camera.getPicture(function (success) {
               window.resolveLocalFileSystemURL(success, function (fileEntry) {
                 fileEntry.file(function (file) {
-                  _this9.upload([file]);
+                  _this10.upload([file]);
                 });
               });
             }, null, {
@@ -34751,7 +35079,7 @@ function (_BaseComponent) {
             camera.getPicture(function (success) {
               window.resolveLocalFileSystemURL(success, function (fileEntry) {
                 fileEntry.file(function (file) {
-                  _this9.upload([file]);
+                  _this10.upload([file]);
                 });
               });
             }, null, {
@@ -34791,9 +35119,9 @@ function (_BaseComponent) {
         title: 'Use Web Camera',
         onClick: function onClick(event) {
           event.preventDefault();
-          _this9.cameraMode = !_this9.cameraMode;
+          _this10.cameraMode = !_this10.cameraMode;
 
-          _this9.refreshDOM();
+          _this10.refreshDOM();
         }
       }, this.ce('i', {
         class: this.iconClass('camera')
@@ -34805,14 +35133,14 @@ function (_BaseComponent) {
       }), this.photo = this.ce('img')]), this.ce('div', {
         class: 'btn btn-primary',
         onClick: function onClick() {
-          _this9.takePicture();
+          _this10.takePicture();
         }
       }, 'Take Photo'), this.ce('div', {
         class: 'btn btn-default',
         onClick: function onClick() {
-          _this9.cameraMode = !_this9.cameraMode;
+          _this10.cameraMode = !_this10.cameraMode;
 
-          _this9.refreshDOM();
+          _this10.refreshDOM();
         }
       }, 'Switch to file upload')] : this.ce('div'));
 
@@ -34825,7 +35153,7 @@ function (_BaseComponent) {
   }, {
     key: "buildBrowseLink",
     value: function buildBrowseLink() {
-      var _this10 = this;
+      var _this11 = this;
 
       this.browseLink = this.ce('a', {
         href: '#',
@@ -34833,10 +35161,10 @@ function (_BaseComponent) {
           event.preventDefault(); // There is no direct way to trigger a file dialog. To work around this, create an input of type file and trigger
           // a click event on it.
 
-          if (typeof _this10.hiddenFileInputElement.trigger === 'function') {
-            _this10.hiddenFileInputElement.trigger('click');
+          if (typeof _this11.hiddenFileInputElement.trigger === 'function') {
+            _this11.hiddenFileInputElement.trigger('click');
           } else {
-            _this10.hiddenFileInputElement.click();
+            _this11.hiddenFileInputElement.click();
           }
         },
         class: 'browse'
@@ -34900,7 +35228,7 @@ function (_BaseComponent) {
   }, {
     key: "createUploadStatus",
     value: function createUploadStatus(fileUpload) {
-      var _this11 = this;
+      var _this12 = this;
 
       var container;
       return container = this.ce('div', {
@@ -34912,7 +35240,7 @@ function (_BaseComponent) {
       }, [fileUpload.originalName, this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick() {
-          return _this11.removeChildFrom(container, _this11.uploadStatusList);
+          return _this12.removeChildFrom(container, _this12.uploadStatusList);
         }
       })]), this.ce('div', {
         class: 'fileSize control-label col-sm-2 text-right'
@@ -35043,7 +35371,7 @@ function (_BaseComponent) {
   }, {
     key: "upload",
     value: function upload(files) {
-      var _this12 = this;
+      var _this13 = this;
 
       // Only allow one upload if not multiple.
       if (!this.component.multiple) {
@@ -35062,68 +35390,73 @@ function (_BaseComponent) {
             message: 'Starting upload'
           }; // Check file pattern
 
-          if (_this12.component.filePattern && !_this12.validatePattern(file, _this12.component.filePattern)) {
+          if (_this13.component.filePattern && !_this13.validatePattern(file, _this13.component.filePattern)) {
             fileUpload.status = 'error';
-            fileUpload.message = "File is the wrong type; it must be ".concat(_this12.component.filePattern);
+            fileUpload.message = "File is the wrong type; it must be ".concat(_this13.component.filePattern);
           } // Check file minimum size
 
 
-          if (_this12.component.fileMinSize && !_this12.validateMinSize(file, _this12.component.fileMinSize)) {
+          if (_this13.component.fileMinSize && !_this13.validateMinSize(file, _this13.component.fileMinSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = "File is too small; it must be at least ".concat(_this12.component.fileMinSize);
+            fileUpload.message = "File is too small; it must be at least ".concat(_this13.component.fileMinSize);
           } // Check file maximum size
 
 
-          if (_this12.component.fileMaxSize && !_this12.validateMaxSize(file, _this12.component.fileMaxSize)) {
+          if (_this13.component.fileMaxSize && !_this13.validateMaxSize(file, _this13.component.fileMaxSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = "File is too big; it must be at most ".concat(_this12.component.fileMaxSize);
+            fileUpload.message = "File is too big; it must be at most ".concat(_this13.component.fileMaxSize);
           } // Get a unique name for this file to keep file collisions from occurring.
 
 
-          var dir = _this12.interpolate(_this12.component.dir || '');
+          var dir = _this13.interpolate(_this13.component.dir || '');
 
-          var fileService = _this12.fileService;
+          var fileService = _this13.fileService;
 
           if (!fileService) {
             fileUpload.status = 'error';
             fileUpload.message = 'File Service not provided.';
           }
 
-          var uploadStatus = _this12.createUploadStatus(fileUpload);
+          var uploadStatus = _this13.createUploadStatus(fileUpload);
 
-          _this12.uploadStatusList.appendChild(uploadStatus);
+          _this13.uploadStatusList.appendChild(uploadStatus);
 
           if (fileUpload.status !== 'error') {
-            if (_this12.component.privateDownload) {
+            if (_this13.component.privateDownload) {
               file.private = true;
             }
 
-            fileService.uploadFile(_this12.component.storage, file, fileName, dir, function (evt) {
+            fileService.uploadFile(_this13.component.storage, file, fileName, dir, function (evt) {
               fileUpload.status = 'progress';
               fileUpload.progress = parseInt(100.0 * evt.loaded / evt.total);
               delete fileUpload.message;
               var originalStatus = uploadStatus;
-              uploadStatus = _this12.createUploadStatus(fileUpload);
+              uploadStatus = _this13.createUploadStatus(fileUpload);
 
-              _this12.uploadStatusList.replaceChild(uploadStatus, originalStatus);
-            }, _this12.component.url).then(function (fileInfo) {
-              _this12.removeChildFrom(uploadStatus, _this12.uploadStatusList);
+              _this13.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+            }, _this13.component.url).then(function (fileInfo) {
+              _this13.removeChildFrom(uploadStatus, _this13.uploadStatusList); // Default to first type.
+
+
+              if (_this13.hasTypes) {
+                fileInfo.fileType = _this13.component.fileTypes[0].value;
+              }
 
               fileInfo.originalName = file.name;
 
-              _this12.dataValue.push(fileInfo);
+              _this13.dataValue.push(fileInfo);
 
-              _this12.refreshDOM();
+              _this13.refreshDOM();
 
-              _this12.triggerChange();
+              _this13.triggerChange();
             }).catch(function (response) {
               fileUpload.status = 'error';
               fileUpload.message = response;
               delete fileUpload.progress;
               var originalStatus = uploadStatus;
-              uploadStatus = _this12.createUploadStatus(fileUpload);
+              uploadStatus = _this13.createUploadStatus(fileUpload);
 
-              _this12.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+              _this13.uploadStatusList.replaceChild(uploadStatus, originalStatus);
             });
           }
         });
@@ -35178,6 +35511,11 @@ function (_BaseComponent) {
       var value = _get(_getPrototypeOf(FileComponent.prototype), "defaultValue", this);
 
       return Array.isArray(value) ? value : [];
+    }
+  }, {
+    key: "hasTypes",
+    get: function get() {
+      return this.component.fileTypes && Array.isArray(this.component.fileTypes) && this.component.fileTypes.length > 1;
     }
   }, {
     key: "fileService",
@@ -35327,6 +35665,24 @@ var _default = [{
       }, true]
     }
   }
+}, {
+  type: 'datagrid',
+  input: true,
+  label: 'File Types',
+  key: 'data.fileTypes',
+  tooltip: 'Specify file types to classify the uploads. This is useful if you allow multiple types of uploads but want to allow the user to specify which type of file each is.',
+  weight: 11,
+  components: [{
+    label: 'Label',
+    key: 'label',
+    input: true,
+    type: 'textfield'
+  }, {
+    label: 'Value',
+    key: 'value',
+    input: true,
+    type: 'textfield'
+  }]
 }, {
   type: 'textfield',
   input: true,
@@ -37107,10 +37463,6 @@ function (_BaseComponent) {
     value: function createComponent(component, options, data, before, state) {
       options = options || this.options;
       data = data || this.data;
-
-      if (this.component.clearOnHide) {
-        component.clearOnHide = true;
-      }
 
       var comp = _Components.default.create(component, options, data, true);
 
@@ -43131,6 +43483,30 @@ function (_TextFieldComponent) {
           return _this2.editor;
         });
         return this.input;
+      }
+
+      if (this.component.editor === 'ckeditor') {
+        this.editorReady = this.addCKE(this.input, null, function (newValue) {
+          return _this2.updateValue(null, newValue);
+        }).then(function (editor) {
+          _this2.editor = editor;
+
+          if (_this2.options.readOnly || _this2.component.disabled) {
+            _this2.editor.isReadOnly = true;
+          } // Set the default rows.
+
+
+          var value = '';
+          var numRows = parseInt(_this2.component.rows, 10);
+
+          for (var i = 0; i < numRows; i++) {
+            value += '<p></p>';
+          }
+
+          editor.data.set(value);
+          return editor;
+        });
+        return this.input;
       } // Normalize the configurations.
 
 
@@ -43202,7 +43578,10 @@ function (_TextFieldComponent) {
       if (this.isPlain) {
         if (this.options.readOnly) {
           // For readOnly, just view the contents.
-          this.input.innerHTML = this.interpolate(value);
+          if (this.input) {
+            this.input.innerHTML = this.interpolate(value);
+          }
+
           this.dataValue = value;
           return;
         } else {
@@ -43215,11 +43594,17 @@ function (_TextFieldComponent) {
 
       if (this.htmlView) {
         // For HTML view, just view the contents.
-        this.input.innerHTML = this.interpolate(value);
+        if (this.input) {
+          this.input.innerHTML = this.interpolate(value);
+        }
       } else if (this.editorReady) {
         this.editorReady.then(function (editor) {
           if (_this3.component.editor === 'ace') {
             editor.setValue(_this3.setConvertedValue(value));
+          } else if (_this3.component.editor === 'ckeditor') {
+            editor.data.set(_this3.setConvertedValue(value));
+
+            _this3.updateValue(flags);
           } else {
             editor.setContents(editor.clipboard.convert(_this3.setConvertedValue(value)));
 
@@ -43348,6 +43733,9 @@ var _default = [{
     }, {
       label: 'Quill',
       value: 'quill'
+    }, {
+      label: 'CKEditor',
+      value: 'ckeditor'
     }, {
       label: 'ACE',
       value: 'ace'
@@ -44694,6 +45082,8 @@ var _default = {
         invalid_regex: '{{field}} does not match the pattern {{regex}}.',
         // eslint-disable-line camelcase
         invalid_date: '{{field}} is not a valid date.',
+        // eslint-disable-line camelcase
+        invalid_day: '{{field}} is not a valid day.',
         // eslint-disable-line camelcase
         mask: '{{field}} does not match the mask.',
         stripe: '{{stripe}}',
@@ -67941,8 +68331,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-__webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
-
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -67963,8 +68351,7 @@ var base64 = function base64() {
             name: fileName,
             url: url,
             size: file.size,
-            type: file.type,
-            data: url.replace("data:".concat(file.type, ";base64,"), '')
+            type: file.type
           });
         };
 
@@ -80266,7 +80653,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.4
+ * @version 1.14.5
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -80363,7 +80750,8 @@ function getStyleComputedProperty(element, property) {
     return [];
   }
   // NOTE: 1 DOM access here
-  var css = getComputedStyle(element, null);
+  var window = element.ownerDocument.defaultView;
+  var css = window.getComputedStyle(element, null);
   return property ? css[property] : css;
 }
 
@@ -80451,7 +80839,7 @@ function getOffsetParent(element) {
   var noOffsetParent = isIE(10) ? document.body : null;
 
   // NOTE: 1 DOM access here
-  var offsetParent = element.offsetParent;
+  var offsetParent = element.offsetParent || null;
   // Skip hidden elements which don't have an offsetParent
   while (offsetParent === noOffsetParent && element.nextElementSibling) {
     offsetParent = (element = element.nextElementSibling).offsetParent;
@@ -80463,9 +80851,9 @@ function getOffsetParent(element) {
     return element ? element.ownerDocument.documentElement : document.documentElement;
   }
 
-  // .offsetParent will return the closest TD or TABLE in case
+  // .offsetParent will return the closest TH, TD or TABLE in case
   // no offsetParent is present, I hate this job...
-  if (['TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
+  if (['TH', 'TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
     return getOffsetParent(offsetParent);
   }
 
@@ -81013,7 +81401,8 @@ function getReferenceOffsets(state, popper, reference) {
  * @returns {Object} object containing width and height properties
  */
 function getOuterSizes(element) {
-  var styles = getComputedStyle(element);
+  var window = element.ownerDocument.defaultView;
+  var styles = window.getComputedStyle(element);
   var x = parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
   var y = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
   var result = {
@@ -83977,7 +84366,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var popper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js");
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.3.0
+ * @version 1.3.1
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *

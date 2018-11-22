@@ -1,4 +1,4 @@
-/*! ng-formio v3.7.0 | https://unpkg.com/ngFormio@3.7.0/LICENSE.txt */
+/*! ng-formio v3.8.0 | https://unpkg.com/ngFormio@3.8.0/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3217,7 +3217,8 @@ dialog.fixed {
   padding: 4px; }
 
 .ql-source:after {
-  content: "[source]"; }
+  content: "[source]";
+  white-space: nowrap; }
 
 .quill-source-code {
   width: 100%;
