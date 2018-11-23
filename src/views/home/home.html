@@ -84,7 +84,7 @@
                 <span><small>{{ project.apiCalls.used.emails || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.emails) }} Emails</small></span>
               </div>
             </div>
-            <div ng-else>
+            <div ng-if="project.remote">
               <h4>Enterprise Edition <br /> (On Premise)</h4>
             </div>
             <div class="project-section-separator"></div>

@@ -95,7 +95,7 @@
             <span>{{ currentProject.apiCalls.used.emails | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.emails) }} per month</span>
           </div>
         </li>
-        <li class="list-group-item" ng-else>
+        <li class="list-group-item" ng-if="currentProject._id !== localProject._id">
           <h4>Enterprise Edition (On Premise)</h4>
         </li>
       </ul>
