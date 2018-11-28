@@ -1,4 +1,4 @@
-/*! ng-formio v3.8.0 | https://unpkg.com/ngFormio@3.8.0/LICENSE.txt */
+/*! ng-formio v3.9.0 | https://unpkg.com/ngFormio@3.9.0/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3311,6 +3311,10 @@ td > .form-group {
   padding: 3px;
   line-height: 0; }
 
+[dir=rtl] .btn.signature-pad-refresh {
+  left: unset;
+  right: 0; }
+
 .choices__list--dropdown .choices__item--selectable {
   padding-right: 0; }
 
@@ -3377,6 +3381,18 @@ td > .form-group {
 .choices__input {
   padding: 2px; }
 
+.choices[dir=rtl] .choices__list--multiple .choices__item[data-deletable] {
+  padding-left: 5px;
+  float: right; }
+
+.choices[dir=rtl] .choices__list--multiple .choices__item[data-deletable] .choices__button {
+  float: left;
+  margin: 0 8px 0 -4px;
+  padding-left: unset;
+  padding-right: 16px;
+  border-left: unset;
+  border-right: 1px solid #008fa1; }
+
 .formio-component-file .fileSelector {
   padding: 15px;
   border: 2px dashed #ddd;
@@ -3388,6 +3404,10 @@ td > .form-group {
 .formio-component-file .fileSelector .fa, .formio-component-file .fileSelector .glyphicon {
   font-size: 20px;
   margin-right: 5px; }
+
+[dir=rtl] .formio-component-file .fileSelector .fa, [dir=rtl] .formio-component-file .fileSelector .glyphicon {
+  margin-right: unset;
+  margin-left: 5px; }
 
 .formio-component-file .fileSelector .browse {
   cursor: pointer; }
@@ -3744,6 +3764,10 @@ body.formio-dialog-open, html.formio-dialog-open {
   vertical-align: top;
   margin-right: 4px;
   margin-top: 1px; }
+
+[dir=rtl] .formio-collapse-icon {
+  margin-right: unset;
+  margin-left: 4px; }
 
 .formio-component-dateTime .form-control[type=datetime-local] ~ .input-group-addon, .formio-component-datetime .form-control[type=datetime-local] ~ .input-group-addon {
   width: auto; }

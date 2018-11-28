@@ -20984,6 +20984,8 @@ function (_Webform) {
 
       this.emit('updateComponent', component);
     }
+    /* eslint-disable max-statements */
+
   }, {
     key: "editComponent",
     value: function editComponent(component) {
@@ -20991,7 +20993,9 @@ function (_Webform) {
 
       var componentCopy = _lodash.default.cloneDeep(component);
 
-      var componentClass = _Components.default.components[componentCopy.component.type]; // Make sure we only have one dialog open at a time.
+      var componentClass = _Components.default.components[componentCopy.component.type];
+      var isCustom = componentClass === undefined;
+      componentClass = isCustom ? _Components.default.components.unknown : componentClass; // Make sure we only have one dialog open at a time.
 
       if (this.dialog) {
         this.dialog.close();
@@ -21053,15 +21057,16 @@ function (_Webform) {
       var overrides = _lodash.default.get(this.options, "editForm.".concat(componentCopy.component.type), {}); // Get the editform for this component.
 
 
-      var editForm = _Components.default.components[componentCopy.component.type].editForm(overrides); // Change the defaultValue component to be reflective.
-
+      var editForm = componentClass.editForm(overrides); // Change the defaultValue component to be reflective.
 
       this.defaultValueComponent = (0, _utils.getComponent)(editForm.components, 'defaultValue');
 
       _lodash.default.assign(this.defaultValueComponent, _lodash.default.omit(componentCopy.component, ['key', 'label', 'placeholder', 'tooltip', 'validate', 'disabled'])); // Create the form instance.
 
 
-      this.editForm = new _Webform2.default(formioForm); // Set the form to the edit form.
+      this.editForm = new _Webform2.default(formioForm, {
+        language: this.options.language
+      }); // Set the form to the edit form.
 
       this.editForm.form = editForm; // Pass along the form being edited.
 
@@ -21072,22 +21077,39 @@ function (_Webform) {
 
       this.editForm.on('change', function (event) {
         if (event.changed) {
-          // See if this is a manually modified key.
-          if (event.changed.component && event.changed.component.key === 'key') {
+          // See if this is a manually modified key. Treat custom component keys as manually modified
+          if (event.changed.component && event.changed.component.key === 'key' || isCustom) {
             componentCopy.keyModified = true;
           } // Set the component JSON to the new data.
 
 
-          componentCopy.component = _this5.editForm.getValue().data; // Update the component.
+          var editFormData = _this5.editForm.getValue().data; //for custom component use value in 'componentJson' field as JSON of component
+
+
+          if (editFormData.type === 'custom' && editFormData.componentJson) {
+            componentCopy.component = editFormData.componentJson;
+          } else {
+            componentCopy.component = editFormData;
+          } // Update the component.
+
 
           _this5.updateComponent(componentCopy);
         }
       }); // Modify the component information in the edit form.
 
       this.editForm.formReady.then(function () {
-        return _this5.editForm.setValue({
-          data: componentCopy.component
-        });
+        //for custom component populate component setting with component JSON
+        if (isCustom) {
+          _this5.editForm.setValue({
+            data: {
+              componentJson: _lodash.default.cloneDeep(componentCopy.component)
+            }
+          });
+        } else {
+          _this5.editForm.setValue({
+            data: componentCopy.component
+          });
+        }
       });
       this.addEventListener(cancelButton, 'click', function (event) {
         event.preventDefault();
@@ -21109,8 +21131,13 @@ function (_Webform) {
         }
 
         event.preventDefault();
-        component.isNew = false;
-        component.component = componentCopy.component;
+        component.isNew = false; //for custom component use value in 'componentJson' field as JSON of component
+
+        if (isCustom) {
+          component.component = _this5.editForm.data.componentJson;
+        } else {
+          component.component = componentCopy.component;
+        }
 
         if (component.dragEvents && component.dragEvents.onSave) {
           component.dragEvents.onSave(component);
@@ -21134,6 +21161,8 @@ function (_Webform) {
 
       this.emit('editComponent', component);
     }
+    /* eslint-enable max-statements */
+
     /**
      * Creates copy of component schema and stores it under sessionStorage.
      * @param {Component} component
@@ -22827,6 +22856,7 @@ var _default = {
 
     if (result && (customErrorMessage || validateCustom)) {
       result = component.t(customErrorMessage || result, {
+        field: component.errorLabel,
         data: component.data
       });
     }
@@ -23398,8 +23428,10 @@ function (_TextFieldComponent) {
 
   _createClass(AddressComponent, [{
     key: "setValueAt",
-    value: function setValueAt(index, value) {
-      if (value === null || value === undefined) {
+    value: function setValueAt(index, value, flags) {
+      flags = flags || {};
+
+      if (!flags.noDefault && (value === null || value === undefined)) {
         value = this.defaultValue;
       }
 
@@ -25100,7 +25132,8 @@ function (_Component) {
         return addButton;
       } else {
         addButton.appendChild(addIcon);
-        addButton.appendChild(this.text(this.component.addAnother || ' Add Another'));
+        addButton.appendChild(this.text(' '));
+        addButton.appendChild(this.text(this.component.addAnother || 'Add Another'));
         return addButton;
       }
     }
@@ -26155,7 +26188,8 @@ function (_Component) {
     key: "deleteValue",
     value: function deleteValue() {
       this.setValue(null, {
-        noUpdateEvent: true
+        noUpdateEvent: true,
+        noDefault: true
       });
 
       _lodash.default.unset(this.data, this.key);
@@ -26257,7 +26291,14 @@ function (_Component) {
       }
 
       flags = flags || {};
-      var newValue = value === undefined || value === null ? this.getValue(flags) : value;
+      var newValue = value;
+
+      if (!this.visible && this.component.clearOnHide) {
+        newValue = this.dataValue;
+      } else if (value === undefined || value === null) {
+        newValue = this.getValue(flags);
+      }
+
       var changed = newValue !== undefined ? this.hasChanged(newValue, this.dataValue) : false;
       this.dataValue = newValue;
 
@@ -26487,8 +26528,10 @@ function (_Component) {
 
   }, {
     key: "setValueAt",
-    value: function setValueAt(index, value) {
-      if (value === null || value === undefined) {
+    value: function setValueAt(index, value, flags) {
+      flags = flags || {};
+
+      if (!flags.noDefault && (value === null || value === undefined)) {
         value = this.defaultValue;
       }
 
@@ -26571,7 +26614,7 @@ function (_Component) {
 
       for (var i in this.inputs) {
         if (this.inputs.hasOwnProperty(i)) {
-          this.setValueAt(i, isArray ? value[i] : value);
+          this.setValueAt(i, isArray ? value[i] : value, flags);
         }
       }
 
@@ -28229,6 +28272,8 @@ var _Time = _interopRequireDefault(__webpack_require__(/*! ./time/Time.form */ "
 
 var _Well = _interopRequireDefault(__webpack_require__(/*! ./well/Well.form */ "./node_modules/formiojs/components/well/Well.form.js"));
 
+var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown.form */ "./node_modules/formiojs/components/unknown/Unknown.form.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _.default.address.editForm = _Address.default;
@@ -28267,6 +28312,7 @@ _.default.textarea.editForm = _TextArea.default;
 _.default.textfield.editForm = _TextField.default;
 _.default.time.editForm = _Time.default;
 _.default.well.editForm = _Well.default;
+_.default.unknown.editForm = _Unknown.default;
 var _default = _.default;
 exports.default = _default;
 
@@ -31753,7 +31799,8 @@ function (_NestedComponent) {
       addButton.appendChild(this.ce('i', {
         class: this.iconClass('plus')
       }));
-      addButton.appendChild(this.text(this.component.addAnother || ' Add Another'));
+      addButton.appendChild(this.text(' '));
+      addButton.appendChild(this.text(this.component.addAnother || 'Add Another'));
       return addButton;
     }
   }, {
@@ -35114,7 +35161,7 @@ function (_BaseComponent) {
         }
       }, [this.ce('i', {
         class: this.iconClass('cloud-upload')
-      }), this.text(' Drop files to attach, or '), this.buildBrowseLink(), this.component.webcam ? [this.text(', or '), this.ce('a', {
+      }), this.text(' '), this.text('Drop files to attach, or'), this.text(' '), this.buildBrowseLink(), this.component.webcam ? [this.text(', or'), this.text(' '), this.ce('a', {
         href: '#',
         title: 'Use Web Camera',
         onClick: function onClick(event) {
@@ -38574,15 +38621,14 @@ function (_NestedComponent) {
         this.panelTitle = this.ce('h4', {
           class: 'mb-0 card-title panel-title'
         });
-        var titleText = this.component.title;
 
         if (this.component.collapsible) {
           this.collapseIcon = this.getCollapseIcon();
           this.panelTitle.appendChild(this.collapseIcon);
-          titleText = " ".concat(titleText);
+          this.panelTitle.appendChild(this.text(' '));
         }
 
-        this.panelTitle.appendChild(this.text(titleText));
+        this.panelTitle.appendChild(this.text(this.component.title));
         this.createTooltip(this.panelTitle);
         heading.appendChild(this.panelTitle);
         this.setCollapseHeader(heading);
@@ -39624,7 +39670,8 @@ function (_SelectComponent) {
         class: this.iconClass('plus')
       });
       addButton.appendChild(addIcon);
-      addButton.appendChild(this.text(" ".concat(this.component.addResourceLabel || 'Add Resource')));
+      addButton.appendChild(this.text(' '));
+      addButton.appendChild(this.text(this.component.addResourceLabel || 'Add Resource'));
       this.addEventListener(addButton, 'click', function (event) {
         event.preventDefault();
 
@@ -44022,12 +44069,14 @@ function (_BaseComponent) {
     }
   }, {
     key: "setValueAt",
-    value: function setValueAt(index, value) {
+    value: function setValueAt(index, value, flags) {
+      flags = flags || {};
+
       if (!this.isMultipleMasksField) {
-        return _get(_getPrototypeOf(TextFieldComponent.prototype), "setValueAt", this).call(this, index, value);
+        return _get(_getPrototypeOf(TextFieldComponent.prototype), "setValueAt", this).call(this, index, value, flags);
       }
 
-      var defaultValue = this.defaultValue;
+      var defaultValue = flags.noDefault ? this.emptyValue : this.defaultValue;
 
       if (!value) {
         if (defaultValue) {
@@ -44674,6 +44723,51 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/unknown/Unknown.form.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/components/unknown/Unknown.form.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
+
+var _UnknownEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Unknown.edit.display */ "./node_modules/formiojs/components/unknown/editForm/Unknown.edit.display.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _default() {
+  return (0, _Base.default)([{
+    key: 'display',
+    components: _UnknownEdit.default
+  }, {
+    key: 'data',
+    ignore: true
+  }, {
+    key: 'validation',
+    ignore: true
+  }, {
+    key: 'api',
+    ignore: true
+  }, {
+    key: 'conditional',
+    ignore: true
+  }, {
+    key: 'logic',
+    ignore: true
+  }]);
+}
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/unknown/Unknown.js":
 /*!*************************************************************!*\
   !*** ./node_modules/formiojs/components/unknown/Unknown.js ***!
@@ -44730,8 +44824,46 @@ function (_BaseComponent) {
     key: "build",
     value: function build() {
       this.createElement();
-      this.element.appendChild(this.text("Unknown component: ".concat(this.component.type)));
+
+      if (this.options.builder) {
+        var builderElement = this.ce('div', {
+          class: 'panel panel-default'
+        }, [this.ce('div', {
+          class: 'panel-body text-muted text-center'
+        }, [document.createTextNode("".concat(this.t('Custom Component'), " (").concat(this.t(this.component.type), ")"))])]);
+        this.append(builderElement);
+      } else {
+        this.element.appendChild(this.text("Unknown component: ".concat(this.component.type)));
+      }
+
       return this.element;
+    }
+  }, {
+    key: "defaultSchema",
+    get: function get() {
+      return UnknownComponent.schema();
+    }
+  }], [{
+    key: "schema",
+    value: function schema() {
+      return {
+        type: 'custom',
+        key: 'custom',
+        protected: false,
+        persistent: true
+      };
+    }
+  }, {
+    key: "builderInfo",
+    get: function get() {
+      return {
+        title: 'Custom',
+        icon: 'fa fa-cubes',
+        group: 'advanced',
+        documentation: 'https://help.form.io/userguide/form-components/#custom',
+        weight: 120,
+        schema: UnknownComponent.schema()
+      };
     }
   }]);
 
@@ -44739,6 +44871,108 @@ function (_BaseComponent) {
 }(_Base.default);
 
 exports.default = UnknownComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/unknown/editForm/Unknown.edit.display.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/unknown/editForm/Unknown.edit.display.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'customComponentDescription',
+  label: 'Custom component description',
+  input: false,
+  tag: 'p',
+  content: 'Custom components can be used to render special fields or widgets inside your app. ' + 'For information on how to display in an app, see ' + '<a href="http://help.form.io/userguide/#custom" target="_blank">' + 'custom component documentation' + '</a>.',
+  type: 'htmlelement',
+  weight: 5
+}, {
+  type: 'textarea',
+  as: 'json',
+  editor: 'ace',
+  weight: 10,
+  input: true,
+  key: 'componentJson',
+  label: 'Custom Element JSON',
+  tooltip: 'Enter the JSON for this custom element.'
+}, {
+  key: 'label',
+  ignore: true
+}, {
+  key: 'hideLabel',
+  ignore: true
+}, {
+  key: 'labelPosition',
+  ignore: true
+}, {
+  key: 'labelWidth',
+  ignore: true
+}, {
+  key: 'labelMargin',
+  ignore: true
+}, {
+  key: 'placeholder',
+  ignore: true
+}, {
+  key: 'description',
+  ignore: true
+}, {
+  key: 'tooltip',
+  ignore: true
+}, {
+  key: 'errorLabel',
+  ignore: true
+}, {
+  key: 'customClass',
+  ignore: true
+}, {
+  key: 'tabindex',
+  ignore: true
+}, {
+  key: 'persistent',
+  ignore: true
+}, {
+  key: 'multiple',
+  ignore: true
+}, {
+  key: 'clearOnHide',
+  ignore: true
+}, {
+  key: 'protected',
+  ignore: true
+}, {
+  key: 'hidden',
+  ignore: true
+}, {
+  key: 'mask',
+  ignore: true
+}, {
+  key: 'dataGridLabel',
+  ignore: true
+}, {
+  key: 'disabled',
+  ignore: true
+}, {
+  key: 'autofocus',
+  ignore: true
+}, {
+  key: 'tableView',
+  ignore: true
+}, {
+  key: 'alwaysEnabled',
+  ignore: true
+}];
+exports.default = _default;
 
 /***/ }),
 
@@ -72410,6 +72644,7 @@ function get() {
     pluralSeparator: '_',
     contextSeparator: '_',
 
+    partialBundledLanguages: false, // allow bundling certain languages that are not remotely fetched
     saveMissing: false, // enable to send missing values
     updateMissing: false, // enable to update default values if different from translated value (only useful on initial development, or when keeping code as source of truth)
     saveMissingTo: 'fallback', // 'current' || 'all'
@@ -72655,7 +72890,7 @@ var I18n = function (_EventEmitter) {
 
     var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
 
-    if (!this.options.resources) {
+    if (!this.options.resources || this.options.partialBundledLanguages) {
       if (this.language && this.language.toLowerCase() === 'cimode') return callback(); // avoid loading resources for cimode
 
       var toLoad = [];
@@ -80653,7 +80888,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.5
+ * @version 1.14.6
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -81403,8 +81638,8 @@ function getReferenceOffsets(state, popper, reference) {
 function getOuterSizes(element) {
   var window = element.ownerDocument.defaultView;
   var styles = window.getComputedStyle(element);
-  var x = parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
-  var y = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
+  var x = parseFloat(styles.marginTop || 0) + parseFloat(styles.marginBottom || 0);
+  var y = parseFloat(styles.marginLeft || 0) + parseFloat(styles.marginRight || 0);
   var result = {
     width: element.offsetWidth + y,
     height: element.offsetHeight + x
@@ -81856,6 +82091,52 @@ function applyStyleOnLoad(reference, popper, options, modifierOptions, state) {
 
 /**
  * @function
+ * @memberof Popper.Utils
+ * @argument {Object} data - The data object generated by `update` method
+ * @argument {Boolean} shouldRound - If the offsets should be rounded at all
+ * @returns {Object} The popper's position offsets rounded
+ *
+ * The tale of pixel-perfect positioning. It's still not 100% perfect, but as
+ * good as it can be within reason.
+ * Discussion here: https://github.com/FezVrasta/popper.js/pull/715
+ *
+ * Low DPI screens cause a popper to be blurry if not using full pixels (Safari
+ * as well on High DPI screens).
+ *
+ * Firefox prefers no rounding for positioning and does not have blurriness on
+ * high DPI screens.
+ *
+ * Only horizontal placement and left/right values need to be considered.
+ */
+function getRoundedOffsets(data, shouldRound) {
+  var _data$offsets = data.offsets,
+      popper = _data$offsets.popper,
+      reference = _data$offsets.reference;
+
+
+  var isVertical = ['left', 'right'].indexOf(data.placement) !== -1;
+  var isVariation = data.placement.indexOf('-') !== -1;
+  var sameWidthOddness = reference.width % 2 === popper.width % 2;
+  var bothOddWidth = reference.width % 2 === 1 && popper.width % 2 === 1;
+  var noRound = function noRound(v) {
+    return v;
+  };
+
+  var horizontalToInteger = !shouldRound ? noRound : isVertical || isVariation || sameWidthOddness ? Math.round : Math.floor;
+  var verticalToInteger = !shouldRound ? noRound : Math.round;
+
+  return {
+    left: horizontalToInteger(bothOddWidth && !isVariation && shouldRound ? popper.left - 1 : popper.left),
+    top: verticalToInteger(popper.top),
+    bottom: verticalToInteger(popper.bottom),
+    right: horizontalToInteger(popper.right)
+  };
+}
+
+var isFirefox = isBrowser && /Firefox/i.test(navigator.userAgent);
+
+/**
+ * @function
  * @memberof Modifiers
  * @argument {Object} data - The data object generated by `update` method
  * @argument {Object} options - Modifiers configuration and options
@@ -81884,15 +82165,7 @@ function computeStyle(data, options) {
     position: popper.position
   };
 
-  // Avoid blurry text by using full pixel integers.
-  // For pixel-perfect positioning, top/bottom prefers rounded
-  // values, while left/right prefers floored values.
-  var offsets = {
-    left: Math.floor(popper.left),
-    top: Math.round(popper.top),
-    bottom: Math.round(popper.bottom),
-    right: Math.floor(popper.right)
-  };
+  var offsets = getRoundedOffsets(data, window.devicePixelRatio < 2 || !isFirefox);
 
   var sideA = x === 'bottom' ? 'top' : 'bottom';
   var sideB = y === 'right' ? 'left' : 'right';
@@ -85005,7 +85278,7 @@ g = (function() {
 
 try {
 	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
+	g = g || new Function("return this")();
 } catch (e) {
 	// This works if the window reference is available
 	if (typeof window === "object") g = window;
