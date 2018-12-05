@@ -27,7 +27,7 @@ angular.module('formioApp').constant('AppConfig', {
   apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
-  pdfServer: 'http://localhost:4005',
+  pdfServer: apiProtocol + '//files.' + serverHost,
   pdfHostedPrice: 50,
   pdfHostedForms: 25,
   pdfHostedSubs: 1000,
