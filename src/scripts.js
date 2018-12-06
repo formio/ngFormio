@@ -1,7 +1,25 @@
 import './index.html';
 import './images/formio-logo.png';
+import './images/formio-logo-white.png';
 import './images/footerlogo-before.png';
+import './images/platforms/angular2.png';
+import './images/platforms/angularjs1.svg';
+import './images/platforms/form.png';
+import './images/platforms/html5.png';
+import './images/platforms/react.svg';
+import './images/platforms/vue.png';
+import './images/empty-project.png';
+import '../node_modules/font-awesome/fonts/FontAwesome.otf';
+import '../node_modules/font-awesome/fonts/fontawesome-webfont.eot';
+import '../node_modules/font-awesome/fonts/fontawesome-webfont.ttf';
+import '../node_modules/font-awesome/fonts/fontawesome-webfont.woff';
+import '../node_modules/font-awesome/fonts/fontawesome-webfont.woff2';
+import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot';
+import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf';
+import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff';
+import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2';
 import './styles.scss';
+// import './robots.txt';
 
 import '../node_modules/ckeditor/ckeditor.js';
 

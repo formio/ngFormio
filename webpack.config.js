@@ -45,7 +45,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(woff2?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(woff2?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
             loader: 'file-loader',
@@ -62,8 +62,8 @@ module.exports = {
           {
             loader: 'file-loader',
             options: {
-              name: '[name].[ext]',
-              outputPath: 'images'
+              name: '[path][name].[ext]',
+              context: './src'
             }
           }
         ]
@@ -88,6 +88,11 @@ module.exports = {
         exclude: /src\/views/,
         use: ['file-loader?name=[name].[ext]']
       },
+      // {
+      //   test: /robots\.txt$/,
+      //   exclude: /src\/views/,
+      //   use: ['file-loader?name=[name].[ext]']
+      // },
       {
         test: /\.html/,
         exclude: /src\/index\.html$/,
@@ -95,8 +100,7 @@ module.exports = {
           {
             loader: 'raw-loader',
             options: {
-              name: '[path]/[name].[ext]',
-              // regExp: /src\/([a-zA-Z0-9\/]+)\/[^\/]+/
+              name: '[path][name].[ext]',
             }
           }]
       }

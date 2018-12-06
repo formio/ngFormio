@@ -3,8 +3,14 @@ var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 var pathType = 'Subdomains';
 
-serverHost = 'localhost:3000';
-apiProtocol = (serverHost.split(':')[0] !== 'localhost') ? 'https:' : protocol;
+if (host.indexOf('localhost') !== 0) {
+  serverHost = host
+  apiProtocol = protocol;
+}
+else {
+  serverHost = 'localhost:3000';
+  apiProtocol = 'http:';
+}
 var parts = serverHost.split('.');
 if (parts[0] === 'portal' || parts[0] === 'beta') {
   parts.shift();
