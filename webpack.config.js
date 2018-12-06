@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
@@ -14,6 +15,9 @@ module.exports = {
       // both options are optional
       filename: "styles.css",
       chunkFilename: "[id].css"
+    }),
+    new webpack.ProvidePlugin({
+      "window.jQuery": "jquery"
     })
   ],
   module: {
@@ -88,11 +92,10 @@ module.exports = {
         exclude: /src\/views/,
         use: ['file-loader?name=[name].[ext]']
       },
-      // {
-      //   test: /robots\.txt$/,
-      //   exclude: /src\/views/,
-      //   use: ['file-loader?name=[name].[ext]']
-      // },
+      {
+        test: /robots\.txt$/,
+        use: ['file-loader?name=[name].[ext]']
+      },
       {
         test: /\.html/,
         exclude: /src\/index\.html$/,

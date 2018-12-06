@@ -41,39 +41,79 @@ app.config([
     // Create states for both forms and resources.
     angular.forEach(['resource', 'form'], function(type) {
       var parentName = 'project.' + type;
+      if (type === 'form') {
+        $stateProvider
+          .state(parentName + '.index', {
+            url: '/',
+            templateUrl: 'views/form/forms.html',
+            controller: [
+              '$scope',
+              function($scope) {
+                $scope.loadProjectPromise.then(function() {
+                  $scope.ready = true;
+                });
+              }
+            ]
+          })
+          .state(parentName, {
+            abstract: true,
+            url: '/' + type,
+            templateUrl: 'views/form/base.html',
+            controller: [
+              '$scope',
+              '$state',
+              function(
+                $scope,
+                $state
+              ) {
+                $scope.formInfo = $state.current.data;
+                $scope.infoTemplate = 'views/form/form-info.html';
+                $scope.currentSection.title = _.capitalize($scope.formInfo.type) + 's';
+                $scope.currentSection.icon = ($scope.formInfo.type === 'form') ? 'fa fa-tasks' : 'fa fa-database';
+                $scope.currentSection.help = $scope.formInfo.help;
+              }
+            ],
+            data: typeInfo[type]
+          })
+
+      }
+      else {
+        $stateProvider
+          .state(parentName + '.index', {
+            url: '/',
+            templateUrl: 'views/form/resources.html',
+            controller: [
+              '$scope',
+              function($scope) {
+                $scope.loadProjectPromise.then(function() {
+                  $scope.ready = true;
+                });
+              }
+            ]
+          })
+          .state(parentName, {
+            abstract: true,
+            url: '/' + type,
+            templateUrl: 'views/form/base.html',
+            controller: [
+              '$scope',
+              '$state',
+              function(
+                $scope,
+                $state
+              ) {
+                $scope.formInfo = $state.current.data;
+                $scope.infoTemplate = 'views/form/resource-info.html';
+                $scope.currentSection.title = _.capitalize($scope.formInfo.type) + 's';
+                $scope.currentSection.icon = ($scope.formInfo.type === 'form') ? 'fa fa-tasks' : 'fa fa-database';
+                $scope.currentSection.help = $scope.formInfo.help;
+              }
+            ],
+            data: typeInfo[type]
+          })
+
+      }
       $stateProvider
-        .state(parentName, {
-          abstract: true,
-          url: '/' + type,
-          templateUrl: 'views/form/base.html',
-          controller: [
-            '$scope',
-            '$state',
-            function(
-              $scope,
-              $state
-            ) {
-              $scope.formInfo = $state.current.data;
-              $scope.infoTemplate = 'views/form/' + $scope.formInfo.type + '-info.html';
-              $scope.currentSection.title = _.capitalize($scope.formInfo.type) + 's';
-              $scope.currentSection.icon = ($scope.formInfo.type === 'form') ? 'fa fa-tasks' : 'fa fa-database';
-              $scope.currentSection.help = $scope.formInfo.help;
-            }
-          ],
-          data: typeInfo[type]
-        })
-        .state(parentName + '.index', {
-          url: '/',
-          // templateUrl: 'views/form/' + type + 's.html',
-          controller: [
-            '$scope',
-            function($scope) {
-              $scope.loadProjectPromise.then(function() {
-                $scope.ready = true;
-              });
-            }
-          ]
-        })
         .state(parentName + '.new', {
           url: '/new/' + type,
           templateUrl: 'views/form/new.html',

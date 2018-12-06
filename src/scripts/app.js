@@ -1072,6 +1072,15 @@ angular
           $state.go('auth');
         }
       });
+      // $stateChangeStart doesn't fire on initial page load anymore.
+      $rootScope.userToken = Formio.getToken();
+      $rootScope.authenticated = !!$rootScope.userToken;
+      if ($rootScope.currentState && $rootScope.currentState.name.substr(0, 4) === 'auth') {
+        return;
+      }
+      if (!$rootScope.authenticated) {
+        $state.go('auth');
+      }
 
       $rootScope.$on('$stateChangeSuccess', function(event, state) {
         var parts = state.name.split('.');

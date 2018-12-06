@@ -1,0 +1,12 @@
+import './formio-logo.png';
+import './formio-logo-white.png';
+import './footerlogo-before.png';
+import './platforms/angular2.png';
+import './platforms/angularjs1.svg';
+import './platforms/form.png';
+import './platforms/html5.png';
+import './platforms/react.svg';
+import './platforms/vue.png';
+import './swagger-logo.png';
+import './empty-project.png';
+import './json.png';
