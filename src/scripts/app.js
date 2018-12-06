@@ -868,6 +868,7 @@ angular
     '$window',
     '$http',
     '$timeout',
+    '$templateCache',
     function(
       $state,
       $stateParams,
@@ -880,7 +881,8 @@ angular
       $location,
       $window,
       $http,
-      $timeout
+      $timeout,
+      $templateCache
     ) {
 
       // Force SSL.
@@ -1117,6 +1119,43 @@ angular
       //   - Any inline style
       //   - Any class name
       CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
+
+      // Preload ng-include templates into cache.
+    // <ng-include src="embedView"></ng-include>
+    //     <ng-include src="infoTemplate"></ng-include>
+    // <ng-include src="currentStep.template" ng-init="init()" />
+      $templateCache.put('views/form/upload.html', require('../views/form/upload.html'));
+      $templateCache.put('views/project/access/access/access.html', require('../views/project/access/access/access.html'));
+      $templateCache.put('views/project/access/roles/view.html', require('../views/project/access/roles/view.html'));
+      $templateCache.put('views/project/access/teams.html', require('../views/project/access/teams.html'));
+      $templateCache.put('views/project/settings/menu.html', require('../views/project/settings/menu.html'));
+      $templateCache.put('views/project/settings.html', require('../views/project/settings.html'));
+      $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
+      $templateCache.put('views/project/env/menu.html', require('../views/project/env/menu.html'));
+      $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
+      $templateCache.put('views/project/env/integrations/storage/s3.html', require('../views/project/env/integrations/storage/s3.html'));
+      $templateCache.put('views/project/env/integrations/storage/dropbox.html', require('../views/project/env/integrations/storage/dropbox.html'));
+      $templateCache.put('views/project/env/integrations/data/office365.html', require('../views/project/env/integrations/data/office365.html'));
+      $templateCache.put('views/project/env/integrations/data/google.html', require('../views/project/env/integrations/data/google.html'));
+      $templateCache.put('views/project/env/integrations/data/kickbox.html', require('../views/project/env/integrations/data/kickbox.html'));
+      $templateCache.put('views/project/env/integrations/data/hubspot.html', require('../views/project/env/integrations/data/hubspot.html'));
+      $templateCache.put('views/project/env/integrations/data/sqlconnector.html', require('../views/project/env/integrations/data/sqlconnector.html'));
+      $templateCache.put('views/project/env/integrations/data/atlassian.html', require('../views/project/env/integrations/data/atlassian.html'));
+      $templateCache.put('views/project/env/integrations/data/moxtra.html', require('../views/project/env/integrations/data/moxtra.html'));
+      $templateCache.put('views/project/env/integrations/email/smtp.html', require('../views/project/env/integrations/email/smtp.html'));
+      $templateCache.put('views/project/env/integrations/email/sendgrid.html', require('../views/project/env/integrations/email/sendgrid.html'));
+      $templateCache.put('views/project/env/integrations/email/mailgun.html', require('../views/project/env/integrations/email/mailgun.html'));
+      $templateCache.put('views/project/env/integrations/email/custom.html', require('../views/project/env/integrations/email/custom.html'));
+      $templateCache.put('views/project/env/authentication/oauth/openid.html', require('../views/project/env/authentication/oauth/openid.html'));
+      $templateCache.put('views/project/env/authentication/oauth/github.html', require('../views/project/env/authentication/oauth/github.html'));
+      $templateCache.put('views/project/env/authentication/oauth/facebook.html', require('../views/project/env/authentication/oauth/facebook.html'));
+      $templateCache.put('views/project/env/authentication/oauth/dropbox.html', require('../views/project/env/authentication/oauth/dropbox.html'));
+      $templateCache.put('views/project/env/authentication/oauth/office365.html', require('../views/project/env/authentication/oauth/office365.html'));
+      $templateCache.put('views/project/env/authentication/oauth/google.html', require('../views/project/env/authentication/oauth/google.html'));
+      $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
+      $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
+      $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
+
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
