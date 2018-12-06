@@ -17,7 +17,8 @@ module.exports = {
       chunkFilename: "[id].css"
     }),
     new webpack.ProvidePlugin({
-      "window.jQuery": "jquery"
+      "window.jQuery": "jquery",
+      "jQuery": "jquery"
     })
   ],
   module: {
