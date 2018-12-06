@@ -64,7 +64,7 @@ app.config([
         })
         .state(parentName + '.index', {
           url: '/',
-          templateUrl: 'views/form/' + type + 's.html',
+          // templateUrl: 'views/form/' + type + 's.html',
           controller: [
             '$scope',
             function($scope) {
@@ -155,8 +155,8 @@ app.config([
         .state(parentName + '.form.settings', {
           url: '/settings',
           templateUrl: 'views/form/form-settings.html',
-          controller: ['$scope', function($scope) {
-            $scope.disableCollection = function() {
+          controller: ['$scope', function ($scope) {
+            $scope.disableCollection = function () {
               // Don't allow collections for hosted projects
               if (_.get($scope, 'localProject._id') === _.get($scope, 'currentProject._id')) {
                 return true;
@@ -172,61 +172,127 @@ app.config([
               return false;
             };
           }]
+        })
+        .state(parentName + '.form.submission', {
+          abstract: true,
+          url: '/submission',
+          template: '<div ui-view></div>'
+        })
+        .state(parentName + '.form.submission' + '.index', {
+          url: '',
+          templateUrl: 'views/form/submission/index.html',
+          controller: 'FormSubmissionsController',
+          params: {
+            _vid: null
+          }
+        })
+        .state(parentName + '.form.submission' + '.item', {
+          abstract: true,
+          url: '/:subId',
+          controller: 'FormSubmissionController',
+          templateUrl: 'views/form/submission/item.html'
+        })
+        .state(parentName + '.form.submission' + '.item.view', {
+          url: '',
+          templateUrl: 'views/form/submission/view.html'
+        })
+        .state(parentName + '.form.submission' + '.item.edit', {
+          url: '/edit',
+          templateUrl: 'views/form/submission/edit.html',
+          controller: 'FormSubmissionEditController'
+        })
+        .state(parentName + '.form.submission' + '.item.delete', {
+          url: '/delete',
+          templateUrl: 'views/form/submission/delete.html',
+          controller: 'FormSubmissionDeleteController'
+        })
+        .state(parentName + '.form.action', {
+          abstract: true,
+          url: '/action',
+          template: '<div ui-view></div>'
+        })
+        .state(parentName + '.form.action' + '.index', {
+          url: '',
+          templateUrl: 'views/form/action/index.html',
+          controller: 'FormActionIndexController',
+          params: {
+            _vid: null
+          }
+        })
+        .state(parentName + '.form.action' + '.item', {
+          abstract: true,
+          url: '/:actionId',
+          templateUrl: 'views/form/action/item.html'
+        })
+        .state(parentName + '.form.action' + '.item.view', {
+          url: '',
+          templateUrl: 'views/form/action/view.html'
+        })
+        .state(parentName + '.form.action' + '.item.edit', {
+          url: '/edit',
+          templateUrl: 'views/form/action/edit.html',
+          controller: 'FormActionEditController'
+        })
+        .state(parentName + '.form.action' + '.item.delete', {
+          url: '/delete',
+          templateUrl: 'views/form/action/delete.html',
+          controller: 'FormActionDeleteController'
         });
 
-      var formStates = {};
-      formStates[parentName + '.form.submission'] = {
-        path: '/submission',
-        id: 'subId',
-        indexController: 'FormSubmissionsController',
-        itemController: 'FormSubmissionController',
-        editController: 'FormSubmissionEditController',
-        deleteController: 'FormSubmissionDeleteController'
-      };
-      formStates[parentName + '.form.action'] = {
-        path: '/action',
-        id: 'actionId',
-        indexController: 'FormActionIndexController',
-        editController: 'FormActionEditController',
-        deleteController: 'FormActionDeleteController'
-      };
-
-      angular.forEach(formStates, function(info, state) {
-        $stateProvider
-          .state(state, {
-            abstract: true,
-            url: info.path,
-            template: '<div ui-view></div>'
-          })
-          .state(state + '.index', {
-            url: '',
-            templateUrl: 'views/form' + info.path + '/index.html',
-            controller: info.indexController,
-            params: {
-              _vid: null
-            }
-          })
-          .state(state + '.item', {
-            abstract: true,
-            url: '/:' + info.id,
-            controller: info.itemController,
-            templateUrl: 'views/form' + info.path + '/item.html'
-          })
-          .state(state + '.item.view', {
-            url: '',
-            templateUrl: 'views/form' + info.path + '/view.html'
-          })
-          .state(state + '.item.edit', {
-            url: '/edit',
-            templateUrl: 'views/form' + info.path + '/edit.html',
-            controller: info.editController
-          })
-          .state(state + '.item.delete', {
-            url: '/delete',
-            templateUrl: 'views/form' + info.path + '/delete.html',
-            controller: info.deleteController
-          });
-      });
+      /** NOTE: Cannot have dynamic template names with webpack **/
+      // var formStates = {};
+      // formStates[parentName + '.form.submission'] = {
+      //   path: '/submission',
+      //   id: 'subId',
+      //   indexController: 'FormSubmissionsController',
+      //   itemController: 'FormSubmissionController',
+      //   editController: 'FormSubmissionEditController',
+      //   deleteController: 'FormSubmissionDeleteController'
+      // };
+      // formStates[parentName + '.form.action'] = {
+      //   path: '/action',
+      //   id: 'actionId',
+      //   indexController: 'FormActionIndexController',
+      //   editController: 'FormActionEditController',
+      //   deleteController: 'FormActionDeleteController'
+      // };
+      //
+      // angular.forEach(formStates, function(info, state) {
+      //   $stateProvider
+      //     .state(state, {
+      //       abstract: true,
+      //       url: info.path,
+      //       template: '<div ui-view></div>'
+      //     })
+      //     .state(state + '.index', {
+      //       url: '',
+      //       templateUrl: 'views/form' + info.path + '/index.html',
+      //       controller: info.indexController,
+      //       params: {
+      //         _vid: null
+      //       }
+      //     })
+      //     .state(state + '.item', {
+      //       abstract: true,
+      //       url: '/:' + info.id,
+      //       controller: info.itemController,
+      //       templateUrl: 'views/form' + info.path + '/item.html'
+      //     })
+      //     .state(state + '.item.view', {
+      //       url: '',
+      //       templateUrl: 'views/form' + info.path + '/view.html'
+      //     })
+      //     .state(state + '.item.edit', {
+      //       url: '/edit',
+      //       templateUrl: 'views/form' + info.path + '/edit.html',
+      //       controller: info.editController
+      //     })
+      //     .state(state + '.item.delete', {
+      //       url: '/delete',
+      //       templateUrl: 'views/form' + info.path + '/delete.html',
+      //       controller: info.deleteController
+      //     });
+      // });
 
       // Add the action adding state.
       $stateProvider.state(parentName + '.form.action.add', {

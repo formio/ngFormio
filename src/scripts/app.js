@@ -23,7 +23,7 @@ angular
     'ckeditor',
     'formioApp.controllers',
     'formioApp.utils',
-    'kendo.directives',
+    // 'kendo.directives',
     'truncate',
     'ngFileUpload',
     'ngDialog',
