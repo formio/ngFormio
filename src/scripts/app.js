@@ -1152,6 +1152,7 @@ angular
       $templateCache.put('views/frameworks/vue/embed.html', require('../views/frameworks/vue/embed.html'));
       $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
       $templateCache.put('views/frameworks/simple/embed.html', require('../views/frameworks/simple/embed.html'));
+      $templateCache.put('views/form/resource-info.html', require('../views/form/resource-info.html'));
 
     }
   ])

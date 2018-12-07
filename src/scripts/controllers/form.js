@@ -1,4 +1,7 @@
 'use strict';
+import jsonpatch from 'fast-json-patch';
+import DOMPurify from 'DOMPurify';
+import moment from 'moment';
 
 /* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
 var app = angular.module('formioApp.controllers.form', [

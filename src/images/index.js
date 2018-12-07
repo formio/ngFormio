@@ -11,3 +11,7 @@ import './swagger-logo.png';
 import './empty-project.png';
 import './webform.png';
 import './w4.png';
+import './json.png';
+import './bootstrap/sprite.png';
+import './bootstrap/sprite_2x.png';
+import './bootstrap/loading-image.gif';

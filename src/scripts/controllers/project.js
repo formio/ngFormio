@@ -1,6 +1,8 @@
 'use strict';
+import semver from 'semver';
+import chance from 'chance';
 
-/* globals NumberAbbreviate, chance, Chartist, semver, localStorage, Blob */
+/* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];

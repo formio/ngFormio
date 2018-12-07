@@ -1,6 +1,7 @@
 'use strict';
+import chance from 'chance';
 
-/* globals chance, location */
+/* globals location */
 
 angular.module('formioApp.controllers.pdf', ['ngDialog'])
   .factory('PDFServer', [
