@@ -884,6 +884,18 @@ angular
       $timeout,
       $templateCache
     ) {
+      // Ensure they are logged.
+      $rootScope.$on('$stateChangeStart', function(event, toState) {
+        $rootScope.userToken = Formio.getToken();
+        $rootScope.authenticated = !!$rootScope.userToken;
+        if (toState.name.substr(0, 4) === 'auth') {
+          return;
+        }
+        if (!$rootScope.authenticated) {
+          event.preventDefault();
+          $state.go('auth');
+        }
+      });
 
       // Force SSL.
       if (AppConfig.forceSSL && $location.protocol() !== 'https') {
@@ -941,12 +953,13 @@ angular
         $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
       };
 
-      // Always redirect to login if they are not authenticated.
-      $state.go('home');
-
       if (!$rootScope.user) {
         Formio.currentUser().then(function(user) {
           $rootScope.user = user;
+          if (!$rootScope.user) {
+            // Always redirect to login if they are not authenticated.
+            $state.go('home');
+          }
         });
       }
 
@@ -1062,28 +1075,6 @@ angular
         }).catch(logoutError);
       };
 
-      // Ensure they are logged.
-      $rootScope.$on('$stateChangeStart', function(event, toState) {
-        $rootScope.userToken = Formio.getToken();
-        $rootScope.authenticated = !!$rootScope.userToken;
-        if (toState.name.substr(0, 4) === 'auth') {
-          return;
-        }
-        if (!$rootScope.authenticated) {
-          event.preventDefault();
-          $state.go('auth');
-        }
-      });
-      // $stateChangeStart doesn't fire on initial page load anymore.
-      $rootScope.userToken = Formio.getToken();
-      $rootScope.authenticated = !!$rootScope.userToken;
-      if ($rootScope.currentState && $rootScope.currentState.name.substr(0, 4) === 'auth') {
-        return;
-      }
-      if (!$rootScope.authenticated) {
-        $state.go('auth');
-      }
-
       $rootScope.$on('$stateChangeSuccess', function(event, state) {
         var parts = state.name.split('.');
         var classes = [];
@@ -1155,6 +1146,12 @@ angular
       $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
       $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
       $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
+      $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
+      $templateCache.put('views/frameworks/angular/embed.html', require('../views/frameworks/angular/embed.html'));
+      $templateCache.put('views/frameworks/react/embed.html', require('../views/frameworks/react/embed.html'));
+      $templateCache.put('views/frameworks/vue/embed.html', require('../views/frameworks/vue/embed.html'));
+      $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
+      $templateCache.put('views/frameworks/simple/embed.html', require('../views/frameworks/simple/embed.html'));
 
     }
   ])
