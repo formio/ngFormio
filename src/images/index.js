@@ -9,4 +9,5 @@ import './platforms/react.svg';
 import './platforms/vue.png';
 import './swagger-logo.png';
 import './empty-project.png';
-import './json.png';
+import './webform.png';
+import './w4.png';

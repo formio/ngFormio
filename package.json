@@ -35,6 +35,8 @@
     "webpack-dev-server": "^3.1.10"
   },
   "dependencies": {
+    "@progress/kendo-ui": "^2018.3.1205",
+    "ajv": "^6.6.1",
     "angular-base64": "^2.0.5",
     "angular-bootstrap": "^0.12.2",
     "angular-bootstrap-lightbox": "^0.12.0",
