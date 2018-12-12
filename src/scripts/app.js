@@ -28,8 +28,7 @@ angular
     'ngFileUpload',
     'ngDialog',
     'swaggerUi',
-    'toastr',
-    'bootstrapLightbox'
+    'toastr'
   ])
   .config([
     '$stateProvider',
@@ -702,7 +701,7 @@ angular
         }
         $scope.selectedFramework = framework;
         ngDialog.open({
-          templateUrl: 'views/project/create.html',
+          template: 'views/project/create.html',
           scope: $scope
         });
       };
@@ -1153,6 +1152,41 @@ angular
       $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
       $templateCache.put('views/frameworks/simple/embed.html', require('../views/frameworks/simple/embed.html'));
       $templateCache.put('views/form/resource-info.html', require('../views/form/resource-info.html'));
+      $templateCache.put('views/partials/pager.html', require('../views/partials/pager.html'));
+      $templateCache.put('views/project/create.html', require('../views/project/create.html'));
+      $templateCache.put('views/project/tour/action.html', require('../views/project/tour/action.html'));
+      $templateCache.put('views/project/tour/configure.html', require('../views/project/tour/configure.html'));
+      $templateCache.put('views/project/tour/download.html', require('../views/project/tour/download.html'));
+      $templateCache.put('views/project/tour/form.html', require('../views/project/tour/form.html'));
+      $templateCache.put('views/project/tour/index.html', require('../views/project/tour/index.html'));
+      $templateCache.put('views/project/tour/launch.html', require('../views/project/tour/launch.html'));
+      $templateCache.put('views/project/tour/next.html', require('../views/project/tour/next.html'));
+      $templateCache.put('views/project/tour/user.html', require('../views/project/tour/user.html'));
+      $templateCache.put('views/project/tour/welcome.html', require('../views/project/tour/welcome.html'));
+      $templateCache.put('views/frameworks/angular/configure.html', require('../views/frameworks/angular/configure.html'));
+      $templateCache.put('views/frameworks/angular/download.html', require('../views/frameworks/angular/download.html'));
+      $templateCache.put('views/frameworks/angular/embed.html', require('../views/frameworks/angular/embed.html'));
+      $templateCache.put('views/frameworks/angular/embed-app.html', require('../views/frameworks/angular/embed-app.html'));
+      $templateCache.put('views/frameworks/angular2/configure.html', require('../views/frameworks/angular2/configure.html'));
+      $templateCache.put('views/frameworks/angular2/download.html', require('../views/frameworks/angular2/download.html'));
+      $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
+      $templateCache.put('views/frameworks/angular2/embed-app.html', require('../views/frameworks/angular2/embed-app.html'));
+      $templateCache.put('views/frameworks/angular2/launch.html', require('../views/frameworks/angular2/launch.html'));
+      $templateCache.put('views/frameworks/custom/download.html', require('../views/frameworks/custom/download.html'));
+      $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
+      $templateCache.put('views/frameworks/custom/embed-app.html', require('../views/frameworks/custom/embed-app.html'));
+      $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
+      $templateCache.put('views/frameworks/react/configure.html', require('../views/frameworks/react/configure.html'));
+      $templateCache.put('views/frameworks/react/download.html', require('../views/frameworks/react/download.html'));
+      $templateCache.put('views/frameworks/react/embed.html', require('../views/frameworks/react/embed.html'));
+      $templateCache.put('views/frameworks/react/embed-app.html', require('../views/frameworks/react/embed-app.html'));
+      $templateCache.put('views/frameworks/simple/configure.html', require('../views/frameworks/simple/configure.html'));
+      $templateCache.put('views/frameworks/simple/embed.html', require('../views/frameworks/simple/embed.html'));
+      $templateCache.put('views/frameworks/simple/embed-app.html', require('../views/frameworks/simple/embed-app.html'));
+      $templateCache.put('views/frameworks/vue/configure.html', require('../views/frameworks/vue/configure.html'));
+      $templateCache.put('views/frameworks/vue/download.html', require('../views/frameworks/vue/download.html'));
+      $templateCache.put('views/frameworks/vue/embed.html', require('../views/frameworks/vue/embed.html'));
+      $templateCache.put('views/frameworks/vue/embed-app.html', require('../views/frameworks/vue/embed-app.html'));
 
     }
   ])

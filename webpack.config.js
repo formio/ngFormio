@@ -18,7 +18,8 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery",
-      "jQuery": "jquery"
+      "jQuery": "jquery",
+      // "window.pm": "postmessage-js"
     })
   ],
   module: {
@@ -62,7 +63,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(svg|gif|png|jpe?g)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(svg|gif|png|jpe?g|ico)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
             loader: 'file-loader',
@@ -111,7 +112,7 @@ module.exports = {
     ]
   },
   mode: 'development',
-  devtool: 'source-map',
+  // devtool: 'source-map',
   devServer: {
     disableHostCheck: true,
   },

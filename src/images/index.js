@@ -1,6 +1,8 @@
 import './formio-logo.png';
 import './formio-logo-white.png';
+import './formio-logo-with-slogan.png';
 import './footerlogo-before.png';
+import './background.png';
 import './platforms/angular2.png';
 import './platforms/angularjs1.svg';
 import './platforms/form.png';
@@ -15,3 +17,5 @@ import './json.png';
 import './bootstrap/sprite.png';
 import './bootstrap/sprite_2x.png';
 import './bootstrap/loading-image.gif';
+import './favicons';
+import './tour/createForm.png';

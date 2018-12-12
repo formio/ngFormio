@@ -49,13 +49,21 @@
       <div class="well">
         <div class="alert alert-danger" ng-if="protocolSecureError">
           <p>On-Premise Environment is not on https.</p>
-          <p>Browsers do not allow connecting to unsecure resources while the page is on https. We recommend installing an SSL certificate for your environment.</p>
-          <p> You can also use an unsecured version of the portal to connect to your environment. You may need to log in again.</p>
-          <p><a href="{{unsecurePortal}}" class="btn btn-default">Switch to unsecure portal</a></p>
+          <p>Browsers do not allow connecting to non-https resources while the page is on https. We recommend installing an SSL certificate for your environment.</p>
+          <p> You can also use an http version of the portal to connect to your environment. You may need to log in again.</p>
+          <p><a href="{{unsecurePortal}}" class="btn btn-default">Switch to http portal</a></p>
         </div>
         <div class="alert alert-danger" ng-if="!protocolSecureError && projectError">
           <p>{{projectUrl}} - {{projectError}}</p>
           <p>If you are seeing this error then there is a configuration issue preventing the form.io portal from accessing your project. Your remote server might be offline or inaccessible.</p>
+        </div>
+      </div>
+    </div>
+    <div ng-if="currentProject.name === 'formio'">
+      <div class="well">
+        <div class="alert alert-warning">
+          <p>This is the Portal Base project in your Primary environment. You should use it to manage your admimnistrative users and teams.</p>
+          <p>DO NOT build your application from this project or add additional forms to it. Instead, go to the home page and create a new project.</p>
         </div>
       </div>
     </div>

@@ -38,5 +38,3 @@ import 'ng-formio-builder';
 import 'qs';
 import 'angular-toastr';
 import 'chartist-plugin-tooltip';
-import '../node_modules/seamless/build/seamless.parent.js';
-import 'angular-bootstrap-lightbox';

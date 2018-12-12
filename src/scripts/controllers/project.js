@@ -1365,7 +1365,6 @@ app.controller('LaunchController', [
   'Formio',
   'FormioAlerts',
   'AppConfig',
-  'Lightbox',
   'ProjectFrameworks',
   'ProjectFrameworkSteps',
   function(
@@ -1377,7 +1376,6 @@ app.controller('LaunchController', [
     Formio,
     FormioAlerts,
     AppConfig,
-    Lightbox,
     ProjectFrameworks,
     ProjectFrameworkSteps
   ) {
@@ -1527,11 +1525,6 @@ app.controller('LaunchController', [
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(newProject));
       }
     });
-    $scope.openLightboxModal = function (images,index) {
-      Lightbox.openModal(images, index);
-      Lightbox.fullScreenMode=false;
-    };
-
   }
 ]);
 
