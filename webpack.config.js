@@ -26,7 +26,10 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: [
+          /node_modules/,
+          /src\/config\.js$/,
+        ],
         use: [
           {
             loader: 'babel-loader',
@@ -96,6 +99,10 @@ module.exports = {
       },
       {
         test: /robots\.txt$/,
+        use: ['file-loader?name=[name].[ext]']
+      },
+      {
+        test: /config\.js$/,
         use: ['file-loader?name=[name].[ext]']
       },
       {

@@ -591,11 +591,6 @@ angular
             deferred.reject();
           });
           return deferred.promise;
-        },
-        loadTemplates: function() {
-          var deferred = $q.defer();
-          deferred.resolve(AppConfig.templates);
-          return deferred.promise;
         }
       };
     }
@@ -686,11 +681,6 @@ angular
         });
         return title;
       };
-
-      $scope.templates = [];
-      FormioProject.loadTemplates().then(function(templates) {
-        $scope.templates = templates;
-      });
 
       $scope.submitted = false;
       $scope.selectedFramework = null;
@@ -895,6 +885,8 @@ angular
           $state.go('auth');
         }
       });
+
+      $rootScope.onPremise = AppConfig.onPremise;
 
       // Force SSL.
       if (AppConfig.forceSSL && $location.protocol() !== 'https') {
