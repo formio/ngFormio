@@ -26,7 +26,7 @@ angular.module('formioApp').constant('AppConfig', {
   pathType: pathType,
   forceSSL: false,
   pdfPrice: 10,
-  onPremise: true,
+  onPremise: false,
   appBase: appBase,
   apiBase: apiBase,
   formioBase: formioBase,
