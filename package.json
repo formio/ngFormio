@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server",
+    "dev": "webpack-dev-server",
+    "start": "http-server -p 3001 dist",
     "build": "webpack -p",
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
@@ -15,8 +16,10 @@
     "chai-as-promised": "^7.0.0",
     "chance": "^1.0.16",
     "css-loader": "^1.0.1",
+    "dotenv": "^6.2.0",
     "file-loader": "^2.0.0",
     "html-dnd": "^1.2.0",
+    "http-server": "^0.11.1",
     "mini-css-extract-plugin": "^0.4.5",
     "mocha": "^5.2.0",
     "mocha-tags": "^1.0.1",
