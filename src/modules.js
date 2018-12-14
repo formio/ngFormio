@@ -6,6 +6,7 @@ import '@progress/kendo-ui/js/kendo.web';
 import '@progress/kendo-ui/js/kendo.dropdownlist';
 import '@progress/kendo-ui/js/kendo.filtermenu';
 import '@progress/kendo-ui/js/kendo.grid';
+import 'seamless/build/seamless.parent';
 import 'ckeditor';
 import 'signature_pad';
 import 'angular-ui-router';

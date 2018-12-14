@@ -19,7 +19,7 @@ module.exports = {
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery",
       "jQuery": "jquery",
-      // "window.pm": "postmessage-js"
+      "$": "jquery",
     })
   ],
   module: {
