@@ -15,7 +15,6 @@ app.get('/config.js', function(req, res) {
     }
     else {
       res.set('Content-Type', 'text/javascript');
-      console.log(data);
       res.send(data.replace("serverHost = 'localhost:3000';", 'serverHost = \'' + serverHost + '\';'));
     }
   });
