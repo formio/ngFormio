@@ -5,6 +5,9 @@ jobs:
       - image: circleci/node:8.11-browsers
     steps:
       - checkout
+      - run:
+          name: Install Bower (needed for angular-ckeditor)
+          command: npm install bower
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
