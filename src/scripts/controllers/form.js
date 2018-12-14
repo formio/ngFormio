@@ -1,6 +1,6 @@
 'use strict';
 import jsonpatch from 'fast-json-patch';
-import DOMPurify from 'DOMPurify';
+import DOMPurify from 'dompurify';
 import moment from 'moment';
 
 /* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
