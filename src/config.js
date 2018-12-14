@@ -4,6 +4,12 @@ var serverHost, apiProtocol;
 var pathType = 'Subdomains';
 var onPremise = false;
 
+var parts = host.split('.');
+if (parts[0] === 'portal' || parts[0] === 'beta') {
+  parts.shift();
+  host = parts.join('.');
+}
+
 if (host.indexOf('localhost') !== 0) {
   serverHost = host;
   apiProtocol = protocol;
@@ -12,13 +18,8 @@ else {
   serverHost = 'localhost:3000';
   apiProtocol = 'http:';
 }
-var parts = serverHost.split('.');
-if (parts[0] === 'portal' || parts[0] === 'beta') {
-  parts.shift();
-  serverHost = parts.join('.');
-}
 
-var appBase = protocol + '//' + host;
+var appBase = protocol + '//' + window.location.host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;
 var pdfServer = apiProtocol + '//files.' + serverHost;
