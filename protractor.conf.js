@@ -3,8 +3,8 @@
 // An example configuration file.
 exports.config = {
   // The address of a running selenium server.
-  // seleniumAddress: 'http://' + process.env.SAUCELABS_USER + ':' + process.env.SAUCELABS_KEY + '@ondemand.saucelabs.com:80/wd/hub',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: 'http://' + process.env.SAUCELABS_USER + ':' + process.env.SAUCELABS_KEY + '@ondemand.saucelabs.com:80/wd/hub',
+  // seleniumAddress: 'http://localhost:4444/wd/hub',
   // seleniumServerJar: deprecated, this should be set on node_modules/protractor/config.json
 
   // Capabilities to be passed to the webdriver instance.
@@ -36,9 +36,9 @@ exports.config = {
 
   capabilities: {
     'browserName': 'chrome',
-    // version:'68',
-    // "maxDuration": 10800,
-    // "platform" : 'Windows 10',
+    version:'68',
+    "maxDuration": 10800,
+    "platform" : 'Windows 10',
     "screenResolution" : '1920x1080'
   },
   // multiCapabilities: [{
