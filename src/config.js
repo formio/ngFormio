@@ -2,9 +2,10 @@ var host = window.location.host;
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 var pathType = 'Subdomains';
+var onPremise = false;
 
 if (host.indexOf('localhost') !== 0) {
-  serverHost = host
+  serverHost = host;
   apiProtocol = protocol;
 }
 else {
@@ -20,13 +21,20 @@ if (parts[0] === 'portal' || parts[0] === 'beta') {
 var appBase = protocol + '//' + host;
 var apiBase = apiProtocol + '//api.' + serverHost;
 var formioBase = apiProtocol + '//formio.' + serverHost;
+var pdfServer = apiProtocol + '//files.' + serverHost;
+if (onPremise) {
+  apiBase = apiProtocol + '//' + serverHost;
+  formioBase = apiProtocol + '//' + serverHost + '/formio';
+  pdfServer = apiProtocol + '//' + serverHost + '/files';
+  pathType = 'Subdirectories';
+}
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
   pathType: pathType,
   forceSSL: false,
   pdfPrice: 10,
-  onPremise: false,
+  onPremise: onPremise,
   appBase: appBase,
   apiBase: apiBase,
   formioBase: formioBase,
@@ -34,7 +42,7 @@ angular.module('formioApp').constant('AppConfig', {
   apiServer: serverHost,
   serverHost: serverHost,
   protocol: apiProtocol,
-  pdfServer: apiProtocol + '//files.' + serverHost,
+  pdfServer: pdfServer,
   pdfHostedPrice: 50,
   pdfHostedForms: 25,
   pdfHostedSubs: 1000,
