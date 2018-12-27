@@ -1179,6 +1179,7 @@ angular
       $templateCache.put('views/frameworks/vue/download.html', require('../views/frameworks/vue/download.html'));
       $templateCache.put('views/frameworks/vue/embed.html', require('../views/frameworks/vue/embed.html'));
       $templateCache.put('views/frameworks/vue/embed-app.html', require('../views/frameworks/vue/embed-app.html'));
+      $templateCache.put('views/form/submission/delete-confirmation.html', require('../views/form/submission/delete-confirmation.html'));
 
     }
   ])
