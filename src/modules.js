@@ -12,7 +12,7 @@ import 'signature_pad';
 import 'angular-ui-router';
 import 'angular-sanitize';
 import 'bootstrap';
-import 'angular-bootstrap';
+import 'angular-ui-bootstrap';
 import 'moment';
 import 'angular-moment';
 import 'ng-sortable';

@@ -13,6 +13,7 @@ angular
     'ngSanitize',
     'ui.router',
     'ui.bootstrap',
+    'ui.bootstrap.accordion',
     'ui.bootstrap.alert',
     'ui.bootstrap.tpls',
     'ui.bootstrap.tooltip',
