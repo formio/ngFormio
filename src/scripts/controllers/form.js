@@ -2242,7 +2242,7 @@ app.controller('FormSubmissionsController', [
         default: filterable = true;
       }
 
-      var field = '["data.' + path ? path + '.' : '' + component.key.replace(/\./g, '.data.') + '"]';
+      var field = path ? '["data.' + path + '.' + component.key.replace(/\./g, '.data.') + '"]' : '["data.' + component.key.replace(/\./g, '.data.') + '"]';
       return {
         field: field,
         title: _.escape(component.label) || component.key,

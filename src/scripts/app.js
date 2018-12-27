@@ -1396,4 +1396,26 @@ angular
 
       return Interceptor;
     }
-  ]);
+  ])
+  .run($run);
+
+// Safely instantiate dataLayer
+$run.$inject = ['$rootScope', '$location', '$window'];
+
+function $run($rootScope, $location, $window) {
+
+  var dataLayer = $window.dataLayer = $window.dataLayer || [];
+
+  $rootScope.$on('$stateChangeSuccess', function() {
+
+    dataLayer.push({
+      event: 'stateChange',
+      attributes: {
+        user: $rootScope.user,
+        route: $location.path()
+      }
+    });
+
+  });
+
+}
