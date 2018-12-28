@@ -963,7 +963,7 @@ module.exports = function (config) {
   };
   this.iSeeTextIn = function (ele, text) {
     text = replacements(text);
-    it('I see text', function (next) {
+    it('I see text ' + text + ' in', function (next) {
       ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
       browser.wait(function () {
         return ele.isPresent();

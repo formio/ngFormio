@@ -61,7 +61,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Save');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Create Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Revisions');
       actions.iSeeText('Upgrade your Project');
       actions.clickOnElementWithText('Settings');
@@ -191,7 +191,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#smtpUser','smtpUser');
       actions.enterTextInField('#smtpPass','smtpPass');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -217,7 +217,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/env/integrations/email');
       actions.enterTextInField('#sendGridPassword','sendGridPassword');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -241,7 +241,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#mailgunAPIKey','mailgunAPIKey');
       actions.enterTextInField('#mailgunDomain','mailgunDomain');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -266,7 +266,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#customUrl','customUrl');
       actions.enterTextInField('#customPassword','customPassword');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -317,7 +317,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('Webhook (Premium)');
       actions.clickOnElementWithText(' Add Action');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText(' This is a Premium Action, please upgrade your ');
       actions.checkElementIsDisabled('//*[@id="title"]');
       actions.clickOnElementWithText('Settings');

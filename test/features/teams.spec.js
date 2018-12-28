@@ -43,7 +43,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamsProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(2000);
       actions.clickOnElementWithText(' Teams');
       actions.checkingUrlEndsWith('/teams');
@@ -58,7 +58,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#name','Beta Team');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Submit');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.checkingUrlEndsWith('/view');
       actions.clickOnClass('.fa.fa-home');
       actions.clickOnElementWithText('teamsProject');
@@ -79,7 +79,7 @@ module.exports = function (actions) {
       actions.clickOnClass('.caret.pull-right');
       actions.enterTextInField('xpath://*[@id="main-wrapper"]/div/div/div/div[2]/div[1]/div[1]/div/div/input[1]','${login2.name}');
       actions.clickOnElementWithText('${login2.name}');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('${login2.name}');
       actions.iSeeText('TEAM MEMBER');
       actions.iSeeText('2');
@@ -87,14 +87,14 @@ module.exports = function (actions) {
       actions.iSeeText('Make team admin');
       actions.iSeeText('Remove from team');
       actions.clickOnElementWithText('Remove from team');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iDonotSeeText('${login2.name}');
       actions.iDonotSeeText('TEAM MEMBER');
       actions.iDonotSeeText('2');
       actions.clickOnClass('.caret.pull-right');
       actions.enterTextInField('xpath://*[@id="main-wrapper"]/div/div/div/div[2]/div[1]/div[1]/div/div/input[1]','${login2.name}');
       actions.clickOnElementWithTextIndex('${login2.name}',0);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('${login2.name}');
       actions.iSeeText('TEAM MEMBER');
       actions.iSeeText('2');
@@ -105,7 +105,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/view');
       actions.clickOnElementWithText('Delete Team');
       actions.clickOnElementWithText('Yes');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.checkingUrlIamOn('#/');
       actions.iDonotSeeText('Beta Team');
       actions.clickOnElementWithText('teamsProject');
@@ -120,7 +120,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#name','Beta Team');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Submit');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
     });
     describe('Team Owner',function() {
       actions.logout();
@@ -137,7 +137,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamProProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Teams');
       actions.checkingUrlEndsWith('/teams');
       actions.clickOnClass('.caret.pull-right');
@@ -147,11 +147,11 @@ module.exports = function (actions) {
       actions.enterTextInField('#name','Beta Team');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Submit');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.caret.pull-right');
       actions.enterTextInField('xpath://*[@id="main-wrapper"]/div/div/div/div[2]/div[1]/div[1]/div/div/input[1]','${login4.name}');
       actions.clickOnElementWithTextIndex('${login4.name}',0);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('${login4.name}');
       actions.iSeeText('TEAM MEMBER');
       actions.iSeeText('2');
@@ -185,7 +185,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('Beta Team');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Remove from team');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.logout();
       actions.enterTextInField('.login-container #email','${login4.email}');
       actions.enterTextInField('.login-container #password','${login4.password}');
@@ -201,7 +201,7 @@ module.exports = function (actions) {
       actions.clickOnClass('.caret.pull-right');
       actions.enterTextInField('xpath://*[@id="main-wrapper"]/div/div/div/div[2]/div[1]/div[1]/div/div/input[1]','${login4.name}');
       actions.clickOnElementWithTextIndex('${login4.name}',0);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('${login4.name}');
       // actions.clickOnClass('.fa.fa-cog');
       // actions.clickOnElementWithText('Make team admin');
@@ -224,7 +224,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','basicProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Trial');
       actions.upgradeToPlan("Basic");
       actions.clickOnButton(' Confirm Billing Change');
@@ -240,10 +240,10 @@ module.exports = function (actions) {
       actions.iSeeText('2 Members');
       actions.clickOnElementWithTextIndex('Project Read',1);
       actions.clickOnElementWithTextIndex('Project Write',1);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithTextIndex('Project Write',1);
       actions.clickOnElementWithTextIndex('Project Admin',1);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Beta Team');
       actions.iSeeText('1');
       actions.clickOnElementWithTextIndex('Projects',1);
@@ -253,7 +253,7 @@ module.exports = function (actions) {
       actions.checkingUrlEndsWith('/teams');
       actions.clickOnElementWithTextIndex('Project Admin',1);
       actions.clickOnElementWithTextIndex('Project Write',1);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Beta Team');
       actions.clickOnElementWithTextIndex('Projects',1);
       actions.iSeeText('teamProProject');
@@ -261,7 +261,7 @@ module.exports = function (actions) {
       actions.clickOnClass('.glyphicon.glyphicon-edit');
       actions.checkingUrlEndsWith('/teams');
       actions.clickOnClass('.fa.fa-times');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.goToPage('#/');
       actions.clickOnElementWithText('Beta Team');
       actions.iSeeText('0');
@@ -279,7 +279,7 @@ module.exports = function (actions) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title','teamsProject');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Teams');
       actions.checkingUrlEndsWith('/teams');
       actions.clickOnElementWithText('Create a New Team');
@@ -287,7 +287,7 @@ module.exports = function (actions) {
       actions.enterTextInField('#name','Beta Team');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Submit');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.caret.pull-right');
       actions.enterTextInField('xpath://*[@id="main-wrapper"]/div/div/div/div[2]/div[1]/div[1]/div/div/input[1]','${login2.name}');
       actions.clickOnElementWithTextIndex('${login2.name}',0);

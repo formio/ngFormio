@@ -9,7 +9,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title', 'AngularJS');
       actions.enterTextInField('#description', 'This is first AngularJS');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Overview');
       actions.iSeeText('AngularJS');
       actions.clickOnElement('.fa-home');
@@ -25,7 +25,7 @@ module.exports = function (actions,tags) {
         actions.enterTextInField('#title', framework);
         actions.enterTextInField('#description', 'This is first ' + framework);
         actions.clickOnElementWithText(' Create Project');
-        actions.clickOnClass('.toast-message');
+      // actions.clickOnClass('.toast-message');
         actions.clickOnElementWithText('Overview');
         actions.iSeeText(framework);
         actions.clickOnElement('.fa-home');
@@ -46,7 +46,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title', 'Test Project');
       actions.enterTextInField('#description', 'Test Description');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Test Project');
@@ -64,12 +64,12 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title','Updated Title');
       actions.enterTextInField('#description','Updated Description');
       actions.clickOnButton(' Save Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('AngularJS');
       actions.clickOnElementWithText('React.js');
       actions.clickOnButton(' Save Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
       actions.iSeeText(' React.js ');
       actions.clickOnClass('.fa.fa-cog');

@@ -17,7 +17,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Save');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Create Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
@@ -34,17 +34,17 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('SendGrid Settings');
       actions.enterTextInField('#sendGridPassword', 'sendGridPassword');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('File Storage');
       actions.clickOnElementWithText('Amazon S3 / Minio (On-Premise, Private Cloud)');
       actions.enterTextInField('#AWSAccessKeyId', 'AWSAccessKeyId');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Data Connections');
       actions.clickOnElementWithText('Kickbox');
       actions.enterTextInField('#kickbox-apikey', 'kickbox-apikey');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Settings');
       actions.iSeeText(' Live ');
       actions.iDonotSeeText('Delete Live Stage');
@@ -82,7 +82,7 @@ module.exports = function (actions,tags) {
         actions.clickOnElementWithText('+ New Stage');
         actions.enterTextInField('#title', value);
         actions.clickOnElementWithText(' Add Stage');
-        actions.clickOnClass('.toast-message');
+      // actions.clickOnClass('.toast-message');
         actions.waitForActionToComplete(1000);
         actions.checkingUrlEndsWith('/overview');
       });
@@ -92,7 +92,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Dev Project Url:');
       actions.enterTextInField('#title', 'Updated Dev');
       actions.clickOnElementWithText(' Save Stage');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iDonotSeeText('Dev Project Url:');
       actions.iSeeText('Updated Dev Project Url:');
       actions.clickOnElementWithText(' Updated Dev ');
@@ -111,13 +111,13 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('API Web Form');
       actions.enterTextInField('#title','Live Form');
       actions.clickOnElementWithText('Create Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Live Resource');
       actions.clickOnButton('Create Resource');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
 
       actions.clickOnElementWithText(' Dev1 ');
       actions.clickOnElementWithText('Forms');
