@@ -1,5 +1,6 @@
 'use strict';
-import chance from 'chance';
+import chanceLib from 'chance';
+const chance = chanceLib();
 
 /* globals location */
 

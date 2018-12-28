@@ -1,6 +1,7 @@
 'use strict';
 import semver from 'semver';
-import chance from 'chance';
+import chanceLib from 'chance';
+const chance = chanceLib();
 
 /* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
