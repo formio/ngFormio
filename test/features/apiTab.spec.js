@@ -30,7 +30,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash', 2);
       actions.clickOnButton('Yes');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iDonotSeeText('Admin Login');
@@ -40,7 +40,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/resource/');
       actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash', 1);
       actions.clickOnButton('Yes');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iDonotSeeText('Admin');
@@ -51,7 +51,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title', 'Test Resource');
       actions.clickOnButton('Create Resource');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Test Resource');
@@ -63,7 +63,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('API Web Form');
       actions.enterTextInField('#title', 'Test Form');
       actions.clickOnElementWithText('Create Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Test Form');
@@ -73,7 +73,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Test Resource');
       actions.enterTextInField('#title', 'Updated Resource');
       actions.clickSave('Save Resource');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Updated Resource');
@@ -84,7 +84,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Test Form');
       actions.enterTextInField('#title', 'Updated Form');
       actions.clickSave('Save Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('API');
       actions.checkingUrlEndsWith('/api');
       actions.iSeeText('Updated Form');
