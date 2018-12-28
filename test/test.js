@@ -2,7 +2,7 @@
 // Boot up the formio server so we can access the resources.
 require('dotenv').load({silent: true});
 var tags = require('mocha-tags');
-// tags.filter = new tags.Filter("not:smoke");
+tags.filter = new tags.Filter("not:smoke");
 var protocol = process.env.APPPROTOCOL || 'http';
 var domain = process.env.APPDOMAIN || 'localhost';
 var port = process.env.APPPORT || 80;

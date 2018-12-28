@@ -99,7 +99,7 @@ module.exports = function (actions,tags) {
       ];
       formsAndResources.forEach(function(formsAndResource){
         actions.clickOnElementWithTextIndex('Open/Hide',formsAndResource[0]);
-        actions.iSeeTextCount('get',3);
+        actions.iSeeTextCount('get',4);
         actions.iSeeText('post');
         actions.iSeeText('put');
         actions.iSeeText('delete');
