@@ -3,7 +3,7 @@
     <h2>Create a New {{ selectedFramework.title }}</h2>
     <ng-include src="'views/project/settings.html'"></ng-include>
   </div>
-  <div class="col-sm-6">
+  <div class="col-sm-6" ng-if="!onPremise">
     <div class="panel panel-info">
       <div class="panel-heading">
         <h2 class="panel-title">Free 30 day Enterprise Trial</h2>
@@ -17,6 +17,23 @@
           <li><strong>Project Staging</strong> - Create multiple stages for Dev/Test/Live and set up a staging and testing workflow for your project.</li>
         </ul>
         <p>You can upgrade or downgrade your project at any time.</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6" ng-if="onPremise">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h2 class="panel-title">On Premise Project</h2>
+      </div>
+      <div class="panel-body">
+        <p>On Premise Projects will automatically be set to Enterprise Projects</p>
+        <p>Enterprise Plan Features</p>
+        <ul>
+          <li><strong>Team Collaboration</strong> - Create teams and collaborate with other developers</li>
+          <li><strong>Premium Actions</strong> - 3rd party integrations such as Email, File storage and Data connectors</li>
+          <li><strong>Project Staging</strong> - Create multiple stages for Dev/Test/Live and set up a staging and testing workflow for your project.</li>
+        </ul>
+        <p>Your account may be charged for the additional project depending on your license agreement.</p>
       </div>
     </div>
   </div>

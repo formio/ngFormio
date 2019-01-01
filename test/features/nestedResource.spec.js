@@ -11,7 +11,7 @@ module.exports = function(actions,tags){
      actions.checkingUrlEndsWith('/resource/create/resource');
      actions.enterTextInField('#title','Test Resource');
      actions.clickOnButton('Create Resource');
-     actions.clickOnClass('.toast-message');
+   // actions.clickOnClass('.toast-message');
      actions.clickOnElementWithText('Resources');
      actions.clickOnElementWithText('Forms');
      actions.checkingUrlEndsWith('/form/');
@@ -24,7 +24,7 @@ module.exports = function(actions,tags){
      actions.clickOnElementWithText('Save');
      actions.waitForActionToComplete(1000);
      actions.clickOnElementWithText('Create Form');
-     actions.clickOnClass('.toast-message');
+   // actions.clickOnClass('.toast-message');
      });
     describe('Setup ‘Test Resource’',function(){
       actions.clickOnElementWithText('Resources');
@@ -85,7 +85,7 @@ module.exports = function(actions,tags){
       actions.waitForActionToComplete(1000);
       actions.iSeeText('Name Resource');
       actions.clickSave('Save Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
     });
     describe('Populating Nested Resources',function(){
       actions.clickOnElementWithText(' Use');
@@ -97,7 +97,7 @@ module.exports = function(actions,tags){
       actions.iSeeText('Denise');
       actions.clickOnElementWithText('Travis');
       actions.clickOnButton('Submit');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Data');
       actions.checkingUrlEndsWith('/submission');
       actions.iSeeText('Travis');
@@ -111,7 +111,7 @@ module.exports = function(actions,tags){
       actions.iSeeText('Denise');
       actions.clickOnElementWithText('Denise');
       actions.clickOnButton('Submit');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Data');
       actions.checkingUrlEndsWith('/submission');
       actions.iSeeText('Denise');

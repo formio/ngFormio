@@ -44,7 +44,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Save');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Create Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Revisions');
       actions.iDonotSeeText('Upgrade your Project');
       actions.clickOnElementWithText('Settings');
@@ -150,17 +150,17 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('CORS');
       actions.enterTextInField('#cors','testCORS');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.pageReload();
       actions.iSeeValueIn('#cors','testCORS');
       actions.enterTextInField('#cors','*');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Security');
       actions.iDonotSeeText('Upgrade your project to a paid plan to enable security settings.');
       actions.enterTextInField('#secret','testSecurity');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.pageReload();
       actions.iSeeValueIn('#secret','testSecurity');
       actions.clickOnElementWithText('Custom JS and CSS');
@@ -185,7 +185,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Create version tag from Live');
       actions.enterTextInField('#tag','0.0.1');
       actions.clickOnElementWithText(' Create version tag');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeTextIn('.badge', '0.0.1');
       actions.clickOnElementWithText('Staging');
       actions.iSeeText('Deploy to Live');
@@ -209,7 +209,7 @@ module.exports = function (actions,tags) {
       actions.closeWindow();
       actions.enterTextInField('#pdfserver','https://pdfserver/');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -377,7 +377,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#maxSize', '100');
       actions.enterTextInField('#expiration', '100');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -397,7 +397,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#cert', 'cert');
       actions.enterTextInField('#thumbprint', 'thumbprint');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -412,7 +412,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#cskey', 'cskey');
       actions.enterTextInField('#refreshtoken', 'refreshtoken');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -423,7 +423,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Kickbox');
       actions.enterTextInField('#kickbox-apikey', 'kickbox-apikey');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -432,7 +432,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Hubspot');
       actions.enterTextInField('#apikey', 'apikey');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -445,7 +445,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#connectorUser', 'connectorUser');
       actions.enterTextInField('#connectorPassword', 'connectorPassword');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -456,7 +456,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Atlassian');
       actions.enterTextInField('#url', 'url');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -467,7 +467,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#clientSecret', 'clientSecret');
       actions.enterTextInField('#orgId', 'orgId');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -506,7 +506,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#openiduserInfoURI','openiduserInfoURI');
       actions.enterTextInField('#openidscope','openidscope');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -521,7 +521,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#githubClientId','githubClientId');
       actions.enterTextInField('#githubClientSecret','githubClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -532,7 +532,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#facebookClientId','facebookClientId');
       actions.enterTextInField('#facebookClientSecret','facebookClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -543,7 +543,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#dropboxClientId','dropboxClientId');
       actions.enterTextInField('#dropboxClientSecret','dropboxClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -555,7 +555,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#office365ClientId','office365ClientId');
       actions.enterTextInField('#office365ClientSecret','office365ClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -567,7 +567,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#googleClientId','googleClientId');
       actions.enterTextInField('#googleClientSecret','googleClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -578,7 +578,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#twitterClientId','twitterClientId');
       actions.enterTextInField('#twitterClientSecret','twitterClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -589,7 +589,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#linkedinClientId','linkedinClientId');
       actions.enterTextInField('#linkedinClientSecret','linkedinClientSecret');
       actions.clickOnElementWithText('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.waitForActionToComplete(500);
@@ -601,7 +601,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Select an Action');
       actions.clickOnElementWithText('OAuth (Premium)');
       actions.clickOnElementWithText(' Add Action');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('#provider');
       actions.iSeeText('OpenID');
       actions.iSeeText('GitHub');

@@ -165,13 +165,13 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#path','');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.enterTextInField('#path','testresource1');
       actions.enterTextInField('#title','');
       actions.enterTextInField('#name','testResource1');
       actions.clickOnButton('Create Resource');
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
     });
     tags('smoke').describe('Attempt to create a new Resource with non unique name and path',function(){
       actions.clickOnElementWithText('Resources');
@@ -189,7 +189,7 @@ module.exports = function (actions,tags) {
       actions.clickOnButton('Create Resource');
       actions.iSeeText('The Name must be unique per Project.');
       actions.iSeeText('The Path must be unique per Project.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
     });
     tags('smoke').describe('Attempt to create a new ‘Resource’ with invalid path name', function () {
       var message = 'Form path cannot contain one of the following names: submission, report, version, tag, owner, exists, export, import, clone, deploy, wipe, role, current, logout, form, token, logs, classic, storage/s3, storage/dropbox, dropbox/auth, upgrade, access, atlassian/oauth/authorize, atlassian/oauth/finalize, sqlconnector, token, v, draft';
@@ -203,7 +203,7 @@ module.exports = function (actions,tags) {
         actions.enterTextInField('#path', value);
         actions.clickOnElementWithText('Create Resource');
         actions.iSeeTextIn(".toast-message", message);
-        actions.clickOnClass('.toast-message');
+      // actions.clickOnClass('.toast-message');
       });
     });
     tags('smoke').describe('Attempt to ‘save’ an existing ‘Resource’ with invalid path name', function () {
@@ -215,7 +215,7 @@ module.exports = function (actions,tags) {
         actions.enterTextInField('#path', value);
         actions.clickSave('Save Resource');
         actions.iSeeTextIn(".toast-message", message);
-        actions.clickOnClass('.toast-message');
+      // actions.clickOnClass('.toast-message');
       });
     });
     tags('smoke').describe('New Resources are created on ‘Forms’ Page',function(){
@@ -232,7 +232,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#path', 'editresource');
       actions.clickSave('Save Resource');
       actions.iSeeTextIn(".toast-message", 'Successfully updated form!');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' API');
       // actions.iSeeText('3000/editresource');
       actions.clickOnElementWithText('Resources');
@@ -247,13 +247,13 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#path','');
       actions.clickSave('Save Resource');
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.enterTextInField('#path','testresource1');
       actions.enterTextInField('#title','');
       actions.enterTextInField('#name','testResource1');
       actions.clickSave('Save Resource');
       actions.iSeeTextIn(".toast-message", 'Path `path` is required.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
     });
     describe('Adding field tags',function(){
       actions.clickOnElementWithText('Resources');
@@ -261,7 +261,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','FieldTags Resource');
       actions.clickOnButton('Create Resource');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.checkingUrlEndsWith('/edit');
       actions.clickOnClassWithIndex('.fa.fa-gear',1);
       actions.iSeeText('Custom Action URL');
@@ -279,7 +279,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Custom URL');
       actions.clickOnButton('Create Resource');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClassWithIndex('.fa.fa-gear',1);
       actions.enterTextInField('#form-action','test.com');
       actions.clickOnButton('Save Settings');
@@ -292,12 +292,12 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText(' Edit');
       actions.enterTextInField('#title','Updated Resource');
       actions.clickSave('Save Resource');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClassWithIndex('.fa.fa-gear',1);
       actions.iSeeValueInContains('#machineName','customUrl');
       actions.enterTextInField('#machineName','updatedMachineName');
       actions.clickOnButton('Save Settings');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       // actions.iSeeValueIn('#machineName','updatedMachineName');
@@ -339,7 +339,6 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Name ');
       actions.iSeeText('Phone ');
       actions.clickOnButton('Create Resource');
-      actions.iSeeTextIn(".toast-message", 'Successfully created form!');
       actions.clickOnElementWithText('Resources');
       actions.iSeeText('Test Import Resource');
     });

@@ -7,7 +7,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('New Project');
       actions.enterTextInField('#title', 'projectPayment');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(1000);
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Plan and Pricing');

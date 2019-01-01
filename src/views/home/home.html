@@ -88,9 +88,9 @@
               <h4>Enterprise Edition <br /> (On Premise)</h4>
             </div>
             <div class="project-section-separator"></div>
-            <div class="row" style="z-index:1000;">
+            <div class="row" style="z-index:1000;" ng-if="!onPremise">
               <div class="col-sm-6 project-tile-button"><button ui-sref="project.overview({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
-              <div class="col-sm-6 project-tile-button" ng-if="!onPrem"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
+              <div class="col-sm-6 project-tile-button"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
             </div>
             <div class="row project-teams">
               <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />

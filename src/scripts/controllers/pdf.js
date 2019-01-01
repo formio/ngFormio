@@ -1,6 +1,8 @@
 'use strict';
+import chanceLib from 'chance';
+const chance = chanceLib();
 
-/* globals chance, location */
+/* globals location */
 
 angular.module('formioApp.controllers.pdf', ['ngDialog'])
   .factory('PDFServer', [

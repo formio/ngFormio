@@ -32,13 +32,13 @@ module.exports = function (actions,tags) {
     actions.clickOnElementWithText('API Web Form');
     actions.enterTextInField('#title','Test Form');
     actions.clickOnElementWithText('Create Form');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.clickOnElementWithText('Disabled');
     actions.iSeeText('Enabled - Use current form version when viewing submissions.');
     actions.iSeeText('Enabled - Use original form version when viewing submissions.');
     actions.clickOnElementWithText('Enabled - Use current form version when viewing submissions.');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Edit');
     actions.iSeeText('Save Draft');
     actions.iSeeText('Publish');
@@ -46,7 +46,7 @@ module.exports = function (actions,tags) {
     actions.clickOnElementWithText(' Revisions');
     actions.clickOnElementWithText('Enabled - Use current form version when viewing submissions.');
     actions.clickOnElementWithText('Disabled');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Edit');
     actions.iDonotSeeText('Save Draft');
     actions.iDonotSeeText('Publish');
@@ -56,7 +56,7 @@ module.exports = function (actions,tags) {
     actions.iSeeText('Enabled - Use current form version when viewing submissions.');
     actions.iSeeText('Enabled - Use original form version when viewing submissions.');
     actions.clickOnElementWithText('Enabled - Use current form version when viewing submissions.');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Edit');
     actions.dragTo('HTML Element', 'formarea');
     actions.iSeeText('HTML Element Component');
@@ -70,7 +70,7 @@ module.exports = function (actions,tags) {
     actions.waitForActionToComplete(1000);
     actions.enterTextInField('xpath://*[@id="form-group-note"]/textarea','Test Note Version 0');
     actions.clickSave('Publish');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.clickOnElementWithText('1');
     actions.switchTab();
@@ -83,7 +83,7 @@ module.exports = function (actions,tags) {
     actions.iSeeText('Field A ');
     actions.enterTextInField('#fieldA','Test Submission');
     actions.clickOnButton('Submit');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.clickOnElementWithTextIndex('Use',1);
     actions.iDonotSeeText('Version 0');
@@ -134,7 +134,7 @@ module.exports = function (actions,tags) {
     actions.waitForActionToComplete(1000);
     actions.enterTextInField('xpath://*[@id="form-group-note"]/textarea','Test Note Version 1');
     actions.clickSave('Publish');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.iSeeText('4');
     actions.iSeeText('Test Note Version 0');
@@ -174,7 +174,7 @@ module.exports = function (actions,tags) {
     actions.waitForActionToComplete(1000);
     actions.enterTextInField('xpath://*[@id="form-group-note"]/textarea','Test Note Version 2');
     actions.clickSave('Publish');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.iSeeText('5');
 
@@ -222,7 +222,7 @@ module.exports = function (actions,tags) {
     actions.iSeeText('Version 0');
     actions.iSeeText('Field A ');
     actions.clickSave('Publish');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Use');
     actions.iDonotSeeText('Version 2');
     actions.iDonotSeeText('Field A2 ');
@@ -241,7 +241,7 @@ module.exports = function (actions,tags) {
     actions.enterTextInField('#fieldA','Test 1');
     actions.enterTextInField('#fieldA1','Test 2');
     actions.clickOnButton('Submit');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.iSeeText('Version 0');
     actions.iSeeText('Field A ');
     actions.iDonotSeeText('Version 1');
@@ -257,7 +257,7 @@ module.exports = function (actions,tags) {
     actions.enterTextInField('#fieldA2','Test 2.3');
     actions.enterTextInField('#number2','2');
     actions.clickOnButton('Submit');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.iDonotSeeText('Version 2');
     actions.iDonotSeeText('Field A2 ');
     actions.iDonotSeeText('Number 2 ');
@@ -287,7 +287,7 @@ module.exports = function (actions,tags) {
     actions.waitForActionToComplete(1000);
     actions.enterTextInField('xpath://*[@id="form-group-note"]/textarea','Draft Version');
     actions.clickSave('Save Draft');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.clickOnButton('Cancel Changes');
     actions.iSeeText('draft');
@@ -296,13 +296,13 @@ module.exports = function (actions,tags) {
     actions.iSeeText('Version 0');
     actions.iSeeText('Field A ');
     actions.clickSave('Publish');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.clickOnElementWithText(' Edit');
     actions.iSeeText('Version 0');
     actions.iSeeText('Field A ');
     actions.clickSave('Publish');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText(' Revisions');
     actions.iSeeText('7');
     actions.iDonotSeeText('draft');
