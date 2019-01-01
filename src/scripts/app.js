@@ -774,9 +774,7 @@ angular
       $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
       $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
       $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
-      $scope.getEmailCallsLimit = ProjectPlans.getEmailCallsLimit.bind(ProjectPlans);
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
-      $scope.getEmailCallsPercent = ProjectPlans.getEmailCallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
 
       $rootScope.welcomeForceClose = false;
@@ -1266,38 +1264,21 @@ angular
         return this.plans[plan].labelStyle;
       },
       getAPICallsLimit: function(apiCalls) {
-        if (!apiCalls || !apiCalls.limit) {
+        if (!apiCalls) {
           return '∞';
         }
-        return $filter('number')(apiCalls.limit);
+        return $filter('number')(apiCalls);
       },
-      getEmailCallsLimit: function(plan) {
-        switch(plan) {
-          case 'basic':
-            return 100;
-          case 'independent':
-            return 1000;
-          default:
-            return '∞';
-        }
-      },
-      getAPICallsPercent: function(apiCalls) {
-        if (!apiCalls || !apiCalls.limit) {
+      getAPICallsPercent: function(apiCalls, type) {
+        if (!apiCalls || !apiCalls.limit || !apiCalls.limit[type]) {
           return '0%';
         }
-        var percent = apiCalls.used / apiCalls.limit * 100;
+        var percent = apiCalls.used[type] / apiCalls.limit[type] * 100;
         return (percent > 100) ? '100%' : percent + '%';
       },
-      getEmailCallsPercent: function(apiCalls, plan) {
-        if (!apiCalls || !apiCalls.emails) {
-          return '0%';
-        }
-        var percent = apiCalls.emails / this.getEmailCallsLimit(plan) * 100;
-        return (percent > 100) ? '100%' : percent + '%';
-      },
-      getProgressBarClass: function(apiCalls) {
-        if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
-        var percentUsed = apiCalls.used / apiCalls.limit;
+      getProgressBarClass: function(apiCalls, type) {
+        if (!apiCalls || !apiCalls.limit || !apiCalls.limit[type]) return 'progress-bar-success';
+        var percentUsed = apiCalls.used[type] / apiCalls.limit[type];
         if (percentUsed >= 0.9) return 'progress-bar-danger';
         if (percentUsed >= 0.7) return 'progress-bar-warning';
         return 'progress-bar-success';
