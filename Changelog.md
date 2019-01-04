@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.0.2
+### Fixed
+ - Remove project limit graphs for on premise portals.
+
+## 6.0.1
+### Added
+ - Project limits for forms, form requests and emails
+ 
+## 6.0.0
+### Changed
+ - Build method now uses webpack and npm instead of bower and wiredep. 
+
 ## 5.11.3
 ### Fixed
  - Problems with the submission grid sorting.
