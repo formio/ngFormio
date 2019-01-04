@@ -66,7 +66,7 @@
             <p class="project-framework"><strong>{{ getFrameworkTitle(project.framework) }}</strong></p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
             <div class="project-section-separator"></div>
-            <div ng-if="!project.remote">
+            <div ng-if="!project.remote && !onPremise">
               <div class="progress">
                 <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'forms')}" ng-class="getProgressBarClass(project.apiCalls, 'forms')"></div>
                 <span><small>{{ project.apiCalls.used.forms || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.forms) }} Forms</small></span>
@@ -84,7 +84,7 @@
                 <span><small>{{ project.apiCalls.used.emails || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.emails) }} Emails</small></span>
               </div>
             </div>
-            <div ng-if="project.remote">
+            <div ng-if="project.remote || onPremise">
               <h4>Enterprise Edition <br /> (On Premise)</h4>
             </div>
             <div class="project-section-separator"></div>
