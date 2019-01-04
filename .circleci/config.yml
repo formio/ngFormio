@@ -62,9 +62,9 @@ jobs:
       - run:
           name: Wait for saucelabs
           command: while [ ! -e ~/sauce_is_ready ]; do sleep 1; done
-#      - run:
-#          name: Test
-#          command: npm test
+      - run:
+          name: Test
+          command: npm test
       - store_artifacts:
           path: ./test/screenshots
       - run: # wait for Sauce Connect to close the tunnel
