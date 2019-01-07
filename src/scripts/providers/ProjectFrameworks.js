@@ -4,7 +4,13 @@ var app = angular.module('formioApp');
 
 app.constant('ProjectFrameworks', [
   {
+    title: 'Javascript',
+    name: 'javascript',
+    img: 'images/platforms/javascript.png'
+  },
+  {
     title: 'AngularJS',
+    hide: true,
     name: 'angular',
     img: 'images/platforms/angularjs1.svg'
   },
@@ -14,7 +20,7 @@ app.constant('ProjectFrameworks', [
     img: 'images/platforms/angular2.png'
   },
   {
-    title: 'React.js',
+    title: 'React',
     name: 'react',
     img: 'images/platforms/react.svg'
   },
@@ -24,10 +30,9 @@ app.constant('ProjectFrameworks', [
     img: 'images/platforms/vue.png'
   },
   {
-    title: 'Web Components',
-    name: 'html5',
-    disabled: true,
-    img: 'images/platforms/html5.png'
+    title: 'Aurelia',
+    name: 'aurelia',
+    img: 'images/platforms/aurelia.svg'
   },
   {
     title: 'Stand-Alone Forms',
