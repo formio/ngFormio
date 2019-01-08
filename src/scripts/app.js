@@ -1163,6 +1163,10 @@ angular
       $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
       $templateCache.put('views/frameworks/angular2/embed-app.html', require('../views/frameworks/angular2/embed-app.html'));
       $templateCache.put('views/frameworks/angular2/launch.html', require('../views/frameworks/angular2/launch.html'));
+      $templateCache.put('views/frameworks/aurelia/download.html', require('../views/frameworks/aurelia/download.html'));
+      $templateCache.put('views/frameworks/aurelia/embed.html', require('../views/frameworks/aurelia/embed.html'));
+      $templateCache.put('views/frameworks/aurelia/embed-app.html', require('../views/frameworks/aurelia/embed-app.html'));
+      $templateCache.put('views/frameworks/aurelia/launch.html', require('../views/frameworks/aurelia/launch.html'));
       $templateCache.put('views/frameworks/custom/download.html', require('../views/frameworks/custom/download.html'));
       $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
       $templateCache.put('views/frameworks/custom/embed-app.html', require('../views/frameworks/custom/embed-app.html'));

@@ -1,0 +1,31 @@
+<div class="row">
+  <div class="col-md-12">
+    <p>There are two ways you typically want to start your application. First you'll start it in development mode while you work on building it out. Then once it is ready, build it and launch it to a server.</p>
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">A</span>
+          <h5>Local Development Environment</h5>
+        </div>
+        <p>Use the au run command to serve the app.</p>
+        <p><pre>au run --watch</pre></p>
+        <p>This will set up the app, start the server and open a browser window for you. Any changes you make within the applications source code will trigger a refresh. This makes development faster and easier.</p>
+        <p>Once launched, you can log in as the Admin User you created earlier if you application has Authentication configured for it.</p>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">B</span>
+          <h5>Build a Distribution</h5>
+        </div>
+        <p>To build your app and prepare it for hosting, use the au build command.</p>
+        <p><pre>au build --env stage</pre></p>
+        <p>This will build your entire application into the <strong>/dist</strong> directory. This will be a fully working version of your app that is ready for deployment.</p>
+        <h4>Deploy to Hosting</h4>
+        <p>Form.io based apps can be hosted anywhere that is able to serve files over http/s. Since all of the logic and functionality is done on the form.io backend, there are no special requirements for hosting the app. There are many good free hosts you can use to host your app or set up your own server.</p>
+        <p>To deploy your app, make sure you have run <strong>gulp build</strong> and copy the contents of the <strong>/dist</strong> directory to your server host.</p>
+        <p>We host many of our apps using <a href="https://pages.github.com/" target="_blank">github pages</a> which is free.</p>
+        <p>Amazon s3 with cloudfront is a very good high performance alternative.</p>
+      </li>
+    </ul>
+  </div>
+</div>
