@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: './src/scripts.js',
@@ -16,10 +17,14 @@ module.exports = {
       filename: "styles.css",
       chunkFilename: "[id].css"
     }),
+    new CopyWebpackPlugin([
+      {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'}
+    ]),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery",
       "jQuery": "jquery",
       "$": "jquery",
+      "ckeditor": 'CKEditor'
     })
   ],
   module: {
