@@ -1,20 +1,20 @@
 module.exports = function (actions,tags) {
   describe('User Portal - Creating Project Templates', function () {
-    describe('Creating AngularJS', function () {
+    describe('Creating Angular', function () {
       actions.logout();
       actions.iAmLoggedInFor('creatingProj');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('AngularJS');
-      actions.iSeeText("Create a New AngularJS");
-      actions.enterTextInField('#title', 'AngularJS');
-      actions.enterTextInField('#description', 'This is first AngularJS');
+      actions.clickOnElementWithText('Angular');
+      actions.iSeeText("Create a New Angular");
+      actions.enterTextInField('#title', 'Angular');
+      actions.enterTextInField('#description', 'This is first Angular');
       actions.clickOnElementWithText(' Create Project');
     // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Overview');
-      actions.iSeeText('AngularJS');
+      actions.iSeeText('Angular');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
-      actions.iSeeText('This is first AngularJS');
+      actions.iSeeText('This is first Angular');
     });
     tags('smoke').describe('Creating Project templates', function () {
       var frameworks = ['Angular','React.js'
@@ -59,14 +59,14 @@ module.exports = function (actions,tags) {
     });
     describe('Editing Project Title and Description', function () {
       actions.pageReload();
-      actions.clickOnElementWithTextIndex('AngularJS',1);
+      actions.clickOnElementWithTextIndex('Angular',1);
       actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#title','Updated Title');
       actions.enterTextInField('#description','Updated Description');
       actions.clickOnButton(' Save Project');
     // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
-      actions.clickOnElementWithText('AngularJS');
+      actions.clickOnElementWithText('Angular');
       actions.clickOnElementWithText('React.js');
       actions.clickOnButton(' Save Project');
     // actions.clickOnClass('.toast-message');

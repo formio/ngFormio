@@ -1,11 +1,11 @@
 module.exports = function (actions,tags) {
   tags('smoke').describe('Walkthrough Page',function(){
-    describe('AngularJS',function(){
+    describe('Javascript',function(){
       actions.logout();
-      actions.iAmLoggedInFor('AngularJS');
+      actions.iAmLoggedInFor('Angular');
       actions.goToPage("#/");
-      actions.clickOnElementWithText('AngularJS');
-      actions.enterTextInField('#title','AngularJSwalkThroughProject');
+      actions.clickOnElementWithText('Angular');
+      actions.enterTextInField('#title','AngularwalkThroughProject');
       actions.clickOnElementWithText(' Create Project');
       actions.checkingUrlEndsWith('/tour');
       actions.iSeeTextCount('Trial',2);
@@ -19,10 +19,10 @@ module.exports = function (actions,tags) {
       // actions.checkingUrlEndsWith('/billing');
       // actions.goBack();
       actions.clickOnElementWithText('Download a StarterKit Application');
-      actions.iSeeText('Clone the Form.io AngularJS StarterKit');
+      actions.iSeeText('Clone the Form.io Angular StarterKit');
       var links = [
         ['https://git-scm.com/','https://git-scm.com/',0],
-        ['https://github.com/formio/ng-app-starterkit','https://github.com/formio/ng-app-starterkit',0]
+        ['https://github.com/formio/angular-app-starterkit','https://github.com/formio/angular-app-starterkit',0]
         //['Fountain.js','http://fountainjs.io/',0],
       ];
       links.forEach(function(link){
@@ -31,24 +31,8 @@ module.exports = function (actions,tags) {
         actions.checkingUrlIamOn(link[1]);
         actions.closeWindow();
       });
-      var links1 = [
-        ['ngFormio','https://github.com/formio/ngFormio',0],
-        ['ngFormBuilder','https://github.com/formio/ngFormBuilder',0],
-        ['ngFormioHelper','https://github.com/formio/ngFormioHelper',0],
-        ['ngFormio','https://github.com/formio/ngFormio',1],
-        ['ngFormBuilder','https://github.com/formio/ngFormBuilder',1]
-      ];
-      links1.forEach(function(link1){
-        actions.clickOnElementWithTextIndex(link1[0],link1[2]);
-        actions.checkingUrlIamOn(link1[1]);
-        actions.goBack();
-      });
       actions.clickOnElementWithText('Configure the starterkit application');
       actions.iSeeText('Configure the app');
-      actions.clickOnElementWithText('https://github.com/formio/ng-app-starterkit/blob/master/src/config.js');
-      actions.newWindow();
-      actions.checkingUrlIamOn('https://github.com/formio/ng-app-starterkit/blob/master/src/config.js');
-      actions.closeWindow();
       actions.clickOnElementWithText('Create an Admin user for your application');
       actions.iSeeText(' Admin User');
       actions.clickOnElementWithTextIndex('Access',1);
@@ -74,16 +58,8 @@ module.exports = function (actions,tags) {
       actions.iSeeText(': Add an action');
       actions.clickOnElementWithText('Embed the form within your application');
       actions.iSeeText(' Embed the form');
-      actions.clickOnElementWithText('https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider');
-      actions.newWindow();
-      actions.checkingUrlIamOn('https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider');
-      actions.closeWindow();
       actions.clickOnElementWithText('Launch your application');
       actions.iSeeText(' Launch');
-      actions.clickOnElementWithText('github pages');
-      actions.newWindow();
-      actions.checkingUrlIamOn('https://pages.github.com/');
-      actions.closeWindow();
       actions.clickOnElementWithText('See what else you can do with Form.io');
       actions.iSeeText(' Next Steps');
       var moreInfoLinks = [
@@ -111,10 +87,10 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText(' Continue Walkthrough');
       actions.iSeeText('Welcome to Your New Project!');
       actions.clickOnClass('.fa.fa-sliders');
-      actions.iSeeText('Clone the Form.io AngularJS StarterKit');
+      actions.iSeeText('Clone the Form.io Angular StarterKit');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Continue Walkthrough');
-      actions.iSeeText('Clone the Form.io AngularJS StarterKit');
+      actions.iSeeText('Clone the Form.io Angular StarterKit');
       actions.clickOnClass('.fa.fa-user-plus');
       actions.iSeeText(' Admin User');
       actions.clickOnElementWithText('Forms');
