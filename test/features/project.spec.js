@@ -73,7 +73,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('angular-formio');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnClass('i.caret.pull-right');
-      actions.clickOnElementWithText('React.js');
+      actions.clickOnElementWithText('React');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
     // actions.clickOnClass('.toast-message');

@@ -17,8 +17,8 @@ module.exports = function (actions,tags) {
       actions.iSeeText('This is first Angular');
     });
     tags('smoke').describe('Creating Project templates', function () {
-      var frameworks = ['Angular','React.js'
-        ,'Vue.js','Stand-Alone Forms','Custom'];
+      var frameworks = ['Javascript', 'Angular','React'
+        ,'Vue.js', 'Aurelia', 'Stand-Alone Forms','Custom'];
       frameworks.forEach(function(framework) {
         actions.clickOnElementWithText(framework);
         actions.iSeeText("Create a New " + framework);
@@ -67,15 +67,15 @@ module.exports = function (actions,tags) {
     // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Angular');
-      actions.clickOnElementWithText('React.js');
+      actions.clickOnElementWithText('React');
       actions.clickOnButton(' Save Project');
     // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
-      actions.iSeeText(' React.js ');
+      actions.iSeeText(' React ');
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', 'Updated Title');
       actions.iSeeValueIn('#description', 'Updated Description');
-      actions.iSeeText('React.js');
+      actions.iSeeText('React');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Updated Title');
