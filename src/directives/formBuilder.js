@@ -37,7 +37,25 @@ export default angular.module('formio').directive('formBuilder', function() {
         $scope.$watch('form.display', display => {
           if (builderReady && display) {
             builderReady.then(() => {
-              builder.setDisplay(display);
+              if (display !== builder.form.display) {
+                builder.setDisplay(display);
+              }
+              if ($scope.url) {
+                builder.instance.url = $scope.url;
+              }
+            });
+          }
+        });
+
+        $scope.$watch('form', form => {
+          if (!form || !form.components) {
+            return;
+          }
+          if (builderReady) {
+            builderReady.then(() => {
+              if (form !== builder.form) {
+                builder.setForm(form);
+              }
               if ($scope.url) {
                 builder.instance.url = $scope.url;
               }
