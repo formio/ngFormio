@@ -908,16 +908,34 @@ var _default = app.provider('Formio', function () {
         // Wrap Formio.request's promises with $q so $apply gets called correctly.
         wrapRequestPromise: wrapQPromise,
         wrapStaticRequestPromise: wrapQPromise
-      }, 'ngFormioPromiseWrapper'); // Broadcast offline events from $rootScope
+      }, 'ngFormioPromiseWrapper'); // Call a safe apply.
+
+
+      var safeApply = function safeApply(fn) {
+        var phase = $rootScope.$root.$$phase;
+
+        if (phase == '$apply' || phase == '$digest') {
+          if (fn && typeof fn === 'function') {
+            fn();
+          }
+        } else {
+          $rootScope.$apply(fn);
+        }
+      }; // Broadcast offline events from $rootScope
 
 
       _formiojs.Formio.events.onAny(function () {
         var event = 'formio.' + this.event;
         var args = [].splice.call(arguments, 0);
         args.unshift(event);
-        $rootScope.$apply(function () {
-          $rootScope.$broadcast.apply($rootScope, args);
-        });
+
+        try {
+          safeApply(function () {
+            $rootScope.$broadcast.apply($rootScope, args);
+          });
+        } catch (err) {
+          console.log(err);
+        }
       }); // Return the formio interface.
 
 
