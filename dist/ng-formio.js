@@ -20886,7 +20886,7 @@ function (_NestedComponent) {
         }
 
         components.forEach(function (path) {
-          var component = _this13.getComponent(path, _lodash.default.identity, err);
+          var component = _this13.getComponent(path, _lodash.default.identity);
 
           var components = _lodash.default.compact(Array.isArray(component) ? component : [component]);
 
@@ -32447,6 +32447,16 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./no
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
 function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -32529,10 +32539,26 @@ function (_NestedComponent) {
     _this.numRows = 0;
     _this.numColumns = 0;
     _this.rows = [];
+
+    if (_this.hasRowGroups() && !_this.options.builder) {
+      var groups = _lodash.default.get(_this.component, 'rowGroups', []);
+
+      var rowsNum = _this.totalRowsNumber(groups);
+
+      _this.setStaticValue(rowsNum);
+    }
+
     return _this;
   }
 
   _createClass(DataGridComponent, [{
+    key: "setStaticValue",
+    value: function setStaticValue(n) {
+      this.dataValue = _lodash.default.range(n).map(function () {
+        return {};
+      });
+    }
+  }, {
     key: "hasAddButton",
     value: function hasAddButton() {
       var maxLength = _lodash.default.get(this.component, 'validate.maxLength');
@@ -32542,7 +32568,9 @@ function (_NestedComponent) {
   }, {
     key: "hasExtraColumn",
     value: function hasExtraColumn() {
-      return this.hasRemoveButtons() || this.options.builder;
+      var rmPlacement = _lodash.default.get(this, 'component.removePlacement', 'col');
+
+      return this.hasRemoveButtons() && rmPlacement === 'col' || this.options.builder;
     }
   }, {
     key: "hasRemoveButtons",
@@ -32578,7 +32606,8 @@ function (_NestedComponent) {
         }
       });
       this.tableElement = this.ce('table', {
-        class: tableClass
+        class: tableClass,
+        style: this.component.layoutFixed ? 'table-layout: fixed;' : ''
       });
       this.element.appendChild(this.tableElement);
 
@@ -32636,7 +32665,12 @@ function (_NestedComponent) {
         this.tableElement.appendChild(header);
       }
 
-      this.tableElement.appendChild(this.ce('tbody', null, tableRows)); // Create the add row button footer element.
+      this.tableElement.appendChild(this.ce('tbody', null, tableRows));
+
+      if (this.hasRowGroups() && !this.options.builder) {
+        this.buildGroups();
+      } // Create the add row button footer element.
+
 
       if (this.hasBottomSubmit()) {
         this.tableElement.appendChild(this.ce('tfoot', null, this.ce('tr', null, this.ce('td', {
@@ -32675,15 +32709,30 @@ function (_NestedComponent) {
     }
   }, {
     key: "buildRow",
-    value: function buildRow(row, index, state) {
+    value: function buildRow(rowData, index, state) {
       var _this6 = this;
 
       state = state || {};
-      this.rows[index] = {};
-      var lastColumn = null;
 
-      if (this.hasRemoveButtons()) {
-        lastColumn = this.ce('td', null, this.removeButton(index));
+      var components = _lodash.default.get(this, 'component.components', []);
+
+      var colsNum = components.length;
+      var lastColIndex = colsNum - 1;
+      var hasRmButton = this.hasRemoveButtons();
+      var hasTopButton = this.hasTopSubmit();
+
+      var rmPlacement = _lodash.default.get(this, 'component.removePlacement', 'col');
+
+      var useCorner = false;
+      var lastColumn = null;
+      this.rows[index] = {};
+
+      if (hasRmButton) {
+        if (rmPlacement === 'col') {
+          lastColumn = this.ce('td', null, this.removeButton(index));
+        } else {
+          useCorner = true;
+        }
       } else if (this.options.builder) {
         lastColumn = this.ce('td', {
           id: "".concat(this.id, "-drag-container"),
@@ -32697,8 +32746,19 @@ function (_NestedComponent) {
         this.root.addDragContainer(lastColumn, this);
       }
 
-      return this.ce('tr', null, [this.component.components.map(function (col, colIndex) {
-        return _this6.buildComponent(col, colIndex, row, index, state[col.key]);
+      return this.ce('tr', null, [components.map(function (cmp, colIndex) {
+        var cell = _this6.buildComponent(cmp, colIndex, rowData, index, _this6.getComponentState(cmp, state));
+
+        if (hasRmButton && useCorner && lastColIndex === colIndex) {
+          cell.style.position = 'relative';
+          cell.append(_this6.removeButton(index, 'small'));
+
+          if (hasTopButton) {
+            cell.setAttribute('colspan', 2);
+          }
+        }
+
+        return cell;
       }), lastColumn]);
     }
   }, {
@@ -32920,8 +32980,7 @@ function (_NestedComponent) {
     }
   }, {
     key: "getComponent",
-    value: function getComponent(path, fn, err) {
-      var index = err.index;
+    value: function getComponent(path, fn) {
       path = Array.isArray(path) ? path : [path];
 
       var _path = path,
@@ -32937,10 +32996,6 @@ function (_NestedComponent) {
 
       this.everyComponent(function (component, components) {
         if (component.component.key === key) {
-          if (!_lodash.default.isNil(index) && component.rowIndex !== index) {
-            return;
-          }
-
           var comp = component;
 
           if (remainingPath.length > 0 && 'getComponent' in component) {
@@ -32953,6 +33008,131 @@ function (_NestedComponent) {
         }
       });
       return result.length > 0 ? result : null;
+    }
+    /** @override **/
+
+  }, {
+    key: "removeButton",
+    value: function removeButton(index) {
+      var mode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'basic';
+
+      if (mode === 'small') {
+        return this.removeButtonSmall(index);
+      }
+
+      return _get(_getPrototypeOf(DataGridComponent.prototype), "removeButton", this).call(this, index);
+    }
+  }, {
+    key: "removeButtonSmall",
+    value: function removeButtonSmall(index) {
+      var _this11 = this;
+
+      var cmpType = _lodash.default.get(this, 'component.type', 'datagrid');
+
+      var className = "btn btn-xxs btn-danger formio-".concat(cmpType, "-remove");
+      var button = this.ce('button', {
+        type: 'button',
+        tabindex: '-1',
+        class: className
+      }, this.ce('i', {
+        class: this.iconClass('remove')
+      }));
+      this.addEventListener(button, 'click', function (event) {
+        event.preventDefault();
+
+        _this11.removeValue(index);
+      });
+      return button;
+    }
+    /*** Row Groups ***/
+
+    /**
+     * @param {Numbers[]} groups
+     * @param {Array<T>} coll - collection
+     *
+     * @return {Array<T[]>}
+     */
+
+  }, {
+    key: "getRowChunks",
+    value: function getRowChunks(groups, coll) {
+      var _groups$reduce = groups.reduce(function (_ref, size) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            startIndex = _ref2[0],
+            acc = _ref2[1];
+
+        var endIndex = startIndex + size;
+        return [endIndex, [].concat(_toConsumableArray(acc), [[startIndex, endIndex]])];
+      }, [0, []]),
+          _groups$reduce2 = _slicedToArray(_groups$reduce, 2),
+          chunks = _groups$reduce2[1];
+
+      return chunks.map(function (range) {
+        return _lodash.default.slice.apply(_lodash.default, [coll].concat(_toConsumableArray(range)));
+      });
+    }
+  }, {
+    key: "hasRowGroups",
+    value: function hasRowGroups() {
+      return _lodash.default.get(this, 'component.enableRowGroups', false);
+    }
+  }, {
+    key: "buildGroups",
+    value: function buildGroups() {
+      var _this12 = this;
+
+      var groups = _lodash.default.get(this.component, 'rowGroups', []);
+
+      var ranges = _lodash.default.map(groups, 'numberOfRows');
+
+      var rows = this.tableElement.querySelectorAll('tbody>tr');
+      var tbody = this.tableElement.querySelector('tbody');
+      var chunks = this.getRowChunks(ranges, rows);
+      var firstElements = chunks.map(_lodash.default.head);
+      var groupElements = groups.map(function (g, index) {
+        return _this12.buildGroup(g, index, chunks[index]);
+      });
+      groupElements.forEach(function (elt, index) {
+        var row = firstElements[index];
+
+        if (row) {
+          tbody.insertBefore(elt, row);
+        }
+      });
+    }
+  }, {
+    key: "buildGroup",
+    value: function buildGroup(_ref3, index, groupRows) {
+      var label = _ref3.label;
+
+      var hasToggle = _lodash.default.get(this, 'component.groupToggle', false);
+
+      var colsNumber = _lodash.default.get(this, 'component.components', []).length;
+
+      var cell = this.ce('td', {
+        colspan: colsNumber,
+        class: 'datagrid-group-label'
+      }, [label]);
+      var header = this.ce('tr', {
+        class: "datagrid-group-header ".concat(hasToggle ? 'clickable' : '')
+      }, cell);
+
+      if (hasToggle) {
+        this.addEventListener(header, 'click', function () {
+          header.classList.toggle('collapsed');
+
+          _lodash.default.each(groupRows, function (row) {
+            row.classList.toggle('hidden');
+          });
+        });
+      }
+
+      return header;
+    }
+  }, {
+    key: "totalRowsNumber",
+    value: function totalRowsNumber(groups) {
+      return _lodash.default.sum(_lodash.default.map(groups, 'numberOfRows'));
     }
   }, {
     key: "defaultSchema",
@@ -33001,7 +33181,9 @@ function (_NestedComponent) {
   }]);
 
   return DataGridComponent;
-}(_NestedComponent2.default);
+}(_NestedComponent2.default); // const BaseGetSchema = Object.getOwnPropertyDescriptor(BaseComponent.prototype, 'schema');
+// Object.defineProperty(DataGridComponent.prototype, 'schema', BaseGetSchema);
+
 
 exports.default = DataGridComponent;
 
@@ -33027,7 +33209,10 @@ var _default = [{
   key: 'disableAddingRemovingRows',
   tooltip: 'Check if you want to hide Add Another button and Remove Row button',
   weight: 405,
-  input: true
+  input: true,
+  clearOnHide: false,
+  customConditional: 'show = !data.enableRowGroups',
+  calculateValue: 'value = data.enableRowGroups ? true : data.disableAddingRemovingRows;'
 }, {
   type: 'textfield',
   label: 'Add Another Text',
@@ -33057,15 +33242,98 @@ var _default = [{
       value: 'both'
     }]
   },
-  weight: 420,
+  weight: 411,
+  customConditional: 'show = !data.disableAddingRemovingRows'
+}, {
+  type: 'select',
+  label: 'Remove Button Placement',
+  key: 'removePlacement',
+  defaultValue: 'col',
+  dataSrc: 'values',
+  data: {
+    values: [{
+      label: 'Right Most Column',
+      value: 'col'
+    }, {
+      label: 'Row Top-Right corner',
+      value: 'corner'
+    }]
+  },
+  weight: 412,
+  input: true,
   customConditional: 'show = !data.disableAddingRemovingRows'
 }, {
   type: 'checkbox',
   label: 'Default Open Rows',
   key: 'defaultOpen',
   tooltip: 'Check this if you would like for the rows of the edit grid to be defaulted to opened if values exist.',
-  weight: 405,
+  weight: 420,
   input: true
+}, {
+  type: 'checkbox',
+  label: 'Equal column width',
+  key: 'layoutFixed',
+  weight: 430,
+  input: true
+}, {
+  key: 'enableRowGroups',
+  type: 'checkbox',
+  label: 'Enable Row Groups',
+  weight: 440,
+  input: true
+}, {
+  label: 'Groups',
+  disableAddingRemovingRows: false,
+  defaultOpen: false,
+  addAnother: '',
+  addAnotherPosition: 'bottom',
+  mask: false,
+  tableView: true,
+  alwaysEnabled: false,
+  type: 'datagrid',
+  input: true,
+  key: 'rowGroups',
+  components: [{
+    label: 'Label',
+    allowMultipleMasks: false,
+    showWordCount: false,
+    showCharCount: false,
+    tableView: true,
+    alwaysEnabled: false,
+    type: 'textfield',
+    input: true,
+    key: 'label',
+    widget: {
+      type: ''
+    },
+    row: '0-0'
+  }, {
+    label: 'Number of Rows',
+    mask: false,
+    tableView: true,
+    alwaysEnabled: false,
+    type: 'number',
+    input: true,
+    key: 'numberOfRows',
+    row: '0-1'
+  }],
+  weight: 441,
+  conditional: {
+    json: {
+      var: 'data.enableRowGroups'
+    }
+  }
+}, {
+  label: 'Hide Group on Header Click',
+  type: 'checkbox',
+  input: true,
+  key: 'groupToggle',
+  weight: 442,
+  conditional: {
+    json: {
+      var: 'data.enableRowGroups'
+    }
+  }
 }];
 exports.default = _default;
 
@@ -35006,7 +35274,9 @@ exports.default = _default;
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
 
-var _EditGridEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/EditGrid.edit.templates */ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.templates.js"));
+var _EditGridEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/EditGrid.edit.data */ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.data.js"));
+
+var _EditGridEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/EditGrid.edit.templates */ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.templates.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35019,13 +35289,10 @@ function _default() {
     label: 'Templates',
     key: 'templates',
     weight: 5,
-    components: _EditGridEdit.default
+    components: _EditGridEdit2.default
   }, {
     key: 'data',
-    components: [{
-      key: 'defaultValue',
-      ignore: true
-    }]
+    components: _EditGridEdit.default
   }]].concat(extend));
 }
 
@@ -35108,6 +35375,7 @@ function (_NestedComponent) {
         defaultOpen: false,
         removeRow: '',
         components: [],
+        inlineEdit: false,
         templates: {
           header: this.defaultHeaderTemplate,
           row: this.defaultRowTemplate,
@@ -35342,8 +35610,6 @@ function (_NestedComponent) {
   }, {
     key: "checkData",
     value: function checkData(data) {
-      var _this5 = this;
-
       var flags = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var index = arguments.length > 2 ? arguments[2] : undefined;
       var valid = true;
@@ -35355,16 +35621,17 @@ function (_NestedComponent) {
 
       var changed = this.updateValue({
         noUpdateEvent: true
-      }); // Iterate through all components and check conditions, and calculate values.
+      });
+      var editRow = this.editRows[index]; // Iterate through all components and check conditions, and calculate values.
 
-      this.editRows[index].components.forEach(function (comp) {
+      editRow.components.forEach(function (comp) {
         changed |= comp.calculateValue(data, {
           noUpdateEvent: true
         });
         comp.checkConditions(data);
 
         if (!flags.noValidate) {
-          valid &= comp.checkValidity(data, !_this5.editRows[index].isOpen);
+          valid &= comp.checkValidity(data, !editRow.isOpen);
         }
       });
       valid &= this.validateRow(index); // Trigger the change if the values changed.
@@ -35401,25 +35668,45 @@ function (_NestedComponent) {
         return;
       }
 
+      var dataObj = {};
       this.editRows.push({
         components: [],
         isOpen: true,
-        data: {}
+        data: dataObj
       });
+
+      if (this.component.inlineEdit) {
+        this.dataValue.push(dataObj);
+      }
+
       this.emit('editGridAddRow', {
         component: this.component,
         row: this.editRows[this.editRows.length - 1]
       });
-      this.buildTable(fromBuild);
+
+      if (this.component.inlineEdit) {
+        this.updateGrid();
+      } else {
+        this.buildTable(fromBuild);
+      }
     }
   }, {
     key: "editRow",
     value: function editRow(rowIndex) {
-      this.editRows[rowIndex].dirty = false;
-      this.editRows[rowIndex].isOpen = true;
-      this.editRows[rowIndex].editing = true;
-      this.editRows[rowIndex].data = _lodash.default.cloneDeep(this.dataValue[rowIndex]);
-      this.buildTable();
+      var editRow = this.editRows[rowIndex];
+      editRow.dirty = false;
+      editRow.isOpen = true;
+      editRow.editing = true;
+
+      var dataSnapshot = _lodash.default.cloneDeep(this.dataValue[rowIndex]);
+
+      if (this.component.inlineEdit) {
+        editRow.backup = dataSnapshot;
+        this.updateGrid();
+      } else {
+        editRow.data = dataSnapshot;
+        this.buildTable();
+      }
     }
   }, {
     key: "updateGrid",
@@ -35431,8 +35718,10 @@ function (_NestedComponent) {
   }, {
     key: "clearErrors",
     value: function clearErrors(rowIndex) {
-      if (this.editRows[rowIndex] && Array.isArray(this.editRows[rowIndex].components)) {
-        this.editRows[rowIndex].components.forEach(function (comp) {
+      var editRow = this.editRows[rowIndex];
+
+      if (editRow && Array.isArray(editRow.components)) {
+        editRow.components.forEach(function (comp) {
           comp.setPristine(true);
           comp.setCustomValidity('');
         });
@@ -35441,21 +35730,33 @@ function (_NestedComponent) {
   }, {
     key: "cancelRow",
     value: function cancelRow(rowIndex) {
+      var editRow = this.editRows[rowIndex];
+
       if (this.options.readOnly) {
-        this.editRows[rowIndex].dirty = false;
-        this.editRows[rowIndex].isOpen = false;
+        editRow.dirty = false;
+        editRow.isOpen = false;
         this.buildTable();
         return;
       }
 
-      if (this.editRows[rowIndex].editing) {
-        this.editRows[rowIndex].dirty = false;
-        this.editRows[rowIndex].isOpen = false;
-        this.editRows[rowIndex].data = this.dataValue[rowIndex];
+      if (editRow.editing) {
+        editRow.dirty = false;
+        editRow.isOpen = false;
+
+        if (this.component.inlineEdit) {
+          this.dataValue[rowIndex] = editRow.backup;
+        }
+
+        editRow.data = this.dataValue[rowIndex];
         this.clearErrors(rowIndex);
       } else {
         this.clearErrors(rowIndex);
-        this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
+
+        if (this.component.inlineEdit) {
+          this.splice(rowIndex);
+        }
+
+        this.removeChildFrom(editRow.element, this.tableElement);
         this.editRows.splice(rowIndex, 1);
       }
 
@@ -35464,33 +35765,36 @@ function (_NestedComponent) {
   }, {
     key: "saveRow",
     value: function saveRow(rowIndex) {
+      var editRow = this.editRows[rowIndex];
+
       if (this.options.readOnly) {
-        this.editRows[rowIndex].dirty = false;
-        this.editRows[rowIndex].isOpen = false;
+        editRow.dirty = false;
+        editRow.isOpen = false;
         this.buildTable();
         return;
       }
 
-      this.editRows[rowIndex].dirty = true;
+      editRow.dirty = true;
 
       if (!this.validateRow(rowIndex)) {
         return;
       }
 
-      if (this.editRows[rowIndex].editing) {
-        this.dataValue[rowIndex] = this.editRows[rowIndex].data;
-      } else {
-        // Insert this row into its proper place.
-        var newIndex = this.dataValue.length;
-        var row = this.editRows[rowIndex];
-        this.dataValue.push(row.data);
-        this.editRows.splice(rowIndex, 1);
-        this.editRows.splice(newIndex, 0, row);
-        rowIndex = newIndex;
+      editRow.dirty = false;
+      editRow.isOpen = false;
+
+      if (!this.component.inlineEdit) {
+        if (editRow.editing) {
+          this.dataValue[rowIndex] = editRow.data;
+        } else {
+          // Insert this row into its proper place.
+          var newIndex = this.dataValue.length;
+          this.dataValue.push(editRow.data);
+          this.editRows.splice(rowIndex, 1);
+          this.editRows.splice(newIndex, 0, editRow);
+        }
       }
 
-      this.editRows[rowIndex].dirty = false;
-      this.editRows[rowIndex].isOpen = false;
       this.updateGrid();
     }
   }, {
@@ -35508,29 +35812,28 @@ function (_NestedComponent) {
   }, {
     key: "validateRow",
     value: function validateRow(rowIndex, dirty) {
-      var _this6 = this;
-
       var check = true;
-      var isDirty = dirty || !!this.editRows[rowIndex].dirty;
-      this.editRows[rowIndex].components.forEach(function (comp) {
+      var editRow = this.editRows[rowIndex];
+      var isDirty = dirty || !!editRow.dirty;
+      editRow.components.forEach(function (comp) {
         comp.setPristine(!isDirty);
-        check &= comp.checkValidity(null, isDirty, _this6.editRows[rowIndex].data);
+        check &= comp.checkValidity(null, isDirty, editRow.data);
       });
 
       if (this.component.validate && this.component.validate.row) {
         var valid = this.evaluate(this.component.validate.row, {
           valid: true,
-          row: this.editRows[rowIndex].data
+          row: editRow.data
         }, 'valid', true);
 
         if (valid === null) {
           valid = "Invalid row validation for ".concat(this.key);
         }
 
-        this.editRows[rowIndex].errorContainer.innerHTML = '';
+        editRow.errorContainer.innerHTML = '';
 
         if (valid !== true) {
-          this.editRows[rowIndex].errorContainer.appendChild(this.ce('div', {
+          editRow.errorContainer.appendChild(this.ce('div', {
             class: 'editgrid-row-error help-block'
           }, valid));
           return false;
@@ -35542,7 +35845,7 @@ function (_NestedComponent) {
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
-      var _this7 = this;
+      var _this5 = this;
 
       if (!this.checkCondition(null, data)) {
         this.setCustomValidity('');
@@ -35553,13 +35856,13 @@ function (_NestedComponent) {
       var rowsClosed = true;
       this.editRows.forEach(function (editRow, rowIndex) {
         // Trigger all errors on the row.
-        var rowValid = _this7.validateRow(rowIndex, dirty); // Add has-error class to row.
+        var rowValid = _this5.validateRow(rowIndex, dirty); // Add has-error class to row.
 
 
         if (!rowValid) {
-          _this7.addClass(_this7.editRows[rowIndex].element, 'has-error');
+          _this5.addClass(editRow.element, 'has-error');
         } else {
-          _this7.removeClass(_this7.editRows[rowIndex].element, 'has-error');
+          _this5.removeClass(editRow.element, 'has-error');
         }
 
         rowsValid &= rowValid; // Any open rows causes validation to fail.
@@ -35620,7 +35923,7 @@ function (_NestedComponent) {
   }, {
     key: "setValue",
     value: function setValue(value) {
-      var _this8 = this;
+      var _this6 = this;
 
       if (!value) {
         this.editRows = this.defaultValue;
@@ -35643,12 +35946,12 @@ function (_NestedComponent) {
       if (Array.isArray(dataValue)) {
         // Refresh editRow data when data changes.
         dataValue.forEach(function (row, rowIndex) {
-          if (_this8.editRows[rowIndex]) {
-            _this8.editRows[rowIndex].data = row;
+          if (_this6.editRows[rowIndex]) {
+            _this6.editRows[rowIndex].data = row;
           } else {
-            _this8.editRows[rowIndex] = {
+            _this6.editRows[rowIndex] = {
               components: [],
-              isOpen: !!_this8.options.defaultOpen,
+              isOpen: !!_this6.options.defaultOpen,
               data: row
             };
           }
@@ -35714,6 +36017,35 @@ function (_NestedComponent) {
 }(_NestedComponent2.default);
 
 exports.default = EditGridComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.data.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.data.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  type: 'checkbox',
+  input: true,
+  weight: 105,
+  key: 'inlineEdit',
+  label: 'Inline Editing',
+  tooltip: 'Check this if you would like your changes within "edit" mode to be committed directly to the submission object as that row is being changed'
+}, {
+  key: 'defaultValue',
+  ignore: true
+}];
+exports.default = _default;
 
 /***/ }),
 
@@ -46100,11 +46432,15 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46166,14 +46502,14 @@ function (_TextFieldComponent) {
   }]);
 
   function TextAreaComponent(component, options, data) {
-    var _this;
+    var _this2;
 
     _classCallCheck(this, TextAreaComponent);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TextAreaComponent).call(this, component, options, data)); // Never submit on enter for text areas.
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TextAreaComponent).call(this, component, options, data)); // Never submit on enter for text areas.
 
-    _this.options.submitOnEnter = false;
-    return _this;
+    _this2.options.submitOnEnter = false;
+    return _this2;
   }
 
   _createClass(TextAreaComponent, [{
@@ -46212,7 +46548,9 @@ function (_TextFieldComponent) {
   }, {
     key: "createInput",
     value: function createInput(container) {
-      var _this2 = this;
+      var _this3 = this;
+
+      var _this = this;
 
       if (this.isPlain) {
         if (this.options.readOnly) {
@@ -46243,47 +46581,47 @@ function (_TextFieldComponent) {
 
       if (this.component.editor === 'ace') {
         this.editorReady = _Formio.default.requireLibrary('ace', 'ace', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js', true).then(function () {
-          var mode = _this2.component.as || 'javascript';
-          _this2.editor = ace.edit(_this2.input);
+          var mode = _this3.component.as || 'javascript';
+          _this3.editor = ace.edit(_this3.input);
 
-          _this2.editor.on('change', function () {
-            var newValue = _this2.getConvertedValue(_this2.editor.getValue()); // Do not bother to update if they are both empty.
+          _this3.editor.on('change', function () {
+            var newValue = _this3.getConvertedValue(_this3.editor.getValue()); // Do not bother to update if they are both empty.
 
 
-            if (!_lodash.default.isEmpty(newValue) || !_lodash.default.isEmpty(_this2.dataValue)) {
-              _this2.updateValue(null, newValue);
+            if (!_lodash.default.isEmpty(newValue) || !_lodash.default.isEmpty(_this3.dataValue)) {
+              _this3.updateValue(null, newValue);
             }
           });
 
-          _this2.editor.getSession().setTabSize(2);
+          _this3.editor.getSession().setTabSize(2);
 
-          _this2.editor.getSession().setMode("ace/mode/".concat(mode));
+          _this3.editor.getSession().setMode("ace/mode/".concat(mode));
 
-          _this2.editor.on('input', function () {
-            return _this2.acePlaceholder();
+          _this3.editor.on('input', function () {
+            return _this3.acePlaceholder();
           });
 
           setTimeout(function () {
-            return _this2.acePlaceholder();
+            return _this3.acePlaceholder();
           }, 100);
-          return _this2.editor;
+          return _this3.editor;
         });
         return this.input;
       }
 
       if (this.component.editor === 'ckeditor') {
         this.editorReady = this.addCKE(this.input, null, function (newValue) {
-          return _this2.updateValue(null, newValue);
+          return _this3.updateValue(null, newValue);
         }).then(function (editor) {
-          _this2.editor = editor;
+          _this3.editor = editor;
 
-          if (_this2.options.readOnly || _this2.component.disabled) {
-            _this2.editor.isReadOnly = true;
+          if (_this3.options.readOnly || _this3.component.disabled) {
+            _this3.editor.isReadOnly = true;
           } // Set the default rows.
 
 
           var value = '';
-          var numRows = parseInt(_this2.component.rows, 10);
+          var numRows = parseInt(_this3.component.rows, 10);
 
           for (var i = 0; i < numRows; i++) {
             value += '<p></p>';
@@ -46309,11 +46647,15 @@ function (_TextFieldComponent) {
 
 
       this.editorReady = this.addQuill(this.input, this.component.wysiwyg, function () {
-        _this2.updateValue(null, _this2.getConvertedValue(_this2.quill.root.innerHTML));
+        _this3.updateValue(null, _this3.getConvertedValue(_this3.quill.root.innerHTML));
       }).then(function (quill) {
-        quill.root.spellcheck = _this2.component.spellcheck;
+        if (_this3.component.isUploadEnabled) {
+          quill.getModule('toolbar').addHandler('image', imageHandler);
+        }
 
-        if (_this2.options.readOnly || _this2.component.disabled) {
+        quill.root.spellcheck = _this3.component.spellcheck;
+
+        if (_this3.options.readOnly || _this3.component.disabled) {
           quill.disable();
         }
 
@@ -46322,6 +46664,60 @@ function (_TextFieldComponent) {
         return console.warn(err);
       });
       return this.input;
+
+      function imageHandler() {
+        var _this4 = this;
+
+        var fileInput = this.container.querySelector('input.ql-image[type=file]');
+
+        if (fileInput == null) {
+          fileInput = document.createElement('input');
+          fileInput.setAttribute('type', 'file');
+          fileInput.setAttribute('accept', 'image/*');
+          fileInput.classList.add('ql-image');
+          fileInput.addEventListener('change', function () {
+            var files = fileInput.files;
+
+            var range = _this4.quill.getSelection(true);
+
+            if (!files || !files.length) {
+              console.warn('No files selected');
+              return;
+            }
+
+            _this4.quill.enable(false);
+
+            var _this$component = _this.component,
+                uploadStorage = _this$component.uploadStorage,
+                uploadUrl = _this$component.uploadUrl,
+                uploadOptions = _this$component.uploadOptions,
+                uploadDir = _this$component.uploadDir;
+
+            _this.root.formio.uploadFile(uploadStorage, files[0], (0, _utils.uniqueName)(files[0].name), uploadDir || '', //should pass empty string if undefined
+            null, uploadUrl, uploadOptions).then(function (result) {
+              return _this.root.formio.downloadFile(result);
+            }).then(function (result) {
+              _this4.quill.enable(true);
+
+              var Delta = Quill.import('delta');
+
+              _this4.quill.updateContents(new Delta().retain(range.index).delete(range.length).insert({
+                image: result.url
+              }), Quill.sources.USER);
+
+              fileInput.value = '';
+            }).catch(function (error) {
+              console.warn('Quill image upload failed');
+              console.warn(error);
+
+              _this4.quill.enable(true);
+            });
+          });
+          this.container.appendChild(fileInput);
+        }
+
+        fileInput.click();
+      }
     }
   }, {
     key: "setConvertedValue",
@@ -46348,7 +46744,7 @@ function (_TextFieldComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this3 = this;
+      var _this5 = this;
 
       //should set value if new value is not equal to current
       var shouldSetValue = !_lodash.default.isEqual(value, this.getValue()); //should set value if is in read only mode
@@ -46385,16 +46781,16 @@ function (_TextFieldComponent) {
         }
       } else if (this.editorReady) {
         this.editorReady.then(function (editor) {
-          if (_this3.component.editor === 'ace') {
-            editor.setValue(_this3.setConvertedValue(value));
-          } else if (_this3.component.editor === 'ckeditor') {
-            editor.data.set(_this3.setConvertedValue(value));
+          if (_this5.component.editor === 'ace') {
+            editor.setValue(_this5.setConvertedValue(value));
+          } else if (_this5.component.editor === 'ckeditor') {
+            editor.data.set(_this5.setConvertedValue(value));
 
-            _this3.updateValue(flags);
+            _this5.updateValue(flags);
           } else {
-            editor.setContents(editor.clipboard.convert(_this3.setConvertedValue(value)));
+            editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
 
-            _this3.updateValue(flags);
+            _this5.updateValue(flags);
           }
         });
       }
@@ -46491,6 +46887,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../../Formio */ "./node_modules/formiojs/Formio.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var _default = [{
   key: 'inputMask',
   ignore: true
@@ -46528,6 +46931,99 @@ var _default = [{
     }]
   },
   weight: 415
+}, {
+  type: 'checkbox',
+  input: true,
+  key: 'isUploadEnabled',
+  label: 'Enable Image Upload',
+  weight: 415.1,
+  conditional: {
+    json: {
+      or: [{
+        '===': [{
+          var: 'data.editor'
+        }, 'quill']
+      }, {
+        '==': [{
+          var: 'data.editor'
+        }, '']
+      }]
+    }
+  }
+}, {
+  type: 'select',
+  input: true,
+  key: 'uploadStorage',
+  label: 'Image Upload Storage',
+  placeholder: 'Select your file storage provider',
+  weight: 415.2,
+  tooltip: 'Which storage to save the files in.',
+  valueProperty: 'value',
+  dataSrc: 'custom',
+  data: {
+    custom: function custom() {
+      return _lodash.default.map(_Formio.default.providers.storage, function (storage, key) {
+        return {
+          label: storage.title,
+          value: key
+        };
+      });
+    }
+  },
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.isUploadEnabled'
+      }, true]
+    }
+  }
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'uploadUrl',
+  label: 'Image Upload Url',
+  weight: 415.3,
+  placeholder: 'Enter the url to post the files to.',
+  tooltip: 'See <a href=\'https://github.com/danialfarid/ng-file-upload#server-side\' target=\'_blank\'>https://github.com/danialfarid/ng-file-upload#server-side</a> for how to set up the server.',
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.uploadStorage'
+      }, 'url']
+    }
+  }
+}, {
+  type: 'textarea',
+  key: 'uploadOptions',
+  label: 'Image Upload Custom request options',
+  tooltip: 'Pass your custom xhr options(optional)',
+  rows: 5,
+  editor: 'ace',
+  input: true,
+  weight: 415.4,
+  placeholder: "{\n      \"withCredentials\": true\n    }",
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.uploadStorage'
+      }, 'url']
+    }
+  }
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'uploadDir',
+  label: 'Image Upload Directory',
+  placeholder: '(optional) Enter a directory for the files',
+  tooltip: 'This will place all the files uploaded in this field in the directory',
+  weight: 415.5,
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.isUploadEnabled'
+      }, true]
+    }
+  }
 }, {
   type: 'select',
   input: true,
@@ -47518,6 +48014,8 @@ var _Components = _interopRequireDefault(__webpack_require__(/*! ../Components *
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
+var _utils = _interopRequireDefault(__webpack_require__(/*! ../../utils */ "./node_modules/formiojs/utils/index.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -47775,6 +48273,8 @@ function (_NestedComponent) {
   }]);
 
   function TreeComponent(component, options, data) {
+    var _this2$component$temp, _this2$component$temp2, _this2$component$temp3, _this2$component$temp4;
+
     var _this2;
 
     _classCallCheck(this, TreeComponent);
@@ -47782,6 +48282,12 @@ function (_NestedComponent) {
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TreeComponent).call(this, component, options, data));
     _this2.type = 'tree';
     _this2.changingNodeClassName = 'formio-component-tree-node-changing';
+    _this2.templateHash = {
+      edit: _utils.default.addTemplateHash(((_this2$component$temp = _this2.component.template) === null || _this2$component$temp === void 0 ? void 0 : _this2$component$temp.edit) || TreeComponent.defaultEditTemplate),
+      view: _utils.default.addTemplateHash(((_this2$component$temp2 = _this2.component.template) === null || _this2$component$temp2 === void 0 ? void 0 : _this2$component$temp2.view) || TreeComponent.defaultViewTemplate),
+      child: _utils.default.addTemplateHash(((_this2$component$temp3 = _this2.component.template) === null || _this2$component$temp3 === void 0 ? void 0 : _this2$component$temp3.child) || TreeComponent.defaultChildTemplate),
+      children: _utils.default.addTemplateHash(((_this2$component$temp4 = _this2.component.template) === null || _this2$component$temp4 === void 0 ? void 0 : _this2$component$temp4.children) || TreeComponent.defaultChildrenTemplate)
+    };
     return _this2;
   }
 
@@ -47830,12 +48336,10 @@ function (_NestedComponent) {
   }, {
     key: "buildNodes",
     value: function buildNodes(parent) {
-      var _this$component$templ,
-          _this3 = this;
+      var _this3 = this;
 
       var childNodes = parent.children.map(this.buildNode.bind(this));
-      var childrenTemplate = ((_this$component$templ = this.component.template) === null || _this$component$templ === void 0 ? void 0 : _this$component$templ.children) || TreeComponent.defaultChildrenTemplate;
-      var element = this.renderElement(childrenTemplate, {
+      var element = this.renderElement(this.templateHash.children, {
         node: parent,
         nodeData: parent.persistentData,
         data: this.data,
@@ -47858,15 +48362,9 @@ function (_NestedComponent) {
   }, {
     key: "buildNode",
     value: function buildNode(node) {
-      var _this$component$templ2,
-          _this$component$templ3,
-          _this$component$templ4,
-          _this4 = this;
+      var _this4 = this;
 
-      var editTemplate = ((_this$component$templ2 = this.component.template) === null || _this$component$templ2 === void 0 ? void 0 : _this$component$templ2.edit) || TreeComponent.defaultEditTemplate;
-      var viewTemplate = ((_this$component$templ3 = this.component.template) === null || _this$component$templ3 === void 0 ? void 0 : _this$component$templ3.view) || TreeComponent.defaultViewTemplate;
-      var childTemplate = ((_this$component$templ4 = this.component.template) === null || _this$component$templ4 === void 0 ? void 0 : _this$component$templ4.child) || TreeComponent.defaultChildTemplate;
-      var element = this.renderElement(childTemplate, {
+      var element = this.renderElement(this.templateHash.child, {
         node: node,
         nodeData: node.persistentData,
         data: this.data,
@@ -47891,7 +48389,7 @@ function (_NestedComponent) {
           instance.node = node;
           return instance;
         });
-        this.renderTemplateToElement(element, editTemplate, {
+        this.renderTemplateToElement(element, this.templateHash.edit, {
           node: node,
           nodeData: node.data,
           data: this.data,
@@ -47913,7 +48411,7 @@ function (_NestedComponent) {
           return _this4.appendChild(element, editForm);
         });
       } else {
-        this.renderTemplateToElement(element, viewTemplate, {
+        this.renderTemplateToElement(element, this.templateHash.view, {
           node: node,
           nodeData: node.persistentData,
           data: this.data,
@@ -73124,6 +73622,7 @@ var _exportNames = {
   checkCondition: true,
   checkTrigger: true,
   setActionProperty: true,
+  addTemplateHash: true,
   interpolate: true,
   uniqueName: true,
   guid: true,
@@ -73168,6 +73667,7 @@ exports.checkJsonConditional = checkJsonConditional;
 exports.checkCondition = checkCondition;
 exports.checkTrigger = checkTrigger;
 exports.setActionProperty = setActionProperty;
+exports.addTemplateHash = addTemplateHash;
 exports.interpolate = interpolate;
 exports.uniqueName = uniqueName;
 exports.guid = guid;
@@ -73267,6 +73767,8 @@ Object.keys(_formUtils).forEach(function (key) {
     }
   });
 });
+
+var _stringHash = _interopRequireDefault(__webpack_require__(/*! string-hash */ "./node_modules/string-hash/index.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -73630,6 +74132,29 @@ function setActionProperty(component, action, row, data, result, instance) {
 
   return component;
 }
+
+var templateCache = {};
+var templateHashCache = {};
+
+function interpolateTemplate(template) {
+  var templateSettings = {
+    evaluate: /\{%([\s\S]+?)%\}/g,
+    interpolate: /\{\{([\s\S]+?)\}\}/g,
+    escape: /\{\{\{([\s\S]+?)\}\}\}/g
+  };
+
+  try {
+    return _lodash.default.template(template, templateSettings);
+  } catch (err) {
+    console.warn('Error while processing template', err, template);
+  }
+}
+
+function addTemplateHash(template) {
+  var hash = (0, _stringHash.default)(template);
+  templateHashCache[hash] = interpolateTemplate(template);
+  return hash;
+}
 /**
  * Interpolate a string and add data replacements.
  *
@@ -73639,17 +74164,13 @@ function setActionProperty(component, action, row, data, result, instance) {
  */
 
 
-function interpolate(string, data) {
-  var templateSettings = {
-    evaluate: /\{%(.+?)%\}/g,
-    interpolate: /\{\{(.+?)\}\}/g,
-    escape: /\{\{\{(.+?)\}\}\}/g
-  };
+function interpolate(rawTemplate, data) {
+  var template = _lodash.default.isNumber(rawTemplate) ? templateHashCache[rawTemplate] : templateCache[rawTemplate] = templateCache[rawTemplate] || interpolateTemplate(rawTemplate);
 
   try {
-    return _lodash.default.template(string, templateSettings)(data);
+    return template(data);
   } catch (err) {
-    console.warn('Error interpolating template', err, string, data);
+    console.warn('Error interpolating template', err, rawTemplate, data);
   }
 }
 /**
@@ -88191,6 +88712,35 @@ SignaturePad.prototype.toData = function () {
 return SignaturePad;
 
 })));
+
+
+/***/ }),
+
+/***/ "./node_modules/string-hash/index.js":
+/*!*******************************************!*\
+  !*** ./node_modules/string-hash/index.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function hash(str) {
+  var hash = 5381,
+      i    = str.length;
+
+  while(i) {
+    hash = (hash * 33) ^ str.charCodeAt(--i);
+  }
+
+  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+   * integers. Since we want the results to be always positive, convert the
+   * signed int to an unsigned by doing an unsigned bitshift. */
+  return hash >>> 0;
+}
+
+module.exports = hash;
 
 
 /***/ }),

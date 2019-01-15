@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.10.2
+### Changed
+ - Upgraded the formio.js renderer to 3.12.0
+
 ## 3.10.1
 ### Fixed
  - Problem with the broadcast of events when apply is already triggered.

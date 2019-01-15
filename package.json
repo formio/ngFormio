@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "3.10.1",
+  "version": "3.10.2",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/ng-formio.js",
   "scripts": {
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "angular": "^1.7.5",
-    "formiojs": "^3.11.1"
+    "formiojs": "^3.12.0"
   },
   "browserify": {
     "transform": [

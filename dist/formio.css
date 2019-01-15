@@ -1,4 +1,4 @@
-/*! ng-formio v3.10.1 | https://unpkg.com/ngFormio@3.10.1/LICENSE.txt */
+/*! ng-formio v3.10.2 | https://unpkg.com/ngFormio@3.10.2/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3781,23 +3781,23 @@ body.formio-dialog-open, html.formio-dialog-open {
 .formio-component-dateTime .form-control[type=datetime-local] ~ .input-group-addon, .formio-component-datetime .form-control[type=datetime-local] ~ .input-group-addon {
   width: auto; }
 
-.formio-component-edittable .formio-edittable-remove {
+.formio-component-datagrid .formio-datagrid-remove {
   position: absolute;
   top: 0;
   right: 0;
-  visibility: hidden; }
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: opacity .2s linear,visibility 0s .2s;
+  transition: opacity .2s linear,visibility 0s .2s; }
 
-.formio-component-edittable .formio-edittable-table {
-  table-layout: fixed; }
-
-.formio-component-edittable .formio-edittable-table > tbody > tr > td:last-child {
+.formio-component-datagrid .datagrid-table > tbody > tr > td:last-child {
   position: relative; }
 
-.formio-component-edittable .formio-edittable-table > tbody > tr:hover > td:last-child .formio-edittable-remove {
-  visibility: visible; }
-
-.formio-component-edittable .edittable-group-label {
-  background-color: #ddd; }
+.formio-component-datagrid .datagrid-table > tbody > tr:hover > td:last-child .formio-datagrid-remove {
+  visibility: visible;
+  opacity: 1;
+  -webkit-transition: visibility 0s,opacity .2s linear;
+  transition: visibility 0s,opacity .2s linear; }
 
 .formio-component-modaledit .formio-modaledit-view-container {
   position: relative;
@@ -3845,6 +3845,21 @@ td .formio-component-modaledit .formio-modaledit-view-container {
 
 .formio-component-select .choices.is-disabled[data-type*=select-one]:after, .formio-component-select div[disabled=disabled] button {
   display: none; }
+
+.datagrid-group-label.collapsed > td {
+  display: none; }
+
+.datagrid-group-header.clickable {
+  cursor: pointer; }
+
+.datagrid-group-header.clickable .datagrid-group-label:before {
+  display: inline-block;
+  vertical-align: middle;
+  content: '▾';
+  margin: 0 5px; }
+
+.datagrid-group-header.clickable.collapsed .datagrid-group-label:before {
+  content: '▸'; }
 
 .formbuilder {
   position: relative; }
