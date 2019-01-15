@@ -1,5 +1,16 @@
 @import "variables.scss";
+@import "~font-awesome/scss/font-awesome.scss";
+@import "~bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "~bootswatch/yeti/_bootswatch.scss";
 @import "mixins.scss";
+@import '~ng-sortable/dist/ng-sortable';
+@import '~chartist/dist/chartist';
+@import '~ng-dialog/css/ngDialog';
+@import '~ng-dialog/css/ngDialog-theme-default';
+@import '~angular-swagger-ui/dist/css/swagger-ui';
+@import '~ui-select/dist/select';
+@import '~ng-tags-input/build/ng-tags-input';
+@import '~angular-toastr/dist/angular-toastr.min';
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
