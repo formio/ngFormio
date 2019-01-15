@@ -109,10 +109,11 @@ return /******/ (function(modules) { // webpackBootstrap
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
 var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
 
-exports.default = angular.module('formio').directive('formBuilder', function () {
+var _default = angular.module('formio').directive('formBuilder', function () {
   return {
     restrict: 'E',
     replace: true,
@@ -128,9 +129,8 @@ exports.default = angular.module('formio').directive('formBuilder', function () 
       var builder = null;
       var builderReady = null;
       var builderElement = null;
-      $scope.options = $scope.options || {};
+      $scope.options = $scope.options || {}; // Initialize the builder.
 
-      // Initialize the builder.
       $scope.initBuilder = function (element) {
         builderElement = element;
         builderElement.innerHTML = '';
@@ -142,20 +142,19 @@ exports.default = angular.module('formio').directive('formBuilder', function () 
         if (builder && builder.instance) {
           builder.instance.buildSidebar();
         }
-      });
+      }); // Detect when the display changes.
 
-      // Detect when the display changes.
       $scope.$watch('form.display', function (display) {
         if (builderReady && display) {
           builderReady.then(function () {
             builder.setDisplay(display);
+
             if ($scope.url) {
               builder.instance.url = $scope.url;
             }
           });
         }
       });
-
       $scope.$on('$destroy', function () {
         if (builder && builder.instance) {
           builder.instance.destroy(true);
@@ -166,26 +165,36 @@ exports.default = angular.module('formio').directive('formBuilder', function () 
   };
 });
 
+exports.default = _default;
+
 /***/ }),
 
 /***/ "./lib/directives/formio.js":
 /*!**********************************!*\
   !*** ./lib/directives/formio.js ***!
   \**********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var core_js_modules_es6_regexp_split__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
+/* harmony import */ var core_js_modules_es6_regexp_split__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_regexp_split__WEBPACK_IMPORTED_MODULE_0__);
+
 
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
 var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
 
 var app = angular.module('formio');
-exports.default = app.directive('formio', function () {
+
+var _default = app.directive('formio', function () {
   return {
     restrict: 'E',
     replace: true,
@@ -208,18 +217,20 @@ exports.default = app.directive('formio', function () {
     controller: ['$scope', '$q', function ($scope, $q) {
       $scope.onLoad = $q.defer();
       $scope.onFormio = $scope.onLoad.promise;
+
       $scope.initializeForm = function () {
         if (!$scope.element) {
           return;
-        }
+        } // Set read only if using legacy option.
 
-        // Set read only if using legacy option.
+
         if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
           $scope.options.readOnly = $scope.readOnly;
         }
 
         if ($scope.src || $scope.form) {
           $scope.initialized = true;
+
           _formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(function (formio) {
             formio.nosubmit = $scope.noSubmit;
             $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
@@ -233,48 +244,54 @@ exports.default = app.directive('formio', function () {
         if ($scope.submission) {
           $scope.formio.submission = $scope.submission;
         }
+
         if ($scope.url) {
           $scope.formio.url = $scope.url;
           $scope.formio.nosubmit = $scope.noSubmit || false;
         }
+
         $scope.formio.events.onAny(function () {
           // Keep backwards compatibility by firing old events as well.
           var args = Array.prototype.slice.call(arguments);
-
           var eventParts = args[0].split('.');
+          var shouldFire = true; // Only handle formio events.
 
-          var shouldFire = true;
-
-          // Only handle formio events.
           if (eventParts[0] !== 'formio' || eventParts.length !== 2) {
             return;
-          }
+          } // Remove formio. from event.
 
-          // Remove formio. from event.
+
           args[0] = eventParts[1];
+
           switch (eventParts[1]) {
             case 'error':
               args[0] = 'formError';
               break;
+
             case 'submit':
               var submission = args[1];
               args[0] = submission.saved ? 'formSubmission' : 'formSubmit';
               break;
+
             case 'submitDone':
               args[0] = 'formSubmission';
               break;
+
             case 'prevPage':
               args[0] = 'wizardPrev';
               break;
+
             case 'nextPage':
               args[0] = 'wizardNext';
               break;
+
             case 'customEvent':
-              args[0] = args[1].type;
-              //prevent customEvent from firing when it's emitted by button with event action (as it is emitted twice)
+              args[0] = args[1].type; //prevent customEvent from firing when it's emitted by button with event action (as it is emitted twice)
+
               if (args[1].component && args[1].component.type === 'button' && args[1].component.action === 'event') {
                 shouldFire = false;
               }
+
               break;
           }
 
@@ -282,7 +299,6 @@ exports.default = app.directive('formio', function () {
             $scope.$emit.apply($scope, args);
           }
         });
-
         $scope.formioReady = true;
         $scope.onLoad.resolve($scope.formio);
         return $scope.formio;
@@ -292,6 +308,7 @@ exports.default = app.directive('formio', function () {
         if (!src) {
           return;
         }
+
         if ($scope.formioReady) {
           $scope.formio.src = src;
         } else if (!$scope.initialized) {
@@ -302,11 +319,11 @@ exports.default = app.directive('formio', function () {
           });
         }
       });
-
       $scope.$watch('url', function (url) {
         if (!url) {
           return;
         }
+
         if ($scope.formioReady) {
           $scope.formio.url = url;
           $scope.formio.nosubmit = $scope.noSubmit || false;
@@ -319,11 +336,11 @@ exports.default = app.directive('formio', function () {
           });
         }
       });
-
       $scope.$watch('form', function (form) {
         if (!form || !form.components) {
           return;
         }
+
         if ($scope.formioReady) {
           $scope.formio.form = form;
         } else if (!$scope.initialized) {
@@ -334,33 +351,32 @@ exports.default = app.directive('formio', function () {
           });
         }
       });
-
       $scope.$watch('submission', function (submission) {
         if (!submission) {
           return;
         }
+
         $scope.onFormio.then(function () {
           return $scope.formio.submission = submission;
         });
       }, true);
-
       $scope.$on('componentChange', function () {
         $scope.$apply();
-      });
+      }); // Clean up the Form from DOM.
 
-      // Clean up the Form from DOM.
       $scope.$on('$destroy', function () {
         if ($scope.formio) {
           $scope.formio.destroy(true);
         }
-      });
+      }); // Initialize the form.
 
-      // Initialize the form.
       $scope.initializeForm();
     }],
     template: '<div />'
   };
 });
+
+exports.default = _default;
 
 /***/ }),
 
@@ -377,11 +393,13 @@ exports.default = app.directive('formio', function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
 var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
 
 var app = angular.module('formio');
-exports.default = app.directive('formioDelete', function () {
+
+var _default = app.directive('formioDelete', function () {
   return {
     restrict: 'E',
     replace: true,
@@ -394,45 +412,49 @@ exports.default = app.directive('formioDelete', function () {
       message: '=?',
       options: '=?'
     },
-    template: '<form role="form">\n        <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert">\n          {{ alert.message | formioTranslate:null:options.building }}\n        </div>\n        <h3>{{ deleteMessage | formioTranslate:null:options.building }}</h3>\n        <div class="btn-toolbar">\n          <button ng-click="onDelete()" class="btn btn-danger">{{ \'Yes\' | formioTranslate:null:options.building }}</button>\n          <button ng-click="onCancel()" class="btn btn-default">{{ \'No\' | formioTranslate:null:options.building }}</button>\n        </div>\n      </form>',
+    template: "<form role=\"form\">\n        <div ng-repeat=\"alert in formioAlerts track by $index\" class=\"alert alert-{{ alert.type }}\" role=\"alert\">\n          {{ alert.message | formioTranslate:null:options.building }}\n        </div>\n        <h3>{{ deleteMessage | formioTranslate:null:options.building }}</h3>\n        <div class=\"btn-toolbar\">\n          <button ng-click=\"onDelete()\" class=\"btn btn-danger\">{{ 'Yes' | formioTranslate:null:options.building }}</button>\n          <button ng-click=\"onCancel()\" class=\"btn btn-default\">{{ 'No' | formioTranslate:null:options.building }}</button>\n        </div>\n      </form>",
     controller: ['$scope', '$element', '$http', 'FormioScope', function ($scope, $element, $http, FormioScope) {
       $scope.options = $scope.options || {};
       $scope.formioAlerts = [];
+
       $scope.showAlerts = function (alerts) {
         $scope.formioAlerts = [].concat(alerts);
       };
+
       var resourceName = '';
       var methodName = '';
       $scope.$watch('src', function (src) {
         if (!src) {
           return;
         }
+
         $scope.formio = new _formiojs.Formio(src);
         resourceName = $scope.formio.submissionId ? 'submission' : 'form';
         var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
         methodName = 'delete' + resourceTitle;
         $scope.deleteMessage = $scope.message || 'Are you sure you wish to delete the ' + resourceName + '?';
       });
-
       $scope.$watch('resourceName', function (name) {
         if (!name) {
           return;
         }
-        resourceName = name;
-      });
 
-      // Create delete capability.
+        resourceName = name;
+      }); // Create delete capability.
+
       $scope.onDelete = function () {
-        resourceName = resourceName || 'resource';
-        // Rebuild resourceTitle, $scope.resourceName could have changed
-        var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
-        // Called when the delete is done.
+        resourceName = resourceName || 'resource'; // Rebuild resourceTitle, $scope.resourceName could have changed
+
+        var resourceTitle = resourceName.charAt(0).toUpperCase() + resourceName.slice(1); // Called when the delete is done.
+
         var onDeleteDone = function onDeleteDone(data) {
           $scope.showAlerts({
             type: 'success',
             message: resourceTitle + ' was deleted.'
           });
+
           _formiojs.Formio.clearCache();
+
           $scope.$emit('delete', data);
         };
 
@@ -444,12 +466,15 @@ exports.default = app.directive('formioDelete', function () {
           $scope.formio[methodName]().then(onDeleteDone, FormioScope.onError($scope, $element));
         }
       };
+
       $scope.onCancel = function () {
         $scope.$emit('cancel');
       };
     }]
   };
 });
+
+exports.default = _default;
 
 /***/ }),
 
@@ -475,26 +500,65 @@ __webpack_require__(/*! ./formioDelete */ "./lib/directives/formioDelete.js");
 /*!**************************************!*\
   !*** ./lib/factories/FormioScope.js ***!
   \**************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var core_js_modules_es6_regexp_to_string__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+/* harmony import */ var core_js_modules_es6_regexp_to_string__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_regexp_to_string__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var core_js_modules_es6_array_find__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-js/modules/es6.array.find.js");
+/* harmony import */ var core_js_modules_es6_array_find__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_array_find__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var core_js_modules_es6_function_name__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+/* harmony import */ var core_js_modules_es6_function_name__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_function_name__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es7_symbol_async_iterator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+/* harmony import */ var core_js_modules_es7_symbol_async_iterator__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es7_symbol_async_iterator__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var core_js_modules_es6_symbol__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+/* harmony import */ var core_js_modules_es6_symbol__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_symbol__WEBPACK_IMPORTED_MODULE_4__);
 
+
+
+
+
+
+
+
+function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-js/modules/es6.array.find.js");
+
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
 
+function _typeof(obj) {
+  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
+    _typeof = function _typeof(obj) {
+      return _typeof2(obj);
+    };
+  } else {
+    _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
+    };
+  }
+
+  return _typeof(obj);
+}
+
 var app = angular.module('formio');
-exports.default = app.factory('FormioScope', function () {
+
+var _default = app.factory('FormioScope', function () {
   return {
     onError: function onError($scope, $element) {
       return function (error) {
@@ -512,19 +576,23 @@ exports.default = app.factory('FormioScope', function () {
         } else {
           if (error instanceof Error) {
             error = error.toString();
-          } else if ((typeof error === 'undefined' ? 'undefined' : _typeof(error)) === 'object') {
+          } else if (_typeof(error) === 'object') {
             error = JSON.stringify(error);
           }
+
           $scope.showAlerts({
             type: 'danger',
             message: error
           });
         }
+
         $scope.$emit('formError', error);
       };
     }
   };
 });
+
+exports.default = _default;
 
 /***/ }),
 
@@ -532,40 +600,52 @@ exports.default = app.factory('FormioScope', function () {
 /*!******************************************!*\
   !*** ./lib/factories/formioTableView.js ***!
   \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var core_js_modules_web_dom_iterable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+/* harmony import */ var core_js_modules_web_dom_iterable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_iterable__WEBPACK_IMPORTED_MODULE_0__);
+
 
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _Components = __webpack_require__(/*! formiojs/components/Components */ "./node_modules/formiojs/components/Components.js");
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
-var _Components2 = _interopRequireDefault(_Components);
+var _Components = _interopRequireDefault(__webpack_require__(/*! formiojs/components/Components */ "./node_modules/formiojs/components/Components.js"));
 
 function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
 }
 
 var app = angular.module('formio');
-exports.default = app.factory('formioTableView', [function () {
+
+var _default = app.factory('formioTableView', [function () {
   return function (value, component) {
     if (!value && value !== 0 && value !== false) {
       return '';
     }
+
     if (!component || !component.input || !component.type) {
       return value;
     }
-    var componentObject = _Components2.default.create(component, {
+
+    var componentObject = _Components.default.create(component, {
       readOnly: true,
       viewAsHtml: true
     });
+
     if (!componentObject.getView) {
       return value;
     }
+
     if (component.multiple && value.length > 0) {
       var values = [];
       angular.forEach(value, function (arrayValue) {
@@ -573,9 +653,12 @@ exports.default = app.factory('formioTableView', [function () {
       });
       return values;
     }
+
     return componentObject.getView(value);
   };
 }]);
+
+exports.default = _default;
 
 /***/ }),
 
@@ -622,11 +705,13 @@ __webpack_require__(/*! ./translate */ "./lib/filters/translate.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
 var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
 
 var app = angular.module('formio');
-exports.default = app.filter('formioTranslate', ['$filter', '$injector', function ($filter, $injector) {
+
+var _default = app.filter('formioTranslate', ['$filter', '$injector', function ($filter, $injector) {
   var formioTranslate = function formioTranslate(text, key, builder) {
     /**
      * Lookup the available translate libraries, currently supports:
@@ -634,26 +719,31 @@ exports.default = app.filter('formioTranslate', ['$filter', '$injector', functio
      * angular-gettext: @see https://github.com/rubenv/angular-gettext
      */
     var $translate, gettextCatalog;
+
     if ($injector.has('$translate')) {
       $translate = $injector.get('$translate');
     } else if ($injector.has('gettextCatalog')) {
       gettextCatalog = $injector.get('gettextCatalog');
     }
+
     if (builder) return text;
+
     try {
       // Translate text using either angular-translate or angular-gettext
       var translateText = function translateText(text) {
         if ($translate) return $translate.instant(text);
         if (gettextCatalog) return gettextCatalog.getString(text);
         return text;
-      };
+      }; // Allow translating by field key which helps with large blocks of html.
 
-      // Allow translating by field key which helps with large blocks of html.
+
       if (key) {
         var result = translateText(key);
+
         if (result === key) {
           result = translateText(text);
         }
+
         return result;
       }
 
@@ -662,15 +752,20 @@ exports.default = app.filter('formioTranslate', ['$filter', '$injector', functio
       return text;
     }
   };
+
   formioTranslate.$stateful = true;
+
   formioTranslate.use = function (language) {
     if ($injector.has('$translate')) {
       var $translate = $injector.get('$translate');
       $translate.use(language);
     }
   };
+
   return formioTranslate;
 }]);
+
+exports.default = _default;
 
 /***/ }),
 
@@ -711,7 +806,11 @@ __webpack_require__(/*! formiojs/dist/formio.full.min.css */ "./node_modules/for
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = angular.module('formio', []);
+exports.default = void 0;
+
+var _default = angular.module('formio', []);
+
+exports.default = _default;
 
 /***/ }),
 
@@ -728,35 +827,35 @@ exports.default = angular.module('formio', []);
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
 var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
 
-var app = angular.module('formio');
+var app = angular.module('formio'); // Configure the formioInterceptor. to be used.
 
-// Configure the formioInterceptor. to be used.
 app.config(['$httpProvider', '$injector', function ($httpProvider, $injector) {
   if (!$httpProvider.defaults.headers.get) {
     $httpProvider.defaults.headers.get = {};
-  }
+  } // Make sure that ngAnimate doesn't mess up loader.
 
-  // Make sure that ngAnimate doesn't mess up loader.
+
   try {
     $injector.get('$animateProvider').classNameFilter(/^((?!(fa-spinner|glyphicon-spin)).)*$/);
   }
   /* eslint-disable no-empty */
   catch (err) {}
   /* eslint-enable no-empty */
-
   // Disable IE caching for GET requests.
+
+
   $httpProvider.defaults.headers.get['Cache-Control'] = 'no-cache';
   $httpProvider.defaults.headers.get.Pragma = 'no-cache';
   $httpProvider.interceptors.push('formioInterceptor');
 }]);
 
-exports.default = app.provider('Formio', function () {
+var _default = app.provider('Formio', function () {
   // Return the provider interface.
   return {
-
     // Expose Formio configuration functions
     setBaseUrl: _formiojs.Formio.setBaseUrl,
     getBaseUrl: _formiojs.Formio.getBaseUrl,
@@ -769,10 +868,8 @@ exports.default = app.provider('Formio', function () {
     registerPlugin: _formiojs.Formio.registerPlugin,
     getPlugin: _formiojs.Formio.getPlugin,
     providers: _formiojs.Formio.providers,
-    setDomain: function setDomain() {
-      // Remove this?
+    setDomain: function setDomain() {// Remove this?
     },
-
     $get: ['$rootScope', '$q', function ($rootScope, $q) {
       var wrapQPromise = function wrapQPromise(promise) {
         return $q.when(promise).catch(function (error) {
@@ -780,8 +877,9 @@ exports.default = app.provider('Formio', function () {
             $rootScope.$broadcast('formio.unauthorized', error);
           } else if (error === 'Login Timeout') {
             $rootScope.$broadcast('formio.sessionExpired', error);
-          }
-          // Propagate error
+          } // Propagate error
+
+
           throw error;
         });
       };
@@ -791,9 +889,9 @@ exports.default = app.provider('Formio', function () {
         // Wrap Formio.request's promises with $q so $apply gets called correctly.
         wrapRequestPromise: wrapQPromise,
         wrapStaticRequestPromise: wrapQPromise
-      }, 'ngFormioPromiseWrapper');
+      }, 'ngFormioPromiseWrapper'); // Broadcast offline events from $rootScope
 
-      // Broadcast offline events from $rootScope
+
       _formiojs.Formio.events.onAny(function () {
         var event = 'formio.' + this.event;
         var args = [].splice.call(arguments, 0);
@@ -801,13 +899,15 @@ exports.default = app.provider('Formio', function () {
         $rootScope.$apply(function () {
           $rootScope.$broadcast.apply($rootScope, args);
         });
-      });
+      }); // Return the formio interface.
 
-      // Return the formio interface.
+
       return _formiojs.Formio;
     }]
   };
 });
+
+exports.default = _default;
 
 /***/ }),
 
@@ -815,26 +915,49 @@ exports.default = app.provider('Formio', function () {
 /*!**************************************!*\
   !*** ./lib/providers/FormioUtils.js ***!
   \**************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var core_js_modules_es6_regexp_to_string__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+/* harmony import */ var core_js_modules_es6_regexp_to_string__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_regexp_to_string__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var core_js_modules_es6_regexp_replace__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
+/* harmony import */ var core_js_modules_es6_regexp_replace__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_regexp_replace__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var core_js_modules_es6_regexp_split__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
+/* harmony import */ var core_js_modules_es6_regexp_split__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_regexp_split__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es6_object_assign__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
+/* harmony import */ var core_js_modules_es6_object_assign__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es6_object_assign__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
 
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 
-var _utils = __webpack_require__(/*! formiojs/utils */ "./node_modules/formiojs/utils/index.js");
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
-var _utils2 = _interopRequireDefault(_utils);
+__webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
+
+var _utils = _interopRequireDefault(__webpack_require__(/*! formiojs/utils */ "./node_modules/formiojs/utils/index.js"));
 
 function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { default: obj };
+  return obj && obj.__esModule ? obj : {
+    default: obj
+  };
 }
 
 var app = angular.module('formio');
-exports.default = app.factory('FormioUtils', function () {
+
+var _default = app.factory('FormioUtils', function () {
   return Object.assign({
     hideFields: function hideFields(form, components) {
       this.eachComponent(form.components, function (component) {
@@ -849,9 +972,11 @@ exports.default = app.factory('FormioUtils', function () {
       var parts = name.toLowerCase().replace(/[^0-9a-z\.]/g, '').split('.');
       var fileName = parts[0];
       var ext = '';
+
       if (parts.length > 1) {
         ext = '.' + parts[parts.length - 1];
       }
+
       return fileName.substr(0, 10) + '-' + this.guid() + ext;
     },
     guid: function guid() {
@@ -864,8 +989,10 @@ exports.default = app.factory('FormioUtils', function () {
     fieldWrap: function fieldWrap(field) {
       return field;
     }
-  }, _utils2.default);
+  }, _utils.default);
 });
+
+exports.default = _default;
 
 /***/ }),
 
@@ -882,9 +1009,12 @@ exports.default = app.factory('FormioUtils', function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 var app = angular.module('formio');
+
 var Components = __webpack_require__(/*! formiojs/components */ "./node_modules/formiojs/components/index.js").default;
-exports.default = app.provider('formioComponents', function () {
+
+var _default = app.provider('formioComponents', function () {
   var components = Components;
   var groups = {
     __component: {
@@ -913,6 +1043,8 @@ exports.default = app.provider('formioComponents', function () {
   };
 });
 
+exports.default = _default;
+
 /***/ }),
 
 /***/ "./lib/providers/formioInterceptor.js":
@@ -928,17 +1060,21 @@ exports.default = app.provider('formioComponents', function () {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = void 0;
 var app = angular.module('formio');
-exports.default = app.factory('formioInterceptor', ['$q', '$rootScope', 'Formio', function ($q, $rootScope, Formio) {
+
+var _default = app.factory('formioInterceptor', ['$q', '$rootScope', 'Formio', function ($q, $rootScope, Formio) {
   var Interceptor = {
     /**
      * Update JWT token received from response.
      */
     response: function response(_response) {
       var token = _response.headers('x-jwt-token');
+
       if (_response.status >= 200 && _response.status < 300 && token && token !== '') {
         Formio.setToken(token);
       }
+
       return _response;
     },
 
@@ -953,6 +1089,7 @@ exports.default = app.factory('formioInterceptor', ['$q', '$rootScope', 'Formio'
       } else if (parseInt(response.status, 10) === 401) {
         $rootScope.$broadcast('formio.unauthorized', response.body);
       }
+
       return $q.reject(response);
     },
 
@@ -966,9 +1103,10 @@ exports.default = app.factory('formioInterceptor', ['$q', '$rootScope', 'Formio'
       return config;
     }
   };
-
   return Interceptor;
 }]);
+
+exports.default = _default;
 
 /***/ }),
 
@@ -7414,6 +7552,26 @@ module.exports = function (key) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/_advance-string-index.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/core-js/modules/_advance-string-index.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var at = __webpack_require__(/*! ./_string-at */ "./node_modules/core-js/modules/_string-at.js")(true);
+
+ // `AdvanceStringIndex` abstract operation
+// https://tc39.github.io/ecma262/#sec-advancestringindex
+module.exports = function (S, index, unicode) {
+  return index + (unicode ? at(S, index).length : 1);
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/_an-instance.js":
 /*!******************************************************!*\
   !*** ./node_modules/core-js/modules/_an-instance.js ***!
@@ -7738,7 +7896,7 @@ module.exports = function (it) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.5.7' };
+var core = module.exports = { version: '2.6.2' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -7989,22 +8147,90 @@ module.exports = function (exec) {
 
 "use strict";
 
-var hide = __webpack_require__(/*! ./_hide */ "./node_modules/core-js/modules/_hide.js");
+__webpack_require__(/*! ./es6.regexp.exec */ "./node_modules/core-js/modules/es6.regexp.exec.js");
 var redefine = __webpack_require__(/*! ./_redefine */ "./node_modules/core-js/modules/_redefine.js");
+var hide = __webpack_require__(/*! ./_hide */ "./node_modules/core-js/modules/_hide.js");
 var fails = __webpack_require__(/*! ./_fails */ "./node_modules/core-js/modules/_fails.js");
 var defined = __webpack_require__(/*! ./_defined */ "./node_modules/core-js/modules/_defined.js");
 var wks = __webpack_require__(/*! ./_wks */ "./node_modules/core-js/modules/_wks.js");
+var regexpExec = __webpack_require__(/*! ./_regexp-exec */ "./node_modules/core-js/modules/_regexp-exec.js");
+
+var SPECIES = wks('species');
+
+var REPLACE_SUPPORTS_NAMED_GROUPS = !fails(function () {
+  // #replace needs built-in support for named groups.
+  // #match works fine because it just return the exec results, even if it has
+  // a "grops" property.
+  var re = /./;
+  re.exec = function () {
+    var result = [];
+    result.groups = { a: '7' };
+    return result;
+  };
+  return ''.replace(re, '$<a>') !== '7';
+});
+
+var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC = (function () {
+  // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
+  var re = /(?:)/;
+  var originalExec = re.exec;
+  re.exec = function () { return originalExec.apply(this, arguments); };
+  var result = 'ab'.split(re);
+  return result.length === 2 && result[0] === 'a' && result[1] === 'b';
+})();
 
 module.exports = function (KEY, length, exec) {
   var SYMBOL = wks(KEY);
-  var fns = exec(defined, SYMBOL, ''[KEY]);
-  var strfn = fns[0];
-  var rxfn = fns[1];
-  if (fails(function () {
+
+  var DELEGATES_TO_SYMBOL = !fails(function () {
+    // String methods call symbol-named RegEp methods
     var O = {};
     O[SYMBOL] = function () { return 7; };
     return ''[KEY](O) != 7;
-  })) {
+  });
+
+  var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL ? !fails(function () {
+    // Symbol-named RegExp methods call .exec
+    var execCalled = false;
+    var re = /a/;
+    re.exec = function () { execCalled = true; return null; };
+    if (KEY === 'split') {
+      // RegExp[@@split] doesn't call the regex's exec method, but first creates
+      // a new one. We need to return the patched regex when creating the new one.
+      re.constructor = {};
+      re.constructor[SPECIES] = function () { return re; };
+    }
+    re[SYMBOL]('');
+    return !execCalled;
+  }) : undefined;
+
+  if (
+    !DELEGATES_TO_SYMBOL ||
+    !DELEGATES_TO_EXEC ||
+    (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+    (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
+  ) {
+    var nativeRegExpMethod = /./[SYMBOL];
+    var fns = exec(
+      defined,
+      SYMBOL,
+      ''[KEY],
+      function maybeCallNative(nativeMethod, regexp, str, arg2, forceStringMethod) {
+        if (regexp.exec === regexpExec) {
+          if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
+            // The native String method already delegates to @@method (this
+            // polyfilled function), leasing to infinite recursion.
+            // We avoid it by directly calling the native @@method method.
+            return { done: true, value: nativeRegExpMethod.call(regexp, str, arg2) };
+          }
+          return { done: true, value: nativeMethod.call(str, regexp, arg2) };
+        }
+        return { done: false };
+      }
+    );
+    var strfn = fns[0];
+    var rxfn = fns[1];
+
     redefine(String.prototype, KEY, strfn);
     hide(RegExp.prototype, SYMBOL, length == 2
       // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
@@ -9122,6 +9348,125 @@ __webpack_require__(/*! ./_core */ "./node_modules/core-js/modules/_core.js").in
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/_regexp-exec-abstract.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/core-js/modules/_regexp-exec-abstract.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var classof = __webpack_require__(/*! ./_classof */ "./node_modules/core-js/modules/_classof.js");
+var builtinExec = RegExp.prototype.exec;
+
+ // `RegExpExec` abstract operation
+// https://tc39.github.io/ecma262/#sec-regexpexec
+module.exports = function (R, S) {
+  var exec = R.exec;
+  if (typeof exec === 'function') {
+    var result = exec.call(R, S);
+    if (typeof result !== 'object') {
+      throw new TypeError('RegExp exec method returned something other than an Object or null');
+    }
+    return result;
+  }
+  if (classof(R) !== 'RegExp') {
+    throw new TypeError('RegExp#exec called on incompatible receiver');
+  }
+  return builtinExec.call(R, S);
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/_regexp-exec.js":
+/*!******************************************************!*\
+  !*** ./node_modules/core-js/modules/_regexp-exec.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var regexpFlags = __webpack_require__(/*! ./_flags */ "./node_modules/core-js/modules/_flags.js");
+
+var nativeExec = RegExp.prototype.exec;
+// This always refers to the native implementation, because the
+// String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
+// which loads this file before patching the method.
+var nativeReplace = String.prototype.replace;
+
+var patchedExec = nativeExec;
+
+var LAST_INDEX = 'lastIndex';
+
+var UPDATES_LAST_INDEX_WRONG = (function () {
+  var re1 = /a/,
+      re2 = /b*/g;
+  nativeExec.call(re1, 'a');
+  nativeExec.call(re2, 'a');
+  return re1[LAST_INDEX] !== 0 || re2[LAST_INDEX] !== 0;
+})();
+
+// nonparticipating capturing group, copied from es5-shim's String#split patch.
+var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
+
+var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+
+if (PATCH) {
+  patchedExec = function exec(str) {
+    var re = this;
+    var lastIndex, reCopy, match, i;
+
+    if (NPCG_INCLUDED) {
+      reCopy = new RegExp('^' + re.source + '$(?!\\s)', regexpFlags.call(re));
+    }
+    if (UPDATES_LAST_INDEX_WRONG) lastIndex = re[LAST_INDEX];
+
+    match = nativeExec.call(re, str);
+
+    if (UPDATES_LAST_INDEX_WRONG && match) {
+      re[LAST_INDEX] = re.global ? match.index + match[0].length : lastIndex;
+    }
+    if (NPCG_INCLUDED && match && match.length > 1) {
+      // Fix browsers whose `exec` methods don't consistently return `undefined`
+      // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
+      // eslint-disable-next-line no-loop-func
+      nativeReplace.call(match[0], reCopy, function () {
+        for (i = 1; i < arguments.length - 2; i++) {
+          if (arguments[i] === undefined) match[i] = undefined;
+        }
+      });
+    }
+
+    return match;
+  };
+}
+
+module.exports = patchedExec;
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/_same-value.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/core-js/modules/_same-value.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// 7.2.9 SameValue(x, y)
+module.exports = Object.is || function is(x, y) {
+  // eslint-disable-next-line no-self-compare
+  return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/_set-proto.js":
 /*!****************************************************!*\
   !*** ./node_modules/core-js/modules/_set-proto.js ***!
@@ -9234,7 +9579,7 @@ var store = global[SHARED] || (global[SHARED] = {});
 })('versions', []).push({
   version: core.version,
   mode: __webpack_require__(/*! ./_library */ "./node_modules/core-js/modules/_library.js") ? 'pure' : 'global',
-  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
 });
 
 
@@ -11355,6 +11700,27 @@ __webpack_require__(/*! ./_set-species */ "./node_modules/core-js/modules/_set-s
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/es6.regexp.exec.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/core-js/modules/es6.regexp.exec.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var regexpExec = __webpack_require__(/*! ./_regexp-exec */ "./node_modules/core-js/modules/_regexp-exec.js");
+__webpack_require__(/*! ./_export */ "./node_modules/core-js/modules/_export.js")({
+  target: 'RegExp',
+  proto: true,
+  forced: regexpExec !== /./.exec
+}, {
+  exec: regexpExec
+});
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/es6.regexp.flags.js":
 /*!**********************************************************!*\
   !*** ./node_modules/core-js/modules/es6.regexp.flags.js ***!
@@ -11378,15 +11744,46 @@ if (__webpack_require__(/*! ./_descriptors */ "./node_modules/core-js/modules/_d
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+var anObject = __webpack_require__(/*! ./_an-object */ "./node_modules/core-js/modules/_an-object.js");
+var toLength = __webpack_require__(/*! ./_to-length */ "./node_modules/core-js/modules/_to-length.js");
+var advanceStringIndex = __webpack_require__(/*! ./_advance-string-index */ "./node_modules/core-js/modules/_advance-string-index.js");
+var regExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "./node_modules/core-js/modules/_regexp-exec-abstract.js");
+
 // @@match logic
-__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('match', 1, function (defined, MATCH, $match) {
-  // 21.1.3.11 String.prototype.match(regexp)
-  return [function match(regexp) {
-    'use strict';
-    var O = defined(this);
-    var fn = regexp == undefined ? undefined : regexp[MATCH];
-    return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
-  }, $match];
+__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('match', 1, function (defined, MATCH, $match, maybeCallNative) {
+  return [
+    // `String.prototype.match` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.match
+    function match(regexp) {
+      var O = defined(this);
+      var fn = regexp == undefined ? undefined : regexp[MATCH];
+      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
+    },
+    // `RegExp.prototype[@@match]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@match
+    function (regexp) {
+      var res = maybeCallNative($match, regexp, this);
+      if (res.done) return res.value;
+      var rx = anObject(regexp);
+      var S = String(this);
+      if (!rx.global) return regExpExec(rx, S);
+      var fullUnicode = rx.unicode;
+      rx.lastIndex = 0;
+      var A = [];
+      var n = 0;
+      var result;
+      while ((result = regExpExec(rx, S)) !== null) {
+        var matchStr = String(result[0]);
+        A[n] = matchStr;
+        if (matchStr === '') rx.lastIndex = advanceStringIndex(S, toLength(rx.lastIndex), fullUnicode);
+        n++;
+      }
+      return n === 0 ? null : A;
+    }
+  ];
 });
 
 
@@ -11399,17 +11796,124 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+var anObject = __webpack_require__(/*! ./_an-object */ "./node_modules/core-js/modules/_an-object.js");
+var toObject = __webpack_require__(/*! ./_to-object */ "./node_modules/core-js/modules/_to-object.js");
+var toLength = __webpack_require__(/*! ./_to-length */ "./node_modules/core-js/modules/_to-length.js");
+var toInteger = __webpack_require__(/*! ./_to-integer */ "./node_modules/core-js/modules/_to-integer.js");
+var advanceStringIndex = __webpack_require__(/*! ./_advance-string-index */ "./node_modules/core-js/modules/_advance-string-index.js");
+var regExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "./node_modules/core-js/modules/_regexp-exec-abstract.js");
+var max = Math.max;
+var min = Math.min;
+var floor = Math.floor;
+var SUBSTITUTION_SYMBOLS = /\$([$&`']|\d\d?|<[^>]*>)/g;
+var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&`']|\d\d?)/g;
+
+var maybeToString = function (it) {
+  return it === undefined ? it : String(it);
+};
+
 // @@replace logic
-__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('replace', 2, function (defined, REPLACE, $replace) {
-  // 21.1.3.14 String.prototype.replace(searchValue, replaceValue)
-  return [function replace(searchValue, replaceValue) {
-    'use strict';
-    var O = defined(this);
-    var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
-    return fn !== undefined
-      ? fn.call(searchValue, O, replaceValue)
-      : $replace.call(String(O), searchValue, replaceValue);
-  }, $replace];
+__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('replace', 2, function (defined, REPLACE, $replace, maybeCallNative) {
+  return [
+    // `String.prototype.replace` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.replace
+    function replace(searchValue, replaceValue) {
+      var O = defined(this);
+      var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
+      return fn !== undefined
+        ? fn.call(searchValue, O, replaceValue)
+        : $replace.call(String(O), searchValue, replaceValue);
+    },
+    // `RegExp.prototype[@@replace]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
+    function (regexp, replaceValue) {
+      var res = maybeCallNative($replace, regexp, this, replaceValue);
+      if (res.done) return res.value;
+
+      var rx = anObject(regexp);
+      var S = String(this);
+      var functionalReplace = typeof replaceValue === 'function';
+      if (!functionalReplace) replaceValue = String(replaceValue);
+      var global = rx.global;
+      if (global) {
+        var fullUnicode = rx.unicode;
+        rx.lastIndex = 0;
+      }
+      var results = [];
+      while (true) {
+        var result = regExpExec(rx, S);
+        if (result === null) break;
+        results.push(result);
+        if (!global) break;
+        var matchStr = String(result[0]);
+        if (matchStr === '') rx.lastIndex = advanceStringIndex(S, toLength(rx.lastIndex), fullUnicode);
+      }
+      var accumulatedResult = '';
+      var nextSourcePosition = 0;
+      for (var i = 0; i < results.length; i++) {
+        result = results[i];
+        var matched = String(result[0]);
+        var position = max(min(toInteger(result.index), S.length), 0);
+        var captures = [];
+        // NOTE: This is equivalent to
+        //   captures = result.slice(1).map(maybeToString)
+        // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
+        // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
+        // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
+        for (var j = 1; j < result.length; j++) captures.push(maybeToString(result[j]));
+        var namedCaptures = result.groups;
+        if (functionalReplace) {
+          var replacerArgs = [matched].concat(captures, position, S);
+          if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
+          var replacement = String(replaceValue.apply(undefined, replacerArgs));
+        } else {
+          replacement = getSubstitution(matched, S, position, captures, namedCaptures, replaceValue);
+        }
+        if (position >= nextSourcePosition) {
+          accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
+          nextSourcePosition = position + matched.length;
+        }
+      }
+      return accumulatedResult + S.slice(nextSourcePosition);
+    }
+  ];
+
+    // https://tc39.github.io/ecma262/#sec-getsubstitution
+  function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
+    var tailPos = position + matched.length;
+    var m = captures.length;
+    var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED;
+    if (namedCaptures !== undefined) {
+      namedCaptures = toObject(namedCaptures);
+      symbols = SUBSTITUTION_SYMBOLS;
+    }
+    return $replace.call(replacement, symbols, function (match, ch) {
+      var capture;
+      switch (ch.charAt(0)) {
+        case '$': return '$';
+        case '&': return matched;
+        case '`': return str.slice(0, position);
+        case "'": return str.slice(tailPos);
+        case '<':
+          capture = namedCaptures[ch.slice(1, -1)];
+          break;
+        default: // \d\d?
+          var n = +ch;
+          if (n === 0) return match;
+          if (n > m) {
+            var f = floor(n / 10);
+            if (f === 0) return match;
+            if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
+            return match;
+          }
+          capture = captures[n - 1];
+      }
+      return capture === undefined ? '' : capture;
+    });
+  }
 });
 
 
@@ -11422,15 +11926,37 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+var anObject = __webpack_require__(/*! ./_an-object */ "./node_modules/core-js/modules/_an-object.js");
+var sameValue = __webpack_require__(/*! ./_same-value */ "./node_modules/core-js/modules/_same-value.js");
+var regExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "./node_modules/core-js/modules/_regexp-exec-abstract.js");
+
 // @@search logic
-__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('search', 1, function (defined, SEARCH, $search) {
-  // 21.1.3.15 String.prototype.search(regexp)
-  return [function search(regexp) {
-    'use strict';
-    var O = defined(this);
-    var fn = regexp == undefined ? undefined : regexp[SEARCH];
-    return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
-  }, $search];
+__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('search', 1, function (defined, SEARCH, $search, maybeCallNative) {
+  return [
+    // `String.prototype.search` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.search
+    function search(regexp) {
+      var O = defined(this);
+      var fn = regexp == undefined ? undefined : regexp[SEARCH];
+      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
+    },
+    // `RegExp.prototype[@@search]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@search
+    function (regexp) {
+      var res = maybeCallNative($search, regexp, this);
+      if (res.done) return res.value;
+      var rx = anObject(regexp);
+      var S = String(this);
+      var previousLastIndex = rx.lastIndex;
+      if (!sameValue(previousLastIndex, 0)) rx.lastIndex = 0;
+      var result = regExpExec(rx, S);
+      if (!sameValue(rx.lastIndex, previousLastIndex)) rx.lastIndex = previousLastIndex;
+      return result === null ? -1 : result.index;
+    }
+  ];
 });
 
 
@@ -11443,15 +11969,28 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+var isRegExp = __webpack_require__(/*! ./_is-regexp */ "./node_modules/core-js/modules/_is-regexp.js");
+var anObject = __webpack_require__(/*! ./_an-object */ "./node_modules/core-js/modules/_an-object.js");
+var speciesConstructor = __webpack_require__(/*! ./_species-constructor */ "./node_modules/core-js/modules/_species-constructor.js");
+var advanceStringIndex = __webpack_require__(/*! ./_advance-string-index */ "./node_modules/core-js/modules/_advance-string-index.js");
+var toLength = __webpack_require__(/*! ./_to-length */ "./node_modules/core-js/modules/_to-length.js");
+var callRegExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "./node_modules/core-js/modules/_regexp-exec-abstract.js");
+var regexpExec = __webpack_require__(/*! ./_regexp-exec */ "./node_modules/core-js/modules/_regexp-exec.js");
+var $min = Math.min;
+var $push = [].push;
+var $SPLIT = 'split';
+var LENGTH = 'length';
+var LAST_INDEX = 'lastIndex';
+
+// eslint-disable-next-line no-empty
+var SUPPORTS_Y = !!(function () { try { return new RegExp('x', 'y'); } catch (e) {} })();
+
 // @@split logic
-__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('split', 2, function (defined, SPLIT, $split) {
-  'use strict';
-  var isRegExp = __webpack_require__(/*! ./_is-regexp */ "./node_modules/core-js/modules/_is-regexp.js");
-  var _split = $split;
-  var $push = [].push;
-  var $SPLIT = 'split';
-  var LENGTH = 'length';
-  var LAST_INDEX = 'lastIndex';
+__webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('split', 2, function (defined, SPLIT, $split, maybeCallNative) {
+  var internalSplit;
   if (
     'abbc'[$SPLIT](/(b)*/)[1] == 'c' ||
     'test'[$SPLIT](/(?:)/, -1)[LENGTH] != 4 ||
@@ -11460,13 +11999,12 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
     '.'[$SPLIT](/()()/)[LENGTH] > 1 ||
     ''[$SPLIT](/.?/)[LENGTH]
   ) {
-    var NPCG = /()??/.exec('')[1] === undefined; // nonparticipating capturing group
     // based on es5-shim implementation, need to rework it
-    $split = function (separator, limit) {
+    internalSplit = function (separator, limit) {
       var string = String(this);
       if (separator === undefined && limit === 0) return [];
       // If `separator` is not a regex, use native split
-      if (!isRegExp(separator)) return _split.call(string, separator, limit);
+      if (!isRegExp(separator)) return $split.call(string, separator, limit);
       var output = [];
       var flags = (separator.ignoreCase ? 'i' : '') +
                   (separator.multiline ? 'm' : '') +
@@ -11476,19 +12014,11 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
       var splitLimit = limit === undefined ? 4294967295 : limit >>> 0;
       // Make `global` and avoid `lastIndex` issues by working with a copy
       var separatorCopy = new RegExp(separator.source, flags + 'g');
-      var separator2, match, lastIndex, lastLength, i;
-      // Doesn't need flags gy, but they don't hurt
-      if (!NPCG) separator2 = new RegExp('^' + separatorCopy.source + '$(?!\\s)', flags);
-      while (match = separatorCopy.exec(string)) {
-        // `separatorCopy.lastIndex` is not reliable cross-browser
-        lastIndex = match.index + match[0][LENGTH];
+      var match, lastIndex, lastLength;
+      while (match = regexpExec.call(separatorCopy, string)) {
+        lastIndex = separatorCopy[LAST_INDEX];
         if (lastIndex > lastLastIndex) {
           output.push(string.slice(lastLastIndex, match.index));
-          // Fix browsers whose `exec` methods don't consistently return `undefined` for NPCG
-          // eslint-disable-next-line no-loop-func
-          if (!NPCG && match[LENGTH] > 1) match[0].replace(separator2, function () {
-            for (i = 1; i < arguments[LENGTH] - 2; i++) if (arguments[i] === undefined) match[i] = undefined;
-          });
           if (match[LENGTH] > 1 && match.index < string[LENGTH]) $push.apply(output, match.slice(1));
           lastLength = match[0][LENGTH];
           lastLastIndex = lastIndex;
@@ -11503,16 +12033,74 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
     };
   // Chakra, V8
   } else if ('0'[$SPLIT](undefined, 0)[LENGTH]) {
-    $split = function (separator, limit) {
-      return separator === undefined && limit === 0 ? [] : _split.call(this, separator, limit);
+    internalSplit = function (separator, limit) {
+      return separator === undefined && limit === 0 ? [] : $split.call(this, separator, limit);
     };
+  } else {
+    internalSplit = $split;
   }
-  // 21.1.3.17 String.prototype.split(separator, limit)
-  return [function split(separator, limit) {
-    var O = defined(this);
-    var fn = separator == undefined ? undefined : separator[SPLIT];
-    return fn !== undefined ? fn.call(separator, O, limit) : $split.call(String(O), separator, limit);
-  }, $split];
+
+  return [
+    // `String.prototype.split` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.split
+    function split(separator, limit) {
+      var O = defined(this);
+      var splitter = separator == undefined ? undefined : separator[SPLIT];
+      return splitter !== undefined
+        ? splitter.call(separator, O, limit)
+        : internalSplit.call(String(O), separator, limit);
+    },
+    // `RegExp.prototype[@@split]` method
+    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@split
+    //
+    // NOTE: This cannot be properly polyfilled in engines that don't support
+    // the 'y' flag.
+    function (regexp, limit) {
+      var res = maybeCallNative(internalSplit, regexp, this, limit, internalSplit !== $split);
+      if (res.done) return res.value;
+
+      var rx = anObject(regexp);
+      var S = String(this);
+      var C = speciesConstructor(rx, RegExp);
+
+      var unicodeMatching = rx.unicode;
+      var flags = (rx.ignoreCase ? 'i' : '') +
+                    (rx.multiline ? 'm' : '') +
+                    (rx.unicode ? 'u' : '') +
+                    (SUPPORTS_Y ? 'y' : 'g');
+
+      // ^(? + rx + ) is needed, in combination with some S slicing, to
+      // simulate the 'y' flag.
+      var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
+      var lim = limit === undefined ? 0xffffffff : limit >>> 0;
+      if (lim === 0) return [];
+      if (S.length === 0) return callRegExpExec(splitter, S) === null ? [S] : [];
+      var p = 0;
+      var q = 0;
+      var A = [];
+      while (q < S.length) {
+        splitter.lastIndex = SUPPORTS_Y ? q : 0;
+        var z = callRegExpExec(splitter, SUPPORTS_Y ? S : S.slice(q));
+        var e;
+        if (
+          z === null ||
+          (e = $min(toLength(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
+        ) {
+          q = advanceStringIndex(S, q, unicodeMatching);
+        } else {
+          A.push(S.slice(p, q));
+          if (A.length === lim) return A;
+          for (var i = 1; i <= z.length - 1; i++) {
+            A.push(z[i]);
+            if (A.length === lim) return A;
+          }
+          q = p = e;
+        }
+      }
+      A.push(S.slice(p));
+      return A;
+    }
+  ];
 });
 
 
@@ -16784,9 +17372,11 @@ function () {
   _createClass(Form, [{
     key: "create",
     value: function create() {
-      if (this.form.display === 'wizard') {
+      var isFlat = this.options && this.options.flatten;
+
+      if (this.form.display === 'wizard' && !isFlat) {
         return new _Wizard.default(this.element, this.options);
-      } else if (this.form.display === 'pdf') {
+      } else if (this.form.display === 'pdf' && !isFlat) {
         return new _PDF.default(this.element, this.options);
       } else {
         return new _Webform.default(this.element, this.options);
@@ -17077,6 +17667,8 @@ var _shallowCopy = _interopRequireDefault(__webpack_require__(/*! shallow-copy *
 var providers = _interopRequireWildcard(__webpack_require__(/*! ./providers */ "./node_modules/formiojs/providers/index.js"));
 
 var _get2 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
+
+var _cloneDeep2 = _interopRequireDefault(__webpack_require__(/*! lodash/cloneDeep */ "./node_modules/formiojs/node_modules/lodash/cloneDeep.js"));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -17629,7 +18221,7 @@ function () {
     }
   }, {
     key: "uploadFile",
-    value: function uploadFile(storage, file, fileName, dir, progressCallback, url) {
+    value: function uploadFile(storage, file, fileName, dir, progressCallback, url, options) {
       var _this5 = this;
 
       var requestArgs = {
@@ -17644,7 +18236,7 @@ function () {
           if (storage && isNil(result)) {
             if (Formio.providers.storage.hasOwnProperty(storage)) {
               var provider = new Formio.providers.storage[storage](_this5);
-              return provider.uploadFile(file, fileName, dir, progressCallback, url);
+              return provider.uploadFile(file, fileName, dir, progressCallback, url, options);
             } else {
               throw 'Storage provider not found';
             }
@@ -17885,7 +18477,7 @@ function () {
       var cacheKey = btoa(url); // Get the cached promise to save multiple loads.
 
       if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
-        return Formio.cache[cacheKey];
+        return (0, _cloneDeep2.default)(Formio.cache[cacheKey]);
       } // Set up and fetch request
 
 
@@ -17991,6 +18583,11 @@ function () {
       }).then(function (result) {
         if (opts.getHeaders) {
           return result;
+        } // Cache the response.
+
+
+        if (method === 'GET') {
+          Formio.cache[cacheKey] = (0, _cloneDeep2.default)(result);
         }
 
         var resultCopy = {}; // Shallow copy result so modifications don't end up in cache
@@ -18021,12 +18618,7 @@ function () {
         }
 
         return _nativePromiseOnly.default.reject(err);
-      }); // Cache the response.
-
-      if (method === 'GET') {
-        Formio.cache[cacheKey] = result;
-      }
-
+      });
       return result;
     } // Needed to maintain reverse compatability...
 
@@ -18104,7 +18696,9 @@ function () {
       var userName = "".concat(opts.namespace || Formio.namespace || 'formio', "User");
 
       if (!user) {
-        Formio.setToken(null, opts); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+        Formio.setToken(null, opts); // Emit an event on the cleared user.
+
+        Formio.events.emit('formio.user', null); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
 
         try {
           return localStorage.removeItem(userName);
@@ -18122,7 +18716,10 @@ function () {
         _browserCookies.default.set(userName, JSON.stringify(user), {
           path: '/'
         });
-      }
+      } // Emit an event on the authenticated user.
+
+
+      Formio.events.emit('formio.user', user);
     }
   }, {
     key: "getUser",
@@ -19291,7 +19888,9 @@ function getOptions(options) {
   options = _lodash.default.defaults(options, {
     submitOnEnter: false,
     icons: _Formio.default.icons || '',
-    i18next: _i18next.default
+    i18next: _i18next.default,
+    saveDraft: false,
+    saveDraftThrottle: 5000
   });
 
   if (!options.events) {
@@ -19318,6 +19917,8 @@ function (_NestedComponent) {
    *
    * @param {Object} element - The DOM element you wish to render this form within.
    * @param {Object} options - The options to create a new form instance.
+   * @param {boolean} options.saveDraft - Set this if you would like to enable the save draft feature.
+   * @param {boolean} options.saveDraftThrottle - The throttle for the save draft feature.
    * @param {boolean} options.readOnly - Set this form to readOnly
    * @param {boolean} options.noAlerts - Set to true to disable the alerts dialog.
    * @param {boolean} options.i18n - The translation file for this rendering. @see https://github.com/formio/formio.js/blob/master/i18n.js
@@ -19387,6 +19988,15 @@ function (_NestedComponent) {
     _this2._loading = false;
     _this2._submission = {};
     _this2._form = {};
+    _this2.draftEnabled = false;
+    _this2.savingDraft = true;
+
+    if (_this2.options.saveDraftThrottle) {
+      _this2.triggerSaveDraft = _lodash.default.throttle(_this2.saveDraft.bind(_assertThisInitialized(_assertThisInitialized(_this2))), _this2.options.saveDraftThrottle);
+    } else {
+      _this2.triggerSaveDraft = _this2.saveDraft.bind(_assertThisInitialized(_assertThisInitialized(_this2)));
+    }
+
     _this2.customErrors = [];
     /**
      * Determines if this form should submit the API on submit.
@@ -19438,6 +20048,12 @@ function (_NestedComponent) {
      */
 
     _this2.onFormBuild = null;
+    /**
+     * Determines if this submission is explicitly set.
+     * @type {boolean}
+     */
+
+    _this2.submissionSet = false;
     /**
      * Promise that executes when the form is ready and rendered.
      * @type {Promise}
@@ -19514,7 +20130,19 @@ function (_NestedComponent) {
 
     _this2.localize().then(function () {
       _this2.language = _this2.options.language;
-    });
+    }); // See if we need to restore the draft from a user.
+
+
+    if (_this2.options.saveDraft && _Formio.default.events) {
+      _Formio.default.events.on('formio.user', function (user) {
+        _this2.formReady.then(function () {
+          // Only restore a draft if the submission isn't explicitly set.
+          if (!_this2.submissionSet) {
+            _this2.restoreDraft(user._id);
+          }
+        });
+      });
+    }
 
     _this2.component.clearOnHide = false;
     return _this2;
@@ -19888,6 +20516,8 @@ function (_NestedComponent) {
 
       return this.onSubmission = this.formReady.then(function () {
         // If nothing changed, still trigger an update.
+        _this7.submissionSet = true;
+
         if (!_this7.setValue(submission, flags)) {
           _this7.triggerChange({
             noValidate: true
@@ -19901,6 +20531,83 @@ function (_NestedComponent) {
         return _this7.submissionReadyReject(err);
       }).catch(function (err) {
         return _this7.submissionReadyReject(err);
+      });
+    }
+    /**
+     * Saves a submission draft.
+     */
+
+  }, {
+    key: "saveDraft",
+    value: function saveDraft() {
+      var _this8 = this;
+
+      if (!this.draftEnabled) {
+        return;
+      }
+
+      if (!this.formio) {
+        console.warn('Cannot save draft because there is no formio instance.');
+        return;
+      }
+
+      if (!_Formio.default.getUser()) {
+        console.warn('Cannot save draft unless a user is authenticated.');
+        return;
+      }
+
+      var draft = _lodash.default.cloneDeep(this.submission);
+
+      draft.state = 'draft';
+
+      if (!this.savingDraft) {
+        this.savingDraft = true;
+        this.formio.saveSubmission(draft).then(function (sub) {
+          _this8.savingDraft = false;
+
+          _this8.emit('saveDraft', sub);
+        });
+      }
+    }
+    /**
+     * Restores a draft submission based on the user who is authenticated.
+     *
+     * @param {userId} - The user id where we need to restore the draft from.
+     */
+
+  }, {
+    key: "restoreDraft",
+    value: function restoreDraft(userId) {
+      var _this9 = this;
+
+      if (!this.formio) {
+        console.warn('Cannot restore draft because there is no formio instance.');
+        return;
+      }
+
+      this.savingDraft = true;
+      this.formio.loadSubmissions({
+        params: {
+          state: 'draft',
+          owner: userId
+        }
+      }).then(function (submissions) {
+        if (submissions.length > 0) {
+          var draft = _lodash.default.cloneDeep(submissions[0]);
+
+          return _this9.setSubmission(draft).then(function () {
+            _this9.draftEnabled = true;
+            _this9.savingDraft = false;
+
+            _this9.emit('restoreDraft', draft);
+          });
+        } // Enable drafts so that we can keep track of changes.
+
+
+        _this9.draftEnabled = true;
+        _this9.savingDraft = false;
+
+        _this9.emit('restoreDraft', null);
       });
     }
   }, {
@@ -19960,7 +20667,7 @@ function (_NestedComponent) {
   }, {
     key: "createForm",
     value: function createForm(form) {
-      var _this8 = this;
+      var _this10 = this;
 
       /**
        * {@link BaseComponent.component}
@@ -19972,21 +20679,21 @@ function (_NestedComponent) {
       }
 
       return this.onFormBuild = this.render().then(function () {
-        _this8.formReadyResolve();
+        _this10.formReadyResolve();
 
-        _this8.onFormBuild = null;
+        _this10.onFormBuild = null;
 
-        _this8.setValue(_this8.submission);
+        _this10.setValue(_this10.submission);
 
-        if (!_this8.changing) {
-          _this8.triggerChange();
+        if (!_this10.changing) {
+          _this10.triggerChange();
         }
 
         return form;
       }).catch(function (err) {
         console.warn(err);
 
-        _this8.formReadyReject(err);
+        _this10.formReadyReject(err);
       });
     }
     /**
@@ -19997,30 +20704,30 @@ function (_NestedComponent) {
   }, {
     key: "render",
     value: function render() {
-      var _this9 = this;
+      var _this11 = this;
 
       return this.onElement.then(function () {
-        var state = _this9.clear();
+        var state = _this11.clear();
 
-        _this9.showElement(false);
+        _this11.showElement(false);
 
-        clearTimeout(_this9.build(state));
-        _this9.isBuilt = true;
+        clearTimeout(_this11.build(state));
+        _this11.isBuilt = true;
 
-        _this9.on('resetForm', function () {
-          return _this9.resetValue();
+        _this11.on('resetForm', function () {
+          return _this11.resetValue();
         }, true);
 
-        _this9.on('deleteSubmission', function () {
-          return _this9.deleteSubmission();
+        _this11.on('deleteSubmission', function () {
+          return _this11.deleteSubmission();
         }, true);
 
-        _this9.on('refreshData', function () {
-          return _this9.updateValue();
+        _this11.on('refreshData', function () {
+          return _this11.updateValue();
         }, true);
 
         setTimeout(function () {
-          return _this9.emit('render');
+          return _this11.emit('render');
         }, 1);
       });
     }
@@ -20080,20 +20787,20 @@ function (_NestedComponent) {
   }, {
     key: "build",
     value: function build(state) {
-      var _this10 = this;
+      var _this12 = this;
 
       this.on('submitButton', function (options) {
-        return _this10.submit(false, options);
+        return _this12.submit(false, options);
       }, true);
       this.on('checkValidity', function (data) {
-        return _this10.checkValidity(null, true, data);
+        return _this12.checkValidity(null, true, data);
       }, true);
       this.addComponents(null, null, null, state);
       this.on('requestUrl', function (args) {
-        return _this10.submitUrl(args.url, args.headers);
+        return _this12.submitUrl(args.url, args.headers);
       }, true);
       return setTimeout(function () {
-        _this10.onChange({
+        _this12.onChange({
           noEmit: true
         });
       }, 1);
@@ -20108,7 +20815,7 @@ function (_NestedComponent) {
   }, {
     key: "showErrors",
     value: function showErrors(error, triggerEvent) {
-      var _this11 = this;
+      var _this13 = this;
 
       this.loading = false;
       var errors = this.errors;
@@ -20129,14 +20836,27 @@ function (_NestedComponent) {
       } // Mark any components as invalid if in a custom message.
 
 
-      this.customErrors.forEach(function (err) {
-        if (err.component) {
-          var component = _this11.getComponent(err.component);
+      errors.forEach(function (err) {
+        var _err$components = err.components,
+            components = _err$components === void 0 ? [] : _err$components;
 
-          if (component) {
-            component.setCustomValidity(err.message, true);
-          }
+        if (err.component) {
+          components.push(err.component);
         }
+
+        if (err.path) {
+          components.push(err.path);
+        }
+
+        components.forEach(function (path) {
+          var component = _this13.getComponent(path, _lodash.default.identity, err);
+
+          var components = _lodash.default.compact(Array.isArray(component) ? component : [component]);
+
+          components.forEach(function (component) {
+            return component.setCustomValidity(err.message, true);
+          });
+        });
       });
       var message = "\n      <p>".concat(this.t('error'), "</p>\n      <ul>\n        ").concat(errors.map(function (err) {
         return err ? "<li><strong>".concat(err.message || err, "</strong></li>") : '';
@@ -20231,7 +20951,11 @@ function (_NestedComponent) {
       value.changed = changed;
       value.isValid = this.checkData(value.data, flags);
       this.showElement(true);
-      this.loading = false;
+      this.loading = false; // See if we need to save the draft of the form.
+
+      if (flags && flags.modified && this.options.saveDraft) {
+        this.triggerSaveDraft();
+      }
 
       if (!flags || !flags.noEmit) {
         this.emit('change', value);
@@ -20261,12 +20985,12 @@ function (_NestedComponent) {
   }, {
     key: "deleteSubmission",
     value: function deleteSubmission() {
-      var _this12 = this;
+      var _this14 = this;
 
       return this.formio.deleteSubmission().then(function () {
-        _this12.emit('submissionDeleted', _this12.submission);
+        _this14.emit('submissionDeleted', _this14.submission);
 
-        _this12.resetValue();
+        _this14.resetValue();
       });
     }
     /**
@@ -20288,26 +21012,24 @@ function (_NestedComponent) {
   }, {
     key: "submitForm",
     value: function submitForm() {
-      var _this13 = this;
+      var _this15 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       return new _nativePromiseOnly.default(function (resolve, reject) {
         // Read-only forms should never submit.
-        if (_this13.options.readOnly) {
+        if (_this15.options.readOnly) {
           return resolve({
-            submission: _this13.submission,
+            submission: _this15.submission,
             saved: false
           });
-        }
-
-        var submission = _lodash.default.cloneDeep(_this13.submission || {}); // Add in metadata about client submitting the form
+        } // Add in metadata about client submitting the form
 
 
-        submission.metadata = submission.metadata || {};
+        _this15.submission.metadata = _this15.submission.metadata || {};
 
-        _lodash.default.defaults(submission.metadata, {
-          timezone: _lodash.default.get(_this13, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
-          offset: parseInt(_lodash.default.get(_this13, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
+        _lodash.default.defaults(_this15.submission.metadata, {
+          timezone: _lodash.default.get(_this15, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
+          offset: parseInt(_lodash.default.get(_this15, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
           referrer: document.referrer,
           browserName: navigator.appName,
           userAgent: navigator.userAgent,
@@ -20315,10 +21037,12 @@ function (_NestedComponent) {
           onLine: navigator.onLine
         });
 
+        var submission = _lodash.default.cloneDeep(_this15.submission || {});
+
         submission.state = options.state || 'submitted';
         var isDraft = submission.state === 'draft';
 
-        _this13.hook('beforeSubmit', submission, function (err) {
+        _this15.hook('beforeSubmit', submission, function (err) {
           if (err) {
             return reject(err);
           }
@@ -20327,11 +21051,11 @@ function (_NestedComponent) {
             return reject('Invalid Submission');
           }
 
-          if (!isDraft && !_this13.checkValidity(submission.data, true)) {
+          if (!isDraft && !_this15.checkValidity(submission.data, true)) {
             return reject();
           }
 
-          _this13.getAllComponents().forEach(function (comp) {
+          _this15.getAllComponents().forEach(function (comp) {
             var _comp$component = comp.component,
                 persistent = _comp$component.persistent,
                 key = _comp$component.key;
@@ -20341,7 +21065,7 @@ function (_NestedComponent) {
             }
           });
 
-          _this13.hook('customValidation', submission, function (err) {
+          _this15.hook('customValidation', submission, function (err) {
             if (err) {
               // If string is returned, cast to object.
               if (typeof err === 'string') {
@@ -20353,19 +21077,19 @@ function (_NestedComponent) {
 
               err = Array.isArray(err) ? err : [err]; // Set as custom errors.
 
-              _this13.customErrors = err;
+              _this15.customErrors = err;
               return reject();
             }
 
-            _this13.loading = true; // Use the form action to submit the form if available.
+            _this15.loading = true; // Use the form action to submit the form if available.
 
-            var submitFormio = _this13.formio;
+            var submitFormio = _this15.formio;
 
-            if (_this13._form && _this13._form.action) {
-              submitFormio = new _Formio.default(_this13._form.action, _this13.formio ? _this13.formio.options : {});
+            if (_this15._form && _this15._form.action) {
+              submitFormio = new _Formio.default(_this15._form.action, _this15.formio ? _this15.formio.options : {});
             }
 
-            if (_this13.nosubmit || !submitFormio) {
+            if (_this15.nosubmit || !submitFormio) {
               return resolve({
                 submission: submission,
                 saved: false
@@ -20387,14 +21111,16 @@ function (_NestedComponent) {
   }, {
     key: "executeSubmit",
     value: function executeSubmit(options) {
-      var _this14 = this;
+      var _this16 = this;
 
       this.submitted = true;
       this.submitting = true;
-      return this.submitForm(options).then(function (result) {
-        return _this14.onSubmit(result.submission, result.saved);
+      return this.submitForm(options).then(function (_ref) {
+        var submission = _ref.submission,
+            saved = _ref.saved;
+        return _this16.onSubmit(submission, saved);
       }).catch(function (err) {
-        return _nativePromiseOnly.default.reject(_this14.onSubmissionError(err));
+        return _nativePromiseOnly.default.reject(_this16.onSubmissionError(err));
       });
     }
     /**
@@ -20421,11 +21147,11 @@ function (_NestedComponent) {
   }, {
     key: "submit",
     value: function submit(before, options) {
-      var _this15 = this;
+      var _this17 = this;
 
       if (!before) {
         return this.beforeSubmit(options).then(function () {
-          return _this15.executeSubmit(options);
+          return _this17.executeSubmit(options);
         });
       } else {
         return this.executeSubmit(options);
@@ -20434,7 +21160,7 @@ function (_NestedComponent) {
   }, {
     key: "submitUrl",
     value: function submitUrl(URL, headers) {
-      var _this16 = this;
+      var _this18 = this;
 
       if (!URL) {
         return console.warn('Missing URL argument');
@@ -20458,9 +21184,9 @@ function (_NestedComponent) {
       if (API_URL && settings) {
         try {
           _Formio.default.makeStaticRequest(API_URL, settings.method, submission, settings.headers).then(function () {
-            _this16.emit('requestDone');
+            _this18.emit('requestDone');
 
-            _this16.setAlert('success', '<p> Success </p>');
+            _this18.setAlert('success', '<p> Success </p>');
           });
         } catch (e) {
           this.showErrors("".concat(e.statusText, " ").concat(e.status));
@@ -20476,10 +21202,10 @@ function (_NestedComponent) {
   }, {
     key: "language",
     set: function set(lang) {
-      var _this17 = this;
+      var _this19 = this;
 
       return new _nativePromiseOnly.default(function (resolve, reject) {
-        _this17.options.language = lang;
+        _this19.options.language = lang;
 
         try {
           _i18next.default.changeLanguage(lang, function (err) {
@@ -20487,9 +21213,9 @@ function (_NestedComponent) {
               return reject(err);
             }
 
-            _this17.redraw();
+            _this19.redraw();
 
-            _this17.emit('languageChanged');
+            _this19.emit('languageChanged');
 
             resolve();
           });
@@ -20529,10 +21255,10 @@ function (_NestedComponent) {
   }, {
     key: "ready",
     get: function get() {
-      var _this18 = this;
+      var _this20 = this;
 
       return this.formReady.then(function () {
-        return _this18.loadingSubmission ? _this18.submissionReady : true;
+        return _this20.loadingSubmission ? _this20.submissionReady : true;
       });
     }
     /**
@@ -21057,7 +21783,7 @@ function (_Webform) {
       var overrides = _lodash.default.get(this.options, "editForm.".concat(componentCopy.component.type), {}); // Get the editform for this component.
 
 
-      var editForm = componentClass.editForm(overrides); // Change the defaultValue component to be reflective.
+      var editForm = componentClass.editForm(_lodash.default.cloneDeep(overrides)); // Change the defaultValue component to be reflective.
 
       this.defaultValueComponent = (0, _utils.getComponent)(editForm.components, 'defaultValue');
 
@@ -22221,7 +22947,8 @@ function (_Webform) {
     key: "pageId",
     value: function pageId(page) {
       if (page.key) {
-        return page.key;
+        // Some panels have the same key....
+        return "".concat(page.key, "-").concat(page.title);
       } else if (page.components && page.components.length > 0) {
         return this.pageId(page.components[0]);
       } else {
@@ -24497,6 +25224,7 @@ function (_Component) {
      */
 
     _this._visible = true;
+    _this._parentVisible = true;
     /**
      * If this input has been input and provided value.
      *
@@ -24973,6 +25701,7 @@ function (_Component) {
     key: "evalContext",
     value: function evalContext(additional) {
       return _get(_getPrototypeOf(BaseComponent.prototype), "evalContext", this).call(this, Object.assign({
+        instance: this,
         component: this.component,
         row: this.data,
         rowIndex: this.rowIndex,
@@ -25385,7 +26114,7 @@ function (_Component) {
         trigger: 'hover click',
         placement: 'right',
         html: true,
-        title: component.tooltip.replace(/(?:\r\n|\r|\n)/g, '<br />')
+        title: this.interpolate(component.tooltip).replace(/(?:\r\n|\r|\n)/g, '<br />')
       });
     }
     /**
@@ -25635,18 +26364,31 @@ function (_Component) {
     key: "renderTemplate",
     value: function renderTemplate(template, data) {
       var actions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-      // Create a container div.
-      var div = this.ce('div'); // Interpolate the template and populate
-
-      div.innerHTML = this.interpolate(template, data); // Add actions to matching elements.
-
+      return this.renderTemplateToElement(this.ce('div'), template, data, actions);
+    }
+  }, {
+    key: "renderElement",
+    value: function renderElement(template, data) {
+      var actions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+      return this.renderTemplate(template, data, actions).firstChild;
+    }
+  }, {
+    key: "renderTemplateToElement",
+    value: function renderTemplateToElement(element, template, data) {
+      var actions = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
+      element.innerHTML = this.interpolate(template, data).trim();
+      this.attachActions(element, actions);
+      return element;
+    }
+  }, {
+    key: "attachActions",
+    value: function attachActions(element, actions) {
       actions.forEach(function (action) {
-        var elements = div.getElementsByClassName(action.class);
+        var elements = element.getElementsByClassName(action.class);
         Array.prototype.forEach.call(elements, function (element) {
           element.addEventListener(action.event, action.action);
         });
       });
-      return div;
     }
     /**
      * Determines if this component has a condition defined.
@@ -25876,7 +26618,7 @@ function (_Component) {
         return _show;
       }
 
-      this._visible = _show;
+      this.visible = _show;
       this.showElement(_show && !this.component.hidden);
 
       if (!noClear) {
@@ -25936,6 +26678,11 @@ function (_Component) {
 
       if (!flags.noValidate) {
         this.pristine = false;
+      }
+
+      if (flags.modified) {
+        // Add a modified class if this element was manually modified.
+        this.addClass(this.getElement(), 'formio-modified');
       } // If we are supposed to validate on blur, then don't trigger validation yet.
 
 
@@ -25993,7 +26740,9 @@ function (_Component) {
       var _this15 = this;
 
       this.addEventListener(input, this.info.changeEvent, function () {
-        return _this15.updateValue();
+        return _this15.updateValue({
+          modified: true
+        });
       });
     }
     /**
@@ -26444,8 +27193,7 @@ function (_Component) {
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty, rowData) {
-      // Force valid if component is conditionally hidden.
-      if (!this.checkCondition(rowData, data)) {
+      if (this.shouldSkipValidation(data, dirty, rowData)) {
         this.setCustomValidity('');
         return true;
       }
@@ -26517,6 +27265,22 @@ function (_Component) {
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
         }
+      });
+    }
+  }, {
+    key: "shouldSkipValidation",
+    value: function shouldSkipValidation(data, dirty, rowData) {
+      var _this19 = this;
+
+      var rules = [// Force valid if component is hidden.
+      function () {
+        return !_this19.visible;
+      }, // Force valid if component is conditionally hidden.
+      function () {
+        return !_this19.checkCondition(rowData, data);
+      }];
+      return rules.some(function (pred) {
+        return pred();
       });
     }
     /**
@@ -26690,7 +27454,7 @@ function (_Component) {
   }, {
     key: "selectOptions",
     value: function selectOptions(select, tag, options, defaultValue) {
-      var _this19 = this;
+      var _this20 = this;
 
       _lodash.default.each(options, function (option) {
         var attrs = {
@@ -26701,9 +27465,9 @@ function (_Component) {
           attrs.selected = 'selected';
         }
 
-        var optionElement = _this19.ce('option', attrs);
+        var optionElement = _this20.ce('option', attrs);
 
-        optionElement.appendChild(_this19.text(option.label));
+        optionElement.appendChild(_this20.text(option.label));
         select.appendChild(optionElement);
       });
     }
@@ -26771,11 +27535,11 @@ function (_Component) {
   }, {
     key: "autofocus",
     value: function autofocus() {
-      var _this20 = this;
+      var _this21 = this;
 
       if (this.component.autofocus) {
         this.on('render', function () {
-          return _this20.focus();
+          return _this21.focus();
         }, true);
       }
     }
@@ -26833,22 +27597,22 @@ function (_Component) {
   }, {
     key: "attachLogic",
     value: function attachLogic() {
-      var _this21 = this;
+      var _this22 = this;
 
       this.logic.forEach(function (logic) {
         if (logic.trigger.type === 'event') {
-          var event = _this21.interpolate(logic.trigger.event);
+          var event = _this22.interpolate(logic.trigger.event);
 
-          _this21.on(event, function () {
-            var newComponent = _lodash.default.cloneDeep(_this21.originalComponent);
+          _this22.on(event, function () {
+            var newComponent = _lodash.default.cloneDeep(_this22.originalComponent);
 
-            if (_this21.applyActions(logic.actions, event, _this21.data, newComponent)) {
+            if (_this22.applyActions(logic.actions, event, _this22.data, newComponent)) {
               // If component definition changed, replace it.
-              if (!_lodash.default.isEqual(_this21.component, newComponent)) {
-                _this21.component = newComponent;
+              if (!_lodash.default.isEqual(_this22.component, newComponent)) {
+                _this22.component = newComponent;
               }
 
-              _this21.redraw();
+              _this22.redraw();
             }
           }, true);
         }
@@ -27002,10 +27766,20 @@ function (_Component) {
   }, {
     key: "visible",
     set: function set(visible) {
-      this.show(visible);
+      this._visible = visible;
     },
     get: function get() {
-      return this._visible;
+      return this._visible && this._parentVisible;
+    }
+  }, {
+    key: "parentVisible",
+    set: function set(value) {
+      if (this._parentVisible !== value) {
+        this._parentVisible = value;
+      }
+    },
+    get: function get() {
+      return this._parentVisible;
     }
   }, {
     key: "wysiwygDefault",
@@ -27163,7 +27937,7 @@ function (_Component) {
      */
     ,
     set: function set(disabled) {
-      var _this22 = this;
+      var _this23 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable || disabled && !this.shouldDisable) {
@@ -27180,7 +27954,7 @@ function (_Component) {
 
 
       _lodash.default.each(this.inputs, function (input) {
-        return _this22.setDisabled(_this22.performInputMapping(input), disabled);
+        return _this23.setDisabled(_this23.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -27856,11 +28630,11 @@ var _default = [{
             value: 'tooltip',
             type: 'string'
           }, {
-            label: 'Decription',
+            label: 'Description',
             value: 'description',
             type: 'string'
           }, {
-            label: 'Paceholder',
+            label: 'Placeholder',
             value: 'placeholder',
             type: 'string'
           }, {
@@ -27958,7 +28732,7 @@ var _default = [{
   type: 'checkbox',
   label: 'Unique',
   tooltip: 'Makes sure the data submitted for this field is unique, and has not been submitted before.',
-  key: 'validate.unique',
+  key: 'unique',
   input: true
 }, {
   weight: 150,
@@ -28083,6 +28857,10 @@ var EditFormUtils = {
   },
   unifyComponents: function unifyComponents(objValue, srcValue) {
     if (objValue.key && srcValue.key) {
+      if (objValue.skipMerge || srcValue.skipMerge) {
+        return false;
+      }
+
       if (objValue.key === srcValue.key) {
         // Create complete objects by including missing keys.
         _lodash.default.each(objValue, function (value, prop) {
@@ -28224,6 +29002,8 @@ var _Day = _interopRequireDefault(__webpack_require__(/*! ./day/Day.form */ "./n
 
 var _EditGrid = _interopRequireDefault(__webpack_require__(/*! ./editgrid/EditGrid.form */ "./node_modules/formiojs/components/editgrid/EditGrid.form.js"));
 
+var _EditTable = _interopRequireDefault(__webpack_require__(/*! ./edittable/EditTable.form */ "./node_modules/formiojs/components/edittable/EditTable.form.js"));
+
 var _Email = _interopRequireDefault(__webpack_require__(/*! ./email/Email.form */ "./node_modules/formiojs/components/email/Email.form.js"));
 
 var _Fieldset = _interopRequireDefault(__webpack_require__(/*! ./fieldset/Fieldset.form */ "./node_modules/formiojs/components/fieldset/Fieldset.form.js"));
@@ -28270,7 +29050,11 @@ var _TextField = _interopRequireDefault(__webpack_require__(/*! ./textfield/Text
 
 var _Time = _interopRequireDefault(__webpack_require__(/*! ./time/Time.form */ "./node_modules/formiojs/components/time/Time.form.js"));
 
+var _Tree = _interopRequireDefault(__webpack_require__(/*! ./tree/Tree.form */ "./node_modules/formiojs/components/tree/Tree.form.js"));
+
 var _Well = _interopRequireDefault(__webpack_require__(/*! ./well/Well.form */ "./node_modules/formiojs/components/well/Well.form.js"));
+
+var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit.form */ "./node_modules/formiojs/components/modaledit/ModalEdit.form.js"));
 
 var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown.form */ "./node_modules/formiojs/components/unknown/Unknown.form.js"));
 
@@ -28288,6 +29072,7 @@ _.default.datamap.editForm = _DataMap.default;
 _.default.datetime.editForm = _DateTime.default;
 _.default.day.editForm = _Day.default;
 _.default.editgrid.editForm = _EditGrid.default;
+_.default.edittable.editForm = _EditTable.default;
 _.default.email.editForm = _Email.default;
 _.default.fieldset.editForm = _Fieldset.default;
 _.default.file.editForm = _File.default;
@@ -28311,7 +29096,9 @@ _.default.tags.editForm = _Tags.default;
 _.default.textarea.editForm = _TextArea.default;
 _.default.textfield.editForm = _TextField.default;
 _.default.time.editForm = _Time.default;
+_.default.tree.editForm = _Tree.default;
 _.default.well.editForm = _Well.default;
+_.default.modaledit.editForm = _ModalEdit.default;
 _.default.unknown.editForm = _Unknown.default;
 var _default = _.default;
 exports.default = _default;
@@ -28599,11 +29386,10 @@ function (_BaseComponent) {
 
       this.on('change', function (value) {
         _this.loading = false;
-        var isValid = _this.root ? _this.root.isValid(value.data, true) : value.isValid;
-        _this.disabled = _this.options.readOnly || _this.component.disableOnInvalid && !isValid;
+        _this.disabled = _this.options.readOnly || _this.component.disableOnInvalid && !value.isValid;
 
         if (onChange) {
-          onChange(value, isValid);
+          onChange(value, value.isValid);
         }
       }, true);
       this.on('error', function () {
@@ -28677,7 +29463,7 @@ function (_BaseComponent) {
             _this.emit('requestButton');
 
             _this.emit('requestUrl', {
-              url: _this.component.url,
+              url: _this.interpolate(_this.component.url),
               headers: _this.component.headers
             });
 
@@ -28975,6 +29761,9 @@ var _default = [{
       label: 'Submit',
       value: 'submit'
     }, {
+      label: 'Save State',
+      value: 'saveState'
+    }, {
       label: 'Event',
       value: 'event'
     }, {
@@ -28990,6 +29779,20 @@ var _default = [{
       label: 'POST to URL',
       value: 'url'
     }]
+  }
+}, {
+  type: 'textfield',
+  label: 'Save State',
+  key: 'state',
+  weight: 112,
+  tooltip: 'The state you wish to save the submission under when this button is pressed. Example "draft" would save the submission in Draft Mode.',
+  input: true,
+  conditional: {
+    json: {
+      '!==': [{
+        var: 'data.action'
+      }, 'saveState']
+    }
   }
 }, {
   type: 'checkbox',
@@ -30057,13 +30860,13 @@ function (_NestedComponent) {
       };
 
       var result = _lodash.default.reduce(this.components, function (acc, next) {
-        var stack = _toConsumableArray(acc.stack).concat([next]);
+        var stack = [].concat(_toConsumableArray(acc.stack), [next]);
 
         if (_lodash.default.sumBy(stack, width) <= _this3.gridSize) {
           acc.stack = stack;
           return acc;
         } else {
-          acc.rows = _toConsumableArray(acc.rows).concat([acc.stack]);
+          acc.rows = [].concat(_toConsumableArray(acc.rows), [acc.stack]);
           acc.stack = [next];
           return acc;
         }
@@ -30219,7 +31022,17 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
-  return _Base.default.apply(void 0, arguments);
+  for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Base.default.apply(void 0, [[{
+    key: 'data',
+    components: [{
+      key: 'defaultValue',
+      ignore: true
+    }]
+  }]].concat(extend));
 }
 
 /***/ }),
@@ -30524,12 +31337,14 @@ function (_BaseComponent) {
       if (this.options.builder) {
         var editorElement = this.ce('div');
         this.element.appendChild(editorElement);
-        this.addCKE(editorElement, null, function (html) {
+        this.editorReady = this.addCKE(editorElement, null, function (html) {
           _this.component.html = html;
         }).then(function (editor) {
           _this.editor = editor;
 
           _this.editor.data.set(_this.component.html);
+
+          return editor;
         }).catch(function (err) {
           return console.warn(err);
         });
@@ -30684,11 +31499,11 @@ var _default = [{
             value: 'tooltip',
             type: 'string'
           }, {
-            label: 'Decription',
+            label: 'Description',
             value: 'description',
             type: 'string'
           }, {
-            label: 'Paceholder',
+            label: 'Placeholder',
             value: 'placeholder',
             type: 'string'
           }, {
@@ -30744,10 +31559,24 @@ exports.default = _default;
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
 
+var _CurrencyEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Currency.edit.display */ "./node_modules/formiojs/components/currency/editForm/Currency.edit.display.js"));
+
+var _CurrencyEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Currency.edit.data */ "./node_modules/formiojs/components/currency/editForm/Currency.edit.data.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
-  return _Base.default.apply(void 0, arguments);
+  for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Base.default.apply(void 0, [[{
+    key: 'display',
+    components: _CurrencyEdit.default
+  }, {
+    key: 'data',
+    components: _CurrencyEdit2.default
+  }]].concat(extend));
 }
 
 /***/ }),
@@ -30859,8 +31688,8 @@ function (_NumberComponent) {
       decimalSeparator: _this.decimalSeparator,
       lang: _this.options.language
     });
-    _this.prefix = affixes.prefix;
-    _this.suffix = affixes.suffix;
+    _this.prefix = _this.options.prefix || affixes.prefix;
+    _this.suffix = _this.options.suffix || affixes.suffix;
     return _this;
   }
 
@@ -30924,6 +31753,580 @@ exports.default = CurrencyComponent;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/currency/editForm/Currency.edit.data.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/currency/editForm/Currency.edit.data.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  type: 'select',
+  input: true,
+  weight: 50,
+  key: 'currency',
+  label: 'Currency',
+  tooltip: 'The currency to use in currency formatting. Possible values are (ISO-4217) currency codes.',
+  defaultValue: 'USD',
+  dataSrc: 'values',
+  data: {
+    values: [{
+      label: 'US Dollar (USD)',
+      value: 'USD'
+    }, {
+      label: 'Euro (EUR)',
+      value: 'EUR'
+    }, {
+      label: 'Pound Sterling (GBP)',
+      value: 'GBP'
+    }, {
+      label: 'Australian Dollar (AUD)',
+      value: 'AUD'
+    }, {
+      label: 'Afghani (AFN)',
+      value: 'AFN'
+    }, {
+      label: 'Lek (ALL)',
+      value: 'ALL'
+    }, {
+      label: 'Algerian Dinar (DZD)',
+      value: 'DZD'
+    }, {
+      label: 'Kwanza (AOA)',
+      value: 'AOA'
+    }, {
+      label: 'East Caribbean Dollar (XCD)',
+      value: 'XCD'
+    }, {
+      label: 'Argentine Peso (ARS)',
+      value: 'ARS'
+    }, {
+      label: 'Armenian Dram (AMD)',
+      value: 'AMD'
+    }, {
+      label: 'Aruban Florin (AWG)',
+      value: 'AWG'
+    }, {
+      label: 'Azerbaijan Manat (AZN)',
+      value: 'AZN'
+    }, {
+      label: 'Bahamian Dollar (BSD)',
+      value: 'BSD'
+    }, {
+      label: 'Bahraini Dinar (BHD)',
+      value: 'BHD'
+    }, {
+      label: 'Taka (BDT)',
+      value: 'BDT'
+    }, {
+      label: 'Barbados Dollar (BBD)',
+      value: 'BBD'
+    }, {
+      label: 'Belarusian Ruble (BYN)',
+      value: 'BYN'
+    }, {
+      label: 'Belize Dollar (BZD)',
+      value: 'BZD'
+    }, {
+      label: 'CFA Franc BCEAO (XOF)',
+      value: 'XOF'
+    }, {
+      label: 'Bermudian Dollar (BMD)',
+      value: 'BMD'
+    }, {
+      label: 'Indian Rupee (INR)',
+      value: 'INR'
+    }, {
+      label: 'Ngultrum (BTN)',
+      value: 'BTN'
+    }, {
+      label: 'Boliviano (BOB)',
+      value: 'BOB'
+    }, {
+      label: 'Mvdol (BOV)',
+      value: 'BOV'
+    }, {
+      label: 'Convertible Mark (BAM)',
+      value: 'BAM'
+    }, {
+      label: 'Pula (BWP)',
+      value: 'BWP'
+    }, {
+      label: 'Norwegian Krone (NOK)',
+      value: 'NOK'
+    }, {
+      label: 'Brazilian Real (BRL)',
+      value: 'BRL'
+    }, {
+      label: 'Brunei Dollar (BND)',
+      value: 'BND'
+    }, {
+      label: 'Bulgarian Lev (BGN)',
+      value: 'BGN'
+    }, {
+      label: 'Burundi Franc (BIF)',
+      value: 'BIF'
+    }, {
+      label: 'Cabo Verde Escudo (CVE)',
+      value: 'CVE'
+    }, {
+      label: 'Riel (KHR)',
+      value: 'KHR'
+    }, {
+      label: 'CFA Franc BEAC (XAF)',
+      value: 'XAF'
+    }, {
+      label: 'Canadian Dollar (CAD)',
+      value: 'CAD'
+    }, {
+      label: 'Cayman Islands Dollar (KYD)',
+      value: 'KYD'
+    }, {
+      label: 'Chilean Peso (CLP)',
+      value: 'CLP'
+    }, {
+      label: 'Unidad de Fomento (CLF)',
+      value: 'CLF'
+    }, {
+      label: 'Yuan Renminbi (CNY)',
+      value: 'CNY'
+    }, {
+      label: 'Colombian Peso (COP)',
+      value: 'COP'
+    }, {
+      label: 'Unidad de Valor Real (COU)',
+      value: 'COU'
+    }, {
+      label: 'Comorian Franc (KMF)',
+      value: 'KMF'
+    }, {
+      label: 'Congolese Franc (CDF)',
+      value: 'CDF'
+    }, {
+      label: 'New Zealand Dollar (NZD)',
+      value: 'NZD'
+    }, {
+      label: 'Costa Rican Colon (CRC)',
+      value: 'CRC'
+    }, {
+      label: 'Kuna (HRK)',
+      value: 'HRK'
+    }, {
+      label: 'Cuban Peso (CUP)',
+      value: 'CUP'
+    }, {
+      label: 'Peso Convertible (CUC)',
+      value: 'CUC'
+    }, {
+      label: 'Netherlands Antillean Guilder (ANG)',
+      value: 'ANG'
+    }, {
+      label: 'Czech Koruna (CZK)',
+      value: 'CZK'
+    }, {
+      label: 'Danish Krone (DKK)',
+      value: 'DKK'
+    }, {
+      label: 'Djibouti Franc (DJF)',
+      value: 'DJF'
+    }, {
+      label: 'Dominican Peso (DOP)',
+      value: 'DOP'
+    }, {
+      label: 'Egyptian Pound (EGP)',
+      value: 'EGP'
+    }, {
+      label: 'El Salvador Colon (SVC)',
+      value: 'SVC'
+    }, {
+      label: 'Nakfa (ERN)',
+      value: 'ERN'
+    }, {
+      label: 'Ethiopian Birr (ETB)',
+      value: 'ETB'
+    }, {
+      label: 'Falkland Islands Pound (FKP)',
+      value: 'FKP'
+    }, {
+      label: 'Fiji Dollar (FJD)',
+      value: 'FJD'
+    }, {
+      label: 'CFP Franc (XPF)',
+      value: 'XPF'
+    }, {
+      label: 'Dalasi (GMD)',
+      value: 'GMD'
+    }, {
+      label: 'Lari (GEL)',
+      value: 'GEL'
+    }, {
+      label: 'Ghana Cedi (GHS)',
+      value: 'GHS'
+    }, {
+      label: 'Gibraltar Pound (GIP)',
+      value: 'GIP'
+    }, {
+      label: 'Quetzal (GTQ)',
+      value: 'GTQ'
+    }, {
+      label: 'Guinean Franc (GNF)',
+      value: 'GNF'
+    }, {
+      label: 'Guyana Dollar (GYD)',
+      value: 'GYD'
+    }, {
+      label: 'Gourde (HTG)',
+      value: 'HTG'
+    }, {
+      label: 'Lempira (HNL)',
+      value: 'HNL'
+    }, {
+      label: 'Hong Kong Dollar (HKD)',
+      value: 'HKD'
+    }, {
+      label: 'Forint (HUF)',
+      value: 'HUF'
+    }, {
+      label: 'Iceland Krona (ISK)',
+      value: 'ISK'
+    }, {
+      label: 'Indian Rupee (INR)',
+      value: 'INR'
+    }, {
+      label: 'Rupiah (IDR)',
+      value: 'IDR'
+    }, {
+      label: 'SDR (Special Drawing Right) (XDR)',
+      value: 'XDR'
+    }, {
+      label: 'Iranian Rial (IRR)',
+      value: 'IRR'
+    }, {
+      label: 'Iraqi Dinar (IQD)',
+      value: 'IQD'
+    }, {
+      label: 'New Israeli Sheqel (ILS)',
+      value: 'ILS'
+    }, {
+      label: 'Jamaican Dollar (JMD)',
+      value: 'JMD'
+    }, {
+      label: 'Yen (JPY)',
+      value: 'JPY'
+    }, {
+      label: 'Jordanian Dinar (JOD)',
+      value: 'JOD'
+    }, {
+      label: 'Tenge (KZT)',
+      value: 'KZT'
+    }, {
+      label: 'Kenyan Shilling (KES)',
+      value: 'KES'
+    }, {
+      label: 'North Korean Won (KPW)',
+      value: 'KPW'
+    }, {
+      label: 'Won (KRW)',
+      value: 'KRW'
+    }, {
+      label: 'Kuwaiti Dinar (KWD)',
+      value: 'KWD'
+    }, {
+      label: 'Som (KGS)',
+      value: 'KGS'
+    }, {
+      label: 'Lao Kip (LAK)',
+      value: 'LAK'
+    }, {
+      label: 'Lebanese Pound (LBP)',
+      value: 'LBP'
+    }, {
+      label: 'Loti (LSL)',
+      value: 'LSL'
+    }, {
+      label: 'Rand (ZAR)',
+      value: 'ZAR'
+    }, {
+      label: 'Liberian Dollar (LRD)',
+      value: 'LRD'
+    }, {
+      label: 'Libyan Dinar (LYD)',
+      value: 'LYD'
+    }, {
+      label: 'Swiss Franc (CHF)',
+      value: 'CHF'
+    }, {
+      label: 'Pataca (MOP)',
+      value: 'MOP'
+    }, {
+      label: 'Denar (MKD)',
+      value: 'MKD'
+    }, {
+      label: 'Malagasy Ariary (MGA)',
+      value: 'MGA'
+    }, {
+      label: 'Malawi Kwacha (MWK)',
+      value: 'MWK'
+    }, {
+      label: 'Malaysian Ringgit (MYR)',
+      value: 'MYR'
+    }, {
+      label: 'Rufiyaa (MVR)',
+      value: 'MVR'
+    }, {
+      label: 'Ouguiya (MRU)',
+      value: 'MRU'
+    }, {
+      label: 'Mauritius Rupee (MUR)',
+      value: 'MUR'
+    }, {
+      label: 'ADB Unit of Account (XUA)',
+      value: 'XUA'
+    }, {
+      label: 'Mexican Peso (MXN)',
+      value: 'MXN'
+    }, {
+      label: 'Mexican Unidad de Inversion (UDI) (MXV)',
+      value: 'MXV'
+    }, {
+      label: 'Moldovan Leu (MDL)',
+      value: 'MDL'
+    }, {
+      label: 'Tugrik (MNT)',
+      value: 'MNT'
+    }, {
+      label: 'Moroccan Dirham (MAD)',
+      value: 'MAD'
+    }, {
+      label: 'Mozambique Metical (MZN)',
+      value: 'MZN'
+    }, {
+      label: 'Kyat (MMK)',
+      value: 'MMK'
+    }, {
+      label: 'Namibia Dollar (NAD)',
+      value: 'NAD'
+    }, {
+      label: 'Nepalese Rupee (NPR)',
+      value: 'NPR'
+    }, {
+      label: 'Cordoba Oro (NIO)',
+      value: 'NIO'
+    }, {
+      label: 'Naira (NGN)',
+      value: 'NGN'
+    }, {
+      label: 'Rial Omani (OMR)',
+      value: 'OMR'
+    }, {
+      label: 'Pakistan Rupee (PKR)',
+      value: 'PKR'
+    }, {
+      label: 'Balboa (PAB)',
+      value: 'PAB'
+    }, {
+      label: 'Kina (PGK)',
+      value: 'PGK'
+    }, {
+      label: 'Guarani (PYG)',
+      value: 'PYG'
+    }, {
+      label: 'Sol (PEN)',
+      value: 'PEN'
+    }, {
+      label: 'Philippine Peso (PHP)',
+      value: 'PHP'
+    }, {
+      label: 'Zloty (PLN)',
+      value: 'PLN'
+    }, {
+      label: 'Qatari Rial (QAR)',
+      value: 'QAR'
+    }, {
+      label: 'Romanian Leu (RON)',
+      value: 'RON'
+    }, {
+      label: 'Russian Ruble (RUB)',
+      value: 'RUB'
+    }, {
+      label: 'Rwanda Franc (RWF)',
+      value: 'RWF'
+    }, {
+      label: 'Saint Helena Pound (SHP)',
+      value: 'SHP'
+    }, {
+      label: 'Tala (WST)',
+      value: 'WST'
+    }, {
+      label: 'Dobra (STN)',
+      value: 'STN'
+    }, {
+      label: 'Saudi Riyal (SAR)',
+      value: 'SAR'
+    }, {
+      label: 'Serbian Dinar (RSD)',
+      value: 'RSD'
+    }, {
+      label: 'Seychelles Rupee (SCR)',
+      value: 'SCR'
+    }, {
+      label: 'Leone (SLL)',
+      value: 'SLL'
+    }, {
+      label: 'Singapore Dollar (SGD)',
+      value: 'SGD'
+    }, {
+      label: 'Sucre (XSU)',
+      value: 'XSU'
+    }, {
+      label: 'Solomon Islands Dollar (SBD)',
+      value: 'SBD'
+    }, {
+      label: 'Somali Shilling (SOS)',
+      value: 'SOS'
+    }, {
+      label: 'South Sudanese Pound (SSP)',
+      value: 'SSP'
+    }, {
+      label: 'Sri Lanka Rupee (LKR)',
+      value: 'LKR'
+    }, {
+      label: 'Sudanese Pound (SDG)',
+      value: 'SDG'
+    }, {
+      label: 'Surinam Dollar (SRD)',
+      value: 'SRD'
+    }, {
+      label: 'Lilangeni (SZL)',
+      value: 'SZL'
+    }, {
+      label: 'Swedish Krona (SEK)',
+      value: 'SEK'
+    }, {
+      label: 'WIR Euro (CHE)',
+      value: 'CHE'
+    }, {
+      label: 'WIR Franc (CHW)',
+      value: 'CHW'
+    }, {
+      label: 'Syrian Pound (SYP)',
+      value: 'SYP'
+    }, {
+      label: 'New Taiwan Dollar (TWD)',
+      value: 'TWD'
+    }, {
+      label: 'Somoni (TJS)',
+      value: 'TJS'
+    }, {
+      label: 'Tanzanian Shilling (TZS)',
+      value: 'TZS'
+    }, {
+      label: 'Baht (THB)',
+      value: 'THB'
+    }, {
+      label: 'Pa’anga (TOP)',
+      value: 'TOP'
+    }, {
+      label: 'Trinidad and Tobago Dollar (TTD)',
+      value: 'TTD'
+    }, {
+      label: 'Tunisian Dinar (TND)',
+      value: 'TND'
+    }, {
+      label: 'Turkish Lira (TRY)',
+      value: 'TRY'
+    }, {
+      label: 'Turkmenistan New Manat (TMT)',
+      value: 'TMT'
+    }, {
+      label: 'Uganda Shilling (UGX)',
+      value: 'UGX'
+    }, {
+      label: 'Hryvnia (UAH)',
+      value: 'UAH'
+    }, {
+      label: 'UAE Dirham (AED)',
+      value: 'AED'
+    }, {
+      label: 'US Dollar (Next day) (USN)',
+      value: 'USN'
+    }, {
+      label: 'Peso Uruguayo (UYU)',
+      value: 'UYU'
+    }, {
+      label: 'Uruguay Peso en Unidades Indexadas (UYI)',
+      value: 'UYI'
+    }, {
+      label: 'Unidad Previsional (UYW)',
+      value: 'UYW'
+    }, {
+      label: 'Uzbekistan Sum (UZS)',
+      value: 'UZS'
+    }, {
+      label: 'Vatu (VUV)',
+      value: 'VUV'
+    }, {
+      label: 'Bolívar Soberano (VES)',
+      value: 'VES'
+    }, {
+      label: 'Dong (VND)',
+      value: 'VND'
+    }, {
+      label: 'Yemeni Rial (YER)',
+      value: 'YER'
+    }, {
+      label: 'Zambian Kwacha (ZMW)',
+      value: 'ZMW'
+    }, {
+      label: 'Zimbabwe Dollar (ZWL),',
+      value: 'ZWL'
+    }]
+  }
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/currency/editForm/Currency.edit.display.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/formiojs/components/currency/editForm/Currency.edit.display.js ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  type: 'textfield',
+  input: true,
+  weight: 310,
+  key: 'prefix',
+  label: 'prefix',
+  tooltip: 'Specify the prefix symbol after the component (e.g.: USD, EUR)'
+}, {
+  type: 'textfield',
+  input: true,
+  weight: 320,
+  key: 'suffix',
+  label: 'suffix',
+  tooltip: 'Specify the suffix symbol after the component (e.g.: USD, EUR).'
+}];
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/datagrid/DataGrid.form.js":
 /*!********************************************************************!*\
   !*** ./node_modules/formiojs/components/datagrid/DataGrid.form.js ***!
@@ -30953,6 +32356,12 @@ function _default() {
   return _Base.default.apply(void 0, [[{
     key: 'display',
     components: _DataGridEdit.default
+  }, {
+    key: 'data',
+    components: [{
+      key: 'defaultValue',
+      ignore: true
+    }]
   }]].concat(extend));
 }
 
@@ -30972,6 +32381,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-js/modules/es6.array.from.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
@@ -30994,6 +32409,14 @@ var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -31459,6 +32882,42 @@ function (_NestedComponent) {
       });
     }
   }, {
+    key: "getComponent",
+    value: function getComponent(path, fn, err) {
+      var index = err.index;
+      path = Array.isArray(path) ? path : [path];
+
+      var _path = path,
+          _path2 = _toArray(_path),
+          key = _path2[0],
+          remainingPath = _path2.slice(1);
+
+      var result = [];
+
+      if (!_lodash.default.isString(key)) {
+        return result;
+      }
+
+      this.everyComponent(function (component, components) {
+        if (component.component.key === key) {
+          if (!_lodash.default.isNil(index) && component.rowIndex !== index) {
+            return;
+          }
+
+          var comp = component;
+
+          if (remainingPath.length > 0 && 'getComponent' in component) {
+            comp = component.getComponent(remainingPath, fn);
+          } else if (fn) {
+            fn(component, components);
+          }
+
+          result = result.concat(comp);
+        }
+      });
+      return result.length > 0 ? result : null;
+    }
+  }, {
     key: "defaultSchema",
     get: function get() {
       return DataGridComponent.schema();
@@ -31604,6 +33063,12 @@ function _default() {
   return _Base.default.apply(void 0, [[{
     key: 'display',
     components: _DataMapEdit.default
+  }, {
+    key: 'data',
+    components: [{
+      key: 'defaultValue',
+      ignore: true
+    }]
   }]].concat(extend));
 }
 
@@ -32287,7 +33752,7 @@ function (_BaseComponent) {
   }, {
     key: "isEmpty",
     value: function isEmpty(value) {
-      if (value.toString() === 'Invalid Date') {
+      if (value && value.toString() === 'Invalid Date') {
         return true;
       }
 
@@ -32467,7 +33932,7 @@ var _default = [{
   key: 'format',
   label: 'Format',
   placeholder: 'Format',
-  description: 'Use formats formats provided by <a href="https://github.com/angular-ui/bootstrap/tree/master/src/dateparser/docs#uibdateparsers-format-codes" target="_blank">DateParser Codes</a>',
+  description: 'Use formats provided by <a href="https://github.com/angular-ui/bootstrap/tree/master/src/dateparser/docs#uibdateparsers-format-codes" target="_blank">DateParser Codes</a>',
   tooltip: 'The date format for saving the value of this field. You can use formats provided by <a href="https://github.com/angular-ui/bootstrap/tree/master/src/dateparser/docs#uibdateparsers-format-codes" target="_blank">DateParser Codes</a>',
   weight: 52
 }];
@@ -32717,8 +34182,10 @@ function (_BaseComponent) {
     key: "getInputValue",
     value: function getInputValue(input, defaultValue) {
       if (_lodash.default.isObject(input)) {
-        if (!_lodash.default.isNaN(input.value)) {
-          return parseInt(input.value, 10);
+        var value = parseInt(input.value, 10);
+
+        if (!_lodash.default.isNaN(value) && _lodash.default.isNumber(value)) {
+          return value;
         }
       }
 
@@ -32829,9 +34296,11 @@ function (_BaseComponent) {
       var self = this; // Ensure the day limits match up with the months selected.
 
       this.monthInput.onchange = function () {
-        self.dayInput.max = new Date(self.yearInput.value, this.value, 0).getDate();
+        var maxDay = parseInt(new Date(self.yearInput.value, this.value, 0).getDate(), 0);
+        var day = self.getInputValue(self.dayInput, 0);
+        self.dayInput.max = maxDay;
 
-        if (self.dayInput.value > self.dayInput.max) {
+        if (day > maxDay) {
           self.dayInput.value = self.dayInput.max;
         }
 
@@ -33514,6 +34983,12 @@ function _default() {
     key: 'templates',
     weight: 5,
     components: _EditGridEdit.default
+  }, {
+    key: 'data',
+    components: [{
+      key: 'defaultValue',
+      ignore: true
+    }]
   }]].concat(extend));
 }
 
@@ -33648,19 +35123,24 @@ function (_NestedComponent) {
       }
 
       this.createElement();
-      this.createLabel(this.element); // Ensure we always have rows for each dataValue available.
+      this.createLabel(this.element);
+      var dataValue = this.dataValue;
 
-      this.dataValue.forEach(function (row, rowIndex) {
-        if (_this2.editRows[rowIndex]) {
-          _this2.editRows[rowIndex].data = row;
-        } else {
-          _this2.editRows[rowIndex] = {
-            components: [],
-            isOpen: !!_this2.options.defaultOpen,
-            data: row
-          };
-        }
-      });
+      if (Array.isArray(dataValue)) {
+        // Ensure we always have rows for each dataValue available.
+        dataValue.forEach(function (row, rowIndex) {
+          if (_this2.editRows[rowIndex]) {
+            _this2.editRows[rowIndex].data = row;
+          } else {
+            _this2.editRows[rowIndex] = {
+              components: [],
+              isOpen: !!_this2.options.defaultOpen,
+              data: row
+            };
+          }
+        });
+      }
+
       this.buildTable();
       this.createAddButton();
       this.createDescription(this.element);
@@ -33989,26 +35469,15 @@ function (_NestedComponent) {
       this.updateGrid();
     }
   }, {
-    key: "removeRowComponents",
-    value: function removeRowComponents(rowIndex) {
-      var _this6 = this;
-
-      // Clean up components list.
-      this.editRows[rowIndex].components.forEach(function (comp) {
-        _this6.removeComponent(comp, _this6.components);
-      });
-      this.editRows[rowIndex].components = [];
-    }
-  }, {
     key: "validateRow",
     value: function validateRow(rowIndex, dirty) {
-      var _this7 = this;
+      var _this6 = this;
 
       var check = true;
       var isDirty = dirty || !!this.editRows[rowIndex].dirty;
       this.editRows[rowIndex].components.forEach(function (comp) {
         comp.setPristine(!isDirty);
-        check &= comp.checkValidity(null, isDirty, _this7.editRows[rowIndex].data);
+        check &= comp.checkValidity(null, isDirty, _this6.editRows[rowIndex].data);
       });
 
       if (this.component.validate && this.component.validate.row) {
@@ -34036,7 +35505,7 @@ function (_NestedComponent) {
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
-      var _this8 = this;
+      var _this7 = this;
 
       if (!this.checkCondition(null, data)) {
         this.setCustomValidity('');
@@ -34047,13 +35516,13 @@ function (_NestedComponent) {
       var rowsClosed = true;
       this.editRows.forEach(function (editRow, rowIndex) {
         // Trigger all errors on the row.
-        var rowValid = _this8.validateRow(rowIndex, dirty); // Add has-error class to row.
+        var rowValid = _this7.validateRow(rowIndex, dirty); // Add has-error class to row.
 
 
         if (!rowValid) {
-          _this8.addClass(_this8.editRows[rowIndex].element, 'has-error');
+          _this7.addClass(_this7.editRows[rowIndex].element, 'has-error');
         } else {
-          _this8.removeClass(_this8.editRows[rowIndex].element, 'has-error');
+          _this7.removeClass(_this7.editRows[rowIndex].element, 'has-error');
         }
 
         rowsValid &= rowValid; // Any open rows causes validation to fail.
@@ -34114,7 +35583,7 @@ function (_NestedComponent) {
   }, {
     key: "setValue",
     value: function setValue(value) {
-      var _this9 = this;
+      var _this8 = this;
 
       if (!value) {
         this.editRows = this.defaultValue;
@@ -34131,24 +35600,28 @@ function (_NestedComponent) {
       }
 
       var changed = this.hasChanged(value, this.dataValue);
-      this.dataValue = value; // Refresh editRow data when data changes.
+      this.dataValue = value;
+      var dataValue = this.dataValue;
 
-      this.dataValue.forEach(function (row, rowIndex) {
-        if (_this9.editRows[rowIndex]) {
-          _this9.editRows[rowIndex].data = row;
-        } else {
-          _this9.editRows[rowIndex] = {
-            components: [],
-            isOpen: !!_this9.options.defaultOpen,
-            data: row
-          };
-        }
-      }); // Remove any extra edit rows.
+      if (Array.isArray(dataValue)) {
+        // Refresh editRow data when data changes.
+        dataValue.forEach(function (row, rowIndex) {
+          if (_this8.editRows[rowIndex]) {
+            _this8.editRows[rowIndex].data = row;
+          } else {
+            _this8.editRows[rowIndex] = {
+              components: [],
+              isOpen: !!_this8.options.defaultOpen,
+              data: row
+            };
+          }
+        }); // Remove any extra edit rows.
 
-      if (this.dataValue.length < this.editRows.length) {
-        for (var rowIndex = this.editRows.length - 1; rowIndex >= this.dataValue.length; rowIndex--) {
-          this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
-          this.editRows.splice(rowIndex, 1);
+        if (dataValue.length < this.editRows.length) {
+          for (var rowIndex = this.editRows.length - 1; rowIndex >= dataValue.length; rowIndex--) {
+            this.removeChildFrom(this.editRows[rowIndex].element, this.tableElement);
+            this.editRows.splice(rowIndex, 1);
+          }
         }
       }
 
@@ -34282,6 +35755,586 @@ var _default = [{
   label: 'Remove Row Text',
   placeholder: 'Remove',
   tooltip: 'Set the text of the remove Row button.'
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/edittable/EditTable.form.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/components/edittable/EditTable.form.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
+
+var _EditTableEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/EditTable.edit.display */ "./node_modules/formiojs/components/edittable/editForm/EditTable.edit.display.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _default() {
+  for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Base.default.apply(void 0, [[{
+    key: 'display',
+    components: _EditTableEdit.default
+  }, {
+    key: 'data',
+    components: [{
+      key: 'defaultValue',
+      ignore: true
+    }, {
+      label: '',
+      mask: false,
+      tableView: true,
+      alwaysEnabled: false,
+      type: 'hidden',
+      input: true,
+      key: 'disableAddingRemovingRows',
+      calculateValue: 'value = data.enableRowGroups',
+      encrypted: false
+    }, {
+      key: 'enableRowGroups',
+      type: 'checkbox',
+      label: 'Enable Row Groups',
+      weight: 50
+    }, {
+      label: 'Groups',
+      disableAddingRemovingRows: false,
+      defaultOpen: false,
+      addAnother: '',
+      addAnotherPosition: 'bottom',
+      mask: false,
+      tableView: true,
+      alwaysEnabled: false,
+      type: 'datagrid',
+      input: true,
+      key: 'rowGroups',
+      components: [{
+        label: 'Label',
+        allowMultipleMasks: false,
+        showWordCount: false,
+        showCharCount: false,
+        tableView: true,
+        alwaysEnabled: false,
+        type: 'textfield',
+        input: true,
+        key: 'label',
+        widget: {
+          type: ''
+        },
+        row: '0-0'
+      }, {
+        label: 'Number of Rows',
+        mask: false,
+        tableView: true,
+        alwaysEnabled: false,
+        type: 'number',
+        input: true,
+        key: 'numberOfRows',
+        row: '0-1'
+      }],
+      weight: 51,
+      conditional: {
+        json: {
+          var: 'data.enableRowGroups'
+        }
+      }
+    }]
+  }]].concat(extend));
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/edittable/EditTable.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/components/edittable/EditTable.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-js/modules/es6.array.from.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _DataGrid = _interopRequireDefault(__webpack_require__(/*! ../datagrid/DataGrid */ "./node_modules/formiojs/components/datagrid/DataGrid.js"));
+
+var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ../modaledit/ModalEdit */ "./node_modules/formiojs/components/modaledit/ModalEdit.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var EditTableComponent =
+/*#__PURE__*/
+function (_DataGridComponent) {
+  _inherits(EditTableComponent, _DataGridComponent);
+
+  _createClass(EditTableComponent, null, [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _DataGrid.default.schema.apply(_DataGrid.default, [{
+        label: 'Edit Table',
+        key: 'editTable',
+        type: 'edittable',
+        input: true,
+        tree: true,
+        components: [],
+        columns: []
+      }].concat(extend));
+    }
+  }, {
+    key: "builderInfo",
+    get: function get() {
+      return false;
+      /*
+      return {
+        title: 'Edit Table',
+        icon: 'fa fa-th',
+        group: 'data',
+        weight: 20,
+        schema: EditTableComponent.schema()
+      };
+      */
+    }
+  }]);
+
+  function EditTableComponent() {
+    var _getPrototypeOf2;
+
+    var _this;
+
+    _classCallCheck(this, EditTableComponent);
+
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(EditTableComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    var groups = _lodash.default.get(_this.component, 'rowGroups', []);
+
+    if (_this.hasColumns()) {
+      _this.component.components = _this.componentComponents;
+    }
+
+    if (_this.groupsMode) {
+      _this.addEmptyRows(_this.totalRowsNumber(groups));
+    }
+
+    return _this;
+  }
+  /**
+   * Checks whether columns are available
+   * @return {Boolean}
+   */
+
+
+  _createClass(EditTableComponent, [{
+    key: "hasColumns",
+    value: function hasColumns() {
+      return this.getColumns().length > 0;
+    }
+    /** Don't show last col in header **/
+
+    /** @override **/
+
+  }, {
+    key: "hasExtraColumn",
+    value: function hasExtraColumn() {
+      return false;
+    }
+    /** @override **/
+
+  }, {
+    key: "hasAddButton",
+    value: function hasAddButton() {
+      return _get(_getPrototypeOf(EditTableComponent.prototype), "hasAddButton", this).call(this) && this.hasColumns();
+    }
+  }, {
+    key: "componentSchema",
+    value: function componentSchema() {
+      for (var _len3 = arguments.length, extend = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        extend[_key3] = arguments[_key3];
+      }
+
+      return _ModalEdit.default.schema.apply(_ModalEdit.default, [{
+        rows: 0,
+        editor: 'ckeditor',
+        hideLabel: true
+      }].concat(extend));
+    }
+    /**
+     * Returns all non-empty columns.
+     *
+     * @return {Array}
+     */
+
+  }, {
+    key: "getColumns",
+    value: function getColumns() {
+      var _this2 = this;
+
+      var cols = _lodash.default.get(this, 'component.columns', []);
+
+      return _lodash.default.filter(_lodash.default.map(cols, function (c) {
+        return _lodash.default.pick(c, ['label', 'key']);
+      }), function (c) {
+        return !_lodash.default.isEqual(c, _this2.emptyColumn);
+      });
+    }
+  }, {
+    key: "getGroups",
+    value: function getGroups() {
+      return _lodash.default.get(this.component, 'rowGroups', []);
+    }
+  }, {
+    key: "totalRowsNumber",
+    value: function totalRowsNumber(groups) {
+      return _lodash.default.sum(_lodash.default.map(groups, 'numberOfRows'));
+    }
+  }, {
+    key: "addEmptyRows",
+    value: function addEmptyRows(n) {
+      this.dataValue = _lodash.default.range(n).map(function () {
+        return {};
+      });
+    }
+  }, {
+    key: "build",
+
+    /** @override **/
+    value: function build() {
+      var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _get(_getPrototypeOf(EditTableComponent.prototype), "build", this).call(this, state);
+
+      this.tableElement.className = this.tableClass;
+
+      if (this.options.builder && !this.hasColumns()) {
+        this.element.appendChild(this.builderView());
+      }
+
+      this.setMeta();
+    }
+  }, {
+    key: "buildRows",
+    value: function buildRows() {
+      _get(_getPrototypeOf(EditTableComponent.prototype), "buildRows", this).call(this);
+
+      if (this.groupsMode) {
+        this.buildGroups();
+      }
+    }
+  }, {
+    key: "buildGroups",
+    value: function buildGroups() {
+      var _this3 = this;
+
+      var groups = _lodash.default.get(this.component, 'rowGroups', []);
+
+      var ranges = _lodash.default.map(groups, 'numberOfRows');
+
+      var rows = this.tableElement.querySelectorAll('tbody>tr');
+      var tbody = this.tableElement.querySelector('tbody');
+      var chunks = this.getRowChunks(ranges, rows);
+      var firstElements = chunks.map(_lodash.default.head);
+      var groupElements = groups.map(function (g) {
+        return _this3.buildGroup(g);
+      });
+      groupElements.forEach(function (elt, index) {
+        var row = firstElements[index];
+
+        if (row) {
+          tbody.insertBefore(elt, row);
+        }
+      });
+    }
+    /**
+     * @param {Numbers[]} groups
+     * @param {Array<T>} coll - collection
+     *
+     * @return {Array<T[]>}
+     */
+
+  }, {
+    key: "getRowChunks",
+    value: function getRowChunks(groups, coll) {
+      var _groups$reduce = groups.reduce(function (_ref, size) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            startIndex = _ref2[0],
+            acc = _ref2[1];
+
+        var endIndex = startIndex + size;
+        return [endIndex, [].concat(_toConsumableArray(acc), [[startIndex, endIndex]])];
+      }, [0, []]),
+          _groups$reduce2 = _slicedToArray(_groups$reduce, 2),
+          chunks = _groups$reduce2[1];
+
+      return chunks.map(function (range) {
+        return _lodash.default.slice.apply(_lodash.default, [coll].concat(_toConsumableArray(range)));
+      });
+    }
+  }, {
+    key: "buildGroup",
+    value: function buildGroup(_ref3) {
+      var label = _ref3.label;
+      var colsNumber = this.getColumns().length;
+      var cell = this.ce('td', {
+        colspan: colsNumber,
+        class: 'edittable-group-label'
+      }, label);
+      return this.ce('tr', null, cell);
+    }
+    /** @override **/
+
+  }, {
+    key: "buildRow",
+    value: function buildRow(row, index) {
+      var _this4 = this;
+
+      var state = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+      if (this.options.builder) {
+        return null;
+      }
+
+      this.rows[index] = {};
+      var colSchemes = this.componentComponents;
+      var lastIndex = colSchemes.length - 1;
+      var columns = colSchemes.map(function (col, colIndex) {
+        var colContainer = _this4.buildComponent(col, colIndex, row, index, _this4.getComponentState(col, state));
+
+        if (_this4.hasRemoveButtons() && colIndex === lastIndex) {
+          colContainer.append(_this4.removeButton(index));
+        }
+
+        return colContainer;
+      });
+      return this.ce('tr', null, columns);
+    }
+    /** override **/
+
+  }, {
+    key: "removeButton",
+    value: function removeButton(index) {
+      var _this5 = this;
+
+      var type = _lodash.default.get(this.component, 'type', 'edittable');
+
+      var button = this.ce('button', {
+        type: 'button',
+        class: "btn btn-xxs btn-danger formio-".concat(type, "-remove")
+      }, this.ce('i', {
+        class: this.iconClass('remove')
+      }));
+      this.addEventListener(button, 'click', function (event) {
+        event.preventDefault();
+
+        _this5.removeValue(index);
+      });
+      return button;
+    }
+  }, {
+    key: "builderView",
+    value: function builderView() {
+      return this.ce('div', {
+        class: 'well edittable-placeholder'
+      }, [this.ce('i', {
+        class: this.iconClass('warning-sign')
+      }), ' ', this.t('No columns provided')]);
+    }
+  }, {
+    key: "getMeta",
+    value: function getMeta() {
+      var groups = this.getGroups();
+
+      if (this.hasColumns && groups.length) {
+        return groups.reduce(function (info, g) {
+          info[g.label] = g.numberOfRows;
+          return info;
+        }, {});
+      } else {
+        return null;
+      }
+    }
+  }, {
+    key: "setMeta",
+    value: function setMeta() {
+      var key = _lodash.default.get(this.component, 'key');
+
+      var data = this.getMeta();
+
+      if (key && data) {
+        _lodash.default.set(this.root, ['_submission', 'metadata', key], data);
+      }
+    }
+  }, {
+    key: "emptyColumn",
+    get: function get() {
+      return {
+        label: '',
+        key: ''
+      };
+    }
+  }, {
+    key: "componentComponents",
+    get: function get() {
+      var _this6 = this;
+
+      return this.getColumns().map(function (_ref4) {
+        var label = _ref4.label,
+            key = _ref4.key;
+        return _this6.componentSchema({
+          label: label,
+          key: key
+        });
+      });
+    }
+  }, {
+    key: "tableClass",
+    get: function get() {
+      var _this7 = this;
+
+      var type = _lodash.default.get(this.component, 'type', 'edittable');
+
+      var defaultClass = ['table', 'table-bordered', "table-".concat(type), 'form-group', "formio-".concat(type, "-table")].join(' ');
+
+      var className = _lodash.default.get(this.component, 'tableClass');
+
+      if (className === '' || !_lodash.default.isString(className)) {
+        className = defaultClass;
+      }
+
+      ['striped', 'bordered', 'hover', 'condensed'].forEach(function (prop) {
+        if (_this7.component[prop]) {
+          className = "".concat(className, " table-").concat(prop);
+        }
+      });
+      return className;
+    }
+  }, {
+    key: "groupsMode",
+    get: function get() {
+      return _lodash.default.get(this.component, 'enableRowGroups', false);
+    }
+  }]);
+
+  return EditTableComponent;
+}(_DataGrid.default);
+
+exports.default = EditTableComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/edittable/editForm/EditTable.edit.display.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/formiojs/components/edittable/editForm/EditTable.edit.display.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'columns',
+  type: 'datagrid',
+  input: true,
+  label: 'Columns',
+  weight: 100,
+  components: [{
+    key: 'label',
+    label: 'Column Label',
+    type: 'textfield',
+    input: true
+  }, {
+    key: 'key',
+    label: 'Column Key',
+    type: 'textfield',
+    allowCalculateOverride: true,
+    input: true,
+    calculateValue: {
+      _camelCase: [{
+        var: 'row.label'
+      }]
+    }
+  }]
 }];
 exports.default = _default;
 
@@ -35473,7 +37526,11 @@ function (_BaseComponent) {
               file.private = true;
             }
 
-            fileService.uploadFile(_this13.component.storage, file, fileName, dir, function (evt) {
+            var _this13$component = _this13.component,
+                storage = _this13$component.storage,
+                url = _this13$component.url,
+                options = _this13$component.options;
+            fileService.uploadFile(storage, file, fileName, dir, function (evt) {
               fileUpload.status = 'progress';
               fileUpload.progress = parseInt(100.0 * evt.loaded / evt.total);
               delete fileUpload.message;
@@ -35481,7 +37538,7 @@ function (_BaseComponent) {
               uploadStatus = _this13.createUploadStatus(fileUpload);
 
               _this13.uploadStatusList.replaceChild(uploadStatus, originalStatus);
-            }, _this13.component.url).then(function (fileInfo) {
+            }, url, options).then(function (fileInfo) {
               _this13.removeChildFrom(uploadStatus, _this13.uploadStatusList); // Default to first type.
 
 
@@ -35562,7 +37619,7 @@ function (_BaseComponent) {
   }, {
     key: "hasTypes",
     get: function get() {
-      return this.component.fileTypes && Array.isArray(this.component.fileTypes) && this.component.fileTypes.length > 1;
+      return this.component.fileTypes && Array.isArray(this.component.fileTypes) && this.component.fileTypes.length !== 0 && (this.component.fileTypes[0].label !== '' || this.component.fileTypes[0].value !== '');
     }
   }, {
     key: "fileService",
@@ -35639,6 +37696,23 @@ var _default = [{
   weight: 10,
   placeholder: 'Enter the url to post the files to.',
   tooltip: "See <a href='https://github.com/danialfarid/ng-file-upload#server-side' target='_blank'>https://github.com/danialfarid/ng-file-upload#server-side</a> for how to set up the server.",
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.storage'
+      }, 'url']
+    }
+  }
+}, {
+  type: 'textarea',
+  key: 'options',
+  label: 'Custom request options',
+  tooltip: 'Pass your custom xhr options(optional)',
+  rows: 5,
+  editor: 'ace',
+  input: true,
+  weight: 15,
+  placeholder: "{\n      \"withCredentials\": true\n    }",
   conditional: {
     json: {
       '===': [{
@@ -35814,6 +37888,8 @@ __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_mod
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
 
+__webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-js/modules/es6.reflect.set.js");
+
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
@@ -35839,6 +37915,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function set(target, property, value, receiver) { if (typeof Reflect !== "undefined" && Reflect.set) { set = Reflect.set; } else { set = function set(target, property, value, receiver) { var base = _superPropBase(target, property); var desc; if (base) { desc = Object.getOwnPropertyDescriptor(base, property); if (desc.set) { desc.set.call(receiver, value); return true; } else if (!desc.writable) { return false; } } desc = Object.getOwnPropertyDescriptor(receiver, property); if (desc) { if (!desc.writable) { return false; } desc.value = value; Object.defineProperty(receiver, property, desc); } else { _defineProperty(receiver, property, value); } return true; }; } return set(target, property, value, receiver); }
+
+function _set(target, property, value, receiver, isStrict) { var s = set(target, property, value, receiver || target); if (!s && isStrict) { throw new Error('failed to set property'); } return value; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
@@ -35927,7 +38009,14 @@ function (_BaseComponent) {
     value: function renderSubForm(form, options) {
       var _this2 = this;
 
-      // Iterate through every component and hide the submit button.
+      if (this.options.builder) {
+        this.element.appendChild(this.ce('div', {
+          class: 'text-muted text-center p-2'
+        }, this.text(form.title)));
+        return;
+      } // Iterate through every component and hide the submit button.
+
+
       (0, _utils.eachComponent)(form.components, function (component) {
         if (component.type === 'button' && component.action === 'submit') {
           component.hidden = true;
@@ -35935,6 +38024,8 @@ function (_BaseComponent) {
       });
       new _Form.default(this.element, form, options).render().then(function (instance) {
         _this2.subForm = instance;
+        _this2.subForm.parent = _this2;
+        _this2.subForm.parentVisible = _this2.visible;
 
         _this2.subForm.on('change', function () {
           _this2.dataValue = _this2.subForm.getValue();
@@ -35983,12 +38074,24 @@ function (_BaseComponent) {
         srcOptions.readOnly = this.options.readOnly;
       }
 
+      if (this.options && this.options.breadcrumbSettings) {
+        srcOptions.breadcrumbSettings = this.options.breadcrumbSettings;
+      }
+
+      if (this.options && this.options.buttonSettings) {
+        srcOptions.buttonSettings = this.options.buttonSettings;
+      }
+
       if (this.options && this.options.icons) {
         srcOptions.icons = this.options.icons;
       }
 
       if (this.options && this.options.viewAsHtml) {
         srcOptions.viewAsHtml = this.options.viewAsHtml;
+      }
+
+      if (_lodash.default.has(this.options, 'language')) {
+        srcOptions.language = this.options.language;
       } // Make sure that if reference is provided, the form must submit.
 
 
@@ -36001,15 +38104,17 @@ function (_BaseComponent) {
       }
 
       if (!this.component.src && !this.options.formio && (this.component.form || this.component.path)) {
-        this.formSrc = _Formio.default.getBaseUrl();
-
         if (this.component.project) {
-          // Check to see if it is a MongoID.
+          this.formSrc = _Formio.default.getBaseUrl(); // Check to see if it is a MongoID.
+
           if ((0, _utils.isMongoId)(this.component.project)) {
             this.formSrc += '/project';
           }
 
           this.formSrc += "/".concat(this.component.project);
+          srcOptions.project = this.formSrc;
+        } else {
+          this.formSrc = _Formio.default.getProjectUrl();
           srcOptions.project = this.formSrc;
         }
 
@@ -36039,11 +38144,12 @@ function (_BaseComponent) {
       if (this.component && this.component.components && this.component.components.length) {
         this.renderSubForm(this.component, srcOptions);
       } else {
-        new _Formio.default(this.formSrc).loadForm({
+        var query = {
           params: {
             live: 1
           }
-        }).then(function (formObj) {
+        };
+        new _Formio.default(this.formSrc).loadForm(query).then(function (formObj) {
           return _this3.renderSubForm(formObj, srcOptions);
         }).catch(function (err) {
           return _this3.subFormReadyReject(err);
@@ -36195,6 +38301,13 @@ function (_BaseComponent) {
       return this.subForm.getAllComponents();
     }
   }, {
+    key: "updateSubFormVisibility",
+    value: function updateSubFormVisibility() {
+      if (this.subForm) {
+        this.subForm.parentVisible = this.visible;
+      }
+    }
+  }, {
     key: "defaultSchema",
     get: function get() {
       return FormComponent.schema();
@@ -36205,6 +38318,26 @@ function (_BaseComponent) {
       return {
         data: {}
       };
+    }
+  }, {
+    key: "visible",
+    get: function get() {
+      return _get(_getPrototypeOf(FormComponent.prototype), "visible", this);
+    },
+    set: function set(value) {
+      _set(_getPrototypeOf(FormComponent.prototype), "visible", value, this, true);
+
+      this.updateSubFormVisibility();
+    }
+  }, {
+    key: "parentVisible",
+    get: function get() {
+      return _get(_getPrototypeOf(FormComponent.prototype), "parentVisible", this);
+    },
+    set: function set(value) {
+      _set(_getPrototypeOf(FormComponent.prototype), "parentVisible", value, this, true);
+
+      this.updateSubFormVisibility();
     }
   }]);
 
@@ -36238,6 +38371,7 @@ var _default = [{
   },
   template: '<span>{{ item.title }}</span>',
   valueProperty: '_id',
+  authenticate: true,
   label: 'Form',
   key: 'form',
   weight: 10,
@@ -36703,11 +38837,11 @@ var _default = [{
             value: 'tooltip',
             type: 'string'
           }, {
-            label: 'Decription',
+            label: 'Description',
             value: 'description',
             type: 'string'
           }, {
-            label: 'Paceholder',
+            label: 'Placeholder',
             value: 'placeholder',
             type: 'string'
           }, {
@@ -36781,6 +38915,8 @@ var _Day = _interopRequireDefault(__webpack_require__(/*! ./day/Day */ "./node_m
 
 var _EditGrid = _interopRequireDefault(__webpack_require__(/*! ./editgrid/EditGrid */ "./node_modules/formiojs/components/editgrid/EditGrid.js"));
 
+var _EditTable = _interopRequireDefault(__webpack_require__(/*! ./edittable/EditTable */ "./node_modules/formiojs/components/edittable/EditTable.js"));
+
 var _HTML = _interopRequireDefault(__webpack_require__(/*! ./html/HTML */ "./node_modules/formiojs/components/html/HTML.js"));
 
 var _Hidden = _interopRequireDefault(__webpack_require__(/*! ./hidden/Hidden */ "./node_modules/formiojs/components/hidden/Hidden.js"));
@@ -36843,6 +38979,10 @@ var _File = _interopRequireDefault(__webpack_require__(/*! ./file/File */ "./nod
 
 var _Tabs = _interopRequireDefault(__webpack_require__(/*! ./tabs/Tabs */ "./node_modules/formiojs/components/tabs/Tabs.js"));
 
+var _Tree = _interopRequireDefault(__webpack_require__(/*! ./tree/Tree */ "./node_modules/formiojs/components/tree/Tree.js"));
+
+var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit */ "./node_modules/formiojs/components/modaledit/ModalEdit.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _default = {
@@ -36858,6 +38998,7 @@ var _default = {
   htmlelement: _HTML.default,
   hidden: _Hidden.default,
   editgrid: _EditGrid.default,
+  edittable: _EditTable.default,
   form: _Form.default,
   textfield: _TextField.default,
   phoneNumber: _PhoneNumber.default,
@@ -36886,7 +39027,9 @@ var _default = {
   survey: _Survey.default,
   well: _Well.default,
   location: _Location.default,
-  file: _File.default
+  file: _File.default,
+  tree: _Tree.default,
+  modaledit: _ModalEdit.default
 };
 exports.default = _default;
 
@@ -37247,6 +39390,385 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/modaledit/ModalEdit.form.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/components/modaledit/ModalEdit.form.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+var _TextArea = _interopRequireDefault(__webpack_require__(/*! ../textarea/TextArea.form */ "./node_modules/formiojs/components/textarea/TextArea.form.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _default() {
+  for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _TextArea.default.apply(void 0, [[{
+    key: 'display',
+    components: [{
+      key: 'rows',
+      ignore: true
+    }, {
+      key: 'multiple',
+      ignore: true
+    }]
+  }]].concat(extend));
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/modaledit/ModalEdit.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/components/modaledit/ModalEdit.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
+
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
+
+var _TextArea = _interopRequireDefault(__webpack_require__(/*! ../textarea/TextArea */ "./node_modules/formiojs/components/textarea/TextArea.js"));
+
+var _utils = __webpack_require__(/*! ../../utils/utils.js */ "./node_modules/formiojs/utils/utils.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var EDIT = Symbol('edit');
+var VIEW = Symbol('view');
+var CKEDITOR = 'https://cdn.ckeditor.com/ckeditor5/11.2.0/inline/ckeditor.js';
+
+var ModalEditComponent =
+/*#__PURE__*/
+function (_TextAreaComponent) {
+  _inherits(ModalEditComponent, _TextAreaComponent);
+
+  _createClass(ModalEditComponent, null, [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _TextArea.default.schema.apply(_TextArea.default, [{
+        type: 'modaledit',
+        label: 'Modal Edit',
+        key: 'modalEdit'
+      }].concat(extend));
+    }
+  }, {
+    key: "builderInfo",
+    get: function get() {
+      return {
+        title: 'Modal Edit',
+        group: 'advanced',
+        icon: 'fa fa-font',
+        weight: 50,
+        schema: ModalEditComponent.schema()
+      };
+    }
+  }]);
+
+  function ModalEditComponent() {
+    var _getPrototypeOf2;
+
+    var _this;
+
+    _classCallCheck(this, ModalEditComponent);
+
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(ModalEditComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
+
+    var _withSwitch = (0, _utils.withSwitch)(VIEW, EDIT),
+        _withSwitch2 = _slicedToArray(_withSwitch, 2),
+        get = _withSwitch2[0],
+        toggle = _withSwitch2[1];
+
+    _this.getMode = get;
+
+    _this.toggleMode = function () {
+      toggle();
+
+      _this.emit('modechange');
+    };
+
+    return _this;
+  }
+
+  _createClass(ModalEditComponent, [{
+    key: "build",
+    value: function build() {
+      var _this2 = this;
+
+      this.createElement();
+      var labelAtTheBottom = this.component.labelPosition === 'bottom';
+
+      if (!labelAtTheBottom) {
+        this.createLabel(this.element);
+      }
+
+      this.editElement = this.buildEditMode({
+        onCloseRequest: function onCloseRequest() {
+          _this2.removeChildFrom(_this2.editElement, document.body);
+
+          _this2.toggleMode();
+        }
+      });
+      this.preview = this.ce('div', {
+        class: 'edittable-preview'
+      });
+      this.element.appendChild(this.preview);
+      this.updateView(this.preview);
+
+      if (labelAtTheBottom) {
+        this.createLabel(this.element);
+      }
+
+      this.restoreValue();
+      this.on('modechange', this.updateView.bind(this, this.preview));
+    }
+  }, {
+    key: "buildViewMode",
+    value: function buildViewMode(_ref) {
+      var _ref$content = _ref.content,
+          content = _ref$content === void 0 ? '' : _ref$content,
+          onClick = _ref.onEdit;
+      var icon = this.ce('i', {
+        class: this.iconClass('edit')
+      });
+      var button = this.ce('button', {
+        type: 'button',
+        role: 'button',
+        onClick: onClick,
+        class: 'btn btn-xxs btn-warning formio-modaledit-edit'
+      }, icon);
+      var child = this.ce('div', {
+        class: 'modaledit-view-inner reset-margins'
+      });
+      child.innerHTML = this.interpolate(content);
+      return this.ce('div', {
+        class: 'formio-modaledit-view-container',
+        onDblClick: onClick
+      }, [button, child]);
+    }
+  }, {
+    key: "buildEditMode",
+    value: function buildEditMode(_ref2) {
+      var _this3 = this;
+
+      var onCloseRequest = _ref2.onCloseRequest,
+          onCloseClick = _ref2.onCloseClick,
+          onOverlayClick = _ref2.onOverlayClick;
+      var overlay = this.ce('div', {
+        class: 'formio-dialog-overlay'
+      });
+      var inner = this.ce('div', {
+        class: 'reset-margins'
+      });
+      var close = this.ce('button', {
+        type: 'button',
+        class: 'btn btn-primary btn-xs formio-modaledit-close'
+      }, 'Close');
+      var container = this.ce('div', {
+        class: 'formio-modaledit-content'
+      }, [close, inner]);
+      var dialog = this.ce('div', {
+        class: 'formio-dialog formio-dialog-theme-default formio-modaledit-dialog'
+      }, [overlay, container]);
+
+      var _this$defaultEditorSi = _slicedToArray(this.defaultEditorSize, 2),
+          dw = _this$defaultEditorSi[0],
+          dh = _this$defaultEditorSi[1];
+
+      var layout = _lodash.default.get(this.component, 'editorLayout', this.defaultLayout);
+
+      var widthPath = _lodash.default.get(this.layoutOptions, [layout, 'width']);
+
+      var heightPath = _lodash.default.get(this.layoutOptions, [layout, 'height']);
+
+      var width = _lodash.default.get(this.component, widthPath, dw);
+
+      var height = _lodash.default.get(this.component, heightPath, dh);
+
+      this.createInput(inner);
+
+      if (this.isPlain) {
+        var textarea = container.querySelector('textarea');
+        textarea.style.minHeight = "".concat(height, "px");
+        textarea.style.borderRadius = 0;
+        textarea.style.resize = 'vertical';
+      }
+
+      container.style.position = 'absolute';
+      container.style.backgroundColor = '#fff';
+      container.style.width = "".concat(width, "px");
+      container.style.minHeight = "".concat(height, "px");
+      this.addEventListener(overlay, 'click', function (event) {
+        event.preventDefault();
+
+        if (_lodash.default.isFunction(onOverlayClick)) {
+          onOverlayClick();
+        }
+
+        if (_lodash.default.isFunction(onCloseRequest)) {
+          onCloseRequest();
+        }
+      });
+      this.addEventListener(close, 'click', function (event) {
+        event.preventDefault();
+
+        if (_lodash.default.isFunction(onCloseClick)) {
+          onCloseClick();
+        }
+
+        if (_lodash.default.isFunction(onCloseRequest)) {
+          onCloseRequest();
+        }
+      });
+
+      dialog.updateLayout = function () {
+        var rect = _this3.preview.getBoundingClientRect();
+
+        container.style.top = "".concat(rect.top, "px");
+        container.style.left = "".concat(rect.left, "px");
+        container.style.width = "".concat(Math.max(width, rect.width), "px");
+      };
+
+      return dialog;
+    }
+  }, {
+    key: "updateView",
+    value: function updateView(container) {
+      var mode = this.getMode();
+
+      if (this.options.builder || mode === VIEW) {
+        var view = this.buildViewMode({
+          onEdit: this.toggleMode,
+          content: _lodash.default.isString(this.dataValue) ? this.dataValue : ''
+        });
+
+        if (container.firstChild) {
+          container.replaceChild(view, container.firstChild);
+        } else {
+          container.appendChild(view);
+        }
+      }
+
+      if (mode === EDIT) {
+        this.editElement.updateLayout();
+        document.body.appendChild(this.editElement);
+      }
+    } // get defaultValue() {
+    //   const value = super.defaultValue;
+    //   return '';
+    // }
+
+  }, {
+    key: "addCKE",
+    value: function addCKE(element, settings, onChange) {
+      settings = _lodash.default.isEmpty(settings) ? null : settings;
+      return _Formio.default.requireLibrary('ckeditor', 'InlineEditor', CKEDITOR, true).then(function () {
+        if (!element.parentNode) {
+          return Promise.reject();
+        }
+
+        return InlineEditor.create(element, settings).then(function (editor) {
+          editor.model.document.on('change', function () {
+            return onChange(editor.data.get());
+          });
+          return editor;
+        });
+      });
+    }
+  }, {
+    key: "defaultEditorSize",
+    get: function get() {
+      return [300, 200];
+    }
+  }, {
+    key: "defaultLayout",
+    get: function get() {
+      return 'grow';
+    }
+  }, {
+    key: "layoutOptions",
+    get: function get() {
+      return {
+        grow: {
+          width: 'minEditorWidth',
+          height: 'minEditorHeight'
+        },
+        fixed: {
+          width: 'width',
+          height: 'height'
+        }
+      };
+    }
+  }]);
+
+  return ModalEditComponent;
+}(_TextArea.default);
+
+exports.default = ModalEditComponent;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/nested/NestedComponent.form.js":
 /*!*************************************************************************!*\
   !*** ./node_modules/formiojs/components/nested/NestedComponent.form.js ***!
@@ -37297,9 +39819,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-js/modules/es6.array.from.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-js/modules/es6.reflect.set.js");
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
@@ -37329,11 +39857,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
+function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function set(target, property, value, receiver) { if (typeof Reflect !== "undefined" && Reflect.set) { set = Reflect.set; } else { set = function set(target, property, value, receiver) { var base = _superPropBase(target, property); var desc; if (base) { desc = Object.getOwnPropertyDescriptor(base, property); if (desc.set) { desc.set.call(receiver, value); return true; } else if (!desc.writable) { return false; } } desc = Object.getOwnPropertyDescriptor(receiver, property); if (desc) { if (!desc.writable) { return false; } desc.value = value; Object.defineProperty(receiver, property, desc); } else { _defineProperty(receiver, property, value); } return true; }; } return set(target, property, value, receiver); }
+
+function _set(target, property, value, receiver, isStrict) { var s = set(target, property, value, receiver || target); if (!s && isStrict) { throw new Error('failed to set property'); } return value; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
@@ -37458,13 +40000,27 @@ function (_BaseComponent) {
 
   }, {
     key: "getComponent",
-    value: function getComponent(key, fn) {
+    value: function getComponent(path, fn) {
+      path = Array.isArray(path) ? path : [path];
+
+      var _path = path,
+          _path2 = _toArray(_path),
+          key = _path2[0],
+          remainingPath = _path2.slice(1);
+
       var comp = null;
+
+      if (!_lodash.default.isString(key)) {
+        return comp;
+      }
+
       this.everyComponent(function (component, components) {
         if (component.component.key === key) {
           comp = component;
 
-          if (fn) {
+          if (remainingPath.length > 0 && 'getComponent' in component) {
+            comp = component.getComponent(remainingPath, fn);
+          } else if (fn) {
             fn(component, components);
           }
 
@@ -38028,6 +40584,34 @@ function (_BaseComponent) {
       return schema;
     }
   }, {
+    key: "visible",
+    set: function set(value) {
+      var _this10 = this;
+
+      _set(_getPrototypeOf(NestedComponent.prototype), "visible", value, this, true);
+
+      this.components.forEach(function (component) {
+        component.parentVisible = _this10.visible;
+      });
+    },
+    get: function get() {
+      return _get(_getPrototypeOf(NestedComponent.prototype), "visible", this);
+    }
+  }, {
+    key: "parentVisible",
+    set: function set(value) {
+      var _this11 = this;
+
+      _set(_getPrototypeOf(NestedComponent.prototype), "parentVisible", value, this, true);
+
+      this.components.forEach(function (component) {
+        component.parentVisible = _this11.visible;
+      });
+    },
+    get: function get() {
+      return _get(_getPrototypeOf(NestedComponent.prototype), "parentVisible", this);
+    }
+  }, {
     key: "componentComponents",
     get: function get() {
       return this.component.components;
@@ -38312,6 +40896,8 @@ function (_BaseComponent) {
     value: function formatValue(value) {
       if (this.component.requireDecimal && value && !value.includes(this.decimalSeparator)) {
         return "".concat(value).concat(this.decimalSeparator).concat(_lodash.default.repeat('0', this.decimalLimit));
+      } else if (this.component.requireDecimal && value && value.includes(this.decimalSeparator)) {
+        return "".concat(value).concat(_lodash.default.repeat('0', this.decimalLimit - value.split(this.decimalSeparator)[1].length), ")}");
       }
 
       return value;
@@ -38336,10 +40922,36 @@ function (_BaseComponent) {
     value: function getMaskedValue(value) {
       return (0, _vanillaTextMask.conformToMask)(value.toString(), this.numberMask).conformedValue;
     }
+    /** @override **/
+
+  }, {
+    key: "createInput",
+    value: function createInput() {
+      var _get2,
+          _this2 = this;
+
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      var input = (_get2 = _get(_getPrototypeOf(NumberComponent.prototype), "createInput", this)).call.apply(_get2, [this].concat(args));
+
+      if (this.component.requireDecimal) {
+        this.addEventListener(input, 'blur', function () {
+          var index = _this2.inputs.indexOf(input);
+
+          if (index !== -1) {
+            _this2.setValueAt(index, _this2.getValueAt(index));
+          }
+        });
+      }
+
+      return input;
+    }
   }, {
     key: "getView",
     value: function getView(value) {
-      if (!value) {
+      if (!value && value !== 0) {
         return '';
       }
 
@@ -39353,7 +41965,7 @@ function (_BaseComponent) {
         _lodash.default.each(this.wrappers, function (wrapper, index) {
           var input = _this2.inputs[index];
 
-          if (input.value === _value) {
+          if (input.value.toString() === _value.toString()) {
             //add class to container when selected
             _this2.addClass(wrapper, optionSelectedClass);
           } else {
@@ -39839,6 +42451,8 @@ __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_mod
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+
 __webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-js/modules/es6.reflect.set.js");
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
@@ -39870,6 +42484,8 @@ var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -39926,9 +42542,11 @@ function (_BaseComponent) {
         searchEnabled: true,
         searchField: '',
         minSearch: 0,
+        readOnlyValue: false,
         authenticate: false,
         template: '<span>{{ item.label }}</span>',
-        selectFields: ''
+        selectFields: '',
+        customOptions: {}
       }].concat(extend));
     }
   }, {
@@ -39983,6 +42601,11 @@ function (_BaseComponent) {
     value: function itemTemplate(data) {
       if (!data) {
         return '';
+      } // If they wish to show the value in read only mode, then just return the itemValue here.
+
+
+      if (this.options.readOnly && this.component.readOnlyValue) {
+        return this.itemValue(data);
       } // Perform a fast interpretation if we should not use the template.
 
 
@@ -40339,9 +42962,10 @@ function (_BaseComponent) {
               }
             }
 
-            this.loadItems(url, searchInput, this.requestHeaders, {
+            var query = this.component.authenticate ? {} : {
               noToken: true
-            }, method, body);
+            };
+            this.loadItems(url, searchInput, this.requestHeaders, query, method, body);
             break;
           }
       }
@@ -40415,7 +43039,18 @@ function (_BaseComponent) {
 
       var useSearch = this.component.hasOwnProperty('searchEnabled') ? this.component.searchEnabled : true;
       var placeholderValue = this.t(this.component.placeholder);
-      var choicesOptions = {
+      var customOptions = this.component.customOptions || {};
+
+      if (typeof customOptions == 'string') {
+        try {
+          customOptions = JSON.parse(customOptions);
+        } catch (err) {
+          console.warn(err.message);
+          customOptions = {};
+        }
+      }
+
+      var choicesOptions = _objectSpread({}, customOptions, {
         removeItemButton: this.component.disabled ? false : _lodash.default.get(this.component, 'removeItemButton', true),
         itemSelectText: '',
         classNames: {
@@ -40425,6 +43060,8 @@ function (_BaseComponent) {
         addItemText: false,
         placeholder: !!this.component.placeholder,
         placeholderValue: placeholderValue,
+        noResultsText: this.t('No results found'),
+        noChoicesText: this.t('No choices to choose from'),
         searchPlaceholderValue: this.t('Type to search'),
         shouldSort: false,
         position: this.component.dropdown || 'auto',
@@ -40436,9 +43073,11 @@ function (_BaseComponent) {
           threshold: 0.3
         },
         itemComparer: _lodash.default.isEqual
-      };
+      });
+
       var tabIndex = input.tabIndex;
       this.addPlaceholder(input);
+      input.setAttribute('dir', this.i18next.dir());
       this.choices = new _choices.default(input, choicesOptions);
 
       if (this.component.multiple) {
@@ -40560,7 +43199,7 @@ function (_BaseComponent) {
   }, {
     key: "getView",
     value: function getView(data) {
-      return this.asString(data);
+      return this.component.multiple && Array.isArray(data) ? data.map(this.asString.bind(this)).join(', ') : this.asString(data);
     }
   }, {
     key: "getValue",
@@ -40707,14 +43346,26 @@ function (_BaseComponent) {
   }, {
     key: "asString",
     value: function asString(value) {
+      var _this8 = this;
+
       value = value || this.getValue();
 
       if (this.component.dataSrc === 'values') {
-        value = _lodash.default.find(this.component.data.values, ['value', value]);
+        value = this.component.multiple ? _lodash.default.filter(this.component.data.values, function (item) {
+          return value.indexOf(item.value) !== -1;
+        }) : _lodash.default.find(this.component.data.values, ['value', value]);
       }
 
       if (_lodash.default.isString(value)) {
         return value;
+      }
+
+      if (Array.isArray(value)) {
+        var items = [];
+        value.forEach(function (item) {
+          return items.push(_this8.itemTemplate(item));
+        });
+        return items.length > 0 ? items.join('<br />') : '-';
       }
 
       return _lodash.default.isObject(value) ? this.itemTemplate(value) : '-';
@@ -40758,7 +43409,7 @@ function (_BaseComponent) {
   }, {
     key: "requestHeaders",
     get: function get() {
-      var _this8 = this;
+      var _this9 = this;
 
       // Create the headers object.
       var headers = new Headers(); // Add custom headers to the url.
@@ -40767,7 +43418,7 @@ function (_BaseComponent) {
         try {
           _lodash.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this8.interpolate(header.value));
+              headers.set(header.key, _this9.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -40980,6 +43631,7 @@ var _default = [{
   input: true,
   label: 'Value Property',
   key: 'valueProperty',
+  skipMerge: true,
   tooltip: 'The field to use as the value.',
   weight: 11,
   refreshOn: 'data.resource',
@@ -41030,6 +43682,7 @@ var _default = [{
   input: true,
   label: 'Value Property',
   key: 'valueProperty',
+  skipMerge: true,
   weight: 13,
   description: "The selected item's property to save.",
   tooltip: 'The property of each item in the data source to use as the select value. If not specified, the item itself will be used.',
@@ -41236,6 +43889,23 @@ var _default = [{
       }, 'url']
     }
   }
+}, {
+  type: 'checkbox',
+  input: true,
+  weight: 22,
+  key: 'readOnlyValue',
+  label: 'Read Only Value',
+  tooltip: 'Check this if you would like to show just the value when in Read Only mode.'
+}, {
+  type: 'textarea',
+  as: 'json',
+  editor: 'ace',
+  weight: 23,
+  input: true,
+  key: 'customOptions',
+  label: 'Custom default options',
+  tooltip: 'A raw JSON object to use as default options for the Select component (Choices JS).',
+  defaultValue: {}
 }];
 exports.default = _default;
 
@@ -41612,7 +44282,7 @@ function (_BaseComponent) {
         key: 'signature',
         footer: 'Sign above',
         width: '100%',
-        height: '150',
+        height: '150px',
         penColor: 'black',
         backgroundColor: 'rgb(245,245,235)',
         minWidth: '0.5',
@@ -42273,7 +44943,7 @@ var _default = [{
   input: true,
   label: 'Questions',
   key: 'questions',
-  tooltip: 'The questions you would like to as in this survey question.',
+  tooltip: 'The questions you would like to ask in this survey question.',
   weight: 50,
   defaultValue: [{
     label: '',
@@ -42820,9 +45490,40 @@ function (_NestedComponent) {
   }
 
   _createClass(TabsComponent, [{
+    key: "build",
+    value: function build(state, showLabel) {
+      var _this2 = this;
+
+      if (this.options.flatten) {
+        this.element = _get(_getPrototypeOf(TabsComponent.prototype), "createElement", this).call(this);
+        this.component.components.forEach(function (tab) {
+          var body;
+
+          var panel = _this2.ce('div', {
+            id: _this2.id,
+            class: 'mb-2 card border panel panel-default'
+          }, [_this2.ce('div', {
+            class: 'card-header bg-default panel-heading'
+          }, _this2.ce('h4', {
+            class: 'mb-0 card-title panel-title'
+          }, tab.label)), body = _this2.ce('div', {
+            class: 'card-body panel-body'
+          })]);
+
+          tab.components.forEach(function (component) {
+            return _this2.addComponent(component, body, _this2.data, null, null, _this2.getComponentState(component, state));
+          });
+
+          _this2.element.appendChild(panel);
+        });
+      } else {
+        return _get(_getPrototypeOf(TabsComponent.prototype), "build", this).call(this, state, showLabel);
+      }
+    }
+  }, {
     key: "createElement",
     value: function createElement() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.tabsBar = this.ce('ul', {
         class: 'nav nav-tabs'
@@ -42833,37 +45534,37 @@ function (_NestedComponent) {
       this.tabLinks = [];
       this.tabs = [];
       this.component.components.forEach(function (tab, index) {
-        var tabLink = _this2.ce('a', {
+        var tabLink = _this3.ce('a', {
           class: 'nav-link',
           href: "#".concat(tab.key)
         }, tab.label);
 
-        _this2.addEventListener(tabLink, 'click', function (event) {
+        _this3.addEventListener(tabLink, 'click', function (event) {
           event.preventDefault();
 
-          _this2.setTab(index);
+          _this3.setTab(index);
         });
 
-        var tabElement = _this2.ce('li', {
+        var tabElement = _this3.ce('li', {
           class: 'nav-item',
           role: 'presentation'
         }, tabLink);
 
         tabElement.tabLink = tabLink;
 
-        _this2.tabsBar.appendChild(tabElement);
+        _this3.tabsBar.appendChild(tabElement);
 
-        _this2.tabLinks.push(tabElement);
+        _this3.tabLinks.push(tabElement);
 
-        var tabPanel = _this2.ce('div', {
+        var tabPanel = _this3.ce('div', {
           role: 'tabpanel',
           class: 'tab-pane',
           id: tab.key
         });
 
-        _this2.tabsContent.appendChild(tabPanel);
+        _this3.tabsContent.appendChild(tabPanel);
 
-        _this2.tabs.push(tabPanel);
+        _this3.tabs.push(tabPanel);
       });
       this.element = this.ce('div', {
         id: this.id,
@@ -42881,7 +45582,7 @@ function (_NestedComponent) {
   }, {
     key: "setTab",
     value: function setTab(index, state) {
-      var _this3 = this;
+      var _this4 = this;
 
       if (!this.tabs || !this.component.components || !this.component.components[this.currentTab] || this.currentTab >= this.tabs.length) {
         return;
@@ -42894,7 +45595,7 @@ function (_NestedComponent) {
       this.components = [];
       var components = this.hook('addComponents', tab.components, this);
       components.forEach(function (component) {
-        return _this3.addComponent(component, _this3.tabs[index], _this3.data, null, null, state);
+        return _this4.addComponent(component, _this4.tabs[index], _this4.data, null, null, state);
       });
       this.restoreValue();
 
@@ -42903,10 +45604,10 @@ function (_NestedComponent) {
       }
 
       this.tabLinks.forEach(function (tabLink) {
-        return _this3.removeClass(tabLink, 'active').removeClass(tabLink.tabLink, 'active');
+        return _this4.removeClass(tabLink, 'active').removeClass(tabLink.tabLink, 'active');
       });
       this.tabs.forEach(function (tab) {
-        return _this3.removeClass(tab, 'active');
+        return _this4.removeClass(tab, 'active');
       });
       this.addClass(this.tabLinks[index], 'active').addClass(this.tabLinks[index].tabLink, 'active').addClass(this.tabs[index], 'active');
       this.triggerChange();
@@ -42954,13 +45655,13 @@ function (_NestedComponent) {
   }, {
     key: "schema",
     get: function get() {
-      var _this4 = this;
+      var _this5 = this;
 
       var schema = _get(_getPrototypeOf(TabsComponent.prototype), "schema", this);
 
       schema.components = this.component.components.map(function (tab, index) {
-        if (index === _this4.currentTab) {
-          tab.components = _this4.getComponents().map(function (component) {
+        if (index === _this5.currentTab) {
+          tab.components = _this5.getComponents().map(function (component) {
             return component.schema;
           });
         }
@@ -43179,6 +45880,7 @@ function (_BaseComponent) {
         return;
       }
 
+      input.setAttribute('dir', this.i18next.dir());
       this.choices = new _choices.default(input, {
         delimiter: this.component.delimeter || ',',
         editItems: true,
@@ -44720,6 +47422,698 @@ var _default = [{
   weight: 50
 }];
 exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/Tree.form.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/Tree.form.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _default() {
+  return _Base.default.apply(void 0, arguments);
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/Tree.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/Tree.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
+
+var _Components = _interopRequireDefault(__webpack_require__(/*! ../Components */ "./node_modules/formiojs/components/Components.js"));
+
+var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Node =
+/*#__PURE__*/
+function () {
+  function Node(parent) {
+    var _this = this;
+
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+        _ref$data = _ref.data,
+        data = _ref$data === void 0 ? {} : _ref$data,
+        _ref$children = _ref.children,
+        children = _ref$children === void 0 ? [] : _ref$children;
+
+    var isNew = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+    _classCallCheck(this, Node);
+
+    this.parent = parent;
+    this.persistentData = data;
+    this.children = children.map(function (child) {
+      return new Node(_this, child, false);
+    });
+    this.new = isNew;
+    this.revertAvailable = false;
+    this.editing = false;
+    this.collapsed = false;
+    this.components = [];
+    this.resetData();
+  }
+
+  _createClass(Node, [{
+    key: "eachChild",
+    value: function eachChild(iteratee) {
+      iteratee(this);
+      this.children.forEach(function (child) {
+        return child.eachChild(iteratee);
+      });
+      return this;
+    }
+  }, {
+    key: "getComponents",
+    value: function getComponents() {
+      return this.children.reduce(function (components, child) {
+        return components.concat(child.getComponents());
+      }, this.components);
+    }
+  }, {
+    key: "addChild",
+    value: function addChild() {
+      if (this.new) {
+        return null;
+      }
+
+      var child = new Node(this);
+      this.children = this.children.concat(child);
+      return child;
+    }
+  }, {
+    key: "removeChild",
+    value: function removeChild(childToRemove) {
+      if (!this.new) {
+        this.children = this.children.filter(function (child) {
+          return child !== childToRemove;
+        });
+      }
+
+      return this;
+    }
+  }, {
+    key: "edit",
+    value: function edit() {
+      if (this.new) {
+        return this;
+      }
+
+      this.editing = true;
+      return this.resetData();
+    }
+  }, {
+    key: "save",
+    value: function save() {
+      if (this.changing) {
+        if (this.new) {
+          this.new = false;
+        } else {
+          this.editing = false;
+          this.revertAvailable = true;
+        }
+
+        this.commitData();
+      }
+
+      return this;
+    }
+  }, {
+    key: "cancel",
+    value: function cancel() {
+      if (this.new) {
+        this.remove();
+      } else if (this.editing) {
+        this.editing = false;
+        this.resetData();
+      }
+
+      return this;
+    }
+  }, {
+    key: "remove",
+    value: function remove() {
+      this.parent.removeChild(this);
+      this.parent = null;
+      return this;
+    }
+  }, {
+    key: "revert",
+    value: function revert() {
+      if (!this.revertAvailable) {
+        return this;
+      }
+
+      this.data = this.previousData;
+      return this.commitData();
+    }
+  }, {
+    key: "commitData",
+    value: function commitData() {
+      this.previousData = _lodash.default.clone(this.persistentData);
+      this.persistentData = _lodash.default.cloneDeep(this.data);
+      return this;
+    }
+  }, {
+    key: "resetData",
+    value: function resetData() {
+      this.data = _lodash.default.cloneDeep(this.persistentData);
+      return this;
+    }
+  }, {
+    key: "value",
+    get: function get() {
+      return this.new ? null // Check the special case for empty root node.
+      : {
+        data: _lodash.default.cloneDeep(this.persistentData),
+        children: this.children.filter(function (child) {
+          return !child.new;
+        }).map(function (child) {
+          return child.value;
+        })
+      };
+    }
+  }, {
+    key: "isRoot",
+    get: function get() {
+      return this.parent === null;
+    }
+  }, {
+    key: "changing",
+    get: function get() {
+      return this.new || this.editing;
+    }
+  }, {
+    key: "hasChangingChildren",
+    get: function get() {
+      return this.changin || this.children.some(function (child) {
+        return child.hasChangingChildren;
+      });
+    }
+  }]);
+
+  return Node;
+}();
+
+var TreeComponent =
+/*#__PURE__*/
+function (_NestedComponent) {
+  _inherits(TreeComponent, _NestedComponent);
+
+  _createClass(TreeComponent, null, [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _NestedComponent2.default.schema.apply(_NestedComponent2.default, [{
+        label: 'Tree',
+        key: 'tree',
+        type: 'tree',
+        clearOnHide: true,
+        input: true,
+        tree: true,
+        components: [],
+        template: {
+          edit: this.defaultEditTemplate,
+          view: this.defaultViewTemplate,
+          child: this.defaultChildTemplate,
+          children: this.defaultChildrenTemplate
+        }
+      }].concat(extend));
+    }
+    /* Ignore builder until we work out the kinks in builder mode.
+    static get builderInfo() {
+      return {
+        title: 'Tree',
+        icon: 'fa fa-indent',
+        group: 'data',
+        weight: 30,
+        schema: TreeComponent.schema(),
+      };
+    }
+    */
+
+  }, {
+    key: "defaultEditTemplate",
+    get: function get() {
+      return "{% if (!node.isRoot) { %}\n  <div class=\"list-group-item\">\n{% } else { %}\n  <li class=\"list-group-item\">\n{% } %}\n  <div class=\"node-edit\">\n    <div node-edit-form></div>\n    {% if (!instance.options.readOnly) { %}\n      <div class=\"node-actions\">\n        <button class=\"btn btn-primary saveNode\">Save</button>\n        <button class=\"btn btn-danger cancelNode\">Cancel</button>\n      </div>\n    {% } %}\n  </div>\n{% if (!node.isRoot) { %}\n  </div>\n{% } else { %}\n  </li>\n{% } %}";
+    }
+  }, {
+    key: "defaultChildTemplate",
+    get: function get() {
+      return "{% if (node.isRoot) { %}\n  <div class=\"list-group-item\"></div>\n{% } else { %}\n  <li class=\"list-group-item col-sm-12\"></li>\n{% } %}";
+    }
+  }, {
+    key: "defaultChildrenTemplate",
+    get: function get() {
+      return '<ul class="tree-listgroup list-group row"></ul>';
+    }
+  }, {
+    key: "defaultViewTemplate",
+    get: function get() {
+      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">\n      {{ getView(component, nodeData[component.key]) }}\n    </div>\n  {% }) %}\n  <div class=\"col-sm-3\">\n    <div class=\"btn-group pull-right\">\n      <button class='btn btn-default btn-sm toggleNode'>{{ node.collapsed ? 'Expand : 'Collapse' }}</button>\n      {% if (!instance.options.readOnly) { %}\n        <button class=\"btn btn-default btn-sm addChild\">Add</button>\n        <button class=\"btn btn-default btn-sm editNode\">Edit</button>\n        <button class=\"btn btn-danger btn-sm removeNode\">Delete</button>\n        {% if (node.revertAvailable) { %}\n          <button class=\"btn btn-danger btn-sm revertNode\">Revert</button>\n        {% } %}\n      {% } %}\n    </div>\n  </div>\n</div>";
+    }
+  }]);
+
+  function TreeComponent(component, options, data) {
+    var _this2;
+
+    _classCallCheck(this, TreeComponent);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TreeComponent).call(this, component, options, data));
+    _this2.type = 'tree';
+    _this2.changingNodeClassName = 'formio-component-tree-node-changing';
+    return _this2;
+  }
+
+  _createClass(TreeComponent, [{
+    key: "getComponents",
+    value: function getComponents() {
+      var _this$tree;
+
+      return ((_this$tree = this.tree) === null || _this$tree === void 0 ? void 0 : _this$tree.getComponents()) || _get(_getPrototypeOf(TreeComponent.prototype), "getComponents", this).call(this);
+    }
+  }, {
+    key: "build",
+    value: function build(state) {
+      if (this.options.builder) {
+        return _get(_getPrototypeOf(TreeComponent.prototype), "build", this).call(this, state, true);
+      }
+
+      this.createElement();
+      this.createLabel(this.element);
+      this.setRoot();
+      this.buildTree();
+      this.createDescription(this.element);
+      this.errorContainer = this.ce('div', {
+        class: 'has-error'
+      });
+      this.element.appendChild(this.errorContainer);
+      this.attachLogic();
+    }
+  }, {
+    key: "buildTree",
+    value: function buildTree() {
+      if (this.options.builder) {
+        return;
+      }
+
+      var treeElement = this.buildNode(this.tree);
+
+      if (this.treeElement) {
+        this.element.replaceChild(treeElement, this.treeElement);
+      } else {
+        this.appendTo(treeElement, this.element);
+      }
+
+      this.treeElement = treeElement;
+    }
+  }, {
+    key: "buildNodes",
+    value: function buildNodes(parent) {
+      var _this$component$templ,
+          _this3 = this;
+
+      var childNodes = parent.children.map(this.buildNode.bind(this));
+      var childrenTemplate = ((_this$component$templ = this.component.template) === null || _this$component$templ === void 0 ? void 0 : _this$component$templ.children) || TreeComponent.defaultChildrenTemplate;
+      var element = this.renderElement(childrenTemplate, {
+        node: parent,
+        nodeData: parent.persistentData,
+        data: this.data,
+        components: this.component.components,
+        instance: this,
+        getView: function getView(component, data) {
+          return _Components.default.create(component, _this3.options, data, true).getView(data);
+        }
+      });
+      this.appendChild(element, childNodes);
+
+      if (parent.hasChangingChildren) {
+        this.addClass(element, this.changingNodeClassName);
+      } else {
+        this.removeClass(element, this.changingNodeClassName);
+      }
+
+      return element;
+    }
+  }, {
+    key: "buildNode",
+    value: function buildNode(node) {
+      var _this$component$templ2,
+          _this$component$templ3,
+          _this$component$templ4,
+          _this4 = this;
+
+      var editTemplate = ((_this$component$templ2 = this.component.template) === null || _this$component$templ2 === void 0 ? void 0 : _this$component$templ2.edit) || TreeComponent.defaultEditTemplate;
+      var viewTemplate = ((_this$component$templ3 = this.component.template) === null || _this$component$templ3 === void 0 ? void 0 : _this$component$templ3.view) || TreeComponent.defaultViewTemplate;
+      var childTemplate = ((_this$component$templ4 = this.component.template) === null || _this$component$templ4 === void 0 ? void 0 : _this$component$templ4.child) || TreeComponent.defaultChildTemplate;
+      var element = this.renderElement(childTemplate, {
+        node: node,
+        nodeData: node.persistentData,
+        data: this.data,
+        components: this.component.components,
+        instance: this,
+        getView: function getView(component, data) {
+          return _Components.default.create(component, _this4.options, data, true).getView(data);
+        }
+      });
+
+      if (node.changing) {
+        node.components = this.component.components.map(function (comp, index) {
+          var component = _lodash.default.cloneDeep(comp);
+
+          var options = _lodash.default.clone(_this4.options);
+
+          options.row = "".concat(_this4.row, "-").concat(index);
+          options.name += "[".concat(index, "]");
+
+          var instance = _this4.createComponent(component, options, node.data);
+
+          instance.node = node;
+          return instance;
+        });
+        this.renderTemplateToElement(element, editTemplate, {
+          node: node,
+          nodeData: node.data,
+          data: this.data,
+          components: this.component.components,
+          instance: this
+        }, [{
+          class: 'saveNode',
+          event: 'click',
+          action: this.saveNode.bind(this, node)
+        }, {
+          class: 'cancelNode',
+          event: 'click',
+          action: this.cancelNode.bind(this, node)
+        }]);
+        var editForm = node.components.map(function (comp) {
+          return comp.element;
+        });
+        element.querySelectorAll('[node-edit-form]').forEach(function (element) {
+          return _this4.appendChild(element, editForm);
+        });
+      } else {
+        this.renderTemplateToElement(element, viewTemplate, {
+          node: node,
+          nodeData: node.persistentData,
+          data: this.data,
+          components: this.component.components,
+          instance: this,
+          getView: function getView(component, data) {
+            return _Components.default.create(component, _this4.options, data, true).getView(data);
+          }
+        }, [{
+          class: 'toggleNode',
+          event: 'click',
+          action: this.toggleNode.bind(this, node)
+        }, {
+          class: 'addChild',
+          event: 'click',
+          action: this.addChild.bind(this, node)
+        }, {
+          class: 'editNode',
+          event: 'click',
+          action: this.editNode.bind(this, node)
+        }, {
+          class: 'removeNode',
+          event: 'click',
+          action: this.removeNode.bind(this, node)
+        }, {
+          class: 'revertNode',
+          event: 'click',
+          action: this.revertNode.bind(this, node)
+        }]);
+      }
+
+      this.checkData(this.data, {
+        noValidate: true
+      });
+
+      if (!node.collapsed && node.children.length > 0) {
+        element.appendChild(this.buildNodes(node));
+      }
+
+      return element;
+    }
+  }, {
+    key: "toggleNode",
+    value: function toggleNode(node) {
+      this.hook('tree.toggleNode', {
+        node: node,
+        component: this
+      }, function () {
+        return node.collapsed = !node.collapsed;
+      });
+      this.buildTree();
+    }
+  }, {
+    key: "addChild",
+    value: function addChild(parent) {
+      if (this.options.readOnly || parent.new) {
+        return;
+      }
+
+      this.hook('tree.addChild', {
+        parent: parent,
+        component: this
+      }, function () {
+        return parent.addChild();
+      });
+      this.buildTree();
+    }
+  }, {
+    key: "editNode",
+    value: function editNode(node) {
+      if (this.options.readOnly || node.new) {
+        return;
+      }
+
+      this.hook('tree.editNode', {
+        node: node,
+        component: this
+      }, function () {
+        return node.edit();
+      });
+      this.buildTree();
+    }
+  }, {
+    key: "cancelNode",
+    value: function cancelNode(node) {
+      var _this5 = this;
+
+      if (this.options.readOnly) {
+        return;
+      }
+
+      this.hook('tree.cancelNode', {
+        node: node,
+        component: this
+      }, function () {
+        if (node.isRoot) {
+          _this5.removeRoot();
+        } else {
+          node.cancel();
+        }
+
+        return node;
+      });
+      this.buildTree();
+    }
+  }, {
+    key: "saveNode",
+    value: function saveNode(node) {
+      if (this.options.readOnly) {
+        return;
+      }
+
+      this.hook('tree.saveNode', {
+        node: node,
+        component: this
+      }, function () {
+        return node.save();
+      });
+      this.updateTree();
+    }
+  }, {
+    key: "revertNode",
+    value: function revertNode(node) {
+      if (this.options.readOnly || !node.revertAvailable) {
+        return;
+      }
+
+      this.hook('tree.revertNode', {
+        node: node,
+        component: this
+      }, function () {
+        return node.revert();
+      });
+      this.updateTree();
+    }
+  }, {
+    key: "removeNode",
+    value: function removeNode(node) {
+      var _this6 = this;
+
+      if (this.options.readOnly || node.new) {
+        return;
+      }
+
+      this.hook('tree.removeNode', {
+        node: node,
+        component: this
+      }, function () {
+        if (node.isRoot) {
+          _this6.removeRoot();
+        } else {
+          node.remove();
+        }
+
+        return node;
+      });
+      this.updateTree();
+    }
+  }, {
+    key: "removeRoot",
+    value: function removeRoot() {
+      if (this.options.readOnly) {
+        return;
+      }
+
+      this.setRoot(this.defaultValue);
+    }
+  }, {
+    key: "updateTree",
+    value: function updateTree() {
+      this.dataValue = this.tree.value;
+      this.updateValue();
+      this.triggerChange();
+      this.buildTree();
+    }
+  }, {
+    key: "getValue",
+    value: function getValue() {
+      return this.dataValue;
+    }
+  }, {
+    key: "setValue",
+    value: function setValue(value, flags) {
+      var changed = _Base.default.prototype.setValue.call(this, value, flags);
+
+      this.dataValue = value;
+      this.setRoot();
+      this.buildTree();
+      return changed;
+    }
+  }, {
+    key: "setRoot",
+    value: function setRoot() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.dataValue;
+      this.tree = new Node(null, value, !value.data);
+      this.hook('tree.setRoot', {
+        root: this.tree,
+        component: this
+      });
+    }
+  }, {
+    key: "updateValue",
+    value: function updateValue(flags, value) {
+      // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
+      return _Base.default.prototype.updateValue.call(this, flags, value);
+    }
+  }, {
+    key: "clearOnHide",
+    value: function clearOnHide(show) {
+      _get(_getPrototypeOf(TreeComponent.prototype), "clearOnHide", this).call(this, show);
+
+      this.setRoot();
+      this.buildTree();
+    }
+  }, {
+    key: "restoreComponentsContext",
+    value: function restoreComponentsContext() {
+      this.getComponents().forEach(function (component) {
+        return component.data = component.node.data;
+      });
+    }
+  }, {
+    key: "defaultSchema",
+    get: function get() {
+      return TreeComponent.schema();
+    }
+  }, {
+    key: "emptyValue",
+    get: function get() {
+      return {};
+    }
+  }]);
+
+  return TreeComponent;
+}(_NestedComponent2.default);
+
+exports.default = TreeComponent;
 
 /***/ }),
 
@@ -49811,6 +53205,46 @@ function clone(value) {
 }
 
 module.exports = clone;
+
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/node_modules/lodash/cloneDeep.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/cloneDeep.js ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseClone = __webpack_require__(/*! ./_baseClone */ "./node_modules/formiojs/node_modules/lodash/_baseClone.js");
+
+/** Used to compose bitmasks for cloning. */
+var CLONE_DEEP_FLAG = 1,
+    CLONE_SYMBOLS_FLAG = 4;
+
+/**
+ * This method is like `_.clone` except that it recursively clones `value`.
+ *
+ * @static
+ * @memberOf _
+ * @since 1.0.0
+ * @category Lang
+ * @param {*} value The value to recursively clone.
+ * @returns {*} Returns the deep cloned value.
+ * @see _.clone
+ * @example
+ *
+ * var objects = [{ 'a': 1 }, { 'b': 2 }];
+ *
+ * var deep = _.cloneDeep(objects);
+ * console.log(deep[0] === objects[0]);
+ * // => false
+ */
+function cloneDeep(value) {
+  return baseClone(value, CLONE_DEEP_FLAG | CLONE_SYMBOLS_FLAG);
+}
+
+module.exports = cloneDeep;
 
 
 /***/ }),
@@ -68878,7 +72312,7 @@ var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-p
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var url = function url(formio) {
-  var xhrRequest = function xhrRequest(url, name, query, data, onprogress) {
+  var xhrRequest = function xhrRequest(url, name, query, data, options, onprogress) {
     return new _nativePromiseOnly.default(function (resolve, reject) {
       var xhr = new XMLHttpRequest();
       var json = typeof data === 'string';
@@ -68930,7 +72364,7 @@ var url = function url(formio) {
         return reject(xhr);
       };
 
-      var requestUrl = "".concat(url, "?");
+      var requestUrl = url + (url.indexOf('?') > -1 ? '&' : '?');
 
       for (var _key in query) {
         requestUrl += "".concat(_key, "=").concat(query[_key], "&");
@@ -68950,6 +72384,15 @@ var url = function url(formio) {
 
       if (token) {
         xhr.setRequestHeader('x-jwt-token', token);
+      } //Overrides previous request props
+
+
+      if (options) {
+        var parsedOptions = JSON.parse(options);
+
+        for (var prop in parsedOptions) {
+          xhr[prop] = parsedOptions[prop];
+        }
       }
 
       xhr.send(json ? data : fd);
@@ -68959,7 +72402,7 @@ var url = function url(formio) {
   return {
     title: 'Url',
     name: 'url',
-    uploadFile: function uploadFile(file, name, dir, progressCallback, url) {
+    uploadFile: function uploadFile(file, name, dir, progressCallback, url, options) {
       var uploadRequest = function uploadRequest(form) {
         return xhrRequest(url, name, {
           baseUrl: encodeURIComponent(formio.projectUrl),
@@ -68969,7 +72412,7 @@ var url = function url(formio) {
           file: file,
           name: name,
           dir: dir
-        }, progressCallback).then(function (response) {
+        }, options, progressCallback).then(function (response) {
           // Store the project and form url along with the metadata.
           response.data = response.data || {};
           response.data.baseUrl = formio.projectUrl;
@@ -69141,6 +72584,9 @@ exports.parseFloatExt = parseFloatExt;
 exports.formatAsCurrency = formatAsCurrency;
 exports.escapeRegExCharacters = escapeRegExCharacters;
 exports.getValue = getValue;
+exports.getStrings = getStrings;
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
 
@@ -69451,6 +72897,98 @@ function getValue(submission, key) {
 
   return search(submission.data);
 }
+/**
+ * Iterate over all components in a form and get string values for translation.
+ * @param form
+ */
+
+
+function getStrings(form) {
+  var _this = this;
+
+  var properties = ['label', 'title', 'legend', 'tooltip', 'description', 'placeholder', 'prefix', 'suffix', 'errorLabel', 'content', 'html'];
+  var strings = [];
+  eachComponent(form.components, function (component) {
+    properties.forEach(function (property) {
+      if (component.hasOwnProperty(property) && component[property]) {
+        strings.push({
+          key: component.key,
+          type: component.type,
+          property: property,
+          string: component[property]
+        });
+      }
+    });
+
+    if ((!component.dataSrc || component.dataSrc === 'values') && component.hasOwnProperty('values') && Array.isArray(component.values) && component.values.length) {
+      component.values.forEach(function (value, index) {
+        strings.push({
+          key: component.key,
+          property: "value[".concat(index, "].label"),
+          string: component.values[index].label
+        });
+      });
+    } // Hard coded values from Day component
+
+
+    if (component.type === 'day') {
+      ['day', 'month', 'year', 'Day', 'Month', 'Year', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].forEach(function (string) {
+        strings.push({
+          key: component.key,
+          property: 'day',
+          string: string
+        });
+      });
+
+      if (component.fields.day.placeholder) {
+        strings.push({
+          key: component.key,
+          property: 'fields.day.placeholder',
+          string: component.fields.day.placeholder
+        });
+      }
+
+      if (component.fields.month.placeholder) {
+        strings.push({
+          key: component.key,
+          property: 'fields.month.placeholder',
+          string: component.fields.month.placeholder
+        });
+      }
+
+      if (component.fields.year.placeholder) {
+        strings.push({
+          key: component.key,
+          property: 'fields.year.placeholder',
+          string: component.fields.year.placeholder
+        });
+      }
+    }
+
+    if (component.type === 'editgrid') {
+      var string = _this.component.addAnother || 'Add Another';
+
+      if (component.addAnother) {
+        strings.push({
+          key: component.key,
+          property: 'addAnother',
+          string: string
+        });
+      }
+    }
+
+    if (component.type === 'select') {
+      ['loading...', 'Type to search'].forEach(function (string) {
+        strings.push({
+          key: component.key,
+          property: 'select',
+          string: string
+        });
+      });
+    }
+  }, true);
+  return strings;
+}
 
 /***/ }),
 
@@ -69576,6 +73114,7 @@ var _exportNames = {
   iterateKey: true,
   uniqueKey: true,
   bootstrapVersion: true,
+  withSwitch: true,
   jsonLogic: true,
   moment: true
 };
@@ -69619,6 +73158,7 @@ exports.delay = delay;
 exports.iterateKey = iterateKey;
 exports.uniqueKey = uniqueKey;
 exports.bootstrapVersion = bootstrapVersion;
+exports.withSwitch = withSwitch;
 Object.defineProperty(exports, "jsonLogic", {
   enumerable: true,
   get: function get() {
@@ -70647,6 +74187,31 @@ function bootstrapVersion() {
   }
 
   return 0;
+}
+/**
+ * Create enclosed state.
+ * Returns functions to getting and cycling between states.
+ * @param {*} a - initial state.
+ * @param {*} b - next state.
+ * @return {Functions[]} -- [get, toggle];
+ */
+
+
+function withSwitch(a, b) {
+  var state = a;
+  var next = b;
+
+  function get() {
+    return state;
+  }
+
+  function toggle() {
+    var prev = state;
+    state = next;
+    next = prev;
+  }
+
+  return [get, toggle];
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
@@ -71685,7 +75250,7 @@ var Interpolator = function () {
       value = handleFormat(match[1].trim());
       if (value === undefined) {
         if (typeof missingInterpolationHandler === 'function') {
-          var temp = missingInterpolationHandler(str, match);
+          var temp = missingInterpolationHandler(str, match, options);
           value = typeof temp === 'string' ? temp : '';
         } else {
           this.logger.warn('missed to pass in variable ' + match[1] + ' for interpolating ' + str);
@@ -72352,9 +75917,8 @@ var Translator = function (_EventEmitter) {
     if (!options) options = {};
 
     // non valid keys handling
-    if (keys === undefined || keys === null || keys === '') return '';
-    if (typeof keys === 'number') keys = String(keys);
-    if (typeof keys === 'string') keys = [keys];
+    if (keys === undefined || keys === null) return '';
+    if (!Array.isArray(keys)) keys = [String(keys)];
 
     // separators
     var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
@@ -72623,6 +76187,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "get", function() { return get; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transformOptions", function() { return transformOptions; });
 
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 function get() {
   return {
     debug: false,
@@ -72663,8 +76230,15 @@ function get() {
     appendNamespaceToCIMode: false,
     overloadTranslationOptionHandler: function handle(args) {
       var ret = {};
-      if (args[1]) ret.defaultValue = args[1];
-      if (args[2]) ret.tDescription = args[2];
+      if (_typeof(args[1]) === 'object') ret = args[1];
+      if (typeof args[1] === 'string') ret.defaultValue = args[1];
+      if (typeof args[2] === 'string') ret.tDescription = args[2];
+      if (_typeof(args[2]) === 'object' || _typeof(args[3]) === 'object') {
+        var options = args[3] || args[2];
+        Object.keys(options).forEach(function (key) {
+          ret[key] = options[key];
+        });
+      }
       return ret;
     },
     interpolation: {
@@ -72726,6 +76300,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BackendConnector_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./BackendConnector.js */ "./node_modules/i18next/dist/es/BackendConnector.js");
 /* harmony import */ var _defaults_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./defaults.js */ "./node_modules/i18next/dist/es/defaults.js");
 /* harmony import */ var _postProcessor_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./postProcessor.js */ "./node_modules/i18next/dist/es/postProcessor.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils */ "./node_modules/i18next/dist/es/utils.js");
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -72737,6 +76312,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : _defaults(subClass, superClass); }
+
 
 
 
@@ -72768,10 +76344,13 @@ var I18n = function (_EventEmitter) {
     _this.modules = { external: [] };
 
     if (callback && !_this.isInitialized && !options.isClone) {
-      var _ret;
-
       // https://github.com/i18next/i18next/issues/879
-      if (!_this.options.initImmediate) return _ret = _this.init(options, callback), _possibleConstructorReturn(_this, _ret);
+      if (!_this.options.initImmediate) {
+        var _ret;
+
+        _this.init(options, callback);
+        return _ret = _this, _possibleConstructorReturn(_this, _ret);
+      }
       setTimeout(function () {
         _this.init(options, callback);
       }, 0);
@@ -72863,12 +76442,15 @@ var I18n = function (_EventEmitter) {
       };
     });
 
+    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+
     var load = function load() {
       _this2.changeLanguage(_this2.options.lng, function (err, t) {
         _this2.isInitialized = true;
         _this2.logger.log('initialized', _this2.options);
         _this2.emit('initialized', _this2.options);
 
+        deferred.resolve(t); // not rejecting on err (as err is only a loading translation failed warning)
         callback(err, t);
       });
     };
@@ -72879,7 +76461,7 @@ var I18n = function (_EventEmitter) {
       setTimeout(load, 0);
     }
 
-    return this;
+    return deferred;
   };
 
   /* eslint consistent-return: 0 */
@@ -72926,10 +76508,15 @@ var I18n = function (_EventEmitter) {
   };
 
   I18n.prototype.reloadResources = function reloadResources(lngs, ns, callback) {
+    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
     if (!lngs) lngs = this.languages;
     if (!ns) ns = this.options.ns;
-    if (!callback) callback = function callback() {};
-    this.services.backendConnector.reload(lngs, ns, callback);
+    if (!callback) callback = noop;
+    this.services.backendConnector.reload(lngs, ns, function () {
+      deferred.resolve();
+      callback(null);
+    });
+    return deferred;
   };
 
   I18n.prototype.use = function use(module) {
@@ -72963,6 +76550,8 @@ var I18n = function (_EventEmitter) {
   I18n.prototype.changeLanguage = function changeLanguage(lng, callback) {
     var _this4 = this;
 
+    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+
     var done = function done(err, l) {
       _this4.translator.changeLanguage(l);
 
@@ -72971,6 +76560,9 @@ var I18n = function (_EventEmitter) {
         _this4.logger.log('languageChanged', l);
       }
 
+      deferred.resolve(function () {
+        return _this4.t.apply(_this4, arguments);
+      });
       if (callback) callback(err, function () {
         return _this4.t.apply(_this4, arguments);
       });
@@ -72997,6 +76589,8 @@ var I18n = function (_EventEmitter) {
     } else {
       setLng(lng);
     }
+
+    return deferred;
   };
 
   I18n.prototype.getFixedT = function getFixedT(lng, ns) {
@@ -73045,17 +76639,29 @@ var I18n = function (_EventEmitter) {
   I18n.prototype.loadNamespaces = function loadNamespaces(ns, callback) {
     var _this6 = this;
 
-    if (!this.options.ns) return callback && callback();
+    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+
+    if (!this.options.ns) {
+      callback && callback();
+      return Promise.resolve();
+    }
     if (typeof ns === 'string') ns = [ns];
 
     ns.forEach(function (n) {
       if (_this6.options.ns.indexOf(n) < 0) _this6.options.ns.push(n);
     });
 
-    this.loadResources(callback);
+    this.loadResources(function (err) {
+      deferred.resolve();
+      if (callback) callback(err);
+    });
+
+    return deferred;
   };
 
   I18n.prototype.loadLanguages = function loadLanguages(lngs, callback) {
+    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+
     if (typeof lngs === 'string') lngs = [lngs];
     var preloaded = this.options.preload || [];
 
@@ -73063,10 +76669,18 @@ var I18n = function (_EventEmitter) {
       return preloaded.indexOf(lng) < 0;
     });
     // Exit early if all given languages are already preloaded
-    if (!newLngs.length) return callback();
+    if (!newLngs.length) {
+      if (callback) callback();
+      return Promise.resolve();
+    }
 
     this.options.preload = preloaded.concat(newLngs);
-    this.loadResources(callback);
+    this.loadResources(function (err) {
+      deferred.resolve();
+      if (callback) callback(err);
+    });
+
+    return deferred;
   };
 
   I18n.prototype.dir = function dir(lng) {
@@ -73307,11 +76921,12 @@ __webpack_require__.r(__webpack_exports__);
 /*!***********************************************!*\
   !*** ./node_modules/i18next/dist/es/utils.js ***!
   \***********************************************/
-/*! exports provided: makeString, copy, setPath, pushPath, getPath, deepExtend, regexEscape, escape */
+/*! exports provided: defer, makeString, copy, setPath, pushPath, getPath, deepExtend, regexEscape, escape */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "defer", function() { return defer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "makeString", function() { return makeString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "copy", function() { return copy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setPath", function() { return setPath; });
@@ -73320,6 +76935,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deepExtend", function() { return deepExtend; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "regexEscape", function() { return regexEscape; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "escape", function() { return escape; });
+// http://lea.verou.me/2016/12/resolve-promises-externally-with-this-one-weird-trick/
+function defer() {
+  var res = void 0;
+  var rej = void 0;
+
+  var promise = new Promise(function (resolve, reject) {
+    res = resolve;
+    rej = reject;
+  });
+
+  promise.resolve = res;
+  promise.reject = rej;
+
+  return promise;
+}
+
 function makeString(object) {
   if (object == null) return '';
   /* eslint prefer-template: 0 */
@@ -77241,7 +80872,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
     var defaultLocaleWeek = {
         dow : 0, // Sunday is the first day of the week.
-        doy : 6  // The week that contains Jan 1st is the first week of the year.
+        doy : 6  // The week that contains Jan 6th is the first week of the year.
     };
 
     function localeFirstDayOfWeek () {
@@ -78117,13 +81748,13 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                     weekdayOverflow = true;
                 }
             } else if (w.e != null) {
-                // local weekday -- counting starts from begining of week
+                // local weekday -- counting starts from beginning of week
                 weekday = w.e + dow;
                 if (w.e < 0 || w.e > 6) {
                     weekdayOverflow = true;
                 }
             } else {
-                // default to begining of week
+                // default to beginning of week
                 weekday = dow;
             }
         }
@@ -78717,7 +82348,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
             years = normalizedInput.year || 0,
             quarters = normalizedInput.quarter || 0,
             months = normalizedInput.month || 0,
-            weeks = normalizedInput.week || 0,
+            weeks = normalizedInput.week || normalizedInput.isoWeek || 0,
             days = normalizedInput.day || 0,
             hours = normalizedInput.hour || 0,
             minutes = normalizedInput.minute || 0,
@@ -79021,7 +82652,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
                 ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
             };
         } else if (!!(match = isoRegex.exec(input))) {
-            sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
+            sign = (match[1] === '-') ? -1 : 1;
             duration = {
                 y : parseIso(match[2], sign),
                 M : parseIso(match[3], sign),
@@ -79172,7 +82803,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         if (!(this.isValid() && localInput.isValid())) {
             return false;
         }
-        units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+        units = normalizeUnits(units) || 'millisecond';
         if (units === 'millisecond') {
             return this.valueOf() > localInput.valueOf();
         } else {
@@ -79185,7 +82816,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         if (!(this.isValid() && localInput.isValid())) {
             return false;
         }
-        units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+        units = normalizeUnits(units) || 'millisecond';
         if (units === 'millisecond') {
             return this.valueOf() < localInput.valueOf();
         } else {
@@ -79194,9 +82825,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     }
 
     function isBetween (from, to, units, inclusivity) {
+        var localFrom = isMoment(from) ? from : createLocal(from),
+            localTo = isMoment(to) ? to : createLocal(to);
+        if (!(this.isValid() && localFrom.isValid() && localTo.isValid())) {
+            return false;
+        }
         inclusivity = inclusivity || '()';
-        return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
-            (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
+        return (inclusivity[0] === '(' ? this.isAfter(localFrom, units) : !this.isBefore(localFrom, units)) &&
+            (inclusivity[1] === ')' ? this.isBefore(localTo, units) : !this.isAfter(localTo, units));
     }
 
     function isSame (input, units) {
@@ -79205,7 +82841,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         if (!(this.isValid() && localInput.isValid())) {
             return false;
         }
-        units = normalizeUnits(units || 'millisecond');
+        units = normalizeUnits(units) || 'millisecond';
         if (units === 'millisecond') {
             return this.valueOf() === localInput.valueOf();
         } else {
@@ -79215,11 +82851,11 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     }
 
     function isSameOrAfter (input, units) {
-        return this.isSame(input, units) || this.isAfter(input,units);
+        return this.isSame(input, units) || this.isAfter(input, units);
     }
 
     function isSameOrBefore (input, units) {
-        return this.isSame(input, units) || this.isBefore(input,units);
+        return this.isSame(input, units) || this.isBefore(input, units);
     }
 
     function diff (input, units, asFloat) {
@@ -80438,7 +84074,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     // Side effect imports
 
 
-    hooks.version = '2.22.2';
+    hooks.version = '2.23.0';
 
     setHookCallback(createLocal);
 
@@ -80479,7 +84115,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         TIME: 'HH:mm',                                  // <input type="time" />
         TIME_SECONDS: 'HH:mm:ss',                       // <input type="time" step="1" />
         TIME_MS: 'HH:mm:ss.SSS',                        // <input type="time" step="0.001" />
-        WEEK: 'YYYY-[W]WW',                             // <input type="week" />
+        WEEK: 'GGGG-[W]WW',                             // <input type="week" />
         MONTH: 'YYYY-MM'                                // <input type="month" />
     };
 
