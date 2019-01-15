@@ -53,15 +53,17 @@ app.controller('UserRegisterController', [
       if (!submission) { return; }
       $rootScope.user = submission;
       GoogleAnalytics.sendEvent('User', 'register', null, 1);
-      $window.google_trackConversion({
-        google_conversion_id : 874586484,
-        google_conversion_language : 'en',
-        google_conversion_format : '3',
-        google_conversion_color : 'ffffff',
-        google_conversion_label : 'J0hUCK3dtGoQ9MKEoQM',
-        google_conversion_value : 0,
-        google_remarketing_only : false
-      });
+      if ($window && $window.google_trackConversion) {
+        $window.google_trackConversion({
+          google_conversion_id : 874586484,
+          google_conversion_language : 'en',
+          google_conversion_format : '3',
+          google_conversion_color : 'ffffff',
+          google_conversion_label : 'J0hUCK3dtGoQ9MKEoQM',
+          google_conversion_value : 0,
+          google_remarketing_only : false
+        });
+      }
       $state.go('home');
     });
   }

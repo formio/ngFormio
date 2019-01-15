@@ -1,4 +1,4 @@
-<div class="feedback" ng-class="state" ng-controller="FeedbackController">
+<div class="feedback" ng-class="state" ng-controller="FeedbackController" ng-if="!onPremise">
   <a ng-if="state == 'closed'" class="feedback-link" ng-click="showFeedback()">Feedback <i class="fa fa-plus"></i>&nbsp;</a>
   <div ng-if="state == 'open'">
     <h4>Have some feedback?</h4>

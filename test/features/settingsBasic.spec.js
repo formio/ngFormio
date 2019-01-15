@@ -42,7 +42,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Save');
       actions.waitForActionToComplete(1000);
       actions.clickOnElementWithText('Create Form');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText(' Revisions');
       actions.iSeeText('Upgrade your Project');
       actions.clickOnElementWithText('Settings');

@@ -13,7 +13,7 @@ module.exports = function (actions,tags) {
         [' How it works','https://help.form.io/intro/howworks/','How it works'],
         [' User Guide','https://help.form.io/userguide/introduction/','Intro'],
         [' Application Development','https://help.form.io/intro/appdev/','Application Development'],
-        [' 30 minute guide','https://help.form.io/intro/guide/','Up & Running'],
+        [' 30 minute guide','https://help.form.io/intro/guide/','Create your Project'],
         [' Developer Section','https://help.form.io/developer/welcome/','Welcome'],
         [' API Docs','https://documenter.getpostman.com/view/684631/formio-api/2Jvuks','Form.io API'],
         [' Github Projects','https://github.com/formio','Form.io'],

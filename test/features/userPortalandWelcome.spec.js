@@ -16,7 +16,7 @@ module.exports = function (actions,tags) {
       var documentLinks = [
         [' Getting Started','https://help.form.io/intro/welcome/','Welcome to <',1],
         [' How it works','https://help.form.io/intro/howworks/','How it works',1],
-        [' 30 minute guide','https://help.form.io/intro/guide/','Up & Running',1],
+        [' 30 minute guide','https://help.form.io/intro/guide/','Create your Project',1],
         [' Developer Info','https://help.form.io/developer/welcome/','Welcome',1],
         [' Tutorials','https://help.form.io/tutorials/videos/welcome/','Welcome',0]
       ];

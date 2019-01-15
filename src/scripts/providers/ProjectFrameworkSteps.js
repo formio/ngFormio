@@ -103,6 +103,13 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       steps[4].template = 'views/frameworks/angular2/embed-app.html';
       steps[5].template = 'views/frameworks/angular2/launch.html';
       break;
+    case 'aurelia':
+      steps[1].template = 'views/frameworks/aurelia/download.html';
+      steps[1].children[0].template = 'views/frameworks/aurelia/download.html';
+      steps[1].children[1].template = 'views/frameworks/aurelia/configure.html';
+      steps[4].template = 'views/frameworks/aurelia/embed-app.html';
+      steps[5].template = 'views/frameworks/aurelia/launch.html';
+      break;
     case 'react':
       steps[1].template = 'views/frameworks/react/download.html';
       steps[1].children[0].template = 'views/frameworks/react/download.html';
@@ -134,6 +141,7 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       steps[5].title = 'Use the form';
       break;
     case 'custom':
+    case 'javascript':
       steps[1].template = 'views/frameworks/custom/download.html';
       steps[1].children = [];
       steps[4].template = 'views/frameworks/custom/embed-app.html';

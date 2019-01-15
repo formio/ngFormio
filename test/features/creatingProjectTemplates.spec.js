@@ -1,31 +1,31 @@
 module.exports = function (actions,tags) {
   describe('User Portal - Creating Project Templates', function () {
-    describe('Creating AngularJS', function () {
+    describe('Creating Angular', function () {
       actions.logout();
       actions.iAmLoggedInFor('creatingProj');
       actions.goToPage('#/');
-      actions.clickOnElementWithText('AngularJS');
-      actions.iSeeText("Create a New AngularJS");
-      actions.enterTextInField('#title', 'AngularJS');
-      actions.enterTextInField('#description', 'This is first AngularJS');
+      actions.clickOnElementWithText('Angular');
+      actions.iSeeText("Create a New Angular");
+      actions.enterTextInField('#title', 'Angular');
+      actions.enterTextInField('#description', 'This is first Angular');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Overview');
-      actions.iSeeText('AngularJS');
+      actions.iSeeText('Angular');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
-      actions.iSeeText('This is first AngularJS');
+      actions.iSeeText('This is first Angular');
     });
     tags('smoke').describe('Creating Project templates', function () {
-      var frameworks = ['Angular','React.js'
-        ,'Vue.js','Stand-Alone Forms','Custom'];
+      var frameworks = ['Javascript', 'Angular','React'
+        ,'Vue.js', 'Aurelia', 'Stand-Alone Forms','Custom'];
       frameworks.forEach(function(framework) {
         actions.clickOnElementWithText(framework);
         actions.iSeeText("Create a New " + framework);
         actions.enterTextInField('#title', framework);
         actions.enterTextInField('#description', 'This is first ' + framework);
         actions.clickOnElementWithText(' Create Project');
-        actions.clickOnClass('.toast-message');
+      // actions.clickOnClass('.toast-message');
         actions.clickOnElementWithText('Overview');
         actions.iSeeText(framework);
         actions.clickOnElement('.fa-home');
@@ -46,7 +46,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title', 'Test Project');
       actions.enterTextInField('#description', 'Test Description');
       actions.clickOnElementWithText(' Create Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Test Project');
@@ -59,23 +59,23 @@ module.exports = function (actions,tags) {
     });
     describe('Editing Project Title and Description', function () {
       actions.pageReload();
-      actions.clickOnElementWithTextIndex('AngularJS',1);
+      actions.clickOnElementWithTextIndex('Angular',1);
       actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#title','Updated Title');
       actions.enterTextInField('#description','Updated Description');
       actions.clickOnButton(' Save Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
-      actions.clickOnElementWithText('AngularJS');
-      actions.clickOnElementWithText('React.js');
+      actions.clickOnElementWithText('Angular');
+      actions.clickOnElementWithText('React');
       actions.clickOnButton(' Save Project');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
-      actions.iSeeText(' React.js ');
+      actions.iSeeText(' React ');
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', 'Updated Title');
       actions.iSeeValueIn('#description', 'Updated Description');
-      actions.iSeeText('React.js');
+      actions.iSeeText('React');
       actions.clickOnElement('.fa-home');
       actions.checkingUrlIamOn('#/');
       actions.iSeeText('Updated Title');

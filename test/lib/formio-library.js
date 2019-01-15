@@ -961,6 +961,25 @@ module.exports = function (config) {
     });
   };
 
+  this.iSeeTextIn = function (ele, text) {
+    text = replacements(text);
+    it('I see text ' + text + ' in', function (next) {
+      ele = (typeof (ele) == 'object') ? ele : element(by.css(ele, text));
+      browser.wait(function () {
+        return ele.isPresent();
+      }, timeout).then(function () {
+        try {
+          var temp=ele.getText();
+          var temp1=temp.then(function(tx) {return tx.trim();})
+          config.expect(temp1).to.eventually.equal(text.trim());
+          next();
+        } catch (err) {
+          next(err);
+        }
+      });
+    });
+  };
+
   this.checkIfLoggedOut = function () {
     it('I am logged Out', function (next) {
       try {

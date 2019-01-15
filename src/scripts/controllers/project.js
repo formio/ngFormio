@@ -1,6 +1,9 @@
 'use strict';
+import semver from 'semver';
+import chanceLib from 'chance';
+const chance = chanceLib();
 
-/* globals NumberAbbreviate, chance, Chartist, semver, localStorage, Blob */
+/* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
 // loadedFiles is used to prevent double loading files on each session.
 var loadedFiles = [];
@@ -645,9 +648,7 @@ app.controller('ProjectController', [
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
     $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
     $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
-    $scope.getEmailCallsLimit = ProjectPlans.getEmailCallsLimit.bind(ProjectPlans);
     $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
-    $scope.getEmailCallsPercent = ProjectPlans.getEmailCallsPercent.bind(ProjectPlans);
     $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
     $scope.getProgressBarClassPercent = ProjectPlans.getProgressBarClassPercent.bind(ProjectPlans);
   }
@@ -1366,7 +1367,6 @@ app.controller('LaunchController', [
   'Formio',
   'FormioAlerts',
   'AppConfig',
-  'Lightbox',
   'ProjectFrameworks',
   'ProjectFrameworkSteps',
   function(
@@ -1378,7 +1378,6 @@ app.controller('LaunchController', [
     Formio,
     FormioAlerts,
     AppConfig,
-    Lightbox,
     ProjectFrameworks,
     ProjectFrameworkSteps
   ) {
@@ -1528,11 +1527,6 @@ app.controller('LaunchController', [
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(newProject));
       }
     });
-    $scope.openLightboxModal = function (images,index) {
-      Lightbox.openModal(images, index);
-      Lightbox.fullScreenMode=false;
-    };
-
   }
 ]);
 

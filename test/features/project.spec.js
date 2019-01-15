@@ -11,14 +11,14 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
       actions.iSeeTextIn('.toast-message', 'New Project created!');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Overview');
       actions.iSeeText('Current Framework');
-      actions.iSeeText(' AngularJS ');
+      actions.iSeeText(' Javascript ');
       actions.clickOnClass('.fa.fa-cog');
       actions.iSeeValueIn('#title', '${project1.title}');
       actions.iSeeValueIn('#description', '${project1.description}');
-      actions.iSeeText('AngularJS');
+      actions.iSeeText('Javascript');
       actions.iSeeText('Delete Project');
       actions.iSeeText('Plan and Pricing');
       actions.iSeeText('Teams');
@@ -31,7 +31,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title','Updated Title');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
       actions.clickOnClass('.fa-home');
       actions.iSeeText('Updated Title');
@@ -45,7 +45,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#description','Updated Description');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
       actions.clickOnClass('.fa-home');
       actions.iSeeText('Updated Title');
@@ -59,7 +59,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Angular');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated Title');
       actions.clickOnClass('.fa-home');
       actions.iSeeText('Updated Title');
@@ -73,10 +73,10 @@ module.exports = function (actions,tags) {
       actions.iSeeText('angular-formio');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnClass('i.caret.pull-right');
-      actions.clickOnElementWithText('React.js');
+      actions.clickOnElementWithText('React');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Embed');
       actions.iSeeText('react-formio');
@@ -85,7 +85,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Vue.js');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Embed');
       actions.iSeeText('vue-formio');
@@ -94,7 +94,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Stand-Alone Forms');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Embed');
       actions.iSeeText('iFrame Embed');
@@ -103,7 +103,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Custom');
       actions.clickOnButton(' Save Project');
       actions.iSeeTextIn('.toast-message', 'Project settings saved.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Embed');
       actions.iSeeText('Include Formio.js + Bootstrap');
@@ -122,7 +122,7 @@ module.exports = function (actions,tags) {
       actions.iSeeTextIn('.btn.btn-danger', 'Yes');
       actions.clickOnElementWithText(' Yes');
       actions.iSeeTextIn('.toast-message', 'Project was deleted!');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iDonotSeeText('Updated Title');
     });
     describe('Attempt to save Project Settings with long Project Title', function () {
@@ -136,7 +136,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
       actions.iSeeTextIn('.toast-message', 'New Project created!');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#title', 'This is a very very very very very very very very very long title');
       actions.iSeeText('Stage Title cannot be longer than 63 characters.');
@@ -153,7 +153,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#description', '${random-description>project1.description}');
       actions.clickOnButton('Create Project');
       actions.iSeeTextIn('.toast-message', 'New Project created!');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
       actions.enterTextInField('#description', 'This is a very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long description');
       actions.iSeeText('Description cannot be longer than 512 characters.');

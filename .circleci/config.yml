@@ -6,29 +6,24 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: sudo npm install -g bower mocha gulp
+          name: Install Bower (needed for angular-ckeditor)
+          command: sudo npm install -g bower
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "bower.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Install npm modules
           command: npm install
-      - run:
-          name: Install bower componets
-          command: bower install --allow-root -s -F
       - save_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "bower.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
-            - bower_components
       - run:
           name: Build
-          command: gulp
+          command: npm run build
       - run:
           name: Tag version
           command: |
             echo ${CIRCLE_TAG} > dist/version.txt
-            cp src/config.js dist/
             sed -i "s/APP_VERSION/${CIRCLE_TAG}/g" dist/config.js
       - persist_to_workspace:
           root: .
@@ -42,8 +37,11 @@ jobs:
       - image: circleci/node:8.11-browsers
     steps:
       - checkout
+      - run:
+          name: Install Bower (needed for angular-ckeditor)
+          command: sudo npm install -g http-server
       - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}-{{ checksum "bower.json" }}
+          key: dependency-cache-{{ checksum "package.json" }}
       - attach_workspace:
           at: .
       - run:

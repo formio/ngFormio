@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-sm-12">
+    <p>The simplest way to embed a Form.io form inside your app is to use the <strong>formio</strong> component.</p>
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">A</span>
+          <h5>Use the formio component in a template.</h5>
+        </div>
+        <p>Add the following in one of your templates.</p>
+        <pre>
+&lt;template&gt;
+  &lt;formio src="https://examples.form.io/example" submission.bind="submission"&gt;&lt;/formio&gt;
+&lt;/template&gt;
+        </pre>      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">B</span>
+          <h5>Add properties to your class</h5>
+        </div>
+        <p>You can bind properties of the component by setting them on your class.</p>
+        <pre>
+export class MyClass {
+  private submission: any = {
+    data: {
+        firstName: 'Joe',
+        lastName: 'Smith'
+    }
+  };
+}
+        </pre>      </li>
+      </li>
+      <!--<li class="list-group-item">-->
+      <!--<div class="list-group-item-title">-->
+      <!--<span class="count-badge">C</span>-->
+      <!--<h5>As Resource Form with Helper Provider</h5>-->
+      <!--</div>-->
+      <!--<p>If you have installed the ngFormioHelper library, you can use it to automatically set up pages and controllers for you using just the form URL.</p>-->
+      <!--<p>You can do this by registering your resource form in the app.config stage like this</p>-->
+      <!--<p><pre>-->
+      <!--app.config(function(config, FormioResourceProvider) {-->
+      <!--FormioResourceProvider.register('demographic', AppConfig.forms.demographicsForm);-->
+      <!--});</pre></p>-->
+      <!--<p>This will automatically create several ui-router states, templates and controllers that make it easy to use the form within your application. After loading your app, try going to <strong>/demographic</strong> and see what all is there. </p>-->
+      <!--<p>For more information on the FormioResource Provider, see <a href="https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider" target="_blank">https://github.com/formio/ngFormioHelper/wiki/FormioResource-Provider</a> </p>-->
+      <!--</li>-->
+    </ul>
+  </div>
+</div>

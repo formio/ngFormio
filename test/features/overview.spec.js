@@ -12,13 +12,13 @@ module.exports = function (actions,tags) {
     actions.clickOnElementWithText('API Web Form');
     actions.enterTextInField('#title','Test Form');
     actions.clickOnElementWithText('Create Form');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText('Resources');
     actions.clickOnElementWithText(' New Resource');
     actions.checkingUrlEndsWith('/resource/create/resource');
     actions.enterTextInField('#title','Test Resource');
     actions.clickOnButton('Create Resource');
-    actions.clickOnClass('.toast-message');
+  // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText('Overview');
     actions.clickOnElementWithText('More...');
     actions.checkingUrlEndsWith('/form/');

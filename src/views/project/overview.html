@@ -69,21 +69,34 @@
       </ul>-->
     </div>
     <div class="col-md-4">
-      <ul class="list-group list-group-striped" ng-if="currentProject._id === localProject._id">
+      <ul class="list-group list-group-striped" ng-if="!onPremise">
         <li class="list-group-item list-group-heading">
-          <h3>Monthly Limits</h3>
+          <h3>Project Limits</h3>
         </li>
-        <li class="list-group-item">
-          <h3>Submission Requests</h3>
+        <li class="list-group-item" ng-if="currentProject._id === localProject._id">
+          <h4>Forms and Resources</h4>
           <div class="progress">
-            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls)}" ng-class="getProgressBarClass(currentProject.apiCalls)"></div>
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'forms')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'forms')"></div>
+            <span>{{ currentProject.apiCalls.used.forms | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.forms) }}</span>
           </div>
-          <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.used | number }} / {{ getAPICallsLimit(currentProject.apiCalls) }}</small></p>
-          <h3>Emails</h3>
+          <h4>Form Requests</h4>
           <div class="progress">
-            <div class="progress-bar" role="progressbar" ng-style="{width: getEmailCallsPercent(currentProject.apiCalls, primaryProject.plan)}" ng-class="getProgressBarClassPercent(currentProject.apiCalls, primaryProject.plan)"></div>
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'formRequests')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'formRequests')"></div>
+            <span>{{ currentProject.apiCalls.used.formRequests | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.formRequests) }} per month</span>
           </div>
-          <p class="text-center text-muted progress-caption"><small>{{ currentProject.apiCalls.emails | number }} / {{ getEmailCallsLimit(primaryProject.plan) }}</small></p>
+          <h4>Submission Requests</h4>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'submissionRequests')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'submissionRequests')"></div>
+            <span>{{ currentProject.apiCalls.used.submissionRequests | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.submissionRequests) }} per month</span>
+          </div>
+          <h4>Emails</h4>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'emails')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'emails')"></div>
+            <span>{{ currentProject.apiCalls.used.emails | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.emails) }} per month</span>
+          </div>
+        </li>
+        <li class="list-group-item" ng-if="currentProject._id !== localProject._id">
+          <h4>Enterprise Edition (On Premise)</h4>
         </li>
       </ul>
       <ul class="list-group list-group-striped">
@@ -135,18 +148,18 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="submission-activity">
-      <div class="col-md-12">
-        <h3>Submission Activity</h3>
-      </div>
-      <div class="project-data project-summary" ng-if="projectUrl" ng-controller="ChartController">
-        <div class="col-sm-12">
-          <h3 class="center">{{label[currentType]}}</h3>
-          <h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>
-          <chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!--<div class="row">-->
+    <!--<div class="submission-activity">-->
+      <!--<div class="col-md-12">-->
+        <!--<h3>Submission Activity</h3>-->
+      <!--</div>-->
+      <!--<div class="project-data project-summary" ng-if="projectUrl" ng-controller="ChartController">-->
+        <!--<div class="col-sm-12">-->
+          <!--<h3 class="center">{{label[currentType]}}</h3>-->
+          <!--<h4>{{viewDate.year}} / {{viewDate.month}} / {{viewDate.day}}&nbsp;(UTC)&emsp;<select ng-init="graphChange()" ng-options="type for type in types" ng-model="graphType" ng-change="graphChange()"></select></h4>-->
+          <!--<chartist class="ct-chart" chartist-data="analytics" chartist-chart-type="Line" chartist-chart-options="analyticsOptions" chartist-events="analyticsEvents"></chartist>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</div>-->
 </div>

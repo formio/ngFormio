@@ -12,10 +12,10 @@ module.exports = function (actions,tags) {
       actions.iSeeTextCount('Anonymous', 3);
       actions.clickOnClassWithIndex('.ui-select-search', 0);
       actions.clickOnElementWithText('Anonymous');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnClassWithIndex('.ui-select-search', 2);
       actions.clickOnElementWithTextIndex('Authenticated', 1);
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.pageReload();
       actions.iSeeTextCount('Administrator', 5);
       actions.iSeeTextCount('Authenticated', 4);
@@ -59,14 +59,14 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Administrator');
       actions.clickOnElementWithText('Yes');
       actions.iSeeTextIn('.toast-message', 'The Administrator role is required. This can be renamed but not deleted, because it is the role assigned to unauthenticated users.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('No');
       actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash', 1);
       actions.iSeeText('Are you sure you wish to delete the role ');
       actions.iSeeText('Anonymous');
       actions.clickOnElementWithText('Yes');
       actions.iSeeTextIn('.toast-message', 'The Anonymous role is required. This can be renamed but not deleted, because it is the role assigned to unauthenticated users.');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('No');
       actions.clickOnClassWithIndex('.glyphicon.glyphicon-trash', 2);
       actions.iSeeText('Are you sure you wish to delete the role ');
@@ -78,7 +78,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Are you sure you wish to delete the role ');
       actions.iSeeText('Authenticated');
       actions.clickOnElementWithText('Yes');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iDonotSeeText('Authenticated');
     });
     describe('',function() {
@@ -91,12 +91,12 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title', 'TestingRole');
       actions.enterTextInField('#description', 'Test description of TestingRole.');
       actions.clickOnElementWithText('Create Role');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('TestingRole');
       actions.iSeeText('Test description of TestingRole.');
       actions.clickOnClassWithIndex('.ui-select-search', 0);
       actions.clickOnElementWithText('TestingRole');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeTextCount('TestingRole',3);
     });
     tags('smoke').describe('',function(){
@@ -104,7 +104,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title','Updated TestingRole');
       actions.enterTextInField('#description','Updated Test description of TestingRole.');
       actions.clickOnElementWithText('Save Changes');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeText('Updated TestingRole');
       actions.iSeeText('Updated Test description of TestingRole.');
       actions.clickOnElementWithTextIndex(' Edit',2);
@@ -112,7 +112,7 @@ module.exports = function (actions,tags) {
       actions.iSeeValueInContains('#machineName','testingRole');
       actions.enterTextInField('#machineName','updatedMachineName');
       actions.clickOnElementWithText('Save Changes');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.waitForActionToComplete(500);
       actions.pageReload();
       actions.clickOnElementWithText('Advanced Settings');
@@ -120,14 +120,14 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Save Changes');
       actions.clickOnClassWithIndex('.ui-select-search', 0);
       actions.clickOnElementWithText('Updated TestingRole');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeTextCount('Updated TestingRole',2);
       actions.clickOnElementWithText(' Edit Form Access');
       actions.checkingUrlEndsWith('/permission');
       actions.iSeeText('User Login Form ');
       actions.clickOnClassWithIndex('.ui-select-search', 0);
       actions.clickOnElementWithText('Updated TestingRole');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.iSeeTextCount('Updated TestingRole',2);
       actions.clickOnElementWithText('Access');
       actions.clickOnElementWithTextIndex(' Edit',2);
@@ -146,7 +146,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Updated TestingRole');
       actions.waitForActionToComplete(500);
       actions.clickOnElementWithText('Save Action');
-      actions.clickOnClass('.toast-message');
+    // actions.clickOnClass('.toast-message');
       actions.logout();
     });
   });

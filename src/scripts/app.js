@@ -13,6 +13,7 @@ angular
     'ngSanitize',
     'ui.router',
     'ui.bootstrap',
+    'ui.bootstrap.accordion',
     'ui.bootstrap.alert',
     'ui.bootstrap.tpls',
     'ui.bootstrap.tooltip',
@@ -28,9 +29,7 @@ angular
     'ngFileUpload',
     'ngDialog',
     'swaggerUi',
-    'toastr',
-    'bootstrapLightbox',
-    'ngFileSaver'
+    'toastr'
   ])
   .config([
     '$stateProvider',
@@ -565,11 +564,6 @@ angular
             deferred.reject();
           });
           return deferred.promise;
-        },
-        loadTemplates: function() {
-          var deferred = $q.defer();
-          deferred.resolve(AppConfig.templates);
-          return deferred.promise;
         }
       };
     }
@@ -659,11 +653,6 @@ angular
         return title;
       };
 
-      $scope.templates = [];
-      FormioProject.loadTemplates().then(function(templates) {
-        $scope.templates = templates;
-      });
-
       $scope.submitted = false;
       $scope.selectedFramework = null;
       $scope.newProject = function(framework) {
@@ -673,7 +662,7 @@ angular
         }
         $scope.selectedFramework = framework;
         ngDialog.open({
-          templateUrl: 'views/project/create.html',
+          template: 'views/project/create.html',
           scope: $scope
         });
       };
@@ -755,9 +744,7 @@ angular
       $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);
       $scope.getPlanLabel = ProjectPlans.getPlanLabel.bind(ProjectPlans);
       $scope.getAPICallsLimit = ProjectPlans.getAPICallsLimit.bind(ProjectPlans);
-      $scope.getEmailCallsLimit = ProjectPlans.getEmailCallsLimit.bind(ProjectPlans);
       $scope.getAPICallsPercent = ProjectPlans.getAPICallsPercent.bind(ProjectPlans);
-      $scope.getEmailCallsPercent = ProjectPlans.getEmailCallsPercent.bind(ProjectPlans);
       $scope.getProgressBarClass = ProjectPlans.getProgressBarClass.bind(ProjectPlans);
 
       $rootScope.welcomeForceClose = false;
@@ -839,6 +826,7 @@ angular
     '$window',
     '$http',
     '$timeout',
+    '$templateCache',
     function(
       $state,
       $stateParams,
@@ -851,8 +839,23 @@ angular
       $location,
       $window,
       $http,
-      $timeout
+      $timeout,
+      $templateCache
     ) {
+      // Ensure they are logged.
+      $rootScope.$on('$stateChangeStart', function(event, toState) {
+        $rootScope.userToken = Formio.getToken();
+        $rootScope.authenticated = !!$rootScope.userToken;
+        if (toState.name.substr(0, 4) === 'auth') {
+          return;
+        }
+        if (!$rootScope.authenticated) {
+          event.preventDefault();
+          $state.go('auth');
+        }
+      });
+
+      $rootScope.onPremise = AppConfig.onPremise;
 
       // Force SSL.
       if (AppConfig.forceSSL && $location.protocol() !== 'https') {
@@ -910,12 +913,13 @@ angular
         $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
       };
 
-      // Always redirect to login if they are not authenticated.
-      $state.go('home');
-
       if (!$rootScope.user) {
         Formio.currentUser().then(function(user) {
           $rootScope.user = user;
+          if (!$rootScope.user) {
+            // Always redirect to login if they are not authenticated.
+            $state.go('home');
+          }
         });
       }
 
@@ -1031,19 +1035,6 @@ angular
         }).catch(logoutError);
       };
 
-      // Ensure they are logged.
-      $rootScope.$on('$stateChangeStart', function(event, toState) {
-        $rootScope.userToken = Formio.getToken();
-        $rootScope.authenticated = !!$rootScope.userToken;
-        if (toState.name.substr(0, 4) === 'auth') {
-          return;
-        }
-        if (!$rootScope.authenticated) {
-          event.preventDefault();
-          $state.go('auth');
-        }
-      });
-
       $rootScope.$on('$stateChangeSuccess', function(event, state) {
         var parts = state.name.split('.');
         var classes = [];
@@ -1079,6 +1070,90 @@ angular
       //   - Any inline style
       //   - Any class name
       CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
+
+      // Preload ng-include templates into cache.
+    // <ng-include src="embedView"></ng-include>
+    //     <ng-include src="infoTemplate"></ng-include>
+    // <ng-include src="currentStep.template" ng-init="init()" />
+      $templateCache.put('views/form/upload.html', require('../views/form/upload.html'));
+      $templateCache.put('views/project/access/access/access.html', require('../views/project/access/access/access.html'));
+      $templateCache.put('views/project/access/roles/view.html', require('../views/project/access/roles/view.html'));
+      $templateCache.put('views/project/access/teams.html', require('../views/project/access/teams.html'));
+      $templateCache.put('views/project/settings/menu.html', require('../views/project/settings/menu.html'));
+      $templateCache.put('views/project/settings.html', require('../views/project/settings.html'));
+      $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
+      $templateCache.put('views/project/env/menu.html', require('../views/project/env/menu.html'));
+      $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
+      $templateCache.put('views/project/env/integrations/storage/s3.html', require('../views/project/env/integrations/storage/s3.html'));
+      $templateCache.put('views/project/env/integrations/storage/dropbox.html', require('../views/project/env/integrations/storage/dropbox.html'));
+      $templateCache.put('views/project/env/integrations/data/office365.html', require('../views/project/env/integrations/data/office365.html'));
+      $templateCache.put('views/project/env/integrations/data/google.html', require('../views/project/env/integrations/data/google.html'));
+      $templateCache.put('views/project/env/integrations/data/kickbox.html', require('../views/project/env/integrations/data/kickbox.html'));
+      $templateCache.put('views/project/env/integrations/data/hubspot.html', require('../views/project/env/integrations/data/hubspot.html'));
+      $templateCache.put('views/project/env/integrations/data/sqlconnector.html', require('../views/project/env/integrations/data/sqlconnector.html'));
+      $templateCache.put('views/project/env/integrations/data/atlassian.html', require('../views/project/env/integrations/data/atlassian.html'));
+      $templateCache.put('views/project/env/integrations/data/moxtra.html', require('../views/project/env/integrations/data/moxtra.html'));
+      $templateCache.put('views/project/env/integrations/email/smtp.html', require('../views/project/env/integrations/email/smtp.html'));
+      $templateCache.put('views/project/env/integrations/email/sendgrid.html', require('../views/project/env/integrations/email/sendgrid.html'));
+      $templateCache.put('views/project/env/integrations/email/mailgun.html', require('../views/project/env/integrations/email/mailgun.html'));
+      $templateCache.put('views/project/env/integrations/email/custom.html', require('../views/project/env/integrations/email/custom.html'));
+      $templateCache.put('views/project/env/authentication/oauth/openid.html', require('../views/project/env/authentication/oauth/openid.html'));
+      $templateCache.put('views/project/env/authentication/oauth/github.html', require('../views/project/env/authentication/oauth/github.html'));
+      $templateCache.put('views/project/env/authentication/oauth/facebook.html', require('../views/project/env/authentication/oauth/facebook.html'));
+      $templateCache.put('views/project/env/authentication/oauth/dropbox.html', require('../views/project/env/authentication/oauth/dropbox.html'));
+      $templateCache.put('views/project/env/authentication/oauth/office365.html', require('../views/project/env/authentication/oauth/office365.html'));
+      $templateCache.put('views/project/env/authentication/oauth/google.html', require('../views/project/env/authentication/oauth/google.html'));
+      $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
+      $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
+      $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
+      $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
+      $templateCache.put('views/frameworks/angular/embed.html', require('../views/frameworks/angular/embed.html'));
+      $templateCache.put('views/frameworks/react/embed.html', require('../views/frameworks/react/embed.html'));
+      $templateCache.put('views/frameworks/vue/embed.html', require('../views/frameworks/vue/embed.html'));
+      $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
+      $templateCache.put('views/frameworks/simple/embed.html', require('../views/frameworks/simple/embed.html'));
+      $templateCache.put('views/form/resource-info.html', require('../views/form/resource-info.html'));
+      $templateCache.put('views/partials/pager.html', require('../views/partials/pager.html'));
+      $templateCache.put('views/project/create.html', require('../views/project/create.html'));
+      $templateCache.put('views/project/tour/action.html', require('../views/project/tour/action.html'));
+      $templateCache.put('views/project/tour/configure.html', require('../views/project/tour/configure.html'));
+      $templateCache.put('views/project/tour/download.html', require('../views/project/tour/download.html'));
+      $templateCache.put('views/project/tour/form.html', require('../views/project/tour/form.html'));
+      $templateCache.put('views/project/tour/index.html', require('../views/project/tour/index.html'));
+      $templateCache.put('views/project/tour/launch.html', require('../views/project/tour/launch.html'));
+      $templateCache.put('views/project/tour/next.html', require('../views/project/tour/next.html'));
+      $templateCache.put('views/project/tour/user.html', require('../views/project/tour/user.html'));
+      $templateCache.put('views/project/tour/welcome.html', require('../views/project/tour/welcome.html'));
+      $templateCache.put('views/frameworks/angular/configure.html', require('../views/frameworks/angular/configure.html'));
+      $templateCache.put('views/frameworks/angular/download.html', require('../views/frameworks/angular/download.html'));
+      $templateCache.put('views/frameworks/angular/embed.html', require('../views/frameworks/angular/embed.html'));
+      $templateCache.put('views/frameworks/angular/embed-app.html', require('../views/frameworks/angular/embed-app.html'));
+      $templateCache.put('views/frameworks/angular2/configure.html', require('../views/frameworks/angular2/configure.html'));
+      $templateCache.put('views/frameworks/angular2/download.html', require('../views/frameworks/angular2/download.html'));
+      $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
+      $templateCache.put('views/frameworks/angular2/embed-app.html', require('../views/frameworks/angular2/embed-app.html'));
+      $templateCache.put('views/frameworks/angular2/launch.html', require('../views/frameworks/angular2/launch.html'));
+      $templateCache.put('views/frameworks/aurelia/download.html', require('../views/frameworks/aurelia/download.html'));
+      $templateCache.put('views/frameworks/aurelia/embed.html', require('../views/frameworks/aurelia/embed.html'));
+      $templateCache.put('views/frameworks/aurelia/embed-app.html', require('../views/frameworks/aurelia/embed-app.html'));
+      $templateCache.put('views/frameworks/aurelia/launch.html', require('../views/frameworks/aurelia/launch.html'));
+      $templateCache.put('views/frameworks/custom/download.html', require('../views/frameworks/custom/download.html'));
+      $templateCache.put('views/frameworks/custom/embed.html', require('../views/frameworks/custom/embed.html'));
+      $templateCache.put('views/frameworks/custom/embed-app.html', require('../views/frameworks/custom/embed-app.html'));
+      $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
+      $templateCache.put('views/frameworks/react/configure.html', require('../views/frameworks/react/configure.html'));
+      $templateCache.put('views/frameworks/react/download.html', require('../views/frameworks/react/download.html'));
+      $templateCache.put('views/frameworks/react/embed.html', require('../views/frameworks/react/embed.html'));
+      $templateCache.put('views/frameworks/react/embed-app.html', require('../views/frameworks/react/embed-app.html'));
+      $templateCache.put('views/frameworks/simple/configure.html', require('../views/frameworks/simple/configure.html'));
+      $templateCache.put('views/frameworks/simple/embed.html', require('../views/frameworks/simple/embed.html'));
+      $templateCache.put('views/frameworks/simple/embed-app.html', require('../views/frameworks/simple/embed-app.html'));
+      $templateCache.put('views/frameworks/vue/configure.html', require('../views/frameworks/vue/configure.html'));
+      $templateCache.put('views/frameworks/vue/download.html', require('../views/frameworks/vue/download.html'));
+      $templateCache.put('views/frameworks/vue/embed.html', require('../views/frameworks/vue/embed.html'));
+      $templateCache.put('views/frameworks/vue/embed-app.html', require('../views/frameworks/vue/embed-app.html'));
+      $templateCache.put('views/form/submission/delete-confirmation.html', require('../views/form/submission/delete-confirmation.html'));
+      $templateCache.put('views/form/cancel-confirm.html', require('../views/form/cancel-confirm.html'));
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
@@ -1162,38 +1237,21 @@ angular
         return this.plans[plan].labelStyle;
       },
       getAPICallsLimit: function(apiCalls) {
-        if (!apiCalls || !apiCalls.limit) {
+        if (!apiCalls) {
           return '∞';
         }
-        return $filter('number')(apiCalls.limit);
+        return $filter('number')(apiCalls);
       },
-      getEmailCallsLimit: function(plan) {
-        switch(plan) {
-          case 'basic':
-            return 100;
-          case 'independent':
-            return 1000;
-          default:
-            return '∞';
-        }
-      },
-      getAPICallsPercent: function(apiCalls) {
-        if (!apiCalls || !apiCalls.limit) {
+      getAPICallsPercent: function(apiCalls, type) {
+        if (!apiCalls || !apiCalls.limit || !apiCalls.limit[type]) {
           return '0%';
         }
-        var percent = apiCalls.used / apiCalls.limit * 100;
+        var percent = apiCalls.used[type] / apiCalls.limit[type] * 100;
         return (percent > 100) ? '100%' : percent + '%';
       },
-      getEmailCallsPercent: function(apiCalls, plan) {
-        if (!apiCalls || !apiCalls.emails) {
-          return '0%';
-        }
-        var percent = apiCalls.emails / this.getEmailCallsLimit(plan) * 100;
-        return (percent > 100) ? '100%' : percent + '%';
-      },
-      getProgressBarClass: function(apiCalls) {
-        if (!apiCalls || !apiCalls.limit) return 'progress-bar-success';
-        var percentUsed = apiCalls.used / apiCalls.limit;
+      getProgressBarClass: function(apiCalls, type) {
+        if (!apiCalls || !apiCalls.limit || !apiCalls.limit[type]) return 'progress-bar-success';
+        var percentUsed = apiCalls.used[type] / apiCalls.limit[type];
         if (percentUsed >= 0.9) return 'progress-bar-danger';
         if (percentUsed >= 0.7) return 'progress-bar-warning';
         return 'progress-bar-success';
@@ -1295,4 +1353,26 @@ angular
 
       return Interceptor;
     }
-  ]);
+  ])
+  .run($run);
+
+// Safely instantiate dataLayer
+$run.$inject = ['$rootScope', '$location', '$window'];
+
+function $run($rootScope, $location, $window) {
+
+  var dataLayer = $window.dataLayer = $window.dataLayer || [];
+
+  $rootScope.$on('$stateChangeSuccess', function() {
+
+    dataLayer.push({
+      event: 'stateChange',
+      attributes: {
+        user: $rootScope.user,
+        route: $location.path()
+      }
+    });
+
+  });
+
+}

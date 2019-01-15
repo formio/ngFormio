@@ -9,62 +9,36 @@ locally as a node server or from gulp. You MUST be running a formio-server and c
 
 Installation (Manual)
 ------------
-In order to install and run this application, you will first need to install Node.JS, Gulp, and Bower. In addition, you
+In order to install and run this application, you will first need to install Node.JS. In addition, you
 you will need to run the formio-server, preferably on port 3000. See https://github.com/formio/formio-server for
 instructions on running it.
 
   - ```brew install node```
-  - ```npm install -g bower```
-  - ```npm install -g gulp```
 
 Next, install dependencies.
 
-  - ```bower install```
   - ```npm install```
-  - ```git submodule update --init --recursive```
 
-Next, build the site.
+Next, run a dev version of the site.
 
-  - ```gulp build```
+  - ```webpack-dev-server```
 
-You can configure which port to run the app server on by creating a .env file and putting PORT=3001 in it.
+This will start the site on port 8080 (typically).
 
-You should then be able to run the application locally by typing.
-
-  - ```node app```
-
-You should then be able to go to http://localhost:3001 to see the https://form.io application.
 
 Developing
 ------------
-In order to develop against the application, you will need to utilize Gulp.
+In order to develop against the application, you will need to utilize npm link. Install ng-formio and ng-form-builder outside of the main directly and run ```npm link``` from within each one.
 
-  - ```cd bower_components/ng-formio```
-  - ```npm install```
-  - ```gulp watch```
+  - ```npm link ng-formio ng-formio-builder```
 
-... create another terminal ...
-
-  - ```cd bower_components/ng-formio-builder```
-  - ```npm install```
-  - ```gulp watch```
-
-... create another terminal ...
-
-  - ```gulp serve```
-
-You should now be able to see the form.io application @ http://localhost:9002.
-
-With these watches running, you can now make changes directly within the formio and ngFormBuilder
-bower_components and those changes will be immediately reflected on the browser. You can then
-check in any changes to the bower_components since each of these are simply a submodule of the
-base formio-app.
+You may also want to uncomment the dev-tool line in webpack.config.js which will create sourcemaps in the compiled code for easier debugging. 
 
 Deployment
 ---------------
 There are five steps that need to be run to deploy a new version.
 
-  - ```./scripts/setup.sh -snb```
+  - ```webpack -p```
   - ```docker build -t formio/formio-app:$TAG_NAME .```
   - ```docker push formio/formio-app:$TAG_NAME```
   - ```./scripts/createVersion.sh $TAG_NAME```

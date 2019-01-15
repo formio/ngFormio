@@ -1,0 +1,66 @@
+<div class="row">
+  <div class="col-sm-12">
+    <h4>To begin development of your application you will need to set up a local development environment. There are three ways to do this. You can start with our StarterKit, start generate an application or roll your own.</h4>
+    <p>Your options are:</p>
+    <ul class="list-group steps">
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">A</span>
+          <h5>Clone the Form.io Aurelia StarterKit</h5>
+        </div>
+        <p>Our React StarterKit comes set up with React Router, redux and react-formio that make it easy to set up and use our forms within React. This is the easiest route to getting a running application.</p>
+        <p>In order to clone the github repo you must have git installed on your computer. If you don't already have it, you can get it at <a href="https://git-scm.com/" target="_blank">https://git-scm.com/</a>.</p>
+        <p>Once you have git, go to your terminal and type</p>
+        <p><pre>git clone https://github.com/formio/aurelia-app-starterkit.git
+cd aurelia-app-starterkit</pre>
+        </p>
+        <p>If you do no have git installed, you can go to <a href="https://github.com/formio/aurelia-app-starterkit" target="_blank">https://github.com/formio/aurelia-app-starterkit</a> and click the <strong>Download Zip</strong> button and unzip it on your computer.</p>
+        <p>Finally, be sure to install all the dependencies to get everything set up. From within the application root directory type</p>
+        <p><pre>npm install</pre>
+        </p>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">B</span>
+          <h5>Use a Aurelia Generator</h5>
+        </div>
+        <p>You can get more information at <a href="https://aurelia.io/docs/tutorials/creating-a-contact-manager#setting-up-your-machine">https://aurelia.io/docs/tutorials/creating-a-contact-manager#setting-up-your-machine</a></p>
+        <p>To set it up, go to your terminal and type</p>
+        <p><pre>npm install aurelia-cli -g</pre></p>
+        <p>Once the dependencies installed, simply launch the generator and answer the questions.</p>
+        <p><pre>au new</pre></p>
+        <p>Answer the questions as you want and be sure to install dependencies as part of the setup or run npm install on your own.</p>
+        </p>
+        <p>Finally, add in the Aurelia Form.io library.</p>
+        <ul>
+          <li>
+            <a href="https://github.com/formio/aurelia-formio">aurelia-formio</a> - The main Aurelia form renderer.
+          </li>
+        </ul>
+        <br />
+        <p>To add it to your application, type the following</p>
+        <p><pre>npm install --save aurelia-formio</pre><p>
+        <p>Be sure to add aurelia-formio as a plugin as well.</p>
+        <p><pre>
+export function configure(aurelia: Aurelia) {
+  aurelia.use
+    .standardConfiguration()
+    .plugin(PLATFORM.moduleName('aurelia-formio'));
+      </pre></p>
+      </li>
+      <li class="list-group-item">
+        <div class="list-group-item-title">
+          <span class="count-badge">C</span>
+          <h5>Roll your own application</h5>
+        </div>
+        <p>If you are have experience with and are comfortable setting up your own Aurelia application you can, of course, do so. This works best for teams that already have an application or have a different set of build tools or dependent libraries than the starterkits use.</p>
+        <p>To add Form.io forms to your application, use one of the package managers and include the aurelia-formio library to your application.</p>
+        <ul>
+          <li>
+            <a href="https://github.com/formio/aurelia-formio">aurelia-formio</a> - The main Aurelia form renderer.
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
