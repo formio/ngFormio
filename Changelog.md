@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.10.3
+### Fixed
+ - A build issue where the final dist build was getting ran through babel twice.
+
 ## 3.10.2
 ### Changed
  - Upgraded the formio.js renderer to 3.12.0
