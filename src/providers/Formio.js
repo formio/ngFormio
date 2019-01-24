@@ -48,14 +48,31 @@ module.exports = function() {
           wrapStaticRequestPromise: wrapQPromise
         }, 'ngFormioPromiseWrapper');
 
+        // Call a safe apply.
+        var safeApply = function(fn) {
+          var phase = $rootScope.$root.$$phase;
+          if(phase == '$apply' || phase == '$digest') {
+            if(fn && (typeof(fn) === 'function')) {
+              fn();
+            }
+          } else {
+            $rootScope.$apply(fn);
+          }
+        };
+
         // Broadcast offline events from $rootScope
         Formio.events.onAny(function() {
           var event = 'formio.' + this.event;
           var args = [].splice.call(arguments, 0);
           args.unshift(event);
-          $rootScope.$apply(function() {
-            $rootScope.$broadcast.apply($rootScope, args);
-          });
+          try {
+            safeApply(function() {
+              $rootScope.$broadcast.apply($rootScope, args);
+            });
+          }
+          catch (err) {
+            console.log(err);
+          }
         });
 
         // Add ability to set the scope base url.

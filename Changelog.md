@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.37.1
+### Fixed
+ - Problems with broadcast to offline mode causing a crash with $scope.$apply.
+
 ## 2.37.0
 ### Changed
  - Upgraded angular@1.7.6, angular-sanitize@1.7.6, node-qunit-phantomjs@2.0.1, formiojs@3.12.3, moment@2.24.0, eslint@5.12.1
