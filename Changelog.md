@@ -4,10 +4,18 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 6.1.0
+### Changed
+ - Upgraded dependencies including the Kendo UI Grid library.
+
+### Added
+ - Add token parse option to projects for custom tokens.
+
 ### Fixed
  - Resetting current viewed page to first when saving Wizard form
-
+ - Problems with wizard forms submitting the data twice.
+ - Problems with "undefined" getting appended to some controls API Keys whose parents are layout components that do have a key established.
+ 
 ## 6.0.2
 ### Fixed
  - Remove project limit graphs for on premise portals.
