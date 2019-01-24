@@ -113,13 +113,7 @@ module.exports = {
       {
         test: /\.html/,
         exclude: /src\/index\.html$/,
-        use: [
-          {
-            loader: 'raw-loader',
-            options: {
-              name: '[path][name].[ext]',
-            }
-          }]
+        use: ['raw-loader']
       }
     ]
   },
