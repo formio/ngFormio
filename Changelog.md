@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.37.0
+### Changed
+ - Upgraded angular@1.7.6, angular-sanitize@1.7.6, node-qunit-phantomjs@2.0.1, formiojs@3.12.3, moment@2.24.0, eslint@5.12.1
+
+### Fixed
+ - Issue with the wizards performing a submission even when "url" is provided and it is supposed to have the noSubmit flag set.
+
 ## 2.36.9
 ### Fixed
  - FOR-1849: Fixed Number component value being 0 when customDefaultValue is empty string

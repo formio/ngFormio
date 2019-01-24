@@ -615,6 +615,9 @@ module.exports = function() {
             var formUrl = form.project ? '/project/' + form.project : '';
             formUrl += '/form/' + form._id;
             $scope.formio = new Formio(formUrl, {base: $scope.baseUrl});
+            if ($scope.url) {
+              $scope.formio.noSubmit = true;
+            }
             setForm(form);
           });
         }
@@ -632,6 +635,9 @@ module.exports = function() {
         else {
           $scope.src = '';
           $scope.formio = new Formio($scope.src, {base: $scope.baseUrl});
+          if ($scope.url) {
+            $scope.formio.noSubmit = true;
+          }
         }
       }
     ]
