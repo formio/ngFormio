@@ -861,6 +861,10 @@ app.controller('FormController', [
         getHeaders: true
       })
       .then(function(response) {
+        const oldPage = $scope.form.page;
+        if (response.result && !response.result.page) {
+          response.result.page = oldPage;
+        }
         $scope.form = $scope.originalForm = response.result;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
