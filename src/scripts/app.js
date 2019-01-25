@@ -1115,6 +1115,7 @@ angular
       $templateCache.put('views/project/env/menu.html', require('../views/project/env/menu.html'));
       $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
       $templateCache.put('views/project/env/integrations/storage/s3.html', require('../views/project/env/integrations/storage/s3.html'));
+      $templateCache.put('views/project/env/integrations/storage/azure.html', require('../views/project/env/integrations/storage/azure.html'));
       $templateCache.put('views/project/env/integrations/storage/dropbox.html', require('../views/project/env/integrations/storage/dropbox.html'));
       $templateCache.put('views/project/env/integrations/data/office365.html', require('../views/project/env/integrations/data/office365.html'));
       $templateCache.put('views/project/env/integrations/data/google.html', require('../views/project/env/integrations/data/google.html'));
