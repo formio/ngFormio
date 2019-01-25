@@ -5,11 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 6.1.0
+### Added
+ - Azure Blob Storage
+ - reCaptcha Support
+ - Some text within the project upgrade page that lets them know why certain controls are disabled.
+ - Add token parse option to projects for custom tokens.
+
+### Removed
+ - The ability to "downgrade" a project to Basic.
+
+### Fixed
+ - Fixed the embed documentation for JavaScript projects.
+ - Fixed the name of the project modal when creating a new project.
+ - A JavaScript crash issue when navigating from your project, back to the home page.
+ - A JavaScript crash issue when logging out of your account.
+
 ### Changed
  - Upgraded dependencies including the Kendo UI Grid library.
-
-### Added
- - Add token parse option to projects for custom tokens.
+ - Some cosmetic fixes to the Walkthrough tutorials (especially for JavaScript perojects)
+ - The project upgrade page to disable the PDF Plan selection for non-paid accounts.
 
 ### Fixed
  - Resetting current viewed page to first when saving Wizard form
