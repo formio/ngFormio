@@ -1,0 +1,16 @@
+<p>
+  Use your Site Key and Secret Key from <a href="https://www.google.com/recaptcha/admin" target="_blank">your reCAPTCHA
+  Admin Panel</a>
+</p>
+<div class="form-group">
+  <label for="recaptchaSecretKey">reCAPTCHA Site Key</label>
+  <input ng-model="currentProject.settings.recaptcha.siteKey" type="text" class="form-control" id="recaptchaSiteKey"
+         name="recaptchaSiteKey" placeholder="Enter reCAPTCHA Site Key">
+</div>
+<div class="form-group">
+  <label for="recaptchaSecretKey">reCAPTCHA Secret Key</label>
+  <input ng-model="currentProject.settings.recaptcha.secretKey" type="text" class="form-control" id="recaptchaSecretKey"
+         name="recaptchaSecretKey" placeholder="Enter reCAPTCHA Secret Key">
+</div>
+
+<button ng-disabled="!minPlan('independent')" class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

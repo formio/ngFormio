@@ -423,6 +423,11 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/integrations/data/index.html'
         })
+        .state('project.env.integrations.recaptcha', {
+          url: '/integrations/recaptcha',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/integrations/recaptcha/index.html'
+        })
         .state('project.env.authentication', {
           url: '/authentication',
           abstract: true,
