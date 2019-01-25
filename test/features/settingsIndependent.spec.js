@@ -34,7 +34,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Submission Requests');
       actions.iSeeText('0 / 10,000');
       actions.iSeeText('Emails');
-      actions.iSeeText('0 / 1000');
+      actions.iSeeText('0 / 100');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="form-group-name"]/div[1]/input');
