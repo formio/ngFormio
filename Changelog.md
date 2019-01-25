@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.37.2
+### Changed
+ - Upgraded dependencies.
+
 ## 2.37.1
 ### Fixed
  - Problems with broadcast to offline mode causing a crash with $scope.$apply.
