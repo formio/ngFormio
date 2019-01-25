@@ -9,7 +9,8 @@ app.constant('ProjectFrameworkSteps', function(framework) {
       noTitle: true,
       title: 'Welcome',
       icon: 'fa fa-check-circle',
-      template: 'views/project/tour/welcome.html'
+      template: 'views/project/tour/welcome.html',
+      next: 'Application Setup'
     },
     {
       step: 'download',

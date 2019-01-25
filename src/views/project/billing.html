@@ -105,7 +105,7 @@
               </div>
             </div>
           </li>
-          <li class="list-group-item" ng-repeat="plan in plans | orderBy:order:true" ng-if="plan.name !== 'trial' || trialDaysRemaining">
+          <li class="list-group-item" ng-repeat="plan in plans | orderBy:order:true" ng-if="(plan.name !== 'trial' || trialDaysRemaining) && !plan.hide">
             <div class="row">
               <div class="col-sm-4">
                 <h4 style="font-weight:bold">{{ plan.title }}</h4>
@@ -175,6 +175,7 @@
               </div>
               <div class="col-sm-2">
                 <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+                <p ng-if="selectedPlan.order < getPlan('team').order">Only available for Team Pro and Enterprise plans</p>
               </div>
             </div>
           </li>
@@ -248,7 +249,12 @@
                 <h4>$50 / month</h4>
               </div>
               <div class="col-sm-3">
-                <span class="btn" ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan !== 'hosted')}" ng-click="setPDFHostedPlan('hosted')">{{ pdfInfo.plan === 'hosted' ? 'Selected' : 'Select' }}</span>
+                <button class="btn"
+                        ng-disabled="(pdfInfo.plan === 'basic' || pdfInfo.plan === 'trial')"
+                        ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan !== 'hosted')}"
+                        ng-click="setPDFHostedPlan('hosted')"
+                >{{ pdfInfo.plan === 'hosted' ? 'Selected' : 'Select' }}</button>
+                <p ng-if="(pdfInfo.plan === 'basic') || (pdfInfo.plan === 'trial')">Only available for paid plans</p>
               </div>
             </div>
           </li>
@@ -284,7 +290,11 @@
                 <h4>$250/mo or $500/mo for 3</h4>
               </div>
               <div class="col-sm-2">
-                <input type="number" class="form-control" ng-model="servers.pdf" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+                <input type="number"
+                       class="form-control"
+                       ng-model="servers.pdf"
+                       ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+                <p ng-if="selectedPlan.order < getPlan('team').order">Only available for Team Pro and Enterprise plans</p>
               </div>
             </div>
           </li>

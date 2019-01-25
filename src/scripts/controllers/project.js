@@ -136,7 +136,7 @@ app.controller('ProjectCreateController', [
     }
     else {
       $scope.selectedFramework = {
-        title: 'Project'
+        title: 'Custom'
       };
       $scope.project.framework = $scope.frameworks[0].name;
     }
@@ -3173,6 +3173,9 @@ app.controller('ProjectBilling', [
     };
 
     PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
+      if (!info) {
+        return console.warn('Cannot find project information.');
+      }
       $scope.pdfInfo = info.data;
       $scope.pdfInfoOriginalPlan = $scope.pdfInfo.plan;
       calculatePrice();
