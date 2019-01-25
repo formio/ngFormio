@@ -1120,6 +1120,7 @@ angular
       $templateCache.put('views/project/env/menu.html', require('../views/project/env/menu.html'));
       $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
       $templateCache.put('views/project/env/integrations/storage/s3.html', require('../views/project/env/integrations/storage/s3.html'));
+      $templateCache.put('views/project/env/integrations/storage/azure.html', require('../views/project/env/integrations/storage/azure.html'));
       $templateCache.put('views/project/env/integrations/storage/dropbox.html', require('../views/project/env/integrations/storage/dropbox.html'));
       $templateCache.put('views/project/env/integrations/data/office365.html', require('../views/project/env/integrations/data/office365.html'));
       $templateCache.put('views/project/env/integrations/data/google.html', require('../views/project/env/integrations/data/google.html'));
@@ -1141,6 +1142,7 @@ angular
       $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
       $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
       $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
+      $templateCache.put('views/frameworks/javascript/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
       $templateCache.put('views/frameworks/angular/embed.html', require('../views/frameworks/angular/embed.html'));
       $templateCache.put('views/frameworks/react/embed.html', require('../views/frameworks/react/embed.html'));
@@ -1231,15 +1233,16 @@ angular
           title: 'Basic',
           labelStyle: 'label-info',
           price: 0,
-          priceDescription: '$0/month'
+          priceDescription: '$0/month',
+          hide: true
         },
         independent: {
           order: 2,
           name: 'independent',
           title: 'Independent',
           labelStyle: 'label-warning',
-          price: 15,
-          priceDescription: '$15/month'
+          price: 25,
+          priceDescription: '$25/month'
         },
         team: {
           order: 3,

@@ -1907,6 +1907,9 @@ app.controller('FormActionEditController', [
             if (attachPDF) {
               // Load the PDFServer information.
               PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
+                if (!info) {
+                  return console.warn('Cannot find project information.');
+                }
                 if (info.data.plan === 'basic') {
                   $timeout(function() {
                     $(document.createElement('div'))

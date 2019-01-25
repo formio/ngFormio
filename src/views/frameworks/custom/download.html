@@ -4,13 +4,16 @@
     <ul class="list-group steps">
       <li class="list-group-item">
         <div class="list-group-item-title">
-          <span class="count-badge">1</span>
+          <span class="count-badge">A</span>
           <h5>Add the formio.js library to your application</h5>
         </div>
         <p>The formio.js library is a Javascript only library that renders form.io forms. You can use it to render within any webpage.</p>
         <p>Either use a package manager like npm or bower to include the formio.js library or include it manually.</p>
         <p>You can also check out one of our many framework libraries.</p>
-        <p><a target="_blank" href="https://github.com/formio/formio.js">Formio.js library</a></p>
+        <p><a target="_blank" class="btn btn-primary" href="https://github.com/formio/formio.js"><i class="fa fa-github" style="font-size: 1.5em;"></i>&nbsp;&nbsp;Formio.js library</a></p>
+        <pre style="font-size: 0.8em;"><code>npm install --save formiojs</code></pre>
+        <pre style="font-size: 0.8em;"><code>import { Formio } from 'formiojs';
+Formio.createForm(document.getElementById('formio'), 'https://examples.form.io');</code></pre>
       </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
@@ -21,7 +24,7 @@
           <pre style="font-size: 0.8em;"><code>&lt;link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"&gt;
 &lt;link rel="stylesheet" href="https://unpkg.com/formiojs@latest/dist/formio.full.min.css"&gt;
 &lt;script src="https://unpkg.com/formiojs@latest/dist/formio.full.min.js"&gt;&lt;/script&gt;</code></pre>
-
+          <p><a target="_blank" class="btn btn-primary" href="https://jsfiddle.net/travistidwell/3ocsxLh4">JSFiddle Example</a></p>
       </li>
     </ul>
   </div>

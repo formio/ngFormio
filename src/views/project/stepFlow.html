@@ -34,7 +34,7 @@
       </div>
       <div class="flow-footer">
         <div class="text-right" ng-if="nextSteps[currentStep.step]">
-          <strong>Next:</strong> <a class="btn btn-primary btn-lg" ng-click="changeStep(nextStep.parentStep, nextStep.childStep)">{{nextStep.childStep.next || nextStep.parentStep.next}}</a>
+          <strong>Next:</strong> <a class="btn btn-primary btn-lg" ng-click="changeStep(nextStep.parentStep, nextStep.childStep)">{{ nextStep.childStep.next || nextStep.parentStep.next }} <span class="glyphicon glyphicon-chevron-right"></span></a>
         </div>
       </div>
     </div>

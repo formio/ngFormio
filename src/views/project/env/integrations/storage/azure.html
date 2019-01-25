@@ -1,0 +1,20 @@
+<div class="well">
+  <h4>Azure Blob Service</h4>
+  <p>These settings allows you to configure a file upload to work with the Azure Blob Service.</p>
+</div>
+<div class="form-group">
+  <label for="connectionString">Connection String</label>
+  <input ng-model="currentProject.settings.storage.azure.connectionString" type="text" class="form-control" id="connectionString" name="connectionString" placeholder="Enter the storage connection string.">
+</div>
+<div class="form-group" >
+  <label for="container">Container Name</label>
+  <input ng-model="currentProject.settings.storage.azure.container" type="text" class="form-control" id="container" name="container" placeholder="Enter the name of your Blob Container">
+</div>
+<div class="form-group">
+  <label for="startsWith">Folder (optional) - Put all files in a folder such as "uploads/"</label>
+  <input ng-model="currentProject.settings.storage.azure.startsWith" type="text" class="form-control" id="startsWith" name="startsWith" placeholder="Enter a folder">
+</div>
+<div class="form-group">
+  <label for="expiration">Policy Expiration (optional) - How long the azure upload policy is valid for (in seconds). Defaults to 1 hour.</label>
+  <input ng-model="currentProject.settings.storage.azure.expiration" type="text" class="form-control" id="expiration" name="expiration" placeholder="Enter the seconds the policy should be valid.">
+</div>
