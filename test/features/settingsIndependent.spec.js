@@ -27,7 +27,7 @@ module.exports = function (actions,tags) {
       actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-warning", "Independent");
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.checkElementIsDisabled('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[2]/ul[3]/li[2]/div/div[3]/input');
       actions.clickOnElementWithText('Overview');
       actions.checkingUrlEndsWith('/overview');
