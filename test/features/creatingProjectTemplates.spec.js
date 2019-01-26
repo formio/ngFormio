@@ -64,6 +64,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title','Updated Title');
       actions.enterTextInField('#description','Updated Description');
       actions.clickOnButton(' Save Project');
+      actions.iSeeElement('.project-main');
     // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Angular');

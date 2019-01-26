@@ -56,6 +56,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title','Test Form');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');

@@ -10,6 +10,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title', 'Test Form');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
@@ -20,6 +21,7 @@ module.exports = function (actions,tags) {
     // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title', 'Test Resource');
       actions.iSeeValueIn('#name', 'testResource');
@@ -109,11 +111,13 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title','Live Form');
       actions.clickOnElementWithText('Create Form');
     // actions.clickOnClass('.toast-message');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Live Resource');
       actions.clickOnButton('Create Resource');

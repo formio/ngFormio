@@ -48,6 +48,7 @@ module.exports = function (actions,tags) {
       actions.iDonotSeeText('Test Resource');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title', 'Test Resource');
       actions.clickOnButton('Create Resource');
@@ -61,6 +62,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title', 'Test Form');
       actions.clickOnElementWithText('Create Form');
     // actions.clickOnClass('.toast-message');
@@ -71,6 +73,7 @@ module.exports = function (actions,tags) {
       actions.iDonotSeeText('Updated Resource');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText('Test Resource');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title', 'Updated Resource');
       actions.clickSave('Save Resource');
     // actions.clickOnClass('.toast-message');
@@ -82,6 +85,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Forms');
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText('Test Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title', 'Updated Form');
       actions.clickSave('Save Form');
     // actions.clickOnClass('.toast-message');

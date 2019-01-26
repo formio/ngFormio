@@ -45,6 +45,7 @@ module.exports = function (actions,tags) {
       actions.iSeeTextCount('https://remote.form.io/', '6');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title', 'Test Form');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
@@ -81,6 +82,7 @@ module.exports = function (actions,tags) {
     tags('smoke').describe('',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Resource');
       actions.iSeeValueIn('#name','testResource');
@@ -191,6 +193,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title','Test Form 2');
       actions.clickOnElementWithText('Create Form');
     // actions.clickOnClass('.toast-message');
