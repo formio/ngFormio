@@ -250,11 +250,11 @@
               </div>
               <div class="col-sm-3">
                 <button class="btn"
-                        ng-disabled="(pdfInfo.plan === 'basic' || pdfInfo.plan === 'trial')"
+                        ng-disabled="selectedPlan.order < getPlan('independent').order"
                         ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan !== 'hosted')}"
                         ng-click="setPDFHostedPlan('hosted')"
                 >{{ pdfInfo.plan === 'hosted' ? 'Selected' : 'Select' }}</button>
-                <p ng-if="(pdfInfo.plan === 'basic') || (pdfInfo.plan === 'trial')">Only available for paid plans</p>
+                <p ng-if="selectedPlan.order < getPlan('independent').order">Only available for paid plans</p>
               </div>
             </div>
           </li>
