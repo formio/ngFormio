@@ -1221,6 +1221,7 @@ angular
       plans: {
         trial: {
           order: 0,
+          displayOrder: 5,
           name: 'trial',
           title: 'Trial',
           labelStyle: 'label-trial',
@@ -1229,6 +1230,7 @@ angular
         },
         basic: {
           order: 1,
+          displayOrder: 1,
           name: 'basic',
           title: 'Basic',
           labelStyle: 'label-info',
@@ -1238,6 +1240,7 @@ angular
         },
         independent: {
           order: 2,
+          displayOrder: 2,
           name: 'independent',
           title: 'Independent',
           labelStyle: 'label-warning',
@@ -1246,6 +1249,7 @@ angular
         },
         team: {
           order: 3,
+          displayOrder: 3,
           name: 'team',
           title: 'Team Pro',
           labelStyle: 'label-success',
@@ -1254,6 +1258,7 @@ angular
         },
         commercial: {
           order: 4,
+          displayOrder: 4,
           name: 'commercial',
           title: 'Enterprise',
           labelStyle: 'label-commercial',
@@ -1262,7 +1267,7 @@ angular
         }
       },
       getPlans: function() {
-        return _(this.plans).values().sortBy('order').value();
+        return _(this.plans).values().sortBy('displayOrder').value();
       },
       getPlan: function(plan) {
         return this.plans[plan];
