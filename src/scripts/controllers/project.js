@@ -507,7 +507,7 @@ app.controller('ProjectController', [
       // Load the users teams.
       $scope.userTeamsLoading = true;
 
-      var userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
+      $scope.userTeamsPromise = $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
         $scope.userTeams = result.data;
         $scope.userTeamsLoading = false;
 
@@ -2630,7 +2630,7 @@ app.controller('ProjectTeamController', [
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
 
     $scope.primaryProjectPromise.then(function(primaryProject) {
-      var projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + primaryProject._id).then(function(result) {
+      $scope.projectTeamsPromise = $http.get(AppConfig.apiBase + '/team/project/' + primaryProject._id).then(function(result) {
         $scope.primaryProjectTeams = result.data;
 
         $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
