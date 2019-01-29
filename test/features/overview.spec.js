@@ -10,11 +10,13 @@ module.exports = function (actions,tags) {
     actions.checkingUrlEndsWith('/form/');
     actions.clickOnElementWithText(' New Form');
     actions.clickOnElementWithText('API Web Form');
+    actions.iSeeElement('.form-edit');
     actions.enterTextInField('#title','Test Form');
     actions.clickOnElementWithText('Create Form');
   // actions.clickOnClass('.toast-message');
     actions.clickOnElementWithText('Resources');
     actions.clickOnElementWithText(' New Resource');
+    actions.iSeeElement('.form-edit');
     actions.checkingUrlEndsWith('/resource/create/resource');
     actions.enterTextInField('#title','Test Resource');
     actions.clickOnButton('Create Resource');

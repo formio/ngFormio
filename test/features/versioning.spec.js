@@ -122,6 +122,7 @@ module.exports = function (actions,tags) {
         actions.clickOnClass('.form-group.pull-right input');
         actions.enterTextInField('#title','Dev Form .3');
         actions.clickOnElementWithText('Create Form');
+        actions.iSeeElement('.form-edit');
       // actions.clickOnClass('.toast-message');
         actions.clickOnElementWithText(' Access');
         actions.clickOnClassWithIndex('.ui-select-search',1);
@@ -280,6 +281,7 @@ module.exports = function (actions,tags) {
         actions.clickOnElementWithText('Save');
         actions.waitForActionToComplete(1000);
         actions.clickOnElementWithText('Create Form');
+        actions.iSeeElement('.form-edit');
       // actions.clickOnClass('.toast-message');
         actions.clickOnElementWithText(' Actions');
         actions.clickOnElementWithText('Select an Action');
@@ -598,6 +600,7 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('.toast-message');
         actions.clickOnLink('Resources');
         actions.clickOnElementWithText(' New Resource');
+        actions.iSeeElement('.form-edit');
         actions.enterTextInField('#title','Dev Resource .2');
         actions.clickOnElementWithText('Create Resource');
       // actions.clickOnClass('.toast-message');

@@ -5,7 +5,7 @@ module.exports = function (actions,tags) {
       actions.iAmLoggedInFor('creatingProj');
       actions.goToPage('#/');
       actions.clickOnElementWithText('Angular');
-      actions.iSeeText("Create a New Angular");
+      actions.iSeeText("Create a new Angular Project");
       actions.enterTextInField('#title', 'Angular');
       actions.enterTextInField('#description', 'This is first Angular');
       actions.clickOnElementWithText(' Create Project');
@@ -21,7 +21,7 @@ module.exports = function (actions,tags) {
         ,'Vue.js', 'Aurelia', 'Stand-Alone Forms','Custom'];
       frameworks.forEach(function(framework) {
         actions.clickOnElementWithText(framework);
-        actions.iSeeText("Create a New " + framework);
+        actions.iSeeText("Create a new " + framework + " Project");
         actions.enterTextInField('#title', framework);
         actions.enterTextInField('#description', 'This is first ' + framework);
         actions.clickOnElementWithText(' Create Project');
@@ -36,13 +36,13 @@ module.exports = function (actions,tags) {
     describe('Creating a project without a title', function () {
       actions.checkingUrlIamOn('#/');
       actions.clickOnElementWithText('New Project');
-      actions.iSeeText('Create a New Project');
+      actions.iSeeText('Create a new Custom Project');
       actions.btnDisabled(' Create Project');
       actions.iDonotSeeText('New Project created!');
     });
     tags('smoke').describe('Verifying Title and Description', function () {
       actions.checkingUrlIamOn('#/');
-      actions.iSeeText('Create a New Project');
+      actions.iSeeText('Create a new Custom Project');
       actions.enterTextInField('#title', 'Test Project');
       actions.enterTextInField('#description', 'Test Description');
       actions.clickOnElementWithText(' Create Project');
@@ -64,6 +64,7 @@ module.exports = function (actions,tags) {
       actions.enterTextInField('#title','Updated Title');
       actions.enterTextInField('#description','Updated Description');
       actions.clickOnButton(' Save Project');
+      actions.iSeeElement('.project-main');
     // actions.clickOnClass('.toast-message');
       actions.clickOnClass('.fa.fa-cog');
       actions.clickOnElementWithText('Angular');

@@ -7,7 +7,7 @@ module.exports = function (actions) {
         ,'Vue.js','Aurelia','Stand-Alone Forms', 'Custom'];
       var framework = frameworks[0];
       actions.clickOnElementWithText(framework);
-      actions.iSeeText("Create a New "+framework);
+      actions.iSeeText("Create a new " + framework + " Project");
       actions.enterTextInField('title', framework);
       actions.enterTextInField('description','This is first '+framework);
       /* frameworks.forEach(function(framework){

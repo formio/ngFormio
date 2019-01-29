@@ -9,14 +9,15 @@ module.exports = function(actions,tags){
      actions.clickOnElementWithText('Resources');
      actions.clickOnElementWithText(' New Resource');
      actions.checkingUrlEndsWith('/resource/create/resource');
+     actions.iSeeElement('.form-edit');
      actions.enterTextInField('#title','Test Resource');
      actions.clickOnButton('Create Resource');
-   // actions.clickOnClass('.toast-message');
      actions.clickOnElementWithText('Resources');
      actions.clickOnElementWithText('Forms');
      actions.checkingUrlEndsWith('/form/');
      actions.clickOnElementWithText(' New Form');
      actions.clickOnElementWithText('API Web Form');
+     actions.iSeeElement('.form-edit');
      actions.enterTextInField('#title','Test Form');
      actions.dragTo('Text Field', 'formarea');
      actions.iSeeText('Text Field Component');
@@ -28,6 +29,7 @@ module.exports = function(actions,tags){
      });
     describe('Setup ‘Test Resource’',function(){
       actions.clickOnElementWithText('Resources');
+      actions.iSeeElement('.form-list li.list-group-item');
       actions.clickOnElementWithText('Test Resource');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');

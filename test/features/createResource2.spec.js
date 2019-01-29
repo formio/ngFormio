@@ -151,6 +151,7 @@ module.exports = function (actions,tags) {
     describe('Creating a new ‘Resource',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Resource');
       actions.clickOnButton('Create Resource');
@@ -160,6 +161,7 @@ module.exports = function (actions,tags) {
     });
     tags('smoke').describe('Attempt to create a new Resource with blank Resource fields',function(){
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Resource1');
       actions.iSeeValueIn('#name','testResource1');
@@ -177,6 +179,7 @@ module.exports = function (actions,tags) {
     tags('smoke').describe('Attempt to create a new Resource with non unique name and path',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','User');
       actions.iSeeValueIn('#name','user');
@@ -185,6 +188,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Save Resource');
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','User');
       actions.clickOnButton('Create Resource');
@@ -227,6 +231,7 @@ module.exports = function (actions,tags) {
     tags('smoke').describe('Editing an existing ‘Resource’',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText('Test Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/edit');
       actions.enterTextInField('#title', 'Edit Resource');
       actions.iSeeValueIn('#name', 'editResource');
@@ -242,6 +247,7 @@ module.exports = function (actions,tags) {
     });
     tags('smoke').describe('Attempt to Edit an existing Resource with blank fields',function(){
       actions.clickOnElementWithText('Edit Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/edit');
       actions.enterTextInField('#title','Test Resource1');
       actions.iSeeValueIn('#name','testResource1');
@@ -259,6 +265,7 @@ module.exports = function (actions,tags) {
     describe('Adding field tags',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','FieldTags Resource');
       actions.clickOnButton('Create Resource');
@@ -277,6 +284,7 @@ module.exports = function (actions,tags) {
     tags('smoke').describe('Adding ‘Custom Action URL ’',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Custom URL');
       actions.clickOnButton('Create Resource');
@@ -307,6 +315,7 @@ module.exports = function (actions,tags) {
     tags('smoke').describe('Fields in a Resource create ‘Existing Resource Fields’',function(){
       actions.clickOnElementWithText('Resources');
       actions.clickOnElementWithText(' New Resource');
+      actions.iSeeElement('.form-edit');
       actions.checkingUrlEndsWith('/resource/create/resource');
       actions.enterTextInField('#title','Test Resource');
       actions.iSeeValueIn('#name','testResource');

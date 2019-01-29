@@ -62,7 +62,7 @@ module.exports = function (actions,tags) {
       actions.iDonotSeeText(' Confirm Billing Change');
       actions.iSeeText('$0/month');
       actions.upgradeToPlan('Independent');
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.upgradeToPlan('Team Pro');
       actions.iSeeText('$100/month');
       actions.upgradeToPlan('Enterprise');
@@ -97,7 +97,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('Name on Card: Test');
       actions.clickOnButton(' Confirm Billing Change');
       actions.iSeeTextIn("a.project-plan.label-warning","Independent");
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.upgradeToPlan('Team Pro');
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
@@ -122,7 +122,7 @@ module.exports = function (actions,tags) {
       actions.iSeeText('$1250/month');
       actions.clickOnElementWithText('Downgrade');
       actions.clickOnElementWithText('Downgrade');
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.upgradeToPlan('Enterprise');
       actions.iSeeText('Payments will be charged to:');
       actions.iSeeText('Visa ending in 1111');
@@ -146,7 +146,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Downgrade');
       actions.iSeeText('$1100/month');
       actions.clickOnElementWithText('Downgrade');
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.clickOnElementWithText('our help documentation');
       actions.switchTab();
       actions.checkingUrlIamOn('https://help.form.io/userguide/pdfserver/');
@@ -170,15 +170,15 @@ module.exports = function (actions,tags) {
       // actions.clickOnClass('.fa.fa-cog');
       // actions.clickOnElementWithText('Plan and Pricing');
       actions.clickOnElementWithText('Select');
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.iDonotSeeText('Hosted PDF');
       actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(1000);
       actions.iDonotSeeText('Hosted PDF');
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.pageReload();
       actions.iDonotSeeText('Hosted PDF');
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.clickOnElementWithText('Settings');
       actions.clickOnElementWithText('PDF Management');
       actions.iSeeText('1');

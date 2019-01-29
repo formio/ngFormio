@@ -105,7 +105,7 @@
               </div>
             </div>
           </li>
-          <li class="list-group-item" ng-repeat="plan in plans | orderBy:order:true" ng-if="plan.name !== 'trial' || trialDaysRemaining">
+          <li class="list-group-item" ng-repeat="plan in plans | orderBy:displayOrder:true" ng-if="(plan.name !== 'trial' || trialDaysRemaining)">
             <div class="row">
               <div class="col-sm-4">
                 <h4 style="font-weight:bold">{{ plan.title }}</h4>
@@ -114,7 +114,7 @@
                 <h4>{{ plan.priceDescription }}</h4>
               </div>
               <div class="col-sm-4">
-                <span class="btn btn-default" ng-if="selectedPlan.order !== plan.order" ng-click="setSelectedPlan(plan)">{{ selectedPlan.order > plan.order ? 'Downgrade' : 'Upgrade' }}</span>
+                <span class="btn btn-default" ng-if="selectedPlan.order !== plan.order" ng-click="setSelectedPlan(plan)">{{ (plan.name === 'basic') || (selectedPlan.order > plan.order) ? 'Downgrade' : 'Upgrade' }}</span>
                 <span ng-if="selectedPlan.order === plan.order" class="btn btn-success">Selected</span>
               </div>
             </div>
@@ -174,7 +174,8 @@
                 <h4>$250/mo or $500/mo for 3</h4>
               </div>
               <div class="col-sm-2">
-                <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+                <input type="number" class="form-control" ng-model="servers.api" ng-disabled="selectedPlan.order < getPlan('commercial').order" min="0" max="20" />
+                <p ng-if="selectedPlan.order < getPlan('commercial').order">Only available for the Enterprise plan</p>
               </div>
             </div>
           </li>
@@ -248,7 +249,12 @@
                 <h4>$50 / month</h4>
               </div>
               <div class="col-sm-3">
-                <span class="btn" ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan !== 'hosted')}" ng-click="setPDFHostedPlan('hosted')">{{ pdfInfo.plan === 'hosted' ? 'Selected' : 'Select' }}</span>
+                <button class="btn"
+                        ng-disabled="selectedPlan.order < getPlan('independent').order"
+                        ng-class="{'btn-success': (pdfInfo.plan === 'hosted'), 'btn-default': (pdfInfo.plan !== 'hosted')}"
+                        ng-click="setPDFHostedPlan('hosted')"
+                >{{ pdfInfo.plan === 'hosted' ? 'Selected' : 'Select' }}</button>
+                <p ng-if="selectedPlan.order < getPlan('independent').order">Only available for paid plans</p>
               </div>
             </div>
           </li>
@@ -284,7 +290,11 @@
                 <h4>$250/mo or $500/mo for 3</h4>
               </div>
               <div class="col-sm-2">
-                <input type="number" class="form-control" ng-model="servers.pdf" ng-disabled="selectedPlan.order < getPlan('team').order" min="0" max="20" />
+                <input type="number"
+                       class="form-control"
+                       ng-model="servers.pdf"
+                       ng-disabled="selectedPlan.order < getPlan('commercial').order" min="0" max="20" />
+                <p ng-if="selectedPlan.order < getPlan('commercial').order">Only available for the Enterprise plan</p>
               </div>
             </div>
           </li>

@@ -8,3 +8,35 @@
 <p>Define different <a href="https://help.form.io/userguide/roles-and-permissions/" target="_blank">roles</a> that can be assigned to form and submission permissions and are given to users.</p>
 <p>Use the <a href="https://help.form.io/userguide/actions/#action-role-assignment" target="_blank">Role Assignment</a> action to assign various roles to the user resources to differentiate the permissions between them.</p>
 <h5><strong>Your project comes by default with a set of resources already created along with login and register forms as well as all the required actions.</strong></h5>
+<div class="form-group" ng-if="onPremise">
+  <h3>Token Parse</h3>
+  <p>If using a custom JWT token, you may want to map the data contained in the token to what the form.io server expects. You can use this function to accomplish this.</p>
+  <textarea ng-model="currentProject.settings.tokenParse" type="text" class="form-control" id="tokenParse" name="tokenParse" placeholder="/** javascript **/" rows="20"></textarea>
+  <div class="description">
+    <p>Parse the user token and return the expected user format. The data from the JWT token is in the "token" variable. Set "data" into the following format:</p>
+    <pre>
+data = {
+  form: {
+    _id: 'USER_RESOURCE_FORM_ID'
+  },
+  project: {
+    _id: 'PROJECT_ID
+  }
+  user: {
+    _id: '123',
+    data: {
+      name: 'joe'
+    }
+    roles: [
+      'ROLE_ID_1',
+      'ROLE_ID_2'
+    ]
+  }
+}
+    </pre>
+    <p>Available variables:</p>
+    <p><strong>token</strong> - the data from the token<br />
+      <strong>roles</strong> - array of available roles. Roles are limited to roles within a project.</p>
+  </div>
+  <button ng-disabled="!minPlan('commercial')" class="btn btn-primary" ng-click="saveProject()">Save Settings</button>
+</div>

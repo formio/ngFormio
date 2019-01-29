@@ -27,14 +27,14 @@ module.exports = function (actions,tags) {
       actions.clickOnButton(' Confirm Billing Change');
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-warning", "Independent");
-      actions.iSeeText('$15/month');
+      actions.iSeeText('$25/month');
       actions.checkElementIsDisabled('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[2]/ul[3]/li[2]/div/div[3]/input');
       actions.clickOnElementWithText('Overview');
       actions.checkingUrlEndsWith('/overview');
       actions.iSeeText('Submission Requests');
       actions.iSeeText('0 / 10,000');
       actions.iSeeText('Emails');
-      actions.iSeeText('0 / 1000');
+      actions.iSeeText('1 / 1,000');
       actions.clickOnElementWithText('Settings');
       actions.checkElementIsDisabled('//*[@id="form-group-title"]/input');
       actions.checkElementIsNotDisabled('//*[@id="form-group-name"]/div[1]/input');
@@ -54,6 +54,7 @@ module.exports = function (actions,tags) {
       actions.checkingUrlEndsWith('/form/');
       actions.clickOnElementWithText(' New Form');
       actions.clickOnElementWithText('API Web Form');
+      actions.iSeeElement('.form-edit');
       actions.enterTextInField('#title','Test Form');
       actions.dragTo('Text Field', 'formarea');
       actions.iSeeText('Text Field Component');
