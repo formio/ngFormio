@@ -28,7 +28,7 @@ module.exports = function (actions,tags) {
       actions.waitForActionToComplete(2000);
       actions.iSeeTextIn("a.project-plan.label-success", "Team Pro");
       actions.iSeeText('$100/month');
-      actions.checkElementIsNotDisabled('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[2]/ul[3]/li[2]/div/div[3]/input');
+      actions.checkElementIsDisabled('//*[@id="main-wrapper"]/div[2]/div[2]/div/div/div/div[2]/div[2]/ul[3]/li[2]/div/div[3]/input');
       actions.clickOnElementWithText(' Teams');
       actions.iDonotSeeText('Upgrade your project to Team Pro or above to enable teams.');
       actions.clickOnElementWithText('Overview');
