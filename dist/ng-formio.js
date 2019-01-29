@@ -7873,7 +7873,7 @@ module.exports = function (it) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.6.2' };
+var core = module.exports = { version: '2.6.3' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -11956,14 +11956,16 @@ var advanceStringIndex = __webpack_require__(/*! ./_advance-string-index */ "./n
 var toLength = __webpack_require__(/*! ./_to-length */ "./node_modules/core-js/modules/_to-length.js");
 var callRegExpExec = __webpack_require__(/*! ./_regexp-exec-abstract */ "./node_modules/core-js/modules/_regexp-exec-abstract.js");
 var regexpExec = __webpack_require__(/*! ./_regexp-exec */ "./node_modules/core-js/modules/_regexp-exec.js");
+var fails = __webpack_require__(/*! ./_fails */ "./node_modules/core-js/modules/_fails.js");
 var $min = Math.min;
 var $push = [].push;
 var $SPLIT = 'split';
 var LENGTH = 'length';
 var LAST_INDEX = 'lastIndex';
+var MAX_UINT32 = 0xffffffff;
 
-// eslint-disable-next-line no-empty
-var SUPPORTS_Y = !!(function () { try { return new RegExp('x', 'y'); } catch (e) {} })();
+// babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
+var SUPPORTS_Y = !fails(function () { RegExp(MAX_UINT32, 'y'); });
 
 // @@split logic
 __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re-wks.js")('split', 2, function (defined, SPLIT, $split, maybeCallNative) {
@@ -11988,7 +11990,7 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
                   (separator.unicode ? 'u' : '') +
                   (separator.sticky ? 'y' : '');
       var lastLastIndex = 0;
-      var splitLimit = limit === undefined ? 4294967295 : limit >>> 0;
+      var splitLimit = limit === undefined ? MAX_UINT32 : limit >>> 0;
       // Make `global` and avoid `lastIndex` issues by working with a copy
       var separatorCopy = new RegExp(separator.source, flags + 'g');
       var match, lastIndex, lastLength;
@@ -12042,14 +12044,14 @@ __webpack_require__(/*! ./_fix-re-wks */ "./node_modules/core-js/modules/_fix-re
 
       var unicodeMatching = rx.unicode;
       var flags = (rx.ignoreCase ? 'i' : '') +
-                    (rx.multiline ? 'm' : '') +
-                    (rx.unicode ? 'u' : '') +
-                    (SUPPORTS_Y ? 'y' : 'g');
+                  (rx.multiline ? 'm' : '') +
+                  (rx.unicode ? 'u' : '') +
+                  (SUPPORTS_Y ? 'y' : 'g');
 
       // ^(? + rx + ) is needed, in combination with some S slicing, to
       // simulate the 'y' flag.
       var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
-      var lim = limit === undefined ? 0xffffffff : limit >>> 0;
+      var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
       if (lim === 0) return [];
       if (S.length === 0) return callRegExpExec(splitter, S) === null ? [S] : [];
       var p = 0;
@@ -12778,6 +12780,162 @@ function CustomEvent (type, params) {
 }
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/deep-equal/index.js":
+/*!******************************************!*\
+  !*** ./node_modules/deep-equal/index.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var pSlice = Array.prototype.slice;
+var objectKeys = __webpack_require__(/*! ./lib/keys.js */ "./node_modules/deep-equal/lib/keys.js");
+var isArguments = __webpack_require__(/*! ./lib/is_arguments.js */ "./node_modules/deep-equal/lib/is_arguments.js");
+
+var deepEqual = module.exports = function (actual, expected, opts) {
+  if (!opts) opts = {};
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+
+  } else if (actual instanceof Date && expected instanceof Date) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if (!actual || !expected || typeof actual != 'object' && typeof expected != 'object') {
+    return opts.strict ? actual === expected : actual == expected;
+
+  // 7.4. For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else {
+    return objEquiv(actual, expected, opts);
+  }
+}
+
+function isUndefinedOrNull(value) {
+  return value === null || value === undefined;
+}
+
+function isBuffer (x) {
+  if (!x || typeof x !== 'object' || typeof x.length !== 'number') return false;
+  if (typeof x.copy !== 'function' || typeof x.slice !== 'function') {
+    return false;
+  }
+  if (x.length > 0 && typeof x[0] !== 'number') return false;
+  return true;
+}
+
+function objEquiv(a, b, opts) {
+  var i, key;
+  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
+    return false;
+  // an identical 'prototype' property.
+  if (a.prototype !== b.prototype) return false;
+  //~~~I've managed to break Object.keys through screwy arguments passing.
+  //   Converting to array solves the problem.
+  if (isArguments(a)) {
+    if (!isArguments(b)) {
+      return false;
+    }
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return deepEqual(a, b, opts);
+  }
+  if (isBuffer(a)) {
+    if (!isBuffer(b)) {
+      return false;
+    }
+    if (a.length !== b.length) return false;
+    for (i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+  try {
+    var ka = objectKeys(a),
+        kb = objectKeys(b);
+  } catch (e) {//happens when one is a string literal and the other isn't
+    return false;
+  }
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length != kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] != kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!deepEqual(a[key], b[key], opts)) return false;
+  }
+  return typeof a === typeof b;
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/deep-equal/lib/is_arguments.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/deep-equal/lib/is_arguments.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var supportsArgumentsClass = (function(){
+  return Object.prototype.toString.call(arguments)
+})() == '[object Arguments]';
+
+exports = module.exports = supportsArgumentsClass ? supported : unsupported;
+
+exports.supported = supported;
+function supported(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+};
+
+exports.unsupported = unsupported;
+function unsupported(object){
+  return object &&
+    typeof object == 'object' &&
+    typeof object.length == 'number' &&
+    Object.prototype.hasOwnProperty.call(object, 'callee') &&
+    !Object.prototype.propertyIsEnumerable.call(object, 'callee') ||
+    false;
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/deep-equal/lib/keys.js":
+/*!*********************************************!*\
+  !*** ./node_modules/deep-equal/lib/keys.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+exports = module.exports = typeof Object.keys === 'function'
+  ? Object.keys : shim;
+
+exports.shim = shim;
+function shim (obj) {
+  var keys = [];
+  for (var key in obj) keys.push(key);
+  return keys;
+}
+
 
 /***/ }),
 
@@ -14405,6 +14563,770 @@ module.exports = dragula;
 }();
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../process/browser.js */ "./node_modules/process/browser.js")))
+
+/***/ }),
+
+/***/ "./node_modules/fast-json-patch/lib/core.js":
+/*!**************************************************!*\
+  !*** ./node_modules/fast-json-patch/lib/core.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var equalsOptions = { strict: true };
+var _equals = __webpack_require__(/*! deep-equal */ "./node_modules/deep-equal/index.js");
+var areEquals = function (a, b) {
+    return _equals(a, b, equalsOptions);
+};
+var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
+exports.JsonPatchError = helpers_1.PatchError;
+exports.deepClone = helpers_1._deepClone;
+/* We use a Javascript hash to store each
+ function. Each hash entry (property) uses
+ the operation identifiers specified in rfc6902.
+ In this way, we can map each patch operation
+ to its dedicated function in efficient way.
+ */
+/* The operations applicable to an object */
+var objOps = {
+    add: function (obj, key, document) {
+        obj[key] = this.value;
+        return { newDocument: document };
+    },
+    remove: function (obj, key, document) {
+        var removed = obj[key];
+        delete obj[key];
+        return { newDocument: document, removed: removed };
+    },
+    replace: function (obj, key, document) {
+        var removed = obj[key];
+        obj[key] = this.value;
+        return { newDocument: document, removed: removed };
+    },
+    move: function (obj, key, document) {
+        /* in case move target overwrites an existing value,
+        return the removed value, this can be taxing performance-wise,
+        and is potentially unneeded */
+        var removed = getValueByPointer(document, this.path);
+        if (removed) {
+            removed = helpers_1._deepClone(removed);
+        }
+        var originalValue = applyOperation(document, { op: "remove", path: this.from }).removed;
+        applyOperation(document, { op: "add", path: this.path, value: originalValue });
+        return { newDocument: document, removed: removed };
+    },
+    copy: function (obj, key, document) {
+        var valueToCopy = getValueByPointer(document, this.from);
+        // enforce copy by value so further operations don't affect source (see issue #177)
+        applyOperation(document, { op: "add", path: this.path, value: helpers_1._deepClone(valueToCopy) });
+        return { newDocument: document };
+    },
+    test: function (obj, key, document) {
+        return { newDocument: document, test: areEquals(obj[key], this.value) };
+    },
+    _get: function (obj, key, document) {
+        this.value = obj[key];
+        return { newDocument: document };
+    }
+};
+/* The operations applicable to an array. Many are the same as for the object */
+var arrOps = {
+    add: function (arr, i, document) {
+        if (helpers_1.isInteger(i)) {
+            arr.splice(i, 0, this.value);
+        }
+        else {
+            arr[i] = this.value;
+        }
+        // this may be needed when using '-' in an array
+        return { newDocument: document, index: i };
+    },
+    remove: function (arr, i, document) {
+        var removedList = arr.splice(i, 1);
+        return { newDocument: document, removed: removedList[0] };
+    },
+    replace: function (arr, i, document) {
+        var removed = arr[i];
+        arr[i] = this.value;
+        return { newDocument: document, removed: removed };
+    },
+    move: objOps.move,
+    copy: objOps.copy,
+    test: objOps.test,
+    _get: objOps._get
+};
+/**
+ * Retrieves a value from a JSON document by a JSON pointer.
+ * Returns the value.
+ *
+ * @param document The document to get the value from
+ * @param pointer an escaped JSON pointer
+ * @return The retrieved value
+ */
+function getValueByPointer(document, pointer) {
+    if (pointer == '') {
+        return document;
+    }
+    var getOriginalDestination = { op: "_get", path: pointer };
+    applyOperation(document, getOriginalDestination);
+    return getOriginalDestination.value;
+}
+exports.getValueByPointer = getValueByPointer;
+/**
+ * Apply a single JSON Patch Operation on a JSON document.
+ * Returns the {newDocument, result} of the operation.
+ * It modifies the `document` and `operation` objects - it gets the values by reference.
+ * If you would like to avoid touching your values, clone them:
+ * `jsonpatch.applyOperation(document, jsonpatch._deepClone(operation))`.
+ *
+ * @param document The document to patch
+ * @param operation The operation to apply
+ * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+ * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @return `{newDocument, result}` after the operation
+ */
+function applyOperation(document, operation, validateOperation, mutateDocument) {
+    if (validateOperation === void 0) { validateOperation = false; }
+    if (mutateDocument === void 0) { mutateDocument = true; }
+    if (validateOperation) {
+        if (typeof validateOperation == 'function') {
+            validateOperation(operation, 0, document, operation.path);
+        }
+        else {
+            validator(operation, 0);
+        }
+    }
+    /* ROOT OPERATIONS */
+    if (operation.path === "") {
+        var returnValue = { newDocument: document };
+        if (operation.op === 'add') {
+            returnValue.newDocument = operation.value;
+            return returnValue;
+        }
+        else if (operation.op === 'replace') {
+            returnValue.newDocument = operation.value;
+            returnValue.removed = document; //document we removed
+            return returnValue;
+        }
+        else if (operation.op === 'move' || operation.op === 'copy') {
+            returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
+            if (operation.op === 'move') {
+                returnValue.removed = document;
+            }
+            return returnValue;
+        }
+        else if (operation.op === 'test') {
+            returnValue.test = areEquals(document, operation.value);
+            if (returnValue.test === false) {
+                throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+            }
+            returnValue.newDocument = document;
+            return returnValue;
+        }
+        else if (operation.op === 'remove') {
+            returnValue.removed = document;
+            returnValue.newDocument = null;
+            return returnValue;
+        }
+        else if (operation.op === '_get') {
+            operation.value = document;
+            return returnValue;
+        }
+        else {
+            if (validateOperation) {
+                throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
+            }
+            else {
+                return returnValue;
+            }
+        }
+    } /* END ROOT OPERATIONS */
+    else {
+        if (!mutateDocument) {
+            document = helpers_1._deepClone(document);
+        }
+        var path = operation.path || "";
+        var keys = path.split('/');
+        var obj = document;
+        var t = 1; //skip empty element - http://jsperf.com/to-shift-or-not-to-shift
+        var len = keys.length;
+        var existingPathFragment = undefined;
+        var key = void 0;
+        var validateFunction = void 0;
+        if (typeof validateOperation == 'function') {
+            validateFunction = validateOperation;
+        }
+        else {
+            validateFunction = validator;
+        }
+        while (true) {
+            key = keys[t];
+            if (validateOperation) {
+                if (existingPathFragment === undefined) {
+                    if (obj[key] === undefined) {
+                        existingPathFragment = keys.slice(0, t).join('/');
+                    }
+                    else if (t == len - 1) {
+                        existingPathFragment = operation.path;
+                    }
+                    if (existingPathFragment !== undefined) {
+                        validateFunction(operation, 0, document, existingPathFragment);
+                    }
+                }
+            }
+            t++;
+            if (Array.isArray(obj)) {
+                if (key === '-') {
+                    key = obj.length;
+                }
+                else {
+                    if (validateOperation && !helpers_1.isInteger(key)) {
+                        throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", 0, operation.path, operation);
+                    } // only parse key when it's an integer for `arr.prop` to work
+                    else if (helpers_1.isInteger(key)) {
+                        key = ~~key;
+                    }
+                }
+                if (t >= len) {
+                    if (validateOperation && operation.op === "add" && key > obj.length) {
+                        throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
+                    }
+                    var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
+                    if (returnValue.test === false) {
+                        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                    }
+                    return returnValue;
+                }
+            }
+            else {
+                if (key && key.indexOf('~') != -1) {
+                    key = helpers_1.unescapePathComponent(key);
+                }
+                if (t >= len) {
+                    var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
+                    if (returnValue.test === false) {
+                        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                    }
+                    return returnValue;
+                }
+            }
+            obj = obj[key];
+        }
+    }
+}
+exports.applyOperation = applyOperation;
+/**
+ * Apply a full JSON Patch array on a JSON document.
+ * Returns the {newDocument, result} of the patch.
+ * It modifies the `document` object and `patch` - it gets the values by reference.
+ * If you would like to avoid touching your values, clone them:
+ * `jsonpatch.applyPatch(document, jsonpatch._deepClone(patch))`.
+ *
+ * @param document The document to patch
+ * @param patch The patch to apply
+ * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
+ * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @return An array of `{newDocument, result}` after the patch
+ */
+function applyPatch(document, patch, validateOperation, mutateDocument) {
+    if (mutateDocument === void 0) { mutateDocument = true; }
+    if (validateOperation) {
+        if (!Array.isArray(patch)) {
+            throw new exports.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
+        }
+    }
+    if (!mutateDocument) {
+        document = helpers_1._deepClone(document);
+    }
+    var results = new Array(patch.length);
+    for (var i = 0, length_1 = patch.length; i < length_1; i++) {
+        results[i] = applyOperation(document, patch[i], validateOperation);
+        document = results[i].newDocument; // in case root was replaced
+    }
+    results.newDocument = document;
+    return results;
+}
+exports.applyPatch = applyPatch;
+/**
+ * Apply a single JSON Patch Operation on a JSON document.
+ * Returns the updated document.
+ * Suitable as a reducer.
+ *
+ * @param document The document to patch
+ * @param operation The operation to apply
+ * @return The updated document
+ */
+function applyReducer(document, operation) {
+    var operationResult = applyOperation(document, operation);
+    if (operationResult.test === false) {
+        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+    }
+    return operationResult.newDocument;
+}
+exports.applyReducer = applyReducer;
+/**
+ * Validates a single operation. Called from `jsonpatch.validate`. Throws `JsonPatchError` in case of an error.
+ * @param {object} operation - operation object (patch)
+ * @param {number} index - index of operation in the sequence
+ * @param {object} [document] - object where the operation is supposed to be applied
+ * @param {string} [existingPathFragment] - comes along with `document`
+ */
+function validator(operation, index, document, existingPathFragment) {
+    if (typeof operation !== 'object' || operation === null || Array.isArray(operation)) {
+        throw new exports.JsonPatchError('Operation is not an object', 'OPERATION_NOT_AN_OBJECT', index, operation, document);
+    }
+    else if (!objOps[operation.op]) {
+        throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
+    }
+    else if (typeof operation.path !== 'string') {
+        throw new exports.JsonPatchError('Operation `path` property is not a string', 'OPERATION_PATH_INVALID', index, operation, document);
+    }
+    else if (operation.path.indexOf('/') !== 0 && operation.path.length > 0) {
+        // paths that aren't empty string should start with "/"
+        throw new exports.JsonPatchError('Operation `path` property must start with "/"', 'OPERATION_PATH_INVALID', index, operation, document);
+    }
+    else if ((operation.op === 'move' || operation.op === 'copy') && typeof operation.from !== 'string') {
+        throw new exports.JsonPatchError('Operation `from` property is not present (applicable in `move` and `copy` operations)', 'OPERATION_FROM_REQUIRED', index, operation, document);
+    }
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && operation.value === undefined) {
+        throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_REQUIRED', index, operation, document);
+    }
+    else if ((operation.op === 'add' || operation.op === 'replace' || operation.op === 'test') && helpers_1.hasUndefined(operation.value)) {
+        throw new exports.JsonPatchError('Operation `value` property is not present (applicable in `add`, `replace` and `test` operations)', 'OPERATION_VALUE_CANNOT_CONTAIN_UNDEFINED', index, operation, document);
+    }
+    else if (document) {
+        if (operation.op == "add") {
+            var pathLen = operation.path.split("/").length;
+            var existingPathLen = existingPathFragment.split("/").length;
+            if (pathLen !== existingPathLen + 1 && pathLen !== existingPathLen) {
+                throw new exports.JsonPatchError('Cannot perform an `add` operation at the desired path', 'OPERATION_PATH_CANNOT_ADD', index, operation, document);
+            }
+        }
+        else if (operation.op === 'replace' || operation.op === 'remove' || operation.op === '_get') {
+            if (operation.path !== existingPathFragment) {
+                throw new exports.JsonPatchError('Cannot perform the operation at a path that does not exist', 'OPERATION_PATH_UNRESOLVABLE', index, operation, document);
+            }
+        }
+        else if (operation.op === 'move' || operation.op === 'copy') {
+            var existingValue = { op: "_get", path: operation.from, value: undefined };
+            var error = validate([existingValue], document);
+            if (error && error.name === 'OPERATION_PATH_UNRESOLVABLE') {
+                throw new exports.JsonPatchError('Cannot perform the operation from a path that does not exist', 'OPERATION_FROM_UNRESOLVABLE', index, operation, document);
+            }
+        }
+    }
+}
+exports.validator = validator;
+/**
+ * Validates a sequence of operations. If `document` parameter is provided, the sequence is additionally validated against the object document.
+ * If error is encountered, returns a JsonPatchError object
+ * @param sequence
+ * @param document
+ * @returns {JsonPatchError|undefined}
+ */
+function validate(sequence, document, externalValidator) {
+    try {
+        if (!Array.isArray(sequence)) {
+            throw new exports.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
+        }
+        if (document) {
+            //clone document and sequence so that we can safely try applying operations
+            applyPatch(helpers_1._deepClone(document), helpers_1._deepClone(sequence), externalValidator || true);
+        }
+        else {
+            externalValidator = externalValidator || validator;
+            for (var i = 0; i < sequence.length; i++) {
+                externalValidator(sequence[i], i, document, undefined);
+            }
+        }
+    }
+    catch (e) {
+        if (e instanceof exports.JsonPatchError) {
+            return e;
+        }
+        else {
+            throw e;
+        }
+    }
+}
+exports.validate = validate;
+
+
+/***/ }),
+
+/***/ "./node_modules/fast-json-patch/lib/duplex.js":
+/*!****************************************************!*\
+  !*** ./node_modules/fast-json-patch/lib/duplex.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var equalsOptions = { strict: true };
+var _equals = __webpack_require__(/*! deep-equal */ "./node_modules/deep-equal/index.js");
+var areEquals = function (a, b) {
+    return _equals(a, b, equalsOptions);
+};
+var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
+var core_1 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
+/* export all core functions */
+var core_2 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
+exports.applyOperation = core_2.applyOperation;
+exports.applyPatch = core_2.applyPatch;
+exports.applyReducer = core_2.applyReducer;
+exports.getValueByPointer = core_2.getValueByPointer;
+exports.validate = core_2.validate;
+exports.validator = core_2.validator;
+/* export some helpers */
+var helpers_2 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
+exports.JsonPatchError = helpers_2.PatchError;
+exports.deepClone = helpers_2._deepClone;
+exports.escapePathComponent = helpers_2.escapePathComponent;
+exports.unescapePathComponent = helpers_2.unescapePathComponent;
+var beforeDict = new WeakMap();
+var Mirror = (function () {
+    function Mirror(obj) {
+        this.observers = new Map();
+        this.obj = obj;
+    }
+    return Mirror;
+}());
+var ObserverInfo = (function () {
+    function ObserverInfo(callback, observer) {
+        this.callback = callback;
+        this.observer = observer;
+    }
+    return ObserverInfo;
+}());
+function getMirror(obj) {
+    return beforeDict.get(obj);
+}
+function getObserverFromMirror(mirror, callback) {
+    return mirror.observers.get(callback);
+}
+function removeObserverFromMirror(mirror, observer) {
+    mirror.observers.delete(observer.callback);
+}
+/**
+ * Detach an observer from an object
+ */
+function unobserve(root, observer) {
+    observer.unobserve();
+}
+exports.unobserve = unobserve;
+/**
+ * Observes changes made to an object, which can then be retrieved using generate
+ */
+function observe(obj, callback) {
+    var patches = [];
+    var observer;
+    var mirror = getMirror(obj);
+    if (!mirror) {
+        mirror = new Mirror(obj);
+        beforeDict.set(obj, mirror);
+    }
+    else {
+        var observerInfo = getObserverFromMirror(mirror, callback);
+        observer = observerInfo && observerInfo.observer;
+    }
+    if (observer) {
+        return observer;
+    }
+    observer = {};
+    mirror.value = helpers_1._deepClone(obj);
+    if (callback) {
+        observer.callback = callback;
+        observer.next = null;
+        var dirtyCheck = function () {
+            generate(observer);
+        };
+        var fastCheck = function () {
+            clearTimeout(observer.next);
+            observer.next = setTimeout(dirtyCheck);
+        };
+        if (typeof window !== 'undefined') {
+            if (window.addEventListener) {
+                window.addEventListener('mouseup', fastCheck);
+                window.addEventListener('keyup', fastCheck);
+                window.addEventListener('mousedown', fastCheck);
+                window.addEventListener('keydown', fastCheck);
+                window.addEventListener('change', fastCheck);
+            }
+            else {
+                document.documentElement.attachEvent('onmouseup', fastCheck);
+                document.documentElement.attachEvent('onkeyup', fastCheck);
+                document.documentElement.attachEvent('onmousedown', fastCheck);
+                document.documentElement.attachEvent('onkeydown', fastCheck);
+                document.documentElement.attachEvent('onchange', fastCheck);
+            }
+        }
+    }
+    observer.patches = patches;
+    observer.object = obj;
+    observer.unobserve = function () {
+        generate(observer);
+        clearTimeout(observer.next);
+        removeObserverFromMirror(mirror, observer);
+        if (typeof window !== 'undefined') {
+            if (window.removeEventListener) {
+                window.removeEventListener('mouseup', fastCheck);
+                window.removeEventListener('keyup', fastCheck);
+                window.removeEventListener('mousedown', fastCheck);
+                window.removeEventListener('keydown', fastCheck);
+            }
+            else {
+                document.documentElement.detachEvent('onmouseup', fastCheck);
+                document.documentElement.detachEvent('onkeyup', fastCheck);
+                document.documentElement.detachEvent('onmousedown', fastCheck);
+                document.documentElement.detachEvent('onkeydown', fastCheck);
+            }
+        }
+    };
+    mirror.observers.set(callback, new ObserverInfo(callback, observer));
+    return observer;
+}
+exports.observe = observe;
+/**
+ * Generate an array of patches from an observer
+ */
+function generate(observer) {
+    var mirror = beforeDict.get(observer.object);
+    _generate(mirror.value, observer.object, observer.patches, "");
+    if (observer.patches.length) {
+        core_1.applyPatch(mirror.value, observer.patches);
+    }
+    var temp = observer.patches;
+    if (temp.length > 0) {
+        observer.patches = [];
+        if (observer.callback) {
+            observer.callback(temp);
+        }
+    }
+    return temp;
+}
+exports.generate = generate;
+// Dirty check if obj is different from mirror, generate patches and update mirror
+function _generate(mirror, obj, patches, path) {
+    if (obj === mirror) {
+        return;
+    }
+    if (typeof obj.toJSON === "function") {
+        obj = obj.toJSON();
+    }
+    var newKeys = helpers_1._objectKeys(obj);
+    var oldKeys = helpers_1._objectKeys(mirror);
+    var changed = false;
+    var deleted = false;
+    //if ever "move" operation is implemented here, make sure this test runs OK: "should not generate the same patch twice (move)"
+    for (var t = oldKeys.length - 1; t >= 0; t--) {
+        var key = oldKeys[t];
+        var oldVal = mirror[key];
+        if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
+            var newVal = obj[key];
+            if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
+                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
+            }
+            else {
+                if (oldVal !== newVal) {
+                    changed = true;
+                    patches.push({ op: "replace", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(newVal) });
+                }
+            }
+        }
+        else {
+            patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
+            deleted = true; // property has been deleted
+        }
+    }
+    if (!deleted && newKeys.length == oldKeys.length) {
+        return;
+    }
+    for (var t = 0; t < newKeys.length; t++) {
+        var key = newKeys[t];
+        if (!helpers_1.hasOwnProperty(mirror, key) && obj[key] !== undefined) {
+            patches.push({ op: "add", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(obj[key]) });
+        }
+    }
+}
+/**
+ * Create an array of patches from the differences in two objects
+ */
+function compare(tree1, tree2) {
+    var patches = [];
+    _generate(tree1, tree2, patches, '');
+    return patches;
+}
+exports.compare = compare;
+
+
+/***/ }),
+
+/***/ "./node_modules/fast-json-patch/lib/helpers.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/fast-json-patch/lib/helpers.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+/*!
+ * https://github.com/Starcounter-Jack/JSON-Patch
+ * (c) 2017 Joachim Wester
+ * MIT license
+ */
+var _hasOwnProperty = Object.prototype.hasOwnProperty;
+function hasOwnProperty(obj, key) {
+    return _hasOwnProperty.call(obj, key);
+}
+exports.hasOwnProperty = hasOwnProperty;
+function _objectKeys(obj) {
+    if (Array.isArray(obj)) {
+        var keys = new Array(obj.length);
+        for (var k = 0; k < keys.length; k++) {
+            keys[k] = "" + k;
+        }
+        return keys;
+    }
+    if (Object.keys) {
+        return Object.keys(obj);
+    }
+    var keys = [];
+    for (var i in obj) {
+        if (hasOwnProperty(obj, i)) {
+            keys.push(i);
+        }
+    }
+    return keys;
+}
+exports._objectKeys = _objectKeys;
+;
+/**
+* Deeply clone the object.
+* https://jsperf.com/deep-copy-vs-json-stringify-json-parse/25 (recursiveDeepCopy)
+* @param  {any} obj value to clone
+* @return {any} cloned obj
+*/
+function _deepClone(obj) {
+    switch (typeof obj) {
+        case "object":
+            return JSON.parse(JSON.stringify(obj)); //Faster than ES5 clone - http://jsperf.com/deep-cloning-of-objects/5
+        case "undefined":
+            return null; //this is how JSON.stringify behaves for array items
+        default:
+            return obj; //no need to clone primitives
+    }
+}
+exports._deepClone = _deepClone;
+//3x faster than cached /^\d+$/.test(str)
+function isInteger(str) {
+    var i = 0;
+    var len = str.length;
+    var charCode;
+    while (i < len) {
+        charCode = str.charCodeAt(i);
+        if (charCode >= 48 && charCode <= 57) {
+            i++;
+            continue;
+        }
+        return false;
+    }
+    return true;
+}
+exports.isInteger = isInteger;
+/**
+* Escapes a json pointer path
+* @param path The raw pointer
+* @return the Escaped path
+*/
+function escapePathComponent(path) {
+    if (path.indexOf('/') === -1 && path.indexOf('~') === -1)
+        return path;
+    return path.replace(/~/g, '~0').replace(/\//g, '~1');
+}
+exports.escapePathComponent = escapePathComponent;
+/**
+ * Unescapes a json pointer path
+ * @param path The escaped pointer
+ * @return The unescaped path
+ */
+function unescapePathComponent(path) {
+    return path.replace(/~1/g, '/').replace(/~0/g, '~');
+}
+exports.unescapePathComponent = unescapePathComponent;
+function _getPathRecursive(root, obj) {
+    var found;
+    for (var key in root) {
+        if (hasOwnProperty(root, key)) {
+            if (root[key] === obj) {
+                return escapePathComponent(key) + '/';
+            }
+            else if (typeof root[key] === 'object') {
+                found = _getPathRecursive(root[key], obj);
+                if (found != '') {
+                    return escapePathComponent(key) + '/' + found;
+                }
+            }
+        }
+    }
+    return '';
+}
+exports._getPathRecursive = _getPathRecursive;
+function getPath(root, obj) {
+    if (root === obj) {
+        return '/';
+    }
+    var path = _getPathRecursive(root, obj);
+    if (path === '') {
+        throw new Error("Object not found in root");
+    }
+    return '/' + path;
+}
+exports.getPath = getPath;
+/**
+* Recursively checks whether an object has any undefined values inside.
+*/
+function hasUndefined(obj) {
+    if (obj === undefined) {
+        return true;
+    }
+    if (obj) {
+        if (Array.isArray(obj)) {
+            for (var i = 0, len = obj.length; i < len; i++) {
+                if (hasUndefined(obj[i])) {
+                    return true;
+                }
+            }
+        }
+        else if (typeof obj === "object") {
+            var objKeys = _objectKeys(obj);
+            var objKeysLength = objKeys.length;
+            for (var i = 0; i < objKeysLength; i++) {
+                if (hasUndefined(obj[objKeys[i]])) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+exports.hasUndefined = hasUndefined;
+var PatchError = (function (_super) {
+    __extends(PatchError, _super);
+    function PatchError(message, name, index, operation, tree) {
+        _super.call(this, message);
+        this.message = message;
+        this.name = name;
+        this.index = index;
+        this.operation = operation;
+        this.tree = tree;
+    }
+    return PatchError;
+}(Error));
+exports.PatchError = PatchError;
+
 
 /***/ }),
 
@@ -16624,7 +17546,9 @@ __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/
 
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
-var _eventemitter = _interopRequireDefault(__webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js"));
+var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
+
+var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
 var FormioUtils = _interopRequireWildcard(__webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js"));
 
@@ -16686,7 +17610,7 @@ function () {
      * @type {EventEmitter}
      */
 
-    this.events = options && options.events ? options.events : new _eventemitter.default({
+    this.events = options && options.events ? options.events : new _EventEmitter.default({
       wildcard: false,
       maxListeners: 0
     });
@@ -16767,9 +17691,15 @@ function () {
 
   }, {
     key: "emit",
-    value: function emit(event, data) {
+    value: function emit(event) {
       if (this.events) {
-        this.events.emit("".concat(this.options.namespace, ".").concat(event), data);
+        var _this$events;
+
+        for (var _len = arguments.length, data = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          data[_key - 1] = arguments[_key];
+        }
+
+        (_this$events = this.events).emit.apply(_this$events, ["".concat(this.options.namespace, ".").concat(event)].concat(data));
       }
     }
     /**
@@ -17221,6 +18151,7 @@ function () {
         _: _lodash.default,
         utils: FormioUtils,
         util: FormioUtils,
+        user: _Formio.default.getUser(),
         moment: _moment.default,
         instance: this
       }, additional);
@@ -17282,6 +18213,133 @@ function () {
 }();
 
 exports.default = Component;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/EventEmitter.js":
+/*!***********************************************!*\
+  !*** ./node_modules/formiojs/EventEmitter.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+
+__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
+
+var _eventemitter = __webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js");
+
+var utils = _interopRequireWildcard(__webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js"));
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var EventEmitter =
+/*#__PURE__*/
+function (_EventEmitter) {
+  _inherits(EventEmitter, _EventEmitter);
+
+  function EventEmitter() {
+    var _this;
+
+    var conf = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, EventEmitter);
+
+    var _conf$loadLimit = conf.loadLimit,
+        loadLimit = _conf$loadLimit === void 0 ? 50 : _conf$loadLimit,
+        _conf$eventsSafeInter = conf.eventsSafeInterval,
+        eventsSafeInterval = _conf$eventsSafeInter === void 0 ? 300 : _conf$eventsSafeInter,
+        _conf$pause = conf.pause,
+        pause = _conf$pause === void 0 ? 500 : _conf$pause,
+        ee2conf = _objectWithoutProperties(conf, ["loadLimit", "eventsSafeInterval", "pause"]);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EventEmitter).call(this, ee2conf));
+
+    var _utils$withSwitch = utils.withSwitch(false, true),
+        _utils$withSwitch2 = _slicedToArray(_utils$withSwitch, 2),
+        isPaused = _utils$withSwitch2[0],
+        togglePause = _utils$withSwitch2[1];
+
+    var overloadHandler = function overloadHandler() {
+      console.warn('Infinite loop detected', _this.id, pause);
+      togglePause();
+      setTimeout(togglePause, pause);
+    };
+
+    var dispatch = utils.observeOverload(overloadHandler, {
+      limit: loadLimit,
+      delay: eventsSafeInterval
+    });
+
+    _this.emit = function () {
+      var _get2;
+
+      if (isPaused()) {
+        return;
+      }
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      (_get2 = _get(_getPrototypeOf(EventEmitter.prototype), "emit", _assertThisInitialized(_this))).call.apply(_get2, [_assertThisInitialized(_this)].concat(args));
+
+      dispatch();
+    };
+
+    return _this;
+  }
+
+  return EventEmitter;
+}(_eventemitter.EventEmitter2);
+
+exports.default = EventEmitter;
 
 /***/ }),
 
@@ -17635,7 +18693,7 @@ var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-p
 
 __webpack_require__(/*! whatwg-fetch */ "./node_modules/whatwg-fetch/fetch.js");
 
-var _eventemitter = __webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js");
+var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
 
 var _browserCookies = _interopRequireDefault(__webpack_require__(/*! browser-cookies */ "./node_modules/browser-cookies/src/browser-cookies.js"));
 
@@ -18454,7 +19512,7 @@ function () {
       var cacheKey = btoa(url); // Get the cached promise to save multiple loads.
 
       if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
-        return (0, _cloneDeep2.default)(Formio.cache[cacheKey]);
+        return _nativePromiseOnly.default.resolve((0, _cloneDeep2.default)(Formio.cache[cacheKey]));
       } // Set up and fetch request
 
 
@@ -18564,7 +19622,7 @@ function () {
 
 
         if (method === 'GET') {
-          Formio.cache[cacheKey] = (0, _cloneDeep2.default)(result);
+          Formio.cache[cacheKey] = result;
         }
 
         var resultCopy = {}; // Shallow copy result so modifications don't end up in cache
@@ -19102,14 +20160,20 @@ function () {
 exports.default = Formio;
 Formio.libraries = {};
 Formio.Promise = _nativePromiseOnly.default;
-Formio.Headers = Headers;
+
+if (typeof Headers !== 'undefined') {
+  Formio.Headers = Headers;
+} else {
+  Formio.Headers = {};
+}
+
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
 Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.providers = providers;
-Formio.events = new _eventemitter.EventEmitter2({
+Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
 });
@@ -19714,6 +20778,8 @@ function (_WebformBuilder) {
           };
 
           _this5.emit('updateComponent', component);
+
+          _this5.emit('change', _this5.form);
         }
 
         return component;
@@ -19810,6 +20876,8 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
@@ -19818,7 +20886,7 @@ var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_m
 
 var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 
-var _eventemitter = _interopRequireDefault(__webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js"));
+var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
 
 var _i18next = _interopRequireDefault(__webpack_require__(/*! i18next */ "./node_modules/i18next/dist/es/index.js"));
 
@@ -19871,7 +20939,7 @@ function getOptions(options) {
   });
 
   if (!options.events) {
-    options.events = new _eventemitter.default({
+    options.events = new _EventEmitter.default({
       wildcard: false,
       maxListeners: 0
     });
@@ -20470,6 +21538,8 @@ function (_NestedComponent) {
       return this.createForm(form).then(function () {
         _this6.emit('formLoad', form);
 
+        _this6.triggerRecaptcha();
+
         return form;
       });
     }
@@ -20914,7 +21984,8 @@ function (_NestedComponent) {
   }, {
     key: "onChange",
     value: function onChange(flags, changed) {
-      // For any change events, clear any custom errors for that component.
+      var isChangeEventEmitted = false; // For any change events, clear any custom errors for that component.
+
       if (changed && changed.component) {
         this.customErrors = this.customErrors.filter(function (err) {
           return err.component && err.component !== changed.component.key;
@@ -20926,7 +21997,7 @@ function (_NestedComponent) {
       var value = _lodash.default.clone(this._submission);
 
       value.changed = changed;
-      value.isValid = this.checkData(value.data, flags);
+      value.isValid = this.checkData(value.data, flags, changed ? changed.instance : null);
       this.showElement(true);
       this.loading = false; // See if we need to save the draft of the form.
 
@@ -20936,18 +22007,19 @@ function (_NestedComponent) {
 
       if (!flags || !flags.noEmit) {
         this.emit('change', value);
+        isChangeEventEmitted = true;
       } // The form is initialized after the first change event occurs.
 
 
-      if (!this.initialized) {
+      if (isChangeEventEmitted && !this.initialized) {
         this.emit('initialized');
         this.initialized = true;
       }
     }
   }, {
     key: "checkData",
-    value: function checkData(data, flags) {
-      var valid = _get(_getPrototypeOf(Webform.prototype), "checkData", this).call(this, data, flags);
+    value: function checkData(data, flags, source) {
+      var valid = _get(_getPrototypeOf(Webform.prototype), "checkData", this).call(this, data, flags, source);
 
       if ((_lodash.default.isEmpty(flags) || flags.noValidate) && this.submitted) {
         this.showErrors();
@@ -21153,14 +22225,16 @@ function (_NestedComponent) {
       if (headers && headers.length > 0) {
         headers.map(function (e) {
           if (e.header !== '' && e.value !== '') {
-            settings.headers[e.header] = e.value;
+            settings.headers[e.header] = _this18.interpolate(e.value, submission);
           }
         });
       }
 
       if (API_URL && settings) {
         try {
-          _Formio.default.makeStaticRequest(API_URL, settings.method, submission, settings.headers).then(function () {
+          _Formio.default.makeStaticRequest(API_URL, settings.method, submission, {
+            headers: settings.headers
+          }).then(function () {
             _this18.emit('requestDone');
 
             _this18.setAlert('success', '<p> Success </p>');
@@ -21174,6 +22248,21 @@ function (_NestedComponent) {
         this.emit('error', 'You should add a URL to this button.');
         this.setAlert('warning', 'You should add a URL to this button.');
         return console.warn('You should add a URL to this button.');
+      }
+    }
+  }, {
+    key: "triggerRecaptcha",
+    value: function triggerRecaptcha() {
+      var recaptchaComponent;
+      this.root.everyComponent(function (component) {
+        if (component.component.type === 'recaptcha' && component.component.eventType === 'formLoad') {
+          recaptchaComponent = component;
+          return false;
+        }
+      });
+
+      if (recaptchaComponent) {
+        recaptchaComponent.verify("".concat(this.form.name ? this.form.name : 'form', "Load"));
       }
     }
   }, {
@@ -21340,6 +22429,16 @@ function (_NestedComponent) {
       });
       return schema;
     }
+  }, {
+    key: "nosubmit",
+    set: function set() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      this._nosubmit = value;
+      this.emit('nosubmit', value);
+    },
+    get: function get() {
+      return this._nosubmit || false;
+    }
   }]);
 
   return Webform;
@@ -21371,7 +22470,15 @@ __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_mod
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.find-index */ "./node_modules/core-js/modules/es6.array.find-index.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
@@ -21389,7 +22496,7 @@ var _builder = _interopRequireDefault(__webpack_require__(/*! ./utils/builder */
 
 var _utils = __webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
-var _eventemitter = _interopRequireDefault(__webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js"));
+var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
@@ -21398,6 +22505,10 @@ var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_m
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21610,6 +22721,28 @@ function (_Webform) {
     value: function setForm(form) {
       var _this3 = this;
 
+      //populate isEnabled for recaptcha form settings
+      var isRecaptchaEnabled = false;
+
+      if (form.components) {
+        (0, _utils.eachComponent)(form.components, function (component) {
+          if (isRecaptchaEnabled) {
+            return;
+          }
+
+          if (component.type === 'recaptcha') {
+            isRecaptchaEnabled = true;
+            return false;
+          }
+        });
+
+        if (isRecaptchaEnabled) {
+          _lodash.default.set(form, 'settings.recaptcha.isEnabled', true);
+        } else if (_lodash.default.get(form, 'settings.recaptcha.isEnabled')) {
+          _lodash.default.set(form, 'settings.recaptcha.isEnabled', false);
+        }
+      }
+
       this.emit('change', form);
       return _get(_getPrototypeOf(WebformBuilder.prototype), "setForm", this).call(this, form).then(function (retVal) {
         setTimeout(function () {
@@ -21633,9 +22766,9 @@ function (_Webform) {
       }
 
       if (remove) {
-        this.emit('deleteComponent', component);
         component.parent.removeComponentById(component.id);
         this.form = this.schema;
+        this.emit('deleteComponent', component);
       }
 
       return remove;
@@ -21653,7 +22786,7 @@ function (_Webform) {
 
         this.preview = _Components.default.create(component.component, {
           preview: true,
-          events: new _eventemitter.default({
+          events: new _EventEmitter.default({
             wildcard: false,
             maxListeners: 0
           })
@@ -21767,9 +22900,11 @@ function (_Webform) {
       _lodash.default.assign(this.defaultValueComponent, _lodash.default.omit(componentCopy.component, ['key', 'label', 'placeholder', 'tooltip', 'validate', 'disabled'])); // Create the form instance.
 
 
-      this.editForm = new _Webform2.default(formioForm, {
+      var editFormOptions = _lodash.default.get(this, 'options.editForm', {});
+
+      this.editForm = new _Webform2.default(formioForm, _objectSpread({
         language: this.options.language
-      }); // Set the form to the edit form.
+      }, editFormOptions)); // Set the form to the edit form.
 
       this.editForm.form = editForm; // Pass along the form being edited.
 
@@ -21834,6 +22969,7 @@ function (_Webform) {
         }
 
         event.preventDefault();
+        var originalComponent = component.component;
         component.isNew = false; //for custom component use value in 'componentJson' field as JSON of component
 
         if (isCustom) {
@@ -21846,9 +22982,9 @@ function (_Webform) {
           component.dragEvents.onSave(component);
         }
 
-        _this5.emit('saveComponent', component);
-
         _this5.form = _this5.schema;
+
+        _this5.emit('saveComponent', component, originalComponent);
 
         _this5.dialog.close();
       });
@@ -22296,8 +23432,30 @@ function (_Webform) {
 
         if (target.dragEvents) {
           component.dragEvents = target.dragEvents;
-        } // Edit the component.
+        } // Get path to the component in the parent component.
 
+
+        var path = 'components';
+
+        switch (component.parent.type) {
+          case 'table':
+            path = "rows[".concat(component.tableRow, "][").concat(component.tableColumn, "].components");
+            break;
+
+          case 'columns':
+            path = "columns[".concat(component.column, "].components");
+            break;
+
+          case 'tabs':
+            path = "components[".concat(component.tab, "].components");
+            break;
+        } // Index within container
+
+
+        var index = _lodash.default.findIndex(_lodash.default.get(component.parent.schema, path), {
+          key: component.key
+        }) || 0;
+        this.emit('addComponent', component, path, index); // Edit the component.
 
         this.editComponent(component); // Remove the element.
 
@@ -22512,7 +23670,6 @@ function (_Webform) {
     _this.pages = [];
     _this.globalComponents = [];
     _this.page = 0;
-    _this.history = [];
     _this._nextPage = 0;
     _this._seenPages = [0];
     return _this;
@@ -22562,7 +23719,9 @@ function (_Webform) {
   }, {
     key: "resetValue",
     value: function resetValue() {
-      this.getPages().forEach(function (page) {
+      this.getPages({
+        all: true
+      }).forEach(function (page) {
         return page.resetValue();
       });
       this.setPristine(true);
@@ -22621,13 +23780,7 @@ function (_Webform) {
   }, {
     key: "getPreviousPage",
     value: function getPreviousPage() {
-      var prev = this.history.pop();
-
-      if (typeof prev !== 'undefined') {
-        return prev;
-      }
-
-      return this.page - 1;
+      return Math.max(this.page - 1, 0);
     }
   }, {
     key: "beforeSubmit",
@@ -22644,7 +23797,6 @@ function (_Webform) {
 
       // Read-only forms should not worry about validation before going to next page, nor should they submit.
       if (this.options.readOnly) {
-        this.history.push(this.page);
         return this.setPage(this.getNextPage(this.submission.data, this.page)).then(function () {
           _this3._nextPage = _this3.getNextPage(_this3.submission.data, _this3.page);
 
@@ -22661,8 +23813,6 @@ function (_Webform) {
           noValidate: true
         });
         return this.beforeNext().then(function () {
-          _this3.history.push(_this3.page);
-
           return _this3.setPage(_this3.getNextPage(_this3.submission.data, _this3.page)).then(function () {
             _this3._nextPage = _this3.getNextPage(_this3.submission.data, _this3.page);
 
@@ -22693,7 +23843,6 @@ function (_Webform) {
     key: "cancel",
     value: function cancel(noconfirm) {
       if (_get(_getPrototypeOf(Wizard.prototype), "cancel", this).call(this, noconfirm)) {
-        this.history = [];
         return this.setPage(0);
       } else {
         return this.setPage();
@@ -22812,6 +23961,7 @@ function (_Webform) {
     key: "hasButton",
     value: function hasButton(name, nextPage) {
       // Check for and initlize button settings object
+      var currentPage = this.currentPage();
       this.options.buttonSettings = _lodash.default.defaults(this.options.buttonSettings, {
         showPrevious: true,
         showNext: true,
@@ -22819,17 +23969,20 @@ function (_Webform) {
       });
 
       if (name === 'previous') {
-        return this.page > 0 && this.options.buttonSettings.showPrevious;
+        var show = (0, _utils.firstNonNil)([_lodash.default.get(currentPage, 'buttonSettings.previous'), this.options.buttonSettings.showPrevious]);
+        return this.page > 0 && show;
       }
 
       nextPage = nextPage === undefined ? this.getNextPage(this.submission.data, this.page) : nextPage;
 
       if (name === 'next') {
-        return nextPage !== null && nextPage < this.pages.length && this.options.buttonSettings.showNext;
+        var _show = (0, _utils.firstNonNil)([_lodash.default.get(currentPage, 'buttonSettings.next'), this.options.buttonSettings.showNext]);
+
+        return nextPage !== null && nextPage < this.pages.length && _show;
       }
 
       if (name === 'cancel') {
-        return this.options.buttonSettings.showCancel;
+        return (0, _utils.firstNonNil)([_lodash.default.get(currentPage, 'buttonSettings.cancel'), this.options.buttonSettings.showCancel]);
       }
 
       if (name === 'submit') {
@@ -22874,13 +24027,11 @@ function (_Webform) {
       this.prepend(this.wizardHeader);
       var showHistory = currentPage.breadcrumb.toLowerCase() === 'history';
       this.pages.forEach(function (page, i) {
-        // See if this page is in our history.
-        if (showHistory && _this7.page !== i && !_this7.history.includes(i)) {
-          return;
-        } // Set clickable based on breadcrumb settings
-
-
-        var clickable = _this7.page !== i && _this7.options.breadcrumbSettings.clickable;
+        // Iterate over predicates and returns first non-undefined value
+        var clickableFlag = (0, _utils.firstNonNil)([// Now page (Panel) can override `breadcrumbSettings.clickable` option
+        _lodash.default.get(page, 'breadcrumbClickable'), // Set clickable based on breadcrumb settings
+        _this7.options.breadcrumbSettings.clickable]);
+        var clickable = _this7.page !== i && clickableFlag;
         var pageClass = 'page-item ';
         pageClass += i === _this7.page ? 'active' : clickable ? '' : 'disabled';
 
@@ -23084,7 +24235,11 @@ function (_Webform) {
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
-      return this.checkPagesValidity(this.getPages(), data, dirty);
+      if (this.submitting) {
+        return this.checkPagesValidity(this.getPages(), data, dirty);
+      } else {
+        return this.checkCurrentPageValidity(data, dirty);
+      }
     }
   }, {
     key: "schema",
@@ -29035,6 +30190,8 @@ var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/Moda
 
 var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown.form */ "./node_modules/formiojs/components/unknown/Unknown.form.js"));
 
+var _ReCaptcha = _interopRequireDefault(__webpack_require__(/*! ./recaptcha/ReCaptcha.form */ "./node_modules/formiojs/components/recaptcha/ReCaptcha.form.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _.default.address.editForm = _Address.default;
@@ -29077,6 +30234,7 @@ _.default.tree.editForm = _Tree.default;
 _.default.well.editForm = _Well.default;
 _.default.modaledit.editForm = _ModalEdit.default;
 _.default.unknown.editForm = _Unknown.default;
+_.default.recaptcha.editForm = _ReCaptcha.default;
 var _default = _.default;
 exports.default = _default;
 
@@ -29377,6 +30535,8 @@ function (_BaseComponent) {
         }
       }, true);
       this.addEventListener(this.buttonElement, 'click', function (event) {
+        _this.triggerReCaptcha();
+
         _this.dataValue = true;
 
         if (_this.component.action !== 'submit' && _this.component.showValidations) {
@@ -29608,6 +30768,23 @@ function (_BaseComponent) {
     key: "focus",
     value: function focus() {
       this.buttonElement.focus();
+    }
+  }, {
+    key: "triggerReCaptcha",
+    value: function triggerReCaptcha() {
+      var _this3 = this;
+
+      var recaptchaComponent;
+      this.root.everyComponent(function (component) {
+        if (component.component.type === 'recaptcha' && component.component.eventType === 'buttonClick' && component.component.buttonKey === _this3.component.key) {
+          recaptchaComponent = component;
+          return false;
+        }
+      });
+
+      if (recaptchaComponent) {
+        recaptchaComponent.verify("".concat(this.component.key, "Click"));
+      }
     }
   }, {
     key: "defaultSchema",
@@ -30864,11 +32041,13 @@ function (_NestedComponent) {
       var container = this.getContainer();
       container.noDrop = true;
 
-      _lodash.default.each(this.component.columns, function (column) {
+      _lodash.default.each(this.component.columns, function (column, index) {
         column.type = 'column';
         column.hideOnChildrenHidden = _this4.component.hideOnChildrenHidden;
 
-        _this4.addComponent(column, container, _this4.data, null, null, state);
+        var component = _this4.addComponent(column, container, _this4.data, null, null, state);
+
+        component.column = index;
       });
 
       this.rows = this.groupByRow();
@@ -37256,6 +38435,7 @@ function (_BaseComponent) {
     value: function buildFileList() {
       var _this2 = this;
 
+      var value = this.dataValue;
       return this.ce('ul', {
         class: 'list-group list-group-striped'
       }, [this.ce('li', {
@@ -37270,9 +38450,9 @@ function (_BaseComponent) {
         class: 'col-md-2'
       }, this.ce('strong', {}, this.text('Size'))), this.hasTypes ? this.ce('div', {
         class: 'col-md-2'
-      }, this.ce('strong', {}, this.text('Type'))) : null])), this.dataValue.map(function (fileInfo, index) {
+      }, this.ce('strong', {}, this.text('Type'))) : null])), Array.isArray(value) ? value.map(function (fileInfo, index) {
         return _this2.createFileListItem(fileInfo, index);
-      })]);
+      }) : null]);
     }
   }, {
     key: "buildHiddenFileInput",
@@ -37363,9 +38543,10 @@ function (_BaseComponent) {
     value: function buildImageList() {
       var _this6 = this;
 
-      return this.ce('div', {}, this.dataValue.map(function (fileInfo, index) {
+      var value = this.dataValue;
+      return this.ce('div', {}, Array.isArray(value) ? value.map(function (fileInfo, index) {
         return _this6.createImageListItem(fileInfo, index);
-      }));
+      }) : null);
     }
   }, {
     key: "createImageListItem",
@@ -38292,10 +39473,22 @@ function (_BaseComponent) {
       _this.subFormReadyResolve = resolve;
       _this.subFormReadyReject = reject;
     });
+
+    _this.subscribe();
+
     return _this;
   }
 
   _createClass(FormComponent, [{
+    key: "subscribe",
+    value: function subscribe() {
+      var _this2 = this;
+
+      this.on('nosubmit', function (value) {
+        _this2.nosubmit = value;
+      });
+    }
+  }, {
     key: "destroy",
     value: function destroy() {
       var state = _get(_getPrototypeOf(FormComponent.prototype), "destroy", this).call(this) || {};
@@ -38316,7 +39509,7 @@ function (_BaseComponent) {
   }, {
     key: "renderSubForm",
     value: function renderSubForm(form, options) {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.options.builder) {
         this.element.appendChild(this.ce('div', {
@@ -38327,29 +39520,30 @@ function (_BaseComponent) {
 
 
       (0, _utils.eachComponent)(form.components, function (component) {
-        if (component.type === 'button' && component.action === 'submit') {
+        if (component.type === 'button' && (component.action === 'submit' || !component.action)) {
           component.hidden = true;
         }
       });
       new _Form.default(this.element, form, options).render().then(function (instance) {
-        _this2.subForm = instance;
-        _this2.subForm.parent = _this2;
-        _this2.subForm.parentVisible = _this2.visible;
+        _this3.subForm = instance;
+        _this3.subForm.root = _this3.root;
+        _this3.subForm.parent = _this3;
+        _this3.subForm.parentVisible = _this3.visible;
 
-        _this2.subForm.on('change', function () {
-          _this2.dataValue = _this2.subForm.getValue();
+        _this3.subForm.on('change', function () {
+          _this3.dataValue = _this3.subForm.getValue();
 
-          _this2.onChange();
+          _this3.triggerChange();
         });
 
-        _this2.subForm.url = _this2.formSrc;
-        _this2.subForm.nosubmit = false;
+        _this3.subForm.url = _this3.formSrc;
+        _this3.subForm.nosubmit = _this3.nosubmit;
 
-        _this2.restoreValue();
+        _this3.restoreValue();
 
-        _this2.subFormReadyResolve(_this2.subForm);
+        _this3.subFormReadyResolve(_this3.subForm);
 
-        return _this2.subForm;
+        return _this3.subForm;
       });
     }
     /**
@@ -38361,7 +39555,7 @@ function (_BaseComponent) {
   }, {
     key: "loadSubForm",
     value: function loadSubForm() {
-      var _this3 = this;
+      var _this4 = this;
 
       // Only load the subform if the subform isn't loaded and the conditions apply.
       if (this.subFormLoaded) {
@@ -38452,16 +39646,16 @@ function (_BaseComponent) {
 
       if (this.component && this.component.components && this.component.components.length) {
         this.renderSubForm(this.component, srcOptions);
-      } else {
+      } else if (this.formSrc) {
         var query = {
           params: {
             live: 1
           }
         };
         new _Formio.default(this.formSrc).loadForm(query).then(function (formObj) {
-          return _this3.renderSubForm(formObj, srcOptions);
+          return _this4.renderSubForm(formObj, srcOptions);
         }).catch(function (err) {
-          return _this3.subFormReadyReject(err);
+          return _this4.subFormReadyReject(err);
         });
       }
 
@@ -38508,16 +39702,16 @@ function (_BaseComponent) {
   }, {
     key: "beforeNext",
     value: function beforeNext() {
-      var _this4 = this;
+      var _this5 = this;
 
       // If we wish to submit the form on next page, then do that here.
       if (this.component.submit) {
         return this.loadSubForm().then(function () {
-          return _this4.subForm.submitForm().then(function (result) {
-            _this4.dataValue = result.submission;
-            return _this4.dataValue;
+          return _this5.subForm.submitForm().then(function (result) {
+            _this5.dataValue = result.submission;
+            return _this5.dataValue;
           }).catch(function (err) {
-            _this4.subForm.onSubmissionError(err);
+            _this5.subForm.onSubmissionError(err);
 
             return _nativePromiseOnly.default.reject(err);
           });
@@ -38533,7 +39727,7 @@ function (_BaseComponent) {
   }, {
     key: "beforeSubmit",
     value: function beforeSubmit() {
-      var _this5 = this;
+      var _this6 = this;
 
       var submission = this.dataValue; // This submission has already been submitted, so just return the reference data.
 
@@ -38548,13 +39742,13 @@ function (_BaseComponent) {
 
       if (this.component.submit) {
         return this.loadSubForm().then(function () {
-          return _this5.subForm.submitForm().then(function (result) {
-            _this5.subForm.loading = false;
-            _this5.dataValue = _this5.component.reference ? {
+          return _this6.subForm.submitForm().then(function (result) {
+            _this6.subForm.loading = false;
+            _this6.dataValue = _this6.component.reference ? {
               _id: result.submission._id,
               form: result.submission.form
             } : result.submission;
-            return _this5.dataValue;
+            return _this6.dataValue;
           }).catch(function () {});
         });
       } else {
@@ -38575,14 +39769,14 @@ function (_BaseComponent) {
   }, {
     key: "setValue",
     value: function setValue(submission, flags) {
-      var _this6 = this;
+      var _this7 = this;
 
       var changed = _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
 
       (this.subForm ? _nativePromiseOnly.default.resolve(this.subForm) : this.loadSubForm()).then(function (form) {
         if (submission && submission._id && form.formio && !flags.noload && _lodash.default.isEmpty(submission.data)) {
           var submissionUrl = "".concat(form.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
-          form.setUrl(submissionUrl, _this6.options);
+          form.setUrl(submissionUrl, _this7.options);
           form.nosubmit = false;
           form.loadSubmission();
         } else {
@@ -38627,6 +39821,28 @@ function (_BaseComponent) {
       return {
         data: {}
       };
+    }
+  }, {
+    key: "root",
+    set: function set(inst) {
+      this._root = inst;
+      this.nosubmit = inst.nosubmit;
+    },
+    get: function get() {
+      return this._root;
+    }
+  }, {
+    key: "nosubmit",
+    set: function set() {
+      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      this._nosubmit = value;
+
+      if (this.subForm) {
+        this.subForm.nosubmit = value;
+      }
+    },
+    get: function get() {
+      return this._nosubmit || false;
     }
   }, {
     key: "visible",
@@ -39290,6 +40506,8 @@ var _Tabs = _interopRequireDefault(__webpack_require__(/*! ./tabs/Tabs */ "./nod
 
 var _Tree = _interopRequireDefault(__webpack_require__(/*! ./tree/Tree */ "./node_modules/formiojs/components/tree/Tree.js"));
 
+var _ReCaptcha = _interopRequireDefault(__webpack_require__(/*! ./recaptcha/ReCaptcha */ "./node_modules/formiojs/components/recaptcha/ReCaptcha.js"));
+
 var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit */ "./node_modules/formiojs/components/modaledit/ModalEdit.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -39338,6 +40556,7 @@ var _default = {
   location: _Location.default,
   file: _File.default,
   tree: _Tree.default,
+  recaptcha: _ReCaptcha.default,
   modaledit: _ModalEdit.default
 };
 exports.default = _default;
@@ -40572,8 +41791,13 @@ function (_BaseComponent) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags) {
+    value: function updateValue(flags, source) {
       return this.components.reduce(function (changed, comp) {
+        // Skip over the source if it is provided.
+        if (source && source.id === comp.id) {
+          return changed;
+        }
+
         return comp.updateValue(flags) || changed;
       }, false);
     }
@@ -40592,7 +41816,7 @@ function (_BaseComponent) {
 
   }, {
     key: "checkData",
-    value: function checkData(data, flags) {
+    value: function checkData(data, flags, source) {
       flags = flags || {};
       var valid = true;
 
@@ -40603,9 +41827,14 @@ function (_BaseComponent) {
 
       var changed = this.updateValue({
         noUpdateEvent: true
-      }); // Iterate through all components and check conditions, and calculate values.
+      }, source); // Iterate through all components and check conditions, and calculate values.
 
       this.getComponents().forEach(function (comp) {
+        // If a source is provided and is the same as the source, then skip.
+        if (source && source.id === comp.id) {
+          return;
+        }
+
         changed |= comp.calculateValue(data, {
           noUpdateEvent: true
         });
@@ -40886,10 +42115,9 @@ function (_BaseComponent) {
     get: function get() {
       var schema = _get(_getPrototypeOf(NestedComponent.prototype), "schema", this);
 
-      schema.components = [];
-      this.eachComponent(function (component) {
-        return schema.components.push(component.schema);
-      });
+      var components = _lodash.default.uniqBy(this.getComponents(), 'key');
+
+      schema.components = _lodash.default.map(components, 'schema');
       return schema;
     }
   }, {
@@ -41387,6 +42615,8 @@ var _NestedComponent = _interopRequireDefault(__webpack_require__(/*! ../nested/
 
 var _PanelEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Panel.edit.display */ "./node_modules/formiojs/components/panel/editForm/Panel.edit.display.js"));
 
+var _PanelEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Panel.edit.conditional */ "./node_modules/formiojs/components/panel/editForm/Panel.edit.conditional.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
@@ -41397,6 +42627,9 @@ function _default() {
   return _NestedComponent.default.apply(void 0, [[{
     key: 'display',
     components: _PanelEdit.default
+  }, {
+    key: 'conditional',
+    components: _PanelEdit2.default
   }]].concat(extend));
 }
 
@@ -41582,6 +42815,53 @@ exports.default = PanelComponent;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/panel/editForm/Panel.edit.conditional.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/panel/editForm/Panel.edit.conditional.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+
+var _utils = _interopRequireDefault(__webpack_require__(/*! ../../base/editForm/utils */ "./node_modules/formiojs/components/base/editForm/utils.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/* eslint-disable quotes, max-len */
+var title = 'Advanced Next Page';
+var jsonProp = 'nextPage';
+var jsProp = 'nextPage';
+var jsDocHTML = "\n  <p>You must assign the <strong>next</strong> variable with the API key of the next page.</p>\n  <p>The global variable <strong>data</strong> is provided, and allows you to access the data of any form component, by using its API key.</p>\n  <p>Also <strong>moment</strong> library is available, and allows you to manipulate dates in a convenient way.</p>\n  <h5>Example</h5><pre>next = data.addComment ? 'page3' : 'page4';</pre>\n";
+var jsonDocHTML = "\n  <p>Submission data is available as JsonLogic variables, with the same api key as your components.</p>\n";
+
+var settingComponent = _utils.default.javaScriptValue(title, jsProp, jsonProp, 110, jsDocHTML, jsonDocHTML);
+
+var _default = [_objectSpread({}, settingComponent, {
+  customConditional: 'show = instance.root.editForm.display === "wizard"'
+})];
+/* eslint-enable quotes, max-len */
+
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/panel/editForm/Panel.edit.display.js":
 /*!*******************************************************************************!*\
   !*** ./node_modules/formiojs/components/panel/editForm/Panel.edit.display.js ***!
@@ -41646,20 +42926,65 @@ var _default = [{
   }
 }, {
   weight: 40,
-  type: 'select',
-  input: true,
-  label: 'Show Breadcrumb',
-  key: 'breadcrumb',
-  dataSrc: 'values',
-  data: {
+  type: 'fieldset',
+  input: false,
+  components: [{
+    type: 'select',
+    input: true,
+    label: 'Breadcrumb Type',
+    key: 'breadcrumb',
+    dataSrc: 'values',
+    data: {
+      values: [{
+        label: 'Default',
+        value: 'default'
+      }, {
+        label: 'Condensed',
+        value: 'condensed'
+      }, {
+        label: 'Hidden',
+        value: 'none'
+      }]
+    }
+  }, {
+    input: true,
+    type: 'checkbox',
+    label: 'Allow click on Breadcrumb',
+    key: 'breadcrumbClickable',
+    defaultValue: true,
+    conditional: {
+      json: {
+        '!==': [{
+          var: 'data.breadcrumb'
+        }, 'none']
+      }
+    }
+  }, {
+    weight: 50,
+    label: 'Panel Navigation Buttons',
+    optionsLabelPosition: 'right',
     values: [{
-      label: 'Yes',
-      value: 'default'
+      label: 'Previous',
+      value: 'previous'
     }, {
-      label: 'No',
-      value: 'none'
-    }]
-  }
+      label: 'Cancel',
+      value: 'cancel'
+    }, {
+      label: 'Next',
+      value: 'next'
+    }],
+    inline: true,
+    type: 'selectboxes',
+    key: 'buttonSettings',
+    input: true,
+    inputType: 'checkbox',
+    defaultValue: {
+      previous: true,
+      cancel: true,
+      next: true
+    }
+  }],
+  customConditional: 'show = instance.root.editForm.display === "wizard"'
 }, {
   weight: 650,
   type: 'checkbox',
@@ -42438,6 +43763,327 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/recaptcha/ReCaptcha.form.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/components/recaptcha/ReCaptcha.form.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
+
+var _ReCaptchaEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/ReCaptcha.edit.display */ "./node_modules/formiojs/components/recaptcha/editForm/ReCaptcha.edit.display.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _default() {
+  return (0, _Base.default)([{
+    key: 'display',
+    components: _ReCaptchaEdit.default
+  }, {
+    key: 'data',
+    ignore: true
+  }, {
+    key: 'validation',
+    ignore: true
+  }, {
+    key: 'conditional',
+    ignore: true
+  }, {
+    key: 'logic',
+    ignore: true
+  }]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/recaptcha/ReCaptcha.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/components/recaptcha/ReCaptcha.js ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
+
+__webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
+
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
+
+var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
+
+var _get3 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get2(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get2 = Reflect.get; } else { _get2 = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get2(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var ReCaptchaComponent =
+/*#__PURE__*/
+function (_BaseComponent) {
+  _inherits(ReCaptchaComponent, _BaseComponent);
+
+  function ReCaptchaComponent() {
+    _classCallCheck(this, ReCaptchaComponent);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ReCaptchaComponent).apply(this, arguments));
+  }
+
+  _createClass(ReCaptchaComponent, [{
+    key: "createInput",
+    value: function createInput() {
+      if (this.options.builder) {
+        // We need to see it in builder mode.
+        this.append(this.text(this.name));
+      } else {
+        var siteKey = (0, _get3.default)(this.root.form, 'settings.recaptcha.siteKey');
+
+        if (siteKey) {
+          var recaptchaApiScriptUrl = "https://www.google.com/recaptcha/api.js?render=".concat(siteKey);
+          this.recaptchaApiReady = _Formio.default.requireLibrary('googleRecaptcha', 'grecaptcha', recaptchaApiScriptUrl, true);
+        } else {
+          console.warn('There is no Site Key specified in settings in form JSON');
+        }
+      }
+    }
+  }, {
+    key: "createLabel",
+    value: function createLabel() {
+      return;
+    }
+  }, {
+    key: "verify",
+    value: function verify(actionName) {
+      var _this = this;
+
+      var siteKey = (0, _get3.default)(this.root.form, 'settings.recaptcha.siteKey');
+
+      if (!siteKey) {
+        console.warn('There is no Site Key specified in settings in form JSON');
+        return;
+      }
+
+      if (!this.recaptchaApiReady) {
+        var recaptchaApiScriptUrl = "https://www.google.com/recaptcha/api.js?render=".concat((0, _get3.default)(this.root.form, 'settings.recaptcha.siteKey'));
+        this.recaptchaApiReady = _Formio.default.requireLibrary('googleRecaptcha', 'grecaptcha', recaptchaApiScriptUrl, true);
+      }
+
+      if (this.recaptchaApiReady) {
+        this.recaptchaVerifiedPromise = new Promise(function (resolve, reject) {
+          _this.recaptchaApiReady.then(function () {
+            grecaptcha.ready(function () {
+              grecaptcha.execute(siteKey, {
+                action: actionName
+              }).then(function (token) {
+                return _this.sendVerificationRequest(token);
+              }).then(function (verificationResult) {
+                _this.setValue(verificationResult);
+
+                return resolve(verificationResult);
+              });
+            });
+          }).catch(function () {
+            return reject();
+          });
+        });
+      }
+    }
+  }, {
+    key: "beforeSubmit",
+    value: function beforeSubmit() {
+      if (this.recaptchaVerifiedPromise) {
+        return this.recaptchaVerifiedPromise;
+      }
+
+      return _get2(_getPrototypeOf(ReCaptchaComponent.prototype), "beforeSubmit", this).call(this);
+    }
+  }, {
+    key: "sendVerificationRequest",
+    value: function sendVerificationRequest(token) {
+      return _Formio.default.makeStaticRequest("".concat(_Formio.default.projectUrl, "/recaptcha?recaptchaToken=").concat(token));
+    }
+  }, {
+    key: "setValue",
+    value: function setValue(value) {
+      this.dataValue = value;
+    }
+  }, {
+    key: "getValue",
+    value: function getValue() {
+      return this.dataValue;
+    }
+  }], [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _Base.default.schema.apply(_Base.default, [{
+        type: 'recaptcha',
+        key: 'recaptcha',
+        label: 'reCAPTCHA'
+      }].concat(extend));
+    }
+  }, {
+    key: "builderInfo",
+    get: function get() {
+      return {
+        title: 'reCAPTCHA',
+        group: 'advanced',
+        icon: 'fa fa-refresh',
+        documentation: 'http://help.form.io/userguide/#recaptcha',
+        weight: 550,
+        schema: ReCaptchaComponent.schema()
+      };
+    }
+  }]);
+
+  return ReCaptchaComponent;
+}(_Base.default);
+
+exports.default = ReCaptchaComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/recaptcha/editForm/ReCaptcha.edit.display.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/formiojs/components/recaptcha/editForm/ReCaptcha.edit.display.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'eventType',
+  label: 'Type of event',
+  tooltip: 'Specify type of event that this reCAPTCHA would react to',
+  type: 'radio',
+  values: [{
+    label: 'Form Load',
+    value: 'formLoad'
+  }, {
+    label: 'Button Click',
+    value: 'buttonClick'
+  }],
+  weight: 650
+}, {
+  key: 'buttonKey',
+  label: 'Button Key',
+  tooltip: 'Specify key of button on this form that this reCAPTCHA should react to',
+  type: 'textfield',
+  customConditional: 'show = data.eventType === "buttonClick";',
+  weight: 660
+}, {
+  key: 'label',
+  ignore: true
+}, {
+  key: 'hideLabel',
+  ignore: true
+}, {
+  key: 'labelPosition',
+  ignore: true
+}, {
+  key: 'labelWidth',
+  ignore: true
+}, {
+  key: 'labelMargin',
+  ignore: true
+}, {
+  key: 'placeholder',
+  ignore: true
+}, {
+  key: 'description',
+  ignore: true
+}, {
+  key: 'tooltip',
+  ignore: true
+}, {
+  key: 'errorLabel',
+  ignore: true
+}, {
+  key: 'customClass',
+  ignore: true
+}, {
+  key: 'tabindex',
+  ignore: true
+}, {
+  key: 'multiple',
+  ignore: true
+}, {
+  key: 'clearOnHide',
+  ignore: true
+}, {
+  key: 'hidden',
+  ignore: true
+}, {
+  key: 'mask',
+  ignore: true
+}, {
+  key: 'dataGridLabel',
+  ignore: true
+}, {
+  key: 'disabled',
+  ignore: true
+}, {
+  key: 'autofocus',
+  ignore: true
+}, {
+  key: 'alwaysEnabled',
+  ignore: true
+}];
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/resource/Resource.form.js":
 /*!********************************************************************!*\
   !*** ./node_modules/formiojs/components/resource/Resource.form.js ***!
@@ -43182,11 +44828,16 @@ function (_BaseComponent) {
      */
 
   }, {
+    key: "getCustomItems",
+    value: function getCustomItems() {
+      return this.evaluate(this.component.data.custom, {
+        values: []
+      }, 'values');
+    }
+  }, {
     key: "updateCustomItems",
     value: function updateCustomItems() {
-      this.setItems(this.evaluate(this.component.data.custom, {
-        values: []
-      }, 'values') || []);
+      this.setItems(this.getCustomItems() || []);
     }
     /* eslint-disable max-statements */
 
@@ -43659,10 +45310,20 @@ function (_BaseComponent) {
 
       value = value || this.getValue();
 
-      if (this.component.dataSrc === 'values') {
-        value = this.component.multiple ? _lodash.default.filter(this.component.data.values, function (item) {
-          return value.indexOf(item.value) !== -1;
-        }) : _lodash.default.find(this.component.data.values, ['value', value]);
+      if (['values', 'custom'].includes(this.component.dataSrc)) {
+        var _ref = this.component.dataSrc === 'values' ? {
+          items: this.component.data.values,
+          valueProperty: 'value'
+        } : {
+          items: this.getCustomItems(),
+          valueProperty: this.component.valueProperty
+        },
+            items = _ref.items,
+            valueProperty = _ref.valueProperty;
+
+        value = this.component.multiple && Array.isArray(value) ? _lodash.default.filter(items, function (item) {
+          return value.includes(item.value);
+        }) : valueProperty ? _lodash.default.find(items, [valueProperty, value]) : value;
       }
 
       if (_lodash.default.isString(value)) {
@@ -43670,14 +45331,14 @@ function (_BaseComponent) {
       }
 
       if (Array.isArray(value)) {
-        var items = [];
+        var _items = [];
         value.forEach(function (item) {
-          return items.push(_this8.itemTemplate(item));
+          return _items.push(_this8.itemTemplate(item));
         });
-        return items.length > 0 ? items.join('<br />') : '-';
+        return _items.length > 0 ? _items.join('<br />') : '-';
       }
 
-      return _lodash.default.isObject(value) ? this.itemTemplate(value) : '-';
+      return !_lodash.default.isNil(value) ? this.itemTemplate(value) : '-';
     }
   }, {
     key: "setupValueElement",
@@ -46685,15 +48346,6 @@ function (_TextFieldComponent) {
     key: "setValue",
     value: function setValue(value, flags) {
       var _this5 = this;
-
-      //should set value if new value is not equal to current
-      var shouldSetValue = !_lodash.default.isEqual(value, this.getValue()); //should set value if is in read only mode
-
-      shouldSetValue = shouldSetValue || this.options.readOnly;
-
-      if (!shouldSetValue) {
-        return;
-      }
 
       value = value || '';
 
@@ -50826,6 +52478,64 @@ function baseRepeat(string, n) {
 }
 
 module.exports = baseRepeat;
+
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseSet.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseSet.js ***!
+  \***************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/formiojs/node_modules/lodash/_assignValue.js"),
+    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/formiojs/node_modules/lodash/_castPath.js"),
+    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/formiojs/node_modules/lodash/_isIndex.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/formiojs/node_modules/lodash/_toKey.js");
+
+/**
+ * The base implementation of `_.set`.
+ *
+ * @private
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @param {Function} [customizer] The function to customize path creation.
+ * @returns {Object} Returns `object`.
+ */
+function baseSet(object, path, value, customizer) {
+  if (!isObject(object)) {
+    return object;
+  }
+  path = castPath(path, object);
+
+  var index = -1,
+      length = path.length,
+      lastIndex = length - 1,
+      nested = object;
+
+  while (nested != null && ++index < length) {
+    var key = toKey(path[index]),
+        newValue = value;
+
+    if (index != lastIndex) {
+      var objValue = nested[key];
+      newValue = customizer ? customizer(objValue, key, nested) : undefined;
+      if (newValue === undefined) {
+        newValue = isObject(objValue)
+          ? objValue
+          : (isIndex(path[index + 1]) ? [] : {});
+      }
+    }
+    assignValue(nested, key, newValue);
+    nested = nested[key];
+  }
+  return object;
+}
+
+module.exports = baseSet;
 
 
 /***/ }),
@@ -72080,6 +73790,52 @@ module.exports = round;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/node_modules/lodash/set.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/set.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseSet = __webpack_require__(/*! ./_baseSet */ "./node_modules/formiojs/node_modules/lodash/_baseSet.js");
+
+/**
+ * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
+ * it's created. Arrays are created for missing index properties while objects
+ * are created for all other missing properties. Use `_.setWith` to customize
+ * `path` creation.
+ *
+ * **Note:** This method mutates `object`.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.7.0
+ * @category Object
+ * @param {Object} object The object to modify.
+ * @param {Array|string} path The path of the property to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns `object`.
+ * @example
+ *
+ * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+ *
+ * _.set(object, 'a[0].b.c', 4);
+ * console.log(object.a[0].b.c);
+ * // => 4
+ *
+ * _.set(object, ['x', '0', 'y', 'z'], 5);
+ * console.log(object.x[0].y.z);
+ * // => 5
+ */
+function set(object, path, value) {
+  return object == null ? object : baseSet(object, path, value);
+}
+
+module.exports = set;
+
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/node_modules/lodash/stubArray.js":
 /*!****************************************************************!*\
   !*** ./node_modules/formiojs/node_modules/lodash/stubArray.js ***!
@@ -72459,6 +74215,56 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/providers/storage/azure.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/azure.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
+var _xhr = _interopRequireDefault(__webpack_require__(/*! ./xhr */ "./node_modules/formiojs/providers/storage/xhr.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var azure = function azure(formio) {
+  return {
+    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
+      return _xhr.default.upload(formio, 'azure', function (xhr, response) {
+        xhr.open('PUT', response.url);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.setRequestHeader('x-ms-blob-type', 'BlockBlob');
+        return file;
+      }, file, fileName, dir, progressCallback).then(function () {
+        return {
+          storage: 'azure',
+          name: _xhr.default.path([dir, fileName]),
+          size: file.size,
+          type: file.type
+        };
+      });
+    },
+    downloadFile: function downloadFile(file) {
+      return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/azure?name=").concat(_xhr.default.trim(file.name)), 'GET');
+    }
+  };
+};
+
+azure.title = 'Azure File Services';
+var _default = azure;
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/providers/storage/base64.js":
 /*!***********************************************************!*\
   !*** ./node_modules/formiojs/providers/storage/base64.js ***!
@@ -72617,6 +74423,8 @@ var _dropbox = _interopRequireDefault(__webpack_require__(/*! ./dropbox */ "./no
 
 var _s = _interopRequireDefault(__webpack_require__(/*! ./s3 */ "./node_modules/formiojs/providers/storage/s3.js"));
 
+var _azure = _interopRequireDefault(__webpack_require__(/*! ./azure */ "./node_modules/formiojs/providers/storage/azure.js"));
+
 var _url = _interopRequireDefault(__webpack_require__(/*! ./url */ "./node_modules/formiojs/providers/storage/url.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -72625,7 +74433,8 @@ var _default = {
   base64: _base.default,
   dropbox: _dropbox.default,
   s3: _s.default,
-  url: _url.default
+  url: _url.default,
+  azure: _azure.default
 };
 exports.default = _default;
 
@@ -72648,110 +74457,48 @@ exports.default = void 0;
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _trim2 = _interopRequireDefault(__webpack_require__(/*! lodash/trim */ "./node_modules/formiojs/node_modules/lodash/trim.js"));
+var _xhr = _interopRequireDefault(__webpack_require__(/*! ./xhr */ "./node_modules/formiojs/providers/storage/xhr.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var trim = function trim(text) {
-  return (0, _trim2.default)(text, '/');
-};
-
-var path = function path(items) {
-  return items.filter(function (item) {
-    return !!item;
-  }).map(trim).join('/');
-};
 
 var s3 = function s3(formio) {
   return {
     uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return new _nativePromiseOnly.default(function (resolve, reject) {
-        // Send the pre response to sign the upload.
-        var pre = new XMLHttpRequest(); // This only fires on a network error.
+      return _xhr.default.upload(formio, 's3', function (xhr, response) {
+        response.data.fileName = fileName;
+        response.data.key = _xhr.default.path([response.data.key, dir, fileName]);
 
-        pre.onerror = function (err) {
-          err.networkError = true;
-          reject(err);
-        };
+        if (response.signed) {
+          xhr.open('PUT', response.signed);
+          xhr.setRequestHeader('Content-Type', file.type);
+          return file;
+        } else {
+          var fd = new FormData();
 
-        pre.onabort = reject;
-
-        pre.onload = function () {
-          if (pre.status >= 200 && pre.status < 300) {
-            var response = JSON.parse(pre.response); // Send the file with data.
-
-            var xhr = new XMLHttpRequest();
-
-            if (typeof progressCallback === 'function') {
-              xhr.upload.onprogress = progressCallback;
-            }
-
-            response.data.fileName = fileName;
-            response.data.key = path([response.data.key, dir, fileName]); // Fire on network error.
-
-            xhr.onerror = function (err) {
-              err.networkError = true;
-              reject(err);
-            };
-
-            xhr.onload = function () {
-              if (xhr.status >= 200 && xhr.status < 300) {
-                resolve({
-                  storage: 's3',
-                  name: fileName,
-                  bucket: response.bucket,
-                  key: response.data.key,
-                  url: path([response.url, response.data.key]),
-                  acl: response.data.acl,
-                  size: file.size,
-                  type: file.type
-                });
-              } else {
-                reject(xhr.response || 'Unable to upload file');
-              }
-            };
-
-            xhr.onabort = reject;
-
-            if (response.signed) {
-              xhr.open('PUT', response.signed);
-              xhr.setRequestHeader('Content-Type', file.type);
-              xhr.send(file);
-            } else {
-              var fd = new FormData();
-
-              for (var key in response.data) {
-                fd.append(key, response.data[key]);
-              }
-
-              fd.append('file', file);
-              xhr.open('POST', response.url);
-              xhr.send(fd);
-            }
-          } else {
-            reject(pre.response || 'Unable to sign file');
+          for (var key in response.data) {
+            fd.append(key, response.data[key]);
           }
-        };
 
-        pre.open('POST', "".concat(formio.formUrl, "/storage/s3"));
-        pre.setRequestHeader('Accept', 'application/json');
-        pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        var token = formio.getToken();
-
-        if (token) {
-          pre.setRequestHeader('x-jwt-token', token);
+          fd.append('file', file);
+          xhr.open('POST', response.url);
+          return fd;
         }
-
-        pre.send(JSON.stringify({
-          name: path([dir, fileName]),
+      }, file, fileName, dir, progressCallback).then(function (response) {
+        return {
+          storage: 's3',
+          name: fileName,
+          bucket: response.bucket,
+          key: response.data.key,
+          url: _xhr.default.path([response.url, response.data.key]),
+          acl: response.data.acl,
           size: file.size,
           type: file.type
-        }));
+        };
       });
     },
     downloadFile: function downloadFile(file) {
       if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/s3?bucket=").concat(trim(file.bucket), "&key=").concat(trim(file.key)), 'GET');
+        return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/s3?bucket=").concat(_xhr.default.trim(file.bucket), "&key=").concat(_xhr.default.trim(file.key)), 'GET');
       } else {
         return _nativePromiseOnly.default.resolve(file);
       }
@@ -72935,6 +74682,110 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/providers/storage/xhr.js":
+/*!********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/xhr.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+var _trim2 = _interopRequireDefault(__webpack_require__(/*! lodash/trim */ "./node_modules/formiojs/node_modules/lodash/trim.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var XHR = {
+  trim: function trim(text) {
+    return (0, _trim2.default)(text, '/');
+  },
+  path: function path(items) {
+    return items.filter(function (item) {
+      return !!item;
+    }).map(XHR.trim).join('/');
+  },
+  upload: function upload(formio, type, xhrCb, file, fileName, dir, progressCallback) {
+    return new _nativePromiseOnly.default(function (resolve, reject) {
+      // Send the pre response to sign the upload.
+      var pre = new XMLHttpRequest(); // This only fires on a network error.
+
+      pre.onerror = function (err) {
+        err.networkError = true;
+        reject(err);
+      };
+
+      pre.onabort = reject;
+
+      pre.onload = function () {
+        if (pre.status >= 200 && pre.status < 300) {
+          var response = JSON.parse(pre.response); // Send the file with data.
+
+          var xhr = new XMLHttpRequest();
+
+          if (typeof progressCallback === 'function') {
+            xhr.upload.onprogress = progressCallback;
+          } // Fire on network error.
+
+
+          xhr.onerror = function (err) {
+            err.networkError = true;
+            reject(err);
+          }; // Fire on network abort.
+
+
+          xhr.onabort = function (err) {
+            err.networkError = true;
+            reject(err);
+          }; // Fired when the response has made it back from the server.
+
+
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(response);
+            } else {
+              reject(xhr.response || 'Unable to upload file');
+            }
+          }; // Set the onabort error callback.
+
+
+          xhr.onabort = reject; // Get the request and send it to the server.
+
+          xhr.send(xhrCb(xhr, response));
+        } else {
+          reject(pre.response || 'Unable to sign file');
+        }
+      };
+
+      pre.open('POST', "".concat(formio.formUrl, "/storage/").concat(type));
+      pre.setRequestHeader('Accept', 'application/json');
+      pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+      var token = formio.getToken();
+
+      if (token) {
+        pre.setRequestHeader('x-jwt-token', token);
+      }
+
+      pre.send(JSON.stringify({
+        name: XHR.path([dir, fileName]),
+        size: file.size,
+        type: file.type
+      }));
+    });
+  }
+};
+var _default = XHR;
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/utils/builder.js":
 /*!************************************************!*\
   !*** ./node_modules/formiojs/utils/builder.js ***!
@@ -73052,7 +74903,12 @@ exports.isLayoutComponent = isLayoutComponent;
 exports.eachComponent = eachComponent;
 exports.matchComponent = matchComponent;
 exports.getComponent = getComponent;
+exports.searchComponents = searchComponents;
 exports.findComponents = findComponents;
+exports.findComponent = findComponent;
+exports.removeComponent = removeComponent;
+exports.generateFormChange = generateFormChange;
+exports.applyFormChanges = applyFormChanges;
 exports.flattenComponents = flattenComponents;
 exports.hasCondition = hasCondition;
 exports.parseFloatExt = parseFloatExt;
@@ -73081,6 +74937,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 var _get = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
 
+var _set = _interopRequireDefault(__webpack_require__(/*! lodash/set */ "./node_modules/formiojs/node_modules/lodash/set.js"));
+
 var _has = _interopRequireDefault(__webpack_require__(/*! lodash/has */ "./node_modules/formiojs/node_modules/lodash/has.js"));
 
 var _clone = _interopRequireDefault(__webpack_require__(/*! lodash/clone */ "./node_modules/formiojs/node_modules/lodash/clone.js"));
@@ -73100,6 +74958,8 @@ var _round = _interopRequireDefault(__webpack_require__(/*! lodash/round */ "./n
 var _chunk = _interopRequireDefault(__webpack_require__(/*! lodash/chunk */ "./node_modules/formiojs/node_modules/lodash/chunk.js"));
 
 var _pad = _interopRequireDefault(__webpack_require__(/*! lodash/pad */ "./node_modules/formiojs/node_modules/lodash/pad.js"));
+
+var _fastJsonPatch = _interopRequireDefault(__webpack_require__(/*! fast-json-patch */ "./node_modules/fast-json-patch/lib/duplex.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -73244,7 +75104,7 @@ function getComponent(components, key, includeAll) {
  */
 
 
-function findComponents(components, query) {
+function searchComponents(components, query) {
   var results = [];
   eachComponent(components, function (component, path) {
     if (matchComponent(component, query)) {
@@ -73253,6 +75113,196 @@ function findComponents(components, query) {
     }
   }, true);
   return results;
+}
+/**
+ * Deprecated version of findComponents. Renamed to searchComponents.
+ *
+ * @param components
+ * @param query
+ * @returns {*}
+ */
+
+
+function findComponents(components, query) {
+  console.warn('formio.js/utils findComponents is deprecated. Use searchComponents instead.');
+  return searchComponents(components, query);
+}
+/**
+ * This function will find a component in a form and return the component AND THE PATH to the component in the form.
+ *
+ * @param components
+ * @param key
+ * @param fn
+ * @param path
+ * @returns {*}
+ */
+
+
+function findComponent(components, key, path, fn) {
+  if (!components) return;
+  path = path || [];
+
+  if (!key) {
+    return fn(components);
+  }
+
+  components.forEach(function (component, index) {
+    var newPath = path.slice();
+    newPath.push(index);
+    if (!component) return;
+
+    if (component.hasOwnProperty('columns') && Array.isArray(component.columns)) {
+      newPath.push('columns');
+      component.columns.forEach(function (column, index) {
+        var colPath = newPath.slice();
+        colPath.push(index);
+        colPath.push('components');
+        findComponent(column.components, key, colPath, fn);
+      });
+    }
+
+    if (component.hasOwnProperty('rows') && Array.isArray(component.rows)) {
+      newPath.push('rows');
+      component.rows.forEach(function (row, index) {
+        var rowPath = newPath.slice();
+        rowPath.push(index);
+        row.forEach(function (column, index) {
+          var colPath = rowPath.slice();
+          colPath.push(index);
+          colPath.push('components');
+          findComponent(column.components, key, colPath, fn);
+        });
+      });
+    }
+
+    if (component.hasOwnProperty('components') && Array.isArray(component.components)) {
+      newPath.push('components');
+      findComponent(component.components, key, newPath, fn);
+    }
+
+    if (component.key === key) {
+      fn(component, newPath);
+    }
+  });
+}
+/**
+ * Remove a component by path.
+ *
+ * @param components
+ * @param path
+ */
+
+
+function removeComponent(components, path) {
+  // Using _.unset() leave a null value. Use Array splice instead.
+  var index = path.pop();
+
+  if (path.length !== 0) {
+    components = (0, _get.default)(components, path);
+  }
+
+  components.splice(index, 1);
+}
+
+function generateFormChange(type, data) {
+  var change;
+
+  switch (type) {
+    case 'add':
+      change = {
+        op: 'add',
+        key: data.component.key,
+        container: data.parent.key,
+        // Parent component
+        path: data.path,
+        // Path to container within parent component.
+        index: data.index,
+        // Index of component in parent container.
+        component: data.component
+      };
+      break;
+
+    case 'edit':
+      change = {
+        op: 'edit',
+        key: data.originalComponent.key,
+        patches: _fastJsonPatch.default.compare(data.originalComponent, data.component)
+      }; // Don't save if nothing changed.
+
+      if (!change.patches.length) {
+        change = null;
+      }
+
+      break;
+
+    case 'remove':
+      change = {
+        op: 'remove',
+        key: data.component.key
+      };
+      break;
+  }
+
+  return change;
+}
+
+function applyFormChanges(form, changes) {
+  var failed = [];
+  changes.forEach(function (change) {
+    var found = false;
+
+    switch (change.op) {
+      case 'add':
+        var newComponent = change.component; // Find the container to set the component in.
+
+        findComponent(form.components, change.container, null, function (parent) {
+          if (!change.container) {
+            parent = form;
+          } // A move will first run an add so remove any existing components with matching key before inserting.
+
+
+          findComponent(form.components, change.key, null, function (component, path) {
+            // If found, use the existing component. (If someone else edited it, the changes would be here)
+            newComponent = component;
+            removeComponent(form.components, path);
+          });
+          found = true;
+          var container = (0, _get.default)(parent, change.path);
+          container.splice(change.index, 0, newComponent);
+        });
+        break;
+
+      case 'remove':
+        findComponent(form.components, change.key, null, function (component, path) {
+          found = true;
+          removeComponent(form.components, path);
+        });
+        break;
+
+      case 'edit':
+        findComponent(form.components, change.key, null, function (component, path) {
+          found = true;
+
+          try {
+            (0, _set.default)(form.components, path, _fastJsonPatch.default.applyPatch(component, change.patches).newDocument);
+          } catch (err) {
+            failed.push(change);
+          }
+        });
+        break;
+
+      case 'move':
+        break;
+    }
+
+    if (!found) {
+      failed.push(change);
+    }
+  });
+  return {
+    form: form,
+    failed: failed
+  };
 }
 /**
  * Flatten the form components for data manipulation.
@@ -73590,7 +75640,10 @@ var _exportNames = {
   iterateKey: true,
   uniqueKey: true,
   bootstrapVersion: true,
+  unfold: true,
+  firstNonNil: true,
   withSwitch: true,
+  observeOverload: true,
   jsonLogic: true,
   moment: true
 };
@@ -73635,7 +75688,9 @@ exports.delay = delay;
 exports.iterateKey = iterateKey;
 exports.uniqueKey = uniqueKey;
 exports.bootstrapVersion = bootstrapVersion;
+exports.unfold = unfold;
 exports.withSwitch = withSwitch;
+exports.observeOverload = observeOverload;
 Object.defineProperty(exports, "jsonLogic", {
   enumerable: true,
   get: function get() {
@@ -73648,6 +75703,7 @@ Object.defineProperty(exports, "moment", {
     return _momentTimezone.default;
   }
 });
+exports.firstNonNil = void 0;
 
 __webpack_require__(/*! core-js/modules/es6.reflect.construct */ "./node_modules/core-js/modules/es6.reflect.construct.js");
 
@@ -73658,6 +75714,8 @@ __webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-j
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-js/modules/es6.array.find.js");
 
 __webpack_require__(/*! core-js/modules/es6.number.constructor */ "./node_modules/core-js/modules/es6.number.constructor.js");
 
@@ -74687,6 +76745,33 @@ function bootstrapVersion() {
   return 0;
 }
 /**
+ * Retrun provided argument.
+ * If argument is a function, returns the result of a function call.
+ * @param {*} e;
+ *
+ * @return {*}
+ */
+
+
+function unfold(e) {
+  if (typeof e === 'function') {
+    return e();
+  }
+
+  return e;
+}
+/**
+ * Map values through unfold and return first non-nil value.
+ * @param {Array<T>} collection;
+ *
+ * @return {T}
+ */
+
+
+var firstNonNil = _lodash.default.flow([_lodash.default.partialRight(_lodash.default.map, unfold), _lodash.default.partialRight(_lodash.default.find, function (v) {
+  return !_lodash.default.isUndefined(v);
+})]);
+/*
  * Create enclosed state.
  * Returns functions to getting and cycling between states.
  * @param {*} a - initial state.
@@ -74694,6 +76779,8 @@ function bootstrapVersion() {
  * @return {Functions[]} -- [get, toggle];
  */
 
+
+exports.firstNonNil = firstNonNil;
 
 function withSwitch(a, b) {
   var state = a;
@@ -74710,6 +76797,36 @@ function withSwitch(a, b) {
   }
 
   return [get, toggle];
+}
+
+function observeOverload(callback) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _options$limit = options.limit,
+      limit = _options$limit === void 0 ? 50 : _options$limit,
+      _options$delay = options.delay,
+      delay = _options$delay === void 0 ? 500 : _options$delay;
+  var callCount = 0;
+  var timeoutID = 0;
+
+  var reset = function reset() {
+    return callCount = 0;
+  };
+
+  return function () {
+    if (timeoutID !== 0) {
+      clearTimeout(timeoutID);
+      timeoutID = 0;
+    }
+
+    timeoutID = setTimeout(reset, delay);
+    callCount += 1;
+
+    if (callCount >= limit) {
+      clearTimeout(timeoutID);
+      reset();
+      return callback();
+    }
+  };
 }
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
@@ -76138,7 +78255,7 @@ var PluralResolver = function () {
         if (suffix === 1) return '';
         if (typeof suffix === 'number') return '_plural_' + suffix.toString();
         return returnSuffix();
-      } else if ( /* v2 */this.options.compatibilityJSON === 'v2' && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+      } else if ( /* v2 */this.options.compatibilityJSON === 'v2') {
         return returnSuffix();
       } else if ( /* v3 - gettext index */this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
         return returnSuffix();
@@ -76798,7 +78915,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _BackendConnector_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./BackendConnector.js */ "./node_modules/i18next/dist/es/BackendConnector.js");
 /* harmony import */ var _defaults_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./defaults.js */ "./node_modules/i18next/dist/es/defaults.js");
 /* harmony import */ var _postProcessor_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./postProcessor.js */ "./node_modules/i18next/dist/es/postProcessor.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils */ "./node_modules/i18next/dist/es/utils.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -76940,7 +79057,7 @@ var I18n = function (_EventEmitter) {
       };
     });
 
-    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+    var deferred = Object(_utils_js__WEBPACK_IMPORTED_MODULE_10__["defer"])();
 
     var load = function load() {
       _this2.changeLanguage(_this2.options.lng, function (err, t) {
@@ -77006,7 +79123,7 @@ var I18n = function (_EventEmitter) {
   };
 
   I18n.prototype.reloadResources = function reloadResources(lngs, ns, callback) {
-    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+    var deferred = Object(_utils_js__WEBPACK_IMPORTED_MODULE_10__["defer"])();
     if (!lngs) lngs = this.languages;
     if (!ns) ns = this.options.ns;
     if (!callback) callback = noop;
@@ -77048,7 +79165,7 @@ var I18n = function (_EventEmitter) {
   I18n.prototype.changeLanguage = function changeLanguage(lng, callback) {
     var _this4 = this;
 
-    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+    var deferred = Object(_utils_js__WEBPACK_IMPORTED_MODULE_10__["defer"])();
 
     var done = function done(err, l) {
       _this4.translator.changeLanguage(l);
@@ -77137,7 +79254,7 @@ var I18n = function (_EventEmitter) {
   I18n.prototype.loadNamespaces = function loadNamespaces(ns, callback) {
     var _this6 = this;
 
-    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+    var deferred = Object(_utils_js__WEBPACK_IMPORTED_MODULE_10__["defer"])();
 
     if (!this.options.ns) {
       callback && callback();
@@ -77158,7 +79275,7 @@ var I18n = function (_EventEmitter) {
   };
 
   I18n.prototype.loadLanguages = function loadLanguages(lngs, callback) {
-    var deferred = Object(_utils__WEBPACK_IMPORTED_MODULE_10__["defer"])();
+    var deferred = Object(_utils_js__WEBPACK_IMPORTED_MODULE_10__["defer"])();
 
     if (typeof lngs === 'string') lngs = [lngs];
     var preloaded = this.options.preload || [];
@@ -81253,22 +83370,36 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     function createDate (y, m, d, h, M, s, ms) {
         // can't just apply() to create a date:
         // https://stackoverflow.com/q/181348
-        var date = new Date(y, m, d, h, M, s, ms);
-
+        var date;
         // the date constructor remaps years 0-99 to 1900-1999
-        if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
-            date.setFullYear(y);
+        if (y < 100 && y >= 0) {
+            // preserve leap years using a full 400 year cycle, then reset
+            date = new Date(y + 400, m, d, h, M, s, ms);
+            if (isFinite(date.getFullYear())) {
+                date.setFullYear(y);
+            }
+        } else {
+            date = new Date(y, m, d, h, M, s, ms);
         }
+
         return date;
     }
 
     function createUTCDate (y) {
-        var date = new Date(Date.UTC.apply(null, arguments));
-
+        var date;
         // the Date.UTC function remaps years 0-99 to 1900-1999
-        if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
-            date.setUTCFullYear(y);
+        if (y < 100 && y >= 0) {
+            var args = Array.prototype.slice.call(arguments);
+            // preserve leap years using a full 400 year cycle, then reset
+            args[0] = y + 400;
+            date = new Date(Date.UTC.apply(null, args));
+            if (isFinite(date.getUTCFullYear())) {
+                date.setUTCFullYear(y);
+            }
+        } else {
+            date = new Date(Date.UTC.apply(null, arguments));
         }
+
         return date;
     }
 
@@ -81479,25 +83610,28 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     }
 
     // LOCALES
+    function shiftWeekdays (ws, n) {
+        return ws.slice(n, 7).concat(ws.slice(0, n));
+    }
 
     var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
     function localeWeekdays (m, format) {
-        if (!m) {
-            return isArray(this._weekdays) ? this._weekdays :
-                this._weekdays['standalone'];
-        }
-        return isArray(this._weekdays) ? this._weekdays[m.day()] :
-            this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
+        var weekdays = isArray(this._weekdays) ? this._weekdays :
+            this._weekdays[(m && m !== true && this._weekdays.isFormat.test(format)) ? 'format' : 'standalone'];
+        return (m === true) ? shiftWeekdays(weekdays, this._week.dow)
+            : (m) ? weekdays[m.day()] : weekdays;
     }
 
     var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
     function localeWeekdaysShort (m) {
-        return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+        return (m === true) ? shiftWeekdays(this._weekdaysShort, this._week.dow)
+            : (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
     }
 
     var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
     function localeWeekdaysMin (m) {
-        return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+        return (m === true) ? shiftWeekdays(this._weekdaysMin, this._week.dow)
+            : (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
     }
 
     function handleStrictParse$1(weekdayName, format, strict) {
@@ -83192,7 +85326,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     }
 
     function positiveMomentsDifference(base, other) {
-        var res = {milliseconds: 0, months: 0};
+        var res = {};
 
         res.months = other.month() - base.month() +
             (other.year() - base.year()) * 12;
@@ -83530,62 +85664,130 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
         return this._locale;
     }
 
+    var MS_PER_SECOND = 1000;
+    var MS_PER_MINUTE = 60 * MS_PER_SECOND;
+    var MS_PER_HOUR = 60 * MS_PER_MINUTE;
+    var MS_PER_400_YEARS = (365 * 400 + 97) * 24 * MS_PER_HOUR;
+
+    // actual modulo - handles negative numbers (for dates before 1970):
+    function mod$1(dividend, divisor) {
+        return (dividend % divisor + divisor) % divisor;
+    }
+
+    function localStartOfDate(y, m, d) {
+        // the date constructor remaps years 0-99 to 1900-1999
+        if (y < 100 && y >= 0) {
+            // preserve leap years using a full 400 year cycle, then reset
+            return new Date(y + 400, m, d) - MS_PER_400_YEARS;
+        } else {
+            return new Date(y, m, d).valueOf();
+        }
+    }
+
+    function utcStartOfDate(y, m, d) {
+        // Date.UTC remaps years 0-99 to 1900-1999
+        if (y < 100 && y >= 0) {
+            // preserve leap years using a full 400 year cycle, then reset
+            return Date.UTC(y + 400, m, d) - MS_PER_400_YEARS;
+        } else {
+            return Date.UTC(y, m, d);
+        }
+    }
+
     function startOf (units) {
+        var time;
         units = normalizeUnits(units);
-        // the following switch intentionally omits break keywords
-        // to utilize falling through the cases.
+        if (units === undefined || units === 'millisecond' || !this.isValid()) {
+            return this;
+        }
+
+        var startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+
         switch (units) {
             case 'year':
-                this.month(0);
-                /* falls through */
+                time = startOfDate(this.year(), 0, 1);
+                break;
             case 'quarter':
+                time = startOfDate(this.year(), this.month() - this.month() % 3, 1);
+                break;
             case 'month':
-                this.date(1);
-                /* falls through */
+                time = startOfDate(this.year(), this.month(), 1);
+                break;
             case 'week':
+                time = startOfDate(this.year(), this.month(), this.date() - this.weekday());
+                break;
             case 'isoWeek':
+                time = startOfDate(this.year(), this.month(), this.date() - (this.isoWeekday() - 1));
+                break;
             case 'day':
             case 'date':
-                this.hours(0);
-                /* falls through */
+                time = startOfDate(this.year(), this.month(), this.date());
+                break;
             case 'hour':
-                this.minutes(0);
-                /* falls through */
+                time = this._d.valueOf();
+                time -= mod$1(time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE), MS_PER_HOUR);
+                break;
             case 'minute':
-                this.seconds(0);
-                /* falls through */
+                time = this._d.valueOf();
+                time -= mod$1(time, MS_PER_MINUTE);
+                break;
             case 'second':
-                this.milliseconds(0);
+                time = this._d.valueOf();
+                time -= mod$1(time, MS_PER_SECOND);
+                break;
         }
 
-        // weeks are a special case
-        if (units === 'week') {
-            this.weekday(0);
-        }
-        if (units === 'isoWeek') {
-            this.isoWeekday(1);
-        }
-
-        // quarters are also special
-        if (units === 'quarter') {
-            this.month(Math.floor(this.month() / 3) * 3);
-        }
-
+        this._d.setTime(time);
+        hooks.updateOffset(this, true);
         return this;
     }
 
     function endOf (units) {
+        var time;
         units = normalizeUnits(units);
-        if (units === undefined || units === 'millisecond') {
+        if (units === undefined || units === 'millisecond' || !this.isValid()) {
             return this;
         }
 
-        // 'date' is an alias for 'day', so it should be considered as such.
-        if (units === 'date') {
-            units = 'day';
+        var startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+
+        switch (units) {
+            case 'year':
+                time = startOfDate(this.year() + 1, 0, 1) - 1;
+                break;
+            case 'quarter':
+                time = startOfDate(this.year(), this.month() - this.month() % 3 + 3, 1) - 1;
+                break;
+            case 'month':
+                time = startOfDate(this.year(), this.month() + 1, 1) - 1;
+                break;
+            case 'week':
+                time = startOfDate(this.year(), this.month(), this.date() - this.weekday() + 7) - 1;
+                break;
+            case 'isoWeek':
+                time = startOfDate(this.year(), this.month(), this.date() - (this.isoWeekday() - 1) + 7) - 1;
+                break;
+            case 'day':
+            case 'date':
+                time = startOfDate(this.year(), this.month(), this.date() + 1) - 1;
+                break;
+            case 'hour':
+                time = this._d.valueOf();
+                time += MS_PER_HOUR - mod$1(time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE), MS_PER_HOUR) - 1;
+                break;
+            case 'minute':
+                time = this._d.valueOf();
+                time += MS_PER_MINUTE - mod$1(time, MS_PER_MINUTE) - 1;
+                break;
+            case 'second':
+                time = this._d.valueOf();
+                time += MS_PER_SECOND - mod$1(time, MS_PER_SECOND) - 1;
+                break;
         }
 
-        return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
+        this._d.setTime(time);
+        hooks.updateOffset(this, true);
+        return this;
     }
 
     function valueOf () {
@@ -84291,10 +86493,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
         units = normalizeUnits(units);
 
-        if (units === 'month' || units === 'year') {
-            days   = this._days   + milliseconds / 864e5;
+        if (units === 'month' || units === 'quarter' || units === 'year') {
+            days = this._days + milliseconds / 864e5;
             months = this._months + daysToMonths(days);
-            return units === 'month' ? months : months / 12;
+            switch (units) {
+                case 'month':   return months;
+                case 'quarter': return months / 3;
+                case 'year':    return months / 12;
+            }
         } else {
             // handle milliseconds separately because of floating point math errors (issue #1867)
             days = this._days + Math.round(monthsToDays(this._months));
@@ -84337,6 +86543,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     var asDays         = makeAs('d');
     var asWeeks        = makeAs('w');
     var asMonths       = makeAs('M');
+    var asQuarters     = makeAs('Q');
     var asYears        = makeAs('y');
 
     function clone$1 () {
@@ -84528,6 +86735,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     proto$2.asDays         = asDays;
     proto$2.asWeeks        = asWeeks;
     proto$2.asMonths       = asMonths;
+    proto$2.asQuarters     = asQuarters;
     proto$2.asYears        = asYears;
     proto$2.valueOf        = valueOf$1;
     proto$2._bubble        = bubble;
@@ -84572,7 +86780,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
     // Side effect imports
 
 
-    hooks.version = '2.23.0';
+    hooks.version = '2.24.0';
 
     setHookCallback(createLocal);
 
@@ -85022,7 +87230,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.6
+ * @version 1.14.7
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -85590,7 +87798,11 @@ function isFixed(element) {
   if (getStyleComputedProperty(element, 'position') === 'fixed') {
     return true;
   }
-  return isFixed(getParentNode(element));
+  var parentNode = getParentNode(element);
+  if (!parentNode) {
+    return false;
+  }
+  return isFixed(parentNode);
 }
 
 /**
@@ -86246,18 +88458,23 @@ function getRoundedOffsets(data, shouldRound) {
   var _data$offsets = data.offsets,
       popper = _data$offsets.popper,
       reference = _data$offsets.reference;
+  var round = Math.round,
+      floor = Math.floor;
 
-
-  var isVertical = ['left', 'right'].indexOf(data.placement) !== -1;
-  var isVariation = data.placement.indexOf('-') !== -1;
-  var sameWidthOddness = reference.width % 2 === popper.width % 2;
-  var bothOddWidth = reference.width % 2 === 1 && popper.width % 2 === 1;
   var noRound = function noRound(v) {
     return v;
   };
 
-  var horizontalToInteger = !shouldRound ? noRound : isVertical || isVariation || sameWidthOddness ? Math.round : Math.floor;
-  var verticalToInteger = !shouldRound ? noRound : Math.round;
+  var referenceWidth = round(reference.width);
+  var popperWidth = round(popper.width);
+
+  var isVertical = ['left', 'right'].indexOf(data.placement) !== -1;
+  var isVariation = data.placement.indexOf('-') !== -1;
+  var sameWidthParity = referenceWidth % 2 === popperWidth % 2;
+  var bothOddWidth = referenceWidth % 2 === 1 && popperWidth % 2 === 1;
+
+  var horizontalToInteger = !shouldRound ? noRound : isVertical || isVariation || sameWidthParity ? round : floor;
+  var verticalToInteger = !shouldRound ? noRound : round;
 
   return {
     left: horizontalToInteger(bothOddWidth && !isVariation && shouldRound ? popper.left - 1 : popper.left),

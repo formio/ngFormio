@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.10.4
+### Changed
+ - Upgraded core renderer to 3.13.1
+
 ## 3.10.3
 ### Fixed
  - A build issue where the final dist build was getting ran through babel twice.
