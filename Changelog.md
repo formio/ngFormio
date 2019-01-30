@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.1.2
+### Fixed
+ - FOR-1869: Problem with the project showing permissions error on project page
+
+## 6.1.1
+### Changed
+ - Added Basic plan downgrade back as an available option.
+ - The label of the Basic plan to "Downgrade".
+ - The minimum project plan to be Enterprise to upgrade to deployed servers.
+ - Moved the Trial button to the top of the plans when applicable.
+ - Changed reCAPTCHA to "Google reCAPTCHA"
+
 ## 6.1.0
 ### Added
  - Azure Blob Storage
