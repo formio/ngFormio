@@ -1,4 +1,4 @@
-/*! ng-formio v2.37.2 | https://unpkg.com/ng-formio@2.37.2/LICENSE.txt */
+/*! ng-formio v2.37.3 | https://unpkg.com/ng-formio@2.37.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -1500,7 +1500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"angular":10,"moment":366}],4:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.7.6
+ * @license AngularJS v1.7.5
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -2212,7 +2212,7 @@ function sanitizeText(chars) {
 // define ngSanitize module and register $sanitize service
 angular.module('ngSanitize', [])
   .provider('$sanitize', $SanitizeProvider)
-  .info({ angularVersion: '1.7.6' });
+  .info({ angularVersion: '1.7.5' });
 
 /**
  * @ngdoc filter
@@ -10558,7 +10558,7 @@ module.exports = 'ui.bootstrap';
 
 },{"./dist/ui-bootstrap-tpls":7}],9:[function(_dereq_,module,exports){
 /**
- * @license AngularJS v1.7.6
+ * @license AngularJS v1.7.5
  * (c) 2010-2018 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10658,7 +10658,7 @@ function isValidObjectMaxDepth(maxDepth) {
 function minErr(module, ErrorConstructor) {
   ErrorConstructor = ErrorConstructor || Error;
 
-  var url = 'https://errors.angularjs.org/1.7.6/';
+  var url = 'https://errors.angularjs.org/1.7.5/';
   var regex = url.replace('.', '\\.') + '[\\s\\S]*';
   var errRegExp = new RegExp(regex, 'g');
 
@@ -12394,8 +12394,13 @@ function angularInit(element, bootstrap) {
   });
   if (appElement) {
     if (!isAutoBootstrapAllowed) {
-      window.console.error('AngularJS: disabling automatic bootstrap. <script> protocol indicates ' +
+      try {
+        window.console.error('AngularJS: disabling automatic bootstrap. <script> protocol indicates ' +
           'an extension, document.location.href does not match.');
+      } catch (e) {
+        // Support: Safari 11 w/ Webdriver
+        // The console.error will throw and make the test fail
+      }
       return;
     }
     config.strictDi = getNgAttribute(appElement, 'strict-di') !== null;
@@ -13229,7 +13234,7 @@ function toDebugString(obj, maxDepth) {
 
   htmlAnchorDirective,
   inputDirective,
-  hiddenInputBrowserCacheDirective,
+  inputDirective,
   formDirective,
   scriptDirective,
   selectDirective,
@@ -13341,11 +13346,11 @@ function toDebugString(obj, maxDepth) {
 var version = {
   // These placeholder strings will be replaced by grunt's `build` task.
   // They need to be double- or single-quoted.
-  full: '1.7.6',
+  full: '1.7.5',
   major: 1,
   minor: 7,
-  dot: 6,
-  codeName: 'gravity-manipulation'
+  dot: 5,
+  codeName: 'anti-prettification'
 };
 
 
@@ -13443,8 +13448,7 @@ function publishExternalAPI(angular) {
             ngModelOptions: ngModelOptionsDirective
         }).
         directive({
-          ngInclude: ngIncludeFillContentDirective,
-          input: hiddenInputBrowserCacheDirective
+          ngInclude: ngIncludeFillContentDirective
         }).
         directive(ngAttributeAliasDirectives).
         directive(ngEventDirectives);
@@ -13495,7 +13499,7 @@ function publishExternalAPI(angular) {
       });
     }
   ])
-  .info({ angularVersion: '1.7.6' });
+  .info({ angularVersion: '1.7.5' });
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -17146,9 +17150,6 @@ function Browser(window, document, $log, $sniffer, $$taskTrackerFactory) {
     if (url) {
       var sameState = lastHistoryState === state;
 
-      // Normalize the inputted URL
-      url = urlResolve(url).href;
-
       // Don't change anything if previous and current URLs and states match. This also prevents
       // IE<10 from getting into redirect loop when in LocationHashbangInHtml5Url mode.
       // See https://github.com/angular/angular.js/commit/ffb2701
@@ -20022,16 +20023,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             this.$$element.removeAttr(attrName);
           } else {
             if (SIMPLE_ATTR_NAME.test(attrName)) {
-              // jQuery skips special boolean attrs treatment in XML nodes for
-              // historical reasons and hence AngularJS cannot freely call
-              // `.attr(attrName, false) with such attributes. To avoid issues
-              // in XHTML, call `removeAttr` in such cases instead.
-              // See https://github.com/jquery/jquery/issues/4249
-              if (booleanKey && value === false) {
-                this.$$element.removeAttr(attrName);
-              } else {
-                this.$$element.attr(attrName, value);
-              }
+              this.$$element.attr(attrName, value);
             } else {
               setSpecialAttr(this.$$element[0], attrName, value);
             }
@@ -21628,7 +21620,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
             pre: function ngPropPreLinkFn(scope, $element) {
               function applyPropValue() {
                 var propValue = ngPropGetter(scope);
-                $element[0][propName] = sanitizer(propValue);
+                $element.prop(propName, sanitizer(propValue));
               }
 
               applyPropValue();
@@ -24417,7 +24409,7 @@ function $InterpolateProvider() {
 
       // Provide a quick exit and simplified result function for text with no interpolation
       if (!text.length || text.indexOf(startSymbol) === -1) {
-        if (mustHaveExpression) return;
+        if (mustHaveExpression && !contextAllowsConcatenation) return;
 
         var unescapedText = unescapeText(text);
         if (contextAllowsConcatenation) {
@@ -28805,13 +28797,7 @@ function markQStateExceptionHandled(state) {
   state.pur = true;
 }
 function markQExceptionHandled(q) {
-  // Built-in `$q` promises will always have a `$$state` property. This check is to allow
-  // overwriting `$q` with a different promise library (e.g. Bluebird + angular-bluebird-promises).
-  // (Currently, this is the only method that might be called with a promise, even if it is not
-  // created by the built-in `$q`.)
-  if (q.$$state) {
-    markQStateExceptionHandled(q.$$state);
-  }
+  markQStateExceptionHandled(q.$$state);
 }
 
 /** @this */
@@ -32192,12 +32178,6 @@ var urlParsingNode = window.document.createElement('a');
 var originUrl = urlResolve(window.location.href);
 var baseUrlParsingNode;
 
-urlParsingNode.href = 'http://[::1]';
-
-// Support: IE 9-11 only, Edge 16-17 only (fixed in 18 Preview)
-// IE/Edge don't wrap IPv6 addresses' hostnames in square brackets
-// when parsed out of an anchor element.
-var ipv6InBrackets = urlParsingNode.hostname === '[::1]';
 
 /**
  *
@@ -32260,19 +32240,13 @@ function urlResolve(url) {
 
   urlParsingNode.setAttribute('href', href);
 
-  var hostname = urlParsingNode.hostname;
-
-  if (!ipv6InBrackets && hostname.indexOf(':') > -1) {
-    hostname = '[' + hostname + ']';
-  }
-
   return {
     href: urlParsingNode.href,
     protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
     host: urlParsingNode.host,
     search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
     hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-    hostname: hostname,
+    hostname: urlParsingNode.hostname,
     port: urlParsingNode.port,
     pathname: (urlParsingNode.pathname.charAt(0) === '/')
       ? urlParsingNode.pathname
@@ -34944,7 +34918,7 @@ forEach(ALIASED_ATTR, function(htmlAttr, ngAttr) {
 // ng-src, ng-srcset, ng-href are interpolated
 forEach(['src', 'srcset', 'href'], function(attrName) {
   var normalized = directiveNormalize('ng-' + attrName);
-  ngAttributeAliasDirectives[normalized] = ['$sce', function($sce) {
+  ngAttributeAliasDirectives[normalized] = function() {
     return {
       priority: 99, // it needs to run after the attributes are interpolated
       link: function(scope, element, attr) {
@@ -34957,10 +34931,6 @@ forEach(['src', 'srcset', 'href'], function(attrName) {
           attr.$attr[name] = 'xlink:href';
           propName = null;
         }
-
-        // We need to sanitize the url at least once, in case it is a constant
-        // non-interpolated attribute.
-        attr.$set(normalized, $sce.getTrustedMediaUrl(attr[normalized]));
 
         attr.$observe(normalized, function(value) {
           if (!value) {
@@ -34981,7 +34951,7 @@ forEach(['src', 'srcset', 'href'], function(attrName) {
         });
       }
     };
-  }];
+  };
 });
 
 /* global -nullFormCtrl, -PENDING_CLASS, -SUBMITTED_CLASS
@@ -37207,7 +37177,7 @@ function createDateParser(regexp, mapping) {
 }
 
 function createDateInputType(type, regexp, parseDate, format) {
-  return function dynamicDateInputType(scope, element, attr, ctrl, $sniffer, $browser, $filter, $parse) {
+  return function dynamicDateInputType(scope, element, attr, ctrl, $sniffer, $browser, $filter) {
     badInputChecker(scope, element, attr, ctrl, type);
     baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
 
@@ -37250,34 +37220,24 @@ function createDateInputType(type, regexp, parseDate, format) {
     });
 
     if (isDefined(attr.min) || attr.ngMin) {
-      var minVal = attr.min || $parse(attr.ngMin)(scope);
-      var parsedMinVal = parseObservedDateValue(minVal);
-
+      var minVal;
       ctrl.$validators.min = function(value) {
-        return !isValidDate(value) || isUndefined(parsedMinVal) || parseDate(value) >= parsedMinVal;
+        return !isValidDate(value) || isUndefined(minVal) || parseDate(value) >= minVal;
       };
       attr.$observe('min', function(val) {
-        if (val !== minVal) {
-          parsedMinVal = parseObservedDateValue(val);
-          minVal = val;
-          ctrl.$validate();
-        }
+        minVal = parseObservedDateValue(val);
+        ctrl.$validate();
       });
     }
 
     if (isDefined(attr.max) || attr.ngMax) {
-      var maxVal = attr.max || $parse(attr.ngMax)(scope);
-      var parsedMaxVal = parseObservedDateValue(maxVal);
-
+      var maxVal;
       ctrl.$validators.max = function(value) {
-        return !isValidDate(value) || isUndefined(parsedMaxVal) || parseDate(value) <= parsedMaxVal;
+        return !isValidDate(value) || isUndefined(maxVal) || parseDate(value) <= maxVal;
       };
       attr.$observe('max', function(val) {
-        if (val !== maxVal) {
-          parsedMaxVal = parseObservedDateValue(val);
-          maxVal = val;
-          ctrl.$validate();
-        }
+        maxVal = parseObservedDateValue(val);
+        ctrl.$validate();
       });
     }
 
@@ -37429,68 +37389,50 @@ function isValidForStep(viewValue, stepBase, step) {
   return (value - stepBase) % step === 0;
 }
 
-function numberInputType(scope, element, attr, ctrl, $sniffer, $browser, $filter, $parse) {
+function numberInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   badInputChecker(scope, element, attr, ctrl, 'number');
   numberFormatterParser(ctrl);
   baseInputType(scope, element, attr, ctrl, $sniffer, $browser);
 
-  var parsedMinVal;
+  var minVal;
+  var maxVal;
 
   if (isDefined(attr.min) || attr.ngMin) {
-    var minVal = attr.min || $parse(attr.ngMin)(scope);
-    parsedMinVal = parseNumberAttrVal(minVal);
-
     ctrl.$validators.min = function(modelValue, viewValue) {
-      return ctrl.$isEmpty(viewValue) || isUndefined(parsedMinVal) || viewValue >= parsedMinVal;
+      return ctrl.$isEmpty(viewValue) || isUndefined(minVal) || viewValue >= minVal;
     };
 
     attr.$observe('min', function(val) {
-      if (val !== minVal) {
-        parsedMinVal = parseNumberAttrVal(val);
-        minVal = val;
-        // TODO(matsko): implement validateLater to reduce number of validations
-        ctrl.$validate();
-      }
+      minVal = parseNumberAttrVal(val);
+      // TODO(matsko): implement validateLater to reduce number of validations
+      ctrl.$validate();
     });
   }
 
   if (isDefined(attr.max) || attr.ngMax) {
-    var maxVal = attr.max || $parse(attr.ngMax)(scope);
-    var parsedMaxVal = parseNumberAttrVal(maxVal);
-
     ctrl.$validators.max = function(modelValue, viewValue) {
-      return ctrl.$isEmpty(viewValue) || isUndefined(parsedMaxVal) || viewValue <= parsedMaxVal;
+      return ctrl.$isEmpty(viewValue) || isUndefined(maxVal) || viewValue <= maxVal;
     };
 
     attr.$observe('max', function(val) {
-      if (val !== maxVal) {
-        parsedMaxVal = parseNumberAttrVal(val);
-        maxVal = val;
-        // TODO(matsko): implement validateLater to reduce number of validations
-        ctrl.$validate();
-      }
+      maxVal = parseNumberAttrVal(val);
+      // TODO(matsko): implement validateLater to reduce number of validations
+      ctrl.$validate();
     });
   }
 
   if (isDefined(attr.step) || attr.ngStep) {
-    var stepVal = attr.step || $parse(attr.ngStep)(scope);
-    var parsedStepVal = parseNumberAttrVal(stepVal);
-
+    var stepVal;
     ctrl.$validators.step = function(modelValue, viewValue) {
-      return ctrl.$isEmpty(viewValue) || isUndefined(parsedStepVal) ||
-        isValidForStep(viewValue, parsedMinVal || 0, parsedStepVal);
+      return ctrl.$isEmpty(viewValue) || isUndefined(stepVal) ||
+             isValidForStep(viewValue, minVal || 0, stepVal);
     };
 
     attr.$observe('step', function(val) {
+      stepVal = parseNumberAttrVal(val);
       // TODO(matsko): implement validateLater to reduce number of validations
-      if (val !== stepVal) {
-        parsedStepVal = parseNumberAttrVal(val);
-        stepVal = val;
-        ctrl.$validate();
-      }
-
+      ctrl.$validate();
     });
-
   }
 }
 
@@ -37520,8 +37462,6 @@ function rangeInputType(scope, element, attr, ctrl, $sniffer, $browser) {
     originalRender;
 
   if (hasMinAttr) {
-    minVal = parseNumberAttrVal(attr.min);
-
     ctrl.$validators.min = supportsRange ?
       // Since all browsers set the input to a valid value, we don't need to check validity
       function noopMinValidator() { return true; } :
@@ -37534,8 +37474,6 @@ function rangeInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   }
 
   if (hasMaxAttr) {
-    maxVal = parseNumberAttrVal(attr.max);
-
     ctrl.$validators.max = supportsRange ?
       // Since all browsers set the input to a valid value, we don't need to check validity
       function noopMaxValidator() { return true; } :
@@ -37548,8 +37486,6 @@ function rangeInputType(scope, element, attr, ctrl, $sniffer, $browser) {
   }
 
   if (hasStepAttr) {
-    stepVal = parseNumberAttrVal(attr.step);
-
     ctrl.$validators.step = supportsRange ?
       function nativeStepValidator() {
         // Currently, only FF implements the spec on step change correctly (i.e. adjusting the
@@ -37571,13 +37507,7 @@ function rangeInputType(scope, element, attr, ctrl, $sniffer, $browser) {
     // attribute value when the input is first rendered, so that the browser can adjust the
     // input value based on the min/max value
     element.attr(htmlAttrName, attr[htmlAttrName]);
-    var oldVal = attr[htmlAttrName];
-    attr.$observe(htmlAttrName, function wrappedObserver(val) {
-      if (val !== oldVal) {
-        oldVal = val;
-        changeFn(val);
-      }
-    });
+    attr.$observe(htmlAttrName, changeFn);
   }
 
   function minChange(val) {
@@ -37631,11 +37561,11 @@ function rangeInputType(scope, element, attr, ctrl, $sniffer, $browser) {
     }
 
     // Some browsers don't adjust the input value correctly, but set the stepMismatch error
-    if (!supportsRange) {
+    if (supportsRange && ctrl.$viewValue !== element.val()) {
+      ctrl.$setViewValue(element.val());
+    } else {
       // TODO(matsko): implement validateLater to reduce number of validations
       ctrl.$validate();
-    } else if (ctrl.$viewValue !== element.val()) {
-      ctrl.$setViewValue(element.val());
     }
   }
 }
@@ -37941,48 +37871,6 @@ var inputDirective = ['$browser', '$sniffer', '$filter', '$parse',
     }
   };
 }];
-
-
-var hiddenInputBrowserCacheDirective = function() {
-  var valueProperty = {
-    configurable: true,
-    enumerable: false,
-    get: function() {
-      return this.getAttribute('value') || '';
-    },
-    set: function(val) {
-      this.setAttribute('value', val);
-    }
-  };
-
-  return {
-    restrict: 'E',
-    priority: 200,
-    compile: function(_, attr) {
-      if (lowercase(attr.type) !== 'hidden') {
-        return;
-      }
-
-      return {
-        pre: function(scope, element, attr, ctrls) {
-          var node = element[0];
-
-          // Support: Edge
-          // Moving the DOM around prevents autofillling
-          if (node.parentNode) {
-            node.parentNode.insertBefore(node, node.nextSibling);
-          }
-
-          // Support: FF, IE
-          // Avoiding direct assignment to .value prevents autofillling
-          if (Object.defineProperty) {
-            Object.defineProperty(node, 'value', valueProperty);
-          }
-        }
-      };
-    }
-  };
-};
 
 
 
@@ -41125,7 +41013,6 @@ NgModelController.prototype = {
    * `$modelValue`, i.e. either the last parsed value or the last value set from the scope.
    */
   $validate: function() {
-
     // ignore $validate before model is initialized
     if (isNumberNaN(this.$modelValue)) {
       return;
@@ -44260,13 +44147,6 @@ var ngRepeatDirective = ['$parse', '$animate', '$compile', function($parse, $ani
     return block.clone[block.clone.length - 1];
   };
 
-  var trackByIdArrayFn = function($scope, key, value) {
-    return hashKey(value);
-  };
-
-  var trackByIdObjFn = function($scope, key) {
-    return key;
-  };
 
   return {
     restrict: 'A',
@@ -44306,22 +44186,31 @@ var ngRepeatDirective = ['$parse', '$animate', '$compile', function($parse, $ani
           aliasAs);
       }
 
-      var trackByIdExpFn;
+      var trackByExpGetter, trackByIdExpFn, trackByIdArrayFn, trackByIdObjFn;
+      var hashFnLocals = {$id: hashKey};
 
       if (trackByExp) {
-        var hashFnLocals = {$id: hashKey};
-        var trackByExpGetter = $parse(trackByExp);
-
-        trackByIdExpFn = function($scope, key, value, index) {
-          // assign key, value, and $index to the locals so that they can be used in hash functions
-          if (keyIdentifier) hashFnLocals[keyIdentifier] = key;
-          hashFnLocals[valueIdentifier] = value;
-          hashFnLocals.$index = index;
-          return trackByExpGetter($scope, hashFnLocals);
+        trackByExpGetter = $parse(trackByExp);
+      } else {
+        trackByIdArrayFn = function(key, value) {
+          return hashKey(value);
+        };
+        trackByIdObjFn = function(key) {
+          return key;
         };
       }
 
       return function ngRepeatLink($scope, $element, $attr, ctrl, $transclude) {
+
+        if (trackByExpGetter) {
+          trackByIdExpFn = function(key, value, index) {
+            // assign key, value, and $index to the locals so that they can be used in hash functions
+            if (keyIdentifier) hashFnLocals[keyIdentifier] = key;
+            hashFnLocals[valueIdentifier] = value;
+            hashFnLocals.$index = index;
+            return trackByExpGetter($scope, hashFnLocals);
+          };
+        }
 
         // Store a list of elements from previous run. This is a hash where key is the item from the
         // iterator, and the value is objects with following properties.
@@ -44376,7 +44265,7 @@ var ngRepeatDirective = ['$parse', '$animate', '$compile', function($parse, $ani
           for (index = 0; index < collectionLength; index++) {
             key = (collection === collectionKeys) ? index : collectionKeys[index];
             value = collection[key];
-            trackById = trackByIdFn($scope, key, value, index);
+            trackById = trackByIdFn(key, value, index);
             if (lastBlockMap[trackById]) {
               // found previously seen block
               block = lastBlockMap[trackById];
@@ -44396,12 +44285,6 @@ var ngRepeatDirective = ['$parse', '$animate', '$compile', function($parse, $ani
               nextBlockOrder[index] = {id: trackById, scope: undefined, clone: undefined};
               nextBlockMap[trackById] = true;
             }
-          }
-
-          // Clear the value property from the hashFnLocals object to prevent a reference to the last value
-          // being leaked into the ngRepeatCompile function scope
-          if (hashFnLocals) {
-            hashFnLocals[valueIdentifier] = undefined;
           }
 
           // remove leftover items
@@ -44959,14 +44842,7 @@ var ngHideDirective = ['$animate', function($animate) {
 var ngStyleDirective = ngDirective(function(scope, element, attr) {
   scope.$watchCollection(attr.ngStyle, function ngStyleWatchAction(newStyles, oldStyles) {
     if (oldStyles && (newStyles !== oldStyles)) {
-      if (!newStyles) {
-        newStyles = {};
-      }
-      forEach(oldStyles, function(val, style) {
-        if (newStyles[style] == null) {
-          newStyles[style] = '';
-        }
-      });
+      forEach(oldStyles, function(val, style) { element.css(style, '');});
     }
     if (newStyles) element.css(newStyles);
   });
@@ -46428,29 +46304,24 @@ var optionDirective = ['$interpolate', function($interpolate) {
  *   </file>
  * </example>
  */
-var requiredDirective = ['$parse', function($parse) {
+var requiredDirective = function() {
   return {
     restrict: 'A',
     require: '?ngModel',
     link: function(scope, elm, attr, ctrl) {
       if (!ctrl) return;
-      var oldVal = attr.required || $parse(attr.ngRequired)(scope);
-
       attr.required = true; // force truthy in case we are on non input element
 
       ctrl.$validators.required = function(modelValue, viewValue) {
         return !attr.required || !ctrl.$isEmpty(viewValue);
       };
 
-      attr.$observe('required', function(val) {
-        if (oldVal !== val) {
-          oldVal = val;
-          ctrl.$validate();
-        }
+      attr.$observe('required', function() {
+        ctrl.$validate();
       });
     }
   };
-}];
+};
 
 /**
  * @ngdoc directive
@@ -46533,59 +46404,36 @@ var requiredDirective = ['$parse', function($parse) {
  *   </file>
  * </example>
  */
-var patternDirective = ['$parse', function($parse) {
+var patternDirective = function() {
   return {
     restrict: 'A',
     require: '?ngModel',
-    compile: function(tElm, tAttr) {
-      var patternExp;
-      var parseFn;
+    link: function(scope, elm, attr, ctrl) {
+      if (!ctrl) return;
 
-      if (tAttr.ngPattern) {
-        patternExp = tAttr.ngPattern;
-
-        // ngPattern might be a scope expression, or an inlined regex, which is not parsable.
-        // We get value of the attribute here, so we can compare the old and the new value
-        // in the observer to avoid unnecessary validations
-        if (tAttr.ngPattern.charAt(0) === '/' && REGEX_STRING_REGEXP.test(tAttr.ngPattern)) {
-          parseFn = function() { return tAttr.ngPattern; };
-        } else {
-          parseFn = $parse(tAttr.ngPattern);
-        }
-      }
-
-      return function(scope, elm, attr, ctrl) {
-        if (!ctrl) return;
-
-        var attrVal = attr.pattern;
-
-        if (attr.ngPattern) {
-          attrVal = parseFn(scope);
-        } else {
-          patternExp = attr.pattern;
+      var regexp, patternExp = attr.ngPattern || attr.pattern;
+      attr.$observe('pattern', function(regex) {
+        if (isString(regex) && regex.length > 0) {
+          regex = new RegExp('^' + regex + '$');
         }
 
-        var regexp = parsePatternAttr(attrVal, patternExp, elm);
+        if (regex && !regex.test) {
+          throw minErr('ngPattern')('noregexp',
+            'Expected {0} to be a RegExp but was {1}. Element: {2}', patternExp,
+            regex, startingTag(elm));
+        }
 
-        attr.$observe('pattern', function(newVal) {
-          var oldRegexp = regexp;
+        regexp = regex || undefined;
+        ctrl.$validate();
+      });
 
-          regexp = parsePatternAttr(newVal, patternExp, elm);
-
-          if ((oldRegexp && oldRegexp.toString()) !== (regexp && regexp.toString())) {
-            ctrl.$validate();
-          }
-        });
-
-        ctrl.$validators.pattern = function(modelValue, viewValue) {
-          // HTML5 pattern constraint validates the input value, so we validate the viewValue
-          return ctrl.$isEmpty(viewValue) || isUndefined(regexp) || regexp.test(viewValue);
-        };
+      ctrl.$validators.pattern = function(modelValue, viewValue) {
+        // HTML5 pattern constraint validates the input value, so we validate the viewValue
+        return ctrl.$isEmpty(viewValue) || isUndefined(regexp) || regexp.test(viewValue);
       };
     }
-
   };
-}];
+};
 
 /**
  * @ngdoc directive
@@ -46658,29 +46506,25 @@ var patternDirective = ['$parse', function($parse) {
  *   </file>
  * </example>
  */
-var maxlengthDirective = ['$parse', function($parse) {
+var maxlengthDirective = function() {
   return {
     restrict: 'A',
     require: '?ngModel',
     link: function(scope, elm, attr, ctrl) {
       if (!ctrl) return;
 
-      var maxlength = attr.maxlength || $parse(attr.ngMaxlength)(scope);
-      var maxlengthParsed = parseLength(maxlength);
-
+      var maxlength = -1;
       attr.$observe('maxlength', function(value) {
-        if (maxlength !== value) {
-          maxlengthParsed = parseLength(value);
-          maxlength = value;
-          ctrl.$validate();
-        }
+        var intVal = toInt(value);
+        maxlength = isNumberNaN(intVal) ? -1 : intVal;
+        ctrl.$validate();
       });
       ctrl.$validators.maxlength = function(modelValue, viewValue) {
-        return (maxlengthParsed < 0) || ctrl.$isEmpty(viewValue) || (viewValue.length <= maxlengthParsed);
+        return (maxlength < 0) || ctrl.$isEmpty(viewValue) || (viewValue.length <= maxlength);
       };
     }
   };
-}];
+};
 
 /**
  * @ngdoc directive
@@ -46751,52 +46595,24 @@ var maxlengthDirective = ['$parse', function($parse) {
  *   </file>
  * </example>
  */
-var minlengthDirective = ['$parse', function($parse) {
+var minlengthDirective = function() {
   return {
     restrict: 'A',
     require: '?ngModel',
     link: function(scope, elm, attr, ctrl) {
       if (!ctrl) return;
 
-      var minlength = attr.minlength || $parse(attr.ngMinlength)(scope);
-      var minlengthParsed = parseLength(minlength) || -1;
-
+      var minlength = 0;
       attr.$observe('minlength', function(value) {
-        if (minlength !== value) {
-          minlengthParsed = parseLength(value) || -1;
-          minlength = value;
-          ctrl.$validate();
-        }
-
+        minlength = toInt(value) || 0;
+        ctrl.$validate();
       });
       ctrl.$validators.minlength = function(modelValue, viewValue) {
-        return ctrl.$isEmpty(viewValue) || viewValue.length >= minlengthParsed;
+        return ctrl.$isEmpty(viewValue) || viewValue.length >= minlength;
       };
     }
   };
-}];
-
-
-function parsePatternAttr(regex, patternExp, elm) {
-  if (!regex) return undefined;
-
-  if (isString(regex)) {
-    regex = new RegExp('^' + regex + '$');
-  }
-
-  if (!regex.test) {
-    throw minErr('ngPattern')('noregexp',
-      'Expected {0} to be a RegExp but was {1}. Element: {2}', patternExp,
-      regex, startingTag(elm));
-  }
-
-  return regex;
-}
-
-function parseLength(val) {
-  var intVal = toInt(val);
-  return isNumberNaN(intVal) ? -1 : intVal;
-}
+};
 
 if (window.angular.bootstrap) {
   // AngularJS is already loaded, so we can return here...
@@ -56929,13 +56745,15 @@ _jsonLogicJs.default.add_operation('relativeMaxDate', function (relativeMaxDate)
  */
 function evaluate(func, args, ret, tokenize) {
   var returnVal = null;
-  var component = args.component ? args.component : {
+  args.component = args.component ? _lodash.default.cloneDeep(args.component) : {
     key: 'unknown'
   };
 
   if (!args.form && args.instance) {
     args.form = _lodash.default.get(args.instance, 'root._form', {});
   }
+
+  args.form = _lodash.default.cloneDeep(args.form);
 
   if (typeof func === 'string') {
     if (ret) {
@@ -56962,7 +56780,7 @@ function evaluate(func, args, ret, tokenize) {
       func = _construct(Function, _toConsumableArray(params).concat([func]));
       args = _lodash.default.values(args);
     } catch (err) {
-      console.warn("An error occured within the custom function for ".concat(component.key), err);
+      console.warn("An error occured within the custom function for ".concat(args.component.key), err);
       returnVal = null;
       func = false;
     }
@@ -56973,17 +56791,17 @@ function evaluate(func, args, ret, tokenize) {
       returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
     } catch (err) {
       returnVal = null;
-      console.warn("An error occured within custom function for ".concat(component.key), err);
+      console.warn("An error occured within custom function for ".concat(args.component.key), err);
     }
   } else if (_typeof(func) === 'object') {
     try {
       returnVal = _jsonLogicJs.default.apply(func, args);
     } catch (err) {
       returnVal = null;
-      console.warn("An error occured within custom function for ".concat(component.key), err);
+      console.warn("An error occured within custom function for ".concat(args.component.key), err);
     }
   } else if (func) {
-    console.warn("Unknown function type for ".concat(component.key));
+    console.warn("Unknown function type for ".concat(args.component.key));
   }
 
   return returnVal;

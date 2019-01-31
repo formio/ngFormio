@@ -1,4 +1,4 @@
-/*! ng-formio v2.37.2 | https://unpkg.com/ng-formio@2.37.2/LICENSE.txt */
+/*! ng-formio v2.37.3 | https://unpkg.com/ng-formio@2.37.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -6773,13 +6773,15 @@ _jsonLogicJs.default.add_operation('relativeMaxDate', function (relativeMaxDate)
  */
 function evaluate(func, args, ret, tokenize) {
   var returnVal = null;
-  var component = args.component ? args.component : {
+  args.component = args.component ? _lodash.default.cloneDeep(args.component) : {
     key: 'unknown'
   };
 
   if (!args.form && args.instance) {
     args.form = _lodash.default.get(args.instance, 'root._form', {});
   }
+
+  args.form = _lodash.default.cloneDeep(args.form);
 
   if (typeof func === 'string') {
     if (ret) {
@@ -6806,7 +6808,7 @@ function evaluate(func, args, ret, tokenize) {
       func = _construct(Function, _toConsumableArray(params).concat([func]));
       args = _lodash.default.values(args);
     } catch (err) {
-      console.warn("An error occured within the custom function for ".concat(component.key), err);
+      console.warn("An error occured within the custom function for ".concat(args.component.key), err);
       returnVal = null;
       func = false;
     }
@@ -6817,17 +6819,17 @@ function evaluate(func, args, ret, tokenize) {
       returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
     } catch (err) {
       returnVal = null;
-      console.warn("An error occured within custom function for ".concat(component.key), err);
+      console.warn("An error occured within custom function for ".concat(args.component.key), err);
     }
   } else if (_typeof(func) === 'object') {
     try {
       returnVal = _jsonLogicJs.default.apply(func, args);
     } catch (err) {
       returnVal = null;
-      console.warn("An error occured within custom function for ".concat(component.key), err);
+      console.warn("An error occured within custom function for ".concat(args.component.key), err);
     }
   } else if (func) {
-    console.warn("Unknown function type for ".concat(component.key));
+    console.warn("Unknown function type for ".concat(args.component.key));
   }
 
   return returnVal;
