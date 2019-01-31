@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.37.3
+### Fixed
+ - Pin angular version to 1.7.5 to get around ng-required issue that is affecting the renderer.
+   https://github.com/angular/angular.js/issues/16814
+
 ## 2.37.2
 ### Changed
  - Upgraded dependencies.
