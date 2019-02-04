@@ -4,6 +4,34 @@ var serverHost, apiProtocol;
 var pathType = 'Subdomains';
 var onPremise = false;
 
+// Parse query string
+const query = {};
+const hashes = location.hash.substr(1).replace(/\?/g, '&').split("&");
+let hashpath = '';
+
+// Look in the location.
+location.search.substr(1).split("&").forEach(function(item) {
+  query[item.split("=")[0]] = item.split("=")[1] && decodeURIComponent(item.split("=")[1]);
+});
+
+// Also look in hashes.
+hashes.forEach(function (item) {
+  parts = item.split('=');
+  if (parts.length > 1) {
+    query[parts[0]] = parts[1] && decodeURIComponent(parts[1]);
+  }
+  else if (item.indexOf('/') === 0) {
+    hashpath = `/#${item}`;
+  }
+});
+
+if (query['x-jwt-token']) {
+  localStorage.setItem('formioToken', query['x-jwt-token']);
+  localStorage.removeItem('formioAppUser');
+  localStorage.removeItem('formioUser');
+  window.history.pushState("", "", hashpath);
+}
+
 var parts = host.split('.');
 if (parts[0] === 'portal' || parts[0] === 'beta') {
   parts.shift();
