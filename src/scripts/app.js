@@ -138,7 +138,7 @@ angular
           templateUrl: 'views/user/resetpass/resetsend-done.html'
         })
         .state('auth-resetpass', {
-          url: '/resetpass?x-jwt-token',
+          url: '/resetpass',
           templateUrl: 'views/user/resetpass/resetpass.html',
           controller: 'ResetPasswordController'
         })
