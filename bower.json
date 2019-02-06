@@ -4,7 +4,7 @@
     "dist/ng-formio.js",
     "dist/formio.css"
   ],
-  "version": "3.10.4",
+  "version": "3.11.0",
   "authors": [
     "Travis Tidwell <travis@form.io>",
     "Randall Knutson <randall@form.io>"

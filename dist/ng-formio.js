@@ -18297,7 +18297,9 @@ function (_EventEmitter) {
         eventsSafeInterval = _conf$eventsSafeInter === void 0 ? 300 : _conf$eventsSafeInter,
         _conf$pause = conf.pause,
         pause = _conf$pause === void 0 ? 500 : _conf$pause,
-        ee2conf = _objectWithoutProperties(conf, ["loadLimit", "eventsSafeInterval", "pause"]);
+        _conf$inspect = conf.inspect,
+        inspect = _conf$inspect === void 0 ? false : _conf$inspect,
+        ee2conf = _objectWithoutProperties(conf, ["loadLimit", "eventsSafeInterval", "pause", "inspect"]);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(EventEmitter).call(this, ee2conf));
 
@@ -18307,7 +18309,7 @@ function (_EventEmitter) {
         togglePause = _utils$withSwitch2[1];
 
     var overloadHandler = function overloadHandler() {
-      console.warn('Infinite loop detected', _this.id, pause);
+      console.warn('Infinite loop detected');
       togglePause();
       setTimeout(togglePause, pause);
     };
@@ -18319,6 +18321,10 @@ function (_EventEmitter) {
 
     _this.emit = function () {
       var _get2;
+
+      if (typeof inspect === 'function') {
+        inspect();
+      }
 
       if (isPaused()) {
         return;
@@ -18606,6 +18612,10 @@ function (_Form) {
   _createClass(FormBuilder, [{
     key: "create",
     value: function create() {
+      if (!this.form) {
+        this.form = {};
+      }
+
       if (!this.form.components) {
         this.form.components = [];
       }
@@ -20265,6 +20275,10 @@ function (_Webform) {
     value: function postMessage(message) {
       var _this2 = this;
 
+      if (!message.type) {
+        message.type = 'iframe-data';
+      }
+
       this.iframeReady.then(function () {
         if (_this2.iframe && _this2.iframe.contentWindow) {
           _this2.iframe.contentWindow.postMessage(JSON.stringify(message), '*');
@@ -21843,6 +21857,7 @@ function (_NestedComponent) {
         return _this12.checkValidity(null, true, data);
       }, true);
       this.addComponents(null, null, null, state);
+      this.currentForm = this;
       this.on('requestUrl', function (args) {
         return _this12.submitUrl(args.url, args.headers);
       }, true);
@@ -21999,7 +22014,12 @@ function (_NestedComponent) {
       value.changed = changed;
       value.isValid = this.checkData(value.data, flags, changed ? changed.instance : null);
       this.showElement(true);
-      this.loading = false; // See if we need to save the draft of the form.
+      this.loading = false;
+
+      if (this.submitted) {
+        this.showErrors();
+      } // See if we need to save the draft of the form.
+
 
       if (flags && flags.modified && this.options.saveDraft) {
         this.triggerSaveDraft();
@@ -23104,6 +23124,7 @@ function (_Webform) {
       info = _lodash.default.clone(info);
       var groupAnchor = this.ce('button', {
         class: 'btn btn-block builder-group-button',
+        'type': 'button',
         'data-toggle': 'collapse',
         'data-parent': "#".concat(container.id),
         'data-target': "#group-".concat(info.key)
@@ -23453,7 +23474,7 @@ function (_Webform) {
 
 
         var index = _lodash.default.findIndex(_lodash.default.get(component.parent.schema, path), {
-          key: component.key
+          key: component.component.key
         }) || 0;
         this.emit('addComponent', component, path, index); // Edit the component.
 
@@ -28738,7 +28759,11 @@ function (_Component) {
           _this22.on(event, function () {
             var newComponent = _lodash.default.cloneDeep(_this22.originalComponent);
 
-            if (_this22.applyActions(logic.actions, event, _this22.data, newComponent)) {
+            for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+              args[_key3] = arguments[_key3];
+            }
+
+            if (_this22.applyActions(logic.actions, args, _this22.data, newComponent)) {
               // If component definition changed, replace it.
               if (!_lodash.default.isEqual(_this22.component, newComponent)) {
                 _this22.component = newComponent;
@@ -28764,6 +28789,14 @@ function (_Component) {
     key: "key",
     get: function get() {
       return _lodash.default.get(this.component, 'key', '');
+    }
+  }, {
+    key: "currentForm",
+    get: function get() {
+      return this._currentForm;
+    },
+    set: function set(instance) {
+      this._currentForm = instance;
     }
   }, {
     key: "schema",
@@ -28840,7 +28873,9 @@ function (_Component) {
 
       if (this.component.defaultValue) {
         defaultValue = this.component.defaultValue;
-      } else if (this.component.customDefaultValue) {
+      }
+
+      if (this.component.customDefaultValue && !this.options.preview) {
         defaultValue = this.evaluate(this.component.customDefaultValue, {
           value: ''
         }, 'value');
@@ -33512,12 +33547,6 @@ function _default() {
   return _Base.default.apply(void 0, [[{
     key: 'display',
     components: _DataGridEdit.default
-  }, {
-    key: 'data',
-    components: [{
-      key: 'defaultValue',
-      ignore: true
-    }]
   }]].concat(extend));
 }
 
@@ -33665,6 +33694,10 @@ function (_NestedComponent) {
       var rowsNum = _this.totalRowsNumber(groups);
 
       _this.setStaticValue(rowsNum);
+
+      _this.dataValue = _lodash.default.zipWith(_this.dataValue, _this.defaultValue, function (a, b) {
+        return _lodash.default.merge(a, b);
+      });
     }
 
     return _this;
@@ -39342,6 +39375,8 @@ var _NestedComponent = _interopRequireDefault(__webpack_require__(/*! ../nested/
 
 var _FormEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Form.edit.form */ "./node_modules/formiojs/components/form/editForm/Form.edit.form.js"));
 
+var _FormEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Form.edit.data */ "./node_modules/formiojs/components/form/editForm/Form.edit.data.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
@@ -39354,6 +39389,11 @@ function _default() {
     key: 'form',
     weight: 10,
     components: _FormEdit.default
+  }, {
+    label: 'Data',
+    key: 'data',
+    weight: 10,
+    components: _FormEdit2.default
   }]].concat(extend));
 }
 
@@ -39382,11 +39422,17 @@ __webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
+
+var _eventemitter = _interopRequireDefault(__webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js"));
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
@@ -39473,6 +39519,7 @@ function (_BaseComponent) {
       _this.subFormReadyResolve = resolve;
       _this.subFormReadyReject = reject;
     });
+    _this.subFormLoaded = false;
 
     _this.subscribe();
 
@@ -39516,8 +39563,9 @@ function (_BaseComponent) {
           class: 'text-muted text-center p-2'
         }, this.text(form.title)));
         return;
-      } // Iterate through every component and hide the submit button.
+      }
 
+      options.events = this.createEmitter(); // Iterate through every component and hide the submit button.
 
       (0, _utils.eachComponent)(form.components, function (component) {
         if (component.type === 'button' && (component.action === 'submit' || !component.action)) {
@@ -39527,13 +39575,18 @@ function (_BaseComponent) {
       new _Form.default(this.element, form, options).render().then(function (instance) {
         _this3.subForm = instance;
         _this3.subForm.root = _this3.root;
+        _this3.subForm.currentForm = _this3;
         _this3.subForm.parent = _this3;
         _this3.subForm.parentVisible = _this3.visible;
 
         _this3.subForm.on('change', function () {
-          _this3.dataValue = _this3.subForm.getValue();
+          _this3.subForm.off('change');
 
-          _this3.triggerChange();
+          _this3.subForm.on('change', function () {
+            _this3.dataValue = _this3.subForm.getValue();
+
+            _this3.triggerChange();
+          });
         });
 
         _this3.subForm.url = _this3.formSrc;
@@ -39545,6 +39598,23 @@ function (_BaseComponent) {
 
         return _this3.subForm;
       });
+    }
+  }, {
+    key: "show",
+    value: function show() {
+      var _get2;
+
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      var state = (_get2 = _get(_getPrototypeOf(FormComponent.prototype), "show", this)).call.apply(_get2, [this].concat(args));
+
+      if (state && !this.subFormLoaded) {
+        this.loadSubForm();
+      }
+
+      return state;
     }
     /**
      * Load the subform.
@@ -39675,7 +39745,19 @@ function (_BaseComponent) {
   }, {
     key: "checkConditions",
     value: function checkConditions(data) {
-      return _get(_getPrototypeOf(FormComponent.prototype), "checkConditions", this).call(this, data) && this.subForm ? this.subForm.checkConditions(this.dataValue.data) : false;
+      var visible = _get(_getPrototypeOf(FormComponent.prototype), "checkConditions", this).call(this, data);
+
+      var subForm = this.subForm; // Return if already hidden
+
+      if (!visible) {
+        return visible;
+      }
+
+      if (subForm && subForm.hasCondition()) {
+        return this.subForm.checkConditions(this.dataValue.data);
+      }
+
+      return visible;
     }
   }, {
     key: "calculateValue",
@@ -39767,13 +39849,31 @@ function (_BaseComponent) {
       this.attachLogic();
     }
   }, {
+    key: "isHidden",
+    value: function isHidden() {
+      if (!this.visible) {
+        return true;
+      }
+
+      return !_get(_getPrototypeOf(FormComponent.prototype), "checkConditions", this).call(this, this.rootValue);
+    }
+  }, {
     key: "setValue",
     value: function setValue(submission, flags) {
       var _this7 = this;
 
       var changed = _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
 
-      (this.subForm ? _nativePromiseOnly.default.resolve(this.subForm) : this.loadSubForm()).then(function (form) {
+      var hidden = this.isHidden();
+      var subForm;
+
+      if (hidden) {
+        subForm = this.subFormReady;
+      } else {
+        subForm = this.loadSubForm();
+      }
+
+      subForm.then(function (form) {
         if (submission && submission._id && form.formio && !flags.noload && _lodash.default.isEmpty(submission.data)) {
           var submissionUrl = "".concat(form.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
           form.setUrl(submissionUrl, _this7.options);
@@ -39811,6 +39911,81 @@ function (_BaseComponent) {
       }
     }
   }, {
+    key: "isInternalEvent",
+    value: function isInternalEvent(event) {
+      switch (event) {
+        case 'focus':
+        case 'blur':
+        case 'componentChange':
+        case 'componentError':
+        case 'error':
+        case 'formLoad':
+        case 'languageChanged':
+        case 'render':
+        case 'checkValidity':
+        case 'initialized':
+        case 'submit':
+        case 'submitButton':
+        case 'nosubmit':
+        case 'updateComponent':
+        case 'submitDone':
+        case 'submissionDeleted':
+        case 'requestDone':
+        case 'nextPage':
+        case 'prevPage':
+        case 'wizardNavigationClicked':
+        case 'updateWizardNav':
+        case 'restoreDraft':
+        case 'saveDraft':
+        case 'saveComponent':
+          return true;
+
+        default:
+          return false;
+      }
+    }
+  }, {
+    key: "createEmitter",
+    value: function createEmitter() {
+      var emiter = new _eventemitter.default({
+        wildcard: false,
+        maxListeners: 0
+      });
+      var nativeEmit = emiter.emit;
+      var that = this;
+
+      emiter.emit = function (event) {
+        var eventType = event.replace("".concat(that.options.namespace, "."), '');
+
+        for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+          args[_key3 - 1] = arguments[_key3];
+        }
+
+        nativeEmit.call.apply(nativeEmit, [this, event].concat(args));
+
+        if (!that.isInternalEvent(eventType)) {
+          that.emit.apply(that, [eventType].concat(args));
+        }
+      };
+
+      return emiter;
+    }
+  }, {
+    key: "deleteValue",
+    value: function deleteValue() {
+      _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, null, {
+        noUpdateEvent: true,
+        noDefault: true
+      });
+
+      _lodash.default.unset(this.data, this.key);
+    }
+  }, {
+    key: "dataReady",
+    get: function get() {
+      return this.subFormReady;
+    }
+  }, {
     key: "defaultSchema",
     get: function get() {
       return FormComponent.schema();
@@ -39845,6 +40020,24 @@ function (_BaseComponent) {
       return this._nosubmit || false;
     }
   }, {
+    key: "currentForm",
+    get: function get() {
+      return this._currentForm;
+    },
+    set: function set(instance) {
+      var _this8 = this;
+
+      this._currentForm = instance;
+
+      if (!this.subForm) {
+        return;
+      }
+
+      this.subForm.getComponents().forEach(function (component) {
+        component.currentForm = _this8;
+      });
+    }
+  }, {
     key: "visible",
     get: function get() {
       return _get(_getPrototypeOf(FormComponent.prototype), "visible", this);
@@ -39873,6 +40066,33 @@ exports.default = FormComponent;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/form/editForm/Form.edit.data.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/formiojs/components/form/editForm/Form.edit.data.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _utils = _interopRequireDefault(__webpack_require__(/*! ../../base/editForm/utils */ "./node_modules/formiojs/components/base/editForm/utils.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/* eslint-disable max-len */
+var _default = [_utils.default.javaScriptValue('Custom Default Value', 'customDefaultValue', 'customDefaultValue', 120, '<p><h4>Example:</h4><pre>value = data.firstName + " " + data.lastName;</pre></p>', '<p><h4>Example:</h4><pre>{"cat": [{"var": "data.firstName"}, " ", {"var": "data.lastName"}]}</pre>'), _utils.default.javaScriptValue('Calculated Value', 'calculateValue', 'calculateValue', 130, '<p><h4>Example:</h4><pre>value = data.a + data.b + data.c;</pre></p>', '<p><h4>Example:</h4><pre>{"sum": [{"var": "data.a"}, {"var": "data.b"}, {"var": "data.c"}]}</pre><p><a target="_blank" href="http://formio.github.io/formio.js/app/examples/calculated.html">Click here for an example</a></p>')];
+/* eslint-enable max-len */
+
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/form/editForm/Form.edit.form.js":
 /*!**************************************************************************!*\
   !*** ./node_modules/formiojs/components/form/editForm/Form.edit.form.js ***!
@@ -39894,6 +40114,7 @@ var _default = [{
   data: {
     url: '/form?limit=4294967295&select=_id,title'
   },
+  searchField: 'title',
   template: '<span>{{ item.title }}</span>',
   valueProperty: '_id',
   authenticate: true,
@@ -41830,11 +42051,6 @@ function (_BaseComponent) {
       }, source); // Iterate through all components and check conditions, and calculate values.
 
       this.getComponents().forEach(function (comp) {
-        // If a source is provided and is the same as the source, then skip.
-        if (source && source.id === comp.id) {
-          return;
-        }
-
         changed |= comp.calculateValue(data, {
           noUpdateEvent: true
         });
@@ -42115,7 +42331,7 @@ function (_BaseComponent) {
     get: function get() {
       var schema = _get(_getPrototypeOf(NestedComponent.prototype), "schema", this);
 
-      var components = _lodash.default.uniqBy(this.getComponents(), 'key');
+      var components = _lodash.default.uniqBy(this.getComponents(), 'component.key');
 
       schema.components = _lodash.default.map(components, 'schema');
       return schema;
@@ -42147,6 +42363,18 @@ function (_BaseComponent) {
     },
     get: function get() {
       return _get(_getPrototypeOf(NestedComponent.prototype), "parentVisible", this);
+    }
+  }, {
+    key: "currentForm",
+    get: function get() {
+      return _get(_getPrototypeOf(NestedComponent.prototype), "currentForm", this);
+    },
+    set: function set(instance) {
+      _set(_getPrototypeOf(NestedComponent.prototype), "currentForm", instance, this, true);
+
+      this.getComponents().forEach(function (component) {
+        component.currentForm = instance;
+      });
     }
   }, {
     key: "componentComponents",
@@ -44501,6 +44729,7 @@ function (_BaseComponent) {
         authenticate: false,
         template: '<span>{{ item.label }}</span>',
         selectFields: '',
+        searchThreshold: 0.3,
         customOptions: {}
       }].concat(extend));
     }
@@ -44784,7 +45013,7 @@ function (_BaseComponent) {
         if (Array.isArray(search)) {
           query["".concat(this.component.searchField, "__in")] = search.join(',');
         } else {
-          query[this.component.searchField] = search;
+          query["".concat(this.component.searchField, "__regex")] = search;
         }
       } // Add filter capability
 
@@ -45030,7 +45259,7 @@ function (_BaseComponent) {
         searchFields: ['label'],
         fuseOptions: {
           include: 'score',
-          threshold: 0.3
+          threshold: _lodash.default.get(this, 'component.searchThreshold', 0.3)
         },
         itemComparer: _lodash.default.isEqual
       });
@@ -45876,6 +46105,26 @@ var _default = [{
   label: 'Custom default options',
   tooltip: 'A raw JSON object to use as default options for the Select component (Choices JS).',
   defaultValue: {}
+}, {
+  label: 'Search Threshold',
+  mask: false,
+  tableView: true,
+  alwaysEnabled: false,
+  type: 'number',
+  input: true,
+  key: 'selectThreshold',
+  validate: {
+    min: 0,
+    customMessage: '',
+    json: '',
+    max: 1
+  },
+  delimiter: false,
+  requireDecimal: false,
+  encrypted: false,
+  defaultValue: 0.3,
+  weight: 30,
+  tooltip: 'At what point does the match algorithm give up. A threshold of 0.0 requires a perfect match, a threshold of 1.0 would match anything.'
 }];
 exports.default = _default;
 
@@ -45967,6 +46216,8 @@ var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_m
 var _Radio = _interopRequireDefault(__webpack_require__(/*! ../radio/Radio */ "./node_modules/formiojs/components/radio/Radio.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -46090,6 +46341,15 @@ function (_RadioComponent) {
     key: "setValue",
     value: function setValue(value, flags) {
       value = value || {};
+
+      if (_typeof(value) !== 'object') {
+        if (typeof value === 'string') {
+          value = _defineProperty({}, value, true);
+        } else {
+          value = {};
+        }
+      }
+
       flags = this.getFlags.apply(this, arguments);
 
       if (Array.isArray(value)) {
@@ -48033,6 +48293,10 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
+
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
@@ -48334,13 +48598,39 @@ function (_TextFieldComponent) {
       return value;
     }
   }, {
+    key: "removeBlanks",
+    value: function removeBlanks(value) {
+      if (!value) {
+        return value;
+      }
+
+      var removeBlanks = function removeBlanks(input) {
+        if (typeof input !== 'string') {
+          return input;
+        }
+
+        return input.replace(/<p>&nbsp;<\/p>/g, '').replace(/<p><br><\/p>/g, '');
+      };
+
+      if (Array.isArray(value)) {
+        value.forEach(function (input, index) {
+          value[index] = removeBlanks(input);
+        });
+      } else {
+        value = removeBlanks(value);
+      }
+
+      return value;
+    }
+  }, {
+    key: "hasChanged",
+    value: function hasChanged(before, after) {
+      return _get(_getPrototypeOf(TextAreaComponent.prototype), "hasChanged", this).call(this, this.removeBlanks(before), this.removeBlanks(after));
+    }
+  }, {
     key: "isEmpty",
     value: function isEmpty(value) {
-      if (this.quill) {
-        return !value || value === '<p><br></p>';
-      } else {
-        return _get(_getPrototypeOf(TextAreaComponent.prototype), "isEmpty", this).call(this, value);
-      }
+      return _get(_getPrototypeOf(TextAreaComponent.prototype), "isEmpty", this).call(this, this.removeBlanks(value));
     }
   }, {
     key: "setValue",
@@ -75815,13 +76105,15 @@ _jsonLogicJs.default.add_operation('relativeMaxDate', function (relativeMaxDate)
  */
 function evaluate(func, args, ret, tokenize) {
   var returnVal = null;
-  var component = args.component ? args.component : {
+  args.component = args.component ? _lodash.default.cloneDeep(args.component) : {
     key: 'unknown'
   };
 
   if (!args.form && args.instance) {
     args.form = _lodash.default.get(args.instance, 'root._form', {});
   }
+
+  args.form = _lodash.default.cloneDeep(args.form);
 
   if (typeof func === 'string') {
     if (ret) {
@@ -75848,7 +76140,7 @@ function evaluate(func, args, ret, tokenize) {
       func = _construct(Function, _toConsumableArray(params).concat([func]));
       args = _lodash.default.values(args);
     } catch (err) {
-      console.warn("An error occured within the custom function for ".concat(component.key), err);
+      console.warn("An error occured within the custom function for ".concat(args.component.key), err);
       returnVal = null;
       func = false;
     }
@@ -75859,17 +76151,17 @@ function evaluate(func, args, ret, tokenize) {
       returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
     } catch (err) {
       returnVal = null;
-      console.warn("An error occured within custom function for ".concat(component.key), err);
+      console.warn("An error occured within custom function for ".concat(args.component.key), err);
     }
   } else if (_typeof(func) === 'object') {
     try {
       returnVal = _jsonLogicJs.default.apply(func, args);
     } catch (err) {
       returnVal = null;
-      console.warn("An error occured within custom function for ".concat(component.key), err);
+      console.warn("An error occured within custom function for ".concat(args.component.key), err);
     }
   } else if (func) {
-    console.warn("Unknown function type for ".concat(component.key));
+    console.warn("Unknown function type for ".concat(args.component.key));
   }
 
   return returnVal;
@@ -77649,7 +77941,9 @@ var Connector = function (_EventEmitter) {
     var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
 
     if (this.backend && this.backend.create) {
-      this.backend.create(languages, namespace, key, fallbackValue, null /* unused callback */, _extends({}, options, { isUpdate: isUpdate }));
+      this.backend.create(languages, namespace, key, fallbackValue, null /* unused callback */, _extends({}, options, {
+        isUpdate: isUpdate
+      }));
     }
 
     // write to store to avoid resending
@@ -79009,7 +79303,11 @@ var I18n = function (_EventEmitter) {
       s.logger = _logger_js__WEBPACK_IMPORTED_MODULE_0__["default"];
       s.resourceStore = this.store;
       s.languageUtils = lu;
-      s.pluralResolver = new _PluralResolver_js__WEBPACK_IMPORTED_MODULE_5__["default"](lu, { prepend: this.options.pluralSeparator, compatibilityJSON: this.options.compatibilityJSON, simplifyPluralSuffix: this.options.simplifyPluralSuffix });
+      s.pluralResolver = new _PluralResolver_js__WEBPACK_IMPORTED_MODULE_5__["default"](lu, {
+        prepend: this.options.pluralSeparator,
+        compatibilityJSON: this.options.compatibilityJSON,
+        simplifyPluralSuffix: this.options.simplifyPluralSuffix
+      });
       s.interpolator = new _Interpolator_js__WEBPACK_IMPORTED_MODULE_6__["default"](this.options);
 
       s.backendConnector = new _BackendConnector_js__WEBPACK_IMPORTED_MODULE_7__["default"](createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options);
@@ -79513,7 +79811,6 @@ var Logger = function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
-
   processors: {},
 
   addPostProcessor: function addPostProcessor(module) {
@@ -79654,12 +79951,12 @@ function regexEscape(str) {
 
 /* eslint-disable */
 var _entityMap = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
   '"': '&quot;',
   "'": '&#39;',
-  "/": '&#x2F;'
+  '/': '&#x2F;'
 };
 /* eslint-enable */
 
