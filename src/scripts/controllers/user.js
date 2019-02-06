@@ -93,10 +93,9 @@ app.controller('ResetPasswordController', [
   function(
     $scope,
     $state,
-    $rootScope,
-    $stateParams
+    $rootScope
   ) {
-    $scope.resetPassFormWithToken = $rootScope.resetPassForm + '?x-jwt-token=' + $stateParams['x-jwt-token'];
+    $scope.resetPassFormWithToken = $rootScope.resetPassForm;
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
       if (!submission) { return; }

@@ -404,7 +404,7 @@ app.directive('formList', function() {
         var getItems = function(formio) {
           $scope.formsLoading = true;
           formio.loadForms(query).then(function (forms) {
-            $scope.totalItems = forms.serverCount;
+            $scope.totalItems = forms.serverCount || 0;
             $scope.forms = forms;
             $scope.formsLoading = false;
           });
@@ -1863,7 +1863,7 @@ app.controller('FormActionIndexController', [
       $scope.loadProjectPromise.then(function() {
         $scope.formio.loadActions(query)
           .then(function(actions) {
-            $scope.totalItems = actions.serverCount;
+            $scope.totalItems = actions.serverCount || 0;
             $scope.actions = actions;
           }, FormioAlerts.onError.bind(FormioAlerts))
           .catch(FormioAlerts.onError.bind(FormioAlerts));
