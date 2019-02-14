@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.12.0
+### Changed
+ - Upgraded core renderer to 3.15.x
+
 ## 3.10.4
 ### Changed
  - Upgraded core renderer to 3.13.1

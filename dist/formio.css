@@ -1,4 +1,4 @@
-/*! ng-formio v3.11.0 | https://unpkg.com/ngFormio@3.11.0/LICENSE.txt */
+/*! ng-formio v3.12.0 | https://unpkg.com/ngFormio@3.12.0/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3860,6 +3860,11 @@ td .formio-component-modaledit .formio-modaledit-view-container {
 
 .datagrid-group-header.clickable.collapsed .datagrid-group-label:before {
   content: '▸'; }
+
+.formio-drag-column, .formio-remove-column {
+  width: 50px;
+  white-space: nowrap;
+  text-align: center; }
 
 .formbuilder {
   position: relative; }
