@@ -1,2 +1,44 @@
-<h2>Saml</h2>
-<p>Support for SAML authentication is coming soon. Please contact us for more information.</p>
+<upgrade-warning ng-if="!minPlan('team') && projectSettingsVisible()" warning="Upgrade your project to team pro or above to configure SAML settings."></upgrade-warning>
+<h2>SAML</h2>
+<div class="form-group">
+  <label for="saml_idp">Identity Provider XML</label>
+  <textarea ng-model="currentProject.settings.saml.idp" class="form-control" rows="5" id="saml_idp" placeholder="&lt;EntityDescriptor&#10; xmlns:md=&#34;urn:oasis:names:tc:SAML:2.0:metadata&#34;&#10; xmlns:saml=&#34;urn:oasis:names:tc:SAML:2.0:assertion&#34;&#10; xmlns:ds=&#34;http://www.w3.org/2000/09/xmldsig#&#34;&#10; entityID=&#34;http://localhost:3000/sso/metadata&#34;&gt;&#10;    &lt;SPSSODescriptor WantAssertionsSigned=&#34;true&#34; protocolSupportEnumeration=&#34;urn:oasis:names:tc:SAML:2.0:protocol&#34;&gt;&#10;        &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&lt;/NameIDFormat&gt;&#10;        &lt;AssertionConsumerService isDefault=&#34;true&#34; index=&#34;0&#34; Binding=&#34;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&#34; Location=&#34;http://localhost:3000/sso/acs&#34;/&gt;&#10;    &lt;/SPSSODescriptor&gt;&#10;&lt;/EntityDescriptor&gt;"></textarea>
+</div>
+<div class="form-group">
+  <label for="saml_sp">Service Provider XML</label>
+  <textarea ng-model="projectSP" class="form-control" rows="5" id="saml_sp"></textarea>
+</div>
+<div class="form-group">
+  <label for="dataPath">Data Path</label>
+  <input ng-model="currentProject.settings.saml.dataPath" type="text" class="form-control" id="dataPath" name="dataPath" placeholder="attributes">
+  <div class="help-block">The path within the SAML response that contains the User information.</div>
+</div>
+<div class="form-group">
+  <label for="rolesPath">Roles Path</label>
+  <input ng-model="currentProject.settings.saml.rolesPath" type="text" class="form-control" id="rolesPath" name="rolesPath" placeholder="attributes.roles">
+  <div class="help-block">The path within the SAML response that contains the Roles.</div>
+</div>
+<div class="form-group">
+  <label for="idPath">ID Path</label>
+  <input ng-model="currentProject.settings.saml.idPath" type="text" class="form-control" id="idPath" name="idPath" placeholder="response.id">
+  <div class="help-block">The path within the SAML response that contains the user ID.</div>
+</div>
+<div class="form-group">
+  <label>Role Mappings</label>
+  <div class="row">
+    <div class="col-md-4"><strong>SAML Role</strong></div>
+    <div class="col-md-4"><strong>Form.io Role</strong></div>
+  </div>
+  <div class="row" ng-repeat="row in currentProject.settings.saml.roles track by $index" style="margin: 10px -15px;">
+    <div class="col-md-4">
+      <input ng-model="row.role" type="text" class="form-control" placeholder="Role Name">
+    </div>
+    <div class="col-md-3">
+      <select class="form-control" ng-model="row.id" ng-options="role._id as role.title for role in currentProjectRoles"></select>
+    </div>
+    <div class="col-md-1"><span class="btn btn-default" ng-click="removeRow($index)"><i class="glyphicon glyphicon-remove-circle"></i></span></div>
+  </div>
+  <span class="btn btn-primary" ng-click="addRow()">Add Role Mapping</span>
+  <p class="text-muted">Map claims values to form.io roles to assign user's to roles.</p>
+</div>
+<button ng-disabled="!minPlan('commercial')" class="btn btn-primary" ng-click="saveSAML()">Save Settings</button>
