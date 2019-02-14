@@ -32,7 +32,14 @@
             </span>
             <h4 ng-if="protected">{{ form.title }}</h4>
             <h4 class="ellipsis" ng-if="listMode == 'launch'">{{ form.title }}</h4>
-            <div class="form-list-description" ng-if="listMode === 'form'">GET&nbsp;{{ projectUrl }}/{{ form.path }}</div>
+            <div class="form-list-description" ng-if="listMode === 'form' || listMode === 'resource'">GET&nbsp;{{ projectUrl }}/{{ form.path }}</div>
+            <div class="form-list-description" ng-if="listMode === 'form' || listMode === 'resource'">Name: {{ form.name }}</div>
+            <div class="form-list-description" ng-if="listMode === 'form' || listMode === 'resource'">
+              <span>Tags:</span>
+              <span ng-repeat="tag in form.tags">
+                <span class="label label-default">{{ tag }}</span>
+              </span>
+            </div>
             <div class="form-list-description" ng-if="listMode === 'data'">GET&nbsp;{{ projectUrl }}/{{ form.path }}/submission</div>
             <div class="form-list-description" ng-if="listMode === 'access'">GET&nbsp;{{ projectUrl }}/{{ form.path }}</div>
             <div class="form-updated">Updated {{ form.modified | timeSince }} ago</div>

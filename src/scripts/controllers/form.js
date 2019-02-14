@@ -394,7 +394,7 @@ app.directive('formList', function() {
         $scope.forms = [];
 
         var query = {params: {
-          select: '_id,title,type,path,modified,name',
+          select: '_id,title,type,path,modified,name,tags',
           limit: $scope.numPerPage,
           skip: 0
         }};
