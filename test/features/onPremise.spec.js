@@ -609,7 +609,6 @@ module.exports = function (actions,tags) {
       actions.iSeeText('SAML');
       actions.clickOnElementWithText('SAML');
       actions.checkingUrlEndsWith('/env/authentication/saml');
-      actions.iSeeText('Support for SAML authentication is coming soon. Please contact us for more information.');
       actions.clickOnElementWithText('Access');
       actions.clickOnElementWithText(' New Role');
       actions.enterTextInField('#title','Test Versioning Role');
