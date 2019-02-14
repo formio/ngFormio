@@ -176,7 +176,6 @@ module.exports = function (actions,tags) {
       actions.iSeeText('SAML');
       actions.clickOnElementWithText('SAML');
       actions.checkingUrlEndsWith('/env/authentication/saml');
-      actions.iSeeText('Support for SAML authentication is coming soon. Please contact us for more information.');
       actions.iSeeText('LDAP');
       actions.clickOnElementWithText('LDAP');
       actions.checkingUrlEndsWith('/env/authentication/ldap');

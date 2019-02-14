@@ -312,7 +312,6 @@ module.exports = function (actions,tags) {
       actions.iSeeText('SAML');
       actions.clickOnElementWithText('SAML');
       actions.checkingUrlEndsWith('/env/authentication/saml');
-      actions.iSeeText('Support for SAML authentication is coming soon. Please contact us for more information.');
       actions.clickOnElementWithText('Forms');
       actions.clickOnElementWithText(' Actions');
       actions.clickOnElementWithText('Select an Action');

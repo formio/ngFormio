@@ -2738,6 +2738,55 @@ app.controller('ProjectTeamController', [
   }
 ]);
 
+app.controller('SAMLController', [
+  '$scope',
+  function(
+    $scope
+  ) {
+    $scope.projectSP = '';
+    $scope.loadProjectPromise.then(function(project) {
+      $scope.projectSP = _.get($scope.currentProject, 'settings.saml.sp', `<EntityDescriptor
+ xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+ xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+ xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+ entityID="${$scope.projectUrl}/saml/metadata">
+    <SPSSODescriptor WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat>
+        <AssertionConsumerService isDefault="true" index="0" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="${$scope.projectUrl}/saml/acs"/>
+    </SPSSODescriptor>
+</EntityDescriptor>`);
+    });
+    $scope.saveSAML = function() {
+      if ($scope.projectSP) {
+        _.set($scope.currentProject, 'settings.saml.sp', $scope.projectSP);
+      }
+      $scope.saveProject();
+    };
+
+    $scope.$watch('currentProject.settings.saml', function() {
+      var samlData = _.get($scope.currentProject, 'settings.saml');
+      if (!samlData) {
+        return;
+      }
+      samlData.roles = samlData.roles || [{}];
+    }, true);
+
+    $scope.addRow = function() {
+      var samlData = _.get($scope.currentProject, 'settings.saml');
+      if (samlData) {
+        samlData.roles = (samlData.roles || [{}]).concat({});
+      }
+    };
+
+    $scope.removeRow = function(index) {
+      var samlData = _.get($scope.currentProject, 'settings.saml');
+      if (samlData && samlData.roles) {
+        samlData.roles.splice(index, 1);
+      }
+    };
+  }
+]);
+
 app.controller('StageTeamController', [
   '$scope',
   '$http',

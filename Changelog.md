@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.1.5
+### Added
+ - SAML authentication configurations per project.
+ - A way to search forms by tag or name.
+ 
+### Changed
+ - Upgraded @progress/kendo-ui@2019.1.213, angular@1.7.7, bootstrap-sass@3.4.1, swagger-ui@3.20.7, webdriverio@5.4.17, webpack@4.29.3, webpack-cli@3.2.3, ajv@6.9.1
+
 ## 6.1.2
 ### Fixed
  - FOR-1869: Problem with the project showing permissions error on project page
