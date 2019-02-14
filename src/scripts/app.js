@@ -456,7 +456,8 @@ angular
         .state('project.env.authentication.saml', {
           url: '/authentication/saml',
           parent: 'project.env',
-          templateUrl: 'views/project/env/authentication/saml.html'
+          templateUrl: 'views/project/env/authentication/saml.html',
+          controller: 'SAMLController'
         })
         .state('project.access', {
           url: '/access',
