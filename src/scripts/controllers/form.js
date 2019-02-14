@@ -669,7 +669,7 @@ app.controller('FormController', [
           components: {
             file: true,
             form: true,
-            custom: true
+            unknown: true
           }
         }
       }
