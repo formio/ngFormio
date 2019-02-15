@@ -8270,7 +8270,7 @@ module.exports = function (it) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.6.4' };
+var core = module.exports = { version: '2.6.5' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
@@ -12902,7 +12902,9 @@ var $pad = __webpack_require__(/*! ./_string-pad */ "./node_modules/core-js/modu
 var userAgent = __webpack_require__(/*! ./_user-agent */ "./node_modules/core-js/modules/_user-agent.js");
 
 // https://github.com/zloirock/core-js/issues/280
-$export($export.P + $export.F * /Version\/10\.\d+(\.\d+)? Safari\//.test(userAgent), 'String', {
+var WEBKIT_BUG = /Version\/10\.\d+(\.\d+)?( Mobile\/\w+)? Safari\//.test(userAgent);
+
+$export($export.P + $export.F * WEBKIT_BUG, 'String', {
   padStart: function padStart(maxLength /* , fillString = ' ' */) {
     return $pad(this, maxLength, arguments.length > 1 ? arguments[1] : undefined, true);
   }
@@ -49451,6 +49453,7 @@ function (_TextFieldComponent) {
     value: function setValue(value, flags) {
       var _this5 = this;
 
+      var shouldSetValue = !_lodash.default.isEqual(value, this.getValue());
       value = value || '';
 
       if (this.isPlain) {
@@ -49478,13 +49481,19 @@ function (_TextFieldComponent) {
       } else if (this.editorReady) {
         this.editorReady.then(function (editor) {
           if (_this5.component.editor === 'ace') {
-            editor.setValue(_this5.setConvertedValue(value));
+            if (shouldSetValue) {
+              editor.setValue(_this5.setConvertedValue(value));
+            }
           } else if (_this5.component.editor === 'ckeditor') {
-            editor.data.set(_this5.setConvertedValue(value));
+            if (shouldSetValue) {
+              editor.data.set(_this5.setConvertedValue(value));
+            }
 
             _this5.updateValue(flags);
           } else {
-            editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+            if (shouldSetValue) {
+              editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+            }
 
             _this5.updateValue(flags);
           }
