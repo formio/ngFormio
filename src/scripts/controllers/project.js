@@ -2763,18 +2763,14 @@ app.controller('SAMLController', [
       $scope.saveProject();
     };
 
-    $scope.$watch('currentProject.settings.saml', function() {
-      var samlData = _.get($scope.currentProject, 'settings.saml');
-      if (!samlData) {
-        return;
-      }
-      samlData.roles = samlData.roles || [{}];
-    }, true);
-
     $scope.addRow = function() {
       var samlData = _.get($scope.currentProject, 'settings.saml');
       if (samlData) {
         samlData.roles = (samlData.roles || [{}]).concat({});
+      }
+      else {
+        samlData = {roles: [{}]};
+        _.set($scope.currentProject, 'settings.saml', samlData)
       }
     };
 

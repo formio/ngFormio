@@ -12,10 +12,10 @@ module.exports = function (actions,tags) {
       actions.iSeeTextCount('Anonymous', 3);
       actions.clickOnClassWithIndex('.ui-select-search', 0);
       actions.clickOnElementWithText('Anonymous');
-    // actions.clickOnClass('.toast-message');
+      actions.iSeeTextIn('.toast-message', 'Project settings saved.');
       actions.clickOnClassWithIndex('.ui-select-search', 2);
       actions.clickOnElementWithTextIndex('Authenticated', 1);
-    // actions.clickOnClass('.toast-message');
+      actions.iSeeTextIn('.toast-message', 'Project settings saved.');
       actions.pageReload();
       actions.iSeeTextCount('Administrator', 5);
       actions.iSeeTextCount('Authenticated', 4);

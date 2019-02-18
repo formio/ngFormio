@@ -96,15 +96,15 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - test_app:
-          requires:
-            - build_app
-          filters:
-            tags:
-              only: /.*/
+#      - test_app:
+#          requires:
+#            - build_app
+#          filters:
+#            tags:
+#              only: /.*/
       - deploy:
           requires:
-            - test_app
+            - build_app
           filters:
             tags:
               only: /^\d+\.\d+\.\d+.*/
