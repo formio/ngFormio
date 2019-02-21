@@ -1,6 +1,7 @@
 <div class="project-section-header">
   <a class="pull-right project-section-header-icon" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.settings" uib-tooltip="Project Settings" tooltip-placement="bottom"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
+  <a ng-if="onPremise" class="btn btn-info pull-right project-section-header-button" href="{{ projectUrl }}/manage"><i class="fa fa-wpforms"></i> Form Manager</a>
   <a class="btn btn-blink pull-right project-section-header-button" ng-if="!$state.includes('project.tour') && createdDays <= 3" ui-sref="project.tour"><i class="fa fa-hand-o-right"></i> Continue Walkthrough</a>
   <span class="pull-right" style="margin: 10px;">
     <span class="text-warning" ng-if="status.save === 'saving'">

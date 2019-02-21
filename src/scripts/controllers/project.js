@@ -2735,6 +2735,61 @@ app.controller('ProjectTeamController', [
   }
 ]);
 
+app.controller('ProjectConfigController', [
+  '$scope',
+  function($scope) {
+    $scope.configuration = {data: {config: []}};
+    $scope.loadProjectPromise.then(function(project) {
+      _.each(project.config, function(value, key) {
+        $scope.configuration.data.config.push({
+          key: key,
+          value: typeof value === 'object' ? JSON.stringify(value) : value,
+          json: typeof value === 'object' ? true : false
+        });
+      });
+    });
+    $scope.configForm = {
+      components: [
+        {
+          type: 'datagrid',
+          key: 'config',
+          label: 'Configurations',
+          addAnother: 'Add Configuration',
+          hideLabel: true,
+          components: [
+            {
+              type: 'textfield',
+              key: 'key',
+              label: 'Key',
+              input: true
+            },
+            {
+              type: 'textfield',
+              key: 'value',
+              label: 'Value',
+              input: true
+            },
+            {
+              type: 'checkbox',
+              key: 'json',
+              label: 'JSON',
+              tooltip: 'Check this if the value is a JSON object.',
+              input: true
+            }
+          ]
+        }
+      ]
+    };
+    $scope.saveConfiguration = function() {
+      $scope.currentProject.config = {};
+      _.each($scope.configuration.data.config, function(config) {
+        $scope.currentProject.config[config.key] = config.json ? JSON.parse(config.value) : config.value;
+      });
+      $scope.saveProject();
+    };
+  }
+]);
+
 app.controller('SAMLController', [
   '$scope',
   function(

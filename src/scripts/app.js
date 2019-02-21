@@ -314,6 +314,12 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/settings/security/index.html'
         })
+        .state('project.env.settings.config', {
+          url: '/settings/config',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/config/index.html',
+          controller: 'ProjectConfigController'
+        })
         .state('project.env.database', {
           url: '/database',
           abstract: true,
