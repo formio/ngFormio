@@ -5,9 +5,9 @@ var pathType = 'Subdomains';
 var onPremise = false;
 
 // Parse query string
-const query = {};
-const hashes = location.hash.substr(1).replace(/\?/g, '&').split("&");
-let hashpath = '';
+var query = {};
+var hashes = location.hash.substr(1).replace(/\?/g, '&').split("&");
+var hashpath = '';
 
 // Look in the location.
 location.search.substr(1).split("&").forEach(function(item) {
@@ -21,7 +21,7 @@ hashes.forEach(function (item) {
     query[parts[0]] = parts[1] && decodeURIComponent(parts[1]);
   }
   else if (item.indexOf('/') === 0) {
-    hashpath = `/#${item}`;
+    hashpath = '/#' + item;
   }
 });
 
@@ -87,5 +87,5 @@ angular.module('formioApp').constant('AppConfig', {
   teamForm: formioBase + '/team',
   betaForm: formioBase + '/beta',
   feedbackForm: formioBase + '/feedback',
-  resetPassForm: formioBase + '/resetpass',
+  resetPassForm: formioBase + '/resetpass'
 });
