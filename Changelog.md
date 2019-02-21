@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.1.8
+### Fixed
+ - Issues where portal would not load in IE11.
+ 
+### Changed
+ - Upgraded @progress/kendo-ui@2019.1.220, dompurify@1.0.10, swagger-ui@3.20.8, webpack@4.29.5, webdriverio@5.6.0, webpack-dev-server@3.2.0, copy-webpack-plugin@5.0.0, mocha@6.0.1
+
 ## 6.1.5
 ### Added
  - SAML authentication configurations per project.
