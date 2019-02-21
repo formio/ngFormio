@@ -1,4 +1,4 @@
-<upgrade-warning ng-if="!minPlan('commercial') && projectSettingsVisible()" warning="Upgrade your project to a paid plan to access OAuth settings."></upgrade-warning>
+<upgrade-warning ng-if="!minPlan('team') && projectSettingsVisible()" warning="Upgrade your project to a paid plan to access OAuth settings."></upgrade-warning>
 <div class="well">
   <h4>OpenID must use Authorization code flow</h4>
   <p>OpenID Connect is a single sign on (SSO) framework for OAuth 2. In order to use OpenID Connect you must have a auth provider that supports OpenID Connect and set up an APP within that provider. Then use the settings from your provider to configure the connection here. See <a href="http://openid.net/connect/" target="_blank">OpenID Connect</a> for detailed information.</p>
