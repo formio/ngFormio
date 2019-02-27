@@ -5,6 +5,16 @@
   <textarea ng-model="currentProject.settings.saml.idp" class="form-control" rows="5" id="saml_idp" placeholder="&lt;EntityDescriptor&#10; xmlns:md=&#34;urn:oasis:names:tc:SAML:2.0:metadata&#34;&#10; xmlns:saml=&#34;urn:oasis:names:tc:SAML:2.0:assertion&#34;&#10; xmlns:ds=&#34;http://www.w3.org/2000/09/xmldsig#&#34;&#10; entityID=&#34;http://localhost:3000/sso/metadata&#34;&gt;&#10;    &lt;SPSSODescriptor WantAssertionsSigned=&#34;true&#34; protocolSupportEnumeration=&#34;urn:oasis:names:tc:SAML:2.0:protocol&#34;&gt;&#10;        &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&lt;/NameIDFormat&gt;&#10;        &lt;AssertionConsumerService isDefault=&#34;true&#34; index=&#34;0&#34; Binding=&#34;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&#34; Location=&#34;http://localhost:3000/sso/acs&#34;/&gt;&#10;    &lt;/SPSSODescriptor&gt;&#10;&lt;/EntityDescriptor&gt;"></textarea>
 </div>
 <div class="form-group">
+  <label for="issuer">Issuer</label>
+  <input ng-model="currentProject.settings.saml.issuer" type="text" class="form-control" id="issuer" name="issuer" placeholder="onelogin_saml">
+  <div class="help-block">The SAML issuer.</div>
+</div>
+<div class="form-group">
+  <label for="callbackUrl">Callback Url</label>
+  <input ng-model="currentProject.settings.saml.callbackUrl" type="text" class="form-control" id="callbackUrl" name="callbackUrl" placeholder="http://myserver.com/myendpoint">
+  <div class="help-block">The redirect callback for after authentication.</div>
+</div>
+<div class="form-group">
   <label for="idPath">ID Path</label>
   <input ng-model="currentProject.settings.saml.idPath" type="text" class="form-control" id="idPath" name="idPath" placeholder="id">
   <div class="help-block">The path within the SAML profile that contains the user ID.</div>
