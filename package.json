@@ -78,5 +78,5 @@
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1"
   },
-  "version": "6.2.5"
+  "version": "6.2.6"
 }

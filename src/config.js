@@ -2,7 +2,11 @@ var host = window.location.host;
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 var pathType = 'Subdomains';
+
+/** DO NOT CHANGE THESE LINES!! **/
 var onPremise = false;
+var hostedPDFServer = '';
+/*******************************/
 
 // Parse query string
 var query = {};
@@ -54,7 +58,7 @@ var pdfServer = apiProtocol + '//files.' + serverHost;
 if (onPremise) {
   apiBase = apiProtocol + '//' + serverHost;
   formioBase = apiProtocol + '//' + serverHost + '/formio';
-  pdfServer = apiProtocol + '//' + serverHost + '/files';
+  pdfServer = hostedPDFServer || 'https://files.form.io';
   pathType = 'Subdirectories';
 }
 angular.module('formioApp').constant('AppConfig', {
