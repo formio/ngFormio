@@ -2,12 +2,16 @@ var host = window.location.host;
 var protocol = window.location.protocol;
 var serverHost, apiProtocol;
 var pathType = 'Subdomains';
+
+/** DO NOT CHANGE THESE LINES!! **/
 var onPremise = false;
+var hostedPDFServer = '';
+/*******************************/
 
 // Parse query string
-const query = {};
-const hashes = location.hash.substr(1).replace(/\?/g, '&').split("&");
-let hashpath = '';
+var query = {};
+var hashes = location.hash.substr(1).replace(/\?/g, '&').split("&");
+var hashpath = '';
 
 // Look in the location.
 location.search.substr(1).split("&").forEach(function(item) {
@@ -21,7 +25,7 @@ hashes.forEach(function (item) {
     query[parts[0]] = parts[1] && decodeURIComponent(parts[1]);
   }
   else if (item.indexOf('/') === 0) {
-    hashpath = `/#${item}`;
+    hashpath = '/#' + item;
   }
 });
 
@@ -54,7 +58,7 @@ var pdfServer = apiProtocol + '//files.' + serverHost;
 if (onPremise) {
   apiBase = apiProtocol + '//' + serverHost;
   formioBase = apiProtocol + '//' + serverHost + '/formio';
-  pdfServer = apiProtocol + '//' + serverHost + '/files';
+  pdfServer = hostedPDFServer || 'https://files.form.io';
   pathType = 'Subdirectories';
 }
 angular.module('formioApp').constant('AppConfig', {
@@ -87,5 +91,5 @@ angular.module('formioApp').constant('AppConfig', {
   teamForm: formioBase + '/team',
   betaForm: formioBase + '/beta',
   feedbackForm: formioBase + '/feedback',
-  resetPassForm: formioBase + '/resetpass',
+  resetPassForm: formioBase + '/resetpass'
 });

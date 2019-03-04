@@ -309,6 +309,26 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
     $scope.unsecurePortal = 'http://' + window.location.host;
+    $scope.hasFormManager = false;
+    const checkFormManager = function() {
+      if (AppConfig.onPremise) {
+        Formio.request(
+          'https://license.form.io/check/manager?project=' + $scope.projectUrl
+        ).then(function(project) {
+          if (project && project.enabled) {
+            $scope.hasFormManager = true;
+            if(!$scope.$$phase) {
+              $scope.$apply();
+            }
+          }
+          else {
+            console.warn('Form Manager not enabled');
+          }
+        }).catch(() => {
+          console.warn('Form Manager not enabled');
+        });
+      }
+    };
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
@@ -409,6 +429,7 @@ app.controller('ProjectController', [
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
+        checkFormManager();
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         if ($scope.projectProtocol === 'http:' && $scope.projectProtocol !== window.location.protocol) {
           $scope.protocolSecureError = true;
@@ -446,6 +467,7 @@ app.controller('ProjectController', [
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
+        checkFormManager();
         formioReady.resolve($scope.formio);
         $scope.loadRoles();
       }
@@ -2734,6 +2756,61 @@ app.controller('ProjectTeamController', [
       $scope._saveProject($scope.primaryProject).then(function(project) {
         $scope.primaryProject = project;
       });
+    };
+  }
+]);
+
+app.controller('ProjectConfigController', [
+  '$scope',
+  function($scope) {
+    $scope.configuration = {data: {config: []}};
+    $scope.loadProjectPromise.then(function(project) {
+      _.each(project.config, function(value, key) {
+        $scope.configuration.data.config.push({
+          key: key,
+          value: typeof value === 'object' ? JSON.stringify(value) : value,
+          json: typeof value === 'object' ? true : false
+        });
+      });
+    });
+    $scope.configForm = {
+      components: [
+        {
+          type: 'datagrid',
+          key: 'config',
+          label: 'Configurations',
+          addAnother: 'Add Configuration',
+          hideLabel: true,
+          components: [
+            {
+              type: 'textfield',
+              key: 'key',
+              label: 'Key',
+              input: true
+            },
+            {
+              type: 'textfield',
+              key: 'value',
+              label: 'Value',
+              input: true
+            },
+            {
+              type: 'checkbox',
+              key: 'json',
+              label: 'JSON',
+              tooltip: 'Check this if the value is a JSON object.',
+              input: true
+            }
+          ]
+        }
+      ]
+    };
+    $scope.saveConfiguration = function() {
+      $scope.currentProject.config = {};
+      _.each($scope.configuration.data.config, function(config) {
+        $scope.currentProject.config[config.key] = config.json ? JSON.parse(config.value) : config.value;
+      });
+      $scope.saveProject();
     };
   }
 ]);

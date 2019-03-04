@@ -2223,3 +2223,7 @@ formio-header-wrapper>formio-header.fixed.absolute {
 #navbar {
   position: relative !important;
 }
+
+.input-group .form-control {
+  z-index: auto;
+}
