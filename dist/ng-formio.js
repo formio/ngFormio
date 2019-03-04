@@ -1620,14 +1620,3844 @@ exports.all = function() {
 
 /***/ }),
 
-/***/ "./node_modules/choices.js/assets/scripts/dist/choices.js":
-/*!****************************************************************!*\
-  !*** ./node_modules/choices.js/assets/scripts/dist/choices.js ***!
-  \****************************************************************/
+/***/ "./node_modules/choices.js/public/assets/scripts/choices.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/choices.js/public/assets/scripts/choices.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/*! choices.js v3.0.4 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+(function webpackUniversalModuleDefinition(root, factory) {
+	//CommonJS2
+	if(true)
+		module.exports = factory();
+	//AMD
+	else {}
+})(window, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/public/assets/scripts/";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.diff = exports.cloneObject = exports.existsInArray = exports.isIE11 = exports.fetchFromObject = exports.getWindowHeight = exports.dispatchEvent = exports.sortByScore = exports.sortByAlpha = exports.calcWidthOfInput = exports.strToEl = exports.sanitise = exports.isScrolledIntoView = exports.getAdjacentEl = exports.findAncestorByAttrName = exports.wrap = exports.isElement = exports.isType = exports.getType = exports.generateId = exports.generateChars = exports.getRandomNumber = void 0;
+
+var _this = void 0;
+
+var getRandomNumber = function getRandomNumber(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+};
+
+exports.getRandomNumber = getRandomNumber;
+
+var generateChars = function generateChars(length) {
+  var chars = '';
+
+  for (var i = 0; i < length; i++) {
+    var randomChar = getRandomNumber(0, 36);
+    chars += randomChar.toString(36);
+  }
+
+  return chars;
+};
+
+exports.generateChars = generateChars;
+
+var generateId = function generateId(element, prefix) {
+  var id = element.id || element.name && "".concat(element.name, "-").concat(generateChars(2)) || generateChars(4);
+  id = id.replace(/(:|\.|\[|\]|,)/g, '');
+  id = "".concat(prefix, "-").concat(id);
+  return id;
+};
+
+exports.generateId = generateId;
+
+var getType = function getType(obj) {
+  return Object.prototype.toString.call(obj).slice(8, -1);
+};
+
+exports.getType = getType;
+
+var isType = function isType(type, obj) {
+  return obj !== undefined && obj !== null && getType(obj) === type;
+};
+
+exports.isType = isType;
+
+var isElement = function isElement(element) {
+  return element instanceof Element;
+};
+
+exports.isElement = isElement;
+
+var wrap = function wrap(element) {
+  var wrapper = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.createElement('div');
+
+  if (element.nextSibling) {
+    element.parentNode.insertBefore(wrapper, element.nextSibling);
+  } else {
+    element.parentNode.appendChild(wrapper);
+  }
+
+  return wrapper.appendChild(element);
+};
+
+exports.wrap = wrap;
+
+var findAncestorByAttrName = function findAncestorByAttrName(el, attr) {
+  var target = el;
+
+  while (target) {
+    if (target.hasAttribute(attr)) {
+      return target;
+    }
+
+    target = target.parentElement;
+  }
+
+  return null;
+};
+
+exports.findAncestorByAttrName = findAncestorByAttrName;
+
+var getAdjacentEl = function getAdjacentEl(startEl, className) {
+  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
+  if (!startEl || !className) {
+    return;
+  }
+
+  var parent = startEl.parentNode.parentNode;
+  var children = Array.from(parent.querySelectorAll(className));
+  var startPos = children.indexOf(startEl);
+  var operatorDirection = direction > 0 ? 1 : -1;
+  return children[startPos + operatorDirection];
+};
+
+exports.getAdjacentEl = getAdjacentEl;
+
+var isScrolledIntoView = function isScrolledIntoView(el, parent) {
+  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
+
+  if (!el) {
+    return;
+  }
+
+  var isVisible;
+
+  if (direction > 0) {
+    // In view from bottom
+    isVisible = parent.scrollTop + parent.offsetHeight >= el.offsetTop + el.offsetHeight;
+  } else {
+    // In view from top
+    isVisible = el.offsetTop >= parent.scrollTop;
+  }
+
+  return isVisible;
+};
+
+exports.isScrolledIntoView = isScrolledIntoView;
+
+var sanitise = function sanitise(value) {
+  if (!isType('String', value)) {
+    return value;
+  }
+
+  return value.replace(/&/g, '&amp;').replace(/>/g, '&rt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+};
+
+exports.sanitise = sanitise;
+
+var strToEl = function () {
+  var tmpEl = document.createElement('div');
+  return function (str) {
+    var cleanedInput = str.trim();
+    tmpEl.innerHTML = cleanedInput;
+    var firldChild = tmpEl.children[0];
+
+    while (tmpEl.firstChild) {
+      tmpEl.removeChild(tmpEl.firstChild);
+    }
+
+    return firldChild;
+  };
+}();
+/**
+ * Determines the width of a passed input based on its value and passes
+ * it to the supplied callback function.
+ */
+
+
+exports.strToEl = strToEl;
+
+var calcWidthOfInput = function calcWidthOfInput(input, callback) {
+  var value = input.value || input.placeholder;
+  var width = input.offsetWidth;
+
+  if (value) {
+    var testEl = strToEl("<span>".concat(sanitise(value), "</span>"));
+    testEl.style.position = 'absolute';
+    testEl.style.padding = '0';
+    testEl.style.top = '-9999px';
+    testEl.style.left = '-9999px';
+    testEl.style.width = 'auto';
+    testEl.style.whiteSpace = 'pre';
+
+    if (document.body.contains(input) && window.getComputedStyle) {
+      var inputStyle = window.getComputedStyle(input);
+
+      if (inputStyle) {
+        testEl.style.fontSize = inputStyle.fontSize;
+        testEl.style.fontFamily = inputStyle.fontFamily;
+        testEl.style.fontWeight = inputStyle.fontWeight;
+        testEl.style.fontStyle = inputStyle.fontStyle;
+        testEl.style.letterSpacing = inputStyle.letterSpacing;
+        testEl.style.textTransform = inputStyle.textTransform;
+        testEl.style.padding = inputStyle.padding;
+      }
+    }
+
+    document.body.appendChild(testEl);
+    requestAnimationFrame(function () {
+      if (value && testEl.offsetWidth !== input.offsetWidth) {
+        width = testEl.offsetWidth + 4;
+      }
+
+      document.body.removeChild(testEl);
+      callback.call(_this, "".concat(width, "px"));
+    });
+  } else {
+    callback.call(_this, "".concat(width, "px"));
+  }
+};
+
+exports.calcWidthOfInput = calcWidthOfInput;
+
+var sortByAlpha = function sortByAlpha(a, b) {
+  var labelA = "".concat(a.label || a.value).toLowerCase();
+  var labelB = "".concat(b.label || b.value).toLowerCase();
+
+  if (labelA < labelB) {
+    return -1;
+  }
+
+  if (labelA > labelB) {
+    return 1;
+  }
+
+  return 0;
+};
+
+exports.sortByAlpha = sortByAlpha;
+
+var sortByScore = function sortByScore(a, b) {
+  return a.score - b.score;
+};
+
+exports.sortByScore = sortByScore;
+
+var dispatchEvent = function dispatchEvent(element, type) {
+  var customArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var event = new CustomEvent(type, {
+    detail: customArgs,
+    bubbles: true,
+    cancelable: true
+  });
+  return element.dispatchEvent(event);
+};
+
+exports.dispatchEvent = dispatchEvent;
+
+var getWindowHeight = function getWindowHeight() {
+  var body = document.body;
+  var html = document.documentElement;
+  return Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+};
+
+exports.getWindowHeight = getWindowHeight;
+
+var fetchFromObject = function fetchFromObject(object, path) {
+  var index = path.indexOf('.');
+
+  if (index > -1) {
+    return fetchFromObject(object[path.substring(0, index)], path.substr(index + 1));
+  }
+
+  return object[path];
+};
+
+exports.fetchFromObject = fetchFromObject;
+
+var isIE11 = function isIE11() {
+  return !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+};
+
+exports.isIE11 = isIE11;
+
+var existsInArray = function existsInArray(array, value) {
+  var key = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
+  return array.some(function (item) {
+    if (isType('String', value)) {
+      return item[key] === value.trim();
+    }
+
+    return item[key] === value;
+  });
+};
+
+exports.existsInArray = existsInArray;
+
+var cloneObject = function cloneObject(obj) {
+  return JSON.parse(JSON.stringify(obj));
+};
+
+exports.cloneObject = cloneObject;
+
+var diff = function diff(a, b) {
+  var aKeys = Object.keys(a).sort();
+  var bKeys = Object.keys(b).sort();
+  return aKeys.filter(function (i) {
+    return bKeys.indexOf(i) < 0;
+  });
+};
+
+exports.diff = diff;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SCROLLING_SPEED = exports.KEY_CODES = exports.ACTION_TYPES = exports.EVENTS = exports.DEFAULT_CONFIG = exports.DEFAULT_CLASSNAMES = void 0;
+
+var _utils = __webpack_require__(0);
+
+var DEFAULT_CLASSNAMES = {
+  containerOuter: 'choices',
+  containerInner: 'choices__inner',
+  input: 'choices__input',
+  inputCloned: 'choices__input--cloned',
+  list: 'choices__list',
+  listItems: 'choices__list--multiple',
+  listSingle: 'choices__list--single',
+  listDropdown: 'choices__list--dropdown',
+  item: 'choices__item',
+  itemSelectable: 'choices__item--selectable',
+  itemDisabled: 'choices__item--disabled',
+  itemChoice: 'choices__item--choice',
+  placeholder: 'choices__placeholder',
+  group: 'choices__group',
+  groupHeading: 'choices__heading',
+  button: 'choices__button',
+  activeState: 'is-active',
+  focusState: 'is-focused',
+  openState: 'is-open',
+  disabledState: 'is-disabled',
+  highlightedState: 'is-highlighted',
+  hiddenState: 'is-hidden',
+  flippedState: 'is-flipped',
+  loadingState: 'is-loading',
+  noResults: 'has-no-results',
+  noChoices: 'has-no-choices'
+};
+exports.DEFAULT_CLASSNAMES = DEFAULT_CLASSNAMES;
+var DEFAULT_CONFIG = {
+  items: [],
+  choices: [],
+  silent: false,
+  renderChoiceLimit: -1,
+  maxItemCount: -1,
+  addItems: true,
+  addItemFilterFn: null,
+  removeItems: true,
+  removeItemButton: false,
+  editItems: false,
+  duplicateItemsAllowed: true,
+  delimiter: ',',
+  paste: true,
+  searchEnabled: true,
+  searchChoices: true,
+  searchFloor: 1,
+  searchResultLimit: 4,
+  searchFields: ['label', 'value'],
+  position: 'auto',
+  resetScrollPosition: true,
+  shouldSort: true,
+  shouldSortItems: false,
+  sortFn: _utils.sortByAlpha,
+  placeholder: true,
+  placeholderValue: null,
+  searchPlaceholderValue: null,
+  prependValue: null,
+  appendValue: null,
+  renderSelectedChoices: 'auto',
+  loadingText: 'Loading...',
+  noResultsText: 'No results found',
+  noChoicesText: 'No choices to choose from',
+  itemSelectText: 'Press to select',
+  uniqueItemText: 'Only unique values can be added',
+  customAddItemText: 'Only values matching specific conditions can be added',
+  addItemText: function addItemText(value) {
+    return "Press Enter to add <b>\"".concat((0, _utils.sanitise)(value), "\"</b>");
+  },
+  maxItemText: function maxItemText(maxItemCount) {
+    return "Only ".concat(maxItemCount, " values can be added");
+  },
+  itemComparer: function itemComparer(choice, item) {
+    return choice === item;
+  },
+  fuseOptions: {
+    includeScore: true
+  },
+  callbackOnInit: null,
+  callbackOnCreateTemplates: null,
+  classNames: DEFAULT_CLASSNAMES
+};
+exports.DEFAULT_CONFIG = DEFAULT_CONFIG;
+var EVENTS = {
+  showDropdown: 'showDropdown',
+  hideDropdown: 'hideDropdown',
+  change: 'change',
+  choice: 'choice',
+  search: 'search',
+  addItem: 'addItem',
+  removeItem: 'removeItem',
+  highlightItem: 'highlightItem',
+  highlightChoice: 'highlightChoice'
+};
+exports.EVENTS = EVENTS;
+var ACTION_TYPES = {
+  ADD_CHOICE: 'ADD_CHOICE',
+  FILTER_CHOICES: 'FILTER_CHOICES',
+  ACTIVATE_CHOICES: 'ACTIVATE_CHOICES',
+  CLEAR_CHOICES: 'CLEAR_CHOICES',
+  ADD_GROUP: 'ADD_GROUP',
+  ADD_ITEM: 'ADD_ITEM',
+  REMOVE_ITEM: 'REMOVE_ITEM',
+  HIGHLIGHT_ITEM: 'HIGHLIGHT_ITEM',
+  CLEAR_ALL: 'CLEAR_ALL'
+};
+exports.ACTION_TYPES = ACTION_TYPES;
+var KEY_CODES = {
+  BACK_KEY: 46,
+  DELETE_KEY: 8,
+  ENTER_KEY: 13,
+  A_KEY: 65,
+  ESC_KEY: 27,
+  UP_KEY: 38,
+  DOWN_KEY: 40,
+  PAGE_UP_KEY: 33,
+  PAGE_DOWN_KEY: 34
+};
+exports.KEY_CODES = KEY_CODES;
+var SCROLLING_SPEED = 4;
+exports.SCROLLING_SPEED = SCROLLING_SPEED;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global, module) {/* harmony import */ var _ponyfill_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* global window */
+
+
+var root;
+
+if (typeof self !== 'undefined') {
+  root = self;
+} else if (typeof window !== 'undefined') {
+  root = window;
+} else if (typeof global !== 'undefined') {
+  root = global;
+} else if (true) {
+  root = module;
+} else {}
+
+var result = Object(_ponyfill_js__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"])(root);
+/* harmony default export */ __webpack_exports__["a"] = (result);
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(16)(module)))
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _utils = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var WrappedElement =
+/*#__PURE__*/
+function () {
+  function WrappedElement(_ref) {
+    var element = _ref.element,
+        classNames = _ref.classNames;
+
+    _classCallCheck(this, WrappedElement);
+
+    Object.assign(this, {
+      element: element,
+      classNames: classNames
+    });
+
+    if (!(0, _utils.isElement)(element)) {
+      throw new TypeError('Invalid element passed');
+    }
+
+    this.isDisabled = false;
+  }
+
+  _createClass(WrappedElement, [{
+    key: "conceal",
+    value: function conceal() {
+      // Hide passed input
+      this.element.classList.add(this.classNames.input);
+      this.element.classList.add(this.classNames.hiddenState); // Remove element from tab index
+
+      this.element.tabIndex = '-1'; // Backup original styles if any
+
+      var origStyle = this.element.getAttribute('style');
+
+      if (origStyle) {
+        this.element.setAttribute('data-choice-orig-style', origStyle);
+      }
+
+      this.element.setAttribute('aria-hidden', 'true');
+      this.element.setAttribute('data-choice', 'active');
+    }
+  }, {
+    key: "reveal",
+    value: function reveal() {
+      // Reinstate passed element
+      this.element.classList.remove(this.classNames.input);
+      this.element.classList.remove(this.classNames.hiddenState);
+      this.element.removeAttribute('tabindex'); // Recover original styles if any
+
+      var origStyle = this.element.getAttribute('data-choice-orig-style');
+
+      if (origStyle) {
+        this.element.removeAttribute('data-choice-orig-style');
+        this.element.setAttribute('style', origStyle);
+      } else {
+        this.element.removeAttribute('style');
+      }
+
+      this.element.removeAttribute('aria-hidden');
+      this.element.removeAttribute('data-choice'); // Re-assign values - this is weird, I know
+
+      this.element.value = this.element.value;
+    }
+  }, {
+    key: "enable",
+    value: function enable() {
+      this.element.removeAttribute('disabled');
+      this.element.disabled = false;
+      this.isDisabled = false;
+    }
+  }, {
+    key: "disable",
+    value: function disable() {
+      this.element.setAttribute('disabled', '');
+      this.element.disabled = true;
+      this.isDisabled = true;
+    }
+  }, {
+    key: "triggerEvent",
+    value: function triggerEvent(eventType, data) {
+      (0, _utils.dispatchEvent)(this.element, eventType, data);
+    }
+  }, {
+    key: "value",
+    get: function get() {
+      return this.element.value;
+    }
+  }]);
+
+  return WrappedElement;
+}();
+
+exports.default = WrappedElement;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.TEMPLATES = void 0;
+
+var _classnames = _interopRequireDefault(__webpack_require__(29));
+
+var _utils = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var TEMPLATES = {
+  containerOuter: function containerOuter(globalClasses, direction, isSelectElement, isSelectOneElement, searchEnabled, passedElementType) {
+    var tabIndex = isSelectOneElement ? 'tabindex="0"' : '';
+    var role = isSelectElement ? 'role="listbox"' : '';
+    var ariaAutoComplete = '';
+
+    if (isSelectElement && searchEnabled) {
+      role = 'role="combobox"';
+      ariaAutoComplete = 'aria-autocomplete="list"';
+    }
+
+    return (0, _utils.strToEl)("\n      <div\n        class=\"".concat(globalClasses.containerOuter, "\"\n        data-type=\"").concat(passedElementType, "\"\n        ").concat(role, "\n        ").concat(tabIndex, "\n        ").concat(ariaAutoComplete, "\n        aria-haspopup=\"true\"\n        aria-expanded=\"false\"\n        dir=\"").concat(direction, "\"\n        >\n      </div>\n    "));
+  },
+  containerInner: function containerInner(globalClasses) {
+    return (0, _utils.strToEl)("\n      <div class=\"".concat(globalClasses.containerInner, "\"></div>\n    "));
+  },
+  itemList: function itemList(globalClasses, isSelectOneElement) {
+    var _classNames;
+
+    var localClasses = (0, _classnames.default)(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, isSelectOneElement), _defineProperty(_classNames, globalClasses.listItems, !isSelectOneElement), _classNames));
+    return (0, _utils.strToEl)("\n      <div class=\"".concat(localClasses, "\"></div>\n    "));
+  },
+  placeholder: function placeholder(globalClasses, value) {
+    return (0, _utils.strToEl)("\n      <div class=\"".concat(globalClasses.placeholder, "\">\n        ").concat(value, "\n      </div>\n    "));
+  },
+  item: function item(globalClasses, data, removeItemButton) {
+    var _classNames2;
+
+    var ariaSelected = data.active ? 'aria-selected="true"' : '';
+    var ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
+    var localClasses = (0, _classnames.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _defineProperty(_classNames2, globalClasses.placeholder, data.placeholder), _classNames2));
+
+    if (removeItemButton) {
+      var _classNames3;
+
+      localClasses = (0, _classnames.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames3, globalClasses.placeholder, data.placeholder), _classNames3));
+      return (0, _utils.strToEl)("\n        <div\n          class=\"".concat(localClasses, "\"\n          data-item\n          data-id=\"").concat(data.id, "\"\n          data-value=\"").concat(data.value, "\"\n          data-custom-properties='").concat(data.customProperties, "'\n          data-deletable\n          ").concat(ariaSelected, "\n          ").concat(ariaDisabled, "\n          >\n          ").concat(data.label, "<!--\n       --><button\n            type=\"button\"\n            class=\"").concat(globalClasses.button, "\"\n            data-button\n            aria-label=\"Remove item: '").concat(data.value, "'\"\n            >\n            Remove item\n          </button>\n        </div>\n      "));
+    }
+
+    return (0, _utils.strToEl)("\n      <div\n        class=\"".concat(localClasses, "\"\n        data-item\n        data-id=\"").concat(data.id, "\"\n        data-value=\"").concat(data.value, "\"\n        ").concat(ariaSelected, "\n        ").concat(ariaDisabled, "\n        >\n        ").concat(data.label, "\n      </div>\n    "));
+  },
+  choiceList: function choiceList(globalClasses, isSelectOneElement) {
+    var ariaMultiSelectable = !isSelectOneElement ? 'aria-multiselectable="true"' : '';
+    return (0, _utils.strToEl)("\n      <div\n        class=\"".concat(globalClasses.list, "\"\n        dir=\"ltr\"\n        role=\"listbox\"\n        ").concat(ariaMultiSelectable, "\n        >\n      </div>\n    "));
+  },
+  choiceGroup: function choiceGroup(globalClasses, data) {
+    var ariaDisabled = data.disabled ? 'aria-disabled="true"' : '';
+    var localClasses = (0, _classnames.default)(globalClasses.group, _defineProperty({}, globalClasses.itemDisabled, data.disabled));
+    return (0, _utils.strToEl)("\n      <div\n        class=\"".concat(localClasses, "\"\n        data-group\n        data-id=\"").concat(data.id, "\"\n        data-value=\"").concat(data.value, "\"\n        role=\"group\"\n        ").concat(ariaDisabled, "\n        >\n        <div class=\"").concat(globalClasses.groupHeading, "\">").concat(data.value, "</div>\n      </div>\n    "));
+  },
+  choice: function choice(globalClasses, data, itemSelectText) {
+    var _classNames5;
+
+    var role = data.groupId > 0 ? 'role="treeitem"' : 'role="option"';
+    var localClasses = (0, _classnames.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames5, globalClasses.placeholder, data.placeholder), _classNames5));
+    return (0, _utils.strToEl)("\n      <div\n        class=\"".concat(localClasses, "\"\n        data-select-text=\"").concat(itemSelectText, "\"\n        data-choice\n        data-id=\"").concat(data.id, "\"\n        data-value=\"").concat(data.value, "\"\n        ").concat(data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable', "\n        id=\"").concat(data.elementId, "\"\n        ").concat(role, "\n        >\n        ").concat(data.label, "\n      </div>\n    "));
+  },
+  input: function input(globalClasses) {
+    var localClasses = (0, _classnames.default)(globalClasses.input, globalClasses.inputCloned);
+    return (0, _utils.strToEl)("\n      <input\n        type=\"text\"\n        class=\"".concat(localClasses, "\"\n        autocomplete=\"off\"\n        autocapitalize=\"off\"\n        spellcheck=\"false\"\n        role=\"textbox\"\n        aria-autocomplete=\"list\"\n        >\n    "));
+  },
+  dropdown: function dropdown(globalClasses) {
+    var localClasses = (0, _classnames.default)(globalClasses.list, globalClasses.listDropdown);
+    return (0, _utils.strToEl)("\n      <div\n        class=\"".concat(localClasses, "\"\n        aria-expanded=\"false\"\n        >\n      </div>\n    "));
+  },
+  notice: function notice(globalClasses, label) {
+    var _classNames6;
+
+    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+    var localClasses = (0, _classnames.default)(globalClasses.item, globalClasses.itemChoice, (_classNames6 = {}, _defineProperty(_classNames6, globalClasses.noResults, type === 'no-results'), _defineProperty(_classNames6, globalClasses.noChoices, type === 'no-choices'), _classNames6));
+    return (0, _utils.strToEl)("\n      <div class=\"".concat(localClasses, "\">\n        ").concat(label, "\n      </div>\n    "));
+  },
+  option: function option(data) {
+    return (0, _utils.strToEl)("\n      <option value=\"".concat(data.value, "\" ").concat(data.active ? 'selected' : '', " ").concat(data.disabled ? 'disabled' : '', " ").concat(data.customProperties ? "data-custom-properties=".concat(data.customProperties) : '', ">").concat(data.label, "</option>\n    "));
+  }
+};
+exports.TEMPLATES = TEMPLATES;
+var _default = TEMPLATES;
+exports.default = _default;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./node_modules/lodash-es/_freeGlobal.js
+var _freeGlobal = __webpack_require__(8);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_root.js
+
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = _freeGlobal["a" /* default */] || freeSelf || Function('return this')();
+
+/* harmony default export */ var _root = (root);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_Symbol.js
+
+
+/** Built-in value references. */
+var Symbol = _root.Symbol;
+
+/* harmony default export */ var _Symbol = (Symbol);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getRawTag.js
+
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var _getRawTag_hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var nativeObjectToString = objectProto.toString;
+
+/** Built-in value references. */
+var symToStringTag = _Symbol ? _Symbol.toStringTag : undefined;
+
+/**
+ * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the raw `toStringTag`.
+ */
+function getRawTag(value) {
+  var isOwn = _getRawTag_hasOwnProperty.call(value, symToStringTag),
+      tag = value[symToStringTag];
+
+  try {
+    value[symToStringTag] = undefined;
+    var unmasked = true;
+  } catch (e) {}
+
+  var result = nativeObjectToString.call(value);
+  if (unmasked) {
+    if (isOwn) {
+      value[symToStringTag] = tag;
+    } else {
+      delete value[symToStringTag];
+    }
+  }
+  return result;
+}
+
+/* harmony default export */ var _getRawTag = (getRawTag);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_objectToString.js
+/** Used for built-in method references. */
+var _objectToString_objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var _objectToString_nativeObjectToString = _objectToString_objectProto.toString;
+
+/**
+ * Converts `value` to a string using `Object.prototype.toString`.
+ *
+ * @private
+ * @param {*} value The value to convert.
+ * @returns {string} Returns the converted string.
+ */
+function objectToString(value) {
+  return _objectToString_nativeObjectToString.call(value);
+}
+
+/* harmony default export */ var _objectToString = (objectToString);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_baseGetTag.js
+
+
+
+
+/** `Object#toString` result references. */
+var nullTag = '[object Null]',
+    undefinedTag = '[object Undefined]';
+
+/** Built-in value references. */
+var _baseGetTag_symToStringTag = _Symbol ? _Symbol.toStringTag : undefined;
+
+/**
+ * The base implementation of `getTag` without fallbacks for buggy environments.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+function baseGetTag(value) {
+  if (value == null) {
+    return value === undefined ? undefinedTag : nullTag;
+  }
+  return (_baseGetTag_symToStringTag && _baseGetTag_symToStringTag in Object(value))
+    ? _getRawTag(value)
+    : _objectToString(value);
+}
+
+/* harmony default export */ var _baseGetTag = (baseGetTag);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_overArg.js
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+
+/* harmony default export */ var _overArg = (overArg);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/_getPrototype.js
+
+
+/** Built-in value references. */
+var getPrototype = _overArg(Object.getPrototypeOf, Object);
+
+/* harmony default export */ var _getPrototype = (getPrototype);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/isObjectLike.js
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return value != null && typeof value == 'object';
+}
+
+/* harmony default export */ var lodash_es_isObjectLike = (isObjectLike);
+
+// CONCATENATED MODULE: ./node_modules/lodash-es/isPlainObject.js
+
+
+
+
+/** `Object#toString` result references. */
+var objectTag = '[object Object]';
+
+/** Used for built-in method references. */
+var funcProto = Function.prototype,
+    isPlainObject_objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var isPlainObject_hasOwnProperty = isPlainObject_objectProto.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!lodash_es_isObjectLike(value) || _baseGetTag(value) != objectTag) {
+    return false;
+  }
+  var proto = _getPrototype(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = isPlainObject_hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+    funcToString.call(Ctor) == objectCtorString;
+}
+
+/* harmony default export */ var lodash_es_isPlainObject = (isPlainObject);
+
+// EXTERNAL MODULE: ./node_modules/symbol-observable/es/index.js
+var es = __webpack_require__(2);
+
+// CONCATENATED MODULE: ./node_modules/redux/es/createStore.js
+
+
+
+/**
+ * These are private action types reserved by Redux.
+ * For any unknown actions, you must return the current state.
+ * If the current state is undefined, you must return the initial state.
+ * Do not reference these action types directly in your code.
+ */
+var ActionTypes = {
+  INIT: '@@redux/INIT'
+
+  /**
+   * Creates a Redux store that holds the state tree.
+   * The only way to change the data in the store is to call `dispatch()` on it.
+   *
+   * There should only be a single store in your app. To specify how different
+   * parts of the state tree respond to actions, you may combine several reducers
+   * into a single reducer function by using `combineReducers`.
+   *
+   * @param {Function} reducer A function that returns the next state tree, given
+   * the current state tree and the action to handle.
+   *
+   * @param {any} [preloadedState] The initial state. You may optionally specify it
+   * to hydrate the state from the server in universal apps, or to restore a
+   * previously serialized user session.
+   * If you use `combineReducers` to produce the root reducer function, this must be
+   * an object with the same shape as `combineReducers` keys.
+   *
+   * @param {Function} [enhancer] The store enhancer. You may optionally specify it
+   * to enhance the store with third-party capabilities such as middleware,
+   * time travel, persistence, etc. The only store enhancer that ships with Redux
+   * is `applyMiddleware()`.
+   *
+   * @returns {Store} A Redux store that lets you read the state, dispatch actions
+   * and subscribe to changes.
+   */
+};function createStore_createStore(reducer, preloadedState, enhancer) {
+  var _ref2;
+
+  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+    enhancer = preloadedState;
+    preloadedState = undefined;
+  }
+
+  if (typeof enhancer !== 'undefined') {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Expected the enhancer to be a function.');
+    }
+
+    return enhancer(createStore_createStore)(reducer, preloadedState);
+  }
+
+  if (typeof reducer !== 'function') {
+    throw new Error('Expected the reducer to be a function.');
+  }
+
+  var currentReducer = reducer;
+  var currentState = preloadedState;
+  var currentListeners = [];
+  var nextListeners = currentListeners;
+  var isDispatching = false;
+
+  function ensureCanMutateNextListeners() {
+    if (nextListeners === currentListeners) {
+      nextListeners = currentListeners.slice();
+    }
+  }
+
+  /**
+   * Reads the state tree managed by the store.
+   *
+   * @returns {any} The current state tree of your application.
+   */
+  function getState() {
+    return currentState;
+  }
+
+  /**
+   * Adds a change listener. It will be called any time an action is dispatched,
+   * and some part of the state tree may potentially have changed. You may then
+   * call `getState()` to read the current state tree inside the callback.
+   *
+   * You may call `dispatch()` from a change listener, with the following
+   * caveats:
+   *
+   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
+   * If you subscribe or unsubscribe while the listeners are being invoked, this
+   * will not have any effect on the `dispatch()` that is currently in progress.
+   * However, the next `dispatch()` call, whether nested or not, will use a more
+   * recent snapshot of the subscription list.
+   *
+   * 2. The listener should not expect to see all state changes, as the state
+   * might have been updated multiple times during a nested `dispatch()` before
+   * the listener is called. It is, however, guaranteed that all subscribers
+   * registered before the `dispatch()` started will be called with the latest
+   * state by the time it exits.
+   *
+   * @param {Function} listener A callback to be invoked on every dispatch.
+   * @returns {Function} A function to remove this change listener.
+   */
+  function subscribe(listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('Expected listener to be a function.');
+    }
+
+    var isSubscribed = true;
+
+    ensureCanMutateNextListeners();
+    nextListeners.push(listener);
+
+    return function unsubscribe() {
+      if (!isSubscribed) {
+        return;
+      }
+
+      isSubscribed = false;
+
+      ensureCanMutateNextListeners();
+      var index = nextListeners.indexOf(listener);
+      nextListeners.splice(index, 1);
+    };
+  }
+
+  /**
+   * Dispatches an action. It is the only way to trigger a state change.
+   *
+   * The `reducer` function, used to create the store, will be called with the
+   * current state tree and the given `action`. Its return value will
+   * be considered the **next** state of the tree, and the change listeners
+   * will be notified.
+   *
+   * The base implementation only supports plain object actions. If you want to
+   * dispatch a Promise, an Observable, a thunk, or something else, you need to
+   * wrap your store creating function into the corresponding middleware. For
+   * example, see the documentation for the `redux-thunk` package. Even the
+   * middleware will eventually dispatch plain object actions using this method.
+   *
+   * @param {Object} action A plain object representing “what changed”. It is
+   * a good idea to keep actions serializable so you can record and replay user
+   * sessions, or use the time travelling `redux-devtools`. An action must have
+   * a `type` property which may not be `undefined`. It is a good idea to use
+   * string constants for action types.
+   *
+   * @returns {Object} For convenience, the same action object you dispatched.
+   *
+   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
+   * return something else (for example, a Promise you can await).
+   */
+  function dispatch(action) {
+    if (!lodash_es_isPlainObject(action)) {
+      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
+    }
+
+    if (typeof action.type === 'undefined') {
+      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
+    }
+
+    if (isDispatching) {
+      throw new Error('Reducers may not dispatch actions.');
+    }
+
+    try {
+      isDispatching = true;
+      currentState = currentReducer(currentState, action);
+    } finally {
+      isDispatching = false;
+    }
+
+    var listeners = currentListeners = nextListeners;
+    for (var i = 0; i < listeners.length; i++) {
+      var listener = listeners[i];
+      listener();
+    }
+
+    return action;
+  }
+
+  /**
+   * Replaces the reducer currently used by the store to calculate the state.
+   *
+   * You might need this if your app implements code splitting and you want to
+   * load some of the reducers dynamically. You might also need this if you
+   * implement a hot reloading mechanism for Redux.
+   *
+   * @param {Function} nextReducer The reducer for the store to use instead.
+   * @returns {void}
+   */
+  function replaceReducer(nextReducer) {
+    if (typeof nextReducer !== 'function') {
+      throw new Error('Expected the nextReducer to be a function.');
+    }
+
+    currentReducer = nextReducer;
+    dispatch({ type: ActionTypes.INIT });
+  }
+
+  /**
+   * Interoperability point for observable/reactive libraries.
+   * @returns {observable} A minimal observable of state changes.
+   * For more information, see the observable proposal:
+   * https://github.com/tc39/proposal-observable
+   */
+  function observable() {
+    var _ref;
+
+    var outerSubscribe = subscribe;
+    return _ref = {
+      /**
+       * The minimal observable subscription method.
+       * @param {Object} observer Any object that can be used as an observer.
+       * The observer object should have a `next` method.
+       * @returns {subscription} An object with an `unsubscribe` method that can
+       * be used to unsubscribe the observable from the store, and prevent further
+       * emission of values from the observable.
+       */
+      subscribe: function subscribe(observer) {
+        if (typeof observer !== 'object') {
+          throw new TypeError('Expected the observer to be an object.');
+        }
+
+        function observeState() {
+          if (observer.next) {
+            observer.next(getState());
+          }
+        }
+
+        observeState();
+        var unsubscribe = outerSubscribe(observeState);
+        return { unsubscribe: unsubscribe };
+      }
+    }, _ref[es["a" /* default */]] = function () {
+      return this;
+    }, _ref;
+  }
+
+  // When a store is created, an "INIT" action is dispatched so that every
+  // reducer returns their initial state. This effectively populates
+  // the initial state tree.
+  dispatch({ type: ActionTypes.INIT });
+
+  return _ref2 = {
+    dispatch: dispatch,
+    subscribe: subscribe,
+    getState: getState,
+    replaceReducer: replaceReducer
+  }, _ref2[es["a" /* default */]] = observable, _ref2;
+}
+// CONCATENATED MODULE: ./node_modules/redux/es/utils/warning.js
+/**
+ * Prints a warning in the console if it exists.
+ *
+ * @param {String} message The warning message.
+ * @returns {void}
+ */
+function warning(message) {
+  /* eslint-disable no-console */
+  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+    console.error(message);
+  }
+  /* eslint-enable no-console */
+  try {
+    // This error was thrown as a convenience so that if you enable
+    // "break on all exceptions" in your console,
+    // it would pause the execution at this line.
+    throw new Error(message);
+    /* eslint-disable no-empty */
+  } catch (e) {}
+  /* eslint-enable no-empty */
+}
+// CONCATENATED MODULE: ./node_modules/redux/es/combineReducers.js
+
+
+
+
+function getUndefinedStateErrorMessage(key, action) {
+  var actionType = action && action.type;
+  var actionName = actionType && '"' + actionType.toString() + '"' || 'an action';
+
+  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state. ' + 'If you want this reducer to hold no value, you can return null instead of undefined.';
+}
+
+function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
+  var reducerKeys = Object.keys(reducers);
+  var argumentName = action && action.type === ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
+
+  if (reducerKeys.length === 0) {
+    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
+  }
+
+  if (!lodash_es_isPlainObject(inputState)) {
+    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
+  }
+
+  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
+    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
+  });
+
+  unexpectedKeys.forEach(function (key) {
+    unexpectedKeyCache[key] = true;
+  });
+
+  if (unexpectedKeys.length > 0) {
+    return 'Unexpected ' + (unexpectedKeys.length > 1 ? 'keys' : 'key') + ' ' + ('"' + unexpectedKeys.join('", "') + '" found in ' + argumentName + '. ') + 'Expected to find one of the known reducer keys instead: ' + ('"' + reducerKeys.join('", "') + '". Unexpected keys will be ignored.');
+  }
+}
+
+function assertReducerShape(reducers) {
+  Object.keys(reducers).forEach(function (key) {
+    var reducer = reducers[key];
+    var initialState = reducer(undefined, { type: ActionTypes.INIT });
+
+    if (typeof initialState === 'undefined') {
+      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined. If you don\'t want to set a value for this reducer, ' + 'you can use null instead of undefined.');
+    }
+
+    var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.');
+    if (typeof reducer(undefined, { type: type }) === 'undefined') {
+      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + ActionTypes.INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined, but can be null.');
+    }
+  });
+}
+
+/**
+ * Turns an object whose values are different reducer functions, into a single
+ * reducer function. It will call every child reducer, and gather their results
+ * into a single state object, whose keys correspond to the keys of the passed
+ * reducer functions.
+ *
+ * @param {Object} reducers An object whose values correspond to different
+ * reducer functions that need to be combined into one. One handy way to obtain
+ * it is to use ES6 `import * as reducers` syntax. The reducers may never return
+ * undefined for any action. Instead, they should return their initial state
+ * if the state passed to them was undefined, and the current state for any
+ * unrecognized action.
+ *
+ * @returns {Function} A reducer function that invokes every reducer inside the
+ * passed object, and builds a state object with the same shape.
+ */
+function combineReducers(reducers) {
+  var reducerKeys = Object.keys(reducers);
+  var finalReducers = {};
+  for (var i = 0; i < reducerKeys.length; i++) {
+    var key = reducerKeys[i];
+
+    if (false) {}
+
+    if (typeof reducers[key] === 'function') {
+      finalReducers[key] = reducers[key];
+    }
+  }
+  var finalReducerKeys = Object.keys(finalReducers);
+
+  var unexpectedKeyCache = void 0;
+  if (false) {}
+
+  var shapeAssertionError = void 0;
+  try {
+    assertReducerShape(finalReducers);
+  } catch (e) {
+    shapeAssertionError = e;
+  }
+
+  return function combination() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var action = arguments[1];
+
+    if (shapeAssertionError) {
+      throw shapeAssertionError;
+    }
+
+    if (false) { var warningMessage; }
+
+    var hasChanged = false;
+    var nextState = {};
+    for (var _i = 0; _i < finalReducerKeys.length; _i++) {
+      var _key = finalReducerKeys[_i];
+      var reducer = finalReducers[_key];
+      var previousStateForKey = state[_key];
+      var nextStateForKey = reducer(previousStateForKey, action);
+      if (typeof nextStateForKey === 'undefined') {
+        var errorMessage = getUndefinedStateErrorMessage(_key, action);
+        throw new Error(errorMessage);
+      }
+      nextState[_key] = nextStateForKey;
+      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
+    }
+    return hasChanged ? nextState : state;
+  };
+}
+// CONCATENATED MODULE: ./node_modules/redux/es/bindActionCreators.js
+function bindActionCreator(actionCreator, dispatch) {
+  return function () {
+    return dispatch(actionCreator.apply(undefined, arguments));
+  };
+}
+
+/**
+ * Turns an object whose values are action creators, into an object with the
+ * same keys, but with every function wrapped into a `dispatch` call so they
+ * may be invoked directly. This is just a convenience method, as you can call
+ * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
+ *
+ * For convenience, you can also pass a single function as the first argument,
+ * and get a function in return.
+ *
+ * @param {Function|Object} actionCreators An object whose values are action
+ * creator functions. One handy way to obtain it is to use ES6 `import * as`
+ * syntax. You may also pass a single function.
+ *
+ * @param {Function} dispatch The `dispatch` function available on your Redux
+ * store.
+ *
+ * @returns {Function|Object} The object mimicking the original object, but with
+ * every action creator wrapped into the `dispatch` call. If you passed a
+ * function as `actionCreators`, the return value will also be a single
+ * function.
+ */
+function bindActionCreators(actionCreators, dispatch) {
+  if (typeof actionCreators === 'function') {
+    return bindActionCreator(actionCreators, dispatch);
+  }
+
+  if (typeof actionCreators !== 'object' || actionCreators === null) {
+    throw new Error('bindActionCreators expected an object or a function, instead received ' + (actionCreators === null ? 'null' : typeof actionCreators) + '. ' + 'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?');
+  }
+
+  var keys = Object.keys(actionCreators);
+  var boundActionCreators = {};
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var actionCreator = actionCreators[key];
+    if (typeof actionCreator === 'function') {
+      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
+    }
+  }
+  return boundActionCreators;
+}
+// CONCATENATED MODULE: ./node_modules/redux/es/compose.js
+/**
+ * Composes single-argument functions from right to left. The rightmost
+ * function can take multiple arguments as it provides the signature for
+ * the resulting composite function.
+ *
+ * @param {...Function} funcs The functions to compose.
+ * @returns {Function} A function obtained by composing the argument functions
+ * from right to left. For example, compose(f, g, h) is identical to doing
+ * (...args) => f(g(h(...args))).
+ */
+
+function compose() {
+  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
+    funcs[_key] = arguments[_key];
+  }
+
+  if (funcs.length === 0) {
+    return function (arg) {
+      return arg;
+    };
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0];
+  }
+
+  return funcs.reduce(function (a, b) {
+    return function () {
+      return a(b.apply(undefined, arguments));
+    };
+  });
+}
+// CONCATENATED MODULE: ./node_modules/redux/es/applyMiddleware.js
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+
+
+/**
+ * Creates a store enhancer that applies middleware to the dispatch method
+ * of the Redux store. This is handy for a variety of tasks, such as expressing
+ * asynchronous actions in a concise manner, or logging every action payload.
+ *
+ * See `redux-thunk` package as an example of the Redux middleware.
+ *
+ * Because middleware is potentially asynchronous, this should be the first
+ * store enhancer in the composition chain.
+ *
+ * Note that each middleware will be given the `dispatch` and `getState` functions
+ * as named arguments.
+ *
+ * @param {...Function} middlewares The middleware chain to be applied.
+ * @returns {Function} A store enhancer applying the middleware.
+ */
+function applyMiddleware() {
+  for (var _len = arguments.length, middlewares = Array(_len), _key = 0; _key < _len; _key++) {
+    middlewares[_key] = arguments[_key];
+  }
+
+  return function (createStore) {
+    return function (reducer, preloadedState, enhancer) {
+      var store = createStore(reducer, preloadedState, enhancer);
+      var _dispatch = store.dispatch;
+      var chain = [];
+
+      var middlewareAPI = {
+        getState: store.getState,
+        dispatch: function dispatch(action) {
+          return _dispatch(action);
+        }
+      };
+      chain = middlewares.map(function (middleware) {
+        return middleware(middlewareAPI);
+      });
+      _dispatch = compose.apply(undefined, chain)(store.dispatch);
+
+      return _extends({}, store, {
+        dispatch: _dispatch
+      });
+    };
+  };
+}
+// CONCATENATED MODULE: ./node_modules/redux/es/index.js
+/* concated harmony reexport createStore */__webpack_require__.d(__webpack_exports__, "createStore", function() { return createStore_createStore; });
+/* concated harmony reexport combineReducers */__webpack_require__.d(__webpack_exports__, "combineReducers", function() { return combineReducers; });
+/* concated harmony reexport bindActionCreators */__webpack_require__.d(__webpack_exports__, "bindActionCreators", function() { return bindActionCreators; });
+/* concated harmony reexport applyMiddleware */__webpack_require__.d(__webpack_exports__, "applyMiddleware", function() { return applyMiddleware; });
+/* concated harmony reexport compose */__webpack_require__.d(__webpack_exports__, "compose", function() { return compose; });
+
+
+
+
+
+
+
+/*
+* This is a dummy function to check if the function name has been altered by minification.
+* If the function has been minified and NODE_ENV !== 'production', warn the user.
+*/
+function isCrushed() {}
+
+if (false) {}
+
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return symbolObservablePonyfill; });
+function symbolObservablePonyfill(root) {
+	var result;
+	var Symbol = root.Symbol;
+
+	if (typeof Symbol === 'function') {
+		if (Symbol.observable) {
+			result = Symbol.observable;
+		} else {
+			result = Symbol('observable');
+			Symbol.observable = result;
+		}
+	} else {
+		result = '@@observable';
+	}
+
+	return result;
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/* harmony default export */ __webpack_exports__["a"] = (freeGlobal);
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(10);
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _fuse = _interopRequireDefault(__webpack_require__(11));
+
+var _deepmerge = _interopRequireDefault(__webpack_require__(12));
+
+__webpack_require__(13);
+
+var _store = _interopRequireDefault(__webpack_require__(15));
+
+var _components = __webpack_require__(22);
+
+var _constants = __webpack_require__(1);
+
+var _templates = __webpack_require__(5);
+
+var _choices = __webpack_require__(30);
+
+var _items = __webpack_require__(31);
+
+var _groups = __webpack_require__(32);
+
+var _misc = __webpack_require__(33);
+
+var _general = __webpack_require__(34);
+
+var _utils = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/**
+ * Choices
+ * @author Josh Johnson<josh@joshuajohnson.co.uk>
+ */
+var Choices =
+/*#__PURE__*/
+function () {
+  function Choices() {
+    var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '[data-choice]';
+    var userConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, Choices);
+
+    if ((0, _utils.isType)('String', element)) {
+      var elements = Array.from(document.querySelectorAll(element)); // If there are multiple elements, create a new instance
+      // for each element besides the first one (as that already has an instance)
+
+      if (elements.length > 1) {
+        return this._generateInstances(elements, userConfig);
+      }
+    }
+
+    this.config = _deepmerge.default.all([_constants.DEFAULT_CONFIG, Choices.userDefaults, userConfig], // When merging array configs, replace with a copy of the userConfig array,
+    // instead of concatenating with the default array
+    {
+      arrayMerge: function arrayMerge(destinationArray, sourceArray) {
+        return [].concat(sourceArray);
+      }
+    });
+    var invalidConfigOptions = (0, _utils.diff)(this.config, _constants.DEFAULT_CONFIG);
+
+    if (invalidConfigOptions.length) {
+      console.warn('Unknown config option(s) passed', invalidConfigOptions.join(', '));
+    }
+
+    if (!['auto', 'always'].includes(this.config.renderSelectedChoices)) {
+      this.config.renderSelectedChoices = 'auto';
+    } // Retrieve triggering element (i.e. element with 'data-choice' trigger)
+
+
+    var passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
+
+    if (!passedElement) {
+      return console.error('Could not find passed element or passed element was of an invalid type');
+    }
+
+    this._isTextElement = passedElement.type === 'text';
+    this._isSelectOneElement = passedElement.type === 'select-one';
+    this._isSelectMultipleElement = passedElement.type === 'select-multiple';
+    this._isSelectElement = this._isSelectOneElement || this._isSelectMultipleElement;
+
+    if (this._isTextElement) {
+      this.passedElement = new _components.WrappedInput({
+        element: passedElement,
+        classNames: this.config.classNames,
+        delimiter: this.config.delimiter
+      });
+    } else if (this._isSelectElement) {
+      this.passedElement = new _components.WrappedSelect({
+        element: passedElement,
+        classNames: this.config.classNames
+      });
+    }
+
+    if (!this.passedElement) {
+      return console.error('Passed element was of an invalid type');
+    }
+
+    if (this.config.shouldSortItems === true && this._isSelectOneElement && !this.config.silent) {
+      console.warn("shouldSortElements: Type of passed element is 'select-one', falling back to false.");
+    }
+
+    this.initialised = false;
+    this._store = new _store.default(this.render);
+    this._initialState = {};
+    this._currentState = {};
+    this._prevState = {};
+    this._currentValue = '';
+    this._canSearch = this.config.searchEnabled;
+    this._isScrollingOnIe = false;
+    this._highlightPosition = 0;
+    this._wasTap = true;
+    this._placeholderValue = this._generatePlaceholderValue();
+    this._baseId = (0, _utils.generateId)(this.passedElement.element, 'choices-');
+    this._direction = this.passedElement.element.getAttribute('dir') || 'ltr';
+    this._idNames = {
+      itemChoice: 'item-choice'
+    }; // Assign preset choices from passed object
+
+    this._presetChoices = this.config.choices; // Assign preset items from passed object first
+
+    this._presetItems = this.config.items; // Then add any values passed from attribute
+
+    if (this.passedElement.value) {
+      this._presetItems = this._presetItems.concat(this.passedElement.value.split(this.config.delimiter));
+    }
+
+    this._render = this._render.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
+    this._onKeyUp = this._onKeyUp.bind(this);
+    this._onKeyDown = this._onKeyDown.bind(this);
+    this._onClick = this._onClick.bind(this);
+    this._onTouchMove = this._onTouchMove.bind(this);
+    this._onTouchEnd = this._onTouchEnd.bind(this);
+    this._onMouseDown = this._onMouseDown.bind(this);
+    this._onMouseOver = this._onMouseOver.bind(this);
+    this._onFormReset = this._onFormReset.bind(this);
+    this._onAKey = this._onAKey.bind(this);
+    this._onEnterKey = this._onEnterKey.bind(this);
+    this._onEscapeKey = this._onEscapeKey.bind(this);
+    this._onDirectionKey = this._onDirectionKey.bind(this);
+    this._onDeleteKey = this._onDeleteKey.bind(this); // If element has already been initialised with Choices, fail silently
+
+    if (this.passedElement.element.getAttribute('data-choice') === 'active') {
+      console.warn('Trying to initialise Choices on element already initialised');
+    } // Let's go
+
+
+    this.init();
+  }
+  /* ========================================
+  =            Public functions            =
+  ======================================== */
+
+
+  _createClass(Choices, [{
+    key: "init",
+    value: function init() {
+      if (this.initialised) {
+        return;
+      }
+
+      this._createTemplates();
+
+      this._createElements();
+
+      this._createStructure(); // Set initial state (We need to clone the state because some reducers
+      // modify the inner objects properties in the state) 🤢
+
+
+      this._initialState = (0, _utils.cloneObject)(this._store.state);
+
+      this._store.subscribe(this._render);
+
+      this._render();
+
+      this._addEventListeners();
+
+      var shouldDisable = !this.config.addItems || this.passedElement.element.hasAttribute('disabled');
+
+      if (shouldDisable) {
+        this.disable();
+      }
+
+      this.initialised = true;
+      var callbackOnInit = this.config.callbackOnInit; // Run callback if it is a function
+
+      if (callbackOnInit && (0, _utils.isType)('Function', callbackOnInit)) {
+        callbackOnInit.call(this);
+      }
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      if (!this.initialised) {
+        return;
+      }
+
+      this._removeEventListeners();
+
+      this.passedElement.reveal();
+      this.containerOuter.unwrap(this.passedElement.element);
+
+      if (this._isSelectElement) {
+        this.passedElement.options = this._presetChoices;
+      }
+
+      this.clearStore();
+      this.config.templates = null;
+      this.initialised = false;
+    }
+  }, {
+    key: "enable",
+    value: function enable() {
+      if (this.passedElement.isDisabled) {
+        this.passedElement.enable();
+      }
+
+      if (this.containerOuter.isDisabled) {
+        this._addEventListeners();
+
+        this.input.enable();
+        this.containerOuter.enable();
+      }
+
+      return this;
+    }
+  }, {
+    key: "disable",
+    value: function disable() {
+      if (!this.passedElement.isDisabled) {
+        this.passedElement.disable();
+      }
+
+      if (!this.containerOuter.isDisabled) {
+        this._removeEventListeners();
+
+        this.input.disable();
+        this.containerOuter.disable();
+      }
+
+      return this;
+    }
+  }, {
+    key: "highlightItem",
+    value: function highlightItem(item) {
+      var runEvent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      if (!item) {
+        return this;
+      }
+
+      var id = item.id,
+          _item$groupId = item.groupId,
+          groupId = _item$groupId === void 0 ? -1 : _item$groupId,
+          _item$value = item.value,
+          value = _item$value === void 0 ? '' : _item$value,
+          _item$label = item.label,
+          label = _item$label === void 0 ? '' : _item$label;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
+
+      this._store.dispatch((0, _items.highlightItem)(id, true));
+
+      if (runEvent) {
+        this.passedElement.triggerEvent(_constants.EVENTS.highlightItem, {
+          id: id,
+          value: value,
+          label: label,
+          groupValue: group && group.value ? group.value : null
+        });
+      }
+
+      return this;
+    }
+  }, {
+    key: "unhighlightItem",
+    value: function unhighlightItem(item) {
+      if (!item) {
+        return this;
+      }
+
+      var id = item.id,
+          _item$groupId2 = item.groupId,
+          groupId = _item$groupId2 === void 0 ? -1 : _item$groupId2,
+          _item$value2 = item.value,
+          value = _item$value2 === void 0 ? '' : _item$value2,
+          _item$label2 = item.label,
+          label = _item$label2 === void 0 ? '' : _item$label2;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
+
+      this._store.dispatch((0, _items.highlightItem)(id, false));
+
+      this.passedElement.triggerEvent(_constants.EVENTS.highlightItem, {
+        id: id,
+        value: value,
+        label: label,
+        groupValue: group && group.value ? group.value : null
+      });
+      return this;
+    }
+  }, {
+    key: "highlightAll",
+    value: function highlightAll() {
+      var _this = this;
+
+      this._store.items.forEach(function (item) {
+        return _this.highlightItem(item);
+      });
+
+      return this;
+    }
+  }, {
+    key: "unhighlightAll",
+    value: function unhighlightAll() {
+      var _this2 = this;
+
+      this._store.items.forEach(function (item) {
+        return _this2.unhighlightItem(item);
+      });
+
+      return this;
+    }
+  }, {
+    key: "removeActiveItemsByValue",
+    value: function removeActiveItemsByValue(value) {
+      var _this3 = this;
+
+      this._store.activeItems.filter(function (item) {
+        return item.value === value;
+      }).forEach(function (item) {
+        return _this3._removeItem(item);
+      });
+
+      return this;
+    }
+  }, {
+    key: "removeActiveItems",
+    value: function removeActiveItems(excludedId) {
+      var _this4 = this;
+
+      this._store.activeItems.filter(function (_ref) {
+        var id = _ref.id;
+        return id !== excludedId;
+      }).forEach(function (item) {
+        return _this4._removeItem(item);
+      });
+
+      return this;
+    }
+  }, {
+    key: "removeHighlightedItems",
+    value: function removeHighlightedItems() {
+      var _this5 = this;
+
+      var runEvent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      this._store.highlightedActiveItems.forEach(function (item) {
+        _this5._removeItem(item); // If this action was performed by the user
+        // trigger the event
+
+
+        if (runEvent) {
+          _this5._triggerChange(item.value);
+        }
+      });
+
+      return this;
+    }
+  }, {
+    key: "showDropdown",
+    value: function showDropdown(preventInputFocus) {
+      var _this6 = this;
+
+      if (this.dropdown.isActive) {
+        return this;
+      }
+
+      requestAnimationFrame(function () {
+        _this6.dropdown.show();
+
+        _this6.containerOuter.open(_this6.dropdown.distanceFromTopWindow());
+
+        if (!preventInputFocus && _this6._canSearch) {
+          _this6.input.focus();
+        }
+
+        _this6.passedElement.triggerEvent(_constants.EVENTS.showDropdown, {});
+      });
+      return this;
+    }
+  }, {
+    key: "hideDropdown",
+    value: function hideDropdown(preventInputBlur) {
+      var _this7 = this;
+
+      if (!this.dropdown.isActive) {
+        return this;
+      }
+
+      requestAnimationFrame(function () {
+        _this7.dropdown.hide();
+
+        _this7.containerOuter.close();
+
+        if (!preventInputBlur && _this7._canSearch) {
+          _this7.input.removeActiveDescendant();
+
+          _this7.input.blur();
+        }
+
+        _this7.passedElement.triggerEvent(_constants.EVENTS.hideDropdown, {});
+      });
+      return this;
+    }
+  }, {
+    key: "getValue",
+    value: function getValue() {
+      var valueOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      var values = this._store.activeItems.reduce(function (selectedItems, item) {
+        var itemValue = valueOnly ? item.value : item;
+        selectedItems.push(itemValue);
+        return selectedItems;
+      }, []);
+
+      return this._isSelectOneElement ? values[0] : values;
+    }
+  }, {
+    key: "setValue",
+    value: function setValue(args) {
+      var _this8 = this;
+
+      if (!this.initialised) {
+        return this;
+      }
+
+      [].concat(args).forEach(function (value) {
+        return _this8._setChoiceOrItem(value);
+      });
+      return this;
+    }
+  }, {
+    key: "setChoiceByValue",
+    value: function setChoiceByValue(value) {
+      var _this9 = this;
+
+      if (!this.initialised || this._isTextElement) {
+        return this;
+      } // If only one value has been passed, convert to array
+
+
+      var choiceValue = (0, _utils.isType)('Array', value) ? value : [value]; // Loop through each value and
+
+      choiceValue.forEach(function (val) {
+        return _this9._findAndSelectChoiceByValue(val);
+      });
+      return this;
+    }
+  }, {
+    key: "setChoices",
+    value: function setChoices() {
+      var _this10 = this;
+
+      var choices = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      var label = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+      var replaceChoices = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+      if (!this._isSelectElement || !choices.length || !value) {
+        return this;
+      } // Clear choices if needed
+
+
+      if (replaceChoices) {
+        this._clearChoices();
+      }
+
+      this.containerOuter.removeLoadingState();
+
+      var addGroupsAndChoices = function addGroupsAndChoices(groupOrChoice) {
+        if (groupOrChoice.choices) {
+          _this10._addGroup({
+            group: groupOrChoice,
+            id: groupOrChoice.id || null,
+            valueKey: value,
+            labelKey: label
+          });
+        } else {
+          _this10._addChoice({
+            value: groupOrChoice[value],
+            label: groupOrChoice[label],
+            isSelected: groupOrChoice.selected,
+            isDisabled: groupOrChoice.disabled,
+            customProperties: groupOrChoice.customProperties,
+            placeholder: groupOrChoice.placeholder
+          });
+        }
+      };
+
+      this._setLoading(true);
+
+      choices.forEach(addGroupsAndChoices);
+
+      this._setLoading(false);
+
+      return this;
+    }
+  }, {
+    key: "clearStore",
+    value: function clearStore() {
+      this._store.dispatch((0, _misc.clearAll)());
+
+      return this;
+    }
+  }, {
+    key: "clearInput",
+    value: function clearInput() {
+      var shouldSetInputWidth = !this._isSelectOneElement;
+      this.input.clear(shouldSetInputWidth);
+
+      if (!this._isTextElement && this._canSearch) {
+        this._isSearching = false;
+
+        this._store.dispatch((0, _choices.activateChoices)(true));
+      }
+
+      return this;
+    }
+  }, {
+    key: "ajax",
+    value: function ajax(fn) {
+      var _this11 = this;
+
+      if (!this.initialised || !this._isSelectElement || !fn) {
+        return this;
+      }
+
+      requestAnimationFrame(function () {
+        return _this11._handleLoadingState(true);
+      });
+      fn(this._ajaxCallback());
+      return this;
+    }
+    /* =====  End of Public functions  ====== */
+
+    /* =============================================
+    =                Private functions            =
+    ============================================= */
+
+  }, {
+    key: "_render",
+    value: function _render() {
+      if (this._store.isLoading()) {
+        return;
+      }
+
+      this._currentState = this._store.state;
+      var stateChanged = this._currentState.choices !== this._prevState.choices || this._currentState.groups !== this._prevState.groups || this._currentState.items !== this._prevState.items;
+      var shouldRenderChoices = this._isSelectElement;
+      var shouldRenderItems = this._currentState.items !== this._prevState.items;
+
+      if (!stateChanged) {
+        return;
+      }
+
+      if (shouldRenderChoices) {
+        this._renderChoices();
+      }
+
+      if (shouldRenderItems) {
+        this._renderItems();
+      }
+
+      this._prevState = this._currentState;
+    }
+  }, {
+    key: "_renderChoices",
+    value: function _renderChoices() {
+      var _this12 = this;
+
+      var _this$_store = this._store,
+          activeGroups = _this$_store.activeGroups,
+          activeChoices = _this$_store.activeChoices;
+      var choiceListFragment = document.createDocumentFragment();
+      this.choiceList.clear();
+
+      if (this.config.resetScrollPosition) {
+        requestAnimationFrame(function () {
+          return _this12.choiceList.scrollToTop();
+        });
+      } // If we have grouped options
+
+
+      if (activeGroups.length >= 1 && !this._isSearching) {
+        // If we have a placeholder choice along with groups
+        var activePlaceholders = activeChoices.filter(function (activeChoice) {
+          return activeChoice.placeholder === true && activeChoice.groupId === -1;
+        });
+
+        if (activePlaceholders.length >= 1) {
+          choiceListFragment = this._createChoicesFragment(activePlaceholders, choiceListFragment);
+        }
+
+        choiceListFragment = this._createGroupsFragment(activeGroups, activeChoices, choiceListFragment);
+      } else if (activeChoices.length >= 1) {
+        choiceListFragment = this._createChoicesFragment(activeChoices, choiceListFragment);
+      } // If we have choices to show
+
+
+      if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
+        var activeItems = this._store.activeItems;
+
+        var canAddItem = this._canAddItem(activeItems, this.input.value); // ...and we can select them
+
+
+        if (canAddItem.response) {
+          // ...append them and highlight the first choice
+          this.choiceList.append(choiceListFragment);
+
+          this._highlightChoice();
+        } else {
+          // ...otherwise show a notice
+          this.choiceList.append(this._getTemplate('notice', canAddItem.notice));
+        }
+      } else {
+        // Otherwise show a notice
+        var dropdownItem;
+        var notice;
+
+        if (this._isSearching) {
+          notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
+          dropdownItem = this._getTemplate('notice', notice, 'no-results');
+        } else {
+          notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
+          dropdownItem = this._getTemplate('notice', notice, 'no-choices');
+        }
+
+        this.choiceList.append(dropdownItem);
+      }
+    }
+  }, {
+    key: "_renderItems",
+    value: function _renderItems() {
+      var activeItems = this._store.activeItems || [];
+      this.itemList.clear(); // Create a fragment to store our list items
+      // (so we don't have to update the DOM for each item)
+
+      var itemListFragment = this._createItemsFragment(activeItems); // If we have items to add, append them
+
+
+      if (itemListFragment.childNodes) {
+        this.itemList.append(itemListFragment);
+      }
+    }
+  }, {
+    key: "_createGroupsFragment",
+    value: function _createGroupsFragment(groups, choices, fragment) {
+      var _this13 = this;
+
+      var groupFragment = fragment || document.createDocumentFragment();
+
+      var getGroupChoices = function getGroupChoices(group) {
+        return choices.filter(function (choice) {
+          if (_this13._isSelectOneElement) {
+            return choice.groupId === group.id;
+          }
+
+          return choice.groupId === group.id && (_this13.config.renderSelectedChoices === 'always' || !choice.selected);
+        });
+      }; // If sorting is enabled, filter groups
+
+
+      if (this.config.shouldSort) {
+        groups.sort(this.config.sortFn);
+      }
+
+      groups.forEach(function (group) {
+        var groupChoices = getGroupChoices(group);
+
+        if (groupChoices.length >= 1) {
+          var dropdownGroup = _this13._getTemplate('choiceGroup', group);
+
+          groupFragment.appendChild(dropdownGroup);
+
+          _this13._createChoicesFragment(groupChoices, groupFragment, true);
+        }
+      });
+      return groupFragment;
+    }
+  }, {
+    key: "_createChoicesFragment",
+    value: function _createChoicesFragment(choices, fragment) {
+      var _this14 = this;
+
+      var withinGroup = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      // Create a fragment to store our list items (so we don't have to update the DOM for each item)
+      var choicesFragment = fragment || document.createDocumentFragment();
+      var _this$config = this.config,
+          renderSelectedChoices = _this$config.renderSelectedChoices,
+          searchResultLimit = _this$config.searchResultLimit,
+          renderChoiceLimit = _this$config.renderChoiceLimit;
+      var filter = this._isSearching ? _utils.sortByScore : this.config.sortFn;
+
+      var appendChoice = function appendChoice(choice) {
+        var shouldRender = renderSelectedChoices === 'auto' ? _this14._isSelectOneElement || !choice.selected : true;
+
+        if (shouldRender) {
+          var dropdownItem = _this14._getTemplate('choice', choice, _this14.config.itemSelectText);
+
+          choicesFragment.appendChild(dropdownItem);
+        }
+      };
+
+      var rendererableChoices = choices;
+
+      if (renderSelectedChoices === 'auto' && !this._isSelectOneElement) {
+        rendererableChoices = choices.filter(function (choice) {
+          return !choice.selected;
+        });
+      } // Split array into placeholders and "normal" choices
+
+
+      var _rendererableChoices$ = rendererableChoices.reduce(function (acc, choice) {
+        if (choice.placeholder) {
+          acc.placeholderChoices.push(choice);
+        } else {
+          acc.normalChoices.push(choice);
+        }
+
+        return acc;
+      }, {
+        placeholderChoices: [],
+        normalChoices: []
+      }),
+          placeholderChoices = _rendererableChoices$.placeholderChoices,
+          normalChoices = _rendererableChoices$.normalChoices; // If sorting is enabled or the user is searching, filter choices
+
+
+      if (this.config.shouldSort || this._isSearching) {
+        normalChoices.sort(filter);
+      }
+
+      var choiceLimit = rendererableChoices.length; // Prepend placeholeder
+
+      var sortedChoices = [].concat(placeholderChoices, normalChoices);
+
+      if (this._isSearching) {
+        choiceLimit = searchResultLimit;
+      } else if (renderChoiceLimit > 0 && !withinGroup) {
+        choiceLimit = renderChoiceLimit;
+      } // Add each choice to dropdown within range
+
+
+      for (var i = 0; i < choiceLimit; i += 1) {
+        if (sortedChoices[i]) {
+          appendChoice(sortedChoices[i]);
+        }
+      }
+
+      return choicesFragment;
+    }
+  }, {
+    key: "_createItemsFragment",
+    value: function _createItemsFragment(items) {
+      var _this15 = this;
+
+      var fragment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      // Create fragment to add elements to
+      var _this$config2 = this.config,
+          shouldSortItems = _this$config2.shouldSortItems,
+          sortFn = _this$config2.sortFn,
+          removeItemButton = _this$config2.removeItemButton;
+      var itemListFragment = fragment || document.createDocumentFragment(); // If sorting is enabled, filter items
+
+      if (shouldSortItems && !this._isSelectOneElement) {
+        items.sort(sortFn);
+      }
+
+      if (this._isTextElement) {
+        // Update the value of the hidden input
+        this.passedElement.value = items;
+      } else {
+        // Update the options of the hidden input
+        this.passedElement.options = items;
+      }
+
+      var addItemToFragment = function addItemToFragment(item) {
+        // Create new list element
+        var listItem = _this15._getTemplate('item', item, removeItemButton); // Append it to list
+
+
+        itemListFragment.appendChild(listItem);
+      }; // Add each list item to list
+
+
+      items.forEach(function (item) {
+        return addItemToFragment(item);
+      });
+      return itemListFragment;
+    }
+  }, {
+    key: "_triggerChange",
+    value: function _triggerChange(value) {
+      if (value === undefined || value === null) {
+        return;
+      }
+
+      this.passedElement.triggerEvent(_constants.EVENTS.change, {
+        value: value
+      });
+    }
+  }, {
+    key: "_selectPlaceholderChoice",
+    value: function _selectPlaceholderChoice() {
+      var placeholderChoice = this._store.placeholderChoice;
+
+      if (placeholderChoice) {
+        this._addItem({
+          value: placeholderChoice.value,
+          label: placeholderChoice.label,
+          choiceId: placeholderChoice.id,
+          groupId: placeholderChoice.groupId,
+          placeholder: placeholderChoice.placeholder
+        });
+
+        this._triggerChange(placeholderChoice.value);
+      }
+    }
+  }, {
+    key: "_handleButtonAction",
+    value: function _handleButtonAction(activeItems, element) {
+      if (!activeItems || !element || !this.config.removeItems || !this.config.removeItemButton) {
+        return;
+      }
+
+      var itemId = element.parentNode.getAttribute('data-id');
+      var itemToRemove = activeItems.find(function (item) {
+        return item.id === parseInt(itemId, 10);
+      }); // Remove item associated with button
+
+      this._removeItem(itemToRemove);
+
+      this._triggerChange(itemToRemove.value);
+
+      if (this._isSelectOneElement) {
+        this._selectPlaceholderChoice();
+      }
+    }
+  }, {
+    key: "_handleItemAction",
+    value: function _handleItemAction(activeItems, element) {
+      var _this16 = this;
+
+      var hasShiftKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      if (!activeItems || !element || !this.config.removeItems || this._isSelectOneElement) {
+        return;
+      }
+
+      var passedId = element.getAttribute('data-id'); // We only want to select one item with a click
+      // so we deselect any items that aren't the target
+      // unless shift is being pressed
+
+      activeItems.forEach(function (item) {
+        if (item.id === parseInt(passedId, 10) && !item.highlighted) {
+          _this16.highlightItem(item);
+        } else if (!hasShiftKey && item.highlighted) {
+          _this16.unhighlightItem(item);
+        }
+      }); // Focus input as without focus, a user cannot do anything with a
+      // highlighted item
+
+      this.input.focus();
+    }
+  }, {
+    key: "_handleChoiceAction",
+    value: function _handleChoiceAction(activeItems, element) {
+      if (!activeItems || !element) {
+        return;
+      } // If we are clicking on an option
+
+
+      var id = element.getAttribute('data-id');
+
+      var choice = this._store.getChoiceById(id);
+
+      var passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
+      var hasActiveDropdown = this.dropdown.isActive; // Update choice keyCode
+
+      choice.keyCode = passedKeyCode;
+      this.passedElement.triggerEvent(_constants.EVENTS.choice, {
+        choice: choice
+      });
+
+      if (choice && !choice.selected && !choice.disabled) {
+        var canAddItem = this._canAddItem(activeItems, choice.value);
+
+        if (canAddItem.response) {
+          this._addItem({
+            value: choice.value,
+            label: choice.label,
+            choiceId: choice.id,
+            groupId: choice.groupId,
+            customProperties: choice.customProperties,
+            placeholder: choice.placeholder,
+            keyCode: choice.keyCode
+          });
+
+          this._triggerChange(choice.value);
+        }
+      }
+
+      this.clearInput(); // We wont to close the dropdown if we are dealing with a single select box
+
+      if (hasActiveDropdown && this._isSelectOneElement) {
+        this.hideDropdown(true);
+        this.containerOuter.focus();
+      }
+    }
+  }, {
+    key: "_handleBackspace",
+    value: function _handleBackspace(activeItems) {
+      if (!this.config.removeItems || !activeItems) {
+        return;
+      }
+
+      var lastItem = activeItems[activeItems.length - 1];
+      var hasHighlightedItems = activeItems.some(function (item) {
+        return item.highlighted;
+      }); // If editing the last item is allowed and there are not other selected items,
+      // we can edit the item value. Otherwise if we can remove items, remove all selected items
+
+      if (this.config.editItems && !hasHighlightedItems && lastItem) {
+        this.input.value = lastItem.value;
+        this.input.setWidth();
+
+        this._removeItem(lastItem);
+
+        this._triggerChange(lastItem.value);
+      } else {
+        if (!hasHighlightedItems) {
+          // Highlight last item if none already highlighted
+          this.highlightItem(lastItem, false);
+        }
+
+        this.removeHighlightedItems(true);
+      }
+    }
+  }, {
+    key: "_setLoading",
+    value: function _setLoading(isLoading) {
+      this._store.dispatch((0, _general.setIsLoading)(isLoading));
+    }
+  }, {
+    key: "_handleLoadingState",
+    value: function _handleLoadingState() {
+      var setLoading = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      var placeholderItem = this.itemList.getChild(".".concat(this.config.classNames.placeholder));
+
+      if (setLoading) {
+        this.disable();
+        this.containerOuter.addLoadingState();
+
+        if (this._isSelectOneElement) {
+          if (!placeholderItem) {
+            placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
+            this.itemList.append(placeholderItem);
+          } else {
+            placeholderItem.innerHTML = this.config.loadingText;
+          }
+        } else {
+          this.input.placeholder = this.config.loadingText;
+        }
+      } else {
+        this.enable();
+        this.containerOuter.removeLoadingState();
+
+        if (this._isSelectOneElement) {
+          placeholderItem.innerHTML = this._placeholderValue || '';
+        } else {
+          this.input.placeholder = this._placeholderValue || '';
+        }
+      }
+    }
+  }, {
+    key: "_handleSearch",
+    value: function _handleSearch(value) {
+      if (!value || !this.input.isFocussed) {
+        return;
+      }
+
+      var choices = this._store.choices;
+      var _this$config3 = this.config,
+          searchFloor = _this$config3.searchFloor,
+          searchChoices = _this$config3.searchChoices;
+      var hasUnactiveChoices = choices.some(function (option) {
+        return !option.active;
+      }); // Check that we have a value to search and the input was an alphanumeric character
+
+      if (value && value.length >= searchFloor) {
+        var resultCount = searchChoices ? this._searchChoices(value) : 0; // Trigger search event
+
+        this.passedElement.triggerEvent(_constants.EVENTS.search, {
+          value: value,
+          resultCount: resultCount
+        });
+      } else if (hasUnactiveChoices) {
+        // Otherwise reset choices to active
+        this._isSearching = false;
+
+        this._store.dispatch((0, _choices.activateChoices)(true));
+      }
+    }
+  }, {
+    key: "_canAddItem",
+    value: function _canAddItem(activeItems, value) {
+      var canAddItem = true;
+      var notice = (0, _utils.isType)('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
+
+      if (!this._isSelectOneElement) {
+        var isDuplicateValue = (0, _utils.existsInArray)(activeItems, value);
+
+        if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
+          // If there is a max entry limit and we have reached that limit
+          // don't update
+          canAddItem = false;
+          notice = (0, _utils.isType)('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
+        }
+
+        if (!this.config.duplicateItemsAllowed && isDuplicateValue && canAddItem) {
+          canAddItem = false;
+          notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
+        }
+
+        if (this._isTextElement && this.config.addItems && canAddItem && (0, _utils.isType)('Function', this.config.addItemFilterFn) && !this.config.addItemFilterFn(value)) {
+          canAddItem = false;
+          notice = (0, _utils.isType)('Function', this.config.customAddItemText) ? this.config.customAddItemText(value) : this.config.customAddItemText;
+        }
+      }
+
+      return {
+        response: canAddItem,
+        notice: notice
+      };
+    }
+  }, {
+    key: "_ajaxCallback",
+    value: function _ajaxCallback() {
+      var _this17 = this;
+
+      return function (results, value, label) {
+        if (!results || !value) {
+          return;
+        }
+
+        var parsedResults = (0, _utils.isType)('Object', results) ? [results] : results;
+
+        if (parsedResults && (0, _utils.isType)('Array', parsedResults) && parsedResults.length) {
+          // Remove loading states/text
+          _this17._handleLoadingState(false);
+
+          _this17._setLoading(true); // Add each result as a choice
+
+
+          parsedResults.forEach(function (result) {
+            if (result.choices) {
+              _this17._addGroup({
+                group: result,
+                id: result.id || null,
+                valueKey: value,
+                labelKey: label
+              });
+            } else {
+              _this17._addChoice({
+                value: (0, _utils.fetchFromObject)(result, value),
+                label: (0, _utils.fetchFromObject)(result, label),
+                isSelected: result.selected,
+                isDisabled: result.disabled,
+                customProperties: result.customProperties,
+                placeholder: result.placeholder
+              });
+            }
+          });
+
+          _this17._setLoading(false);
+
+          if (_this17._isSelectOneElement) {
+            _this17._selectPlaceholderChoice();
+          }
+        } else {
+          // No results, remove loading state
+          _this17._handleLoadingState(false);
+        }
+      };
+    }
+  }, {
+    key: "_searchChoices",
+    value: function _searchChoices(value) {
+      var newValue = (0, _utils.isType)('String', value) ? value.trim() : value;
+      var currentValue = (0, _utils.isType)('String', this._currentValue) ? this._currentValue.trim() : this._currentValue;
+
+      if (newValue.length < 1 && newValue === "".concat(currentValue, " ")) {
+        return 0;
+      } // If new value matches the desired length and is not the same as the current value with a space
+
+
+      var haystack = this._store.searchableChoices;
+      var needle = newValue;
+      var keys = [].concat(this.config.searchFields);
+      var options = Object.assign(this.config.fuseOptions, {
+        keys: keys
+      });
+      var fuse = new _fuse.default(haystack, options);
+      var results = fuse.search(needle);
+      this._currentValue = newValue;
+      this._highlightPosition = 0;
+      this._isSearching = true;
+
+      this._store.dispatch((0, _choices.filterChoices)(results));
+
+      return results.length;
+    }
+  }, {
+    key: "_addEventListeners",
+    value: function _addEventListeners() {
+      document.addEventListener('keyup', this._onKeyUp);
+      document.addEventListener('keydown', this._onKeyDown);
+      document.addEventListener('click', this._onClick);
+      document.addEventListener('touchmove', this._onTouchMove);
+      document.addEventListener('touchend', this._onTouchEnd);
+      document.addEventListener('mousedown', this._onMouseDown);
+      document.addEventListener('mouseover', this._onMouseOver);
+
+      if (this._isSelectOneElement) {
+        this.containerOuter.element.addEventListener('focus', this._onFocus);
+        this.containerOuter.element.addEventListener('blur', this._onBlur);
+      }
+
+      this.input.element.addEventListener('focus', this._onFocus);
+      this.input.element.addEventListener('blur', this._onBlur);
+
+      if (this.input.element.form) {
+        this.input.element.form.addEventListener('reset', this._onFormReset);
+      }
+
+      this.input.addEventListeners();
+    }
+  }, {
+    key: "_removeEventListeners",
+    value: function _removeEventListeners() {
+      document.removeEventListener('keyup', this._onKeyUp);
+      document.removeEventListener('keydown', this._onKeyDown);
+      document.removeEventListener('click', this._onClick);
+      document.removeEventListener('touchmove', this._onTouchMove);
+      document.removeEventListener('touchend', this._onTouchEnd);
+      document.removeEventListener('mousedown', this._onMouseDown);
+      document.removeEventListener('mouseover', this._onMouseOver);
+
+      if (this._isSelectOneElement) {
+        this.containerOuter.element.removeEventListener('focus', this._onFocus);
+        this.containerOuter.element.removeEventListener('blur', this._onBlur);
+      }
+
+      this.input.element.removeEventListener('focus', this._onFocus);
+      this.input.element.removeEventListener('blur', this._onBlur);
+
+      if (this.input.element.form) {
+        this.input.element.form.removeEventListener('reset', this._onFormReset);
+      }
+
+      this.input.removeEventListeners();
+    }
+  }, {
+    key: "_onKeyDown",
+    value: function _onKeyDown(event) {
+      var _keyDownActions;
+
+      var target = event.target,
+          keyCode = event.keyCode,
+          ctrlKey = event.ctrlKey,
+          metaKey = event.metaKey;
+
+      if (target !== this.input.element && !this.containerOuter.element.contains(target)) {
+        return;
+      }
+
+      var activeItems = this._store.activeItems;
+      var hasFocusedInput = this.input.isFocussed;
+      var hasActiveDropdown = this.dropdown.isActive;
+      var hasItems = this.itemList.hasChildren;
+      var keyString = String.fromCharCode(keyCode);
+      var BACK_KEY = _constants.KEY_CODES.BACK_KEY,
+          DELETE_KEY = _constants.KEY_CODES.DELETE_KEY,
+          ENTER_KEY = _constants.KEY_CODES.ENTER_KEY,
+          A_KEY = _constants.KEY_CODES.A_KEY,
+          ESC_KEY = _constants.KEY_CODES.ESC_KEY,
+          UP_KEY = _constants.KEY_CODES.UP_KEY,
+          DOWN_KEY = _constants.KEY_CODES.DOWN_KEY,
+          PAGE_UP_KEY = _constants.KEY_CODES.PAGE_UP_KEY,
+          PAGE_DOWN_KEY = _constants.KEY_CODES.PAGE_DOWN_KEY;
+      var hasCtrlDownKeyPressed = ctrlKey || metaKey; // If a user is typing and the dropdown is not active
+
+      if (!this._isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString)) {
+        this.showDropdown();
+      } // Map keys to key actions
+
+
+      var keyDownActions = (_keyDownActions = {}, _defineProperty(_keyDownActions, A_KEY, this._onAKey), _defineProperty(_keyDownActions, ENTER_KEY, this._onEnterKey), _defineProperty(_keyDownActions, ESC_KEY, this._onEscapeKey), _defineProperty(_keyDownActions, UP_KEY, this._onDirectionKey), _defineProperty(_keyDownActions, PAGE_UP_KEY, this._onDirectionKey), _defineProperty(_keyDownActions, DOWN_KEY, this._onDirectionKey), _defineProperty(_keyDownActions, PAGE_DOWN_KEY, this._onDirectionKey), _defineProperty(_keyDownActions, DELETE_KEY, this._onDeleteKey), _defineProperty(_keyDownActions, BACK_KEY, this._onDeleteKey), _keyDownActions); // If keycode has a function, run it
+
+      if (keyDownActions[keyCode]) {
+        keyDownActions[keyCode]({
+          event: event,
+          target: target,
+          keyCode: keyCode,
+          metaKey: metaKey,
+          activeItems: activeItems,
+          hasFocusedInput: hasFocusedInput,
+          hasActiveDropdown: hasActiveDropdown,
+          hasItems: hasItems,
+          hasCtrlDownKeyPressed: hasCtrlDownKeyPressed
+        });
+      }
+    }
+  }, {
+    key: "_onKeyUp",
+    value: function _onKeyUp(_ref2) {
+      var target = _ref2.target,
+          keyCode = _ref2.keyCode;
+
+      if (target !== this.input.element) {
+        return;
+      }
+
+      var value = this.input.value;
+      var activeItems = this._store.activeItems;
+
+      var canAddItem = this._canAddItem(activeItems, value);
+
+      var backKey = _constants.KEY_CODES.BACK_KEY,
+          deleteKey = _constants.KEY_CODES.DELETE_KEY; // We are typing into a text input and have a value, we want to show a dropdown
+      // notice. Otherwise hide the dropdown
+
+      if (this._isTextElement) {
+        var canShowDropdownNotice = canAddItem.notice && value;
+
+        if (canShowDropdownNotice) {
+          var dropdownItem = this._getTemplate('notice', canAddItem.notice);
+
+          this.dropdown.element.innerHTML = dropdownItem.outerHTML;
+          this.showDropdown(true);
+        } else {
+          this.hideDropdown(true);
+        }
+      } else {
+        var userHasRemovedValue = (keyCode === backKey || keyCode === deleteKey) && !target.value;
+        var canReactivateChoices = !this._isTextElement && this._isSearching;
+        var canSearch = this._canSearch && canAddItem.response;
+
+        if (userHasRemovedValue && canReactivateChoices) {
+          this._isSearching = false;
+
+          this._store.dispatch((0, _choices.activateChoices)(true));
+        } else if (canSearch) {
+          this._handleSearch(this.input.value);
+        }
+      }
+
+      this._canSearch = this.config.searchEnabled;
+    }
+  }, {
+    key: "_onAKey",
+    value: function _onAKey(_ref3) {
+      var hasItems = _ref3.hasItems,
+          hasCtrlDownKeyPressed = _ref3.hasCtrlDownKeyPressed;
+
+      // If CTRL + A or CMD + A have been pressed and there are items to select
+      if (hasCtrlDownKeyPressed && hasItems) {
+        this._canSearch = false;
+        var shouldHightlightAll = this.config.removeItems && !this.input.value && this.input.element === document.activeElement;
+
+        if (shouldHightlightAll) {
+          this.highlightAll();
+        }
+      }
+    }
+  }, {
+    key: "_onEnterKey",
+    value: function _onEnterKey(_ref4) {
+      var event = _ref4.event,
+          target = _ref4.target,
+          activeItems = _ref4.activeItems,
+          hasActiveDropdown = _ref4.hasActiveDropdown;
+      var enterKey = _constants.KEY_CODES.ENTER_KEY;
+      var targetWasButton = target.hasAttribute('data-button');
+
+      if (this._isTextElement && target.value) {
+        var value = this.input.value;
+
+        var canAddItem = this._canAddItem(activeItems, value);
+
+        if (canAddItem.response) {
+          this.hideDropdown(true);
+
+          this._addItem({
+            value: value
+          });
+
+          this._triggerChange(value);
+
+          this.clearInput();
+        }
+      }
+
+      if (targetWasButton) {
+        this._handleButtonAction(activeItems, target);
+
+        event.preventDefault();
+      }
+
+      if (hasActiveDropdown) {
+        var highlightedChoice = this.dropdown.getChild(".".concat(this.config.classNames.highlightedState));
+
+        if (highlightedChoice) {
+          // add enter keyCode value
+          if (activeItems[0]) {
+            activeItems[0].keyCode = enterKey; // eslint-disable-line no-param-reassign
+          }
+
+          this._handleChoiceAction(activeItems, highlightedChoice);
+        }
+
+        event.preventDefault();
+      } else if (this._isSelectOneElement) {
+        this.showDropdown();
+        event.preventDefault();
+      }
+    }
+  }, {
+    key: "_onEscapeKey",
+    value: function _onEscapeKey(_ref5) {
+      var hasActiveDropdown = _ref5.hasActiveDropdown;
+
+      if (hasActiveDropdown) {
+        this.hideDropdown(true);
+        this.containerOuter.focus();
+      }
+    }
+  }, {
+    key: "_onDirectionKey",
+    value: function _onDirectionKey(_ref6) {
+      var event = _ref6.event,
+          hasActiveDropdown = _ref6.hasActiveDropdown,
+          keyCode = _ref6.keyCode,
+          metaKey = _ref6.metaKey;
+      var downKey = _constants.KEY_CODES.DOWN_KEY,
+          pageUpKey = _constants.KEY_CODES.PAGE_UP_KEY,
+          pageDownKey = _constants.KEY_CODES.PAGE_DOWN_KEY; // If up or down key is pressed, traverse through options
+
+      if (hasActiveDropdown || this._isSelectOneElement) {
+        this.showDropdown();
+        this._canSearch = false;
+        var directionInt = keyCode === downKey || keyCode === pageDownKey ? 1 : -1;
+        var skipKey = metaKey || keyCode === pageDownKey || keyCode === pageUpKey;
+        var selectableChoiceIdentifier = '[data-choice-selectable]';
+        var nextEl;
+
+        if (skipKey) {
+          if (directionInt > 0) {
+            nextEl = Array.from(this.dropdown.element.querySelectorAll(selectableChoiceIdentifier)).pop();
+          } else {
+            nextEl = this.dropdown.element.querySelector(selectableChoiceIdentifier);
+          }
+        } else {
+          var currentEl = this.dropdown.element.querySelector(".".concat(this.config.classNames.highlightedState));
+
+          if (currentEl) {
+            nextEl = (0, _utils.getAdjacentEl)(currentEl, selectableChoiceIdentifier, directionInt);
+          } else {
+            nextEl = this.dropdown.element.querySelector(selectableChoiceIdentifier);
+          }
+        }
+
+        if (nextEl) {
+          // We prevent default to stop the cursor moving
+          // when pressing the arrow
+          if (!(0, _utils.isScrolledIntoView)(nextEl, this.choiceList.element, directionInt)) {
+            this.choiceList.scrollToChoice(nextEl, directionInt);
+          }
+
+          this._highlightChoice(nextEl);
+        } // Prevent default to maintain cursor position whilst
+        // traversing dropdown options
+
+
+        event.preventDefault();
+      }
+    }
+  }, {
+    key: "_onDeleteKey",
+    value: function _onDeleteKey(_ref7) {
+      var event = _ref7.event,
+          target = _ref7.target,
+          hasFocusedInput = _ref7.hasFocusedInput,
+          activeItems = _ref7.activeItems;
+
+      // If backspace or delete key is pressed and the input has no value
+      if (hasFocusedInput && !target.value && !this._isSelectOneElement) {
+        this._handleBackspace(activeItems);
+
+        event.preventDefault();
+      }
+    }
+  }, {
+    key: "_onTouchMove",
+    value: function _onTouchMove() {
+      if (this._wasTap) {
+        this._wasTap = false;
+      }
+    }
+  }, {
+    key: "_onTouchEnd",
+    value: function _onTouchEnd(event) {
+      var _ref8 = event || event.touches[0],
+          target = _ref8.target;
+
+      var touchWasWithinContainer = this._wasTap && this.containerOuter.element.contains(target);
+
+      if (touchWasWithinContainer) {
+        var containerWasExactTarget = target === this.containerOuter.element || target === this.containerInner.element;
+
+        if (containerWasExactTarget) {
+          if (this._isTextElement) {
+            this.input.focus();
+          } else if (this._isSelectMultipleElement) {
+            this.showDropdown();
+          }
+        } // Prevents focus event firing
+
+
+        event.stopPropagation();
+      }
+
+      this._wasTap = true;
+    }
+  }, {
+    key: "_onMouseDown",
+    value: function _onMouseDown(event) {
+      var target = event.target,
+          shiftKey = event.shiftKey; // If we have our mouse down on the scrollbar and are on IE11...
+
+      if (target === this.choiceList && (0, _utils.isIE11)()) {
+        this._isScrollingOnIe = true;
+      }
+
+      if (!this.containerOuter.element.contains(target) || target === this.input.element) {
+        return;
+      }
+
+      var activeItems = this._store.activeItems;
+      var hasShiftKey = shiftKey;
+      var buttonTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button');
+      var itemTarget = (0, _utils.findAncestorByAttrName)(target, 'data-item');
+      var choiceTarget = (0, _utils.findAncestorByAttrName)(target, 'data-choice');
+
+      if (buttonTarget) {
+        this._handleButtonAction(activeItems, buttonTarget);
+      } else if (itemTarget) {
+        this._handleItemAction(activeItems, itemTarget, hasShiftKey);
+      } else if (choiceTarget) {
+        this._handleChoiceAction(activeItems, choiceTarget);
+      }
+
+      event.preventDefault();
+    }
+  }, {
+    key: "_onMouseOver",
+    value: function _onMouseOver(_ref9) {
+      var target = _ref9.target;
+      var targetWithinDropdown = target === this.dropdown || this.dropdown.element.contains(target);
+      var shouldHighlightChoice = targetWithinDropdown && target.hasAttribute('data-choice');
+
+      if (shouldHighlightChoice) {
+        this._highlightChoice(target);
+      }
+    }
+  }, {
+    key: "_onClick",
+    value: function _onClick(_ref10) {
+      var target = _ref10.target;
+      var clickWasWithinContainer = this.containerOuter.element.contains(target);
+
+      if (clickWasWithinContainer) {
+        if (!this.dropdown.isActive && !this.containerOuter.isDisabled) {
+          if (this._isTextElement) {
+            if (document.activeElement !== this.input.element) {
+              this.input.focus();
+            }
+          } else {
+            this.showDropdown();
+            this.containerOuter.focus();
+          }
+        } else if (this._isSelectOneElement && target !== this.input.element && !this.dropdown.element.contains(target)) {
+          this.hideDropdown();
+        }
+      } else {
+        var hasHighlightedItems = this._store.highlightedActiveItems;
+
+        if (hasHighlightedItems) {
+          this.unhighlightAll();
+        }
+
+        this.containerOuter.removeFocusState();
+        this.hideDropdown(true);
+      }
+    }
+  }, {
+    key: "_onFocus",
+    value: function _onFocus(_ref11) {
+      var _this18 = this;
+
+      var target = _ref11.target;
+      var focusWasWithinContainer = this.containerOuter.element.contains(target);
+
+      if (!focusWasWithinContainer) {
+        return;
+      }
+
+      var focusActions = {
+        text: function text() {
+          if (target === _this18.input.element) {
+            _this18.containerOuter.addFocusState();
+          }
+        },
+        'select-one': function selectOne() {
+          _this18.containerOuter.addFocusState();
+
+          if (target === _this18.input.element) {
+            _this18.showDropdown(true);
+          }
+        },
+        'select-multiple': function selectMultiple() {
+          if (target === _this18.input.element) {
+            _this18.showDropdown(true); // If element is a select box, the focused element is the container and the dropdown
+            // isn't already open, focus and show dropdown
+
+
+            _this18.containerOuter.addFocusState();
+          }
+        }
+      };
+      focusActions[this.passedElement.element.type]();
+    }
+  }, {
+    key: "_onBlur",
+    value: function _onBlur(_ref12) {
+      var _this19 = this;
+
+      var target = _ref12.target;
+      var blurWasWithinContainer = this.containerOuter.element.contains(target);
+
+      if (blurWasWithinContainer && !this._isScrollingOnIe) {
+        var activeItems = this._store.activeItems;
+        var hasHighlightedItems = activeItems.some(function (item) {
+          return item.highlighted;
+        });
+        var blurActions = {
+          text: function text() {
+            if (target === _this19.input.element) {
+              _this19.containerOuter.removeFocusState();
+
+              if (hasHighlightedItems) {
+                _this19.unhighlightAll();
+              }
+
+              _this19.hideDropdown(true);
+            }
+          },
+          'select-one': function selectOne() {
+            _this19.containerOuter.removeFocusState();
+
+            if (target === _this19.input.element || target === _this19.containerOuter.element && !_this19._canSearch) {
+              _this19.hideDropdown(true);
+            }
+          },
+          'select-multiple': function selectMultiple() {
+            if (target === _this19.input.element) {
+              _this19.containerOuter.removeFocusState();
+
+              _this19.hideDropdown(true);
+
+              if (hasHighlightedItems) {
+                _this19.unhighlightAll();
+              }
+            }
+          }
+        };
+        blurActions[this.passedElement.element.type]();
+      } else {
+        // On IE11, clicking the scollbar blurs our input and thus
+        // closes the dropdown. To stop this, we refocus our input
+        // if we know we are on IE *and* are scrolling.
+        this._isScrollingOnIe = false;
+        this.input.element.focus();
+      }
+    }
+  }, {
+    key: "_onFormReset",
+    value: function _onFormReset() {
+      this._store.dispatch((0, _misc.resetTo)(this._initialState));
+    }
+  }, {
+    key: "_highlightChoice",
+    value: function _highlightChoice() {
+      var _this20 = this;
+
+      var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var choices = Array.from(this.dropdown.element.querySelectorAll('[data-choice-selectable]'));
+
+      if (!choices.length) {
+        return;
+      }
+
+      var passedEl = el;
+      var highlightedChoices = Array.from(this.dropdown.element.querySelectorAll(".".concat(this.config.classNames.highlightedState))); // Remove any highlighted choices
+
+      highlightedChoices.forEach(function (choice) {
+        choice.classList.remove(_this20.config.classNames.highlightedState);
+        choice.setAttribute('aria-selected', 'false');
+      });
+
+      if (passedEl) {
+        this._highlightPosition = choices.indexOf(passedEl);
+      } else {
+        // Highlight choice based on last known highlight location
+        if (choices.length > this._highlightPosition) {
+          // If we have an option to highlight
+          passedEl = choices[this._highlightPosition];
+        } else {
+          // Otherwise highlight the option before
+          passedEl = choices[choices.length - 1];
+        }
+
+        if (!passedEl) {
+          passedEl = choices[0];
+        }
+      }
+
+      passedEl.classList.add(this.config.classNames.highlightedState);
+      passedEl.setAttribute('aria-selected', 'true');
+      this.passedElement.triggerEvent(_constants.EVENTS.highlightChoice, {
+        el: passedEl
+      });
+
+      if (this.dropdown.isActive) {
+        // IE11 ignores aria-label and blocks virtual keyboard
+        // if aria-activedescendant is set without a dropdown
+        this.input.setActiveDescendant(passedEl.id);
+        this.containerOuter.setActiveDescendant(passedEl.id);
+      }
+    }
+  }, {
+    key: "_addItem",
+    value: function _addItem(_ref13) {
+      var value = _ref13.value,
+          _ref13$label = _ref13.label,
+          label = _ref13$label === void 0 ? null : _ref13$label,
+          _ref13$choiceId = _ref13.choiceId,
+          choiceId = _ref13$choiceId === void 0 ? -1 : _ref13$choiceId,
+          _ref13$groupId = _ref13.groupId,
+          groupId = _ref13$groupId === void 0 ? -1 : _ref13$groupId,
+          _ref13$customProperti = _ref13.customProperties,
+          customProperties = _ref13$customProperti === void 0 ? null : _ref13$customProperti,
+          _ref13$placeholder = _ref13.placeholder,
+          placeholder = _ref13$placeholder === void 0 ? false : _ref13$placeholder,
+          _ref13$keyCode = _ref13.keyCode,
+          keyCode = _ref13$keyCode === void 0 ? null : _ref13$keyCode;
+      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
+      var passedKeyCode = keyCode;
+      var passedCustomProperties = customProperties;
+      var items = this._store.items;
+      var passedLabel = label || passedValue;
+      var passedOptionId = parseInt(choiceId, 10) || -1;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
+      var id = items ? items.length + 1 : 1; // If a prepended value has been passed, prepend it
+
+      if (this.config.prependValue) {
+        passedValue = this.config.prependValue + passedValue.toString();
+      } // If an appended value has been passed, append it
+
+
+      if (this.config.appendValue) {
+        passedValue += this.config.appendValue.toString();
+      }
+
+      this._store.dispatch((0, _items.addItem)({
+        value: passedValue,
+        label: passedLabel,
+        id: id,
+        choiceId: passedOptionId,
+        groupId: groupId,
+        customProperties: customProperties,
+        placeholder: placeholder,
+        keyCode: passedKeyCode
+      }));
+
+      if (this._isSelectOneElement) {
+        this.removeActiveItems(id);
+      } // Trigger change event
+
+
+      this.passedElement.triggerEvent(_constants.EVENTS.addItem, {
+        id: id,
+        value: passedValue,
+        label: passedLabel,
+        customProperties: passedCustomProperties,
+        groupValue: group && group.value ? group.value : undefined,
+        keyCode: passedKeyCode
+      });
+      return this;
+    }
+  }, {
+    key: "_removeItem",
+    value: function _removeItem(item) {
+      if (!item || !(0, _utils.isType)('Object', item)) {
+        return this;
+      }
+
+      var id = item.id,
+          value = item.value,
+          label = item.label,
+          choiceId = item.choiceId,
+          groupId = item.groupId;
+      var group = groupId >= 0 ? this._store.getGroupById(groupId) : null;
+
+      this._store.dispatch((0, _items.removeItem)(id, choiceId));
+
+      if (group && group.value) {
+        this.passedElement.triggerEvent(_constants.EVENTS.removeItem, {
+          id: id,
+          value: value,
+          label: label,
+          groupValue: group.value
+        });
+      } else {
+        this.passedElement.triggerEvent(_constants.EVENTS.removeItem, {
+          id: id,
+          value: value,
+          label: label
+        });
+      }
+
+      return this;
+    }
+  }, {
+    key: "_addChoice",
+    value: function _addChoice(_ref14) {
+      var value = _ref14.value,
+          _ref14$label = _ref14.label,
+          label = _ref14$label === void 0 ? null : _ref14$label,
+          _ref14$isSelected = _ref14.isSelected,
+          isSelected = _ref14$isSelected === void 0 ? false : _ref14$isSelected,
+          _ref14$isDisabled = _ref14.isDisabled,
+          isDisabled = _ref14$isDisabled === void 0 ? false : _ref14$isDisabled,
+          _ref14$groupId = _ref14.groupId,
+          groupId = _ref14$groupId === void 0 ? -1 : _ref14$groupId,
+          _ref14$customProperti = _ref14.customProperties,
+          customProperties = _ref14$customProperti === void 0 ? null : _ref14$customProperti,
+          _ref14$placeholder = _ref14.placeholder,
+          placeholder = _ref14$placeholder === void 0 ? false : _ref14$placeholder,
+          _ref14$keyCode = _ref14.keyCode,
+          keyCode = _ref14$keyCode === void 0 ? null : _ref14$keyCode;
+
+      if (typeof value === 'undefined' || value === null) {
+        return;
+      } // Generate unique id
+
+
+      var choices = this._store.choices;
+      var choiceLabel = label || value;
+      var choiceId = choices ? choices.length + 1 : 1;
+      var choiceElementId = "".concat(this._baseId, "-").concat(this._idNames.itemChoice, "-").concat(choiceId);
+
+      this._store.dispatch((0, _choices.addChoice)({
+        value: value,
+        label: choiceLabel,
+        id: choiceId,
+        groupId: groupId,
+        disabled: isDisabled,
+        elementId: choiceElementId,
+        customProperties: customProperties,
+        placeholder: placeholder,
+        keyCode: keyCode
+      }));
+
+      if (isSelected) {
+        this._addItem({
+          value: value,
+          label: choiceLabel,
+          choiceId: choiceId,
+          customProperties: customProperties,
+          placeholder: placeholder,
+          keyCode: keyCode
+        });
+      }
+    }
+  }, {
+    key: "_clearChoices",
+    value: function _clearChoices() {
+      this._store.dispatch((0, _choices.clearChoices)());
+    }
+  }, {
+    key: "_addGroup",
+    value: function _addGroup(_ref15) {
+      var _this21 = this;
+
+      var group = _ref15.group,
+          id = _ref15.id,
+          _ref15$valueKey = _ref15.valueKey,
+          valueKey = _ref15$valueKey === void 0 ? 'value' : _ref15$valueKey,
+          _ref15$labelKey = _ref15.labelKey,
+          labelKey = _ref15$labelKey === void 0 ? 'label' : _ref15$labelKey;
+      var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
+      var groupId = id || Math.floor(new Date().valueOf() * Math.random());
+      var isDisabled = group.disabled ? group.disabled : false;
+
+      if (groupChoices) {
+        this._store.dispatch((0, _groups.addGroup)(group.label, groupId, true, isDisabled));
+
+        var addGroupChoices = function addGroupChoices(choice) {
+          var isOptDisabled = choice.disabled || choice.parentNode && choice.parentNode.disabled;
+
+          _this21._addChoice({
+            value: choice[valueKey],
+            label: (0, _utils.isType)('Object', choice) ? choice[labelKey] : choice.innerHTML,
+            isSelected: choice.selected,
+            isDisabled: isOptDisabled,
+            groupId: groupId,
+            customProperties: choice.customProperties,
+            placeholder: choice.placeholder
+          });
+        };
+
+        groupChoices.forEach(addGroupChoices);
+      } else {
+        this._store.dispatch((0, _groups.addGroup)(group.label, group.id, false, group.disabled));
+      }
+    }
+  }, {
+    key: "_getTemplate",
+    value: function _getTemplate(template) {
+      var _templates$template;
+
+      if (!template) {
+        return null;
+      }
+
+      var _this$config4 = this.config,
+          templates = _this$config4.templates,
+          classNames = _this$config4.classNames;
+
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      return (_templates$template = templates[template]).call.apply(_templates$template, [this, classNames].concat(args));
+    }
+  }, {
+    key: "_createTemplates",
+    value: function _createTemplates() {
+      var callbackOnCreateTemplates = this.config.callbackOnCreateTemplates;
+      var userTemplates = {};
+
+      if (callbackOnCreateTemplates && (0, _utils.isType)('Function', callbackOnCreateTemplates)) {
+        userTemplates = callbackOnCreateTemplates.call(this, _utils.strToEl);
+      }
+
+      this.config.templates = (0, _deepmerge.default)(_templates.TEMPLATES, userTemplates);
+    }
+  }, {
+    key: "_createElements",
+    value: function _createElements() {
+      this.containerOuter = new _components.Container({
+        element: this._getTemplate('containerOuter', this._direction, this._isSelectElement, this._isSelectOneElement, this.config.searchEnabled, this.passedElement.element.type),
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type,
+        position: this.config.position
+      });
+      this.containerInner = new _components.Container({
+        element: this._getTemplate('containerInner'),
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type,
+        position: this.config.position
+      });
+      this.input = new _components.Input({
+        element: this._getTemplate('input'),
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type
+      });
+      this.choiceList = new _components.List({
+        element: this._getTemplate('choiceList', this._isSelectOneElement)
+      });
+      this.itemList = new _components.List({
+        element: this._getTemplate('itemList', this._isSelectOneElement)
+      });
+      this.dropdown = new _components.Dropdown({
+        element: this._getTemplate('dropdown'),
+        classNames: this.config.classNames,
+        type: this.passedElement.element.type
+      });
+    }
+  }, {
+    key: "_createStructure",
+    value: function _createStructure() {
+      // Hide original element
+      this.passedElement.conceal(); // Wrap input in container preserving DOM ordering
+
+      this.containerInner.wrap(this.passedElement.element); // Wrapper inner container with outer container
+
+      this.containerOuter.wrap(this.containerInner.element);
+
+      if (this._isSelectOneElement) {
+        this.input.placeholder = this.config.searchPlaceholderValue || '';
+      } else if (this._placeholderValue) {
+        this.input.placeholder = this._placeholderValue;
+        this.input.setWidth(true);
+      }
+
+      this.containerOuter.element.appendChild(this.containerInner.element);
+      this.containerOuter.element.appendChild(this.dropdown.element);
+      this.containerInner.element.appendChild(this.itemList.element);
+
+      if (!this._isTextElement) {
+        this.dropdown.element.appendChild(this.choiceList.element);
+      }
+
+      if (!this._isSelectOneElement) {
+        this.containerInner.element.appendChild(this.input.element);
+      } else if (this.config.searchEnabled) {
+        this.dropdown.element.insertBefore(this.input.element, this.dropdown.element.firstChild);
+      }
+
+      if (this._isSelectElement) {
+        this._addPredefinedChoices();
+      } else if (this._isTextElement) {
+        this._addPredefinedItems();
+      }
+    }
+  }, {
+    key: "_addPredefinedChoices",
+    value: function _addPredefinedChoices() {
+      var _this22 = this;
+
+      var passedGroups = this.passedElement.optionGroups;
+      this._highlightPosition = 0;
+      this._isSearching = false;
+
+      this._setLoading(true);
+
+      if (passedGroups && passedGroups.length) {
+        // If we have a placeholder option
+        var placeholderChoice = this.passedElement.placeholderOption;
+
+        if (placeholderChoice && placeholderChoice.parentNode.tagName === 'SELECT') {
+          this._addChoice({
+            value: placeholderChoice.value,
+            label: placeholderChoice.innerHTML,
+            isSelected: placeholderChoice.selected,
+            isDisabled: placeholderChoice.disabled,
+            placeholder: true
+          });
+        }
+
+        passedGroups.forEach(function (group) {
+          return _this22._addGroup({
+            group: group,
+            id: group.id || null
+          });
+        });
+      } else {
+        var passedOptions = this.passedElement.options;
+        var filter = this.config.sortFn;
+        var allChoices = this._presetChoices; // Create array of options from option elements
+
+        passedOptions.forEach(function (o) {
+          allChoices.push({
+            value: o.value,
+            label: o.innerHTML,
+            selected: o.selected,
+            disabled: o.disabled || o.parentNode.disabled,
+            placeholder: o.hasAttribute('placeholder'),
+            customProperties: o.getAttribute('data-custom-properties')
+          });
+        }); // If sorting is enabled or the user is searching, filter choices
+
+        if (this.config.shouldSort) allChoices.sort(filter); // Determine whether there is a selected choice
+
+        var hasSelectedChoice = allChoices.some(function (choice) {
+          return choice.selected;
+        });
+
+        var handleChoice = function handleChoice(choice, index) {
+          var value = choice.value,
+              label = choice.label,
+              customProperties = choice.customProperties,
+              placeholder = choice.placeholder;
+
+          if (_this22._isSelectElement) {
+            // If the choice is actually a group
+            if (choice.choices) {
+              _this22._addGroup({
+                group: choice,
+                id: choice.id || null
+              });
+            } else {
+              // If there is a selected choice already or the choice is not
+              // the first in the array, add each choice normally
+              // Otherwise pre-select the first choice in the array if it's a single select
+              var shouldPreselect = _this22._isSelectOneElement && !hasSelectedChoice && index === 0;
+              var isSelected = shouldPreselect ? true : choice.selected;
+              var isDisabled = shouldPreselect ? false : choice.disabled;
+
+              _this22._addChoice({
+                value: value,
+                label: label,
+                isSelected: isSelected,
+                isDisabled: isDisabled,
+                customProperties: customProperties,
+                placeholder: placeholder
+              });
+            }
+          } else {
+            _this22._addChoice({
+              value: value,
+              label: label,
+              isSelected: choice.selected,
+              isDisabled: choice.disabled,
+              customProperties: customProperties,
+              placeholder: placeholder
+            });
+          }
+        }; // Add each choice
+
+
+        allChoices.forEach(function (choice, index) {
+          return handleChoice(choice, index);
+        });
+      }
+
+      this._setLoading(false);
+    }
+  }, {
+    key: "_addPredefinedItems",
+    value: function _addPredefinedItems() {
+      var _this23 = this;
+
+      var handlePresetItem = function handlePresetItem(item) {
+        var itemType = (0, _utils.getType)(item);
+
+        if (itemType === 'Object' && item.value) {
+          _this23._addItem({
+            value: item.value,
+            label: item.label,
+            choiceId: item.id,
+            customProperties: item.customProperties,
+            placeholder: item.placeholder
+          });
+        } else if (itemType === 'String') {
+          _this23._addItem({
+            value: item
+          });
+        }
+      };
+
+      this._presetItems.forEach(function (item) {
+        return handlePresetItem(item);
+      });
+    }
+  }, {
+    key: "_setChoiceOrItem",
+    value: function _setChoiceOrItem(item) {
+      var _this24 = this;
+
+      var itemType = (0, _utils.getType)(item).toLowerCase();
+      var handleType = {
+        object: function object() {
+          if (!item.value) {
+            return;
+          } // If we are dealing with a select input, we need to create an option first
+          // that is then selected. For text inputs we can just add items normally.
+
+
+          if (!_this24._isTextElement) {
+            _this24._addChoice({
+              value: item.value,
+              label: item.label,
+              isSelected: true,
+              isDisabled: false,
+              customProperties: item.customProperties,
+              placeholder: item.placeholder
+            });
+          } else {
+            _this24._addItem({
+              value: item.value,
+              label: item.label,
+              choiceId: item.id,
+              customProperties: item.customProperties,
+              placeholder: item.placeholder
+            });
+          }
+        },
+        string: function string() {
+          if (!_this24._isTextElement) {
+            _this24._addChoice({
+              value: item,
+              label: item,
+              isSelected: true,
+              isDisabled: false
+            });
+          } else {
+            _this24._addItem({
+              value: item
+            });
+          }
+        }
+      };
+      handleType[itemType]();
+    }
+  }, {
+    key: "_findAndSelectChoiceByValue",
+    value: function _findAndSelectChoiceByValue(val) {
+      var _this25 = this;
+
+      var choices = this._store.choices; // Check 'value' property exists and the choice isn't already selected
+
+      var foundChoice = choices.find(function (choice) {
+        return _this25.config.itemComparer(choice.value, val);
+      });
+
+      if (foundChoice && !foundChoice.selected) {
+        this._addItem({
+          value: foundChoice.value,
+          label: foundChoice.label,
+          choiceId: foundChoice.id,
+          groupId: foundChoice.groupId,
+          customProperties: foundChoice.customProperties,
+          placeholder: foundChoice.placeholder,
+          keyCode: foundChoice.keyCode
+        });
+      }
+    }
+  }, {
+    key: "_generateInstances",
+    value: function _generateInstances(elements, config) {
+      return elements.reduce(function (instances, element) {
+        instances.push(new Choices(element, config));
+        return instances;
+      }, [this]);
+    }
+  }, {
+    key: "_generatePlaceholderValue",
+    value: function _generatePlaceholderValue() {
+      if (this._isSelectOneElement) {
+        return false;
+      }
+
+      return this.config.placeholder ? this.config.placeholderValue || this.passedElement.element.getAttribute('placeholder') : false;
+    }
+    /* =====  End of Private functions  ====== */
+
+  }]);
+
+  return Choices;
+}();
+
+Choices.userDefaults = {}; // We cannot export default here due to Webpack: https://github.com/webpack/webpack/issues/3929
+
+module.exports = Choices;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*!
+ * Fuse.js v3.4.2 - Lightweight fuzzy-search (http://fusejs.io)
+ * 
+ * Copyright (c) 2012-2017 Kirollos Risk (http://kiro.me)
+ * All Rights Reserved. Apache Software License 2.0
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(true)
 		module.exports = factory();
@@ -1636,6172 +5466,3008 @@ exports.all = function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
-/******/ 			exports: {},
-/******/ 			id: moduleId,
-/******/ 			loaded: false
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
-
+/******/ 		module.l = true;
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/assets/scripts/dist/";
-
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(0);
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/index.js");
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(1);
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _fuse = __webpack_require__(2);
-
-	var _fuse2 = _interopRequireDefault(_fuse);
-
-	var _classnames = __webpack_require__(3);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _index = __webpack_require__(4);
-
-	var _index2 = _interopRequireDefault(_index);
-
-	var _index3 = __webpack_require__(31);
-
-	var _utils = __webpack_require__(32);
-
-	__webpack_require__(33);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Choices
-	 */
-	var Choices = function () {
-	  function Choices() {
-	    var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '[data-choice]';
-	    var userConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-	    _classCallCheck(this, Choices);
-
-	    // If there are multiple elements, create a new instance
-	    // for each element besides the first one (as that already has an instance)
-	    if ((0, _utils.isType)('String', element)) {
-	      var elements = document.querySelectorAll(element);
-	      if (elements.length > 1) {
-	        for (var i = 1; i < elements.length; i++) {
-	          var el = elements[i];
-	          new Choices(el, userConfig);
-	        }
-	      }
-	    }
-
-	    var defaultConfig = {
-	      silent: false,
-	      items: [],
-	      choices: [],
-	      renderChoiceLimit: -1,
-	      maxItemCount: -1,
-	      addItems: true,
-	      removeItems: true,
-	      removeItemButton: false,
-	      editItems: false,
-	      duplicateItems: true,
-	      delimiter: ',',
-	      paste: true,
-	      searchEnabled: true,
-	      searchChoices: true,
-	      searchFloor: 1,
-	      searchResultLimit: 4,
-	      searchFields: ['label', 'value'],
-	      position: 'auto',
-	      resetScrollPosition: true,
-	      regexFilter: null,
-	      shouldSort: true,
-	      shouldSortItems: false,
-	      sortFilter: _utils.sortByAlpha,
-	      placeholder: true,
-	      placeholderValue: null,
-	      searchPlaceholderValue: null,
-	      prependValue: null,
-	      appendValue: null,
-	      renderSelectedChoices: 'auto',
-	      loadingText: 'Loading...',
-	      noResultsText: 'No results found',
-	      noChoicesText: 'No choices to choose from',
-	      itemSelectText: 'Press to select',
-	      addItemText: function addItemText(value) {
-	        return 'Press Enter to add <b>"' + (0, _utils.stripHTML)(value) + '"</b>';
-	      },
-	      maxItemText: function maxItemText(maxItemCount) {
-	        return 'Only ' + maxItemCount + ' values can be added.';
-	      },
-	      itemComparer: function itemComparer(choice, item) {
-	        return choice === item;
-	      },
-	      uniqueItemText: 'Only unique values can be added.',
-	      classNames: {
-	        containerOuter: 'choices',
-	        containerInner: 'choices__inner',
-	        input: 'choices__input',
-	        inputCloned: 'choices__input--cloned',
-	        list: 'choices__list',
-	        listItems: 'choices__list--multiple',
-	        listSingle: 'choices__list--single',
-	        listDropdown: 'choices__list--dropdown',
-	        item: 'choices__item',
-	        itemSelectable: 'choices__item--selectable',
-	        itemDisabled: 'choices__item--disabled',
-	        itemChoice: 'choices__item--choice',
-	        placeholder: 'choices__placeholder',
-	        group: 'choices__group',
-	        groupHeading: 'choices__heading',
-	        button: 'choices__button',
-	        activeState: 'is-active',
-	        focusState: 'is-focused',
-	        openState: 'is-open',
-	        disabledState: 'is-disabled',
-	        highlightedState: 'is-highlighted',
-	        hiddenState: 'is-hidden',
-	        flippedState: 'is-flipped',
-	        loadingState: 'is-loading',
-	        noResults: 'has-no-results',
-	        noChoices: 'has-no-choices'
-	      },
-	      fuseOptions: {
-	        include: 'score'
-	      },
-	      callbackOnInit: null,
-	      callbackOnCreateTemplates: null
-	    };
-
-	    this.idNames = {
-	      itemChoice: 'item-choice'
-	    };
-
-	    // Merge options with user options
-	    this.config = (0, _utils.extend)(defaultConfig, userConfig);
-
-	    if (this.config.renderSelectedChoices !== 'auto' && this.config.renderSelectedChoices !== 'always') {
-	      if (!this.config.silent) {
-	        console.warn('renderSelectedChoices: Possible values are \'auto\' and \'always\'. Falling back to \'auto\'.');
-	      }
-	      this.config.renderSelectedChoices = 'auto';
-	    }
-
-	    // Create data store
-	    this.store = new _index2.default(this.render);
-
-	    // State tracking
-	    this.initialised = false;
-	    this.currentState = {};
-	    this.prevState = {};
-	    this.currentValue = '';
-
-	    // Retrieve triggering element (i.e. element with 'data-choice' trigger)
-	    this.element = element;
-	    this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
-
-	    if (!this.passedElement) {
-	      if (!this.config.silent) {
-	        console.error('Passed element not found');
-	      }
-	      return;
-	    }
-
-	    this.isTextElement = this.passedElement.type === 'text';
-	    this.isSelectOneElement = this.passedElement.type === 'select-one';
-	    this.isSelectMultipleElement = this.passedElement.type === 'select-multiple';
-	    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
-	    this.isValidElementType = this.isTextElement || this.isSelectElement;
-	    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
-	    this.isScrollingOnIe = false;
-
-	    if (this.config.shouldSortItems === true && this.isSelectOneElement) {
-	      if (!this.config.silent) {
-	        console.warn('shouldSortElements: Type of passed element is \'select-one\', falling back to false.');
-	      }
-	    }
-
-	    this.highlightPosition = 0;
-	    this.canSearch = this.config.searchEnabled;
-
-	    this.placeholder = false;
-	    if (!this.isSelectOneElement) {
-	      this.placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
-	    }
-
-	    // Assign preset choices from passed object
-	    this.presetChoices = this.config.choices;
-
-	    // Assign preset items from passed object first
-	    this.presetItems = this.config.items;
-
-	    // Then add any values passed from attribute
-	    if (this.passedElement.value) {
-	      this.presetItems = this.presetItems.concat(this.passedElement.value.split(this.config.delimiter));
-	    }
-
-	    // Set unique base Id
-	    this.baseId = (0, _utils.generateId)(this.passedElement, 'choices-');
-
-	    // Bind methods
-	    this.render = this.render.bind(this);
-
-	    // Bind event handlers
-	    this._onFocus = this._onFocus.bind(this);
-	    this._onBlur = this._onBlur.bind(this);
-	    this._onKeyUp = this._onKeyUp.bind(this);
-	    this._onKeyDown = this._onKeyDown.bind(this);
-	    this._onClick = this._onClick.bind(this);
-	    this._onTouchMove = this._onTouchMove.bind(this);
-	    this._onTouchEnd = this._onTouchEnd.bind(this);
-	    this._onMouseDown = this._onMouseDown.bind(this);
-	    this._onMouseOver = this._onMouseOver.bind(this);
-	    this._onPaste = this._onPaste.bind(this);
-	    this._onInput = this._onInput.bind(this);
-
-	    // Monitor touch taps/scrolls
-	    this.wasTap = true;
-
-	    // Cutting the mustard
-	    var cuttingTheMustard = 'classList' in document.documentElement;
-	    if (!cuttingTheMustard && !this.config.silent) {
-	      console.error('Choices: Your browser doesn\'t support Choices');
-	    }
-
-	    var canInit = (0, _utils.isElement)(this.passedElement) && this.isValidElementType;
-
-	    if (canInit) {
-	      // If element has already been initialised with Choices
-	      if (this.passedElement.getAttribute('data-choice') === 'active') {
-	        return;
-	      }
-
-	      // Let's go
-	      this.init();
-	    } else if (!this.config.silent) {
-	      console.error('Incompatible input passed');
-	    }
-	  }
-
-	  /*========================================
-	  =            Public functions            =
-	  ========================================*/
-
-	  /**
-	   * Initialise Choices
-	   * @return
-	   * @public
-	   */
-
-
-	  _createClass(Choices, [{
-	    key: 'init',
-	    value: function init() {
-	      if (this.initialised === true) {
-	        return;
-	      }
-
-	      var callback = this.config.callbackOnInit;
-
-	      // Set initialise flag
-	      this.initialised = true;
-	      // Create required elements
-	      this._createTemplates();
-	      // Generate input markup
-	      this._createInput();
-	      // Subscribe store to render method
-	      this.store.subscribe(this.render);
-	      // Render any items
-	      this.render();
-	      // Trigger event listeners
-	      this._addEventListeners();
-
-	      // Run callback if it is a function
-	      if (callback) {
-	        if ((0, _utils.isType)('Function', callback)) {
-	          callback.call(this);
-	        }
-	      }
-	    }
-
-	    /**
-	     * Destroy Choices and nullify values
-	     * @return
-	     * @public
-	     */
-
-	  }, {
-	    key: 'destroy',
-	    value: function destroy() {
-	      if (this.initialised === false) {
-	        return;
-	      }
-
-	      // Remove all event listeners
-	      this._removeEventListeners();
-
-	      // Reinstate passed element
-	      this.passedElement.classList.remove(this.config.classNames.input, this.config.classNames.hiddenState);
-	      this.passedElement.removeAttribute('tabindex');
-	      // Recover original styles if any
-	      var origStyle = this.passedElement.getAttribute('data-choice-orig-style');
-	      if (Boolean(origStyle)) {
-	        this.passedElement.removeAttribute('data-choice-orig-style');
-	        this.passedElement.setAttribute('style', origStyle);
-	      } else {
-	        this.passedElement.removeAttribute('style');
-	      }
-	      this.passedElement.removeAttribute('aria-hidden');
-	      this.passedElement.removeAttribute('data-choice');
-
-	      // Re-assign values - this is weird, I know
-	      this.passedElement.value = this.passedElement.value;
-
-	      // Move passed element back to original position
-	      this.containerOuter.parentNode.insertBefore(this.passedElement, this.containerOuter);
-	      // Remove added elements
-	      this.containerOuter.parentNode.removeChild(this.containerOuter);
-
-	      // Clear data store
-	      this.clearStore();
-
-	      // Nullify instance-specific data
-	      this.config.templates = null;
-
-	      // Uninitialise
-	      this.initialised = false;
-	    }
-
-	    /**
-	     * Render group choices into a DOM fragment and append to choice list
-	     * @param  {Array} groups    Groups to add to list
-	     * @param  {Array} choices   Choices to add to groups
-	     * @param  {DocumentFragment} fragment Fragment to add groups and options to (optional)
-	     * @return {DocumentFragment} Populated options fragment
-	     * @private
-	     */
-
-	  }, {
-	    key: 'renderGroups',
-	    value: function renderGroups(groups, choices, fragment) {
-	      var _this = this;
-
-	      var groupFragment = fragment || document.createDocumentFragment();
-	      var filter = this.config.sortFilter;
-
-	      // If sorting is enabled, filter groups
-	      if (this.config.shouldSort) {
-	        groups.sort(filter);
-	      }
-
-	      groups.forEach(function (group) {
-	        // Grab options that are children of this group
-	        var groupChoices = choices.filter(function (choice) {
-	          if (_this.isSelectOneElement) {
-	            return choice.groupId === group.id;
-	          }
-	          return choice.groupId === group.id && !choice.selected;
-	        });
-
-	        if (groupChoices.length >= 1) {
-	          var dropdownGroup = _this._getTemplate('choiceGroup', group);
-	          groupFragment.appendChild(dropdownGroup);
-	          _this.renderChoices(groupChoices, groupFragment, true);
-	        }
-	      });
-
-	      return groupFragment;
-	    }
-
-	    /**
-	     * Render choices into a DOM fragment and append to choice list
-	     * @param  {Array} choices    Choices to add to list
-	     * @param  {DocumentFragment} fragment Fragment to add choices to (optional)
-	     * @return {DocumentFragment} Populated choices fragment
-	     * @private
-	     */
-
-	  }, {
-	    key: 'renderChoices',
-	    value: function renderChoices(choices, fragment) {
-	      var _this2 = this;
-
-	      var withinGroup = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-	      // Create a fragment to store our list items (so we don't have to update the DOM for each item)
-	      var choicesFragment = fragment || document.createDocumentFragment();
-	      var _config = this.config,
-	          renderSelectedChoices = _config.renderSelectedChoices,
-	          searchResultLimit = _config.searchResultLimit,
-	          renderChoiceLimit = _config.renderChoiceLimit;
-
-	      var filter = this.isSearching ? _utils.sortByScore : this.config.sortFilter;
-	      var appendChoice = function appendChoice(choice) {
-	        var shouldRender = renderSelectedChoices === 'auto' ? _this2.isSelectOneElement || !choice.selected : true;
-	        if (shouldRender) {
-	          var dropdownItem = _this2._getTemplate('choice', choice);
-	          choicesFragment.appendChild(dropdownItem);
-	        }
-	      };
-
-	      var rendererableChoices = choices;
-
-	      if (renderSelectedChoices === 'auto' && !this.isSelectOneElement) {
-	        rendererableChoices = choices.filter(function (choice) {
-	          return !choice.selected;
-	        });
-	      }
-
-	      // Split array into placeholders and "normal" choices
-
-	      var _rendererableChoices$ = rendererableChoices.reduce(function (acc, choice) {
-	        if (choice.placeholder) {
-	          acc.placeholderChoices.push(choice);
-	        } else {
-	          acc.normalChoices.push(choice);
-	        }
-	        return acc;
-	      }, { placeholderChoices: [], normalChoices: [] }),
-	          placeholderChoices = _rendererableChoices$.placeholderChoices,
-	          normalChoices = _rendererableChoices$.normalChoices;
-
-	      // If sorting is enabled or the user is searching, filter choices
-
-
-	      if (this.config.shouldSort || this.isSearching) {
-	        normalChoices.sort(filter);
-	      }
-
-	      var choiceLimit = rendererableChoices.length;
-
-	      // Prepend placeholeder
-	      var sortedChoices = [].concat(_toConsumableArray(placeholderChoices), _toConsumableArray(normalChoices));
-
-	      if (this.isSearching) {
-	        choiceLimit = searchResultLimit;
-	      } else if (renderChoiceLimit > 0 && !withinGroup) {
-	        choiceLimit = renderChoiceLimit;
-	      }
-
-	      // Add each choice to dropdown within range
-	      for (var i = 0; i < choiceLimit; i++) {
-	        if (sortedChoices[i]) {
-	          appendChoice(sortedChoices[i]);
-	        }
-	      };
-
-	      return choicesFragment;
-	    }
-
-	    /**
-	     * Render items into a DOM fragment and append to items list
-	     * @param  {Array} items    Items to add to list
-	     * @param  {DocumentFragment} [fragment] Fragment to add items to (optional)
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: 'renderItems',
-	    value: function renderItems(items) {
-	      var _this3 = this;
-
-	      var fragment = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-	      // Create fragment to add elements to
-	      var itemListFragment = fragment || document.createDocumentFragment();
-
-	      // If sorting is enabled, filter items
-	      if (this.config.shouldSortItems && !this.isSelectOneElement) {
-	        items.sort(this.config.sortFilter);
-	      }
-
-	      if (this.isTextElement) {
-	        // Simplify store data to just values
-	        var itemsFiltered = this.store.getItemsReducedToValues(items);
-	        var itemsFilteredString = itemsFiltered.join(this.config.delimiter);
-	        // Update the value of the hidden input
-	        this.passedElement.setAttribute('value', itemsFilteredString);
-	        this.passedElement.value = itemsFilteredString;
-	      } else {
-	        var selectedOptionsFragment = document.createDocumentFragment();
-
-	        // Add each list item to list
-	        items.forEach(function (item) {
-	          // Create a standard select option
-	          var option = _this3._getTemplate('option', item);
-	          // Append it to fragment
-	          selectedOptionsFragment.appendChild(option);
-	        });
-
-	        // Update selected choices
-	        this.passedElement.innerHTML = '';
-	        this.passedElement.appendChild(selectedOptionsFragment);
-	      }
-
-	      // Add each list item to list
-	      items.forEach(function (item) {
-	        // Create new list element
-	        var listItem = _this3._getTemplate('item', item);
-	        // Append it to list
-	        itemListFragment.appendChild(listItem);
-	      });
-
-	      return itemListFragment;
-	    }
-
-	    /**
-	     * Render DOM with values
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      if (this.store.isLoading()) {
-	        return;
-	      }
-
-	      this.currentState = this.store.getState();
-
-	      // Only render if our state has actually changed
-	      if (this.currentState !== this.prevState) {
-	        // Choices
-	        if (this.currentState.choices !== this.prevState.choices || this.currentState.groups !== this.prevState.groups || this.currentState.items !== this.prevState.items) {
-	          if (this.isSelectElement) {
-	            // Get active groups/choices
-	            var activeGroups = this.store.getGroupsFilteredByActive();
-	            var activeChoices = this.store.getChoicesFilteredByActive();
-
-	            var choiceListFragment = document.createDocumentFragment();
-
-	            // Clear choices
-	            this.choiceList.innerHTML = '';
-
-	            // Scroll back to top of choices list
-	            if (this.config.resetScrollPosition) {
-	              this.choiceList.scrollTop = 0;
-	            }
-
-	            // If we have grouped options
-	            if (activeGroups.length >= 1 && this.isSearching !== true) {
-	              choiceListFragment = this.renderGroups(activeGroups, activeChoices, choiceListFragment);
-	            } else if (activeChoices.length >= 1) {
-	              choiceListFragment = this.renderChoices(activeChoices, choiceListFragment);
-	            }
-
-	            var activeItems = this.store.getItemsFilteredByActive();
-	            var canAddItem = this._canAddItem(activeItems, this.input.value);
-
-	            // If we have choices to show
-	            if (choiceListFragment.childNodes && choiceListFragment.childNodes.length > 0) {
-	              // ...and we can select them
-	              if (canAddItem.response) {
-	                // ...append them and highlight the first choice
-	                this.choiceList.appendChild(choiceListFragment);
-	                this._highlightChoice();
-	              } else {
-	                // ...otherwise show a notice
-	                this.choiceList.appendChild(this._getTemplate('notice', canAddItem.notice));
-	              }
-	            } else {
-	              // Otherwise show a notice
-	              var dropdownItem = void 0;
-	              var notice = void 0;
-
-	              if (this.isSearching) {
-	                notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
-
-	                dropdownItem = this._getTemplate('notice', notice, 'no-results');
-	              } else {
-	                notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
-
-	                dropdownItem = this._getTemplate('notice', notice, 'no-choices');
-	              }
-
-	              this.choiceList.appendChild(dropdownItem);
-	            }
-	          }
-	        }
-
-	        // Items
-	        if (this.currentState.items !== this.prevState.items) {
-	          // Get active items (items that can be selected)
-	          var _activeItems = this.store.getItemsFilteredByActive();
-
-	          // Clear list
-	          this.itemList.innerHTML = '';
-
-	          if (_activeItems && _activeItems) {
-	            // Create a fragment to store our list items
-	            // (so we don't have to update the DOM for each item)
-	            var itemListFragment = this.renderItems(_activeItems);
-
-	            // If we have items to add
-	            if (itemListFragment.childNodes) {
-	              // Update list
-	              this.itemList.appendChild(itemListFragment);
-	            }
-	          }
-	        }
-
-	        this.prevState = this.currentState;
-	      }
-	    }
-
-	    /**
-	     * Select item (a selected item can be deleted)
-	     * @param  {Element} item Element to select
-	     * @param  {Boolean} [runEvent=true] Whether to trigger 'highlightItem' event
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'highlightItem',
-	    value: function highlightItem(item) {
-	      var runEvent = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-	      if (!item) {
-	        return this;
-	      }
-
-	      var id = item.id;
-	      var groupId = item.groupId;
-	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-
-	      this.store.dispatch((0, _index3.highlightItem)(id, true));
-
-	      if (runEvent) {
-	        if (group && group.value) {
-	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
-	            id: id,
-	            value: item.value,
-	            label: item.label,
-	            groupValue: group.value
-	          });
-	        } else {
-	          (0, _utils.triggerEvent)(this.passedElement, 'highlightItem', {
-	            id: id,
-	            value: item.value,
-	            label: item.label
-	          });
-	        }
-	      }
-
-	      return this;
-	    }
-
-	    /**
-	     * Deselect item
-	     * @param  {Element} item Element to de-select
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'unhighlightItem',
-	    value: function unhighlightItem(item) {
-	      if (!item) {
-	        return this;
-	      }
-
-	      var id = item.id;
-	      var groupId = item.groupId;
-	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-
-	      this.store.dispatch((0, _index3.highlightItem)(id, false));
-
-	      if (group && group.value) {
-	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
-	          id: id,
-	          value: item.value,
-	          label: item.label,
-	          groupValue: group.value
-	        });
-	      } else {
-	        (0, _utils.triggerEvent)(this.passedElement, 'unhighlightItem', {
-	          id: id,
-	          value: item.value,
-	          label: item.label
-	        });
-	      }
-
-	      return this;
-	    }
-
-	    /**
-	     * Highlight items within store
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'highlightAll',
-	    value: function highlightAll() {
-	      var _this4 = this;
-
-	      var items = this.store.getItems();
-	      items.forEach(function (item) {
-	        _this4.highlightItem(item);
-	      });
-
-	      return this;
-	    }
-
-	    /**
-	     * Deselect items within store
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'unhighlightAll',
-	    value: function unhighlightAll() {
-	      var _this5 = this;
-
-	      var items = this.store.getItems();
-	      items.forEach(function (item) {
-	        _this5.unhighlightItem(item);
-	      });
-
-	      return this;
-	    }
-
-	    /**
-	     * Remove an item from the store by its value
-	     * @param  {String} value Value to search for
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'removeItemsByValue',
-	    value: function removeItemsByValue(value) {
-	      var _this6 = this;
-
-	      if (!value || !(0, _utils.isType)('String', value)) {
-	        return this;
-	      }
-
-	      var items = this.store.getItemsFilteredByActive();
-
-	      items.forEach(function (item) {
-	        if (item.value === value) {
-	          _this6._removeItem(item);
-	        }
-	      });
-
-	      return this;
-	    }
-
-	    /**
-	     * Remove all items from store array
-	     * @note Removed items are soft deleted
-	     * @param  {Number} excludedId Optionally exclude item by ID
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'removeActiveItems',
-	    value: function removeActiveItems(excludedId) {
-	      var _this7 = this;
-
-	      var items = this.store.getItemsFilteredByActive();
-
-	      items.forEach(function (item) {
-	        if (item.active && excludedId !== item.id) {
-	          _this7._removeItem(item);
-	        }
-	      });
-
-	      return this;
-	    }
-
-	    /**
-	     * Remove all selected items from store
-	     * @note Removed items are soft deleted
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'removeHighlightedItems',
-	    value: function removeHighlightedItems() {
-	      var _this8 = this;
-
-	      var runEvent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-	      var items = this.store.getItemsFilteredByActive();
-
-	      items.forEach(function (item) {
-	        if (item.highlighted && item.active) {
-	          _this8._removeItem(item);
-	          // If this action was performed by the user
-	          // trigger the event
-	          if (runEvent) {
-	            _this8._triggerChange(item.value);
-	          }
-	        }
-	      });
-
-	      return this;
-	    }
-
-	    /**
-	     * Show dropdown to user by adding active state class
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'showDropdown',
-	    value: function showDropdown() {
-	      var focusInput = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-	      var body = document.body;
-	      var html = document.documentElement;
-	      var winHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-
-	      this.containerOuter.classList.add(this.config.classNames.openState);
-	      this.containerOuter.setAttribute('aria-expanded', 'true');
-	      this.dropdown.classList.add(this.config.classNames.activeState);
-	      this.dropdown.setAttribute('aria-expanded', 'true');
-
-	      var dimensions = this.dropdown.getBoundingClientRect();
-	      var dropdownPos = Math.ceil(dimensions.top + window.scrollY + this.dropdown.offsetHeight);
-
-	      // If flip is enabled and the dropdown bottom position is greater than the window height flip the dropdown.
-	      var shouldFlip = false;
-	      if (this.config.position === 'auto') {
-	        shouldFlip = dropdownPos >= winHeight;
-	      } else if (this.config.position === 'top') {
-	        shouldFlip = true;
-	      }
-
-	      if (shouldFlip) {
-	        this.containerOuter.classList.add(this.config.classNames.flippedState);
-	      }
-
-	      // Optionally focus the input if we have a search input
-	      if (focusInput && this.canSearch && document.activeElement !== this.input) {
-	        this.input.focus();
-	      }
-
-	      (0, _utils.triggerEvent)(this.passedElement, 'showDropdown', {});
-
-	      return this;
-	    }
-
-	    /**
-	     * Hide dropdown from user
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'hideDropdown',
-	    value: function hideDropdown() {
-	      var blurInput = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-	      // A dropdown flips if it does not have space within the page
-	      var isFlipped = this.containerOuter.classList.contains(this.config.classNames.flippedState);
-
-	      this.containerOuter.classList.remove(this.config.classNames.openState);
-	      this.containerOuter.setAttribute('aria-expanded', 'false');
-	      this.dropdown.classList.remove(this.config.classNames.activeState);
-	      this.dropdown.setAttribute('aria-expanded', 'false');
-
-	      if (isFlipped) {
-	        this.containerOuter.classList.remove(this.config.classNames.flippedState);
-	      }
-
-	      // Optionally blur the input if we have a search input
-	      if (blurInput && this.canSearch && document.activeElement === this.input) {
-	        this.input.blur();
-	      }
-
-	      (0, _utils.triggerEvent)(this.passedElement, 'hideDropdown', {});
-
-	      return this;
-	    }
-
-	    /**
-	     * Determine whether to hide or show dropdown based on its current state
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'toggleDropdown',
-	    value: function toggleDropdown() {
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	      if (hasActiveDropdown) {
-	        this.hideDropdown();
-	      } else {
-	        this.showDropdown(true);
-	      }
-
-	      return this;
-	    }
-
-	    /**
-	     * Get value(s) of input (i.e. inputted items (text) or selected choices (select))
-	     * @param {Boolean} valueOnly Get only values of selected items, otherwise return selected items
-	     * @return {Array/String} selected value (select-one) or array of selected items (inputs & select-multiple)
-	     * @public
-	     */
-
-	  }, {
-	    key: 'getValue',
-	    value: function getValue() {
-	      var _this9 = this;
-
-	      var valueOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-	      var items = this.store.getItemsFilteredByActive();
-	      var selectedItems = [];
-
-	      items.forEach(function (item) {
-	        if (_this9.isTextElement) {
-	          selectedItems.push(valueOnly ? item.value : item);
-	        } else if (item.active) {
-	          selectedItems.push(valueOnly ? item.value : item);
-	        }
-	      });
-
-	      if (this.isSelectOneElement) {
-	        return selectedItems[0];
-	      }
-
-	      return selectedItems;
-	    }
-
-	    /**
-	     * Set value of input. If the input is a select box, a choice will be created and selected otherwise
-	     * an item will created directly.
-	     * @param  {Array}   args  Array of value objects or value strings
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'setValue',
-	    value: function setValue(args) {
-	      var _this10 = this;
-
-	      if (this.initialised === true) {
-	        // Convert args to an iterable array
-	        var values = [].concat(_toConsumableArray(args)),
-	            handleValue = function handleValue(item) {
-	          var itemType = (0, _utils.getType)(item);
-	          if (itemType === 'Object') {
-	            if (!item.value) {
-	              return;
-	            }
-
-	            // If we are dealing with a select input, we need to create an option first
-	            // that is then selected. For text inputs we can just add items normally.
-	            if (!_this10.isTextElement) {
-	              _this10._addChoice(item.value, item.label, true, false, -1, item.customProperties, item.placeholder);
-	            } else {
-	              _this10._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
-	            }
-	          } else if (itemType === 'String') {
-	            if (!_this10.isTextElement) {
-	              _this10._addChoice(item, item, true, false, -1, null);
-	            } else {
-	              _this10._addItem(item);
-	            }
-	          }
-	        };
-
-	        if (values.length > 1) {
-	          values.forEach(function (value) {
-	            handleValue(value);
-	          });
-	        } else {
-	          handleValue(values[0]);
-	        }
-	      }
-	      return this;
-	    }
-
-	    /**
-	     * Select value of select box via the value of an existing choice
-	     * @param {Array/String} value An array of strings of a single string
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'setValueByChoice',
-	    value: function setValueByChoice(value) {
-	      var _this11 = this;
-
-	      if (!this.isTextElement) {
-	        var choices = this.store.getChoices();
-	        // If only one value has been passed, convert to array
-	        var choiceValue = (0, _utils.isType)('Array', value) ? value : [value];
-
-	        // Loop through each value and
-	        choiceValue.forEach(function (val) {
-	          var foundChoice = choices.find(function (choice) {
-	            // Check 'value' property exists and the choice isn't already selected
-	            return _this11.config.itemComparer(choice.value, val);
-	          });
-
-	          if (foundChoice) {
-	            if (!foundChoice.selected) {
-	              _this11._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties, foundChoice.placeholder, foundChoice.keyCode);
-	            } else if (!_this11.config.silent) {
-	              console.warn('Attempting to select choice already selected');
-	            }
-	          } else if (!_this11.config.silent) {
-	            console.warn('Attempting to select choice that does not exist');
-	          }
-	        });
-	      }
-	      return this;
-	    }
-
-	    /**
-	     * Direct populate choices
-	     * @param  {Array} choices - Choices to insert
-	     * @param  {String} value - Name of 'value' property
-	     * @param  {String} label - Name of 'label' property
-	     * @param  {Boolean} replaceChoices Whether existing choices should be removed
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'setChoices',
-	    value: function setChoices(choices, value, label) {
-	      var _this12 = this;
-
-	      var replaceChoices = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
-	      if (this.initialised === true) {
-	        if (this.isSelectElement) {
-	          if (!(0, _utils.isType)('Array', choices) || !value) {
-	            return this;
-	          }
-
-	          // Clear choices if needed
-	          if (replaceChoices) {
-	            this._clearChoices();
-	          }
-
-	          this._setLoading(true);
-
-	          // Add choices if passed
-	          if (choices && choices.length) {
-	            this.containerOuter.classList.remove(this.config.classNames.loadingState);
-	            choices.forEach(function (result) {
-	              if (result.choices) {
-	                _this12._addGroup(result, result.id || null, value, label);
-	              } else {
-	                _this12._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
-	              }
-	            });
-	          }
-
-	          this._setLoading(false);
-	        }
-	      }
-	      return this;
-	    }
-
-	    /**
-	     * Clear items,choices and groups
-	     * @note Hard delete
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'clearStore',
-	    value: function clearStore() {
-	      this.store.dispatch((0, _index3.clearAll)());
-	      return this;
-	    }
-
-	    /**
-	     * Set value of input to blank
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'clearInput',
-	    value: function clearInput() {
-	      if (this.input.value) {
-	        this.input.value = '';
-	      }
-	      if (!this.isSelectOneElement) {
-	        this._setInputWidth();
-	      }
-	      if (!this.isTextElement && this.config.searchEnabled) {
-	        this.isSearching = false;
-	        this.store.dispatch((0, _index3.activateChoices)(true));
-	      }
-	      return this;
-	    }
-
-	    /**
-	     * Enable interaction with Choices
-	     * @return {Object} Class instance
-	     */
-
-	  }, {
-	    key: 'enable',
-	    value: function enable() {
-	      if (this.initialised) {
-	        this.passedElement.disabled = false;
-	        var isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
-	        if (isDisabled) {
-	          this._addEventListeners();
-	          this.passedElement.removeAttribute('disabled');
-	          this.input.removeAttribute('disabled');
-	          this.containerOuter.classList.remove(this.config.classNames.disabledState);
-	          this.containerOuter.removeAttribute('aria-disabled');
-	          if (this.isSelectOneElement) {
-	            this.containerOuter.setAttribute('tabindex', '0');
-	          }
-	        }
-	      }
-	      return this;
-	    }
-
-	    /**
-	     * Disable interaction with Choices
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'disable',
-	    value: function disable() {
-	      if (this.initialised) {
-	        this.passedElement.disabled = true;
-	        var isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
-	        if (isEnabled) {
-	          this._removeEventListeners();
-	          this.passedElement.setAttribute('disabled', '');
-	          this.input.setAttribute('disabled', '');
-	          this.containerOuter.classList.add(this.config.classNames.disabledState);
-	          this.containerOuter.setAttribute('aria-disabled', 'true');
-	          if (this.isSelectOneElement) {
-	            this.containerOuter.setAttribute('tabindex', '-1');
-	          }
-	        }
-	      }
-	      return this;
-	    }
-
-	    /**
-	     * Populate options via ajax callback
-	     * @param  {Function} fn Function that actually makes an AJAX request
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: 'ajax',
-	    value: function ajax(fn) {
-	      var _this13 = this;
-
-	      if (this.initialised === true) {
-	        if (this.isSelectElement) {
-	          // Show loading text
-	          requestAnimationFrame(function () {
-	            _this13._handleLoadingState(true);
-	          });
-	          // Run callback
-	          fn(this._ajaxCallback());
-	        }
-	      }
-	      return this;
-	    }
-
-	    /*=====  End of Public functions  ======*/
-
-	    /*=============================================
-	    =                Private functions            =
-	    =============================================*/
-
-	    /**
-	     * Call change callback
-	     * @param  {String} value - last added/deleted/selected value
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_triggerChange',
-	    value: function _triggerChange(value) {
-	      if (!value) {
-	        return;
-	      }
-
-	      (0, _utils.triggerEvent)(this.passedElement, 'change', {
-	        value: value
-	      });
-	    }
-
-	    /**
-	     * Process enter/click of an item button
-	     * @param {Array} activeItems The currently active items
-	     * @param  {Element} element Button being interacted with
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_handleButtonAction',
-	    value: function _handleButtonAction(activeItems, element) {
-	      if (!activeItems || !element) {
-	        return;
-	      }
-
-	      // If we are clicking on a button
-	      if (this.config.removeItems && this.config.removeItemButton) {
-	        var itemId = element.parentNode.getAttribute('data-id');
-	        var itemToRemove = activeItems.find(function (item) {
-	          return item.id === parseInt(itemId, 10);
-	        });
-
-	        // Remove item associated with button
-	        this._removeItem(itemToRemove);
-	        this._triggerChange(itemToRemove.value);
-
-	        if (this.isSelectOneElement) {
-	          this._selectPlaceholderChoice();
-	        }
-	      }
-	    }
-
-	    /**
-	     * Select placeholder choice
-	     */
-
-	  }, {
-	    key: '_selectPlaceholderChoice',
-	    value: function _selectPlaceholderChoice() {
-	      var placeholderChoice = this.store.getPlaceholderChoice();
-
-	      if (placeholderChoice) {
-	        this._addItem(placeholderChoice.value, placeholderChoice.label, placeholderChoice.id, placeholderChoice.groupId, null, placeholderChoice.placeholder);
-	        this._triggerChange(placeholderChoice.value);
-	      }
-	    }
-
-	    /**
-	     * Process click of an item
-	     * @param {Array} activeItems The currently active items
-	     * @param  {Element} element Item being interacted with
-	     * @param  {Boolean} hasShiftKey Whether the user has the shift key active
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_handleItemAction',
-	    value: function _handleItemAction(activeItems, element) {
-	      var _this14 = this;
-
-	      var hasShiftKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-	      if (!activeItems || !element) {
-	        return;
-	      }
-
-	      // If we are clicking on an item
-	      if (this.config.removeItems && !this.isSelectOneElement) {
-	        var passedId = element.getAttribute('data-id');
-
-	        // We only want to select one item with a click
-	        // so we deselect any items that aren't the target
-	        // unless shift is being pressed
-	        activeItems.forEach(function (item) {
-	          if (item.id === parseInt(passedId, 10) && !item.highlighted) {
-	            _this14.highlightItem(item);
-	          } else if (!hasShiftKey) {
-	            if (item.highlighted) {
-	              _this14.unhighlightItem(item);
-	            }
-	          }
-	        });
-
-	        // Focus input as without focus, a user cannot do anything with a
-	        // highlighted item
-	        if (document.activeElement !== this.input) {
-	          this.input.focus();
-	        }
-	      }
-	    }
-
-	    /**
-	     * Process click of a choice
-	     * @param {Array} activeItems The currently active items
-	     * @param  {Element} element Choice being interacted with
-	     * @return
-	     */
-
-	  }, {
-	    key: '_handleChoiceAction',
-	    value: function _handleChoiceAction(activeItems, element) {
-	      if (!activeItems || !element) {
-	        return;
-	      }
-
-	      // If we are clicking on an option
-	      var id = element.getAttribute('data-id');
-	      var choice = this.store.getChoiceById(id);
-	      var passedKeyCode = activeItems[0] && activeItems[0].keyCode ? activeItems[0].keyCode : null;
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-	      // Update choice keyCode
-	      choice.keyCode = passedKeyCode;
-
-	      (0, _utils.triggerEvent)(this.passedElement, 'choice', {
-	        choice: choice
-	      });
-
-	      if (choice && !choice.selected && !choice.disabled) {
-	        var canAddItem = this._canAddItem(activeItems, choice.value);
-
-	        if (canAddItem.response) {
-	          this._addItem(choice.value, choice.label, choice.id, choice.groupId, choice.customProperties, choice.placeholder, choice.keyCode);
-	          this._triggerChange(choice.value);
-	        }
-	      }
-
-	      this.clearInput();
-
-	      // We wont to close the dropdown if we are dealing with a single select box
-	      if (hasActiveDropdown && this.isSelectOneElement) {
-	        this.hideDropdown();
-	        this.containerOuter.focus();
-	      }
-	    }
-
-	    /**
-	     * Process back space event
-	     * @param  {Array} activeItems items
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_handleBackspace',
-	    value: function _handleBackspace(activeItems) {
-	      if (this.config.removeItems && activeItems) {
-	        var lastItem = activeItems[activeItems.length - 1];
-	        var hasHighlightedItems = activeItems.some(function (item) {
-	          return item.highlighted;
-	        });
-
-	        // If editing the last item is allowed and there are not other selected items,
-	        // we can edit the item value. Otherwise if we can remove items, remove all selected items
-	        if (this.config.editItems && !hasHighlightedItems && lastItem) {
-	          this.input.value = lastItem.value;
-	          this._setInputWidth();
-	          this._removeItem(lastItem);
-	          this._triggerChange(lastItem.value);
-	        } else {
-	          if (!hasHighlightedItems) {
-	            this.highlightItem(lastItem, false);
-	          }
-	          this.removeHighlightedItems(true);
-	        }
-	      }
-	    }
-
-	    /**
-	     * Validates whether an item can be added by a user
-	     * @param {Array} activeItems The currently active items
-	     * @param  {String} value     Value of item to add
-	     * @return {Object}           Response: Whether user can add item
-	     *                            Notice: Notice show in dropdown
-	     */
-
-	  }, {
-	    key: '_canAddItem',
-	    value: function _canAddItem(activeItems, value) {
-	      var canAddItem = true;
-	      var notice = (0, _utils.isType)('Function', this.config.addItemText) ? this.config.addItemText(value) : this.config.addItemText;
-
-	      if (this.isSelectMultipleElement || this.isTextElement) {
-	        if (this.config.maxItemCount > 0 && this.config.maxItemCount <= activeItems.length) {
-	          // If there is a max entry limit and we have reached that limit
-	          // don't update
-	          canAddItem = false;
-	          notice = (0, _utils.isType)('Function', this.config.maxItemText) ? this.config.maxItemText(this.config.maxItemCount) : this.config.maxItemText;
-	        }
-	      }
-
-	      if (this.isTextElement && this.config.addItems && canAddItem) {
-	        // If a user has supplied a regular expression filter
-	        if (this.config.regexFilter) {
-	          // Determine whether we can update based on whether
-	          // our regular expression passes
-	          canAddItem = this._regexFilter(value);
-	        }
-	      }
-
-	      // If no duplicates are allowed, and the value already exists
-	      // in the array
-	      var isUnique = !activeItems.some(function (item) {
-	        if ((0, _utils.isType)('String', value)) {
-	          return item.value === value.trim();
-	        }
-
-	        return item.value === value;
-	      });
-
-	      if (!isUnique && !this.config.duplicateItems && !this.isSelectOneElement && canAddItem) {
-	        canAddItem = false;
-	        notice = (0, _utils.isType)('Function', this.config.uniqueItemText) ? this.config.uniqueItemText(value) : this.config.uniqueItemText;
-	      }
-
-	      return {
-	        response: canAddItem,
-	        notice: notice
-	      };
-	    }
-
-	    /**
-	     * Apply or remove a loading state to the component.
-	     * @param {Boolean} setLoading default value set to 'true'.
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_handleLoadingState',
-	    value: function _handleLoadingState() {
-	      var setLoading = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
-	      var placeholderItem = this.itemList.querySelector('.' + this.config.classNames.placeholder);
-	      if (setLoading) {
-	        this.containerOuter.classList.add(this.config.classNames.loadingState);
-	        this.containerOuter.setAttribute('aria-busy', 'true');
-	        if (this.isSelectOneElement) {
-	          if (!placeholderItem) {
-	            placeholderItem = this._getTemplate('placeholder', this.config.loadingText);
-	            this.itemList.appendChild(placeholderItem);
-	          } else {
-	            placeholderItem.innerHTML = this.config.loadingText;
-	          }
-	        } else {
-	          this.input.placeholder = this.config.loadingText;
-	        }
-	      } else {
-	        // Remove loading states/text
-	        this.containerOuter.classList.remove(this.config.classNames.loadingState);
-
-	        if (this.isSelectOneElement) {
-	          placeholderItem.innerHTML = this.placeholder || '';
-	        } else {
-	          this.input.placeholder = this.placeholder || '';
-	        }
-	      }
-	    }
-
-	    /**
-	     * Retrieve the callback used to populate component's choices in an async way.
-	     * @returns {Function} The callback as a function.
-	     * @private
-	     */
-
-	  }, {
-	    key: '_ajaxCallback',
-	    value: function _ajaxCallback() {
-	      var _this15 = this;
-
-	      return function (results, value, label) {
-	        if (!results || !value) {
-	          return;
-	        }
-
-	        var parsedResults = (0, _utils.isType)('Object', results) ? [results] : results;
-
-	        if (parsedResults && (0, _utils.isType)('Array', parsedResults) && parsedResults.length) {
-	          // Remove loading states/text
-	          _this15._handleLoadingState(false);
-	          // Add each result as a choice
-
-	          _this15._setLoading(true);
-
-	          parsedResults.forEach(function (result) {
-	            if (result.choices) {
-	              var groupId = result.id || null;
-	              _this15._addGroup(result, groupId, value, label);
-	            } else {
-	              _this15._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
-	            }
-	          });
-
-	          _this15._setLoading(false);
-
-	          if (_this15.isSelectOneElement) {
-	            _this15._selectPlaceholderChoice();
-	          }
-	        } else {
-	          // No results, remove loading state
-	          _this15._handleLoadingState(false);
-	        }
-
-	        _this15.containerOuter.removeAttribute('aria-busy');
-	      };
-	    }
-
-	    /**
-	     * Filter choices based on search value
-	     * @param  {String} value Value to filter by
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_searchChoices',
-	    value: function _searchChoices(value) {
-	      var newValue = (0, _utils.isType)('String', value) ? value.trim() : value;
-	      var currentValue = (0, _utils.isType)('String', this.currentValue) ? this.currentValue.trim() : this.currentValue;
-
-	      // If new value matches the desired length and is not the same as the current value with a space
-	      if (newValue.length >= 1 && newValue !== currentValue + ' ') {
-	        var haystack = this.store.getSearchableChoices();
-	        var needle = newValue;
-	        var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
-	        var options = Object.assign(this.config.fuseOptions, { keys: keys });
-	        var fuse = new _fuse2.default(haystack, options);
-	        var results = fuse.search(needle);
-
-	        this.currentValue = newValue;
-	        this.highlightPosition = 0;
-	        this.isSearching = true;
-	        this.store.dispatch((0, _index3.filterChoices)(results));
-
-	        return results.length;
-	      }
-
-	      return 0;
-	    }
-
-	    /**
-	     * Determine the action when a user is searching
-	     * @param  {String} value Value entered by user
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_handleSearch',
-	    value: function _handleSearch(value) {
-	      if (!value) {
-	        return;
-	      }
-
-	      var choices = this.store.getChoices();
-	      var hasUnactiveChoices = choices.some(function (option) {
-	        return !option.active;
-	      });
-
-	      // Run callback if it is a function
-	      if (this.input === document.activeElement) {
-	        // Check that we have a value to search and the input was an alphanumeric character
-	        if (value && value.length >= this.config.searchFloor) {
-	          var resultCount = 0;
-	          // Check flag to filter search input
-	          if (this.config.searchChoices) {
-	            // Filter available choices
-	            resultCount = this._searchChoices(value);
-	          }
-	          // Trigger search event
-	          (0, _utils.triggerEvent)(this.passedElement, 'search', {
-	            value: value,
-	            resultCount: resultCount
-	          });
-	        } else if (hasUnactiveChoices) {
-	          // Otherwise reset choices to active
-	          this.isSearching = false;
-	          this.store.dispatch((0, _index3.activateChoices)(true));
-	        }
-	      }
-	    }
-
-	    /**
-	     * Trigger event listeners
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_addEventListeners',
-	    value: function _addEventListeners() {
-	      document.addEventListener('keyup', this._onKeyUp);
-	      document.addEventListener('keydown', this._onKeyDown);
-	      document.addEventListener('click', this._onClick);
-	      document.addEventListener('touchmove', this._onTouchMove);
-	      document.addEventListener('touchend', this._onTouchEnd);
-	      document.addEventListener('mousedown', this._onMouseDown);
-	      document.addEventListener('mouseover', this._onMouseOver);
-
-	      if (this.isSelectOneElement) {
-	        this.containerOuter.addEventListener('focus', this._onFocus);
-	        this.containerOuter.addEventListener('blur', this._onBlur);
-	      }
-
-	      this.input.addEventListener('input', this._onInput);
-	      this.input.addEventListener('paste', this._onPaste);
-	      this.input.addEventListener('focus', this._onFocus);
-	      this.input.addEventListener('blur', this._onBlur);
-	    }
-
-	    /**
-	     * Remove event listeners
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_removeEventListeners',
-	    value: function _removeEventListeners() {
-	      document.removeEventListener('keyup', this._onKeyUp);
-	      document.removeEventListener('keydown', this._onKeyDown);
-	      document.removeEventListener('click', this._onClick);
-	      document.removeEventListener('touchmove', this._onTouchMove);
-	      document.removeEventListener('touchend', this._onTouchEnd);
-	      document.removeEventListener('mousedown', this._onMouseDown);
-	      document.removeEventListener('mouseover', this._onMouseOver);
-
-	      if (this.isSelectOneElement) {
-	        this.containerOuter.removeEventListener('focus', this._onFocus);
-	        this.containerOuter.removeEventListener('blur', this._onBlur);
-	      }
-
-	      this.input.removeEventListener('input', this._onInput);
-	      this.input.removeEventListener('paste', this._onPaste);
-	      this.input.removeEventListener('focus', this._onFocus);
-	      this.input.removeEventListener('blur', this._onBlur);
-	    }
-
-	    /**
-	     * Set the correct input width based on placeholder
-	     * value or input value
-	     * @return
-	     */
-
-	  }, {
-	    key: '_setInputWidth',
-	    value: function _setInputWidth() {
-	      if (this.placeholder) {
-	        // If there is a placeholder, we only want to set the width of the input when it is a greater
-	        // length than 75% of the placeholder. This stops the input jumping around.
-	        if (this.input.value && this.input.value.length >= this.placeholder.length / 1.25) {
-	          this.input.style.width = (0, _utils.getWidthOfInput)(this.input);
-	        }
-	      } else {
-	        // If there is no placeholder, resize input to contents
-	        this.input.style.width = (0, _utils.getWidthOfInput)(this.input);
-	      }
-	    }
-
-	    /**
-	     * Key down event
-	     * @param  {Object} e Event
-	     * @return
-	     */
-
-	  }, {
-	    key: '_onKeyDown',
-	    value: function _onKeyDown(e) {
-	      var _this16 = this,
-	          _keyDownActions;
-
-	      if (e.target !== this.input && !this.containerOuter.contains(e.target)) {
-	        return;
-	      }
-
-	      var target = e.target;
-	      var activeItems = this.store.getItemsFilteredByActive();
-	      var hasFocusedInput = this.input === document.activeElement;
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	      var hasItems = this.itemList && this.itemList.children;
-	      var keyString = String.fromCharCode(e.keyCode);
-
-	      var backKey = 46;
-	      var deleteKey = 8;
-	      var enterKey = 13;
-	      var aKey = 65;
-	      var escapeKey = 27;
-	      var upKey = 38;
-	      var downKey = 40;
-	      var pageUpKey = 33;
-	      var pageDownKey = 34;
-	      var ctrlDownKey = e.ctrlKey || e.metaKey;
-
-	      // If a user is typing and the dropdown is not active
-	      if (!this.isTextElement && /[a-zA-Z0-9-_ ]/.test(keyString) && !hasActiveDropdown) {
-	        this.showDropdown(true);
-	      }
-
-	      this.canSearch = this.config.searchEnabled;
-
-	      var onAKey = function onAKey() {
-	        // If CTRL + A or CMD + A have been pressed and there are items to select
-	        if (ctrlDownKey && hasItems) {
-	          _this16.canSearch = false;
-	          if (_this16.config.removeItems && !_this16.input.value && _this16.input === document.activeElement) {
-	            // Highlight items
-	            _this16.highlightAll();
-	          }
-	        }
-	      };
-
-	      var onEnterKey = function onEnterKey() {
-	        // If enter key is pressed and the input has a value
-	        if (_this16.isTextElement && target.value) {
-	          var value = _this16.input.value;
-	          var canAddItem = _this16._canAddItem(activeItems, value);
-
-	          // All is good, add
-	          if (canAddItem.response) {
-	            if (hasActiveDropdown) {
-	              _this16.hideDropdown();
-	            }
-	            _this16._addItem(value);
-	            _this16._triggerChange(value);
-	            _this16.clearInput();
-	          }
-	        }
-
-	        if (target.hasAttribute('data-button')) {
-	          _this16._handleButtonAction(activeItems, target);
-	          e.preventDefault();
-	        }
-
-	        if (hasActiveDropdown) {
-	          e.preventDefault();
-	          var highlighted = _this16.dropdown.querySelector('.' + _this16.config.classNames.highlightedState);
-
-	          // If we have a highlighted choice
-	          if (highlighted) {
-	            // add enter keyCode value
-	            if (activeItems[0]) {
-	              activeItems[0].keyCode = enterKey;
-	            }
-	            _this16._handleChoiceAction(activeItems, highlighted);
-	          }
-	        } else if (_this16.isSelectOneElement) {
-	          // Open single select dropdown if it's not active
-	          if (!hasActiveDropdown) {
-	            _this16.showDropdown(true);
-	            e.preventDefault();
-	          }
-	        }
-	      };
-
-	      var onEscapeKey = function onEscapeKey() {
-	        if (hasActiveDropdown) {
-	          _this16.toggleDropdown();
-	          _this16.containerOuter.focus();
-	        }
-	      };
-
-	      var onDirectionKey = function onDirectionKey() {
-	        // If up or down key is pressed, traverse through options
-	        if (hasActiveDropdown || _this16.isSelectOneElement) {
-	          // Show dropdown if focus
-	          if (!hasActiveDropdown) {
-	            _this16.showDropdown(true);
-	          }
-
-	          _this16.canSearch = false;
-
-	          var directionInt = e.keyCode === downKey || e.keyCode === pageDownKey ? 1 : -1;
-	          var skipKey = e.metaKey || e.keyCode === pageDownKey || e.keyCode === pageUpKey;
-
-	          var nextEl = void 0;
-	          if (skipKey) {
-	            if (directionInt > 0) {
-	              nextEl = Array.from(_this16.dropdown.querySelectorAll('[data-choice-selectable]')).pop();
-	            } else {
-	              nextEl = _this16.dropdown.querySelector('[data-choice-selectable]');
-	            }
-	          } else {
-	            var currentEl = _this16.dropdown.querySelector('.' + _this16.config.classNames.highlightedState);
-	            if (currentEl) {
-	              nextEl = (0, _utils.getAdjacentEl)(currentEl, '[data-choice-selectable]', directionInt);
-	            } else {
-	              nextEl = _this16.dropdown.querySelector('[data-choice-selectable]');
-	            }
-	          }
-
-	          if (nextEl) {
-	            // We prevent default to stop the cursor moving
-	            // when pressing the arrow
-	            if (!(0, _utils.isScrolledIntoView)(nextEl, _this16.choiceList, directionInt)) {
-	              _this16._scrollToChoice(nextEl, directionInt);
-	            }
-	            _this16._highlightChoice(nextEl);
-	          }
-
-	          // Prevent default to maintain cursor position whilst
-	          // traversing dropdown options
-	          e.preventDefault();
-	        }
-	      };
-
-	      var onDeleteKey = function onDeleteKey() {
-	        // If backspace or delete key is pressed and the input has no value
-	        if (hasFocusedInput && !e.target.value && !_this16.isSelectOneElement) {
-	          _this16._handleBackspace(activeItems);
-	          e.preventDefault();
-	        }
-	      };
-
-	      // Map keys to key actions
-	      var keyDownActions = (_keyDownActions = {}, _defineProperty(_keyDownActions, aKey, onAKey), _defineProperty(_keyDownActions, enterKey, onEnterKey), _defineProperty(_keyDownActions, escapeKey, onEscapeKey), _defineProperty(_keyDownActions, upKey, onDirectionKey), _defineProperty(_keyDownActions, pageUpKey, onDirectionKey), _defineProperty(_keyDownActions, downKey, onDirectionKey), _defineProperty(_keyDownActions, pageDownKey, onDirectionKey), _defineProperty(_keyDownActions, deleteKey, onDeleteKey), _defineProperty(_keyDownActions, backKey, onDeleteKey), _keyDownActions);
-
-	      // If keycode has a function, run it
-	      if (keyDownActions[e.keyCode]) {
-	        keyDownActions[e.keyCode]();
-	      }
-	    }
-
-	    /**
-	     * Key up event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onKeyUp',
-	    value: function _onKeyUp(e) {
-	      if (e.target !== this.input) {
-	        return;
-	      }
-
-	      var value = this.input.value;
-	      var activeItems = this.store.getItemsFilteredByActive();
-	      var canAddItem = this._canAddItem(activeItems, value);
-
-	      // We are typing into a text input and have a value, we want to show a dropdown
-	      // notice. Otherwise hide the dropdown
-	      if (this.isTextElement) {
-	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	        if (value) {
-
-	          if (canAddItem.notice) {
-	            var dropdownItem = this._getTemplate('notice', canAddItem.notice);
-	            this.dropdown.innerHTML = dropdownItem.outerHTML;
-	          }
-
-	          if (canAddItem.response === true) {
-	            if (!hasActiveDropdown) {
-	              this.showDropdown();
-	            }
-	          } else if (!canAddItem.notice && hasActiveDropdown) {
-	            this.hideDropdown();
-	          }
-	        } else if (hasActiveDropdown) {
-	          this.hideDropdown();
-	        }
-	      } else {
-	        var backKey = 46;
-	        var deleteKey = 8;
-
-	        // If user has removed value...
-	        if ((e.keyCode === backKey || e.keyCode === deleteKey) && !e.target.value) {
-	          // ...and it is a multiple select input, activate choices (if searching)
-	          if (!this.isTextElement && this.isSearching) {
-	            this.isSearching = false;
-	            this.store.dispatch((0, _index3.activateChoices)(true));
-	          }
-	        } else if (this.canSearch && canAddItem.response) {
-	          this._handleSearch(this.input.value);
-	        }
-	      }
-	      // Re-establish canSearch value from changes in _onKeyDown
-	      this.canSearch = this.config.searchEnabled;
-	    }
-
-	    /**
-	     * Input event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onInput',
-	    value: function _onInput() {
-	      if (!this.isSelectOneElement) {
-	        this._setInputWidth();
-	      }
-	    }
-
-	    /**
-	     * Touch move event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onTouchMove',
-	    value: function _onTouchMove() {
-	      if (this.wasTap === true) {
-	        this.wasTap = false;
-	      }
-	    }
-
-	    /**
-	     * Touch end event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onTouchEnd',
-	    value: function _onTouchEnd(e) {
-	      var target = e.target || e.touches[0].target;
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-
-	      // If a user tapped within our container...
-	      if (this.wasTap === true && this.containerOuter.contains(target)) {
-	        // ...and we aren't dealing with a single select box, show dropdown/focus input
-	        if ((target === this.containerOuter || target === this.containerInner) && !this.isSelectOneElement) {
-	          if (this.isTextElement) {
-	            // If text element, we only want to focus the input (if it isn't already)
-	            if (document.activeElement !== this.input) {
-	              this.input.focus();
-	            }
-	          } else {
-	            if (!hasActiveDropdown) {
-	              // If a select box, we want to show the dropdown
-	              this.showDropdown(true);
-	            }
-	          }
-	        }
-	        // Prevents focus event firing
-	        e.stopPropagation();
-	      }
-
-	      this.wasTap = true;
-	    }
-
-	    /**
-	     * Mouse down event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onMouseDown',
-	    value: function _onMouseDown(e) {
-	      var target = e.target;
-
-	      // If we have our mouse down on the scrollbar and are on IE11...
-	      if (target === this.choiceList && this.isIe11) {
-	        this.isScrollingOnIe = true;
-	      }
-
-	      if (this.containerOuter.contains(target) && target !== this.input) {
-	        var foundTarget = void 0;
-	        var activeItems = this.store.getItemsFilteredByActive();
-	        var hasShiftKey = e.shiftKey;
-
-	        if (foundTarget = (0, _utils.findAncestorByAttrName)(target, 'data-button')) {
-	          this._handleButtonAction(activeItems, foundTarget);
-	        } else if (foundTarget = (0, _utils.findAncestorByAttrName)(target, 'data-item')) {
-	          this._handleItemAction(activeItems, foundTarget, hasShiftKey);
-	        } else if (foundTarget = (0, _utils.findAncestorByAttrName)(target, 'data-choice')) {
-	          this._handleChoiceAction(activeItems, foundTarget);
-	        }
-
-	        e.preventDefault();
-	      }
-	    }
-
-	    /**
-	     * Click event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onClick',
-	    value: function _onClick(e) {
-	      var target = e.target;
-	      var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	      var activeItems = this.store.getItemsFilteredByActive();
-
-	      // If target is something that concerns us
-	      if (this.containerOuter.contains(target)) {
-	        // Handle button delete
-	        if (target.hasAttribute('data-button')) {
-	          this._handleButtonAction(activeItems, target);
-	        }
-
-	        if (!hasActiveDropdown) {
-	          if (this.isTextElement) {
-	            if (document.activeElement !== this.input) {
-	              this.input.focus();
-	            }
-	          } else {
-	            if (this.canSearch) {
-	              this.showDropdown(true);
-	            } else {
-	              this.showDropdown();
-	              this.containerOuter.focus();
-	            }
-	          }
-	        } else if (this.isSelectOneElement && target !== this.input && !this.dropdown.contains(target)) {
-	          this.hideDropdown(true);
-	        }
-	      } else {
-	        var hasHighlightedItems = activeItems.some(function (item) {
-	          return item.highlighted;
-	        });
-
-	        // De-select any highlighted items
-	        if (hasHighlightedItems) {
-	          this.unhighlightAll();
-	        }
-
-	        // Remove focus state
-	        this.containerOuter.classList.remove(this.config.classNames.focusState);
-
-	        // Close all other dropdowns
-	        if (hasActiveDropdown) {
-	          this.hideDropdown();
-	        }
-	      }
-	    }
-
-	    /**
-	     * Mouse over (hover) event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onMouseOver',
-	    value: function _onMouseOver(e) {
-	      // If the dropdown is either the target or one of its children is the target
-	      if (e.target === this.dropdown || this.dropdown.contains(e.target)) {
-	        if (e.target.hasAttribute('data-choice')) this._highlightChoice(e.target);
-	      }
-	    }
-
-	    /**
-	     * Paste event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onPaste',
-	    value: function _onPaste(e) {
-	      // Disable pasting into the input if option has been set
-	      if (e.target === this.input && !this.config.paste) {
-	        e.preventDefault();
-	      }
-	    }
-
-	    /**
-	     * Focus event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onFocus',
-	    value: function _onFocus(e) {
-	      var _this17 = this;
-
-	      var target = e.target;
-	      // If target is something that concerns us
-	      if (this.containerOuter.contains(target)) {
-	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	        var focusActions = {
-	          text: function text() {
-	            if (target === _this17.input) {
-	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
-	            }
-	          },
-	          'select-one': function selectOne() {
-	            _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
-	            if (target === _this17.input) {
-	              // Show dropdown if it isn't already showing
-	              if (!hasActiveDropdown) {
-	                _this17.showDropdown();
-	              }
-	            }
-	          },
-	          'select-multiple': function selectMultiple() {
-	            if (target === _this17.input) {
-	              // If element is a select box, the focused element is the container and the dropdown
-	              // isn't already open, focus and show dropdown
-	              _this17.containerOuter.classList.add(_this17.config.classNames.focusState);
-
-	              if (!hasActiveDropdown) {
-	                _this17.showDropdown(true);
-	              }
-	            }
-	          }
-	        };
-
-	        focusActions[this.passedElement.type]();
-	      }
-	    }
-
-	    /**
-	     * Blur event
-	     * @param  {Object} e Event
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_onBlur',
-	    value: function _onBlur(e) {
-	      var _this18 = this;
-
-	      var target = e.target;
-	      // If target is something that concerns us
-	      if (this.containerOuter.contains(target) && !this.isScrollingOnIe) {
-	        var activeItems = this.store.getItemsFilteredByActive();
-	        var hasActiveDropdown = this.dropdown.classList.contains(this.config.classNames.activeState);
-	        var hasHighlightedItems = activeItems.some(function (item) {
-	          return item.highlighted;
-	        });
-	        var blurActions = {
-	          text: function text() {
-	            if (target === _this18.input) {
-	              // Remove the focus state
-	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
-	              // De-select any highlighted items
-	              if (hasHighlightedItems) {
-	                _this18.unhighlightAll();
-	              }
-	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown) {
-	                _this18.hideDropdown();
-	              }
-	            }
-	          },
-	          'select-one': function selectOne() {
-	            _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
-	            if (target === _this18.containerOuter) {
-	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown && !_this18.canSearch) {
-	                _this18.hideDropdown();
-	              }
-	            }
-	            if (target === _this18.input && hasActiveDropdown) {
-	              // Hide dropdown if it is showing
-	              _this18.hideDropdown();
-	            }
-	          },
-	          'select-multiple': function selectMultiple() {
-	            if (target === _this18.input) {
-	              // Remove the focus state
-	              _this18.containerOuter.classList.remove(_this18.config.classNames.focusState);
-	              // Hide dropdown if it is showing
-	              if (hasActiveDropdown) {
-	                _this18.hideDropdown();
-	              }
-	              // De-select any highlighted items
-	              if (hasHighlightedItems) {
-	                _this18.unhighlightAll();
-	              }
-	            }
-	          }
-	        };
-
-	        blurActions[this.passedElement.type]();
-	      } else {
-	        // On IE11, clicking the scollbar blurs our input and thus
-	        // closes the dropdown. To stop this, we refocus our input
-	        // if we know we are on IE *and* are scrolling.
-	        this.isScrollingOnIe = false;
-	        this.input.focus();
-	      }
-	    }
-
-	    /**
-	     * Tests value against a regular expression
-	     * @param  {string} value   Value to test
-	     * @return {Boolean}        Whether test passed/failed
-	     * @private
-	     */
-
-	  }, {
-	    key: '_regexFilter',
-	    value: function _regexFilter(value) {
-	      if (!value) {
-	        return false;
-	      }
-
-	      var regex = this.config.regexFilter;
-	      var expression = new RegExp(regex.source, 'i');
-	      return expression.test(value);
-	    }
-
-	    /**
-	     * Scroll to an option element
-	     * @param  {HTMLElement} choice  Option to scroll to
-	     * @param  {Number} direction  Whether option is above or below
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_scrollToChoice',
-	    value: function _scrollToChoice(choice, direction) {
-	      var _this19 = this;
-
-	      if (!choice) {
-	        return;
-	      }
-
-	      var dropdownHeight = this.choiceList.offsetHeight;
-	      var choiceHeight = choice.offsetHeight;
-	      // Distance from bottom of element to top of parent
-	      var choicePos = choice.offsetTop + choiceHeight;
-	      // Scroll position of dropdown
-	      var containerScrollPos = this.choiceList.scrollTop + dropdownHeight;
-	      // Difference between the choice and scroll position
-	      var endPoint = direction > 0 ? this.choiceList.scrollTop + choicePos - containerScrollPos : choice.offsetTop;
-
-	      var animateScroll = function animateScroll() {
-	        var strength = 4;
-	        var choiceListScrollTop = _this19.choiceList.scrollTop;
-	        var continueAnimation = false;
-	        var easing = void 0;
-	        var distance = void 0;
-
-	        if (direction > 0) {
-	          easing = (endPoint - choiceListScrollTop) / strength;
-	          distance = easing > 1 ? easing : 1;
-
-	          _this19.choiceList.scrollTop = choiceListScrollTop + distance;
-	          if (choiceListScrollTop < endPoint) {
-	            continueAnimation = true;
-	          }
-	        } else {
-	          easing = (choiceListScrollTop - endPoint) / strength;
-	          distance = easing > 1 ? easing : 1;
-
-	          _this19.choiceList.scrollTop = choiceListScrollTop - distance;
-	          if (choiceListScrollTop > endPoint) {
-	            continueAnimation = true;
-	          }
-	        }
-
-	        if (continueAnimation) {
-	          requestAnimationFrame(function (time) {
-	            animateScroll(time, endPoint, direction);
-	          });
-	        }
-	      };
-
-	      requestAnimationFrame(function (time) {
-	        animateScroll(time, endPoint, direction);
-	      });
-	    }
-
-	    /**
-	     * Highlight choice
-	     * @param  {HTMLElement} [el] Element to highlight
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_highlightChoice',
-	    value: function _highlightChoice() {
-	      var _this20 = this;
-
-	      var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-	      // Highlight first element in dropdown
-	      var choices = Array.from(this.dropdown.querySelectorAll('[data-choice-selectable]'));
-	      var passedEl = el;
-
-	      if (choices && choices.length) {
-	        var highlightedChoices = Array.from(this.dropdown.querySelectorAll('.' + this.config.classNames.highlightedState));
-
-	        // Remove any highlighted choices
-	        highlightedChoices.forEach(function (choice) {
-	          choice.classList.remove(_this20.config.classNames.highlightedState);
-	          choice.setAttribute('aria-selected', 'false');
-	        });
-
-	        if (passedEl) {
-	          this.highlightPosition = choices.indexOf(passedEl);
-	        } else {
-	          // Highlight choice based on last known highlight location
-	          if (choices.length > this.highlightPosition) {
-	            // If we have an option to highlight
-	            passedEl = choices[this.highlightPosition];
-	          } else {
-	            // Otherwise highlight the option before
-	            passedEl = choices[choices.length - 1];
-	          }
-
-	          if (!passedEl) {
-	            passedEl = choices[0];
-	          }
-	        }
-
-	        // Highlight given option, and set accessiblity attributes
-	        passedEl.classList.add(this.config.classNames.highlightedState);
-	        passedEl.setAttribute('aria-selected', 'true');
-	        this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
-	      }
-	    }
-
-	    /**
-	     * Add item to store with correct value
-	     * @param {String} value Value to add to store
-	     * @param {String} [label] Label to add to store
-	     * @param {Number} [choiceId=-1] ID of the associated choice that was selected
-	     * @param {Number} [groupId=-1] ID of group choice is within. Negative number indicates no group
-	     * @param {Object} [customProperties] Object containing user defined properties
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: '_addItem',
-	    value: function _addItem(value) {
-	      var label = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-	      var choiceId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
-	      var groupId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -1;
-	      var customProperties = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-	      var placeholder = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-	      var keyCode = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
-
-	      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
-	      var passedKeyCode = keyCode;
-	      var items = this.store.getItems();
-	      var passedLabel = label || passedValue;
-	      var passedOptionId = parseInt(choiceId, 10) || -1;
-
-	      // Get group if group ID passed
-	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-
-	      // Generate unique id
-	      var id = items ? items.length + 1 : 1;
-
-	      // If a prepended value has been passed, prepend it
-	      if (this.config.prependValue) {
-	        passedValue = this.config.prependValue + passedValue.toString();
-	      }
-
-	      // If an appended value has been passed, append it
-	      if (this.config.appendValue) {
-	        passedValue += this.config.appendValue.toString();
-	      }
-
-	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, placeholder, passedKeyCode));
-
-	      if (this.isSelectOneElement) {
-	        this.removeActiveItems(id);
-	      }
-
-	      // Trigger change event
-	      if (group && group.value) {
-	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
-	          id: id,
-	          value: passedValue,
-	          label: passedLabel,
-	          groupValue: group.value,
-	          keyCode: passedKeyCode
-	        });
-	      } else {
-	        (0, _utils.triggerEvent)(this.passedElement, 'addItem', {
-	          id: id,
-	          value: passedValue,
-	          label: passedLabel,
-	          keyCode: passedKeyCode
-	        });
-	      }
-
-	      return this;
-	    }
-
-	    /**
-	     * Remove item from store
-	     * @param {Object} item Item to remove
-	     * @return {Object} Class instance
-	     * @public
-	     */
-
-	  }, {
-	    key: '_removeItem',
-	    value: function _removeItem(item) {
-	      if (!item || !(0, _utils.isType)('Object', item)) {
-	        return this;
-	      }
-
-	      var id = item.id;
-	      var value = item.value;
-	      var label = item.label;
-	      var choiceId = item.choiceId;
-	      var groupId = item.groupId;
-	      var group = groupId >= 0 ? this.store.getGroupById(groupId) : null;
-
-	      this.store.dispatch((0, _index3.removeItem)(id, choiceId));
-
-	      if (group && group.value) {
-	        (0, _utils.triggerEvent)(this.passedElement, 'removeItem', {
-	          id: id,
-	          value: value,
-	          label: label,
-	          groupValue: group.value
-	        });
-	      } else {
-	        (0, _utils.triggerEvent)(this.passedElement, 'removeItem', {
-	          id: id,
-	          value: value,
-	          label: label
-	        });
-	      }
-
-	      return this;
-	    }
-
-	    /**
-	     * Add choice to dropdown
-	     * @param {String} value Value of choice
-	     * @param {String} [label] Label of choice
-	     * @param {Boolean} [isSelected=false] Whether choice is selected
-	     * @param {Boolean} [isDisabled=false] Whether choice is disabled
-	     * @param {Number} [groupId=-1] ID of group choice is within. Negative number indicates no group
-	     * @param {Object} [customProperties] Object containing user defined properties
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_addChoice',
-	    value: function _addChoice(value) {
-	      var label = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-	      var isSelected = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-	      var isDisabled = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
-	      var customProperties = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-	      var placeholder = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
-	      var keyCode = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
-
-	      if (typeof value === 'undefined' || value === null) {
-	        return;
-	      }
-
-	      // Generate unique id
-	      var choices = this.store.getChoices();
-	      var choiceLabel = label || value;
-	      var choiceId = choices ? choices.length + 1 : 1;
-	      var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
-
-	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, placeholder, keyCode));
-
-	      if (isSelected) {
-	        this._addItem(value, choiceLabel, choiceId, undefined, customProperties, placeholder, keyCode);
-	      }
-	    }
-
-	    /**
-	     * Clear all choices added to the store.
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_clearChoices',
-	    value: function _clearChoices() {
-	      this.store.dispatch((0, _index3.clearChoices)());
-	    }
-
-	    /**
-	     * Add group to dropdown
-	     * @param {Object} group Group to add
-	     * @param {Number} id Group ID
-	     * @param {String} [valueKey] name of the value property on the object
-	     * @param {String} [labelKey] name of the label property on the object
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_addGroup',
-	    value: function _addGroup(group, id) {
-	      var _this21 = this;
-
-	      var valueKey = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'value';
-	      var labelKey = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'label';
-
-	      var groupChoices = (0, _utils.isType)('Object', group) ? group.choices : Array.from(group.getElementsByTagName('OPTION'));
-	      var groupId = id ? id : Math.floor(new Date().valueOf() * Math.random());
-	      var isDisabled = group.disabled ? group.disabled : false;
-
-	      if (groupChoices) {
-	        this.store.dispatch((0, _index3.addGroup)(group.label, groupId, true, isDisabled));
-
-	        groupChoices.forEach(function (option) {
-	          var isOptDisabled = option.disabled || option.parentNode && option.parentNode.disabled;
-	          _this21._addChoice(option[valueKey], (0, _utils.isType)('Object', option) ? option[labelKey] : option.innerHTML, option.selected, isOptDisabled, groupId, option.customProperties, option.placeholder);
-	        });
-	      } else {
-	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
-	      }
-	    }
-
-	    /**
-	     * Get template from name
-	     * @param  {String}    template Name of template to get
-	     * @param  {...}       args     Data to pass to template
-	     * @return {HTMLElement}        Template
-	     * @private
-	     */
-
-	  }, {
-	    key: '_getTemplate',
-	    value: function _getTemplate(template) {
-	      if (!template) {
-	        return null;
-	      }
-	      var templates = this.config.templates;
-
-	      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        args[_key - 1] = arguments[_key];
-	      }
-
-	      return templates[template].apply(templates, args);
-	    }
-
-	    /**
-	     * Create HTML element based on type and arguments
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_createTemplates',
-	    value: function _createTemplates() {
-	      var _this22 = this;
-
-	      var globalClasses = this.config.classNames;
-	      var templates = {
-	        containerOuter: function containerOuter(direction) {
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.containerOuter + '"\n            ' + (_this22.isSelectElement ? _this22.config.searchEnabled ? 'role="combobox" aria-autocomplete="list"' : 'role="listbox"' : '') + '\n            data-type="' + _this22.passedElement.type + '"\n            ' + (_this22.isSelectOneElement ? 'tabindex="0"' : '') + '\n            aria-haspopup="true"\n            aria-expanded="false"\n            dir="' + direction + '"\n            >\n          </div>\n        ');
-	        },
-	        containerInner: function containerInner() {
-	          return (0, _utils.strToEl)('\n          <div class="' + globalClasses.containerInner + '"></div>\n        ');
-	        },
-	        itemList: function itemList() {
-	          var _classNames;
-
-	          var localClasses = (0, _classnames2.default)(globalClasses.list, (_classNames = {}, _defineProperty(_classNames, globalClasses.listSingle, _this22.isSelectOneElement), _defineProperty(_classNames, globalClasses.listItems, !_this22.isSelectOneElement), _classNames));
-
-	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '"></div>\n        ');
-	        },
-	        placeholder: function placeholder(value) {
-	          return (0, _utils.strToEl)('\n          <div class="' + globalClasses.placeholder + '">\n            ' + value + '\n          </div>\n        ');
-	        },
-	        item: function item(data) {
-	          var _classNames2;
-
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _defineProperty(_classNames2, globalClasses.placeholder, data.placeholder), _classNames2));
-
-	          if (_this22.config.removeItemButton) {
-	            var _classNames3;
-
-	            localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames3, globalClasses.placeholder, data.placeholder), _classNames3));
-
-	            return (0, _utils.strToEl)('\n            <div\n              class="' + localClasses + '"\n              data-item\n              data-id="' + data.id + '"\n              data-value="' + data.value + '"\n              data-deletable\n              ' + (data.active ? 'aria-selected="true"' : '') + '\n              ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n              >\n              ' + data.label + '<!--\n           --><button\n                type="button"\n                class="' + globalClasses.button + '"\n                data-button\n                aria-label="Remove item: \'' + data.value + '\'"\n                >\n                Remove item\n              </button>\n            </div>\n          ');
-	          }
-
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-item\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.active ? 'aria-selected="true"' : '') + '\n            ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
-	        },
-	        choiceList: function choiceList() {
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + globalClasses.list + '"\n            dir="ltr"\n            role="listbox"\n            ' + (!_this22.isSelectOneElement ? 'aria-multiselectable="true"' : '') + '\n            >\n          </div>\n        ');
-	        },
-	        choiceGroup: function choiceGroup(data) {
-	          var localClasses = (0, _classnames2.default)(globalClasses.group, _defineProperty({}, globalClasses.itemDisabled, data.disabled));
-
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-group\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            role="group"\n            ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n            >\n            <div class="' + globalClasses.groupHeading + '">' + data.value + '</div>\n          </div>\n        ');
-	        },
-	        choice: function choice(data) {
-	          var _classNames5;
-
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames5, globalClasses.placeholder, data.placeholder), _classNames5));
-
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-select-text="' + _this22.config.itemSelectText + '"\n            data-choice\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n            id="' + data.elementId + '"\n            ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
-	        },
-	        input: function input() {
-	          var localClasses = (0, _classnames2.default)(globalClasses.input, globalClasses.inputCloned);
-
-	          return (0, _utils.strToEl)('\n          <input\n            type="text"\n            class="' + localClasses + '"\n            autocomplete="off"\n            autocapitalize="off"\n            spellcheck="false"\n            role="textbox"\n            aria-autocomplete="list"\n            >\n        ');
-	        },
-	        dropdown: function dropdown() {
-	          var localClasses = (0, _classnames2.default)(globalClasses.list, globalClasses.listDropdown);
-
-	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            aria-expanded="false"\n            >\n          </div>\n        ');
-	        },
-	        notice: function notice(label) {
-	          var _classNames6;
-
-	          var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames6 = {}, _defineProperty(_classNames6, globalClasses.noResults, type === 'no-results'), _defineProperty(_classNames6, globalClasses.noChoices, type === 'no-choices'), _classNames6));
-
-	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '">\n            ' + label + '\n          </div>\n        ');
-	        },
-	        option: function option(data) {
-	          return (0, _utils.strToEl)('\n          <option value="' + data.value + '" selected>' + data.label + '</option>\n        ');
-	        }
-	      };
-
-	      // User's custom templates
-	      var callbackTemplate = this.config.callbackOnCreateTemplates;
-	      var userTemplates = {};
-	      if (callbackTemplate && (0, _utils.isType)('Function', callbackTemplate)) {
-	        userTemplates = callbackTemplate.call(this, _utils.strToEl);
-	      }
-
-	      this.config.templates = (0, _utils.extend)(templates, userTemplates);
-	    }
-	  }, {
-	    key: '_setLoading',
-	    value: function _setLoading(isLoading) {
-	      this.store.dispatch((0, _index3.setIsLoading)(isLoading));
-	    }
-
-	    /**
-	     * Create DOM structure around passed select element
-	     * @return
-	     * @private
-	     */
-
-	  }, {
-	    key: '_createInput',
-	    value: function _createInput() {
-	      var _this23 = this;
-
-	      var direction = this.passedElement.getAttribute('dir') || 'ltr';
-	      var containerOuter = this._getTemplate('containerOuter', direction);
-	      var containerInner = this._getTemplate('containerInner');
-	      var itemList = this._getTemplate('itemList');
-	      var choiceList = this._getTemplate('choiceList');
-	      var input = this._getTemplate('input');
-	      var dropdown = this._getTemplate('dropdown');
-
-	      this.containerOuter = containerOuter;
-	      this.containerInner = containerInner;
-	      this.input = input;
-	      this.choiceList = choiceList;
-	      this.itemList = itemList;
-	      this.dropdown = dropdown;
-
-	      // Hide passed input
-	      this.passedElement.classList.add(this.config.classNames.input, this.config.classNames.hiddenState);
-
-	      // Remove element from tab index
-	      this.passedElement.tabIndex = '-1';
-
-	      // Backup original styles if any
-	      var origStyle = this.passedElement.getAttribute('style');
-
-	      if (Boolean(origStyle)) {
-	        this.passedElement.setAttribute('data-choice-orig-style', origStyle);
-	      }
-
-	      this.passedElement.setAttribute('style', 'display:none;');
-	      this.passedElement.setAttribute('aria-hidden', 'true');
-	      this.passedElement.setAttribute('data-choice', 'active');
-
-	      // Wrap input in container preserving DOM ordering
-	      (0, _utils.wrap)(this.passedElement, containerInner);
-
-	      // Wrapper inner container with outer container
-	      (0, _utils.wrap)(containerInner, containerOuter);
-
-	      if (this.isSelectOneElement) {
-	        input.placeholder = this.config.searchPlaceholderValue || '';
-	      } else if (this.placeholder) {
-	        input.placeholder = this.placeholder;
-	        input.style.width = (0, _utils.getWidthOfInput)(input);
-	      }
-
-	      if (!this.config.addItems) {
-	        this.disable();
-	      }
-
-	      containerOuter.appendChild(containerInner);
-	      containerOuter.appendChild(dropdown);
-	      containerInner.appendChild(itemList);
-
-	      if (!this.isTextElement) {
-	        dropdown.appendChild(choiceList);
-	      }
-
-	      if (this.isSelectMultipleElement || this.isTextElement) {
-	        containerInner.appendChild(input);
-	      } else if (this.canSearch) {
-	        dropdown.insertBefore(input, dropdown.firstChild);
-	      }
-
-	      if (this.isSelectElement) {
-	        var passedGroups = Array.from(this.passedElement.getElementsByTagName('OPTGROUP'));
-
-	        this.highlightPosition = 0;
-	        this.isSearching = false;
-
-	        this._setLoading(true);
-
-	        if (passedGroups && passedGroups.length) {
-	          passedGroups.forEach(function (group) {
-	            _this23._addGroup(group, group.id || null);
-	          });
-	        } else {
-	          var passedOptions = Array.from(this.passedElement.options);
-	          var filter = this.config.sortFilter;
-	          var allChoices = this.presetChoices;
-
-	          // Create array of options from option elements
-	          passedOptions.forEach(function (o) {
-	            allChoices.push({
-	              value: o.value,
-	              label: o.innerHTML,
-	              selected: o.selected,
-	              disabled: o.disabled || o.parentNode.disabled,
-	              placeholder: o.hasAttribute('placeholder')
-	            });
-	          });
-
-	          // If sorting is enabled or the user is searching, filter choices
-	          if (this.config.shouldSort) {
-	            allChoices.sort(filter);
-	          }
-
-	          // Determine whether there is a selected choice
-	          var hasSelectedChoice = allChoices.some(function (choice) {
-	            return choice.selected;
-	          });
-
-	          // Add each choice
-	          allChoices.forEach(function (choice, index) {
-	            // Pre-select first choice if it's a single select
-	            if (_this23.isSelectOneElement) {
-	              // If there is a selected choice already or the choice is not
-	              // the first in the array, add each choice normally
-	              // Otherwise pre-select the first choice in the array
-	              var shouldPreselect = hasSelectedChoice || !hasSelectedChoice && index > 0;
-	              _this23._addChoice(choice.value, choice.label, shouldPreselect ? choice.selected : true, shouldPreselect ? choice.disabled : false, undefined, choice.customProperties, choice.placeholder);
-	            } else {
-	              _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties, choice.placeholder);
-	            }
-	          });
-	        }
-
-	        this._setLoading(false);
-	      } else if (this.isTextElement) {
-	        // Add any preset values seperated by delimiter
-	        this.presetItems.forEach(function (item) {
-	          var itemType = (0, _utils.getType)(item);
-	          if (itemType === 'Object') {
-	            if (!item.value) {
-	              return;
-	            }
-	            _this23._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
-	          } else if (itemType === 'String') {
-	            _this23._addItem(item);
-	          }
-	        });
-	      }
-	    }
-
-	    /*=====  End of Private functions  ======*/
-
-	  }]);
-
-	  return Choices;
-	}();
-
-		module.exports = Choices;
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	/**
-	 * @license
-	 * Fuse - Lightweight fuzzy-search
-	 *
-	 * Copyright (c) 2012-2016 Kirollos Risk <kirollos@gmail.com>.
-	 * All Rights Reserved. Apache Software License 2.0
-	 *
-	 * Licensed under the Apache License, Version 2.0 (the "License")
-	 * you may not use this file except in compliance with the License.
-	 * You may obtain a copy of the License at
-	 *
-	 * http://www.apache.org/licenses/LICENSE-2.0
-	 *
-	 * Unless required by applicable law or agreed to in writing, software
-	 * distributed under the License is distributed on an "AS IS" BASIS,
-	 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	 * See the License for the specific language governing permissions and
-	 * limitations under the License.
-	 */
-	;(function (global) {
-	  'use strict'
-
-	  /** @type {function(...*)} */
-	  function log () {
-	    console.log.apply(console, arguments)
-	  }
-
-	  var defaultOptions = {
-	    // The name of the identifier property. If specified, the returned result will be a list
-	    // of the items' dentifiers, otherwise it will be a list of the items.
-	    id: null,
-
-	    // Indicates whether comparisons should be case sensitive.
-
-	    caseSensitive: false,
-
-	    // An array of values that should be included from the searcher's output. When this array
-	    // contains elements, each result in the list will be of the form `{ item: ..., include1: ..., include2: ... }`.
-	    // Values you can include are `score`, `matchedLocations`
-	    include: [],
-
-	    // Whether to sort the result list, by score
-	    shouldSort: true,
-
-	    // The search function to use
-	    // Note that the default search function ([[Function]]) must conform to the following API:
-	    //
-	    //  @param pattern The pattern string to search
-	    //  @param options The search option
-	    //  [[Function]].constructor = function(pattern, options)
-	    //
-	    //  @param text: the string to search in for the pattern
-	    //  @return Object in the form of:
-	    //    - isMatch: boolean
-	    //    - score: Int
-	    //  [[Function]].prototype.search = function(text)
-	    searchFn: BitapSearcher,
-
-	    // Default sort function
-	    sortFn: function (a, b) {
-	      return a.score - b.score
-	    },
-
-	    // The get function to use when fetching an object's properties.
-	    // The default will search nested paths *ie foo.bar.baz*
-	    getFn: deepValue,
-
-	    // List of properties that will be searched. This also supports nested properties.
-	    keys: [],
-
-	    // Will print to the console. Useful for debugging.
-	    verbose: false,
-
-	    // When true, the search algorithm will search individual words **and** the full string,
-	    // computing the final score as a function of both. Note that when `tokenize` is `true`,
-	    // the `threshold`, `distance`, and `location` are inconsequential for individual tokens.
-	    tokenize: false,
-
-	    // When true, the result set will only include records that match all tokens. Will only work
-	    // if `tokenize` is also true.
-	    matchAllTokens: false,
-
-	    // Regex used to separate words when searching. Only applicable when `tokenize` is `true`.
-	    tokenSeparator: / +/g,
-
-	    // Minimum number of characters that must be matched before a result is considered a match
-	    minMatchCharLength: 1,
-
-	    // When true, the algorithm continues searching to the end of the input even if a perfect
-	    // match is found before the end of the same input.
-	    findAllMatches: false
-	  }
-
-	  /**
-	   * @constructor
-	   * @param {!Array} list
-	   * @param {!Object<string, *>} options
-	   */
-	  function Fuse (list, options) {
-	    var key
-
-	    this.list = list
-	    this.options = options = options || {}
-
-	    for (key in defaultOptions) {
-	      if (!defaultOptions.hasOwnProperty(key)) {
-	        continue;
-	      }
-	      // Add boolean type options
-	      if (typeof defaultOptions[key] === 'boolean') {
-	        this.options[key] = key in options ? options[key] : defaultOptions[key];
-	      // Add all other options
-	      } else {
-	        this.options[key] = options[key] || defaultOptions[key]
-	      }
-	    }
-	  }
-
-	  Fuse.VERSION = '2.7.3'
-
-	  /**
-	   * Sets a new list for Fuse to match against.
-	   * @param {!Array} list
-	   * @return {!Array} The newly set list
-	   * @public
-	   */
-	  Fuse.prototype.set = function (list) {
-	    this.list = list
-	    return list
-	  }
-
-	  Fuse.prototype.search = function (pattern) {
-	    if (this.options.verbose) log('\nSearch term:', pattern, '\n')
-
-	    this.pattern = pattern
-	    this.results = []
-	    this.resultMap = {}
-	    this._keyMap = null
-
-	    this._prepareSearchers()
-	    this._startSearch()
-	    this._computeScore()
-	    this._sort()
-
-	    var output = this._format()
-	    return output
-	  }
-
-	  Fuse.prototype._prepareSearchers = function () {
-	    var options = this.options
-	    var pattern = this.pattern
-	    var searchFn = options.searchFn
-	    var tokens = pattern.split(options.tokenSeparator)
-	    var i = 0
-	    var len = tokens.length
-
-	    if (this.options.tokenize) {
-	      this.tokenSearchers = []
-	      for (; i < len; i++) {
-	        this.tokenSearchers.push(new searchFn(tokens[i], options))
-	      }
-	    }
-	    this.fullSeacher = new searchFn(pattern, options)
-	  }
-
-	  Fuse.prototype._startSearch = function () {
-	    var options = this.options
-	    var getFn = options.getFn
-	    var list = this.list
-	    var listLen = list.length
-	    var keys = this.options.keys
-	    var keysLen = keys.length
-	    var key
-	    var weight
-	    var item = null
-	    var i
-	    var j
-
-	    // Check the first item in the list, if it's a string, then we assume
-	    // that every item in the list is also a string, and thus it's a flattened array.
-	    if (typeof list[0] === 'string') {
-	      // Iterate over every item
-	      for (i = 0; i < listLen; i++) {
-	        this._analyze('', list[i], i, i)
-	      }
-	    } else {
-	      this._keyMap = {}
-	      // Otherwise, the first item is an Object (hopefully), and thus the searching
-	      // is done on the values of the keys of each item.
-	      // Iterate over every item
-	      for (i = 0; i < listLen; i++) {
-	        item = list[i]
-	        // Iterate over every key
-	        for (j = 0; j < keysLen; j++) {
-	          key = keys[j]
-	          if (typeof key !== 'string') {
-	            weight = (1 - key.weight) || 1
-	            this._keyMap[key.name] = {
-	              weight: weight
-	            }
-	            if (key.weight <= 0 || key.weight > 1) {
-	              throw new Error('Key weight has to be > 0 and <= 1')
-	            }
-	            key = key.name
-	          } else {
-	            this._keyMap[key] = {
-	              weight: 1
-	            }
-	          }
-	          this._analyze(key, getFn(item, key, []), item, i)
-	        }
-	      }
-	    }
-	  }
-
-	  Fuse.prototype._analyze = function (key, text, entity, index) {
-	    var options = this.options
-	    var words
-	    var scores
-	    var exists = false
-	    var existingResult
-	    var averageScore
-	    var finalScore
-	    var scoresLen
-	    var mainSearchResult
-	    var tokenSearcher
-	    var termScores
-	    var word
-	    var tokenSearchResult
-	    var hasMatchInText
-	    var checkTextMatches
-	    var i
-	    var j
-
-	    // Check if the text can be searched
-	    if (text === undefined || text === null) {
-	      return
-	    }
-
-	    scores = []
-
-	    var numTextMatches = 0
-
-	    if (typeof text === 'string') {
-	      words = text.split(options.tokenSeparator)
-
-	      if (options.verbose) log('---------\nKey:', key)
-
-	      if (this.options.tokenize) {
-	        for (i = 0; i < this.tokenSearchers.length; i++) {
-	          tokenSearcher = this.tokenSearchers[i]
-
-	          if (options.verbose) log('Pattern:', tokenSearcher.pattern)
-
-	          termScores = []
-	          hasMatchInText = false
-
-	          for (j = 0; j < words.length; j++) {
-	            word = words[j]
-	            tokenSearchResult = tokenSearcher.search(word)
-	            var obj = {}
-	            if (tokenSearchResult.isMatch) {
-	              obj[word] = tokenSearchResult.score
-	              exists = true
-	              hasMatchInText = true
-	              scores.push(tokenSearchResult.score)
-	            } else {
-	              obj[word] = 1
-	              if (!this.options.matchAllTokens) {
-	                scores.push(1)
-	              }
-	            }
-	            termScores.push(obj)
-	          }
-
-	          if (hasMatchInText) {
-	            numTextMatches++
-	          }
-
-	          if (options.verbose) log('Token scores:', termScores)
-	        }
-
-	        averageScore = scores[0]
-	        scoresLen = scores.length
-	        for (i = 1; i < scoresLen; i++) {
-	          averageScore += scores[i]
-	        }
-	        averageScore = averageScore / scoresLen
-
-	        if (options.verbose) log('Token score average:', averageScore)
-	      }
-
-	      mainSearchResult = this.fullSeacher.search(text)
-	      if (options.verbose) log('Full text score:', mainSearchResult.score)
-
-	      finalScore = mainSearchResult.score
-	      if (averageScore !== undefined) {
-	        finalScore = (finalScore + averageScore) / 2
-	      }
-
-	      if (options.verbose) log('Score average:', finalScore)
-
-	      checkTextMatches = (this.options.tokenize && this.options.matchAllTokens) ? numTextMatches >= this.tokenSearchers.length : true
-
-	      if (options.verbose) log('Check Matches', checkTextMatches)
-
-	      // If a match is found, add the item to <rawResults>, including its score
-	      if ((exists || mainSearchResult.isMatch) && checkTextMatches) {
-	        // Check if the item already exists in our results
-	        existingResult = this.resultMap[index]
-
-	        if (existingResult) {
-	          // Use the lowest score
-	          // existingResult.score, bitapResult.score
-	          existingResult.output.push({
-	            key: key,
-	            score: finalScore,
-	            matchedIndices: mainSearchResult.matchedIndices
-	          })
-	        } else {
-	          // Add it to the raw result list
-	          this.resultMap[index] = {
-	            item: entity,
-	            output: [{
-	              key: key,
-	              score: finalScore,
-	              matchedIndices: mainSearchResult.matchedIndices
-	            }]
-	          }
-
-	          this.results.push(this.resultMap[index])
-	        }
-	      }
-	    } else if (isArray(text)) {
-	      for (i = 0; i < text.length; i++) {
-	        this._analyze(key, text[i], entity, index)
-	      }
-	    }
-	  }
-
-	  Fuse.prototype._computeScore = function () {
-	    var i
-	    var j
-	    var keyMap = this._keyMap
-	    var totalScore
-	    var output
-	    var scoreLen
-	    var score
-	    var weight
-	    var results = this.results
-	    var bestScore
-	    var nScore
-
-	    if (this.options.verbose) log('\n\nComputing score:\n')
-
-	    for (i = 0; i < results.length; i++) {
-	      totalScore = 0
-	      output = results[i].output
-	      scoreLen = output.length
-
-	      bestScore = 1
-
-	      for (j = 0; j < scoreLen; j++) {
-	        score = output[j].score
-	        weight = keyMap ? keyMap[output[j].key].weight : 1
-
-	        nScore = score * weight
-
-	        if (weight !== 1) {
-	          bestScore = Math.min(bestScore, nScore)
-	        } else {
-	          totalScore += nScore
-	          output[j].nScore = nScore
-	        }
-	      }
-
-	      if (bestScore === 1) {
-	        results[i].score = totalScore / scoreLen
-	      } else {
-	        results[i].score = bestScore
-	      }
-
-	      if (this.options.verbose) log(results[i])
-	    }
-	  }
-
-	  Fuse.prototype._sort = function () {
-	    var options = this.options
-	    if (options.shouldSort) {
-	      if (options.verbose) log('\n\nSorting....')
-	      this.results.sort(options.sortFn)
-	    }
-	  }
-
-	  Fuse.prototype._format = function () {
-	    var options = this.options
-	    var getFn = options.getFn
-	    var finalOutput = []
-	    var i
-	    var len
-	    var results = this.results
-	    var replaceValue
-	    var getItemAtIndex
-	    var include = options.include
-
-	    if (options.verbose) log('\n\nOutput:\n\n', results)
-
-	    // Helper function, here for speed-up, which replaces the item with its value,
-	    // if the options specifies it,
-	    replaceValue = options.id ? function (index) {
-	      results[index].item = getFn(results[index].item, options.id, [])[0]
-	    } : function () {}
-
-	    getItemAtIndex = function (index) {
-	      var record = results[index]
-	      var data
-	      var j
-	      var output
-	      var _item
-	      var _result
-
-	      // If `include` has values, put the item in the result
-	      if (include.length > 0) {
-	        data = {
-	          item: record.item
-	        }
-	        if (include.indexOf('matches') !== -1) {
-	          output = record.output
-	          data.matches = []
-	          for (j = 0; j < output.length; j++) {
-	            _item = output[j]
-	            _result = {
-	              indices: _item.matchedIndices
-	            }
-	            if (_item.key) {
-	              _result.key = _item.key
-	            }
-	            data.matches.push(_result)
-	          }
-	        }
-
-	        if (include.indexOf('score') !== -1) {
-	          data.score = results[index].score
-	        }
-
-	      } else {
-	        data = record.item
-	      }
-
-	      return data
-	    }
-
-	    // From the results, push into a new array only the item identifier (if specified)
-	    // of the entire item.  This is because we don't want to return the <results>,
-	    // since it contains other metadata
-	    for (i = 0, len = results.length; i < len; i++) {
-	      replaceValue(i)
-	      finalOutput.push(getItemAtIndex(i))
-	    }
-
-	    return finalOutput
-	  }
-
-	  // Helpers
-
-	  function deepValue (obj, path, list) {
-	    var firstSegment
-	    var remaining
-	    var dotIndex
-	    var value
-	    var i
-	    var len
-
-	    if (!path) {
-	      // If there's no path left, we've gotten to the object we care about.
-	      list.push(obj)
-	    } else {
-	      dotIndex = path.indexOf('.')
-
-	      if (dotIndex !== -1) {
-	        firstSegment = path.slice(0, dotIndex)
-	        remaining = path.slice(dotIndex + 1)
-	      } else {
-	        firstSegment = path
-	      }
-
-	      value = obj[firstSegment]
-	      if (value !== null && value !== undefined) {
-	        if (!remaining && (typeof value === 'string' || typeof value === 'number')) {
-	          list.push(value)
-	        } else if (isArray(value)) {
-	          // Search each item in the array.
-	          for (i = 0, len = value.length; i < len; i++) {
-	            deepValue(value[i], remaining, list)
-	          }
-	        } else if (remaining) {
-	          // An object. Recurse further.
-	          deepValue(value, remaining, list)
-	        }
-	      }
-	    }
-
-	    return list
-	  }
-
-	  function isArray (obj) {
-	    return Object.prototype.toString.call(obj) === '[object Array]'
-	  }
-
-	  /**
-	   * Adapted from "Diff, Match and Patch", by Google
-	   *
-	   *   http://code.google.com/p/google-diff-match-patch/
-	   *
-	   * Modified by: Kirollos Risk <kirollos@gmail.com>
-	   * -----------------------------------------------
-	   * Details: the algorithm and structure was modified to allow the creation of
-	   * <Searcher> instances with a <search> method which does the actual
-	   * bitap search. The <pattern> (the string that is searched for) is only defined
-	   * once per instance and thus it eliminates redundant re-creation when searching
-	   * over a list of strings.
-	   *
-	   * Licensed under the Apache License, Version 2.0 (the "License")
-	   * you may not use this file except in compliance with the License.
-	   *
-	   * @constructor
-	   */
-	  function BitapSearcher (pattern, options) {
-	    options = options || {}
-	    this.options = options
-	    this.options.location = options.location || BitapSearcher.defaultOptions.location
-	    this.options.distance = 'distance' in options ? options.distance : BitapSearcher.defaultOptions.distance
-	    this.options.threshold = 'threshold' in options ? options.threshold : BitapSearcher.defaultOptions.threshold
-	    this.options.maxPatternLength = options.maxPatternLength || BitapSearcher.defaultOptions.maxPatternLength
-
-	    this.pattern = options.caseSensitive ? pattern : pattern.toLowerCase()
-	    this.patternLen = pattern.length
-
-	    if (this.patternLen <= this.options.maxPatternLength) {
-	      this.matchmask = 1 << (this.patternLen - 1)
-	      this.patternAlphabet = this._calculatePatternAlphabet()
-	    }
-	  }
-
-	  BitapSearcher.defaultOptions = {
-	    // Approximately where in the text is the pattern expected to be found?
-	    location: 0,
-
-	    // Determines how close the match must be to the fuzzy location (specified above).
-	    // An exact letter match which is 'distance' characters away from the fuzzy location
-	    // would score as a complete mismatch. A distance of '0' requires the match be at
-	    // the exact location specified, a threshold of '1000' would require a perfect match
-	    // to be within 800 characters of the fuzzy location to be found using a 0.8 threshold.
-	    distance: 100,
-
-	    // At what point does the match algorithm give up. A threshold of '0.0' requires a perfect match
-	    // (of both letters and location), a threshold of '1.0' would match anything.
-	    threshold: 0.6,
-
-	    // Machine word size
-	    maxPatternLength: 32
-	  }
-
-	  /**
-	   * Initialize the alphabet for the Bitap algorithm.
-	   * @return {Object} Hash of character locations.
-	   * @private
-	   */
-	  BitapSearcher.prototype._calculatePatternAlphabet = function () {
-	    var mask = {},
-	      i = 0
-
-	    for (i = 0; i < this.patternLen; i++) {
-	      mask[this.pattern.charAt(i)] = 0
-	    }
-
-	    for (i = 0; i < this.patternLen; i++) {
-	      mask[this.pattern.charAt(i)] |= 1 << (this.pattern.length - i - 1)
-	    }
-
-	    return mask
-	  }
-
-	  /**
-	   * Compute and return the score for a match with `e` errors and `x` location.
-	   * @param {number} errors Number of errors in match.
-	   * @param {number} location Location of match.
-	   * @return {number} Overall score for match (0.0 = good, 1.0 = bad).
-	   * @private
-	   */
-	  BitapSearcher.prototype._bitapScore = function (errors, location) {
-	    var accuracy = errors / this.patternLen,
-	      proximity = Math.abs(this.options.location - location)
-
-	    if (!this.options.distance) {
-	      // Dodge divide by zero error.
-	      return proximity ? 1.0 : accuracy
-	    }
-	    return accuracy + (proximity / this.options.distance)
-	  }
-
-	  /**
-	   * Compute and return the result of the search
-	   * @param {string} text The text to search in
-	   * @return {{isMatch: boolean, score: number}} Literal containing:
-	   *                          isMatch - Whether the text is a match or not
-	   *                          score - Overall score for the match
-	   * @public
-	   */
-	  BitapSearcher.prototype.search = function (text) {
-	    var options = this.options
-	    var i
-	    var j
-	    var textLen
-	    var findAllMatches
-	    var location
-	    var threshold
-	    var bestLoc
-	    var binMin
-	    var binMid
-	    var binMax
-	    var start, finish
-	    var bitArr
-	    var lastBitArr
-	    var charMatch
-	    var score
-	    var locations
-	    var matches
-	    var isMatched
-	    var matchMask
-	    var matchedIndices
-	    var matchesLen
-	    var match
-
-	    text = options.caseSensitive ? text : text.toLowerCase()
-
-	    if (this.pattern === text) {
-	      // Exact match
-	      return {
-	        isMatch: true,
-	        score: 0,
-	        matchedIndices: [[0, text.length - 1]]
-	      }
-	    }
-
-	    // When pattern length is greater than the machine word length, just do a a regex comparison
-	    if (this.patternLen > options.maxPatternLength) {
-	      matches = text.match(new RegExp(this.pattern.replace(options.tokenSeparator, '|')))
-	      isMatched = !!matches
-
-	      if (isMatched) {
-	        matchedIndices = []
-	        for (i = 0, matchesLen = matches.length; i < matchesLen; i++) {
-	          match = matches[i]
-	          matchedIndices.push([text.indexOf(match), match.length - 1])
-	        }
-	      }
-
-	      return {
-	        isMatch: isMatched,
-	        // TODO: revisit this score
-	        score: isMatched ? 0.5 : 1,
-	        matchedIndices: matchedIndices
-	      }
-	    }
-
-	    findAllMatches = options.findAllMatches
-
-	    location = options.location
-	    // Set starting location at beginning text and initialize the alphabet.
-	    textLen = text.length
-	    // Highest score beyond which we give up.
-	    threshold = options.threshold
-	    // Is there a nearby exact match? (speedup)
-	    bestLoc = text.indexOf(this.pattern, location)
-
-	    // a mask of the matches
-	    matchMask = []
-	    for (i = 0; i < textLen; i++) {
-	      matchMask[i] = 0
-	    }
-
-	    if (bestLoc != -1) {
-	      threshold = Math.min(this._bitapScore(0, bestLoc), threshold)
-	      // What about in the other direction? (speed up)
-	      bestLoc = text.lastIndexOf(this.pattern, location + this.patternLen)
-
-	      if (bestLoc != -1) {
-	        threshold = Math.min(this._bitapScore(0, bestLoc), threshold)
-	      }
-	    }
-
-	    bestLoc = -1
-	    score = 1
-	    locations = []
-	    binMax = this.patternLen + textLen
-
-	    for (i = 0; i < this.patternLen; i++) {
-	      // Scan for the best match; each iteration allows for one more error.
-	      // Run a binary search to determine how far from the match location we can stray
-	      // at this error level.
-	      binMin = 0
-	      binMid = binMax
-	      while (binMin < binMid) {
-	        if (this._bitapScore(i, location + binMid) <= threshold) {
-	          binMin = binMid
-	        } else {
-	          binMax = binMid
-	        }
-	        binMid = Math.floor((binMax - binMin) / 2 + binMin)
-	      }
-
-	      // Use the result from this iteration as the maximum for the next.
-	      binMax = binMid
-	      start = Math.max(1, location - binMid + 1)
-	      if (findAllMatches) {
-	        finish = textLen;
-	      } else {
-	        finish = Math.min(location + binMid, textLen) + this.patternLen
-	      }
-
-	      // Initialize the bit array
-	      bitArr = Array(finish + 2)
-
-	      bitArr[finish + 1] = (1 << i) - 1
-
-	      for (j = finish; j >= start; j--) {
-	        charMatch = this.patternAlphabet[text.charAt(j - 1)]
-
-	        if (charMatch) {
-	          matchMask[j - 1] = 1
-	        }
-
-	        bitArr[j] = ((bitArr[j + 1] << 1) | 1) & charMatch
-
-	        if (i !== 0) {
-	          // Subsequent passes: fuzzy match.
-	          bitArr[j] |= (((lastBitArr[j + 1] | lastBitArr[j]) << 1) | 1) | lastBitArr[j + 1]
-	        }
-	        if (bitArr[j] & this.matchmask) {
-	          score = this._bitapScore(i, j - 1)
-
-	          // This match will almost certainly be better than any existing match.
-	          // But check anyway.
-	          if (score <= threshold) {
-	            // Indeed it is
-	            threshold = score
-	            bestLoc = j - 1
-	            locations.push(bestLoc)
-
-	            // Already passed loc, downhill from here on in.
-	            if (bestLoc <= location) {
-	              break
-	            }
-
-	            // When passing loc, don't exceed our current distance from loc.
-	            start = Math.max(1, 2 * location - bestLoc)
-	          }
-	        }
-	      }
-
-	      // No hope for a (better) match at greater error levels.
-	      if (this._bitapScore(i + 1, location) > threshold) {
-	        break
-	      }
-	      lastBitArr = bitArr
-	    }
-
-	    matchedIndices = this._getMatchedIndices(matchMask)
-
-	    // Count exact matches (those with a score of 0) to be "almost" exact
-	    return {
-	      isMatch: bestLoc >= 0,
-	      score: score === 0 ? 0.001 : score,
-	      matchedIndices: matchedIndices
-	    }
-	  }
-
-	  BitapSearcher.prototype._getMatchedIndices = function (matchMask) {
-	    var matchedIndices = []
-	    var start = -1
-	    var end = -1
-	    var i = 0
-	    var match
-	    var len = matchMask.length
-	    for (; i < len; i++) {
-	      match = matchMask[i]
-	      if (match && start === -1) {
-	        start = i
-	      } else if (!match && start !== -1) {
-	        end = i - 1
-	        if ((end - start) + 1 >= this.options.minMatchCharLength) {
-	            matchedIndices.push([start, end])
-	        }
-	        start = -1
-	      }
-	    }
-	    if (matchMask[i - 1]) {
-	      if ((i-1 - start) + 1 >= this.options.minMatchCharLength) {
-	        matchedIndices.push([start, i - 1])
-	      }
-	    }
-	    return matchedIndices
-	  }
-
-	  // Export to Common JS Loader
-	  if (true) {
-	    // Node. Does not work with strict CommonJS, but
-	    // only CommonJS-like environments that support module.exports,
-	    // like Node.
-	    module.exports = Fuse
-	  } else {}
-
-	})(this);
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2016 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	(function () {
-		'use strict';
-
-		var hasOwn = {}.hasOwnProperty;
-
-		function classNames () {
-			var classes = [];
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes.push(arg);
-				} else if (Array.isArray(arg)) {
-					classes.push(classNames.apply(null, arg));
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes.push(key);
-						}
-					}
-				}
-			}
-
-			return classes.join(' ');
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {}
-	}());
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _redux = __webpack_require__(5);
-
-	var _index = __webpack_require__(26);
-
-	var _index2 = _interopRequireDefault(_index);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Store = function () {
-	  function Store() {
-	    _classCallCheck(this, Store);
-
-	    this.store = (0, _redux.createStore)(_index2.default, window.devToolsExtension ? window.devToolsExtension() : undefined);
-	  }
-
-	  /**
-	   * Get store object (wrapping Redux method)
-	   * @return {Object} State
-	   */
-
-
-	  _createClass(Store, [{
-	    key: 'getState',
-	    value: function getState() {
-	      return this.store.getState();
-	    }
-
-	    /**
-	     * Dispatch event to store (wrapped Redux method)
-	     * @param  {Function} action Action function to trigger
-	     * @return
-	     */
-
-	  }, {
-	    key: 'dispatch',
-	    value: function dispatch(action) {
-	      this.store.dispatch(action);
-	    }
-
-	    /**
-	     * Subscribe store to function call (wrapped Redux method)
-	     * @param  {Function} onChange Function to trigger when state changes
-	     * @return
-	     */
-
-	  }, {
-	    key: 'subscribe',
-	    value: function subscribe(onChange) {
-	      this.store.subscribe(onChange);
-	    }
-
-	    /**
-	     * Get loading state from store
-	     * @return {Boolean} Loading State
-	     */
-
-	  }, {
-	    key: 'isLoading',
-	    value: function isLoading() {
-	      var state = this.store.getState();
-	      return state.general.loading;
-	    }
-
-	    /**
-	     * Get items from store
-	     * @return {Array} Item objects
-	     */
-
-	  }, {
-	    key: 'getItems',
-	    value: function getItems() {
-	      var state = this.store.getState();
-	      return state.items;
-	    }
-
-	    /**
-	     * Get active items from store
-	     * @return {Array} Item objects
-	     */
-
-	  }, {
-	    key: 'getItemsFilteredByActive',
-	    value: function getItemsFilteredByActive() {
-	      var items = this.getItems();
-	      var values = items.filter(function (item) {
-	        return item.active === true;
-	      }, []);
-
-	      return values;
-	    }
-
-	    /**
-	     * Get items from store reduced to just their values
-	     * @return {Array} Item objects
-	     */
-
-	  }, {
-	    key: 'getItemsReducedToValues',
-	    value: function getItemsReducedToValues() {
-	      var items = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.getItems();
-
-	      var values = items.reduce(function (prev, current) {
-	        prev.push(current.value);
-	        return prev;
-	      }, []);
-
-	      return values;
-	    }
-
-	    /**
-	     * Get choices from store
-	     * @return {Array} Option objects
-	     */
-
-	  }, {
-	    key: 'getChoices',
-	    value: function getChoices() {
-	      var state = this.store.getState();
-	      return state.choices;
-	    }
-
-	    /**
-	     * Get active choices from store
-	     * @return {Array} Option objects
-	     */
-
-	  }, {
-	    key: 'getChoicesFilteredByActive',
-	    value: function getChoicesFilteredByActive() {
-	      var choices = this.getChoices();
-	      var values = choices.filter(function (choice) {
-	        return choice.active === true;
-	      });
-
-	      return values;
-	    }
-
-	    /**
-	     * Get selectable choices from store
-	     * @return {Array} Option objects
-	     */
-
-	  }, {
-	    key: 'getChoicesFilteredBySelectable',
-	    value: function getChoicesFilteredBySelectable() {
-	      var choices = this.getChoices();
-	      var values = choices.filter(function (choice) {
-	        return choice.disabled !== true;
-	      });
-
-	      return values;
-	    }
-
-	    /**
-	     * Get choices that can be searched (excluding placeholders)
-	     * @return {Array} Option objects
-	     */
-
-	  }, {
-	    key: 'getSearchableChoices',
-	    value: function getSearchableChoices() {
-	      var filtered = this.getChoicesFilteredBySelectable();
-	      return filtered.filter(function (choice) {
-	        return choice.placeholder !== true;
-	      });
-	    }
-
-	    /**
-	     * Get single choice by it's ID
-	     * @return {Object} Found choice
-	     */
-
-	  }, {
-	    key: 'getChoiceById',
-	    value: function getChoiceById(id) {
-	      if (id) {
-	        var choices = this.getChoicesFilteredByActive();
-	        var foundChoice = choices.find(function (choice) {
-	          return choice.id === parseInt(id, 10);
-	        });
-	        return foundChoice;
-	      }
-	      return false;
-	    }
-
-	    /**
-	     * Get groups from store
-	     * @return {Array} Group objects
-	     */
-
-	  }, {
-	    key: 'getGroups',
-	    value: function getGroups() {
-	      var state = this.store.getState();
-	      return state.groups;
-	    }
-
-	    /**
-	     * Get active groups from store
-	     * @return {Array} Group objects
-	     */
-
-	  }, {
-	    key: 'getGroupsFilteredByActive',
-	    value: function getGroupsFilteredByActive() {
-	      var groups = this.getGroups();
-	      var choices = this.getChoices();
-
-	      var values = groups.filter(function (group) {
-	        var isActive = group.active === true && group.disabled === false;
-	        var hasActiveOptions = choices.some(function (choice) {
-	          return choice.active === true && choice.disabled === false;
-	        });
-	        return isActive && hasActiveOptions;
-	      }, []);
-
-	      return values;
-	    }
-
-	    /**
-	     * Get group by group id
-	     * @param  {Number} id Group ID
-	     * @return {Object}    Group data
-	     */
-
-	  }, {
-	    key: 'getGroupById',
-	    value: function getGroupById(id) {
-	      var groups = this.getGroups();
-	      var foundGroup = groups.find(function (group) {
-	        return group.id === id;
-	      });
-
-	      return foundGroup;
-	    }
-
-	    /**
-	     * Get placeholder choice from store
-	     * @return {Object} Found placeholder
-	     */
-
-	  }, {
-	    key: 'getPlaceholderChoice',
-	    value: function getPlaceholderChoice() {
-	      var choices = this.getChoices();
-	      var placeholderChoice = [].concat(_toConsumableArray(choices)).reverse().find(function (choice) {
-	        return choice.placeholder === true;
-	      });
-
-	      return placeholderChoice;
-	    }
-	  }]);
-
-	  return Store;
-	}();
-
-	exports.default = Store;
-
-
-		module.exports = Store;
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-	exports.compose = exports.applyMiddleware = exports.bindActionCreators = exports.combineReducers = exports.createStore = undefined;
-
-	var _createStore = __webpack_require__(6);
-
-	var _createStore2 = _interopRequireDefault(_createStore);
-
-	var _combineReducers = __webpack_require__(21);
-
-	var _combineReducers2 = _interopRequireDefault(_combineReducers);
-
-	var _bindActionCreators = __webpack_require__(23);
-
-	var _bindActionCreators2 = _interopRequireDefault(_bindActionCreators);
-
-	var _applyMiddleware = __webpack_require__(24);
-
-	var _applyMiddleware2 = _interopRequireDefault(_applyMiddleware);
-
-	var _compose = __webpack_require__(25);
-
-	var _compose2 = _interopRequireDefault(_compose);
-
-	var _warning = __webpack_require__(22);
-
-	var _warning2 = _interopRequireDefault(_warning);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	/*
-	* This is a dummy function to check if the function name has been altered by minification.
-	* If the function has been minified and NODE_ENV !== 'production', warn the user.
-	*/
-	function isCrushed() {}
-
-	if (false) {}
-
-	exports.createStore = _createStore2['default'];
-	exports.combineReducers = _combineReducers2['default'];
-	exports.bindActionCreators = _bindActionCreators2['default'];
-	exports.applyMiddleware = _applyMiddleware2['default'];
-	exports.compose = _compose2['default'];
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.__esModule = true;
-	exports.ActionTypes = undefined;
-	exports['default'] = createStore;
-
-	var _isPlainObject = __webpack_require__(7);
-
-	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
-
-	var _symbolObservable = __webpack_require__(17);
-
-	var _symbolObservable2 = _interopRequireDefault(_symbolObservable);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	/**
-	 * These are private action types reserved by Redux.
-	 * For any unknown actions, you must return the current state.
-	 * If the current state is undefined, you must return the initial state.
-	 * Do not reference these action types directly in your code.
-	 */
-	var ActionTypes = exports.ActionTypes = {
-	  INIT: '@@redux/INIT'
-
-	  /**
-	   * Creates a Redux store that holds the state tree.
-	   * The only way to change the data in the store is to call `dispatch()` on it.
-	   *
-	   * There should only be a single store in your app. To specify how different
-	   * parts of the state tree respond to actions, you may combine several reducers
-	   * into a single reducer function by using `combineReducers`.
-	   *
-	   * @param {Function} reducer A function that returns the next state tree, given
-	   * the current state tree and the action to handle.
-	   *
-	   * @param {any} [preloadedState] The initial state. You may optionally specify it
-	   * to hydrate the state from the server in universal apps, or to restore a
-	   * previously serialized user session.
-	   * If you use `combineReducers` to produce the root reducer function, this must be
-	   * an object with the same shape as `combineReducers` keys.
-	   *
-	   * @param {Function} [enhancer] The store enhancer. You may optionally specify it
-	   * to enhance the store with third-party capabilities such as middleware,
-	   * time travel, persistence, etc. The only store enhancer that ships with Redux
-	   * is `applyMiddleware()`.
-	   *
-	   * @returns {Store} A Redux store that lets you read the state, dispatch actions
-	   * and subscribe to changes.
-	   */
-	};function createStore(reducer, preloadedState, enhancer) {
-	  var _ref2;
-
-	  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
-	    enhancer = preloadedState;
-	    preloadedState = undefined;
-	  }
-
-	  if (typeof enhancer !== 'undefined') {
-	    if (typeof enhancer !== 'function') {
-	      throw new Error('Expected the enhancer to be a function.');
-	    }
-
-	    return enhancer(createStore)(reducer, preloadedState);
-	  }
-
-	  if (typeof reducer !== 'function') {
-	    throw new Error('Expected the reducer to be a function.');
-	  }
-
-	  var currentReducer = reducer;
-	  var currentState = preloadedState;
-	  var currentListeners = [];
-	  var nextListeners = currentListeners;
-	  var isDispatching = false;
-
-	  function ensureCanMutateNextListeners() {
-	    if (nextListeners === currentListeners) {
-	      nextListeners = currentListeners.slice();
-	    }
-	  }
-
-	  /**
-	   * Reads the state tree managed by the store.
-	   *
-	   * @returns {any} The current state tree of your application.
-	   */
-	  function getState() {
-	    return currentState;
-	  }
-
-	  /**
-	   * Adds a change listener. It will be called any time an action is dispatched,
-	   * and some part of the state tree may potentially have changed. You may then
-	   * call `getState()` to read the current state tree inside the callback.
-	   *
-	   * You may call `dispatch()` from a change listener, with the following
-	   * caveats:
-	   *
-	   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
-	   * If you subscribe or unsubscribe while the listeners are being invoked, this
-	   * will not have any effect on the `dispatch()` that is currently in progress.
-	   * However, the next `dispatch()` call, whether nested or not, will use a more
-	   * recent snapshot of the subscription list.
-	   *
-	   * 2. The listener should not expect to see all state changes, as the state
-	   * might have been updated multiple times during a nested `dispatch()` before
-	   * the listener is called. It is, however, guaranteed that all subscribers
-	   * registered before the `dispatch()` started will be called with the latest
-	   * state by the time it exits.
-	   *
-	   * @param {Function} listener A callback to be invoked on every dispatch.
-	   * @returns {Function} A function to remove this change listener.
-	   */
-	  function subscribe(listener) {
-	    if (typeof listener !== 'function') {
-	      throw new Error('Expected listener to be a function.');
-	    }
-
-	    var isSubscribed = true;
-
-	    ensureCanMutateNextListeners();
-	    nextListeners.push(listener);
-
-	    return function unsubscribe() {
-	      if (!isSubscribed) {
-	        return;
-	      }
-
-	      isSubscribed = false;
-
-	      ensureCanMutateNextListeners();
-	      var index = nextListeners.indexOf(listener);
-	      nextListeners.splice(index, 1);
-	    };
-	  }
-
-	  /**
-	   * Dispatches an action. It is the only way to trigger a state change.
-	   *
-	   * The `reducer` function, used to create the store, will be called with the
-	   * current state tree and the given `action`. Its return value will
-	   * be considered the **next** state of the tree, and the change listeners
-	   * will be notified.
-	   *
-	   * The base implementation only supports plain object actions. If you want to
-	   * dispatch a Promise, an Observable, a thunk, or something else, you need to
-	   * wrap your store creating function into the corresponding middleware. For
-	   * example, see the documentation for the `redux-thunk` package. Even the
-	   * middleware will eventually dispatch plain object actions using this method.
-	   *
-	   * @param {Object} action A plain object representing “what changed”. It is
-	   * a good idea to keep actions serializable so you can record and replay user
-	   * sessions, or use the time travelling `redux-devtools`. An action must have
-	   * a `type` property which may not be `undefined`. It is a good idea to use
-	   * string constants for action types.
-	   *
-	   * @returns {Object} For convenience, the same action object you dispatched.
-	   *
-	   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
-	   * return something else (for example, a Promise you can await).
-	   */
-	  function dispatch(action) {
-	    if (!(0, _isPlainObject2['default'])(action)) {
-	      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
-	    }
-
-	    if (typeof action.type === 'undefined') {
-	      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
-	    }
-
-	    if (isDispatching) {
-	      throw new Error('Reducers may not dispatch actions.');
-	    }
-
-	    try {
-	      isDispatching = true;
-	      currentState = currentReducer(currentState, action);
-	    } finally {
-	      isDispatching = false;
-	    }
-
-	    var listeners = currentListeners = nextListeners;
-	    for (var i = 0; i < listeners.length; i++) {
-	      var listener = listeners[i];
-	      listener();
-	    }
-
-	    return action;
-	  }
-
-	  /**
-	   * Replaces the reducer currently used by the store to calculate the state.
-	   *
-	   * You might need this if your app implements code splitting and you want to
-	   * load some of the reducers dynamically. You might also need this if you
-	   * implement a hot reloading mechanism for Redux.
-	   *
-	   * @param {Function} nextReducer The reducer for the store to use instead.
-	   * @returns {void}
-	   */
-	  function replaceReducer(nextReducer) {
-	    if (typeof nextReducer !== 'function') {
-	      throw new Error('Expected the nextReducer to be a function.');
-	    }
-
-	    currentReducer = nextReducer;
-	    dispatch({ type: ActionTypes.INIT });
-	  }
-
-	  /**
-	   * Interoperability point for observable/reactive libraries.
-	   * @returns {observable} A minimal observable of state changes.
-	   * For more information, see the observable proposal:
-	   * https://github.com/tc39/proposal-observable
-	   */
-	  function observable() {
-	    var _ref;
-
-	    var outerSubscribe = subscribe;
-	    return _ref = {
-	      /**
-	       * The minimal observable subscription method.
-	       * @param {Object} observer Any object that can be used as an observer.
-	       * The observer object should have a `next` method.
-	       * @returns {subscription} An object with an `unsubscribe` method that can
-	       * be used to unsubscribe the observable from the store, and prevent further
-	       * emission of values from the observable.
-	       */
-	      subscribe: function subscribe(observer) {
-	        if (typeof observer !== 'object') {
-	          throw new TypeError('Expected the observer to be an object.');
-	        }
-
-	        function observeState() {
-	          if (observer.next) {
-	            observer.next(getState());
-	          }
-	        }
-
-	        observeState();
-	        var unsubscribe = outerSubscribe(observeState);
-	        return { unsubscribe: unsubscribe };
-	      }
-	    }, _ref[_symbolObservable2['default']] = function () {
-	      return this;
-	    }, _ref;
-	  }
-
-	  // When a store is created, an "INIT" action is dispatched so that every
-	  // reducer returns their initial state. This effectively populates
-	  // the initial state tree.
-	  dispatch({ type: ActionTypes.INIT });
-
-	  return _ref2 = {
-	    dispatch: dispatch,
-	    subscribe: subscribe,
-	    getState: getState,
-	    replaceReducer: replaceReducer
-	  }, _ref2[_symbolObservable2['default']] = observable, _ref2;
-	}
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var baseGetTag = __webpack_require__(8),
-	    getPrototype = __webpack_require__(14),
-	    isObjectLike = __webpack_require__(16);
-
-	/** `Object#toString` result references. */
-	var objectTag = '[object Object]';
-
-	/** Used for built-in method references. */
-	var funcProto = Function.prototype,
-	    objectProto = Object.prototype;
-
-	/** Used to resolve the decompiled source of functions. */
-	var funcToString = funcProto.toString;
-
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
-
-	/** Used to infer the `Object` constructor. */
-	var objectCtorString = funcToString.call(Object);
-
-	/**
-	 * Checks if `value` is a plain object, that is, an object created by the
-	 * `Object` constructor or one with a `[[Prototype]]` of `null`.
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 0.8.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
-	 * @example
-	 *
-	 * function Foo() {
-	 *   this.a = 1;
-	 * }
-	 *
-	 * _.isPlainObject(new Foo);
-	 * // => false
-	 *
-	 * _.isPlainObject([1, 2, 3]);
-	 * // => false
-	 *
-	 * _.isPlainObject({ 'x': 0, 'y': 0 });
-	 * // => true
-	 *
-	 * _.isPlainObject(Object.create(null));
-	 * // => true
-	 */
-	function isPlainObject(value) {
-	  if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
-	    return false;
-	  }
-	  var proto = getPrototype(value);
-	  if (proto === null) {
-	    return true;
-	  }
-	  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-	  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
-	    funcToString.call(Ctor) == objectCtorString;
-	}
-
-	module.exports = isPlainObject;
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var Symbol = __webpack_require__(9),
-	    getRawTag = __webpack_require__(12),
-	    objectToString = __webpack_require__(13);
-
-	/** `Object#toString` result references. */
-	var nullTag = '[object Null]',
-	    undefinedTag = '[object Undefined]';
-
-	/** Built-in value references. */
-	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-
-	/**
-	 * The base implementation of `getTag` without fallbacks for buggy environments.
-	 *
-	 * @private
-	 * @param {*} value The value to query.
-	 * @returns {string} Returns the `toStringTag`.
-	 */
-	function baseGetTag(value) {
-	  if (value == null) {
-	    return value === undefined ? undefinedTag : nullTag;
-	  }
-	  return (symToStringTag && symToStringTag in Object(value))
-	    ? getRawTag(value)
-	    : objectToString(value);
-	}
-
-	module.exports = baseGetTag;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var root = __webpack_require__(10);
-
-	/** Built-in value references. */
-	var Symbol = root.Symbol;
-
-	module.exports = Symbol;
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var freeGlobal = __webpack_require__(11);
-
-	/** Detect free variable `self`. */
-	var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-	/** Used as a reference to the global object. */
-	var root = freeGlobal || freeSelf || Function('return this')();
-
-	module.exports = root;
-
-
-/***/ }),
-/* 11 */
+/******/ ({
+
+/***/ "./src/bitap/bitap_matched_indices.js":
+/*!********************************************!*\
+  !*** ./src/bitap/bitap_matched_indices.js ***!
+  \********************************************/
+/*! no static exports found */
 /***/ (function(module, exports) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
-	var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+module.exports = function () {
+  var matchmask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var minMatchCharLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+  var matchedIndices = [];
+  var start = -1;
+  var end = -1;
+  var i = 0;
 
-	module.exports = freeGlobal;
+  for (var len = matchmask.length; i < len; i += 1) {
+    var match = matchmask[i];
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+    if (match && start === -1) {
+      start = i;
+    } else if (!match && start !== -1) {
+      end = i - 1;
+
+      if (end - start + 1 >= minMatchCharLength) {
+        matchedIndices.push([start, end]);
+      }
+
+      start = -1;
+    }
+  } // (i-1 - start) + 1 => i - start
+
+
+  if (matchmask[i - 1] && i - start >= minMatchCharLength) {
+    matchedIndices.push([start, i - 1]);
+  }
+
+  return matchedIndices;
+};
+
+/***/ }),
+
+/***/ "./src/bitap/bitap_pattern_alphabet.js":
+/*!*********************************************!*\
+  !*** ./src/bitap/bitap_pattern_alphabet.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function (pattern) {
+  var mask = {};
+  var len = pattern.length;
+
+  for (var i = 0; i < len; i += 1) {
+    mask[pattern.charAt(i)] = 0;
+  }
+
+  for (var _i = 0; _i < len; _i += 1) {
+    mask[pattern.charAt(_i)] |= 1 << len - _i - 1;
+  }
+
+  return mask;
+};
+
+/***/ }),
+
+/***/ "./src/bitap/bitap_regex_search.js":
+/*!*****************************************!*\
+  !*** ./src/bitap/bitap_regex_search.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var SPECIAL_CHARS_REGEX = /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g;
+
+module.exports = function (text, pattern) {
+  var tokenSeparator = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : / +/g;
+  var regex = new RegExp(pattern.replace(SPECIAL_CHARS_REGEX, '\\$&').replace(tokenSeparator, '|'));
+  var matches = text.match(regex);
+  var isMatch = !!matches;
+  var matchedIndices = [];
+
+  if (isMatch) {
+    for (var i = 0, matchesLen = matches.length; i < matchesLen; i += 1) {
+      var match = matches[i];
+      matchedIndices.push([text.indexOf(match), match.length - 1]);
+    }
+  }
+
+  return {
+    // TODO: revisit this score
+    score: isMatch ? 0.5 : 1,
+    isMatch: isMatch,
+    matchedIndices: matchedIndices
+  };
+};
+
+/***/ }),
+
+/***/ "./src/bitap/bitap_score.js":
+/*!**********************************!*\
+  !*** ./src/bitap/bitap_score.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function (pattern, _ref) {
+  var _ref$errors = _ref.errors,
+      errors = _ref$errors === void 0 ? 0 : _ref$errors,
+      _ref$currentLocation = _ref.currentLocation,
+      currentLocation = _ref$currentLocation === void 0 ? 0 : _ref$currentLocation,
+      _ref$expectedLocation = _ref.expectedLocation,
+      expectedLocation = _ref$expectedLocation === void 0 ? 0 : _ref$expectedLocation,
+      _ref$distance = _ref.distance,
+      distance = _ref$distance === void 0 ? 100 : _ref$distance;
+  var accuracy = errors / pattern.length;
+  var proximity = Math.abs(expectedLocation - currentLocation);
+
+  if (!distance) {
+    // Dodge divide by zero error.
+    return proximity ? 1.0 : accuracy;
+  }
+
+  return accuracy + proximity / distance;
+};
+
+/***/ }),
+
+/***/ "./src/bitap/bitap_search.js":
+/*!***********************************!*\
+  !*** ./src/bitap/bitap_search.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var bitapScore = __webpack_require__(/*! ./bitap_score */ "./src/bitap/bitap_score.js");
+
+var matchedIndices = __webpack_require__(/*! ./bitap_matched_indices */ "./src/bitap/bitap_matched_indices.js");
+
+module.exports = function (text, pattern, patternAlphabet, _ref) {
+  var _ref$location = _ref.location,
+      location = _ref$location === void 0 ? 0 : _ref$location,
+      _ref$distance = _ref.distance,
+      distance = _ref$distance === void 0 ? 100 : _ref$distance,
+      _ref$threshold = _ref.threshold,
+      threshold = _ref$threshold === void 0 ? 0.6 : _ref$threshold,
+      _ref$findAllMatches = _ref.findAllMatches,
+      findAllMatches = _ref$findAllMatches === void 0 ? false : _ref$findAllMatches,
+      _ref$minMatchCharLeng = _ref.minMatchCharLength,
+      minMatchCharLength = _ref$minMatchCharLeng === void 0 ? 1 : _ref$minMatchCharLeng;
+  var expectedLocation = location; // Set starting location at beginning text and initialize the alphabet.
+
+  var textLen = text.length; // Highest score beyond which we give up.
+
+  var currentThreshold = threshold; // Is there a nearby exact match? (speedup)
+
+  var bestLocation = text.indexOf(pattern, expectedLocation);
+  var patternLen = pattern.length; // a mask of the matches
+
+  var matchMask = [];
+
+  for (var i = 0; i < textLen; i += 1) {
+    matchMask[i] = 0;
+  }
+
+  if (bestLocation !== -1) {
+    var score = bitapScore(pattern, {
+      errors: 0,
+      currentLocation: bestLocation,
+      expectedLocation: expectedLocation,
+      distance: distance
+    });
+    currentThreshold = Math.min(score, currentThreshold); // What about in the other direction? (speed up)
+
+    bestLocation = text.lastIndexOf(pattern, expectedLocation + patternLen);
+
+    if (bestLocation !== -1) {
+      var _score = bitapScore(pattern, {
+        errors: 0,
+        currentLocation: bestLocation,
+        expectedLocation: expectedLocation,
+        distance: distance
+      });
+
+      currentThreshold = Math.min(_score, currentThreshold);
+    }
+  } // Reset the best location
+
+
+  bestLocation = -1;
+  var lastBitArr = [];
+  var finalScore = 1;
+  var binMax = patternLen + textLen;
+  var mask = 1 << patternLen - 1;
+
+  for (var _i = 0; _i < patternLen; _i += 1) {
+    // Scan for the best match; each iteration allows for one more error.
+    // Run a binary search to determine how far from the match location we can stray
+    // at this error level.
+    var binMin = 0;
+    var binMid = binMax;
+
+    while (binMin < binMid) {
+      var _score3 = bitapScore(pattern, {
+        errors: _i,
+        currentLocation: expectedLocation + binMid,
+        expectedLocation: expectedLocation,
+        distance: distance
+      });
+
+      if (_score3 <= currentThreshold) {
+        binMin = binMid;
+      } else {
+        binMax = binMid;
+      }
+
+      binMid = Math.floor((binMax - binMin) / 2 + binMin);
+    } // Use the result from this iteration as the maximum for the next.
+
+
+    binMax = binMid;
+    var start = Math.max(1, expectedLocation - binMid + 1);
+    var finish = findAllMatches ? textLen : Math.min(expectedLocation + binMid, textLen) + patternLen; // Initialize the bit array
+
+    var bitArr = Array(finish + 2);
+    bitArr[finish + 1] = (1 << _i) - 1;
+
+    for (var j = finish; j >= start; j -= 1) {
+      var currentLocation = j - 1;
+      var charMatch = patternAlphabet[text.charAt(currentLocation)];
+
+      if (charMatch) {
+        matchMask[currentLocation] = 1;
+      } // First pass: exact match
+
+
+      bitArr[j] = (bitArr[j + 1] << 1 | 1) & charMatch; // Subsequent passes: fuzzy match
+
+      if (_i !== 0) {
+        bitArr[j] |= (lastBitArr[j + 1] | lastBitArr[j]) << 1 | 1 | lastBitArr[j + 1];
+      }
+
+      if (bitArr[j] & mask) {
+        finalScore = bitapScore(pattern, {
+          errors: _i,
+          currentLocation: currentLocation,
+          expectedLocation: expectedLocation,
+          distance: distance
+        }); // This match will almost certainly be better than any existing match.
+        // But check anyway.
+
+        if (finalScore <= currentThreshold) {
+          // Indeed it is
+          currentThreshold = finalScore;
+          bestLocation = currentLocation; // Already passed `loc`, downhill from here on in.
+
+          if (bestLocation <= expectedLocation) {
+            break;
+          } // When passing `bestLocation`, don't exceed our current distance from `expectedLocation`.
+
+
+          start = Math.max(1, 2 * expectedLocation - bestLocation);
+        }
+      }
+    } // No hope for a (better) match at greater error levels.
+
+
+    var _score2 = bitapScore(pattern, {
+      errors: _i + 1,
+      currentLocation: expectedLocation,
+      expectedLocation: expectedLocation,
+      distance: distance
+    }); // console.log('score', score, finalScore)
+
+
+    if (_score2 > currentThreshold) {
+      break;
+    }
+
+    lastBitArr = bitArr;
+  } // console.log('FINAL SCORE', finalScore)
+  // Count exact matches (those with a score of 0) to be "almost" exact
+
+
+  return {
+    isMatch: bestLocation >= 0,
+    score: finalScore === 0 ? 0.001 : finalScore,
+    matchedIndices: matchedIndices(matchMask, minMatchCharLength)
+  };
+};
+
+/***/ }),
+
+/***/ "./src/bitap/index.js":
+/*!****************************!*\
+  !*** ./src/bitap/index.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var bitapRegexSearch = __webpack_require__(/*! ./bitap_regex_search */ "./src/bitap/bitap_regex_search.js");
+
+var bitapSearch = __webpack_require__(/*! ./bitap_search */ "./src/bitap/bitap_search.js");
+
+var patternAlphabet = __webpack_require__(/*! ./bitap_pattern_alphabet */ "./src/bitap/bitap_pattern_alphabet.js");
+
+var Bitap =
+/*#__PURE__*/
+function () {
+  function Bitap(pattern, _ref) {
+    var _ref$location = _ref.location,
+        location = _ref$location === void 0 ? 0 : _ref$location,
+        _ref$distance = _ref.distance,
+        distance = _ref$distance === void 0 ? 100 : _ref$distance,
+        _ref$threshold = _ref.threshold,
+        threshold = _ref$threshold === void 0 ? 0.6 : _ref$threshold,
+        _ref$maxPatternLength = _ref.maxPatternLength,
+        maxPatternLength = _ref$maxPatternLength === void 0 ? 32 : _ref$maxPatternLength,
+        _ref$isCaseSensitive = _ref.isCaseSensitive,
+        isCaseSensitive = _ref$isCaseSensitive === void 0 ? false : _ref$isCaseSensitive,
+        _ref$tokenSeparator = _ref.tokenSeparator,
+        tokenSeparator = _ref$tokenSeparator === void 0 ? / +/g : _ref$tokenSeparator,
+        _ref$findAllMatches = _ref.findAllMatches,
+        findAllMatches = _ref$findAllMatches === void 0 ? false : _ref$findAllMatches,
+        _ref$minMatchCharLeng = _ref.minMatchCharLength,
+        minMatchCharLength = _ref$minMatchCharLeng === void 0 ? 1 : _ref$minMatchCharLeng;
+
+    _classCallCheck(this, Bitap);
+
+    this.options = {
+      location: location,
+      distance: distance,
+      threshold: threshold,
+      maxPatternLength: maxPatternLength,
+      isCaseSensitive: isCaseSensitive,
+      tokenSeparator: tokenSeparator,
+      findAllMatches: findAllMatches,
+      minMatchCharLength: minMatchCharLength
+    };
+    this.pattern = this.options.isCaseSensitive ? pattern : pattern.toLowerCase();
+
+    if (this.pattern.length <= maxPatternLength) {
+      this.patternAlphabet = patternAlphabet(this.pattern);
+    }
+  }
+
+  _createClass(Bitap, [{
+    key: "search",
+    value: function search(text) {
+      if (!this.options.isCaseSensitive) {
+        text = text.toLowerCase();
+      } // Exact match
+
+
+      if (this.pattern === text) {
+        return {
+          isMatch: true,
+          score: 0,
+          matchedIndices: [[0, text.length - 1]]
+        };
+      } // When pattern length is greater than the machine word length, just do a a regex comparison
+
+
+      var _this$options = this.options,
+          maxPatternLength = _this$options.maxPatternLength,
+          tokenSeparator = _this$options.tokenSeparator;
+
+      if (this.pattern.length > maxPatternLength) {
+        return bitapRegexSearch(text, this.pattern, tokenSeparator);
+      } // Otherwise, use Bitap algorithm
+
+
+      var _this$options2 = this.options,
+          location = _this$options2.location,
+          distance = _this$options2.distance,
+          threshold = _this$options2.threshold,
+          findAllMatches = _this$options2.findAllMatches,
+          minMatchCharLength = _this$options2.minMatchCharLength;
+      return bitapSearch(text, this.pattern, this.patternAlphabet, {
+        location: location,
+        distance: distance,
+        threshold: threshold,
+        findAllMatches: findAllMatches,
+        minMatchCharLength: minMatchCharLength
+      });
+    }
+  }]);
+
+  return Bitap;
+}(); // let x = new Bitap("od mn war", {})
+// let result = x.search("Old Man's War")
+// console.log(result)
+
+
+module.exports = Bitap;
+
+/***/ }),
+
+/***/ "./src/helpers/deep_value.js":
+/*!***********************************!*\
+  !*** ./src/helpers/deep_value.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isArray = __webpack_require__(/*! ./is_array */ "./src/helpers/is_array.js");
+
+var deepValue = function deepValue(obj, path, list) {
+  if (!path) {
+    // If there's no path left, we've gotten to the object we care about.
+    list.push(obj);
+  } else {
+    var dotIndex = path.indexOf('.');
+    var firstSegment = path;
+    var remaining = null;
+
+    if (dotIndex !== -1) {
+      firstSegment = path.slice(0, dotIndex);
+      remaining = path.slice(dotIndex + 1);
+    }
+
+    var value = obj[firstSegment];
+
+    if (value !== null && value !== undefined) {
+      if (!remaining && (typeof value === 'string' || typeof value === 'number')) {
+        list.push(value.toString());
+      } else if (isArray(value)) {
+        // Search each item in the array.
+        for (var i = 0, len = value.length; i < len; i += 1) {
+          deepValue(value[i], remaining, list);
+        }
+      } else if (remaining) {
+        // An object. Recurse further.
+        deepValue(value, remaining, list);
+      }
+    }
+  }
+
+  return list;
+};
+
+module.exports = function (obj, path) {
+  return deepValue(obj, path, []);
+};
+
+/***/ }),
+
+/***/ "./src/helpers/is_array.js":
+/*!*********************************!*\
+  !*** ./src/helpers/is_array.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function (obj) {
+  return !Array.isArray ? Object.prototype.toString.call(obj) === '[object Array]' : Array.isArray(obj);
+};
+
+/***/ }),
+
+/***/ "./src/index.js":
+/*!**********************!*\
+  !*** ./src/index.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Bitap = __webpack_require__(/*! ./bitap */ "./src/bitap/index.js");
+
+var deepValue = __webpack_require__(/*! ./helpers/deep_value */ "./src/helpers/deep_value.js");
+
+var isArray = __webpack_require__(/*! ./helpers/is_array */ "./src/helpers/is_array.js");
+
+var Fuse =
+/*#__PURE__*/
+function () {
+  function Fuse(list, _ref) {
+    var _ref$location = _ref.location,
+        location = _ref$location === void 0 ? 0 : _ref$location,
+        _ref$distance = _ref.distance,
+        distance = _ref$distance === void 0 ? 100 : _ref$distance,
+        _ref$threshold = _ref.threshold,
+        threshold = _ref$threshold === void 0 ? 0.6 : _ref$threshold,
+        _ref$maxPatternLength = _ref.maxPatternLength,
+        maxPatternLength = _ref$maxPatternLength === void 0 ? 32 : _ref$maxPatternLength,
+        _ref$caseSensitive = _ref.caseSensitive,
+        caseSensitive = _ref$caseSensitive === void 0 ? false : _ref$caseSensitive,
+        _ref$tokenSeparator = _ref.tokenSeparator,
+        tokenSeparator = _ref$tokenSeparator === void 0 ? / +/g : _ref$tokenSeparator,
+        _ref$findAllMatches = _ref.findAllMatches,
+        findAllMatches = _ref$findAllMatches === void 0 ? false : _ref$findAllMatches,
+        _ref$minMatchCharLeng = _ref.minMatchCharLength,
+        minMatchCharLength = _ref$minMatchCharLeng === void 0 ? 1 : _ref$minMatchCharLeng,
+        _ref$id = _ref.id,
+        id = _ref$id === void 0 ? null : _ref$id,
+        _ref$keys = _ref.keys,
+        keys = _ref$keys === void 0 ? [] : _ref$keys,
+        _ref$shouldSort = _ref.shouldSort,
+        shouldSort = _ref$shouldSort === void 0 ? true : _ref$shouldSort,
+        _ref$getFn = _ref.getFn,
+        getFn = _ref$getFn === void 0 ? deepValue : _ref$getFn,
+        _ref$sortFn = _ref.sortFn,
+        sortFn = _ref$sortFn === void 0 ? function (a, b) {
+      return a.score - b.score;
+    } : _ref$sortFn,
+        _ref$tokenize = _ref.tokenize,
+        tokenize = _ref$tokenize === void 0 ? false : _ref$tokenize,
+        _ref$matchAllTokens = _ref.matchAllTokens,
+        matchAllTokens = _ref$matchAllTokens === void 0 ? false : _ref$matchAllTokens,
+        _ref$includeMatches = _ref.includeMatches,
+        includeMatches = _ref$includeMatches === void 0 ? false : _ref$includeMatches,
+        _ref$includeScore = _ref.includeScore,
+        includeScore = _ref$includeScore === void 0 ? false : _ref$includeScore,
+        _ref$verbose = _ref.verbose,
+        verbose = _ref$verbose === void 0 ? false : _ref$verbose;
+
+    _classCallCheck(this, Fuse);
+
+    this.options = {
+      location: location,
+      distance: distance,
+      threshold: threshold,
+      maxPatternLength: maxPatternLength,
+      isCaseSensitive: caseSensitive,
+      tokenSeparator: tokenSeparator,
+      findAllMatches: findAllMatches,
+      minMatchCharLength: minMatchCharLength,
+      id: id,
+      keys: keys,
+      includeMatches: includeMatches,
+      includeScore: includeScore,
+      shouldSort: shouldSort,
+      getFn: getFn,
+      sortFn: sortFn,
+      verbose: verbose,
+      tokenize: tokenize,
+      matchAllTokens: matchAllTokens
+    };
+    this.setCollection(list);
+  }
+
+  _createClass(Fuse, [{
+    key: "setCollection",
+    value: function setCollection(list) {
+      this.list = list;
+      return list;
+    }
+  }, {
+    key: "search",
+    value: function search(pattern) {
+      var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        limit: false
+      };
+
+      this._log("---------\nSearch pattern: \"".concat(pattern, "\""));
+
+      var _this$_prepareSearche = this._prepareSearchers(pattern),
+          tokenSearchers = _this$_prepareSearche.tokenSearchers,
+          fullSearcher = _this$_prepareSearche.fullSearcher;
+
+      var _this$_search = this._search(tokenSearchers, fullSearcher),
+          weights = _this$_search.weights,
+          results = _this$_search.results;
+
+      this._computeScore(weights, results);
+
+      if (this.options.shouldSort) {
+        this._sort(results);
+      }
+
+      if (opts.limit && typeof opts.limit === 'number') {
+        results = results.slice(0, opts.limit);
+      }
+
+      return this._format(results);
+    }
+  }, {
+    key: "_prepareSearchers",
+    value: function _prepareSearchers() {
+      var pattern = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+      var tokenSearchers = [];
+
+      if (this.options.tokenize) {
+        // Tokenize on the separator
+        var tokens = pattern.split(this.options.tokenSeparator);
+
+        for (var i = 0, len = tokens.length; i < len; i += 1) {
+          tokenSearchers.push(new Bitap(tokens[i], this.options));
+        }
+      }
+
+      var fullSearcher = new Bitap(pattern, this.options);
+      return {
+        tokenSearchers: tokenSearchers,
+        fullSearcher: fullSearcher
+      };
+    }
+  }, {
+    key: "_search",
+    value: function _search() {
+      var tokenSearchers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+      var fullSearcher = arguments.length > 1 ? arguments[1] : undefined;
+      var list = this.list;
+      var resultMap = {};
+      var results = []; // Check the first item in the list, if it's a string, then we assume
+      // that every item in the list is also a string, and thus it's a flattened array.
+
+      if (typeof list[0] === 'string') {
+        // Iterate over every item
+        for (var i = 0, len = list.length; i < len; i += 1) {
+          this._analyze({
+            key: '',
+            value: list[i],
+            record: i,
+            index: i
+          }, {
+            resultMap: resultMap,
+            results: results,
+            tokenSearchers: tokenSearchers,
+            fullSearcher: fullSearcher
+          });
+        }
+
+        return {
+          weights: null,
+          results: results
+        };
+      } // Otherwise, the first item is an Object (hopefully), and thus the searching
+      // is done on the values of the keys of each item.
+
+
+      var weights = {};
+
+      for (var _i = 0, _len = list.length; _i < _len; _i += 1) {
+        var item = list[_i]; // Iterate over every key
+
+        for (var j = 0, keysLen = this.options.keys.length; j < keysLen; j += 1) {
+          var key = this.options.keys[j];
+
+          if (typeof key !== 'string') {
+            weights[key.name] = {
+              weight: 1 - key.weight || 1
+            };
+
+            if (key.weight <= 0 || key.weight > 1) {
+              throw new Error('Key weight has to be > 0 and <= 1');
+            }
+
+            key = key.name;
+          } else {
+            weights[key] = {
+              weight: 1
+            };
+          }
+
+          this._analyze({
+            key: key,
+            value: this.options.getFn(item, key),
+            record: item,
+            index: _i
+          }, {
+            resultMap: resultMap,
+            results: results,
+            tokenSearchers: tokenSearchers,
+            fullSearcher: fullSearcher
+          });
+        }
+      }
+
+      return {
+        weights: weights,
+        results: results
+      };
+    }
+  }, {
+    key: "_analyze",
+    value: function _analyze(_ref2, _ref3) {
+      var key = _ref2.key,
+          _ref2$arrayIndex = _ref2.arrayIndex,
+          arrayIndex = _ref2$arrayIndex === void 0 ? -1 : _ref2$arrayIndex,
+          value = _ref2.value,
+          record = _ref2.record,
+          index = _ref2.index;
+      var _ref3$tokenSearchers = _ref3.tokenSearchers,
+          tokenSearchers = _ref3$tokenSearchers === void 0 ? [] : _ref3$tokenSearchers,
+          _ref3$fullSearcher = _ref3.fullSearcher,
+          fullSearcher = _ref3$fullSearcher === void 0 ? [] : _ref3$fullSearcher,
+          _ref3$resultMap = _ref3.resultMap,
+          resultMap = _ref3$resultMap === void 0 ? {} : _ref3$resultMap,
+          _ref3$results = _ref3.results,
+          results = _ref3$results === void 0 ? [] : _ref3$results;
+
+      // Check if the texvaluet can be searched
+      if (value === undefined || value === null) {
+        return;
+      }
+
+      var exists = false;
+      var averageScore = -1;
+      var numTextMatches = 0;
+
+      if (typeof value === 'string') {
+        this._log("\nKey: ".concat(key === '' ? '-' : key));
+
+        var mainSearchResult = fullSearcher.search(value);
+
+        this._log("Full text: \"".concat(value, "\", score: ").concat(mainSearchResult.score));
+
+        if (this.options.tokenize) {
+          var words = value.split(this.options.tokenSeparator);
+          var scores = [];
+
+          for (var i = 0; i < tokenSearchers.length; i += 1) {
+            var tokenSearcher = tokenSearchers[i];
+
+            this._log("\nPattern: \"".concat(tokenSearcher.pattern, "\"")); // let tokenScores = []
+
+
+            var hasMatchInText = false;
+
+            for (var j = 0; j < words.length; j += 1) {
+              var word = words[j];
+              var tokenSearchResult = tokenSearcher.search(word);
+              var obj = {};
+
+              if (tokenSearchResult.isMatch) {
+                obj[word] = tokenSearchResult.score;
+                exists = true;
+                hasMatchInText = true;
+                scores.push(tokenSearchResult.score);
+              } else {
+                obj[word] = 1;
+
+                if (!this.options.matchAllTokens) {
+                  scores.push(1);
+                }
+              }
+
+              this._log("Token: \"".concat(word, "\", score: ").concat(obj[word])); // tokenScores.push(obj)
+
+            }
+
+            if (hasMatchInText) {
+              numTextMatches += 1;
+            }
+          }
+
+          averageScore = scores[0];
+          var scoresLen = scores.length;
+
+          for (var _i2 = 1; _i2 < scoresLen; _i2 += 1) {
+            averageScore += scores[_i2];
+          }
+
+          averageScore = averageScore / scoresLen;
+
+          this._log('Token score average:', averageScore);
+        }
+
+        var finalScore = mainSearchResult.score;
+
+        if (averageScore > -1) {
+          finalScore = (finalScore + averageScore) / 2;
+        }
+
+        this._log('Score average:', finalScore);
+
+        var checkTextMatches = this.options.tokenize && this.options.matchAllTokens ? numTextMatches >= tokenSearchers.length : true;
+
+        this._log("\nCheck Matches: ".concat(checkTextMatches)); // If a match is found, add the item to <rawResults>, including its score
+
+
+        if ((exists || mainSearchResult.isMatch) && checkTextMatches) {
+          // Check if the item already exists in our results
+          var existingResult = resultMap[index];
+
+          if (existingResult) {
+            // Use the lowest score
+            // existingResult.score, bitapResult.score
+            existingResult.output.push({
+              key: key,
+              arrayIndex: arrayIndex,
+              value: value,
+              score: finalScore,
+              matchedIndices: mainSearchResult.matchedIndices
+            });
+          } else {
+            // Add it to the raw result list
+            resultMap[index] = {
+              item: record,
+              output: [{
+                key: key,
+                arrayIndex: arrayIndex,
+                value: value,
+                score: finalScore,
+                matchedIndices: mainSearchResult.matchedIndices
+              }]
+            };
+            results.push(resultMap[index]);
+          }
+        }
+      } else if (isArray(value)) {
+        for (var _i3 = 0, len = value.length; _i3 < len; _i3 += 1) {
+          this._analyze({
+            key: key,
+            arrayIndex: _i3,
+            value: value[_i3],
+            record: record,
+            index: index
+          }, {
+            resultMap: resultMap,
+            results: results,
+            tokenSearchers: tokenSearchers,
+            fullSearcher: fullSearcher
+          });
+        }
+      }
+    }
+  }, {
+    key: "_computeScore",
+    value: function _computeScore(weights, results) {
+      this._log('\n\nComputing score:\n');
+
+      for (var i = 0, len = results.length; i < len; i += 1) {
+        var output = results[i].output;
+        var scoreLen = output.length;
+        var currScore = 1;
+        var bestScore = 1;
+
+        for (var j = 0; j < scoreLen; j += 1) {
+          var weight = weights ? weights[output[j].key].weight : 1;
+          var score = weight === 1 ? output[j].score : output[j].score || 0.001;
+          var nScore = score * weight;
+
+          if (weight !== 1) {
+            bestScore = Math.min(bestScore, nScore);
+          } else {
+            output[j].nScore = nScore;
+            currScore *= nScore;
+          }
+        }
+
+        results[i].score = bestScore === 1 ? currScore : bestScore;
+
+        this._log(results[i]);
+      }
+    }
+  }, {
+    key: "_sort",
+    value: function _sort(results) {
+      this._log('\n\nSorting....');
+
+      results.sort(this.options.sortFn);
+    }
+  }, {
+    key: "_format",
+    value: function _format(results) {
+      var finalOutput = [];
+
+      if (this.options.verbose) {
+        var cache = [];
+
+        this._log('\n\nOutput:\n\n', JSON.stringify(results, function (key, value) {
+          if (_typeof(value) === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+              // Circular reference found, discard key
+              return;
+            } // Store value in our collection
+
+
+            cache.push(value);
+          }
+
+          return value;
+        }));
+
+        cache = null;
+      }
+
+      var transformers = [];
+
+      if (this.options.includeMatches) {
+        transformers.push(function (result, data) {
+          var output = result.output;
+          data.matches = [];
+
+          for (var i = 0, len = output.length; i < len; i += 1) {
+            var item = output[i];
+
+            if (item.matchedIndices.length === 0) {
+              continue;
+            }
+
+            var obj = {
+              indices: item.matchedIndices,
+              value: item.value
+            };
+
+            if (item.key) {
+              obj.key = item.key;
+            }
+
+            if (item.hasOwnProperty('arrayIndex') && item.arrayIndex > -1) {
+              obj.arrayIndex = item.arrayIndex;
+            }
+
+            data.matches.push(obj);
+          }
+        });
+      }
+
+      if (this.options.includeScore) {
+        transformers.push(function (result, data) {
+          data.score = result.score;
+        });
+      }
+
+      for (var i = 0, len = results.length; i < len; i += 1) {
+        var result = results[i];
+
+        if (this.options.id) {
+          result.item = this.options.getFn(result.item, this.options.id)[0];
+        }
+
+        if (!transformers.length) {
+          finalOutput.push(result.item);
+          continue;
+        }
+
+        var data = {
+          item: result.item
+        };
+
+        for (var j = 0, _len2 = transformers.length; j < _len2; j += 1) {
+          transformers[j](result, data);
+        }
+
+        finalOutput.push(data);
+      }
+
+      return finalOutput;
+    }
+  }, {
+    key: "_log",
+    value: function _log() {
+      if (this.options.verbose) {
+        var _console;
+
+        (_console = console).log.apply(_console, arguments);
+      }
+    }
+  }]);
+
+  return Fuse;
+}();
+
+module.exports = Fuse;
+
+/***/ })
+
+/******/ });
+});
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-	var Symbol = __webpack_require__(9);
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var isMergeableObject = function isMergeableObject(value) {
+	return isNonNullObject(value)
+		&& !isSpecial(value)
+};
 
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
+function isNonNullObject(value) {
+	return !!value && typeof value === 'object'
+}
 
-	/** Used to check objects for own properties. */
-	var hasOwnProperty = objectProto.hasOwnProperty;
+function isSpecial(value) {
+	var stringValue = Object.prototype.toString.call(value);
 
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var nativeObjectToString = objectProto.toString;
+	return stringValue === '[object RegExp]'
+		|| stringValue === '[object Date]'
+		|| isReactElement(value)
+}
 
-	/** Built-in value references. */
-	var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
+// see https://github.com/facebook/react/blob/b5ac963fb791d1298e7f396236383bc955f916c1/src/isomorphic/classic/element/ReactElement.js#L21-L25
+var canUseSymbol = typeof Symbol === 'function' && Symbol.for;
+var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for('react.element') : 0xeac7;
 
-	/**
-	 * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
-	 *
-	 * @private
-	 * @param {*} value The value to query.
-	 * @returns {string} Returns the raw `toStringTag`.
-	 */
-	function getRawTag(value) {
-	  var isOwn = hasOwnProperty.call(value, symToStringTag),
-	      tag = value[symToStringTag];
+function isReactElement(value) {
+	return value.$$typeof === REACT_ELEMENT_TYPE
+}
 
-	  try {
-	    value[symToStringTag] = undefined;
-	    var unmasked = true;
-	  } catch (e) {}
+function emptyTarget(val) {
+	return Array.isArray(val) ? [] : {}
+}
 
-	  var result = nativeObjectToString.call(value);
-	  if (unmasked) {
-	    if (isOwn) {
-	      value[symToStringTag] = tag;
-	    } else {
-	      delete value[symToStringTag];
-	    }
-	  }
-	  return result;
+function cloneUnlessOtherwiseSpecified(value, options) {
+	return (options.clone !== false && options.isMergeableObject(value))
+		? deepmerge(emptyTarget(value), value, options)
+		: value
+}
+
+function defaultArrayMerge(target, source, options) {
+	return target.concat(source).map(function(element) {
+		return cloneUnlessOtherwiseSpecified(element, options)
+	})
+}
+
+function mergeObject(target, source, options) {
+	var destination = {};
+	if (options.isMergeableObject(target)) {
+		Object.keys(target).forEach(function(key) {
+			destination[key] = cloneUnlessOtherwiseSpecified(target[key], options);
+		});
+	}
+	Object.keys(source).forEach(function(key) {
+		if (!options.isMergeableObject(source[key]) || !target[key]) {
+			destination[key] = cloneUnlessOtherwiseSpecified(source[key], options);
+		} else {
+			destination[key] = deepmerge(target[key], source[key], options);
+		}
+	});
+	return destination
+}
+
+function deepmerge(target, source, options) {
+	options = options || {};
+	options.arrayMerge = options.arrayMerge || defaultArrayMerge;
+	options.isMergeableObject = options.isMergeableObject || isMergeableObject;
+
+	var sourceIsArray = Array.isArray(source);
+	var targetIsArray = Array.isArray(target);
+	var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
+
+	if (!sourceAndTargetTypesMatch) {
+		return cloneUnlessOtherwiseSpecified(source, options)
+	} else if (sourceIsArray) {
+		return options.arrayMerge(target, source, options)
+	} else {
+		return mergeObject(target, source, options)
+	}
+}
+
+deepmerge.all = function deepmergeAll(array, options) {
+	if (!Array.isArray(array)) {
+		throw new Error('first argument should be an array')
 	}
 
-	module.exports = getRawTag;
+	return array.reduce(function(prev, next) {
+		return deepmerge(prev, next, options)
+	}, {})
+};
+
+var deepmerge_1 = deepmerge;
+
+/* harmony default export */ __webpack_exports__["default"] = (deepmerge_1);
 
 
 /***/ }),
 /* 13 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	/** Used for built-in method references. */
-	var objectProto = Object.prototype;
+"use strict";
 
-	/**
-	 * Used to resolve the
-	 * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-	 * of values.
-	 */
-	var nativeObjectToString = objectProto.toString;
 
-	/**
-	 * Converts `value` to a string using `Object.prototype.toString`.
-	 *
-	 * @private
-	 * @param {*} value The value to convert.
-	 * @returns {string} Returns the converted string.
-	 */
-	function objectToString(value) {
-	  return nativeObjectToString.call(value);
-	}
-
-	module.exports = objectToString;
-
+__webpack_require__(14);
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-	var overArg = __webpack_require__(15);
+// Polyfill for creating CustomEvents on IE9/10/11
 
-	/** Built-in value references. */
-	var getPrototype = overArg(Object.getPrototypeOf, Object);
+// code pulled from:
+// https://github.com/d4tocchini/customevent-polyfill
+// https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
 
-	module.exports = getPrototype;
+try {
+    var ce = new window.CustomEvent('test');
+    ce.preventDefault();
+    if (ce.defaultPrevented !== true) {
+        // IE has problems with .preventDefault() on custom events
+        // http://stackoverflow.com/questions/23349191
+        throw new Error('Could not prevent default');
+    }
+} catch(e) {
+  var CustomEvent = function(event, params) {
+    var evt, origPrevent;
+    params = params || {
+      bubbles: false,
+      cancelable: false,
+      detail: undefined
+    };
+
+    evt = document.createEvent("CustomEvent");
+    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+    origPrevent = evt.preventDefault;
+    evt.preventDefault = function () {
+      origPrevent.call(this);
+      try {
+        Object.defineProperty(this, 'defaultPrevented', {
+          get: function () {
+            return true;
+          }
+        });
+      } catch(e) {
+        this.defaultPrevented = true;
+      }
+    };
+    return evt;
+  };
+
+  CustomEvent.prototype = window.Event.prototype;
+  window.CustomEvent = CustomEvent; // expose definition to window
+}
 
 
 /***/ }),
 /* 15 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	/**
-	 * Creates a unary function that invokes `func` with its argument transformed.
-	 *
-	 * @private
-	 * @param {Function} func The function to wrap.
-	 * @param {Function} transform The argument transform.
-	 * @returns {Function} Returns the new function.
-	 */
-	function overArg(func, transform) {
-	  return function(arg) {
-	    return func(transform(arg));
-	  };
-	}
+"use strict";
 
-	module.exports = overArg;
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _redux = __webpack_require__(6);
+
+var _index = _interopRequireDefault(__webpack_require__(17));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Store =
+/*#__PURE__*/
+function () {
+  function Store() {
+    _classCallCheck(this, Store);
+
+    this._store = (0, _redux.createStore)(_index.default, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  }
+  /**
+   * Subscribe store to function call (wrapped Redux method)
+   * @param  {Function} onChange Function to trigger when state changes
+   * @return
+   */
+
+
+  _createClass(Store, [{
+    key: "subscribe",
+    value: function subscribe(onChange) {
+      this._store.subscribe(onChange);
+    }
+    /**
+     * Dispatch event to store (wrapped Redux method)
+     * @param  {Function} action Action function to trigger
+     * @return
+     */
+
+  }, {
+    key: "dispatch",
+    value: function dispatch(action) {
+      this._store.dispatch(action);
+    }
+    /**
+     * Get store object (wrapping Redux method)
+     * @return {Object} State
+     */
+
+  }, {
+    key: "isLoading",
+
+    /**
+     * Get loading state from store
+     * @return {Boolean} Loading State
+     */
+    value: function isLoading() {
+      return this.state.general.loading;
+    }
+    /**
+     * Get single choice by it's ID
+     * @return {Object} Found choice
+     */
+
+  }, {
+    key: "getChoiceById",
+    value: function getChoiceById(id) {
+      if (id) {
+        var choices = this.activeChoices;
+        var foundChoice = choices.find(function (choice) {
+          return choice.id === parseInt(id, 10);
+        });
+        return foundChoice;
+      }
+
+      return false;
+    }
+    /**
+     * Get group by group id
+     * @param  {Number} id Group ID
+     * @return {Object}    Group data
+     */
+
+  }, {
+    key: "getGroupById",
+    value: function getGroupById(id) {
+      return this.groups.find(function (group) {
+        return group.id === parseInt(id, 10);
+      });
+    }
+  }, {
+    key: "state",
+    get: function get() {
+      return this._store.getState();
+    }
+    /**
+     * Get items from store
+     * @return {Array} Item objects
+     */
+
+  }, {
+    key: "items",
+    get: function get() {
+      return this.state.items;
+    }
+    /**
+     * Get active items from store
+     * @return {Array} Item objects
+     */
+
+  }, {
+    key: "activeItems",
+    get: function get() {
+      return this.items.filter(function (item) {
+        return item.active === true;
+      });
+    }
+    /**
+     * Get highlighted items from store
+     * @return {Array} Item objects
+     */
+
+  }, {
+    key: "highlightedActiveItems",
+    get: function get() {
+      return this.items.filter(function (item) {
+        return item.active && item.highlighted;
+      });
+    }
+    /**
+     * Get choices from store
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: "choices",
+    get: function get() {
+      return this.state.choices;
+    }
+    /**
+     * Get active choices from store
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: "activeChoices",
+    get: function get() {
+      var choices = this.choices;
+      var values = choices.filter(function (choice) {
+        return choice.active === true;
+      });
+      return values;
+    }
+    /**
+     * Get selectable choices from store
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: "selectableChoices",
+    get: function get() {
+      return this.choices.filter(function (choice) {
+        return choice.disabled !== true;
+      });
+    }
+    /**
+     * Get choices that can be searched (excluding placeholders)
+     * @return {Array} Option objects
+     */
+
+  }, {
+    key: "searchableChoices",
+    get: function get() {
+      return this.selectableChoices.filter(function (choice) {
+        return choice.placeholder !== true;
+      });
+    }
+    /**
+     * Get placeholder choice from store
+     * @return {Object} Found placeholder
+     */
+
+  }, {
+    key: "placeholderChoice",
+    get: function get() {
+      return [].concat(this.choices).reverse().find(function (choice) {
+        return choice.placeholder === true;
+      });
+    }
+    /**
+     * Get groups from store
+     * @return {Array} Group objects
+     */
+
+  }, {
+    key: "groups",
+    get: function get() {
+      return this.state.groups;
+    }
+    /**
+     * Get active groups from store
+     * @return {Array} Group objects
+     */
+
+  }, {
+    key: "activeGroups",
+    get: function get() {
+      var groups = this.groups;
+      var choices = this.choices;
+      return groups.filter(function (group) {
+        var isActive = group.active === true && group.disabled === false;
+        var hasActiveOptions = choices.some(function (choice) {
+          return choice.active === true && choice.disabled === false;
+        });
+        return isActive && hasActiveOptions;
+      }, []);
+    }
+  }]);
+
+  return Store;
+}();
+
+exports.default = Store;
 
 /***/ }),
 /* 16 */
 /***/ (function(module, exports) {
 
-	/**
-	 * Checks if `value` is object-like. A value is object-like if it's not `null`
-	 * and has a `typeof` result of "object".
-	 *
-	 * @static
-	 * @memberOf _
-	 * @since 4.0.0
-	 * @category Lang
-	 * @param {*} value The value to check.
-	 * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-	 * @example
-	 *
-	 * _.isObjectLike({});
-	 * // => true
-	 *
-	 * _.isObjectLike([1, 2, 3]);
-	 * // => true
-	 *
-	 * _.isObjectLike(_.noop);
-	 * // => false
-	 *
-	 * _.isObjectLike(null);
-	 * // => false
-	 */
-	function isObjectLike(value) {
-	  return value != null && typeof value == 'object';
+module.exports = function(originalModule) {
+	if (!originalModule.webpackPolyfill) {
+		var module = Object.create(originalModule);
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		Object.defineProperty(module, "exports", {
+			enumerable: true
+		});
+		module.webpackPolyfill = 1;
 	}
-
-	module.exports = isObjectLike;
+	return module;
+};
 
 
 /***/ }),
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(18);
+"use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _redux = __webpack_require__(6);
+
+var _items = _interopRequireDefault(__webpack_require__(18));
+
+var _groups = _interopRequireDefault(__webpack_require__(19));
+
+var _choices = _interopRequireDefault(__webpack_require__(20));
+
+var _general = _interopRequireDefault(__webpack_require__(21));
+
+var _utils = __webpack_require__(0);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var appReducer = (0, _redux.combineReducers)({
+  items: _items.default,
+  groups: _groups.default,
+  choices: _choices.default,
+  general: _general.default
+});
+
+var rootReducer = function rootReducer(passedState, action) {
+  var state = passedState; // If we are clearing all items, groups and options we reassign
+  // state and then pass that state to our proper reducer. This isn't
+  // mutating our actual state
+  // See: http://stackoverflow.com/a/35641992
+
+  if (action.type === 'CLEAR_ALL') {
+    state = undefined;
+  } else if (action.type === 'RESET_TO') {
+    return (0, _utils.cloneObject)(action.state);
+  }
+
+  return appReducer(state, action);
+};
+
+var _default = rootReducer;
+exports.default = _default;
 
 /***/ }),
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global, module) {'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _ponyfill = __webpack_require__(20);
-
-	var _ponyfill2 = _interopRequireDefault(_ponyfill);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var root; /* global window */
+"use strict";
 
 
-	if (typeof self !== 'undefined') {
-	  root = self;
-	} else if (typeof window !== 'undefined') {
-	  root = window;
-	} else if (typeof global !== 'undefined') {
-	  root = global;
-	} else if (true) {
-	  root = module;
-	} else {}
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = items;
+exports.defaultState = void 0;
+var defaultState = [];
+exports.defaultState = defaultState;
 
-	var result = (0, _ponyfill2['default'])(root);
-	exports['default'] = result;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(19)(module)))
+function items() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case 'ADD_ITEM':
+      {
+        // Add object to items array
+        var newState = [].concat(state, [{
+          id: action.id,
+          choiceId: action.choiceId,
+          groupId: action.groupId,
+          value: action.value,
+          label: action.label,
+          active: true,
+          highlighted: false,
+          customProperties: action.customProperties,
+          placeholder: action.placeholder || false,
+          keyCode: null
+        }]);
+        return newState.map(function (obj) {
+          var item = obj;
+          item.highlighted = false;
+          return item;
+        });
+      }
+
+    case 'REMOVE_ITEM':
+      {
+        // Set item to inactive
+        return state.map(function (obj) {
+          var item = obj;
+
+          if (item.id === action.id) {
+            item.active = false;
+          }
+
+          return item;
+        });
+      }
+
+    case 'HIGHLIGHT_ITEM':
+      {
+        return state.map(function (obj) {
+          var item = obj;
+
+          if (item.id === action.id) {
+            item.highlighted = action.highlighted;
+          }
+
+          return item;
+        });
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
 
 /***/ }),
 /* 19 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = function(module) {
-		if(!module.webpackPolyfill) {
-			module.deprecate = function() {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	}
+"use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = groups;
+exports.defaultState = void 0;
+var defaultState = [];
+exports.defaultState = defaultState;
+
+function groups() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case 'ADD_GROUP':
+      {
+        return [].concat(state, [{
+          id: action.id,
+          value: action.value,
+          active: action.active,
+          disabled: action.disabled
+        }]);
+      }
+
+    case 'CLEAR_CHOICES':
+      {
+        return [];
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
 
 /***/ }),
 /* 20 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports['default'] = symbolObservablePonyfill;
-	function symbolObservablePonyfill(root) {
-		var result;
-		var _Symbol = root.Symbol;
 
-		if (typeof _Symbol === 'function') {
-			if (_Symbol.observable) {
-				result = _Symbol.observable;
-			} else {
-				result = _Symbol('observable');
-				_Symbol.observable = result;
-			}
-		} else {
-			result = '@@observable';
-		}
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = choices;
+exports.defaultState = void 0;
+var defaultState = [];
+exports.defaultState = defaultState;
 
-		return result;
-	};
+function choices() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
+
+  switch (action.type) {
+    case 'ADD_CHOICE':
+      {
+        /*
+            A disabled choice appears in the choice dropdown but cannot be selected
+            A selected choice has been added to the passed input's value (added as an item)
+            An active choice appears within the choice dropdown
+         */
+        return [].concat(state, [{
+          id: action.id,
+          elementId: action.elementId,
+          groupId: action.groupId,
+          value: action.value,
+          label: action.label || action.value,
+          disabled: action.disabled || false,
+          selected: false,
+          active: true,
+          score: 9999,
+          customProperties: action.customProperties,
+          placeholder: action.placeholder || false,
+          keyCode: null
+        }]);
+      }
+
+    case 'ADD_ITEM':
+      {
+        // If all choices need to be activated
+        if (action.activateOptions) {
+          return state.map(function (obj) {
+            var choice = obj;
+            choice.active = action.active;
+            return choice;
+          });
+        } // When an item is added and it has an associated choice,
+        // we want to disable it so it can't be chosen again
+
+
+        if (action.choiceId > -1) {
+          return state.map(function (obj) {
+            var choice = obj;
+
+            if (choice.id === parseInt(action.choiceId, 10)) {
+              choice.selected = true;
+            }
+
+            return choice;
+          });
+        }
+
+        return state;
+      }
+
+    case 'REMOVE_ITEM':
+      {
+        // When an item is removed and it has an associated choice,
+        // we want to re-enable it so it can be chosen again
+        if (action.choiceId > -1) {
+          return state.map(function (obj) {
+            var choice = obj;
+
+            if (choice.id === parseInt(action.choiceId, 10)) {
+              choice.selected = false;
+            }
+
+            return choice;
+          });
+        }
+
+        return state;
+      }
+
+    case 'FILTER_CHOICES':
+      {
+        return state.map(function (obj) {
+          var choice = obj; // Set active state based on whether choice is
+          // within filtered results
+
+          choice.active = action.results.some(function (_ref) {
+            var item = _ref.item,
+                score = _ref.score;
+
+            if (item.id === choice.id) {
+              choice.score = score;
+              return true;
+            }
+
+            return false;
+          });
+          return choice;
+        });
+      }
+
+    case 'ACTIVATE_CHOICES':
+      {
+        return state.map(function (obj) {
+          var choice = obj;
+          choice.active = action.active;
+          return choice;
+        });
+      }
+
+    case 'CLEAR_CHOICES':
+      {
+        return defaultState;
+      }
+
+    default:
+      {
+        return state;
+      }
+  }
+}
 
 /***/ }),
 /* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	exports.__esModule = true;
-	exports['default'] = combineReducers;
 
-	var _createStore = __webpack_require__(6);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.defaultState = void 0;
+var defaultState = {
+  loading: false
+};
+exports.defaultState = defaultState;
 
-	var _isPlainObject = __webpack_require__(7);
+var general = function general() {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+  var action = arguments.length > 1 ? arguments[1] : undefined;
 
-	var _isPlainObject2 = _interopRequireDefault(_isPlainObject);
+  switch (action.type) {
+    case 'SET_IS_LOADING':
+      {
+        return {
+          loading: action.isLoading
+        };
+      }
 
-	var _warning = __webpack_require__(22);
+    default:
+      {
+        return state;
+      }
+  }
+};
 
-	var _warning2 = _interopRequireDefault(_warning);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function getUndefinedStateErrorMessage(key, action) {
-	  var actionType = action && action.type;
-	  var actionName = actionType && '"' + actionType.toString() + '"' || 'an action';
-
-	  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state. ' + 'If you want this reducer to hold no value, you can return null instead of undefined.';
-	}
-
-	function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
-	  var reducerKeys = Object.keys(reducers);
-	  var argumentName = action && action.type === _createStore.ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
-
-	  if (reducerKeys.length === 0) {
-	    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
-	  }
-
-	  if (!(0, _isPlainObject2['default'])(inputState)) {
-	    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
-	  }
-
-	  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
-	    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
-	  });
-
-	  unexpectedKeys.forEach(function (key) {
-	    unexpectedKeyCache[key] = true;
-	  });
-
-	  if (unexpectedKeys.length > 0) {
-	    return 'Unexpected ' + (unexpectedKeys.length > 1 ? 'keys' : 'key') + ' ' + ('"' + unexpectedKeys.join('", "') + '" found in ' + argumentName + '. ') + 'Expected to find one of the known reducer keys instead: ' + ('"' + reducerKeys.join('", "') + '". Unexpected keys will be ignored.');
-	  }
-	}
-
-	function assertReducerShape(reducers) {
-	  Object.keys(reducers).forEach(function (key) {
-	    var reducer = reducers[key];
-	    var initialState = reducer(undefined, { type: _createStore.ActionTypes.INIT });
-
-	    if (typeof initialState === 'undefined') {
-	      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined. If you don\'t want to set a value for this reducer, ' + 'you can use null instead of undefined.');
-	    }
-
-	    var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.');
-	    if (typeof reducer(undefined, { type: type }) === 'undefined') {
-	      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + _createStore.ActionTypes.INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined, but can be null.');
-	    }
-	  });
-	}
-
-	/**
-	 * Turns an object whose values are different reducer functions, into a single
-	 * reducer function. It will call every child reducer, and gather their results
-	 * into a single state object, whose keys correspond to the keys of the passed
-	 * reducer functions.
-	 *
-	 * @param {Object} reducers An object whose values correspond to different
-	 * reducer functions that need to be combined into one. One handy way to obtain
-	 * it is to use ES6 `import * as reducers` syntax. The reducers may never return
-	 * undefined for any action. Instead, they should return their initial state
-	 * if the state passed to them was undefined, and the current state for any
-	 * unrecognized action.
-	 *
-	 * @returns {Function} A reducer function that invokes every reducer inside the
-	 * passed object, and builds a state object with the same shape.
-	 */
-	function combineReducers(reducers) {
-	  var reducerKeys = Object.keys(reducers);
-	  var finalReducers = {};
-	  for (var i = 0; i < reducerKeys.length; i++) {
-	    var key = reducerKeys[i];
-
-	    if (false) {}
-
-	    if (typeof reducers[key] === 'function') {
-	      finalReducers[key] = reducers[key];
-	    }
-	  }
-	  var finalReducerKeys = Object.keys(finalReducers);
-
-	  var unexpectedKeyCache = void 0;
-	  if (false) {}
-
-	  var shapeAssertionError = void 0;
-	  try {
-	    assertReducerShape(finalReducers);
-	  } catch (e) {
-	    shapeAssertionError = e;
-	  }
-
-	  return function combination() {
-	    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-	    var action = arguments[1];
-
-	    if (shapeAssertionError) {
-	      throw shapeAssertionError;
-	    }
-
-	    if (false) { var warningMessage; }
-
-	    var hasChanged = false;
-	    var nextState = {};
-	    for (var _i = 0; _i < finalReducerKeys.length; _i++) {
-	      var _key = finalReducerKeys[_i];
-	      var reducer = finalReducers[_key];
-	      var previousStateForKey = state[_key];
-	      var nextStateForKey = reducer(previousStateForKey, action);
-	      if (typeof nextStateForKey === 'undefined') {
-	        var errorMessage = getUndefinedStateErrorMessage(_key, action);
-	        throw new Error(errorMessage);
-	      }
-	      nextState[_key] = nextStateForKey;
-	      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
-	    }
-	    return hasChanged ? nextState : state;
-	  };
-	}
+var _default = general;
+exports.default = _default;
 
 /***/ }),
 /* 22 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	exports.__esModule = true;
-	exports['default'] = warning;
-	/**
-	 * Prints a warning in the console if it exists.
-	 *
-	 * @param {String} message The warning message.
-	 * @returns {void}
-	 */
-	function warning(message) {
-	  /* eslint-disable no-console */
-	  if (typeof console !== 'undefined' && typeof console.error === 'function') {
-	    console.error(message);
-	  }
-	  /* eslint-enable no-console */
-	  try {
-	    // This error was thrown as a convenience so that if you enable
-	    // "break on all exceptions" in your console,
-	    // it would pause the execution at this line.
-	    throw new Error(message);
-	    /* eslint-disable no-empty */
-	  } catch (e) {}
-	  /* eslint-enable no-empty */
-	}
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "Dropdown", {
+  enumerable: true,
+  get: function get() {
+    return _dropdown.default;
+  }
+});
+Object.defineProperty(exports, "Container", {
+  enumerable: true,
+  get: function get() {
+    return _container.default;
+  }
+});
+Object.defineProperty(exports, "Input", {
+  enumerable: true,
+  get: function get() {
+    return _input.default;
+  }
+});
+Object.defineProperty(exports, "List", {
+  enumerable: true,
+  get: function get() {
+    return _list.default;
+  }
+});
+Object.defineProperty(exports, "WrappedInput", {
+  enumerable: true,
+  get: function get() {
+    return _wrappedInput.default;
+  }
+});
+Object.defineProperty(exports, "WrappedSelect", {
+  enumerable: true,
+  get: function get() {
+    return _wrappedSelect.default;
+  }
+});
+
+var _dropdown = _interopRequireDefault(__webpack_require__(23));
+
+var _container = _interopRequireDefault(__webpack_require__(24));
+
+var _input = _interopRequireDefault(__webpack_require__(25));
+
+var _list = _interopRequireDefault(__webpack_require__(26));
+
+var _wrappedInput = _interopRequireDefault(__webpack_require__(27));
+
+var _wrappedSelect = _interopRequireDefault(__webpack_require__(28));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
 /* 23 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	exports.__esModule = true;
-	exports['default'] = bindActionCreators;
-	function bindActionCreator(actionCreator, dispatch) {
-	  return function () {
-	    return dispatch(actionCreator.apply(undefined, arguments));
-	  };
-	}
 
-	/**
-	 * Turns an object whose values are action creators, into an object with the
-	 * same keys, but with every function wrapped into a `dispatch` call so they
-	 * may be invoked directly. This is just a convenience method, as you can call
-	 * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
-	 *
-	 * For convenience, you can also pass a single function as the first argument,
-	 * and get a function in return.
-	 *
-	 * @param {Function|Object} actionCreators An object whose values are action
-	 * creator functions. One handy way to obtain it is to use ES6 `import * as`
-	 * syntax. You may also pass a single function.
-	 *
-	 * @param {Function} dispatch The `dispatch` function available on your Redux
-	 * store.
-	 *
-	 * @returns {Function|Object} The object mimicking the original object, but with
-	 * every action creator wrapped into the `dispatch` call. If you passed a
-	 * function as `actionCreators`, the return value will also be a single
-	 * function.
-	 */
-	function bindActionCreators(actionCreators, dispatch) {
-	  if (typeof actionCreators === 'function') {
-	    return bindActionCreator(actionCreators, dispatch);
-	  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-	  if (typeof actionCreators !== 'object' || actionCreators === null) {
-	    throw new Error('bindActionCreators expected an object or a function, instead received ' + (actionCreators === null ? 'null' : typeof actionCreators) + '. ' + 'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?');
-	  }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	  var keys = Object.keys(actionCreators);
-	  var boundActionCreators = {};
-	  for (var i = 0; i < keys.length; i++) {
-	    var key = keys[i];
-	    var actionCreator = actionCreators[key];
-	    if (typeof actionCreator === 'function') {
-	      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
-	    }
-	  }
-	  return boundActionCreators;
-	}
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Dropdown =
+/*#__PURE__*/
+function () {
+  function Dropdown(_ref) {
+    var element = _ref.element,
+        type = _ref.type,
+        classNames = _ref.classNames;
+
+    _classCallCheck(this, Dropdown);
+
+    Object.assign(this, {
+      element: element,
+      type: type,
+      classNames: classNames
+    });
+    this.isActive = false;
+  }
+  /**
+   * Determine how far the top of our element is from
+   * the top of the window
+   * @return {Number} Vertical position
+   */
+
+
+  _createClass(Dropdown, [{
+    key: "distanceFromTopWindow",
+    value: function distanceFromTopWindow() {
+      this.dimensions = this.element.getBoundingClientRect();
+      this.position = Math.ceil(this.dimensions.top + window.pageYOffset + this.element.offsetHeight);
+      return this.position;
+    }
+    /**
+     * Find element that matches passed selector
+     * @return {HTMLElement}
+     */
+
+  }, {
+    key: "getChild",
+    value: function getChild(selector) {
+      return this.element.querySelector(selector);
+    }
+    /**
+     * Show dropdown to user by adding active state class
+     * @return {Object} Class instance
+     * @public
+     */
+
+  }, {
+    key: "show",
+    value: function show() {
+      this.element.classList.add(this.classNames.activeState);
+      this.element.setAttribute('aria-expanded', 'true');
+      this.isActive = true;
+      return this;
+    }
+    /**
+     * Hide dropdown from user
+     * @return {Object} Class instance
+     * @public
+     */
+
+  }, {
+    key: "hide",
+    value: function hide() {
+      this.element.classList.remove(this.classNames.activeState);
+      this.element.setAttribute('aria-expanded', 'false');
+      this.isActive = false;
+      return this;
+    }
+  }]);
+
+  return Dropdown;
+}();
+
+exports.default = Dropdown;
 
 /***/ }),
 /* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	exports.__esModule = true;
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-	exports['default'] = applyMiddleware;
+var _utils = __webpack_require__(0);
 
-	var _compose = __webpack_require__(25);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var _compose2 = _interopRequireDefault(_compose);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-	/**
-	 * Creates a store enhancer that applies middleware to the dispatch method
-	 * of the Redux store. This is handy for a variety of tasks, such as expressing
-	 * asynchronous actions in a concise manner, or logging every action payload.
-	 *
-	 * See `redux-thunk` package as an example of the Redux middleware.
-	 *
-	 * Because middleware is potentially asynchronous, this should be the first
-	 * store enhancer in the composition chain.
-	 *
-	 * Note that each middleware will be given the `dispatch` and `getState` functions
-	 * as named arguments.
-	 *
-	 * @param {...Function} middlewares The middleware chain to be applied.
-	 * @returns {Function} A store enhancer applying the middleware.
-	 */
-	function applyMiddleware() {
-	  for (var _len = arguments.length, middlewares = Array(_len), _key = 0; _key < _len; _key++) {
-	    middlewares[_key] = arguments[_key];
-	  }
+var Container =
+/*#__PURE__*/
+function () {
+  function Container(_ref) {
+    var element = _ref.element,
+        type = _ref.type,
+        classNames = _ref.classNames,
+        position = _ref.position;
 
-	  return function (createStore) {
-	    return function (reducer, preloadedState, enhancer) {
-	      var store = createStore(reducer, preloadedState, enhancer);
-	      var _dispatch = store.dispatch;
-	      var chain = [];
+    _classCallCheck(this, Container);
 
-	      var middlewareAPI = {
-	        getState: store.getState,
-	        dispatch: function dispatch(action) {
-	          return _dispatch(action);
-	        }
-	      };
-	      chain = middlewares.map(function (middleware) {
-	        return middleware(middlewareAPI);
-	      });
-	      _dispatch = _compose2['default'].apply(undefined, chain)(store.dispatch);
+    Object.assign(this, {
+      element: element,
+      classNames: classNames,
+      type: type,
+      position: position
+    });
+    this.isOpen = false;
+    this.isFlipped = false;
+    this.isFocussed = false;
+    this.isDisabled = false;
+    this.isLoading = false;
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
+  }
+  /**
+   * Add event listeners
+   */
 
-	      return _extends({}, store, {
-	        dispatch: _dispatch
-	      });
-	    };
-	  };
-	}
+
+  _createClass(Container, [{
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      this.element.addEventListener('focus', this._onFocus);
+      this.element.addEventListener('blur', this._onBlur);
+    }
+    /**
+     * Remove event listeners
+     */
+
+    /** */
+
+  }, {
+    key: "removeEventListeners",
+    value: function removeEventListeners() {
+      this.element.removeEventListener('focus', this._onFocus);
+      this.element.removeEventListener('blur', this._onBlur);
+    }
+    /**
+     * Determine whether container should be flipped
+     * based on passed dropdown position
+     * @param {Number} dropdownPos
+     * @returns
+     */
+
+  }, {
+    key: "shouldFlip",
+    value: function shouldFlip(dropdownPos) {
+      var windowHeight = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (0, _utils.getWindowHeight)();
+
+      if (dropdownPos === undefined) {
+        return false;
+      } // If flip is enabled and the dropdown bottom position is
+      // greater than the window height flip the dropdown.
+
+
+      var shouldFlip = false;
+
+      if (this.position === 'auto') {
+        shouldFlip = dropdownPos >= windowHeight;
+      } else if (this.position === 'top') {
+        shouldFlip = true;
+      }
+
+      return shouldFlip;
+    }
+    /**
+     * Set active descendant attribute
+     * @param {Number} activeDescendant ID of active descendant
+     */
+
+  }, {
+    key: "setActiveDescendant",
+    value: function setActiveDescendant(activeDescendantID) {
+      this.element.setAttribute('aria-activedescendant', activeDescendantID);
+    }
+    /**
+     * Remove active descendant attribute
+     */
+
+  }, {
+    key: "removeActiveDescendant",
+    value: function removeActiveDescendant() {
+      this.element.removeAttribute('aria-activedescendant');
+    }
+  }, {
+    key: "open",
+    value: function open(dropdownPos) {
+      this.element.classList.add(this.classNames.openState);
+      this.element.setAttribute('aria-expanded', 'true');
+      this.isOpen = true;
+
+      if (this.shouldFlip(dropdownPos)) {
+        this.element.classList.add(this.classNames.flippedState);
+        this.isFlipped = true;
+      }
+    }
+  }, {
+    key: "close",
+    value: function close() {
+      this.element.classList.remove(this.classNames.openState);
+      this.element.setAttribute('aria-expanded', 'false');
+      this.removeActiveDescendant();
+      this.isOpen = false; // A dropdown flips if it does not have space within the page
+
+      if (this.isFlipped) {
+        this.element.classList.remove(this.classNames.flippedState);
+        this.isFlipped = false;
+      }
+    }
+  }, {
+    key: "focus",
+    value: function focus() {
+      if (!this.isFocussed) {
+        this.element.focus();
+      }
+    }
+  }, {
+    key: "addFocusState",
+    value: function addFocusState() {
+      this.element.classList.add(this.classNames.focusState);
+    }
+  }, {
+    key: "removeFocusState",
+    value: function removeFocusState() {
+      this.element.classList.remove(this.classNames.focusState);
+    }
+    /**
+     * Remove disabled state
+     */
+
+  }, {
+    key: "enable",
+    value: function enable() {
+      this.element.classList.remove(this.classNames.disabledState);
+      this.element.removeAttribute('aria-disabled');
+
+      if (this.type === 'select-one') {
+        this.element.setAttribute('tabindex', '0');
+      }
+
+      this.isDisabled = false;
+    }
+    /**
+     * Set disabled state
+     */
+
+  }, {
+    key: "disable",
+    value: function disable() {
+      this.element.classList.add(this.classNames.disabledState);
+      this.element.setAttribute('aria-disabled', 'true');
+
+      if (this.type === 'select-one') {
+        this.element.setAttribute('tabindex', '-1');
+      }
+
+      this.isDisabled = true;
+    }
+  }, {
+    key: "wrap",
+    value: function wrap(element) {
+      (0, _utils.wrap)(element, this.element);
+    }
+  }, {
+    key: "unwrap",
+    value: function unwrap(element) {
+      // Move passed element outside this element
+      this.element.parentNode.insertBefore(element, this.element); // Remove this element
+
+      this.element.parentNode.removeChild(this.element);
+    }
+    /**
+     * Add loading state to element
+     */
+
+  }, {
+    key: "addLoadingState",
+    value: function addLoadingState() {
+      this.element.classList.add(this.classNames.loadingState);
+      this.element.setAttribute('aria-busy', 'true');
+      this.isLoading = true;
+    }
+    /**
+     * Remove loading state from element
+     */
+
+  }, {
+    key: "removeLoadingState",
+    value: function removeLoadingState() {
+      this.element.classList.remove(this.classNames.loadingState);
+      this.element.removeAttribute('aria-busy');
+      this.isLoading = false;
+    }
+    /**
+     * Set focussed state
+     */
+
+  }, {
+    key: "_onFocus",
+    value: function _onFocus() {
+      this.isFocussed = true;
+    }
+    /**
+     * Remove blurred state
+     */
+
+  }, {
+    key: "_onBlur",
+    value: function _onBlur() {
+      this.isFocussed = false;
+    }
+  }]);
+
+  return Container;
+}();
+
+exports.default = Container;
 
 /***/ }),
 /* 25 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+"use strict";
 
-	exports.__esModule = true;
-	exports["default"] = compose;
-	/**
-	 * Composes single-argument functions from right to left. The rightmost
-	 * function can take multiple arguments as it provides the signature for
-	 * the resulting composite function.
-	 *
-	 * @param {...Function} funcs The functions to compose.
-	 * @returns {Function} A function obtained by composing the argument functions
-	 * from right to left. For example, compose(f, g, h) is identical to doing
-	 * (...args) => f(g(h(...args))).
-	 */
 
-	function compose() {
-	  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
-	    funcs[_key] = arguments[_key];
-	  }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-	  if (funcs.length === 0) {
-	    return function (arg) {
-	      return arg;
-	    };
-	  }
+var _utils = __webpack_require__(0);
 
-	  if (funcs.length === 1) {
-	    return funcs[0];
-	  }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	  return funcs.reduce(function (a, b) {
-	    return function () {
-	      return a(b.apply(undefined, arguments));
-	    };
-	  });
-	}
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Input =
+/*#__PURE__*/
+function () {
+  function Input(_ref) {
+    var element = _ref.element,
+        type = _ref.type,
+        classNames = _ref.classNames,
+        placeholderValue = _ref.placeholderValue;
+
+    _classCallCheck(this, Input);
+
+    Object.assign(this, {
+      element: element,
+      type: type,
+      classNames: classNames,
+      placeholderValue: placeholderValue
+    });
+    this.element = element;
+    this.classNames = classNames;
+    this.isFocussed = this.element === document.activeElement;
+    this.isDisabled = false;
+    this._onPaste = this._onPaste.bind(this);
+    this._onInput = this._onInput.bind(this);
+    this._onFocus = this._onFocus.bind(this);
+    this._onBlur = this._onBlur.bind(this);
+  }
+
+  _createClass(Input, [{
+    key: "addEventListeners",
+    value: function addEventListeners() {
+      this.element.addEventListener('input', this._onInput);
+      this.element.addEventListener('paste', this._onPaste);
+      this.element.addEventListener('focus', this._onFocus);
+      this.element.addEventListener('blur', this._onBlur);
+
+      if (this.element.form) {
+        this.element.form.addEventListener('reset', this._onFormReset);
+      }
+    }
+  }, {
+    key: "removeEventListeners",
+    value: function removeEventListeners() {
+      this.element.removeEventListener('input', this._onInput);
+      this.element.removeEventListener('paste', this._onPaste);
+      this.element.removeEventListener('focus', this._onFocus);
+      this.element.removeEventListener('blur', this._onBlur);
+
+      if (this.element.form) {
+        this.element.form.removeEventListener('reset', this._onFormReset);
+      }
+    }
+  }, {
+    key: "enable",
+    value: function enable() {
+      this.element.removeAttribute('disabled');
+      this.isDisabled = false;
+    }
+  }, {
+    key: "disable",
+    value: function disable() {
+      this.element.setAttribute('disabled', '');
+      this.isDisabled = true;
+    }
+  }, {
+    key: "focus",
+    value: function focus() {
+      if (!this.isFocussed) {
+        this.element.focus();
+      }
+    }
+  }, {
+    key: "blur",
+    value: function blur() {
+      if (this.isFocussed) {
+        this.element.blur();
+      }
+    }
+    /**
+     * Set value of input to blank
+     * @return {Object} Class instance
+     * @public
+     */
+
+  }, {
+    key: "clear",
+    value: function clear() {
+      var setWidth = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+      if (this.element.value) {
+        this.element.value = '';
+      }
+
+      if (setWidth) {
+        this.setWidth();
+      }
+
+      return this;
+    }
+    /**
+     * Set the correct input width based on placeholder
+     * value or input value
+     * @return
+     */
+
+  }, {
+    key: "setWidth",
+    value: function setWidth(enforceWidth) {
+      var _this = this;
+
+      var callback = function callback(width) {
+        _this.element.style.width = width;
+      };
+
+      if (this._placeholderValue) {
+        // If there is a placeholder, we only want to set the width of the input when it is a greater
+        // length than 75% of the placeholder. This stops the input jumping around.
+        var valueHasDesiredLength = this.element.value.length >= this._placeholderValue.length / 1.25;
+
+        if (this.element.value && valueHasDesiredLength || enforceWidth) {
+          this.calcWidth(callback);
+        }
+      } else {
+        // If there is no placeholder, resize input to contents
+        this.calcWidth(callback);
+      }
+    }
+  }, {
+    key: "calcWidth",
+    value: function calcWidth(callback) {
+      return (0, _utils.calcWidthOfInput)(this.element, callback);
+    }
+  }, {
+    key: "setActiveDescendant",
+    value: function setActiveDescendant(activeDescendantID) {
+      this.element.setAttribute('aria-activedescendant', activeDescendantID);
+    }
+  }, {
+    key: "removeActiveDescendant",
+    value: function removeActiveDescendant() {
+      this.element.removeAttribute('aria-activedescendant');
+    }
+  }, {
+    key: "_onInput",
+    value: function _onInput() {
+      if (this.type !== 'select-one') {
+        this.setWidth();
+      }
+    }
+  }, {
+    key: "_onPaste",
+    value: function _onPaste(event) {
+      var target = event.target;
+
+      if (target === this.element && this.preventPaste) {
+        event.preventDefault();
+      }
+    }
+  }, {
+    key: "_onFocus",
+    value: function _onFocus() {
+      this.isFocussed = true;
+    }
+  }, {
+    key: "_onBlur",
+    value: function _onBlur() {
+      this.isFocussed = false;
+    }
+  }, {
+    key: "placeholder",
+    set: function set(placeholder) {
+      this.element.placeholder = placeholder;
+    }
+  }, {
+    key: "value",
+    set: function set(value) {
+      this.element.value = value;
+    },
+    get: function get() {
+      return (0, _utils.sanitise)(this.element.value);
+    }
+  }]);
+
+  return Input;
+}();
+
+exports.default = Input;
 
 /***/ }),
 /* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 
-	var _redux = __webpack_require__(5);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-	var _items = __webpack_require__(27);
+var _constants = __webpack_require__(1);
 
-	var _items2 = _interopRequireDefault(_items);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var _groups = __webpack_require__(28);
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-	var _groups2 = _interopRequireDefault(_groups);
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-	var _choices = __webpack_require__(29);
+var List =
+/*#__PURE__*/
+function () {
+  function List(_ref) {
+    var element = _ref.element;
 
-	var _choices2 = _interopRequireDefault(_choices);
+    _classCallCheck(this, List);
 
-	var _general = __webpack_require__(30);
+    Object.assign(this, {
+      element: element
+    });
+    this.scrollPos = this.element.scrollTop;
+    this.height = this.element.offsetHeight;
+    this.hasChildren = !!this.element.children;
+  }
 
-	var _general2 = _interopRequireDefault(_general);
+  _createClass(List, [{
+    key: "clear",
+    value: function clear() {
+      this.element.innerHTML = '';
+    }
+  }, {
+    key: "append",
+    value: function append(node) {
+      this.element.appendChild(node);
+    }
+  }, {
+    key: "getChild",
+    value: function getChild(selector) {
+      return this.element.querySelector(selector);
+    }
+  }, {
+    key: "scrollToTop",
+    value: function scrollToTop() {
+      this.element.scrollTop = 0;
+    }
+  }, {
+    key: "scrollToChoice",
+    value: function scrollToChoice(choice, direction) {
+      var _this = this;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+      if (!choice) {
+        return;
+      }
 
-	var appReducer = (0, _redux.combineReducers)({
-	  items: _items2.default,
-	  groups: _groups2.default,
-	  choices: _choices2.default,
-	  general: _general2.default
-	});
+      var dropdownHeight = this.element.offsetHeight;
+      var choiceHeight = choice.offsetHeight; // Distance from bottom of element to top of parent
 
-	var rootReducer = function rootReducer(passedState, action) {
-	  var state = passedState;
-	  // If we are clearing all items, groups and options we reassign
-	  // state and then pass that state to our proper reducer. This isn't
-	  // mutating our actual state
-	  // See: http://stackoverflow.com/a/35641992
-	  if (action.type === 'CLEAR_ALL') {
-	    state = undefined;
-	  }
+      var choicePos = choice.offsetTop + choiceHeight; // Scroll position of dropdown
 
-	  return appReducer(state, action);
-	};
+      var containerScrollPos = this.element.scrollTop + dropdownHeight; // Difference between the choice and scroll position
 
-	exports.default = rootReducer;
+      var endpoint = direction > 0 ? this.element.scrollTop + choicePos - containerScrollPos : choice.offsetTop;
+      requestAnimationFrame(function (time) {
+        _this._animateScroll(time, endpoint, direction);
+      });
+    }
+  }, {
+    key: "_scrollDown",
+    value: function _scrollDown(scrollPos, strength, endpoint) {
+      var easing = (endpoint - scrollPos) / strength;
+      var distance = easing > 1 ? easing : 1;
+      this.element.scrollTop = scrollPos + distance;
+    }
+  }, {
+    key: "_scrollUp",
+    value: function _scrollUp(scrollPos, strength, endpoint) {
+      var easing = (scrollPos - endpoint) / strength;
+      var distance = easing > 1 ? easing : 1;
+      this.element.scrollTop = scrollPos - distance;
+    }
+  }, {
+    key: "_animateScroll",
+    value: function _animateScroll(time, endpoint, direction) {
+      var _this2 = this;
+
+      var strength = _constants.SCROLLING_SPEED;
+      var choiceListScrollTop = this.element.scrollTop;
+      var continueAnimation = false;
+
+      if (direction > 0) {
+        this._scrollDown(choiceListScrollTop, strength, endpoint);
+
+        if (choiceListScrollTop < endpoint) {
+          continueAnimation = true;
+        }
+      } else {
+        this._scrollUp(choiceListScrollTop, strength, endpoint);
+
+        if (choiceListScrollTop > endpoint) {
+          continueAnimation = true;
+        }
+      }
+
+      if (continueAnimation) {
+        requestAnimationFrame(function () {
+          _this2._animateScroll(time, endpoint, direction);
+        });
+      }
+    }
+  }]);
+
+  return List;
+}();
+
+exports.default = List;
 
 /***/ }),
 /* 27 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-	var items = function items() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  var action = arguments[1];
+var _wrappedElement = _interopRequireDefault(__webpack_require__(4));
 
-	  switch (action.type) {
-	    case 'ADD_ITEM':
-	      {
-	        // Add object to items array
-	        var newState = [].concat(_toConsumableArray(state), [{
-	          id: action.id,
-	          choiceId: action.choiceId,
-	          groupId: action.groupId,
-	          value: action.value,
-	          label: action.label,
-	          active: true,
-	          highlighted: false,
-	          customProperties: action.customProperties,
-	          placeholder: action.placeholder || false,
-	          keyCode: null
-	        }]);
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	        return newState.map(function (item) {
-	          if (item.highlighted) {
-	            item.highlighted = false;
-	          }
-	          return item;
-	        });
-	      }
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-	    case 'REMOVE_ITEM':
-	      {
-	        // Set item to inactive
-	        return state.map(function (item) {
-	          if (item.id === action.id) {
-	            item.active = false;
-	          }
-	          return item;
-	        });
-	      }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	    case 'HIGHLIGHT_ITEM':
-	      {
-	        return state.map(function (item) {
-	          if (item.id === action.id) {
-	            item.highlighted = action.highlighted;
-	          }
-	          return item;
-	        });
-	      }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-	    default:
-	      {
-	        return state;
-	      }
-	  }
-	};
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-	exports.default = items;
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var WrappedInput =
+/*#__PURE__*/
+function (_WrappedElement) {
+  _inherits(WrappedInput, _WrappedElement);
+
+  function WrappedInput(_ref) {
+    var _this;
+
+    var element = _ref.element,
+        classNames = _ref.classNames,
+        delimiter = _ref.delimiter;
+
+    _classCallCheck(this, WrappedInput);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(WrappedInput).call(this, {
+      element: element,
+      classNames: classNames
+    }));
+    _this.delimiter = delimiter;
+    return _this;
+  }
+
+  _createClass(WrappedInput, [{
+    key: "value",
+    set: function set(items) {
+      var itemValues = items.map(function (_ref2) {
+        var value = _ref2.value;
+        return value;
+      });
+      var joinedValues = itemValues.join(this.delimiter);
+      this.element.setAttribute('value', joinedValues);
+      this.element.value = joinedValues;
+    } // @todo figure out why we need this? Perhaps a babel issue
+    ,
+    get: function get() {
+      return _get(_getPrototypeOf(WrappedInput.prototype), "value", this);
+    }
+  }]);
+
+  return WrappedInput;
+}(_wrappedElement.default);
+
+exports.default = WrappedInput;
 
 /***/ }),
 /* 28 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
 
-	var groups = function groups() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  var action = arguments[1];
+var _wrappedElement = _interopRequireDefault(__webpack_require__(4));
 
-	  switch (action.type) {
-	    case 'ADD_GROUP':
-	      {
-	        return [].concat(_toConsumableArray(state), [{
-	          id: action.id,
-	          value: action.value,
-	          active: action.active,
-	          disabled: action.disabled
-	        }]);
-	      }
+var _templates = _interopRequireDefault(__webpack_require__(5));
 
-	    case 'CLEAR_CHOICES':
-	      {
-	        return state.groups = [];
-	      }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	    default:
-	      {
-	        return state;
-	      }
-	  }
-	};
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-	exports.default = groups;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var WrappedSelect =
+/*#__PURE__*/
+function (_WrappedElement) {
+  _inherits(WrappedSelect, _WrappedElement);
+
+  function WrappedSelect(_ref) {
+    var element = _ref.element,
+        classNames = _ref.classNames;
+
+    _classCallCheck(this, WrappedSelect);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(WrappedSelect).call(this, {
+      element: element,
+      classNames: classNames
+    }));
+  }
+
+  _createClass(WrappedSelect, [{
+    key: "appendDocFragment",
+    value: function appendDocFragment(fragment) {
+      this.element.innerHTML = '';
+      this.element.appendChild(fragment);
+    }
+  }, {
+    key: "placeholderOption",
+    get: function get() {
+      return this.element.querySelector('option[placeholder]');
+    }
+  }, {
+    key: "optionGroups",
+    get: function get() {
+      return Array.from(this.element.getElementsByTagName('OPTGROUP'));
+    }
+  }, {
+    key: "options",
+    get: function get() {
+      return Array.from(this.element.options);
+    },
+    set: function set(options) {
+      var fragment = document.createDocumentFragment();
+
+      var addOptionToFragment = function addOptionToFragment(data) {
+        // Create a standard select option
+        var template = _templates.default.option(data); // Append it to fragment
+
+
+        fragment.appendChild(template);
+      }; // Add each list item to list
+
+
+      options.forEach(function (optionData) {
+        return addOptionToFragment(optionData);
+      });
+      this.appendDocFragment(fragment);
+    }
+  }]);
+
+  return WrappedSelect;
+}(_wrappedElement.default);
+
+exports.default = WrappedSelect;
 
 /***/ }),
 /* 29 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+  Copyright (c) 2017 Jed Watson.
+  Licensed under the MIT License (MIT), see
+  http://jedwatson.github.io/classnames
+*/
+/* global define */
+
+(function () {
 	'use strict';
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
+	var hasOwn = {}.hasOwnProperty;
 
-	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+	function classNames () {
+		var classes = [];
 
-	var choices = function choices() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-	  var action = arguments[1];
+		for (var i = 0; i < arguments.length; i++) {
+			var arg = arguments[i];
+			if (!arg) continue;
 
-	  switch (action.type) {
-	    case 'ADD_CHOICE':
-	      {
-	        /*
-	            A disabled choice appears in the choice dropdown but cannot be selected
-	            A selected choice has been added to the passed input's value (added as an item)
-	            An active choice appears within the choice dropdown
-	         */
-	        return [].concat(_toConsumableArray(state), [{
-	          id: action.id,
-	          elementId: action.elementId,
-	          groupId: action.groupId,
-	          value: action.value,
-	          label: action.label || action.value,
-	          disabled: action.disabled || false,
-	          selected: false,
-	          active: true,
-	          score: 9999,
-	          customProperties: action.customProperties,
-	          placeholder: action.placeholder || false,
-	          keyCode: null
-	        }]);
-	      }
+			var argType = typeof arg;
 
-	    case 'ADD_ITEM':
-	      {
-	        var newState = state;
+			if (argType === 'string' || argType === 'number') {
+				classes.push(arg);
+			} else if (Array.isArray(arg) && arg.length) {
+				var inner = classNames.apply(null, arg);
+				if (inner) {
+					classes.push(inner);
+				}
+			} else if (argType === 'object') {
+				for (var key in arg) {
+					if (hasOwn.call(arg, key) && arg[key]) {
+						classes.push(key);
+					}
+				}
+			}
+		}
 
-	        // If all choices need to be activated
-	        if (action.activateOptions) {
-	          newState = state.map(function (choice) {
-	            choice.active = action.active;
-	            return choice;
-	          });
-	        }
-	        // When an item is added and it has an associated choice,
-	        // we want to disable it so it can't be chosen again
-	        if (action.choiceId > -1) {
-	          newState = state.map(function (choice) {
-	            if (choice.id === parseInt(action.choiceId, 10)) {
-	              choice.selected = true;
-	            }
-	            return choice;
-	          });
-	        }
+		return classes.join(' ');
+	}
 
-	        return newState;
-	      }
+	if (  true && module.exports) {
+		classNames.default = classNames;
+		module.exports = classNames;
+	} else if (true) {
+		// register as 'classnames', consistent with npm package name
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+			return classNames;
+		}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else {}
+}());
 
-	    case 'REMOVE_ITEM':
-	      {
-	        // When an item is removed and it has an associated choice,
-	        // we want to re-enable it so it can be chosen again
-	        if (action.choiceId > -1) {
-	          return state.map(function (choice) {
-	            if (choice.id === parseInt(action.choiceId, 10)) {
-	              choice.selected = false;
-	            }
-	            return choice;
-	          });
-	        }
-
-	        return state;
-	      }
-
-	    case 'FILTER_CHOICES':
-	      {
-	        var filteredResults = action.results;
-	        var filteredState = state.map(function (choice) {
-	          // Set active state based on whether choice is
-	          // within filtered results
-
-	          choice.active = filteredResults.some(function (result) {
-	            if (result.item.id === choice.id) {
-	              choice.score = result.score;
-	              return true;
-	            }
-	            return false;
-	          });
-
-	          return choice;
-	        });
-
-	        return filteredState;
-	      }
-
-	    case 'ACTIVATE_CHOICES':
-	      {
-	        return state.map(function (choice) {
-	          choice.active = action.active;
-	          return choice;
-	        });
-	      }
-
-	    case 'CLEAR_CHOICES':
-	      {
-	        return state.choices = [];
-	      }
-
-	    default:
-	      {
-	        return state;
-	      }
-	  }
-	};
-
-	exports.default = choices;
 
 /***/ }),
 /* 30 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var general = function general() {
-	  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { loading: false };
-	  var action = arguments[1];
 
-	  switch (action.type) {
-	    case 'LOADING':
-	      {
-	        return {
-	          loading: action.isLoading
-	        };
-	      }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.clearChoices = exports.activateChoices = exports.filterChoices = exports.addChoice = void 0;
 
-	    default:
-	      {
-	        return state;
-	      }
-	  }
-	};
+var _constants = __webpack_require__(1);
 
-	exports.default = general;
+var addChoice = function addChoice(_ref) {
+  var value = _ref.value,
+      label = _ref.label,
+      id = _ref.id,
+      groupId = _ref.groupId,
+      disabled = _ref.disabled,
+      elementId = _ref.elementId,
+      customProperties = _ref.customProperties,
+      placeholder = _ref.placeholder,
+      keyCode = _ref.keyCode;
+  return {
+    type: _constants.ACTION_TYPES.ADD_CHOICE,
+    value: value,
+    label: label,
+    id: id,
+    groupId: groupId,
+    disabled: disabled,
+    elementId: elementId,
+    customProperties: customProperties,
+    placeholder: placeholder,
+    keyCode: keyCode
+  };
+};
+
+exports.addChoice = addChoice;
+
+var filterChoices = function filterChoices(results) {
+  return {
+    type: _constants.ACTION_TYPES.FILTER_CHOICES,
+    results: results
+  };
+};
+
+exports.filterChoices = filterChoices;
+
+var activateChoices = function activateChoices() {
+  var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+  return {
+    type: _constants.ACTION_TYPES.ACTIVATE_CHOICES,
+    active: active
+  };
+};
+
+exports.activateChoices = activateChoices;
+
+var clearChoices = function clearChoices() {
+  return {
+    type: _constants.ACTION_TYPES.CLEAR_CHOICES
+  };
+};
+
+exports.clearChoices = clearChoices;
 
 /***/ }),
 /* 31 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) {
-	  return {
-	    type: 'ADD_ITEM',
-	    value: value,
-	    label: label,
-	    id: id,
-	    choiceId: choiceId,
-	    groupId: groupId,
-	    customProperties: customProperties,
-	    placeholder: placeholder,
-	    keyCode: keyCode
-	  };
-	};
 
-	var removeItem = exports.removeItem = function removeItem(id, choiceId) {
-	  return {
-	    type: 'REMOVE_ITEM',
-	    id: id,
-	    choiceId: choiceId
-	  };
-	};
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.highlightItem = exports.removeItem = exports.addItem = void 0;
 
-	var highlightItem = exports.highlightItem = function highlightItem(id, highlighted) {
-	  return {
-	    type: 'HIGHLIGHT_ITEM',
-	    id: id,
-	    highlighted: highlighted
-	  };
-	};
+var _constants = __webpack_require__(1);
 
-	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) {
-	  return {
-	    type: 'ADD_CHOICE',
-	    value: value,
-	    label: label,
-	    id: id,
-	    groupId: groupId,
-	    disabled: disabled,
-	    elementId: elementId,
-	    customProperties: customProperties,
-	    placeholder: placeholder,
-	    keyCode: keyCode
-	  };
-	};
+var addItem = function addItem(_ref) {
+  var value = _ref.value,
+      label = _ref.label,
+      id = _ref.id,
+      choiceId = _ref.choiceId,
+      groupId = _ref.groupId,
+      customProperties = _ref.customProperties,
+      placeholder = _ref.placeholder,
+      keyCode = _ref.keyCode;
+  return {
+    type: _constants.ACTION_TYPES.ADD_ITEM,
+    value: value,
+    label: label,
+    id: id,
+    choiceId: choiceId,
+    groupId: groupId,
+    customProperties: customProperties,
+    placeholder: placeholder,
+    keyCode: keyCode
+  };
+};
 
-	var filterChoices = exports.filterChoices = function filterChoices(results) {
-	  return {
-	    type: 'FILTER_CHOICES',
-	    results: results
-	  };
-	};
+exports.addItem = addItem;
 
-	var activateChoices = exports.activateChoices = function activateChoices() {
-	  var active = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+var removeItem = function removeItem(id, choiceId) {
+  return {
+    type: _constants.ACTION_TYPES.REMOVE_ITEM,
+    id: id,
+    choiceId: choiceId
+  };
+};
 
-	  return {
-	    type: 'ACTIVATE_CHOICES',
-	    active: active
-	  };
-	};
+exports.removeItem = removeItem;
 
-	var clearChoices = exports.clearChoices = function clearChoices() {
-	  return {
-	    type: 'CLEAR_CHOICES'
-	  };
-	};
+var highlightItem = function highlightItem(id, highlighted) {
+  return {
+    type: _constants.ACTION_TYPES.HIGHLIGHT_ITEM,
+    id: id,
+    highlighted: highlighted
+  };
+};
 
-	var addGroup = exports.addGroup = function addGroup(value, id, active, disabled) {
-	  return {
-	    type: 'ADD_GROUP',
-	    value: value,
-	    id: id,
-	    active: active,
-	    disabled: disabled
-	  };
-	};
-
-	var clearAll = exports.clearAll = function clearAll() {
-	  return {
-	    type: 'CLEAR_ALL'
-	  };
-	};
-
-	var setIsLoading = exports.setIsLoading = function setIsLoading(isLoading) {
-	  return {
-	    type: 'LOADING',
-	    isLoading: isLoading
-	  };
-		};
+exports.highlightItem = highlightItem;
 
 /***/ }),
 /* 32 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addGroup = void 0;
 
-	/* eslint-disable */
-	/**
-	 * Capitalises the first letter of each word in a string
-	 * @param  {String} str String to capitalise
-	 * @return {String}     Capitalised string
-	 */
-	var capitalise = exports.capitalise = function capitalise(str) {
-	  return str.replace(/\w\S*/g, function (txt) {
-	    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-	  });
-	};
+var _constants = __webpack_require__(1);
 
-	/**
-	 * Generates a string of random chars
-	 * @param  {Number} length Length of the string to generate
-	 * @return {String} String of random chars
-	 */
-	var generateChars = exports.generateChars = function generateChars(length) {
-	  var chars = '';
+/* eslint-disable import/prefer-default-export */
+var addGroup = function addGroup(value, id, active, disabled) {
+  return {
+    type: _constants.ACTION_TYPES.ADD_GROUP,
+    value: value,
+    id: id,
+    active: active,
+    disabled: disabled
+  };
+};
 
-	  for (var i = 0; i < length; i++) {
-	    var randomChar = getRandomNumber(0, 36);
-	    chars += randomChar.toString(36);
-	  }
-
-	  return chars;
-	};
-
-	/**
-	 * Generates a unique id based on an element
-	 * @param  {HTMLElement} element Element to generate the id from
-	 * @param  {String} Prefix for the Id
-	 * @return {String} Unique Id
-	 */
-	var generateId = exports.generateId = function generateId(element, prefix) {
-	  var id = element.id || element.name && element.name + '-' + generateChars(2) || generateChars(4);
-	  id = id.replace(/(:|\.|\[|\]|,)/g, '');
-	  id = prefix + id;
-
-	  return id;
-	};
-
-	/**
-	 * Tests the type of an object
-	 * @param  {String}  type Type to test object against
-	 * @param  {Object}  obj  Object to be tested
-	 * @return {Boolean}
-	 */
-	var getType = exports.getType = function getType(obj) {
-	  return Object.prototype.toString.call(obj).slice(8, -1);
-	};
-
-	/**
-	 * Tests the type of an object
-	 * @param  {String}  type Type to test object against
-	 * @param  {Object}  obj  Object to be tested
-	 * @return {Boolean}
-	 */
-	var isType = exports.isType = function isType(type, obj) {
-	  var clas = getType(obj);
-	  return obj !== undefined && obj !== null && clas === type;
-	};
-
-	/**
-	 * Tests to see if a passed object is a node
-	 * @param  {Object}  obj  Object to be tested
-	 * @return {Boolean}
-	 */
-	var isNode = exports.isNode = function isNode(o) {
-	  return (typeof Node === 'undefined' ? 'undefined' : _typeof(Node)) === "object" ? o instanceof Node : o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === "object" && typeof o.nodeType === "number" && typeof o.nodeName === "string";
-	};
-
-	/**
-	 * Tests to see if a passed object is an element
-	 * @param  {Object}  obj  Object to be tested
-	 * @return {Boolean}
-	 */
-	var isElement = exports.isElement = function isElement(o) {
-	  return (typeof HTMLElement === 'undefined' ? 'undefined' : _typeof(HTMLElement)) === "object" ? o instanceof HTMLElement : //DOM2
-	  o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName === "string";
-	};
-
-	/**
-	 * Merges unspecified amount of objects into new object
-	 * @private
-	 * @return {Object} Merged object of arguments
-	 */
-	var extend = exports.extend = function extend() {
-	  var extended = {};
-	  var length = arguments.length;
-
-	  /**
-	   * Merge one object into another
-	   * @param  {Object} obj  Object to merge into extended object
-	   */
-	  var merge = function merge(obj) {
-	    for (var prop in obj) {
-	      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
-	        // If deep merge and property is an object, merge properties
-	        if (isType('Object', obj[prop])) {
-	          extended[prop] = extend(true, extended[prop], obj[prop]);
-	        } else {
-	          extended[prop] = obj[prop];
-	        }
-	      }
-	    }
-	  };
-
-	  // Loop through each passed argument
-	  for (var i = 0; i < length; i++) {
-	    // store argument at position i
-	    var obj = arguments[i];
-
-	    // If we are in fact dealing with an object, merge it.
-	    if (isType('Object', obj)) {
-	      merge(obj);
-	    }
-	  }
-
-	  return extended;
-	};
-
-	/**
-	 * CSS transition end event listener
-	 * @return
-	 */
-	var whichTransitionEvent = exports.whichTransitionEvent = function whichTransitionEvent() {
-	  var t,
-	      el = document.createElement('fakeelement');
-
-	  var transitions = {
-	    'transition': 'transitionend',
-	    'OTransition': 'oTransitionEnd',
-	    'MozTransition': 'transitionend',
-	    'WebkitTransition': 'webkitTransitionEnd'
-	  };
-
-	  for (t in transitions) {
-	    if (el.style[t] !== undefined) {
-	      return transitions[t];
-	    }
-	  }
-	};
-
-	/**
-	 * CSS animation end event listener
-	 * @return
-	 */
-	var whichAnimationEvent = exports.whichAnimationEvent = function whichAnimationEvent() {
-	  var t,
-	      el = document.createElement('fakeelement');
-
-	  var animations = {
-	    'animation': 'animationend',
-	    'OAnimation': 'oAnimationEnd',
-	    'MozAnimation': 'animationend',
-	    'WebkitAnimation': 'webkitAnimationEnd'
-	  };
-
-	  for (t in animations) {
-	    if (el.style[t] !== undefined) {
-	      return animations[t];
-	    }
-	  }
-	};
-
-	/**
-	 *  Get the ancestors of each element in the current set of matched elements,
-	 *  up to but not including the element matched by the selector
-	 * @param  {NodeElement} elem     Element to begin search from
-	 * @param  {NodeElement} parent   Parent to find
-	 * @param  {String} selector Class to find
-	 * @return {Array}          Array of parent elements
-	 */
-	var getParentsUntil = exports.getParentsUntil = function getParentsUntil(elem, parent, selector) {
-	  var parents = [];
-	  // Get matches
-	  for (; elem && elem !== document; elem = elem.parentNode) {
-
-	    // Check if parent has been reached
-	    if (parent) {
-
-	      var parentType = parent.charAt(0);
-
-	      // If parent is a class
-	      if (parentType === '.') {
-	        if (elem.classList.contains(parent.substr(1))) {
-	          break;
-	        }
-	      }
-
-	      // If parent is an ID
-	      if (parentType === '#') {
-	        if (elem.id === parent.substr(1)) {
-	          break;
-	        }
-	      }
-
-	      // If parent is a data attribute
-	      if (parentType === '[') {
-	        if (elem.hasAttribute(parent.substr(1, parent.length - 1))) {
-	          break;
-	        }
-	      }
-
-	      // If parent is a tag
-	      if (elem.tagName.toLowerCase() === parent) {
-	        break;
-	      }
-	    }
-	    if (selector) {
-	      var selectorType = selector.charAt(0);
-
-	      // If selector is a class
-	      if (selectorType === '.') {
-	        if (elem.classList.contains(selector.substr(1))) {
-	          parents.push(elem);
-	        }
-	      }
-
-	      // If selector is an ID
-	      if (selectorType === '#') {
-	        if (elem.id === selector.substr(1)) {
-	          parents.push(elem);
-	        }
-	      }
-
-	      // If selector is a data attribute
-	      if (selectorType === '[') {
-	        if (elem.hasAttribute(selector.substr(1, selector.length - 1))) {
-	          parents.push(elem);
-	        }
-	      }
-
-	      // If selector is a tag
-	      if (elem.tagName.toLowerCase() === selector) {
-	        parents.push(elem);
-	      }
-	    } else {
-	      parents.push(elem);
-	    }
-	  }
-
-	  // Return parents if any exist
-	  if (parents.length === 0) {
-	    return null;
-	  } else {
-	    return parents;
-	  }
-	};
-
-	var wrap = exports.wrap = function wrap(element, wrapper) {
-	  wrapper = wrapper || document.createElement('div');
-	  if (element.nextSibling) {
-	    element.parentNode.insertBefore(wrapper, element.nextSibling);
-	  } else {
-	    element.parentNode.appendChild(wrapper);
-	  }
-	  return wrapper.appendChild(element);
-	};
-
-	var getSiblings = exports.getSiblings = function getSiblings(elem) {
-	  var siblings = [];
-	  var sibling = elem.parentNode.firstChild;
-	  for (; sibling; sibling = sibling.nextSibling) {
-	    if (sibling.nodeType === 1 && sibling !== elem) {
-	      siblings.push(sibling);
-	    }
-	  }
-	  return siblings;
-	};
-
-	/**
-	 * Find ancestor in DOM tree
-	 * @param  {NodeElement} el  Element to start search from
-	 * @param  {[type]} cls Class of parent
-	 * @return {NodeElement}     Found parent element
-	 */
-	var findAncestor = exports.findAncestor = function findAncestor(el, cls) {
-	  while ((el = el.parentElement) && !el.classList.contains(cls)) {}
-	  return el;
-	};
-
-	/**
-	 * Find ancestor in DOM tree by attribute name
-	 * @param  {NodeElement} el  Element to start search from
-	 * @param  {string} attr Attribute name of parent
-	 * @return {?NodeElement}     Found parent element or null
-	 */
-	var findAncestorByAttrName = exports.findAncestorByAttrName = function findAncestorByAttrName(el, attr) {
-	  var target = el;
-
-	  while (target) {
-	    if (target.hasAttribute(attr)) {
-	      return target;
-	    }
-
-	    target = target.parentElement;
-	  }
-
-	  return null;
-	};
-
-	/**
-	 * Debounce an event handler.
-	 * @param  {Function} func      Function to run after wait
-	 * @param  {Number} wait      The delay before the function is executed
-	 * @param  {Boolean} immediate  If  passed, trigger the function on the leading edge, instead of the trailing.
-	 * @return {Function}           A function will be called after it stops being called for a given delay
-	 */
-	var debounce = exports.debounce = function debounce(func, wait, immediate) {
-	  var timeout;
-	  return function () {
-	    var context = this,
-	        args = arguments;
-	    var later = function later() {
-	      timeout = null;
-	      if (!immediate) func.apply(context, args);
-	    };
-	    var callNow = immediate && !timeout;
-	    clearTimeout(timeout);
-	    timeout = setTimeout(later, wait);
-	    if (callNow) func.apply(context, args);
-	  };
-	};
-
-	/**
-	 * Get an element's distance from the top of the page
-	 * @private
-	 * @param  {NodeElement} el Element to test for
-	 * @return {Number} Elements Distance from top of page
-	 */
-	var getElemDistance = exports.getElemDistance = function getElemDistance(el) {
-	  var location = 0;
-	  if (el.offsetParent) {
-	    do {
-	      location += el.offsetTop;
-	      el = el.offsetParent;
-	    } while (el);
-	  }
-	  return location >= 0 ? location : 0;
-	};
-
-	/**
-	 * Determine element height multiplied by any offsets
-	 * @private
-	 * @param  {HTMLElement} el Element to test for
-	 * @return {Number}    Height of element
-	 */
-	var getElementOffset = exports.getElementOffset = function getElementOffset(el, offset) {
-	  var elOffset = offset;
-	  if (elOffset > 1) elOffset = 1;
-	  if (elOffset > 0) elOffset = 0;
-
-	  return Math.max(el.offsetHeight * elOffset);
-	};
-
-	/**
-	 * Get the next or previous element from a given start point
-	 * @param  {HTMLElement} startEl    Element to start position from
-	 * @param  {String}      className  The class we will look through
-	 * @param  {Number}      direction  Positive next element, negative previous element
-	 * @return {[HTMLElement}           Found element
-	 */
-	var getAdjacentEl = exports.getAdjacentEl = function getAdjacentEl(startEl, className) {
-	  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-
-	  if (!startEl || !className) return;
-
-	  var parent = startEl.parentNode.parentNode;
-	  var children = Array.from(parent.querySelectorAll(className));
-
-	  var startPos = children.indexOf(startEl);
-	  var operatorDirection = direction > 0 ? 1 : -1;
-
-	  return children[startPos + operatorDirection];
-	};
-
-	/**
-	 * Get scroll position based on top/bottom position
-	 * @private
-	 * @return {String} Position of scroll
-	 */
-	var getScrollPosition = exports.getScrollPosition = function getScrollPosition(position) {
-	  if (position === 'bottom') {
-	    // Scroll position from the bottom of the viewport
-	    return Math.max((window.scrollY || window.pageYOffset) + (window.innerHeight || document.documentElement.clientHeight));
-	  } else {
-	    // Scroll position from the top of the viewport
-	    return window.scrollY || window.pageYOffset;
-	  }
-	};
-
-	/**
-	 * Determine whether an element is within the viewport
-	 * @param  {HTMLElement}  el Element to test
-	 * @return {String} Position of scroll
-	 * @return {Boolean}
-	 */
-	var isInView = exports.isInView = function isInView(el, position, offset) {
-	  // If the user has scrolled further than the distance from the element to the top of its parent
-	  return this.getScrollPosition(position) > this.getElemDistance(el) + this.getElementOffset(el, offset) ? true : false;
-	};
-
-	/**
-	 * Determine whether an element is within
-	 * @param  {HTMLElement} el        Element to test
-	 * @param  {HTMLElement} parent    Scrolling parent
-	 * @param  {Number} direction      Whether element is visible from above or below
-	 * @return {Boolean}
-	 */
-	var isScrolledIntoView = exports.isScrolledIntoView = function isScrolledIntoView(el, parent) {
-	  var direction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-
-	  if (!el) return;
-
-	  var isVisible = void 0;
-
-	  if (direction > 0) {
-	    // In view from bottom
-	    isVisible = parent.scrollTop + parent.offsetHeight >= el.offsetTop + el.offsetHeight;
-	  } else {
-	    // In view from top
-	    isVisible = el.offsetTop >= parent.scrollTop;
-	  }
-
-	  return isVisible;
-	};
-
-	/**
-	 * Escape html in a string
-	 * @param  {String} html  Initial string/html
-	 * @return {String}  Sanitised string
-	 */
-	var stripHTML = exports.stripHTML = function stripHTML(html) {
-	  return html.replace(/&/g, '&amp;').replace(/>/g, '&rt;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
-	};
-
-	/**
-	 * Adds animation to an element and removes it upon animation completion
-	 * @param  {Element} el        Element to add animation to
-	 * @param  {String} animation Animation class to add to element
-	 * @return
-	 */
-	var addAnimation = exports.addAnimation = function addAnimation(el, animation) {
-	  var animationEvent = whichAnimationEvent();
-
-	  var removeAnimation = function removeAnimation() {
-	    el.classList.remove(animation);
-	    el.removeEventListener(animationEvent, removeAnimation, false);
-	  };
-
-	  el.classList.add(animation);
-	  el.addEventListener(animationEvent, removeAnimation, false);
-	};
-
-	/**
-	 * Get a random number between a range
-	 * @param  {Number} min Minimum range
-	 * @param  {Number} max Maximum range
-	 * @return {Number}     Random number
-	 */
-	var getRandomNumber = exports.getRandomNumber = function getRandomNumber(min, max) {
-	  return Math.floor(Math.random() * (max - min) + min);
-	};
-
-	/**
-	 * Turn a string into a node
-	 * @param  {String} String to convert
-	 * @return {HTMLElement}   Converted node element
-	 */
-	var strToEl = exports.strToEl = function () {
-	  var tmpEl = document.createElement('div');
-	  return function (str) {
-	    var cleanedInput = str.trim();
-	    var r = void 0;
-	    tmpEl.innerHTML = cleanedInput;
-	    r = tmpEl.children[0];
-
-	    while (tmpEl.firstChild) {
-	      tmpEl.removeChild(tmpEl.firstChild);
-	    }
-
-	    return r;
-	  };
-	}();
-
-	/**
-	 * Sets the width of a passed input based on its value
-	 * @return {Number} Width of input
-	 */
-	var getWidthOfInput = exports.getWidthOfInput = function getWidthOfInput(input) {
-	  var value = input.value || input.placeholder;
-	  var width = input.offsetWidth;
-
-	  if (value) {
-	    var testEl = strToEl('<span>' + stripHTML(value) + '</span>');
-	    testEl.style.position = 'absolute';
-	    testEl.style.padding = '0';
-	    testEl.style.top = '-9999px';
-	    testEl.style.left = '-9999px';
-	    testEl.style.width = 'auto';
-	    testEl.style.whiteSpace = 'pre';
-
-	    if (document.body.contains(input) && window.getComputedStyle) {
-	      var inputStyle = window.getComputedStyle(input);
-
-	      if (inputStyle) {
-	        testEl.style.fontSize = inputStyle.fontSize;
-	        testEl.style.fontFamily = inputStyle.fontFamily;
-	        testEl.style.fontWeight = inputStyle.fontWeight;
-	        testEl.style.fontStyle = inputStyle.fontStyle;
-	        testEl.style.letterSpacing = inputStyle.letterSpacing;
-	        testEl.style.textTransform = inputStyle.textTransform;
-	        testEl.style.padding = inputStyle.padding;
-	      }
-	    }
-
-	    document.body.appendChild(testEl);
-
-	    if (value && testEl.offsetWidth !== input.offsetWidth) {
-	      width = testEl.offsetWidth + 4;
-	    }
-
-	    document.body.removeChild(testEl);
-	  }
-
-	  return width + 'px';
-	};
-
-	/**
-	 * Sorting function for current and previous string
-	 * @param  {String} a Current value
-	 * @param  {String} b Next value
-	 * @return {Number}   -1 for after previous,
-	 *                    1 for before,
-	 *                    0 for same location
-	 */
-	var sortByAlpha = exports.sortByAlpha = function sortByAlpha(a, b) {
-	  var labelA = (a.label || a.value).toLowerCase();
-	  var labelB = (b.label || b.value).toLowerCase();
-
-	  if (labelA < labelB) return -1;
-	  if (labelA > labelB) return 1;
-	  return 0;
-	};
-
-	/**
-	 * Sort by numeric score
-	 * @param  {Object} a Current value
-	 * @param  {Object} b Next value
-	 * @return {Number}   -1 for after previous,
-	 *                    1 for before,
-	 *                    0 for same location
-	 */
-	var sortByScore = exports.sortByScore = function sortByScore(a, b) {
-	  return a.score - b.score;
-	};
-
-	/**
-	 * Trigger native event
-	 * @param  {NodeElement} element Element to trigger event on
-	 * @param  {String} type         Type of event to trigger
-	 * @param  {Object} customArgs   Data to pass with event
-	 * @return {Object}              Triggered event
-	 */
-	var triggerEvent = exports.triggerEvent = function triggerEvent(element, type) {
-	  var customArgs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
-	  var event = new CustomEvent(type, {
-	    detail: customArgs,
-	    bubbles: true,
-	    cancelable: true
-	  });
-
-	  return element.dispatchEvent(event);
-	};
+exports.addGroup = addGroup;
 
 /***/ }),
 /* 33 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-	'use strict';
+"use strict";
 
-	/* eslint-disable */
-	(function () {
-	  // Production steps of ECMA-262, Edition 6, 22.1.2.1
-	  // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
-	  if (!Array.from) {
-	    Array.from = function () {
-	      var toStr = Object.prototype.toString;
 
-	      var isCallable = function isCallable(fn) {
-	        return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
-	      };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.resetTo = exports.clearAll = void 0;
 
-	      var toInteger = function toInteger(value) {
-	        var number = Number(value);
-	        if (isNaN(number)) {
-	          return 0;
-	        }
-	        if (number === 0 || !isFinite(number)) {
-	          return number;
-	        }
-	        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
-	      };
+var clearAll = function clearAll() {
+  return {
+    type: 'CLEAR_ALL'
+  };
+};
 
-	      var maxSafeInteger = Math.pow(2, 53) - 1;
+exports.clearAll = clearAll;
 
-	      var toLength = function toLength(value) {
-	        var len = toInteger(value);
-	        return Math.min(Math.max(len, 0), maxSafeInteger);
-	      };
+var resetTo = function resetTo(state) {
+  return {
+    type: 'RESET_TO',
+    state: state
+  };
+};
 
-	      // The length property of the from method is 1.
-	      return function from(arrayLike /*, mapFn, thisArg */) {
-	        // 1. Let C be the this value.
-	        var C = this;
+exports.resetTo = resetTo;
 
-	        // 2. Let items be ToObject(arrayLike).
-	        var items = Object(arrayLike);
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
 
-	        // 3. ReturnIfAbrupt(items).
-	        if (arrayLike == null) {
-	          throw new TypeError("Array.from requires an array-like object - not null or undefined");
-	        }
+"use strict";
 
-	        // 4. If mapfn is undefined, then let mapping be false.
-	        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
-	        var T;
-	        if (typeof mapFn !== 'undefined') {
-	          // 5. else
-	          // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
-	          if (!isCallable(mapFn)) {
-	            throw new TypeError('Array.from: when provided, the second argument must be a function');
-	          }
 
-	          // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
-	          if (arguments.length > 2) {
-	            T = arguments[2];
-	          }
-	        }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setIsLoading = void 0;
 
-	        // 10. Let lenValue be Get(items, "length").
-	        // 11. Let len be ToLength(lenValue).
-	        var len = toLength(items.length);
+/* eslint-disable import/prefer-default-export */
+var setIsLoading = function setIsLoading(isLoading) {
+  return {
+    type: 'SET_IS_LOADING',
+    isLoading: isLoading
+  };
+};
 
-	        // 13. If IsConstructor(C) is true, then
-	        // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
-	        // 14. a. Else, Let A be ArrayCreate(len).
-	        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
-
-	        // 16. Let k be 0.
-	        var k = 0;
-	        // 17. Repeat, while k < len… (also steps a - h)
-	        var kValue;
-	        while (k < len) {
-	          kValue = items[k];
-	          if (mapFn) {
-	            A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
-	          } else {
-	            A[k] = kValue;
-	          }
-	          k += 1;
-	        }
-	        // 18. Let putStatus be Put(A, "length", len, true).
-	        A.length = len;
-	        // 20. Return A.
-	        return A;
-	      };
-	    }();
-	  }
-
-	  // Reference: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-	  if (!Array.prototype.find) {
-	    Array.prototype.find = function (predicate) {
-	      'use strict';
-
-	      if (this == null) {
-	        throw new TypeError('Array.prototype.find called on null or undefined');
-	      }
-	      if (typeof predicate !== 'function') {
-	        throw new TypeError('predicate must be a function');
-	      }
-	      var list = Object(this);
-	      var length = list.length >>> 0;
-	      var thisArg = arguments[1];
-	      var value;
-
-	      for (var i = 0; i < length; i++) {
-	        value = list[i];
-	        if (predicate.call(thisArg, value, i, list)) {
-	          return value;
-	        }
-	      }
-	      return undefined;
-	    };
-	  }
-
-	  function CustomEvent(event, params) {
-	    params = params || {
-	      bubbles: false,
-	      cancelable: false,
-	      detail: undefined
-	    };
-	    var evt = document.createEvent('CustomEvent');
-	    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-	    return evt;
-	  }
-
-	  CustomEvent.prototype = window.Event.prototype;
-
-	  window.CustomEvent = CustomEvent;
-	})();
+exports.setIsLoading = setIsLoading;
 
 /***/ })
-/******/ ])
+/******/ ]);
 });
-;
-//# sourceMappingURL=choices.js.map
 
 /***/ }),
 
@@ -15741,6 +16407,514 @@ exports.PatchError = PatchError;
 
 /***/ }),
 
+/***/ "./node_modules/fetch-ponyfill/build/fetch-browser.js":
+/*!************************************************************!*\
+  !*** ./node_modules/fetch-ponyfill/build/fetch-browser.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_RESULT__;(function (self) {
+  'use strict';
+
+  function fetchPonyfill(options) {
+    var Promise = options && options.Promise || self.Promise;
+    var XMLHttpRequest = options && options.XMLHttpRequest || self.XMLHttpRequest;
+    var global = self;
+
+    return (function () {
+      var self = Object.create(global, {
+        fetch: {
+          value: undefined,
+          writable: true
+        }
+      });
+
+      (function(self) {
+        'use strict';
+
+        if (self.fetch) {
+          return
+        }
+
+        var support = {
+          searchParams: 'URLSearchParams' in self,
+          iterable: 'Symbol' in self && 'iterator' in Symbol,
+          blob: 'FileReader' in self && 'Blob' in self && (function() {
+            try {
+              new Blob()
+              return true
+            } catch(e) {
+              return false
+            }
+          })(),
+          formData: 'FormData' in self,
+          arrayBuffer: 'ArrayBuffer' in self
+        }
+
+        if (support.arrayBuffer) {
+          var viewClasses = [
+            '[object Int8Array]',
+            '[object Uint8Array]',
+            '[object Uint8ClampedArray]',
+            '[object Int16Array]',
+            '[object Uint16Array]',
+            '[object Int32Array]',
+            '[object Uint32Array]',
+            '[object Float32Array]',
+            '[object Float64Array]'
+          ]
+
+          var isDataView = function(obj) {
+            return obj && DataView.prototype.isPrototypeOf(obj)
+          }
+
+          var isArrayBufferView = ArrayBuffer.isView || function(obj) {
+            return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+          }
+        }
+
+        function normalizeName(name) {
+          if (typeof name !== 'string') {
+            name = String(name)
+          }
+          if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+            throw new TypeError('Invalid character in header field name')
+          }
+          return name.toLowerCase()
+        }
+
+        function normalizeValue(value) {
+          if (typeof value !== 'string') {
+            value = String(value)
+          }
+          return value
+        }
+
+        // Build a destructive iterator for the value list
+        function iteratorFor(items) {
+          var iterator = {
+            next: function() {
+              var value = items.shift()
+              return {done: value === undefined, value: value}
+            }
+          }
+
+          if (support.iterable) {
+            iterator[Symbol.iterator] = function() {
+              return iterator
+            }
+          }
+
+          return iterator
+        }
+
+        function Headers(headers) {
+          this.map = {}
+
+          if (headers instanceof Headers) {
+            headers.forEach(function(value, name) {
+              this.append(name, value)
+            }, this)
+          } else if (Array.isArray(headers)) {
+            headers.forEach(function(header) {
+              this.append(header[0], header[1])
+            }, this)
+          } else if (headers) {
+            Object.getOwnPropertyNames(headers).forEach(function(name) {
+              this.append(name, headers[name])
+            }, this)
+          }
+        }
+
+        Headers.prototype.append = function(name, value) {
+          name = normalizeName(name)
+          value = normalizeValue(value)
+          var oldValue = this.map[name]
+          this.map[name] = oldValue ? oldValue+','+value : value
+        }
+
+        Headers.prototype['delete'] = function(name) {
+          delete this.map[normalizeName(name)]
+        }
+
+        Headers.prototype.get = function(name) {
+          name = normalizeName(name)
+          return this.has(name) ? this.map[name] : null
+        }
+
+        Headers.prototype.has = function(name) {
+          return this.map.hasOwnProperty(normalizeName(name))
+        }
+
+        Headers.prototype.set = function(name, value) {
+          this.map[normalizeName(name)] = normalizeValue(value)
+        }
+
+        Headers.prototype.forEach = function(callback, thisArg) {
+          for (var name in this.map) {
+            if (this.map.hasOwnProperty(name)) {
+              callback.call(thisArg, this.map[name], name, this)
+            }
+          }
+        }
+
+        Headers.prototype.keys = function() {
+          var items = []
+          this.forEach(function(value, name) { items.push(name) })
+          return iteratorFor(items)
+        }
+
+        Headers.prototype.values = function() {
+          var items = []
+          this.forEach(function(value) { items.push(value) })
+          return iteratorFor(items)
+        }
+
+        Headers.prototype.entries = function() {
+          var items = []
+          this.forEach(function(value, name) { items.push([name, value]) })
+          return iteratorFor(items)
+        }
+
+        if (support.iterable) {
+          Headers.prototype[Symbol.iterator] = Headers.prototype.entries
+        }
+
+        function consumed(body) {
+          if (body.bodyUsed) {
+            return Promise.reject(new TypeError('Already read'))
+          }
+          body.bodyUsed = true
+        }
+
+        function fileReaderReady(reader) {
+          return new Promise(function(resolve, reject) {
+            reader.onload = function() {
+              resolve(reader.result)
+            }
+            reader.onerror = function() {
+              reject(reader.error)
+            }
+          })
+        }
+
+        function readBlobAsArrayBuffer(blob) {
+          var reader = new FileReader()
+          var promise = fileReaderReady(reader)
+          reader.readAsArrayBuffer(blob)
+          return promise
+        }
+
+        function readBlobAsText(blob) {
+          var reader = new FileReader()
+          var promise = fileReaderReady(reader)
+          reader.readAsText(blob)
+          return promise
+        }
+
+        function readArrayBufferAsText(buf) {
+          var view = new Uint8Array(buf)
+          var chars = new Array(view.length)
+
+          for (var i = 0; i < view.length; i++) {
+            chars[i] = String.fromCharCode(view[i])
+          }
+          return chars.join('')
+        }
+
+        function bufferClone(buf) {
+          if (buf.slice) {
+            return buf.slice(0)
+          } else {
+            var view = new Uint8Array(buf.byteLength)
+            view.set(new Uint8Array(buf))
+            return view.buffer
+          }
+        }
+
+        function Body() {
+          this.bodyUsed = false
+
+          this._initBody = function(body) {
+            this._bodyInit = body
+            if (!body) {
+              this._bodyText = ''
+            } else if (typeof body === 'string') {
+              this._bodyText = body
+            } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+              this._bodyBlob = body
+            } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+              this._bodyFormData = body
+            } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+              this._bodyText = body.toString()
+            } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+              this._bodyArrayBuffer = bufferClone(body.buffer)
+              // IE 10-11 can't handle a DataView body.
+              this._bodyInit = new Blob([this._bodyArrayBuffer])
+            } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+              this._bodyArrayBuffer = bufferClone(body)
+            } else {
+              throw new Error('unsupported BodyInit type')
+            }
+
+            if (!this.headers.get('content-type')) {
+              if (typeof body === 'string') {
+                this.headers.set('content-type', 'text/plain;charset=UTF-8')
+              } else if (this._bodyBlob && this._bodyBlob.type) {
+                this.headers.set('content-type', this._bodyBlob.type)
+              } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+                this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
+              }
+            }
+          }
+
+          if (support.blob) {
+            this.blob = function() {
+              var rejected = consumed(this)
+              if (rejected) {
+                return rejected
+              }
+
+              if (this._bodyBlob) {
+                return Promise.resolve(this._bodyBlob)
+              } else if (this._bodyArrayBuffer) {
+                return Promise.resolve(new Blob([this._bodyArrayBuffer]))
+              } else if (this._bodyFormData) {
+                throw new Error('could not read FormData body as blob')
+              } else {
+                return Promise.resolve(new Blob([this._bodyText]))
+              }
+            }
+
+            this.arrayBuffer = function() {
+              if (this._bodyArrayBuffer) {
+                return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
+              } else {
+                return this.blob().then(readBlobAsArrayBuffer)
+              }
+            }
+          }
+
+          this.text = function() {
+            var rejected = consumed(this)
+            if (rejected) {
+              return rejected
+            }
+
+            if (this._bodyBlob) {
+              return readBlobAsText(this._bodyBlob)
+            } else if (this._bodyArrayBuffer) {
+              return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+            } else if (this._bodyFormData) {
+              throw new Error('could not read FormData body as text')
+            } else {
+              return Promise.resolve(this._bodyText)
+            }
+          }
+
+          if (support.formData) {
+            this.formData = function() {
+              return this.text().then(decode)
+            }
+          }
+
+          this.json = function() {
+            return this.text().then(JSON.parse)
+          }
+
+          return this
+        }
+
+        // HTTP methods whose capitalization should be normalized
+        var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
+
+        function normalizeMethod(method) {
+          var upcased = method.toUpperCase()
+          return (methods.indexOf(upcased) > -1) ? upcased : method
+        }
+
+        function Request(input, options) {
+          options = options || {}
+          var body = options.body
+
+          if (input instanceof Request) {
+            if (input.bodyUsed) {
+              throw new TypeError('Already read')
+            }
+            this.url = input.url
+            this.credentials = input.credentials
+            if (!options.headers) {
+              this.headers = new Headers(input.headers)
+            }
+            this.method = input.method
+            this.mode = input.mode
+            if (!body && input._bodyInit != null) {
+              body = input._bodyInit
+              input.bodyUsed = true
+            }
+          } else {
+            this.url = String(input)
+          }
+
+          this.credentials = options.credentials || this.credentials || 'omit'
+          if (options.headers || !this.headers) {
+            this.headers = new Headers(options.headers)
+          }
+          this.method = normalizeMethod(options.method || this.method || 'GET')
+          this.mode = options.mode || this.mode || null
+          this.referrer = null
+
+          if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+            throw new TypeError('Body not allowed for GET or HEAD requests')
+          }
+          this._initBody(body)
+        }
+
+        Request.prototype.clone = function() {
+          return new Request(this, { body: this._bodyInit })
+        }
+
+        function decode(body) {
+          var form = new FormData()
+          body.trim().split('&').forEach(function(bytes) {
+            if (bytes) {
+              var split = bytes.split('=')
+              var name = split.shift().replace(/\+/g, ' ')
+              var value = split.join('=').replace(/\+/g, ' ')
+              form.append(decodeURIComponent(name), decodeURIComponent(value))
+            }
+          })
+          return form
+        }
+
+        function parseHeaders(rawHeaders) {
+          var headers = new Headers()
+          rawHeaders.split(/\r?\n/).forEach(function(line) {
+            var parts = line.split(':')
+            var key = parts.shift().trim()
+            if (key) {
+              var value = parts.join(':').trim()
+              headers.append(key, value)
+            }
+          })
+          return headers
+        }
+
+        Body.call(Request.prototype)
+
+        function Response(bodyInit, options) {
+          if (!options) {
+            options = {}
+          }
+
+          this.type = 'default'
+          this.status = 'status' in options ? options.status : 200
+          this.ok = this.status >= 200 && this.status < 300
+          this.statusText = 'statusText' in options ? options.statusText : 'OK'
+          this.headers = new Headers(options.headers)
+          this.url = options.url || ''
+          this._initBody(bodyInit)
+        }
+
+        Body.call(Response.prototype)
+
+        Response.prototype.clone = function() {
+          return new Response(this._bodyInit, {
+            status: this.status,
+            statusText: this.statusText,
+            headers: new Headers(this.headers),
+            url: this.url
+          })
+        }
+
+        Response.error = function() {
+          var response = new Response(null, {status: 0, statusText: ''})
+          response.type = 'error'
+          return response
+        }
+
+        var redirectStatuses = [301, 302, 303, 307, 308]
+
+        Response.redirect = function(url, status) {
+          if (redirectStatuses.indexOf(status) === -1) {
+            throw new RangeError('Invalid status code')
+          }
+
+          return new Response(null, {status: status, headers: {location: url}})
+        }
+
+        self.Headers = Headers
+        self.Request = Request
+        self.Response = Response
+
+        self.fetch = function(input, init) {
+          return new Promise(function(resolve, reject) {
+            var request = new Request(input, init)
+            var xhr = new XMLHttpRequest()
+
+            xhr.onload = function() {
+              var options = {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                headers: parseHeaders(xhr.getAllResponseHeaders() || '')
+              }
+              options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
+              var body = 'response' in xhr ? xhr.response : xhr.responseText
+              resolve(new Response(body, options))
+            }
+
+            xhr.onerror = function() {
+              reject(new TypeError('Network request failed'))
+            }
+
+            xhr.ontimeout = function() {
+              reject(new TypeError('Network request failed'))
+            }
+
+            xhr.open(request.method, request.url, true)
+
+            if (request.credentials === 'include') {
+              xhr.withCredentials = true
+            }
+
+            if ('responseType' in xhr && support.blob) {
+              xhr.responseType = 'blob'
+            }
+
+            request.headers.forEach(function(value, name) {
+              xhr.setRequestHeader(name, value)
+            })
+
+            xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
+          })
+        }
+        self.fetch.polyfill = true
+      })(typeof self !== 'undefined' ? self : this);
+
+
+      return {
+        fetch: self.fetch,
+        Headers: self.Headers,
+        Request: self.Request,
+        Response: self.Response
+      };
+    }());
+  }
+
+  if (true) {
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+      return fetchPonyfill;
+    }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {}
+}(typeof self !== 'undefined' ? self : typeof global !== 'undefined' ? global : this));
+
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "./node_modules/flatpickr/dist/flatpickr.js":
 /*!**************************************************!*\
   !*** ./node_modules/flatpickr/dist/flatpickr.js ***!
@@ -15748,2179 +16922,2502 @@ exports.PatchError = PatchError;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.2, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.5, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
-}(this, (function () { 'use strict';
+}(this, function () { 'use strict';
 
-    var pad = function pad(number) {
-      return ("0" + number).slice(-2);
-    };
-    var int = function int(bool) {
-      return bool === true ? 1 : 0;
-    };
-    function debounce(func, wait, immediate) {
-      if (immediate === void 0) {
-        immediate = false;
-      }
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
 
-      var timeout;
-      return function () {
-        var context = this,
-            args = arguments;
-        timeout !== null && clearTimeout(timeout);
-        timeout = window.setTimeout(function () {
-          timeout = null;
-          if (!immediate) func.apply(context, args);
-        }, wait);
-        if (immediate && !timeout) func.apply(context, args);
-      };
-    }
-    var arrayify = function arrayify(obj) {
-      return obj instanceof Array ? obj : [obj];
-    };
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
 
-    var do_nothing = function do_nothing() {
-      return undefined;
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+
+    var __assign = function() {
+        __assign = Object.assign || function __assign(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign.apply(this, arguments);
     };
 
-    var monthToStr = function monthToStr(monthNumber, shorthand, locale) {
-      return locale.months[shorthand ? "shorthand" : "longhand"][monthNumber];
-    };
-    var revFormat = {
-      D: do_nothing,
-      F: function F(dateObj, monthName, locale) {
-        dateObj.setMonth(locale.months.longhand.indexOf(monthName));
-      },
-      G: function G(dateObj, hour) {
-        dateObj.setHours(parseFloat(hour));
-      },
-      H: function H(dateObj, hour) {
-        dateObj.setHours(parseFloat(hour));
-      },
-      J: function J(dateObj, day) {
-        dateObj.setDate(parseFloat(day));
-      },
-      K: function K(dateObj, amPM, locale) {
-        dateObj.setHours(dateObj.getHours() % 12 + 12 * int(new RegExp(locale.amPM[1], "i").test(amPM)));
-      },
-      M: function M(dateObj, shortMonth, locale) {
-        dateObj.setMonth(locale.months.shorthand.indexOf(shortMonth));
-      },
-      S: function S(dateObj, seconds) {
-        dateObj.setSeconds(parseFloat(seconds));
-      },
-      U: function U(_, unixSeconds) {
-        return new Date(parseFloat(unixSeconds) * 1000);
-      },
-      W: function W(dateObj, weekNum) {
-        var weekNumber = parseInt(weekNum);
-        return new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0);
-      },
-      Y: function Y(dateObj, year) {
-        dateObj.setFullYear(parseFloat(year));
-      },
-      Z: function Z(_, ISODate) {
-        return new Date(ISODate);
-      },
-      d: function d(dateObj, day) {
-        dateObj.setDate(parseFloat(day));
-      },
-      h: function h(dateObj, hour) {
-        dateObj.setHours(parseFloat(hour));
-      },
-      i: function i(dateObj, minutes) {
-        dateObj.setMinutes(parseFloat(minutes));
-      },
-      j: function j(dateObj, day) {
-        dateObj.setDate(parseFloat(day));
-      },
-      l: do_nothing,
-      m: function m(dateObj, month) {
-        dateObj.setMonth(parseFloat(month) - 1);
-      },
-      n: function n(dateObj, month) {
-        dateObj.setMonth(parseFloat(month) - 1);
-      },
-      s: function s(dateObj, seconds) {
-        dateObj.setSeconds(parseFloat(seconds));
-      },
-      w: do_nothing,
-      y: function y(dateObj, year) {
-        dateObj.setFullYear(2000 + parseFloat(year));
-      }
-    };
-    var tokenRegex = {
-      D: "(\\w+)",
-      F: "(\\w+)",
-      G: "(\\d\\d|\\d)",
-      H: "(\\d\\d|\\d)",
-      J: "(\\d\\d|\\d)\\w+",
-      K: "",
-      M: "(\\w+)",
-      S: "(\\d\\d|\\d)",
-      U: "(.+)",
-      W: "(\\d\\d|\\d)",
-      Y: "(\\d{4})",
-      Z: "(.+)",
-      d: "(\\d\\d|\\d)",
-      h: "(\\d\\d|\\d)",
-      i: "(\\d\\d|\\d)",
-      j: "(\\d\\d|\\d)",
-      l: "(\\w+)",
-      m: "(\\d\\d|\\d)",
-      n: "(\\d\\d|\\d)",
-      s: "(\\d\\d|\\d)",
-      w: "(\\d\\d|\\d)",
-      y: "(\\d{2})"
-    };
-    var formats = {
-      Z: function Z(date) {
-        return date.toISOString();
-      },
-      D: function D(date, locale, options) {
-        return locale.weekdays.shorthand[formats.w(date, locale, options)];
-      },
-      F: function F(date, locale, options) {
-        return monthToStr(formats.n(date, locale, options) - 1, false, locale);
-      },
-      G: function G(date, locale, options) {
-        return pad(formats.h(date, locale, options));
-      },
-      H: function H(date) {
-        return pad(date.getHours());
-      },
-      J: function J(date, locale) {
-        return locale.ordinal !== undefined ? date.getDate() + locale.ordinal(date.getDate()) : date.getDate();
-      },
-      K: function K(date, locale) {
-        return locale.amPM[int(date.getHours() > 11)];
-      },
-      M: function M(date, locale) {
-        return monthToStr(date.getMonth(), true, locale);
-      },
-      S: function S(date) {
-        return pad(date.getSeconds());
-      },
-      U: function U(date) {
-        return date.getTime() / 1000;
-      },
-      W: function W(date, _, options) {
-        return options.getWeek(date);
-      },
-      Y: function Y(date) {
-        return date.getFullYear();
-      },
-      d: function d(date) {
-        return pad(date.getDate());
-      },
-      h: function h(date) {
-        return date.getHours() % 12 ? date.getHours() % 12 : 12;
-      },
-      i: function i(date) {
-        return pad(date.getMinutes());
-      },
-      j: function j(date) {
-        return date.getDate();
-      },
-      l: function l(date, locale) {
-        return locale.weekdays.longhand[date.getDay()];
-      },
-      m: function m(date) {
-        return pad(date.getMonth() + 1);
-      },
-      n: function n(date) {
-        return date.getMonth() + 1;
-      },
-      s: function s(date) {
-        return date.getSeconds();
-      },
-      w: function w(date) {
-        return date.getDay();
-      },
-      y: function y(date) {
-        return String(date.getFullYear()).substring(2);
-      }
+    var HOOKS = [
+        "onChange",
+        "onClose",
+        "onDayCreate",
+        "onDestroy",
+        "onKeyDown",
+        "onMonthChange",
+        "onOpen",
+        "onParseConfig",
+        "onReady",
+        "onValueUpdate",
+        "onYearChange",
+        "onPreCalendarPosition",
+    ];
+    var defaults = {
+        _disable: [],
+        _enable: [],
+        allowInput: false,
+        altFormat: "F j, Y",
+        altInput: false,
+        altInputClass: "form-control input",
+        animate: typeof window === "object" &&
+            window.navigator.userAgent.indexOf("MSIE") === -1,
+        ariaDateFormat: "F j, Y",
+        clickOpens: true,
+        closeOnSelect: true,
+        conjunction: ", ",
+        dateFormat: "Y-m-d",
+        defaultHour: 12,
+        defaultMinute: 0,
+        defaultSeconds: 0,
+        disable: [],
+        disableMobile: false,
+        enable: [],
+        enableSeconds: false,
+        enableTime: false,
+        errorHandler: function (err) {
+            return typeof console !== "undefined" && console.warn(err);
+        },
+        getWeek: function (givenDate) {
+            var date = new Date(givenDate.getTime());
+            date.setHours(0, 0, 0, 0);
+            // Thursday in current week decides the year.
+            date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+            // January 4 is always in week 1.
+            var week1 = new Date(date.getFullYear(), 0, 4);
+            // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+            return (1 +
+                Math.round(((date.getTime() - week1.getTime()) / 86400000 -
+                    3 +
+                    ((week1.getDay() + 6) % 7)) /
+                    7));
+        },
+        hourIncrement: 1,
+        ignoredFocusElements: [],
+        inline: false,
+        locale: "default",
+        minuteIncrement: 5,
+        mode: "single",
+        nextArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z' /></svg>",
+        noCalendar: false,
+        now: new Date(),
+        onChange: [],
+        onClose: [],
+        onDayCreate: [],
+        onDestroy: [],
+        onKeyDown: [],
+        onMonthChange: [],
+        onOpen: [],
+        onParseConfig: [],
+        onReady: [],
+        onValueUpdate: [],
+        onYearChange: [],
+        onPreCalendarPosition: [],
+        plugins: [],
+        position: "auto",
+        positionElement: undefined,
+        prevArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z' /></svg>",
+        shorthandCurrentMonth: false,
+        showMonths: 1,
+        static: false,
+        time_24hr: false,
+        weekNumbers: false,
+        wrap: false
     };
 
     var english = {
-      weekdays: {
-        shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-      },
-      months: {
-        shorthand: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        longhand: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-      },
-      daysInMonth: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-      firstDayOfWeek: 0,
-      ordinal: function ordinal(nth) {
-        var s = nth % 100;
-        if (s > 3 && s < 21) return "th";
-
-        switch (s % 10) {
-          case 1:
-            return "st";
-
-          case 2:
-            return "nd";
-
-          case 3:
-            return "rd";
-
-          default:
-            return "th";
-        }
-      },
-      rangeSeparator: " to ",
-      weekAbbreviation: "Wk",
-      scrollTitle: "Scroll to increment",
-      toggleTitle: "Click to toggle",
-      amPM: ["AM", "PM"],
-      yearAriaLabel: "Year"
-    };
-
-    var createDateFormatter = function createDateFormatter(_ref) {
-      var _ref$config = _ref.config,
-          config = _ref$config === void 0 ? defaults : _ref$config,
-          _ref$l10n = _ref.l10n,
-          l10n = _ref$l10n === void 0 ? english : _ref$l10n;
-      return function (dateObj, frmt, overrideLocale) {
-        var locale = overrideLocale || l10n;
-
-        if (config.formatDate !== undefined) {
-          return config.formatDate(dateObj, frmt, locale);
-        }
-
-        return frmt.split("").map(function (c, i, arr) {
-          return formats[c] && arr[i - 1] !== "\\" ? formats[c](dateObj, locale, config) : c !== "\\" ? c : "";
-        }).join("");
-      };
-    };
-    var createDateParser = function createDateParser(_ref2) {
-      var _ref2$config = _ref2.config,
-          config = _ref2$config === void 0 ? defaults : _ref2$config,
-          _ref2$l10n = _ref2.l10n,
-          l10n = _ref2$l10n === void 0 ? english : _ref2$l10n;
-      return function (date, givenFormat, timeless, customLocale) {
-        if (date !== 0 && !date) return undefined;
-        var locale = customLocale || l10n;
-        var parsedDate;
-        var date_orig = date;
-        if (date instanceof Date) parsedDate = new Date(date.getTime());else if (typeof date !== "string" && date.toFixed !== undefined) parsedDate = new Date(date);else if (typeof date === "string") {
-          var format = givenFormat || (config || defaults).dateFormat;
-          var datestr = String(date).trim();
-
-          if (datestr === "today") {
-            parsedDate = new Date();
-            timeless = true;
-          } else if (/Z$/.test(datestr) || /GMT$/.test(datestr)) parsedDate = new Date(date);else if (config && config.parseDate) parsedDate = config.parseDate(date, format);else {
-            parsedDate = !config || !config.noCalendar ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0) : new Date(new Date().setHours(0, 0, 0, 0));
-            var matched,
-                ops = [];
-
-            for (var i = 0, matchIndex = 0, regexStr = ""; i < format.length; i++) {
-              var token = format[i];
-              var isBackSlash = token === "\\";
-              var escaped = format[i - 1] === "\\" || isBackSlash;
-
-              if (tokenRegex[token] && !escaped) {
-                regexStr += tokenRegex[token];
-                var match = new RegExp(regexStr).exec(date);
-
-                if (match && (matched = true)) {
-                  ops[token !== "Y" ? "push" : "unshift"]({
-                    fn: revFormat[token],
-                    val: match[++matchIndex]
-                  });
-                }
-              } else if (!isBackSlash) regexStr += ".";
-
-              ops.forEach(function (_ref3) {
-                var fn = _ref3.fn,
-                    val = _ref3.val;
-                return parsedDate = fn(parsedDate, val, locale) || parsedDate;
-              });
+        weekdays: {
+            shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+            longhand: [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+            ]
+        },
+        months: {
+            shorthand: [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+            ],
+            longhand: [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ]
+        },
+        daysInMonth: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+        firstDayOfWeek: 0,
+        ordinal: function (nth) {
+            var s = nth % 100;
+            if (s > 3 && s < 21)
+                return "th";
+            switch (s % 10) {
+                case 1:
+                    return "st";
+                case 2:
+                    return "nd";
+                case 3:
+                    return "rd";
+                default:
+                    return "th";
             }
-
-            parsedDate = matched ? parsedDate : undefined;
-          }
-        }
-
-        if (!(parsedDate instanceof Date && !isNaN(parsedDate.getTime()))) {
-          config.errorHandler(new Error("Invalid date provided: " + date_orig));
-          return undefined;
-        }
-
-        if (timeless === true) parsedDate.setHours(0, 0, 0, 0);
-        return parsedDate;
-      };
+        },
+        rangeSeparator: " to ",
+        weekAbbreviation: "Wk",
+        scrollTitle: "Scroll to increment",
+        toggleTitle: "Click to toggle",
+        amPM: ["AM", "PM"],
+        yearAriaLabel: "Year"
     };
-    function compareDates(date1, date2, timeless) {
-      if (timeless === void 0) {
-        timeless = true;
-      }
 
-      if (timeless !== false) {
-        return new Date(date1.getTime()).setHours(0, 0, 0, 0) - new Date(date2.getTime()).setHours(0, 0, 0, 0);
-      }
-
-      return date1.getTime() - date2.getTime();
+    var pad = function (number) { return ("0" + number).slice(-2); };
+    var int = function (bool) { return (bool === true ? 1 : 0); };
+    /* istanbul ignore next */
+    function debounce(func, wait, immediate) {
+        if (immediate === void 0) { immediate = false; }
+        var timeout;
+        return function () {
+            var context = this, args = arguments;
+            timeout !== null && clearTimeout(timeout);
+            timeout = window.setTimeout(function () {
+                timeout = null;
+                if (!immediate)
+                    func.apply(context, args);
+            }, wait);
+            if (immediate && !timeout)
+                func.apply(context, args);
+        };
     }
-    var getWeek = function getWeek(givenDate) {
-      var date = new Date(givenDate.getTime());
-      date.setHours(0, 0, 0, 0);
-      date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-      var week1 = new Date(date.getFullYear(), 0, 4);
-      return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-    };
-    var isBetween = function isBetween(ts, ts1, ts2) {
-      return ts > Math.min(ts1, ts2) && ts < Math.max(ts1, ts2);
-    };
-    var duration = {
-      DAY: 86400000
-    };
-
-    var HOOKS = ["onChange", "onClose", "onDayCreate", "onDestroy", "onKeyDown", "onMonthChange", "onOpen", "onParseConfig", "onReady", "onValueUpdate", "onYearChange", "onPreCalendarPosition"];
-    var defaults = {
-      _disable: [],
-      _enable: [],
-      allowInput: false,
-      altFormat: "F j, Y",
-      altInput: false,
-      altInputClass: "form-control input",
-      animate: typeof window === "object" && window.navigator.userAgent.indexOf("MSIE") === -1,
-      ariaDateFormat: "F j, Y",
-      clickOpens: true,
-      closeOnSelect: true,
-      conjunction: ", ",
-      dateFormat: "Y-m-d",
-      defaultHour: 12,
-      defaultMinute: 0,
-      defaultSeconds: 0,
-      disable: [],
-      disableMobile: false,
-      enable: [],
-      enableSeconds: false,
-      enableTime: false,
-      errorHandler: function errorHandler(err) {
-        return typeof console !== "undefined" && console.warn(err);
-      },
-      getWeek: getWeek,
-      hourIncrement: 1,
-      ignoredFocusElements: [],
-      inline: false,
-      locale: "default",
-      minuteIncrement: 5,
-      mode: "single",
-      nextArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z' /></svg>",
-      noCalendar: false,
-      now: new Date(),
-      onChange: [],
-      onClose: [],
-      onDayCreate: [],
-      onDestroy: [],
-      onKeyDown: [],
-      onMonthChange: [],
-      onOpen: [],
-      onParseConfig: [],
-      onReady: [],
-      onValueUpdate: [],
-      onYearChange: [],
-      onPreCalendarPosition: [],
-      plugins: [],
-      position: "auto",
-      positionElement: undefined,
-      prevArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M5.207 8.471l7.146 7.147-0.707 0.707-7.853-7.854 7.854-7.853 0.707 0.707-7.147 7.146z' /></svg>",
-      shorthandCurrentMonth: false,
-      showMonths: 1,
-      static: false,
-      time_24hr: false,
-      weekNumbers: false,
-      wrap: false
+    var arrayify = function (obj) {
+        return obj instanceof Array ? obj : [obj];
     };
 
     function toggleClass(elem, className, bool) {
-      if (bool === true) return elem.classList.add(className);
-      elem.classList.remove(className);
+        if (bool === true)
+            return elem.classList.add(className);
+        elem.classList.remove(className);
     }
     function createElement(tag, className, content) {
-      var e = window.document.createElement(tag);
-      className = className || "";
-      content = content || "";
-      e.className = className;
-      if (content !== undefined) e.textContent = content;
-      return e;
+        var e = window.document.createElement(tag);
+        className = className || "";
+        content = content || "";
+        e.className = className;
+        if (content !== undefined)
+            e.textContent = content;
+        return e;
     }
     function clearNode(node) {
-      while (node.firstChild) {
-        node.removeChild(node.firstChild);
-      }
+        while (node.firstChild)
+            node.removeChild(node.firstChild);
     }
     function findParent(node, condition) {
-      if (condition(node)) return node;else if (node.parentNode) return findParent(node.parentNode, condition);
-      return undefined;
+        if (condition(node))
+            return node;
+        else if (node.parentNode)
+            return findParent(node.parentNode, condition);
+        return undefined; // nothing found
     }
     function createNumberInput(inputClassName, opts) {
-      var wrapper = createElement("div", "numInputWrapper"),
-          numInput = createElement("input", "numInput " + inputClassName),
-          arrowUp = createElement("span", "arrowUp"),
-          arrowDown = createElement("span", "arrowDown");
-      numInput.type = "text";
-      numInput.pattern = "\\d*";
-      if (opts !== undefined) for (var key in opts) {
-        numInput.setAttribute(key, opts[key]);
-      }
-      wrapper.appendChild(numInput);
-      wrapper.appendChild(arrowUp);
-      wrapper.appendChild(arrowDown);
-      return wrapper;
+        var wrapper = createElement("div", "numInputWrapper"), numInput = createElement("input", "numInput " + inputClassName), arrowUp = createElement("span", "arrowUp"), arrowDown = createElement("span", "arrowDown");
+        if (navigator.userAgent.indexOf("MSIE 9.0") === -1) {
+            numInput.type = "number";
+        }
+        else {
+            numInput.type = "text";
+            numInput.pattern = "\\d*";
+        }
+        if (opts !== undefined)
+            for (var key in opts)
+                numInput.setAttribute(key, opts[key]);
+        wrapper.appendChild(numInput);
+        wrapper.appendChild(arrowUp);
+        wrapper.appendChild(arrowDown);
+        return wrapper;
+    }
+    function getEventTarget(event) {
+        if (typeof event.composedPath === "function") {
+            var path = event.composedPath();
+            return path[0];
+        }
+        return event.target;
     }
 
-    if (typeof Object.assign !== "function") {
-      Object.assign = function (target) {
-        if (!target) {
-          throw TypeError("Cannot convert undefined or null to object");
+    var do_nothing = function () { return undefined; };
+    var monthToStr = function (monthNumber, shorthand, locale) { return locale.months[shorthand ? "shorthand" : "longhand"][monthNumber]; };
+    var revFormat = {
+        D: do_nothing,
+        F: function (dateObj, monthName, locale) {
+            dateObj.setMonth(locale.months.longhand.indexOf(monthName));
+        },
+        G: function (dateObj, hour) {
+            dateObj.setHours(parseFloat(hour));
+        },
+        H: function (dateObj, hour) {
+            dateObj.setHours(parseFloat(hour));
+        },
+        J: function (dateObj, day) {
+            dateObj.setDate(parseFloat(day));
+        },
+        K: function (dateObj, amPM, locale) {
+            dateObj.setHours((dateObj.getHours() % 12) +
+                12 * int(new RegExp(locale.amPM[1], "i").test(amPM)));
+        },
+        M: function (dateObj, shortMonth, locale) {
+            dateObj.setMonth(locale.months.shorthand.indexOf(shortMonth));
+        },
+        S: function (dateObj, seconds) {
+            dateObj.setSeconds(parseFloat(seconds));
+        },
+        U: function (_, unixSeconds) { return new Date(parseFloat(unixSeconds) * 1000); },
+        W: function (dateObj, weekNum) {
+            var weekNumber = parseInt(weekNum);
+            return new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0);
+        },
+        Y: function (dateObj, year) {
+            dateObj.setFullYear(parseFloat(year));
+        },
+        Z: function (_, ISODate) { return new Date(ISODate); },
+        d: function (dateObj, day) {
+            dateObj.setDate(parseFloat(day));
+        },
+        h: function (dateObj, hour) {
+            dateObj.setHours(parseFloat(hour));
+        },
+        i: function (dateObj, minutes) {
+            dateObj.setMinutes(parseFloat(minutes));
+        },
+        j: function (dateObj, day) {
+            dateObj.setDate(parseFloat(day));
+        },
+        l: do_nothing,
+        m: function (dateObj, month) {
+            dateObj.setMonth(parseFloat(month) - 1);
+        },
+        n: function (dateObj, month) {
+            dateObj.setMonth(parseFloat(month) - 1);
+        },
+        s: function (dateObj, seconds) {
+            dateObj.setSeconds(parseFloat(seconds));
+        },
+        u: function (_, unixMillSeconds) {
+            return new Date(parseFloat(unixMillSeconds));
+        },
+        w: do_nothing,
+        y: function (dateObj, year) {
+            dateObj.setFullYear(2000 + parseFloat(year));
         }
+    };
+    var tokenRegex = {
+        D: "(\\w+)",
+        F: "(\\w+)",
+        G: "(\\d\\d|\\d)",
+        H: "(\\d\\d|\\d)",
+        J: "(\\d\\d|\\d)\\w+",
+        K: "",
+        M: "(\\w+)",
+        S: "(\\d\\d|\\d)",
+        U: "(.+)",
+        W: "(\\d\\d|\\d)",
+        Y: "(\\d{4})",
+        Z: "(.+)",
+        d: "(\\d\\d|\\d)",
+        h: "(\\d\\d|\\d)",
+        i: "(\\d\\d|\\d)",
+        j: "(\\d\\d|\\d)",
+        l: "(\\w+)",
+        m: "(\\d\\d|\\d)",
+        n: "(\\d\\d|\\d)",
+        s: "(\\d\\d|\\d)",
+        u: "(.+)",
+        w: "(\\d\\d|\\d)",
+        y: "(\\d{2})"
+    };
+    var formats = {
+        // get the date in UTC
+        Z: function (date) { return date.toISOString(); },
+        // weekday name, short, e.g. Thu
+        D: function (date, locale, options) {
+            return locale.weekdays.shorthand[formats.w(date, locale, options)];
+        },
+        // full month name e.g. January
+        F: function (date, locale, options) {
+            return monthToStr(formats.n(date, locale, options) - 1, false, locale);
+        },
+        // padded hour 1-12
+        G: function (date, locale, options) {
+            return pad(formats.h(date, locale, options));
+        },
+        // hours with leading zero e.g. 03
+        H: function (date) { return pad(date.getHours()); },
+        // day (1-30) with ordinal suffix e.g. 1st, 2nd
+        J: function (date, locale) {
+            return locale.ordinal !== undefined
+                ? date.getDate() + locale.ordinal(date.getDate())
+                : date.getDate();
+        },
+        // AM/PM
+        K: function (date, locale) { return locale.amPM[int(date.getHours() > 11)]; },
+        // shorthand month e.g. Jan, Sep, Oct, etc
+        M: function (date, locale) {
+            return monthToStr(date.getMonth(), true, locale);
+        },
+        // seconds 00-59
+        S: function (date) { return pad(date.getSeconds()); },
+        // unix timestamp
+        U: function (date) { return date.getTime() / 1000; },
+        W: function (date, _, options) {
+            return options.getWeek(date);
+        },
+        // full year e.g. 2016
+        Y: function (date) { return date.getFullYear(); },
+        // day in month, padded (01-30)
+        d: function (date) { return pad(date.getDate()); },
+        // hour from 1-12 (am/pm)
+        h: function (date) { return (date.getHours() % 12 ? date.getHours() % 12 : 12); },
+        // minutes, padded with leading zero e.g. 09
+        i: function (date) { return pad(date.getMinutes()); },
+        // day in month (1-30)
+        j: function (date) { return date.getDate(); },
+        // weekday name, full, e.g. Thursday
+        l: function (date, locale) {
+            return locale.weekdays.longhand[date.getDay()];
+        },
+        // padded month number (01-12)
+        m: function (date) { return pad(date.getMonth() + 1); },
+        // the month number (1-12)
+        n: function (date) { return date.getMonth() + 1; },
+        // seconds 0-59
+        s: function (date) { return date.getSeconds(); },
+        // Unix Milliseconds
+        u: function (date) { return date.getTime(); },
+        // number of the day of the week
+        w: function (date) { return date.getDay(); },
+        // last two digits of year e.g. 16 for 2016
+        y: function (date) { return String(date.getFullYear()).substring(2); }
+    };
 
-        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        var _loop = function _loop() {
-          var source = args[_i];
-
-          if (source) {
-            Object.keys(source).forEach(function (key) {
-              return target[key] = source[key];
-            });
-          }
+    var createDateFormatter = function (_a) {
+        var _b = _a.config, config = _b === void 0 ? defaults : _b, _c = _a.l10n, l10n = _c === void 0 ? english : _c;
+        return function (dateObj, frmt, overrideLocale) {
+            var locale = overrideLocale || l10n;
+            if (config.formatDate !== undefined) {
+                return config.formatDate(dateObj, frmt, locale);
+            }
+            return frmt
+                .split("")
+                .map(function (c, i, arr) {
+                return formats[c] && arr[i - 1] !== "\\"
+                    ? formats[c](dateObj, locale, config)
+                    : c !== "\\"
+                        ? c
+                        : "";
+            })
+                .join("");
         };
-
-        for (var _i = 0; _i < args.length; _i++) {
-          _loop();
+    };
+    var createDateParser = function (_a) {
+        var _b = _a.config, config = _b === void 0 ? defaults : _b, _c = _a.l10n, l10n = _c === void 0 ? english : _c;
+        return function (date, givenFormat, timeless, customLocale) {
+            if (date !== 0 && !date)
+                return undefined;
+            var locale = customLocale || l10n;
+            var parsedDate;
+            var date_orig = date;
+            if (date instanceof Date)
+                parsedDate = new Date(date.getTime());
+            else if (typeof date !== "string" &&
+                date.toFixed !== undefined // timestamp
+            )
+                // create a copy
+                parsedDate = new Date(date);
+            else if (typeof date === "string") {
+                // date string
+                var format = givenFormat || (config || defaults).dateFormat;
+                var datestr = String(date).trim();
+                if (datestr === "today") {
+                    parsedDate = new Date();
+                    timeless = true;
+                }
+                else if (/Z$/.test(datestr) ||
+                    /GMT$/.test(datestr) // datestrings w/ timezone
+                )
+                    parsedDate = new Date(date);
+                else if (config && config.parseDate)
+                    parsedDate = config.parseDate(date, format);
+                else {
+                    parsedDate =
+                        !config || !config.noCalendar
+                            ? new Date(new Date().getFullYear(), 0, 1, 0, 0, 0, 0)
+                            : new Date(new Date().setHours(0, 0, 0, 0));
+                    var matched = void 0, ops = [];
+                    for (var i = 0, matchIndex = 0, regexStr = ""; i < format.length; i++) {
+                        var token_1 = format[i];
+                        var isBackSlash = token_1 === "\\";
+                        var escaped = format[i - 1] === "\\" || isBackSlash;
+                        if (tokenRegex[token_1] && !escaped) {
+                            regexStr += tokenRegex[token_1];
+                            var match = new RegExp(regexStr).exec(date);
+                            if (match && (matched = true)) {
+                                ops[token_1 !== "Y" ? "push" : "unshift"]({
+                                    fn: revFormat[token_1],
+                                    val: match[++matchIndex]
+                                });
+                            }
+                        }
+                        else if (!isBackSlash)
+                            regexStr += "."; // don't really care
+                        ops.forEach(function (_a) {
+                            var fn = _a.fn, val = _a.val;
+                            return (parsedDate = fn(parsedDate, val, locale) || parsedDate);
+                        });
+                    }
+                    parsedDate = matched ? parsedDate : undefined;
+                }
+            }
+            /* istanbul ignore next */
+            if (!(parsedDate instanceof Date && !isNaN(parsedDate.getTime()))) {
+                config.errorHandler(new Error("Invalid date provided: " + date_orig));
+                return undefined;
+            }
+            if (timeless === true)
+                parsedDate.setHours(0, 0, 0, 0);
+            return parsedDate;
+        };
+    };
+    /**
+     * Compute the difference in dates, measured in ms
+     */
+    function compareDates(date1, date2, timeless) {
+        if (timeless === void 0) { timeless = true; }
+        if (timeless !== false) {
+            return (new Date(date1.getTime()).setHours(0, 0, 0, 0) -
+                new Date(date2.getTime()).setHours(0, 0, 0, 0));
         }
+        return date1.getTime() - date2.getTime();
+    }
+    var isBetween = function (ts, ts1, ts2) {
+        return ts > Math.min(ts1, ts2) && ts < Math.max(ts1, ts2);
+    };
+    var duration = {
+        DAY: 86400000
+    };
 
-        return target;
-      };
+    if (typeof Object.assign !== "function") {
+        Object.assign = function (target) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            if (!target) {
+                throw TypeError("Cannot convert undefined or null to object");
+            }
+            var _loop_1 = function (source) {
+                if (source) {
+                    Object.keys(source).forEach(function (key) { return (target[key] = source[key]); });
+                }
+            };
+            for (var _a = 0, args_1 = args; _a < args_1.length; _a++) {
+                var source = args_1[_a];
+                _loop_1(source);
+            }
+            return target;
+        };
     }
 
     var DEBOUNCED_CHANGE_MS = 300;
-
     function FlatpickrInstance(element, instanceConfig) {
-      var self = {
-        config: Object.assign({}, flatpickr.defaultConfig),
-        l10n: english
-      };
-      self.parseDate = createDateParser({
-        config: self.config,
-        l10n: self.l10n
-      });
-      self._handlers = [];
-      self._bind = bind;
-      self._setHoursFromDate = setHoursFromDate;
-      self._positionCalendar = positionCalendar;
-      self.changeMonth = changeMonth;
-      self.changeYear = changeYear;
-      self.clear = clear;
-      self.close = close;
-      self._createElement = createElement;
-      self.destroy = destroy;
-      self.isEnabled = isEnabled;
-      self.jumpToDate = jumpToDate;
-      self.open = open;
-      self.redraw = redraw;
-      self.set = set;
-      self.setDate = setDate;
-      self.toggle = toggle;
-
-      function setupHelperFunctions() {
-        self.utils = {
-          getDaysInMonth: function getDaysInMonth(month, yr) {
-            if (month === void 0) {
-              month = self.currentMonth;
-            }
-
-            if (yr === void 0) {
-              yr = self.currentYear;
-            }
-
-            if (month === 1 && (yr % 4 === 0 && yr % 100 !== 0 || yr % 400 === 0)) return 29;
-            return self.l10n.daysInMonth[month];
-          }
+        var self = {
+            config: __assign({}, flatpickr.defaultConfig),
+            l10n: english
         };
-      }
-
-      function init() {
-        self.element = self.input = element;
-        self.isOpen = false;
-        parseConfig();
-        setupLocale();
-        setupInputs();
-        setupDates();
-        setupHelperFunctions();
-        if (!self.isMobile) build();
-        bindEvents();
-
-        if (self.selectedDates.length || self.config.noCalendar) {
-          if (self.config.enableTime) {
-            setHoursFromDate(self.config.noCalendar ? self.latestSelectedDateObj || self.config.minDate : undefined);
-          }
-
-          updateValue(false);
-        }
-
-        setCalendarWidth();
-        self.showTimeInput = self.selectedDates.length > 0 || self.config.noCalendar;
-        var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-
-        if (!self.isMobile && isSafari) {
-          positionCalendar();
-        }
-
-        triggerEvent("onReady");
-      }
-
-      function bindToInstance(fn) {
-        return fn.bind(self);
-      }
-
-      function setCalendarWidth() {
-        var config = self.config;
-        if (config.weekNumbers === false && config.showMonths === 1) return;else if (config.noCalendar !== true) {
-          window.requestAnimationFrame(function () {
-            self.calendarContainer.style.visibility = "hidden";
-            self.calendarContainer.style.display = "block";
-
-            if (self.daysContainer !== undefined) {
-              var daysWidth = (self.days.offsetWidth + 1) * config.showMonths;
-              self.daysContainer.style.width = daysWidth + "px";
-              self.calendarContainer.style.width = daysWidth + (self.weekWrapper !== undefined ? self.weekWrapper.offsetWidth : 0) + "px";
-              self.calendarContainer.style.removeProperty("visibility");
-              self.calendarContainer.style.removeProperty("display");
-            }
-          });
-        }
-      }
-
-      function updateTime(e) {
-        if (self.selectedDates.length === 0) return;
-
-        if (e !== undefined && e.type !== "blur") {
-          timeWrapper(e);
-        }
-
-        var prevValue = self._input.value;
-        setHoursFromInputs();
-        updateValue();
-
-        if (self._input.value !== prevValue) {
-          self._debouncedChange();
-        }
-      }
-
-      function ampm2military(hour, amPM) {
-        return hour % 12 + 12 * int(amPM === self.l10n.amPM[1]);
-      }
-
-      function military2ampm(hour) {
-        switch (hour % 24) {
-          case 0:
-          case 12:
-            return 12;
-
-          default:
-            return hour % 12;
-        }
-      }
-
-      function setHoursFromInputs() {
-        if (self.hourElement === undefined || self.minuteElement === undefined) return;
-        var hours = (parseInt(self.hourElement.value.slice(-2), 10) || 0) % 24,
-            minutes = (parseInt(self.minuteElement.value, 10) || 0) % 60,
-            seconds = self.secondElement !== undefined ? (parseInt(self.secondElement.value, 10) || 0) % 60 : 0;
-
-        if (self.amPM !== undefined) {
-          hours = ampm2military(hours, self.amPM.textContent);
-        }
-
-        var limitMinHours = self.config.minTime !== undefined || self.config.minDate && self.minDateHasTime && self.latestSelectedDateObj && compareDates(self.latestSelectedDateObj, self.config.minDate, true) === 0;
-        var limitMaxHours = self.config.maxTime !== undefined || self.config.maxDate && self.maxDateHasTime && self.latestSelectedDateObj && compareDates(self.latestSelectedDateObj, self.config.maxDate, true) === 0;
-
-        if (limitMaxHours) {
-          var maxTime = self.config.maxTime !== undefined ? self.config.maxTime : self.config.maxDate;
-          hours = Math.min(hours, maxTime.getHours());
-          if (hours === maxTime.getHours()) minutes = Math.min(minutes, maxTime.getMinutes());
-          if (minutes === maxTime.getMinutes()) seconds = Math.min(seconds, maxTime.getSeconds());
-        }
-
-        if (limitMinHours) {
-          var minTime = self.config.minTime !== undefined ? self.config.minTime : self.config.minDate;
-          hours = Math.max(hours, minTime.getHours());
-          if (hours === minTime.getHours()) minutes = Math.max(minutes, minTime.getMinutes());
-          if (minutes === minTime.getMinutes()) seconds = Math.max(seconds, minTime.getSeconds());
-        }
-
-        setHours(hours, minutes, seconds);
-      }
-
-      function setHoursFromDate(dateObj) {
-        var date = dateObj || self.latestSelectedDateObj;
-        if (date) setHours(date.getHours(), date.getMinutes(), date.getSeconds());
-      }
-
-      function setDefaultHours() {
-        var hours = self.config.defaultHour;
-        var minutes = self.config.defaultMinute;
-        var seconds = self.config.defaultSeconds;
-
-        if (self.config.minDate !== undefined) {
-          var min_hr = self.config.minDate.getHours();
-          var min_minutes = self.config.minDate.getMinutes();
-          hours = Math.max(hours, min_hr);
-          if (hours === min_hr) minutes = Math.max(min_minutes, minutes);
-          if (hours === min_hr && minutes === min_minutes) seconds = self.config.minDate.getSeconds();
-        }
-
-        if (self.config.maxDate !== undefined) {
-          var max_hr = self.config.maxDate.getHours();
-          var max_minutes = self.config.maxDate.getMinutes();
-          hours = Math.min(hours, max_hr);
-          if (hours === max_hr) minutes = Math.min(max_minutes, minutes);
-          if (hours === max_hr && minutes === max_minutes) seconds = self.config.maxDate.getSeconds();
-        }
-
-        setHours(hours, minutes, seconds);
-      }
-
-      function setHours(hours, minutes, seconds) {
-        if (self.latestSelectedDateObj !== undefined) {
-          self.latestSelectedDateObj.setHours(hours % 24, minutes, seconds || 0, 0);
-        }
-
-        if (!self.hourElement || !self.minuteElement || self.isMobile) return;
-        self.hourElement.value = pad(!self.config.time_24hr ? (12 + hours) % 12 + 12 * int(hours % 12 === 0) : hours);
-        self.minuteElement.value = pad(minutes);
-        if (self.amPM !== undefined) self.amPM.textContent = self.l10n.amPM[int(hours >= 12)];
-        if (self.secondElement !== undefined) self.secondElement.value = pad(seconds);
-      }
-
-      function onYearInput(event) {
-        var year = parseInt(event.target.value) + (event.delta || 0);
-
-        if (year / 1000 > 1 || event.key === "Enter" && !/[^\d]/.test(year.toString())) {
-          changeYear(year);
-        }
-      }
-
-      function bind(element, event, handler, options) {
-        if (event instanceof Array) return event.forEach(function (ev) {
-          return bind(element, ev, handler, options);
-        });
-        if (element instanceof Array) return element.forEach(function (el) {
-          return bind(el, event, handler, options);
-        });
-        element.addEventListener(event, handler, options);
-
-        self._handlers.push({
-          element: element,
-          event: event,
-          handler: handler,
-          options: options
-        });
-      }
-
-      function onClick(handler) {
-        return function (evt) {
-          evt.which === 1 && handler(evt);
-        };
-      }
-
-      function triggerChange() {
-        triggerEvent("onChange");
-      }
-
-      function bindEvents() {
-        if (self.config.wrap) {
-          ["open", "close", "toggle", "clear"].forEach(function (evt) {
-            Array.prototype.forEach.call(self.element.querySelectorAll("[data-" + evt + "]"), function (el) {
-              return bind(el, "click", self[evt]);
-            });
-          });
-        }
-
-        if (self.isMobile) {
-          setupMobile();
-          return;
-        }
-
-        var debouncedResize = debounce(onResize, 50);
-        self._debouncedChange = debounce(triggerChange, DEBOUNCED_CHANGE_MS);
-        if (self.daysContainer && !/iPhone|iPad|iPod/i.test(navigator.userAgent)) bind(self.daysContainer, "mouseover", function (e) {
-          if (self.config.mode === "range") onMouseOver(e.target);
-        });
-        bind(window.document.body, "keydown", onKeyDown);
-        if (!self.config.static) bind(self._input, "keydown", onKeyDown);
-        if (!self.config.inline && !self.config.static) bind(window, "resize", debouncedResize);
-        if (window.ontouchstart !== undefined) bind(window.document, "click", documentClick);else bind(window.document, "mousedown", onClick(documentClick));
-        bind(window.document, "focus", documentClick, {
-          capture: true
-        });
-
-        if (self.config.clickOpens === true) {
-          bind(self._input, "focus", self.open);
-          bind(self._input, "mousedown", onClick(self.open));
-        }
-
-        if (self.daysContainer !== undefined) {
-          bind(self.monthNav, "mousedown", onClick(onMonthNavClick));
-          bind(self.monthNav, ["keyup", "increment"], onYearInput);
-          bind(self.daysContainer, "mousedown", onClick(selectDate));
-        }
-
-        if (self.timeContainer !== undefined && self.minuteElement !== undefined && self.hourElement !== undefined) {
-          var selText = function selText(e) {
-            return e.target.select();
-          };
-
-          bind(self.timeContainer, ["increment"], updateTime);
-          bind(self.timeContainer, "blur", updateTime, {
-            capture: true
-          });
-          bind(self.timeContainer, "mousedown", onClick(timeIncrement));
-          bind([self.hourElement, self.minuteElement], ["focus", "click"], selText);
-          if (self.secondElement !== undefined) bind(self.secondElement, "focus", function () {
-            return self.secondElement && self.secondElement.select();
-          });
-
-          if (self.amPM !== undefined) {
-            bind(self.amPM, "mousedown", onClick(function (e) {
-              updateTime(e);
-              triggerChange();
-            }));
-          }
-        }
-      }
-
-      function jumpToDate(jumpDate) {
-        var jumpTo = jumpDate !== undefined ? self.parseDate(jumpDate) : self.latestSelectedDateObj || (self.config.minDate && self.config.minDate > self.now ? self.config.minDate : self.config.maxDate && self.config.maxDate < self.now ? self.config.maxDate : self.now);
-
-        try {
-          if (jumpTo !== undefined) {
-            self.currentYear = jumpTo.getFullYear();
-            self.currentMonth = jumpTo.getMonth();
-          }
-        } catch (e) {
-          e.message = "Invalid date supplied: " + jumpTo;
-          self.config.errorHandler(e);
-        }
-
-        self.redraw();
-      }
-
-      function timeIncrement(e) {
-        if (~e.target.className.indexOf("arrow")) incrementNumInput(e, e.target.classList.contains("arrowUp") ? 1 : -1);
-      }
-
-      function incrementNumInput(e, delta, inputElem) {
-        var target = e && e.target;
-        var input = inputElem || target && target.parentNode && target.parentNode.firstChild;
-        var event = createEvent("increment");
-        event.delta = delta;
-        input && input.dispatchEvent(event);
-      }
-
-      function build() {
-        var fragment = window.document.createDocumentFragment();
-        self.calendarContainer = createElement("div", "flatpickr-calendar");
-        self.calendarContainer.tabIndex = -1;
-
-        if (!self.config.noCalendar) {
-          fragment.appendChild(buildMonthNav());
-          self.innerContainer = createElement("div", "flatpickr-innerContainer");
-
-          if (self.config.weekNumbers) {
-            var _buildWeeks = buildWeeks(),
-                weekWrapper = _buildWeeks.weekWrapper,
-                weekNumbers = _buildWeeks.weekNumbers;
-
-            self.innerContainer.appendChild(weekWrapper);
-            self.weekNumbers = weekNumbers;
-            self.weekWrapper = weekWrapper;
-          }
-
-          self.rContainer = createElement("div", "flatpickr-rContainer");
-          self.rContainer.appendChild(buildWeekdays());
-
-          if (!self.daysContainer) {
-            self.daysContainer = createElement("div", "flatpickr-days");
-            self.daysContainer.tabIndex = -1;
-          }
-
-          buildDays();
-          self.rContainer.appendChild(self.daysContainer);
-          self.innerContainer.appendChild(self.rContainer);
-          fragment.appendChild(self.innerContainer);
-        }
-
-        if (self.config.enableTime) {
-          fragment.appendChild(buildTime());
-        }
-
-        toggleClass(self.calendarContainer, "rangeMode", self.config.mode === "range");
-        toggleClass(self.calendarContainer, "animate", self.config.animate === true);
-        toggleClass(self.calendarContainer, "multiMonth", self.config.showMonths > 1);
-        self.calendarContainer.appendChild(fragment);
-        var customAppend = self.config.appendTo !== undefined && self.config.appendTo.nodeType !== undefined;
-
-        if (self.config.inline || self.config.static) {
-          self.calendarContainer.classList.add(self.config.inline ? "inline" : "static");
-
-          if (self.config.inline) {
-            if (!customAppend && self.element.parentNode) self.element.parentNode.insertBefore(self.calendarContainer, self._input.nextSibling);else if (self.config.appendTo !== undefined) self.config.appendTo.appendChild(self.calendarContainer);
-          }
-
-          if (self.config.static) {
-            var wrapper = createElement("div", "flatpickr-wrapper");
-            if (self.element.parentNode) self.element.parentNode.insertBefore(wrapper, self.element);
-            wrapper.appendChild(self.element);
-            if (self.altInput) wrapper.appendChild(self.altInput);
-            wrapper.appendChild(self.calendarContainer);
-          }
-        }
-
-        if (!self.config.static && !self.config.inline) (self.config.appendTo !== undefined ? self.config.appendTo : window.document.body).appendChild(self.calendarContainer);
-      }
-
-      function createDay(className, date, dayNumber, i) {
-        var dateIsEnabled = isEnabled(date, true),
-            dayElement = createElement("span", "flatpickr-day " + className, date.getDate().toString());
-        dayElement.dateObj = date;
-        dayElement.$i = i;
-        dayElement.setAttribute("aria-label", self.formatDate(date, self.config.ariaDateFormat));
-
-        if (className.indexOf("hidden") === -1 && compareDates(date, self.now) === 0) {
-          self.todayDateElem = dayElement;
-          dayElement.classList.add("today");
-          dayElement.setAttribute("aria-current", "date");
-        }
-
-        if (dateIsEnabled) {
-          dayElement.tabIndex = -1;
-
-          if (isDateSelected(date)) {
-            dayElement.classList.add("selected");
-            self.selectedDateElem = dayElement;
-
-            if (self.config.mode === "range") {
-              toggleClass(dayElement, "startRange", self.selectedDates[0] && compareDates(date, self.selectedDates[0], true) === 0);
-              toggleClass(dayElement, "endRange", self.selectedDates[1] && compareDates(date, self.selectedDates[1], true) === 0);
-              if (className === "nextMonthDay") dayElement.classList.add("inRange");
-            }
-          }
-        } else {
-          dayElement.classList.add("disabled");
-        }
-
-        if (self.config.mode === "range") {
-          if (isDateInRange(date) && !isDateSelected(date)) dayElement.classList.add("inRange");
-        }
-
-        if (self.weekNumbers && self.config.showMonths === 1 && className !== "prevMonthDay" && dayNumber % 7 === 1) {
-          self.weekNumbers.insertAdjacentHTML("beforeend", "<span class='flatpickr-day'>" + self.config.getWeek(date) + "</span>");
-        }
-
-        triggerEvent("onDayCreate", dayElement);
-        return dayElement;
-      }
-
-      function focusOnDayElem(targetNode) {
-        targetNode.focus();
-        if (self.config.mode === "range") onMouseOver(targetNode);
-      }
-
-      function getFirstAvailableDay(delta) {
-        var startMonth = delta > 0 ? 0 : self.config.showMonths - 1;
-        var endMonth = delta > 0 ? self.config.showMonths : -1;
-
-        for (var m = startMonth; m != endMonth; m += delta) {
-          var month = self.daysContainer.children[m];
-          var startIndex = delta > 0 ? 0 : month.children.length - 1;
-          var endIndex = delta > 0 ? month.children.length : -1;
-
-          for (var i = startIndex; i != endIndex; i += delta) {
-            var c = month.children[i];
-            if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj)) return c;
-          }
-        }
-
-        return undefined;
-      }
-
-      function getNextAvailableDay(current, delta) {
-        var givenMonth = current.className.indexOf("Month") === -1 ? current.dateObj.getMonth() : self.currentMonth;
-        var endMonth = delta > 0 ? self.config.showMonths : -1;
-        var loopDelta = delta > 0 ? 1 : -1;
-
-        for (var m = givenMonth - self.currentMonth; m != endMonth; m += loopDelta) {
-          var month = self.daysContainer.children[m];
-          var startIndex = givenMonth - self.currentMonth === m ? current.$i + delta : delta < 0 ? month.children.length - 1 : 0;
-          var numMonthDays = month.children.length;
-
-          for (var i = startIndex; i >= 0 && i < numMonthDays && i != (delta > 0 ? numMonthDays : -1); i += loopDelta) {
-            var c = month.children[i];
-            if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj) && Math.abs(current.$i - i) >= Math.abs(delta)) return focusOnDayElem(c);
-          }
-        }
-
-        self.changeMonth(loopDelta);
-        focusOnDay(getFirstAvailableDay(loopDelta), 0);
-        return undefined;
-      }
-
-      function focusOnDay(current, offset) {
-        var dayFocused = isInView(document.activeElement || document.body);
-        var startElem = current !== undefined ? current : dayFocused ? document.activeElement : self.selectedDateElem !== undefined && isInView(self.selectedDateElem) ? self.selectedDateElem : self.todayDateElem !== undefined && isInView(self.todayDateElem) ? self.todayDateElem : getFirstAvailableDay(offset > 0 ? 1 : -1);
-        if (startElem === undefined) return self._input.focus();
-        if (!dayFocused) return focusOnDayElem(startElem);
-        getNextAvailableDay(startElem, offset);
-      }
-
-      function buildMonthDays(year, month) {
-        var firstOfMonth = (new Date(year, month, 1).getDay() - self.l10n.firstDayOfWeek + 7) % 7;
-        var prevMonthDays = self.utils.getDaysInMonth((month - 1 + 12) % 12);
-        var daysInMonth = self.utils.getDaysInMonth(month),
-            days = window.document.createDocumentFragment(),
-            isMultiMonth = self.config.showMonths > 1,
-            prevMonthDayClass = isMultiMonth ? "prevMonthDay hidden" : "prevMonthDay",
-            nextMonthDayClass = isMultiMonth ? "nextMonthDay hidden" : "nextMonthDay";
-        var dayNumber = prevMonthDays + 1 - firstOfMonth,
-            dayIndex = 0;
-
-        for (; dayNumber <= prevMonthDays; dayNumber++, dayIndex++) {
-          days.appendChild(createDay(prevMonthDayClass, new Date(year, month - 1, dayNumber), dayNumber, dayIndex));
-        }
-
-        for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++, dayIndex++) {
-          days.appendChild(createDay("", new Date(year, month, dayNumber), dayNumber, dayIndex));
-        }
-
-        for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth && (self.config.showMonths === 1 || dayIndex % 7 !== 0); dayNum++, dayIndex++) {
-          days.appendChild(createDay(nextMonthDayClass, new Date(year, month + 1, dayNum % daysInMonth), dayNum, dayIndex));
-        }
-
-        var dayContainer = createElement("div", "dayContainer");
-        dayContainer.appendChild(days);
-        return dayContainer;
-      }
-
-      function buildDays() {
-        if (self.daysContainer === undefined) {
-          return;
-        }
-
-        clearNode(self.daysContainer);
-        if (self.weekNumbers) clearNode(self.weekNumbers);
-        var frag = document.createDocumentFragment();
-
-        for (var i = 0; i < self.config.showMonths; i++) {
-          var d = new Date(self.currentYear, self.currentMonth, 1);
-          d.setMonth(self.currentMonth + i);
-          frag.appendChild(buildMonthDays(d.getFullYear(), d.getMonth()));
-        }
-
-        self.daysContainer.appendChild(frag);
-        self.days = self.daysContainer.firstChild;
-
-        if (self.config.mode === "range" && self.selectedDates.length === 1) {
-          onMouseOver();
-        }
-      }
-
-      function buildMonth() {
-        var container = createElement("div", "flatpickr-month");
-        var monthNavFragment = window.document.createDocumentFragment();
-        var monthElement = createElement("span", "cur-month");
-        var yearInput = createNumberInput("cur-year", {
-          tabindex: "-1"
-        });
-        var yearElement = yearInput.getElementsByTagName("input")[0];
-        yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
-        if (self.config.minDate) yearElement.setAttribute("data-min", self.config.minDate.getFullYear().toString());
-
-        if (self.config.maxDate) {
-          yearElement.setAttribute("data-max", self.config.maxDate.getFullYear().toString());
-          yearElement.disabled = !!self.config.minDate && self.config.minDate.getFullYear() === self.config.maxDate.getFullYear();
-        }
-
-        var currentMonth = createElement("div", "flatpickr-current-month");
-        currentMonth.appendChild(monthElement);
-        currentMonth.appendChild(yearInput);
-        monthNavFragment.appendChild(currentMonth);
-        container.appendChild(monthNavFragment);
-        return {
-          container: container,
-          yearElement: yearElement,
-          monthElement: monthElement
-        };
-      }
-
-      function buildMonths() {
-        clearNode(self.monthNav);
-        self.monthNav.appendChild(self.prevMonthNav);
-
-        for (var m = self.config.showMonths; m--;) {
-          var month = buildMonth();
-          self.yearElements.push(month.yearElement);
-          self.monthElements.push(month.monthElement);
-          self.monthNav.appendChild(month.container);
-        }
-
-        self.monthNav.appendChild(self.nextMonthNav);
-      }
-
-      function buildMonthNav() {
-        self.monthNav = createElement("div", "flatpickr-months");
-        self.yearElements = [];
-        self.monthElements = [];
-        self.prevMonthNav = createElement("span", "flatpickr-prev-month");
-        self.prevMonthNav.innerHTML = self.config.prevArrow;
-        self.nextMonthNav = createElement("span", "flatpickr-next-month");
-        self.nextMonthNav.innerHTML = self.config.nextArrow;
-        buildMonths();
-        Object.defineProperty(self, "_hidePrevMonthArrow", {
-          get: function get() {
-            return self.__hidePrevMonthArrow;
-          },
-          set: function set(bool) {
-            if (self.__hidePrevMonthArrow !== bool) {
-              toggleClass(self.prevMonthNav, "disabled", bool);
-              self.__hidePrevMonthArrow = bool;
-            }
-          }
-        });
-        Object.defineProperty(self, "_hideNextMonthArrow", {
-          get: function get() {
-            return self.__hideNextMonthArrow;
-          },
-          set: function set(bool) {
-            if (self.__hideNextMonthArrow !== bool) {
-              toggleClass(self.nextMonthNav, "disabled", bool);
-              self.__hideNextMonthArrow = bool;
-            }
-          }
-        });
-        self.currentYearElement = self.yearElements[0];
-        updateNavigationCurrentMonth();
-        return self.monthNav;
-      }
-
-      function buildTime() {
-        self.calendarContainer.classList.add("hasTime");
-        if (self.config.noCalendar) self.calendarContainer.classList.add("noCalendar");
-        self.timeContainer = createElement("div", "flatpickr-time");
-        self.timeContainer.tabIndex = -1;
-        var separator = createElement("span", "flatpickr-time-separator", ":");
-        var hourInput = createNumberInput("flatpickr-hour");
-        self.hourElement = hourInput.getElementsByTagName("input")[0];
-        var minuteInput = createNumberInput("flatpickr-minute");
-        self.minuteElement = minuteInput.getElementsByTagName("input")[0];
-        self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
-        self.hourElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getHours() : self.config.time_24hr ? self.config.defaultHour : military2ampm(self.config.defaultHour));
-        self.minuteElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getMinutes() : self.config.defaultMinute);
-        self.hourElement.setAttribute("data-step", self.config.hourIncrement.toString());
-        self.minuteElement.setAttribute("data-step", self.config.minuteIncrement.toString());
-        self.hourElement.setAttribute("data-min", self.config.time_24hr ? "0" : "1");
-        self.hourElement.setAttribute("data-max", self.config.time_24hr ? "23" : "12");
-        self.minuteElement.setAttribute("data-min", "0");
-        self.minuteElement.setAttribute("data-max", "59");
-        self.timeContainer.appendChild(hourInput);
-        self.timeContainer.appendChild(separator);
-        self.timeContainer.appendChild(minuteInput);
-        if (self.config.time_24hr) self.timeContainer.classList.add("time24hr");
-
-        if (self.config.enableSeconds) {
-          self.timeContainer.classList.add("hasSeconds");
-          var secondInput = createNumberInput("flatpickr-second");
-          self.secondElement = secondInput.getElementsByTagName("input")[0];
-          self.secondElement.value = pad(self.latestSelectedDateObj ? self.latestSelectedDateObj.getSeconds() : self.config.defaultSeconds);
-          self.secondElement.setAttribute("data-step", self.minuteElement.getAttribute("data-step"));
-          self.secondElement.setAttribute("data-min", self.minuteElement.getAttribute("data-min"));
-          self.secondElement.setAttribute("data-max", self.minuteElement.getAttribute("data-max"));
-          self.timeContainer.appendChild(createElement("span", "flatpickr-time-separator", ":"));
-          self.timeContainer.appendChild(secondInput);
-        }
-
-        if (!self.config.time_24hr) {
-          self.amPM = createElement("span", "flatpickr-am-pm", self.l10n.amPM[int((self.latestSelectedDateObj ? self.hourElement.value : self.config.defaultHour) > 11)]);
-          self.amPM.title = self.l10n.toggleTitle;
-          self.amPM.tabIndex = -1;
-          self.timeContainer.appendChild(self.amPM);
-        }
-
-        return self.timeContainer;
-      }
-
-      function buildWeekdays() {
-        if (!self.weekdayContainer) self.weekdayContainer = createElement("div", "flatpickr-weekdays");else clearNode(self.weekdayContainer);
-
-        for (var i = self.config.showMonths; i--;) {
-          var container = createElement("div", "flatpickr-weekdaycontainer");
-          self.weekdayContainer.appendChild(container);
-        }
-
-        updateWeekdays();
-        return self.weekdayContainer;
-      }
-
-      function updateWeekdays() {
-        var firstDayOfWeek = self.l10n.firstDayOfWeek;
-        var weekdays = self.l10n.weekdays.shorthand.concat();
-
-        if (firstDayOfWeek > 0 && firstDayOfWeek < weekdays.length) {
-          weekdays = weekdays.splice(firstDayOfWeek, weekdays.length).concat(weekdays.splice(0, firstDayOfWeek));
-        }
-
-        for (var i = self.config.showMonths; i--;) {
-          self.weekdayContainer.children[i].innerHTML = "\n      <span class=flatpickr-weekday>\n        " + weekdays.join("</span><span class=flatpickr-weekday>") + "\n      </span>\n      ";
-        }
-      }
-
-      function buildWeeks() {
-        self.calendarContainer.classList.add("hasWeeks");
-        var weekWrapper = createElement("div", "flatpickr-weekwrapper");
-        weekWrapper.appendChild(createElement("span", "flatpickr-weekday", self.l10n.weekAbbreviation));
-        var weekNumbers = createElement("div", "flatpickr-weeks");
-        weekWrapper.appendChild(weekNumbers);
-        return {
-          weekWrapper: weekWrapper,
-          weekNumbers: weekNumbers
-        };
-      }
-
-      function changeMonth(value, is_offset) {
-        if (is_offset === void 0) {
-          is_offset = true;
-        }
-
-        var delta = is_offset ? value : value - self.currentMonth;
-        if (delta < 0 && self._hidePrevMonthArrow === true || delta > 0 && self._hideNextMonthArrow === true) return;
-        self.currentMonth += delta;
-
-        if (self.currentMonth < 0 || self.currentMonth > 11) {
-          self.currentYear += self.currentMonth > 11 ? 1 : -1;
-          self.currentMonth = (self.currentMonth + 12) % 12;
-          triggerEvent("onYearChange");
-        }
-
-        buildDays();
-        triggerEvent("onMonthChange");
-        updateNavigationCurrentMonth();
-      }
-
-      function clear(triggerChangeEvent) {
-        if (triggerChangeEvent === void 0) {
-          triggerChangeEvent = true;
-        }
-
-        self.input.value = "";
-        if (self.altInput !== undefined) self.altInput.value = "";
-        if (self.mobileInput !== undefined) self.mobileInput.value = "";
-        self.selectedDates = [];
-        self.latestSelectedDateObj = undefined;
-        self.showTimeInput = false;
-
-        if (self.config.enableTime === true) {
-          setDefaultHours();
-        }
-
-        self.redraw();
-        if (triggerChangeEvent) triggerEvent("onChange");
-      }
-
-      function close() {
-        self.isOpen = false;
-
-        if (!self.isMobile) {
-          self.calendarContainer.classList.remove("open");
-
-          self._input.classList.remove("active");
-        }
-
-        triggerEvent("onClose");
-      }
-
-      function destroy() {
-        if (self.config !== undefined) triggerEvent("onDestroy");
-
-        for (var i = self._handlers.length; i--;) {
-          var h = self._handlers[i];
-          h.element.removeEventListener(h.event, h.handler, h.options);
-        }
-
+        self.parseDate = createDateParser({ config: self.config, l10n: self.l10n });
         self._handlers = [];
-
-        if (self.mobileInput) {
-          if (self.mobileInput.parentNode) self.mobileInput.parentNode.removeChild(self.mobileInput);
-          self.mobileInput = undefined;
-        } else if (self.calendarContainer && self.calendarContainer.parentNode) {
-          if (self.config.static && self.calendarContainer.parentNode) {
-            var wrapper = self.calendarContainer.parentNode;
-            wrapper.lastChild && wrapper.removeChild(wrapper.lastChild);
-
-            if (wrapper.parentNode) {
-              while (wrapper.firstChild) {
-                wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
-              }
-
-              wrapper.parentNode.removeChild(wrapper);
-            }
-          } else self.calendarContainer.parentNode.removeChild(self.calendarContainer);
-        }
-
-        if (self.altInput) {
-          self.input.type = "text";
-          if (self.altInput.parentNode) self.altInput.parentNode.removeChild(self.altInput);
-          delete self.altInput;
-        }
-
-        if (self.input) {
-          self.input.type = self.input._type;
-          self.input.classList.remove("flatpickr-input");
-          self.input.removeAttribute("readonly");
-          self.input.value = "";
-        }
-
-        ["_showTimeInput", "latestSelectedDateObj", "_hideNextMonthArrow", "_hidePrevMonthArrow", "__hideNextMonthArrow", "__hidePrevMonthArrow", "isMobile", "isOpen", "selectedDateElem", "minDateHasTime", "maxDateHasTime", "days", "daysContainer", "_input", "_positionElement", "innerContainer", "rContainer", "monthNav", "todayDateElem", "calendarContainer", "weekdayContainer", "prevMonthNav", "nextMonthNav", "currentMonthElement", "currentYearElement", "navigationCurrentMonth", "selectedDateElem", "config"].forEach(function (k) {
-          try {
-            delete self[k];
-          } catch (_) {}
-        });
-      }
-
-      function isCalendarElem(elem) {
-        if (self.config.appendTo && self.config.appendTo.contains(elem)) return true;
-        return self.calendarContainer.contains(elem);
-      }
-
-      function documentClick(e) {
-        if (self.isOpen && !self.config.inline) {
-          var isCalendarElement = isCalendarElem(e.target);
-          var isInput = e.target === self.input || e.target === self.altInput || self.element.contains(e.target) || e.path && e.path.indexOf && (~e.path.indexOf(self.input) || ~e.path.indexOf(self.altInput));
-          var lostFocus = e.type === "blur" ? isInput && e.relatedTarget && !isCalendarElem(e.relatedTarget) : !isInput && !isCalendarElement;
-          var isIgnored = !self.config.ignoredFocusElements.some(function (elem) {
-            return elem.contains(e.target);
-          });
-
-          if (lostFocus && isIgnored) {
-            self.close();
-
-            if (self.config.mode === "range" && self.selectedDates.length === 1) {
-              self.clear(false);
-              self.redraw();
-            }
-          }
-        }
-      }
-
-      function changeYear(newYear) {
-        if (!newYear || self.config.minDate && newYear < self.config.minDate.getFullYear() || self.config.maxDate && newYear > self.config.maxDate.getFullYear()) return;
-        var newYearNum = newYear,
-            isNewYear = self.currentYear !== newYearNum;
-        self.currentYear = newYearNum || self.currentYear;
-
-        if (self.config.maxDate && self.currentYear === self.config.maxDate.getFullYear()) {
-          self.currentMonth = Math.min(self.config.maxDate.getMonth(), self.currentMonth);
-        } else if (self.config.minDate && self.currentYear === self.config.minDate.getFullYear()) {
-          self.currentMonth = Math.max(self.config.minDate.getMonth(), self.currentMonth);
-        }
-
-        if (isNewYear) {
-          self.redraw();
-          triggerEvent("onYearChange");
-        }
-      }
-
-      function isEnabled(date, timeless) {
-        if (timeless === void 0) {
-          timeless = true;
-        }
-
-        var dateToCheck = self.parseDate(date, undefined, timeless);
-        if (self.config.minDate && dateToCheck && compareDates(dateToCheck, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0 || self.config.maxDate && dateToCheck && compareDates(dateToCheck, self.config.maxDate, timeless !== undefined ? timeless : !self.maxDateHasTime) > 0) return false;
-        if (self.config.enable.length === 0 && self.config.disable.length === 0) return true;
-        if (dateToCheck === undefined) return false;
-        var bool = self.config.enable.length > 0,
-            array = bool ? self.config.enable : self.config.disable;
-
-        for (var i = 0, d; i < array.length; i++) {
-          d = array[i];
-          if (typeof d === "function" && d(dateToCheck)) return bool;else if (d instanceof Date && dateToCheck !== undefined && d.getTime() === dateToCheck.getTime()) return bool;else if (typeof d === "string" && dateToCheck !== undefined) {
-            var parsed = self.parseDate(d, undefined, true);
-            return parsed && parsed.getTime() === dateToCheck.getTime() ? bool : !bool;
-          } else if (typeof d === "object" && dateToCheck !== undefined && d.from && d.to && dateToCheck.getTime() >= d.from.getTime() && dateToCheck.getTime() <= d.to.getTime()) return bool;
-        }
-
-        return !bool;
-      }
-
-      function isInView(elem) {
-        if (self.daysContainer !== undefined) return elem.className.indexOf("hidden") === -1 && self.daysContainer.contains(elem);
-        return false;
-      }
-
-      function onKeyDown(e) {
-        var isInput = e.target === self._input;
-        var allowInput = self.config.allowInput;
-        var allowKeydown = self.isOpen && (!allowInput || !isInput);
-        var allowInlineKeydown = self.config.inline && isInput && !allowInput;
-
-        if (e.keyCode === 13 && isInput) {
-          if (allowInput) {
-            self.setDate(self._input.value, true, e.target === self.altInput ? self.config.altFormat : self.config.dateFormat);
-            return e.target.blur();
-          } else self.open();
-        } else if (isCalendarElem(e.target) || allowKeydown || allowInlineKeydown) {
-          var isTimeObj = !!self.timeContainer && self.timeContainer.contains(e.target);
-
-          switch (e.keyCode) {
-            case 13:
-              if (isTimeObj) updateTime();else selectDate(e);
-              break;
-
-            case 27:
-              e.preventDefault();
-              focusAndClose();
-              break;
-
-            case 8:
-            case 46:
-              if (isInput && !self.config.allowInput) {
-                e.preventDefault();
-                self.clear();
-              }
-
-              break;
-
-            case 37:
-            case 39:
-              if (!isTimeObj) {
-                e.preventDefault();
-
-                if (self.daysContainer !== undefined && (allowInput === false || isInView(document.activeElement))) {
-                  var _delta = e.keyCode === 39 ? 1 : -1;
-
-                  if (!e.ctrlKey) focusOnDay(undefined, _delta);else {
-                    changeMonth(_delta);
-                    focusOnDay(getFirstAvailableDay(1), 0);
-                  }
+        self._bind = bind;
+        self._setHoursFromDate = setHoursFromDate;
+        self._positionCalendar = positionCalendar;
+        self.changeMonth = changeMonth;
+        self.changeYear = changeYear;
+        self.clear = clear;
+        self.close = close;
+        self._createElement = createElement;
+        self.destroy = destroy;
+        self.isEnabled = isEnabled;
+        self.jumpToDate = jumpToDate;
+        self.open = open;
+        self.redraw = redraw;
+        self.set = set;
+        self.setDate = setDate;
+        self.toggle = toggle;
+        function setupHelperFunctions() {
+            self.utils = {
+                getDaysInMonth: function (month, yr) {
+                    if (month === void 0) { month = self.currentMonth; }
+                    if (yr === void 0) { yr = self.currentYear; }
+                    if (month === 1 && ((yr % 4 === 0 && yr % 100 !== 0) || yr % 400 === 0))
+                        return 29;
+                    return self.l10n.daysInMonth[month];
                 }
-              } else if (self.hourElement) self.hourElement.focus();
-
-              break;
-
-            case 38:
-            case 40:
-              e.preventDefault();
-              var delta = e.keyCode === 40 ? 1 : -1;
-
-              if (self.daysContainer && e.target.$i !== undefined) {
-                if (e.ctrlKey) {
-                  changeYear(self.currentYear - delta);
-                  focusOnDay(getFirstAvailableDay(1), 0);
-                } else if (!isTimeObj) focusOnDay(undefined, delta * 7);
-              } else if (self.config.enableTime) {
-                if (!isTimeObj && self.hourElement) self.hourElement.focus();
-                updateTime(e);
-
+            };
+        }
+        function init() {
+            self.element = self.input = element;
+            self.isOpen = false;
+            parseConfig();
+            setupLocale();
+            setupInputs();
+            setupDates();
+            setupHelperFunctions();
+            if (!self.isMobile)
+                build();
+            bindEvents();
+            if (self.selectedDates.length || self.config.noCalendar) {
+                if (self.config.enableTime) {
+                    setHoursFromDate(self.config.noCalendar
+                        ? self.latestSelectedDateObj || self.config.minDate
+                        : undefined);
+                }
+                updateValue(false);
+            }
+            setCalendarWidth();
+            self.showTimeInput =
+                self.selectedDates.length > 0 || self.config.noCalendar;
+            var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            /* TODO: investigate this further
+        
+              Currently, there is weird positioning behavior in safari causing pages
+              to scroll up. https://github.com/chmln/flatpickr/issues/563
+        
+              However, most browsers are not Safari and positioning is expensive when used
+              in scale. https://github.com/chmln/flatpickr/issues/1096
+            */
+            if (!self.isMobile && isSafari) {
+                positionCalendar();
+            }
+            triggerEvent("onReady");
+        }
+        function bindToInstance(fn) {
+            return fn.bind(self);
+        }
+        function setCalendarWidth() {
+            var config = self.config;
+            if (config.weekNumbers === false && config.showMonths === 1)
+                return;
+            else if (config.noCalendar !== true) {
+                window.requestAnimationFrame(function () {
+                    if (self.calendarContainer !== undefined) {
+                        self.calendarContainer.style.visibility = "hidden";
+                        self.calendarContainer.style.display = "block";
+                    }
+                    if (self.daysContainer !== undefined) {
+                        var daysWidth = (self.days.offsetWidth + 1) * config.showMonths;
+                        self.daysContainer.style.width = daysWidth + "px";
+                        self.calendarContainer.style.width =
+                            daysWidth +
+                                (self.weekWrapper !== undefined
+                                    ? self.weekWrapper.offsetWidth
+                                    : 0) +
+                                "px";
+                        self.calendarContainer.style.removeProperty("visibility");
+                        self.calendarContainer.style.removeProperty("display");
+                    }
+                });
+            }
+        }
+        /**
+         * The handler for all events targeting the time inputs
+         */
+        function updateTime(e) {
+            if (self.selectedDates.length === 0) {
+                setDefaultTime();
+            }
+            if (e !== undefined && e.type !== "blur") {
+                timeWrapper(e);
+            }
+            var prevValue = self._input.value;
+            setHoursFromInputs();
+            updateValue();
+            if (self._input.value !== prevValue) {
                 self._debouncedChange();
-              }
-
-              break;
-
-            case 9:
-              if (!isTimeObj) {
-                self.element.focus();
-                break;
-              }
-
-              var elems = [self.hourElement, self.minuteElement, self.secondElement, self.amPM].filter(function (x) {
-                return x;
-              });
-              var i = elems.indexOf(e.target);
-
-              if (i !== -1) {
-                var target = elems[i + (e.shiftKey ? -1 : 1)];
-
-                if (target !== undefined) {
-                  e.preventDefault();
-                  target.focus();
-                } else {
-                  self.element.focus();
-                }
-              }
-
-              break;
-
-            default:
-              break;
-          }
-        }
-
-        if (self.amPM !== undefined && e.target === self.amPM) {
-          switch (e.key) {
-            case self.l10n.amPM[0].charAt(0):
-            case self.l10n.amPM[0].charAt(0).toLowerCase():
-              self.amPM.textContent = self.l10n.amPM[0];
-              setHoursFromInputs();
-              updateValue();
-              break;
-
-            case self.l10n.amPM[1].charAt(0):
-            case self.l10n.amPM[1].charAt(0).toLowerCase():
-              self.amPM.textContent = self.l10n.amPM[1];
-              setHoursFromInputs();
-              updateValue();
-              break;
-          }
-        }
-
-        triggerEvent("onKeyDown", e);
-      }
-
-      function onMouseOver(elem) {
-        if (self.selectedDates.length !== 1 || elem && (!elem.classList.contains("flatpickr-day") || elem.classList.contains("disabled"))) return;
-        var hoverDate = elem ? elem.dateObj.getTime() : self.days.firstElementChild.dateObj.getTime(),
-            initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(),
-            rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()),
-            rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime()),
-            lastDate = self.daysContainer.lastChild.lastChild.dateObj.getTime();
-        var containsDisabled = false;
-        var minRange = 0,
-            maxRange = 0;
-
-        for (var t = rangeStartDate; t < lastDate; t += duration.DAY) {
-          if (!isEnabled(new Date(t), true)) {
-            containsDisabled = containsDisabled || t > rangeStartDate && t < rangeEndDate;
-            if (t < initialDate && (!minRange || t > minRange)) minRange = t;else if (t > initialDate && (!maxRange || t < maxRange)) maxRange = t;
-          }
-        }
-
-        for (var m = 0; m < self.config.showMonths; m++) {
-          var month = self.daysContainer.children[m];
-          var prevMonth = self.daysContainer.children[m - 1];
-
-          var _loop = function _loop(i, l) {
-            var dayElem = month.children[i],
-                date = dayElem.dateObj;
-            var timestamp = date.getTime();
-            var outOfRange = minRange > 0 && timestamp < minRange || maxRange > 0 && timestamp > maxRange;
-
-            if (outOfRange) {
-              dayElem.classList.add("notAllowed");
-              ["inRange", "startRange", "endRange"].forEach(function (c) {
-                dayElem.classList.remove(c);
-              });
-              return "continue";
-            } else if (containsDisabled && !outOfRange) return "continue";
-
-            ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
-              dayElem.classList.remove(c);
-            });
-
-            if (elem !== undefined) {
-              elem.classList.add(hoverDate < self.selectedDates[0].getTime() ? "startRange" : "endRange");
-
-              if (month.contains(elem) || !(m > 0 && prevMonth && prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
-                if (initialDate < hoverDate && timestamp === initialDate) dayElem.classList.add("startRange");else if (initialDate > hoverDate && timestamp === initialDate) dayElem.classList.add("endRange");
-                if (timestamp >= minRange && (maxRange === 0 || timestamp <= maxRange) && isBetween(timestamp, initialDate, hoverDate)) dayElem.classList.add("inRange");
-              }
             }
-          };
-
-          for (var i = 0, l = month.children.length; i < l; i++) {
-            var _ret = _loop(i, l);
-
-            if (_ret === "continue") continue;
-          }
         }
-      }
-
-      function onResize() {
-        if (self.isOpen && !self.config.static && !self.config.inline) positionCalendar();
-      }
-
-      function open(e, positionElement) {
-        if (positionElement === void 0) {
-          positionElement = self._positionElement;
+        function ampm2military(hour, amPM) {
+            return (hour % 12) + 12 * int(amPM === self.l10n.amPM[1]);
         }
-
-        if (self.isMobile === true) {
-          if (e) {
-            e.preventDefault();
-            e.target && e.target.blur();
-          }
-
-          if (self.mobileInput !== undefined) {
-            self.mobileInput.focus();
-            self.mobileInput.click();
-          }
-
-          triggerEvent("onOpen");
-          return;
+        function military2ampm(hour) {
+            switch (hour % 24) {
+                case 0:
+                case 12:
+                    return 12;
+                default:
+                    return hour % 12;
+            }
         }
-
-        if (self._input.disabled || self.config.inline) return;
-        var wasOpen = self.isOpen;
-        self.isOpen = true;
-
-        if (!wasOpen) {
-          self.calendarContainer.classList.add("open");
-
-          self._input.classList.add("active");
-
-          triggerEvent("onOpen");
-          positionCalendar(positionElement);
+        /**
+         * Syncs the selected date object time with user's time input
+         */
+        function setHoursFromInputs() {
+            if (self.hourElement === undefined || self.minuteElement === undefined)
+                return;
+            var hours = (parseInt(self.hourElement.value.slice(-2), 10) || 0) % 24, minutes = (parseInt(self.minuteElement.value, 10) || 0) % 60, seconds = self.secondElement !== undefined
+                ? (parseInt(self.secondElement.value, 10) || 0) % 60
+                : 0;
+            if (self.amPM !== undefined) {
+                hours = ampm2military(hours, self.amPM.textContent);
+            }
+            var limitMinHours = self.config.minTime !== undefined ||
+                (self.config.minDate &&
+                    self.minDateHasTime &&
+                    self.latestSelectedDateObj &&
+                    compareDates(self.latestSelectedDateObj, self.config.minDate, true) ===
+                        0);
+            var limitMaxHours = self.config.maxTime !== undefined ||
+                (self.config.maxDate &&
+                    self.maxDateHasTime &&
+                    self.latestSelectedDateObj &&
+                    compareDates(self.latestSelectedDateObj, self.config.maxDate, true) ===
+                        0);
+            if (limitMaxHours) {
+                var maxTime = self.config.maxTime !== undefined
+                    ? self.config.maxTime
+                    : self.config.maxDate;
+                hours = Math.min(hours, maxTime.getHours());
+                if (hours === maxTime.getHours())
+                    minutes = Math.min(minutes, maxTime.getMinutes());
+                if (minutes === maxTime.getMinutes())
+                    seconds = Math.min(seconds, maxTime.getSeconds());
+            }
+            if (limitMinHours) {
+                var minTime = self.config.minTime !== undefined
+                    ? self.config.minTime
+                    : self.config.minDate;
+                hours = Math.max(hours, minTime.getHours());
+                if (hours === minTime.getHours())
+                    minutes = Math.max(minutes, minTime.getMinutes());
+                if (minutes === minTime.getMinutes())
+                    seconds = Math.max(seconds, minTime.getSeconds());
+            }
+            setHours(hours, minutes, seconds);
         }
-
-        if (self.config.enableTime === true && self.config.noCalendar === true) {
-          if (self.selectedDates.length === 0) {
-            self.setDate(self.config.minDate !== undefined ? new Date(self.config.minDate.getTime()) : new Date(), false);
+        /**
+         * Syncs time input values with a date
+         */
+        function setHoursFromDate(dateObj) {
+            var date = dateObj || self.latestSelectedDateObj;
+            if (date)
+                setHours(date.getHours(), date.getMinutes(), date.getSeconds());
+        }
+        function setDefaultHours() {
+            var hours = self.config.defaultHour;
+            var minutes = self.config.defaultMinute;
+            var seconds = self.config.defaultSeconds;
+            if (self.config.minDate !== undefined) {
+                var min_hr = self.config.minDate.getHours();
+                var min_minutes = self.config.minDate.getMinutes();
+                hours = Math.max(hours, min_hr);
+                if (hours === min_hr)
+                    minutes = Math.max(min_minutes, minutes);
+                if (hours === min_hr && minutes === min_minutes)
+                    seconds = self.config.minDate.getSeconds();
+            }
+            if (self.config.maxDate !== undefined) {
+                var max_hr = self.config.maxDate.getHours();
+                var max_minutes = self.config.maxDate.getMinutes();
+                hours = Math.min(hours, max_hr);
+                if (hours === max_hr)
+                    minutes = Math.min(max_minutes, minutes);
+                if (hours === max_hr && minutes === max_minutes)
+                    seconds = self.config.maxDate.getSeconds();
+            }
+            setHours(hours, minutes, seconds);
+        }
+        /**
+         * Sets the hours, minutes, and optionally seconds
+         * of the latest selected date object and the
+         * corresponding time inputs
+         * @param {Number} hours the hour. whether its military
+         *                 or am-pm gets inferred from config
+         * @param {Number} minutes the minutes
+         * @param {Number} seconds the seconds (optional)
+         */
+        function setHours(hours, minutes, seconds) {
+            if (self.latestSelectedDateObj !== undefined) {
+                self.latestSelectedDateObj.setHours(hours % 24, minutes, seconds || 0, 0);
+            }
+            if (!self.hourElement || !self.minuteElement || self.isMobile)
+                return;
+            self.hourElement.value = pad(!self.config.time_24hr
+                ? ((12 + hours) % 12) + 12 * int(hours % 12 === 0)
+                : hours);
+            self.minuteElement.value = pad(minutes);
+            if (self.amPM !== undefined)
+                self.amPM.textContent = self.l10n.amPM[int(hours >= 12)];
+            if (self.secondElement !== undefined)
+                self.secondElement.value = pad(seconds);
+        }
+        /**
+         * Handles the year input and incrementing events
+         * @param {Event} event the keyup or increment event
+         */
+        function onYearInput(event) {
+            var year = parseInt(event.target.value) + (event.delta || 0);
+            if (year / 1000 > 1 ||
+                (event.key === "Enter" && !/[^\d]/.test(year.toString()))) {
+                changeYear(year);
+            }
+        }
+        /**
+         * Essentially addEventListener + tracking
+         * @param {Element} element the element to addEventListener to
+         * @param {String} event the event name
+         * @param {Function} handler the event handler
+         */
+        function bind(element, event, handler, options) {
+            if (event instanceof Array)
+                return event.forEach(function (ev) { return bind(element, ev, handler, options); });
+            if (element instanceof Array)
+                return element.forEach(function (el) { return bind(el, event, handler, options); });
+            element.addEventListener(event, handler, options);
+            self._handlers.push({
+                element: element,
+                event: event,
+                handler: handler,
+                options: options
+            });
+        }
+        /**
+         * A mousedown handler which mimics click.
+         * Minimizes latency, since we don't need to wait for mouseup in most cases.
+         * Also, avoids handling right clicks.
+         *
+         * @param {Function} handler the event handler
+         */
+        function onClick(handler) {
+            return function (evt) {
+                evt.which === 1 && handler(evt);
+            };
+        }
+        function triggerChange() {
+            triggerEvent("onChange");
+        }
+        /**
+         * Adds all the necessary event listeners
+         */
+        function bindEvents() {
+            if (self.config.wrap) {
+                ["open", "close", "toggle", "clear"].forEach(function (evt) {
+                    Array.prototype.forEach.call(self.element.querySelectorAll("[data-" + evt + "]"), function (el) {
+                        return bind(el, "click", self[evt]);
+                    });
+                });
+            }
+            if (self.isMobile) {
+                setupMobile();
+                return;
+            }
+            var debouncedResize = debounce(onResize, 50);
+            self._debouncedChange = debounce(triggerChange, DEBOUNCED_CHANGE_MS);
+            if (self.daysContainer && !/iPhone|iPad|iPod/i.test(navigator.userAgent))
+                bind(self.daysContainer, "mouseover", function (e) {
+                    if (self.config.mode === "range")
+                        onMouseOver(e.target);
+                });
+            bind(window.document.body, "keydown", onKeyDown);
+            if (!self.config.static)
+                bind(self._input, "keydown", onKeyDown);
+            if (!self.config.inline && !self.config.static)
+                bind(window, "resize", debouncedResize);
+            if (window.ontouchstart !== undefined)
+                bind(window.document, "click", documentClick);
+            else
+                bind(window.document, "mousedown", onClick(documentClick));
+            bind(window.document, "focus", documentClick, { capture: true });
+            if (self.config.clickOpens === true) {
+                bind(self._input, "focus", self.open);
+                bind(self._input, "mousedown", onClick(self.open));
+            }
+            if (self.daysContainer !== undefined) {
+                bind(self.monthNav, "mousedown", onClick(onMonthNavClick));
+                bind(self.monthNav, ["keyup", "increment"], onYearInput);
+                bind(self.daysContainer, "mousedown", onClick(selectDate));
+            }
+            if (self.timeContainer !== undefined &&
+                self.minuteElement !== undefined &&
+                self.hourElement !== undefined) {
+                var selText = function (e) {
+                    return e.target.select();
+                };
+                bind(self.timeContainer, ["increment"], updateTime);
+                bind(self.timeContainer, "blur", updateTime, { capture: true });
+                bind(self.timeContainer, "mousedown", onClick(timeIncrement));
+                bind([self.hourElement, self.minuteElement], ["focus", "click"], selText);
+                if (self.secondElement !== undefined)
+                    bind(self.secondElement, "focus", function () { return self.secondElement && self.secondElement.select(); });
+                if (self.amPM !== undefined) {
+                    bind(self.amPM, "mousedown", onClick(function (e) {
+                        updateTime(e);
+                        triggerChange();
+                    }));
+                }
+            }
+        }
+        /**
+         * Set the calendar view to a particular date.
+         * @param {Date} jumpDate the date to set the view to
+         */
+        function jumpToDate(jumpDate) {
+            var jumpTo = jumpDate !== undefined
+                ? self.parseDate(jumpDate)
+                : self.latestSelectedDateObj ||
+                    (self.config.minDate && self.config.minDate > self.now
+                        ? self.config.minDate
+                        : self.config.maxDate && self.config.maxDate < self.now
+                            ? self.config.maxDate
+                            : self.now);
+            try {
+                if (jumpTo !== undefined) {
+                    self.currentYear = jumpTo.getFullYear();
+                    self.currentMonth = jumpTo.getMonth();
+                }
+            }
+            catch (e) {
+                /* istanbul ignore next */
+                e.message = "Invalid date supplied: " + jumpTo;
+                self.config.errorHandler(e);
+            }
+            self.redraw();
+        }
+        /**
+         * The up/down arrow handler for time inputs
+         * @param {Event} e the click event
+         */
+        function timeIncrement(e) {
+            if (~e.target.className.indexOf("arrow"))
+                incrementNumInput(e, e.target.classList.contains("arrowUp") ? 1 : -1);
+        }
+        /**
+         * Increments/decrements the value of input associ-
+         * ated with the up/down arrow by dispatching an
+         * "increment" event on the input.
+         *
+         * @param {Event} e the click event
+         * @param {Number} delta the diff (usually 1 or -1)
+         * @param {Element} inputElem the input element
+         */
+        function incrementNumInput(e, delta, inputElem) {
+            var target = e && e.target;
+            var input = inputElem ||
+                (target && target.parentNode && target.parentNode.firstChild);
+            var event = createEvent("increment");
+            event.delta = delta;
+            input && input.dispatchEvent(event);
+        }
+        function build() {
+            var fragment = window.document.createDocumentFragment();
+            self.calendarContainer = createElement("div", "flatpickr-calendar");
+            self.calendarContainer.tabIndex = -1;
+            if (!self.config.noCalendar) {
+                fragment.appendChild(buildMonthNav());
+                self.innerContainer = createElement("div", "flatpickr-innerContainer");
+                if (self.config.weekNumbers) {
+                    var _a = buildWeeks(), weekWrapper = _a.weekWrapper, weekNumbers = _a.weekNumbers;
+                    self.innerContainer.appendChild(weekWrapper);
+                    self.weekNumbers = weekNumbers;
+                    self.weekWrapper = weekWrapper;
+                }
+                self.rContainer = createElement("div", "flatpickr-rContainer");
+                self.rContainer.appendChild(buildWeekdays());
+                if (!self.daysContainer) {
+                    self.daysContainer = createElement("div", "flatpickr-days");
+                    self.daysContainer.tabIndex = -1;
+                }
+                buildDays();
+                self.rContainer.appendChild(self.daysContainer);
+                self.innerContainer.appendChild(self.rContainer);
+                fragment.appendChild(self.innerContainer);
+            }
+            if (self.config.enableTime) {
+                fragment.appendChild(buildTime());
+            }
+            toggleClass(self.calendarContainer, "rangeMode", self.config.mode === "range");
+            toggleClass(self.calendarContainer, "animate", self.config.animate === true);
+            toggleClass(self.calendarContainer, "multiMonth", self.config.showMonths > 1);
+            self.calendarContainer.appendChild(fragment);
+            var customAppend = self.config.appendTo !== undefined &&
+                self.config.appendTo.nodeType !== undefined;
+            if (self.config.inline || self.config.static) {
+                self.calendarContainer.classList.add(self.config.inline ? "inline" : "static");
+                if (self.config.inline) {
+                    if (!customAppend && self.element.parentNode)
+                        self.element.parentNode.insertBefore(self.calendarContainer, self._input.nextSibling);
+                    else if (self.config.appendTo !== undefined)
+                        self.config.appendTo.appendChild(self.calendarContainer);
+                }
+                if (self.config.static) {
+                    var wrapper = createElement("div", "flatpickr-wrapper");
+                    if (self.element.parentNode)
+                        self.element.parentNode.insertBefore(wrapper, self.element);
+                    wrapper.appendChild(self.element);
+                    if (self.altInput)
+                        wrapper.appendChild(self.altInput);
+                    wrapper.appendChild(self.calendarContainer);
+                }
+            }
+            if (!self.config.static && !self.config.inline)
+                (self.config.appendTo !== undefined
+                    ? self.config.appendTo
+                    : window.document.body).appendChild(self.calendarContainer);
+        }
+        function createDay(className, date, dayNumber, i) {
+            var dateIsEnabled = isEnabled(date, true), dayElement = createElement("span", "flatpickr-day " + className, date.getDate().toString());
+            dayElement.dateObj = date;
+            dayElement.$i = i;
+            dayElement.setAttribute("aria-label", self.formatDate(date, self.config.ariaDateFormat));
+            if (className.indexOf("hidden") === -1 &&
+                compareDates(date, self.now) === 0) {
+                self.todayDateElem = dayElement;
+                dayElement.classList.add("today");
+                dayElement.setAttribute("aria-current", "date");
+            }
+            if (dateIsEnabled) {
+                dayElement.tabIndex = -1;
+                if (isDateSelected(date)) {
+                    dayElement.classList.add("selected");
+                    self.selectedDateElem = dayElement;
+                    if (self.config.mode === "range") {
+                        toggleClass(dayElement, "startRange", self.selectedDates[0] &&
+                            compareDates(date, self.selectedDates[0], true) === 0);
+                        toggleClass(dayElement, "endRange", self.selectedDates[1] &&
+                            compareDates(date, self.selectedDates[1], true) === 0);
+                        if (className === "nextMonthDay")
+                            dayElement.classList.add("inRange");
+                    }
+                }
+            }
+            else {
+                dayElement.classList.add("disabled");
+            }
+            if (self.config.mode === "range") {
+                if (isDateInRange(date) && !isDateSelected(date))
+                    dayElement.classList.add("inRange");
+            }
+            if (self.weekNumbers &&
+                self.config.showMonths === 1 &&
+                className !== "prevMonthDay" &&
+                dayNumber % 7 === 1) {
+                self.weekNumbers.insertAdjacentHTML("beforeend", "<span class='flatpickr-day'>" + self.config.getWeek(date) + "</span>");
+            }
+            triggerEvent("onDayCreate", dayElement);
+            return dayElement;
+        }
+        function focusOnDayElem(targetNode) {
+            targetNode.focus();
+            if (self.config.mode === "range")
+                onMouseOver(targetNode);
+        }
+        function getFirstAvailableDay(delta) {
+            var startMonth = delta > 0 ? 0 : self.config.showMonths - 1;
+            var endMonth = delta > 0 ? self.config.showMonths : -1;
+            for (var m = startMonth; m != endMonth; m += delta) {
+                var month = self.daysContainer.children[m];
+                var startIndex = delta > 0 ? 0 : month.children.length - 1;
+                var endIndex = delta > 0 ? month.children.length : -1;
+                for (var i = startIndex; i != endIndex; i += delta) {
+                    var c = month.children[i];
+                    if (c.className.indexOf("hidden") === -1 && isEnabled(c.dateObj))
+                        return c;
+                }
+            }
+            return undefined;
+        }
+        function getNextAvailableDay(current, delta) {
+            var givenMonth = current.className.indexOf("Month") === -1
+                ? current.dateObj.getMonth()
+                : self.currentMonth;
+            var endMonth = delta > 0 ? self.config.showMonths : -1;
+            var loopDelta = delta > 0 ? 1 : -1;
+            for (var m = givenMonth - self.currentMonth; m != endMonth; m += loopDelta) {
+                var month = self.daysContainer.children[m];
+                var startIndex = givenMonth - self.currentMonth === m
+                    ? current.$i + delta
+                    : delta < 0
+                        ? month.children.length - 1
+                        : 0;
+                var numMonthDays = month.children.length;
+                for (var i = startIndex; i >= 0 && i < numMonthDays && i != (delta > 0 ? numMonthDays : -1); i += loopDelta) {
+                    var c = month.children[i];
+                    if (c.className.indexOf("hidden") === -1 &&
+                        isEnabled(c.dateObj) &&
+                        Math.abs(current.$i - i) >= Math.abs(delta))
+                        return focusOnDayElem(c);
+                }
+            }
+            self.changeMonth(loopDelta);
+            focusOnDay(getFirstAvailableDay(loopDelta), 0);
+            return undefined;
+        }
+        function focusOnDay(current, offset) {
+            var dayFocused = isInView(document.activeElement || document.body);
+            var startElem = current !== undefined
+                ? current
+                : dayFocused
+                    ? document.activeElement
+                    : self.selectedDateElem !== undefined && isInView(self.selectedDateElem)
+                        ? self.selectedDateElem
+                        : self.todayDateElem !== undefined && isInView(self.todayDateElem)
+                            ? self.todayDateElem
+                            : getFirstAvailableDay(offset > 0 ? 1 : -1);
+            if (startElem === undefined)
+                return self._input.focus();
+            if (!dayFocused)
+                return focusOnDayElem(startElem);
+            getNextAvailableDay(startElem, offset);
+        }
+        function buildMonthDays(year, month) {
+            var firstOfMonth = (new Date(year, month, 1).getDay() - self.l10n.firstDayOfWeek + 7) % 7;
+            var prevMonthDays = self.utils.getDaysInMonth((month - 1 + 12) % 12);
+            var daysInMonth = self.utils.getDaysInMonth(month), days = window.document.createDocumentFragment(), isMultiMonth = self.config.showMonths > 1, prevMonthDayClass = isMultiMonth ? "prevMonthDay hidden" : "prevMonthDay", nextMonthDayClass = isMultiMonth ? "nextMonthDay hidden" : "nextMonthDay";
+            var dayNumber = prevMonthDays + 1 - firstOfMonth, dayIndex = 0;
+            // prepend days from the ending of previous month
+            for (; dayNumber <= prevMonthDays; dayNumber++, dayIndex++) {
+                days.appendChild(createDay(prevMonthDayClass, new Date(year, month - 1, dayNumber), dayNumber, dayIndex));
+            }
+            // Start at 1 since there is no 0th day
+            for (dayNumber = 1; dayNumber <= daysInMonth; dayNumber++, dayIndex++) {
+                days.appendChild(createDay("", new Date(year, month, dayNumber), dayNumber, dayIndex));
+            }
+            // append days from the next month
+            for (var dayNum = daysInMonth + 1; dayNum <= 42 - firstOfMonth &&
+                (self.config.showMonths === 1 || dayIndex % 7 !== 0); dayNum++, dayIndex++) {
+                days.appendChild(createDay(nextMonthDayClass, new Date(year, month + 1, dayNum % daysInMonth), dayNum, dayIndex));
+            }
+            //updateNavigationCurrentMonth();
+            var dayContainer = createElement("div", "dayContainer");
+            dayContainer.appendChild(days);
+            return dayContainer;
+        }
+        function buildDays() {
+            if (self.daysContainer === undefined) {
+                return;
+            }
+            clearNode(self.daysContainer);
+            // TODO: week numbers for each month
+            if (self.weekNumbers)
+                clearNode(self.weekNumbers);
+            var frag = document.createDocumentFragment();
+            for (var i = 0; i < self.config.showMonths; i++) {
+                var d = new Date(self.currentYear, self.currentMonth, 1);
+                d.setMonth(self.currentMonth + i);
+                frag.appendChild(buildMonthDays(d.getFullYear(), d.getMonth()));
+            }
+            self.daysContainer.appendChild(frag);
+            self.days = self.daysContainer.firstChild;
+            if (self.config.mode === "range" && self.selectedDates.length === 1) {
+                onMouseOver();
+            }
+        }
+        function buildMonth() {
+            var container = createElement("div", "flatpickr-month");
+            var monthNavFragment = window.document.createDocumentFragment();
+            var monthElement = createElement("span", "cur-month");
+            var yearInput = createNumberInput("cur-year", { tabindex: "-1" });
+            var yearElement = yearInput.getElementsByTagName("input")[0];
+            yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
+            if (self.config.minDate) {
+                yearElement.setAttribute("min", self.config.minDate.getFullYear().toString());
+            }
+            if (self.config.maxDate) {
+                yearElement.setAttribute("max", self.config.maxDate.getFullYear().toString());
+                yearElement.disabled =
+                    !!self.config.minDate &&
+                        self.config.minDate.getFullYear() === self.config.maxDate.getFullYear();
+            }
+            var currentMonth = createElement("div", "flatpickr-current-month");
+            currentMonth.appendChild(monthElement);
+            currentMonth.appendChild(yearInput);
+            monthNavFragment.appendChild(currentMonth);
+            container.appendChild(monthNavFragment);
+            return {
+                container: container,
+                yearElement: yearElement,
+                monthElement: monthElement
+            };
+        }
+        function buildMonths() {
+            clearNode(self.monthNav);
+            self.monthNav.appendChild(self.prevMonthNav);
+            if (self.config.showMonths) {
+                self.yearElements = [];
+                self.monthElements = [];
+            }
+            for (var m = self.config.showMonths; m--;) {
+                var month = buildMonth();
+                self.yearElements.push(month.yearElement);
+                self.monthElements.push(month.monthElement);
+                self.monthNav.appendChild(month.container);
+            }
+            self.monthNav.appendChild(self.nextMonthNav);
+        }
+        function buildMonthNav() {
+            self.monthNav = createElement("div", "flatpickr-months");
+            self.yearElements = [];
+            self.monthElements = [];
+            self.prevMonthNav = createElement("span", "flatpickr-prev-month");
+            self.prevMonthNav.innerHTML = self.config.prevArrow;
+            self.nextMonthNav = createElement("span", "flatpickr-next-month");
+            self.nextMonthNav.innerHTML = self.config.nextArrow;
+            buildMonths();
+            Object.defineProperty(self, "_hidePrevMonthArrow", {
+                get: function () { return self.__hidePrevMonthArrow; },
+                set: function (bool) {
+                    if (self.__hidePrevMonthArrow !== bool) {
+                        toggleClass(self.prevMonthNav, "disabled", bool);
+                        self.__hidePrevMonthArrow = bool;
+                    }
+                }
+            });
+            Object.defineProperty(self, "_hideNextMonthArrow", {
+                get: function () { return self.__hideNextMonthArrow; },
+                set: function (bool) {
+                    if (self.__hideNextMonthArrow !== bool) {
+                        toggleClass(self.nextMonthNav, "disabled", bool);
+                        self.__hideNextMonthArrow = bool;
+                    }
+                }
+            });
+            self.currentYearElement = self.yearElements[0];
+            updateNavigationCurrentMonth();
+            return self.monthNav;
+        }
+        function buildTime() {
+            self.calendarContainer.classList.add("hasTime");
+            if (self.config.noCalendar)
+                self.calendarContainer.classList.add("noCalendar");
+            self.timeContainer = createElement("div", "flatpickr-time");
+            self.timeContainer.tabIndex = -1;
+            var separator = createElement("span", "flatpickr-time-separator", ":");
+            var hourInput = createNumberInput("flatpickr-hour");
+            self.hourElement = hourInput.getElementsByTagName("input")[0];
+            var minuteInput = createNumberInput("flatpickr-minute");
+            self.minuteElement = minuteInput.getElementsByTagName("input")[0];
+            self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
+            self.hourElement.value = pad(self.latestSelectedDateObj
+                ? self.latestSelectedDateObj.getHours()
+                : self.config.time_24hr
+                    ? self.config.defaultHour
+                    : military2ampm(self.config.defaultHour));
+            self.minuteElement.value = pad(self.latestSelectedDateObj
+                ? self.latestSelectedDateObj.getMinutes()
+                : self.config.defaultMinute);
+            self.hourElement.setAttribute("step", self.config.hourIncrement.toString());
+            self.minuteElement.setAttribute("step", self.config.minuteIncrement.toString());
+            self.hourElement.setAttribute("min", self.config.time_24hr ? "0" : "1");
+            self.hourElement.setAttribute("max", self.config.time_24hr ? "23" : "12");
+            self.minuteElement.setAttribute("min", "0");
+            self.minuteElement.setAttribute("max", "59");
+            self.timeContainer.appendChild(hourInput);
+            self.timeContainer.appendChild(separator);
+            self.timeContainer.appendChild(minuteInput);
+            if (self.config.time_24hr)
+                self.timeContainer.classList.add("time24hr");
+            if (self.config.enableSeconds) {
+                self.timeContainer.classList.add("hasSeconds");
+                var secondInput = createNumberInput("flatpickr-second");
+                self.secondElement = secondInput.getElementsByTagName("input")[0];
+                self.secondElement.value = pad(self.latestSelectedDateObj
+                    ? self.latestSelectedDateObj.getSeconds()
+                    : self.config.defaultSeconds);
+                self.secondElement.setAttribute("step", self.minuteElement.getAttribute("step"));
+                self.secondElement.setAttribute("min", "0");
+                self.secondElement.setAttribute("max", "59");
+                self.timeContainer.appendChild(createElement("span", "flatpickr-time-separator", ":"));
+                self.timeContainer.appendChild(secondInput);
+            }
+            if (!self.config.time_24hr) {
+                // add self.amPM if appropriate
+                self.amPM = createElement("span", "flatpickr-am-pm", self.l10n.amPM[int((self.latestSelectedDateObj
+                    ? self.hourElement.value
+                    : self.config.defaultHour) > 11)]);
+                self.amPM.title = self.l10n.toggleTitle;
+                self.amPM.tabIndex = -1;
+                self.timeContainer.appendChild(self.amPM);
+            }
+            return self.timeContainer;
+        }
+        function buildWeekdays() {
+            if (!self.weekdayContainer)
+                self.weekdayContainer = createElement("div", "flatpickr-weekdays");
+            else
+                clearNode(self.weekdayContainer);
+            for (var i = self.config.showMonths; i--;) {
+                var container = createElement("div", "flatpickr-weekdaycontainer");
+                self.weekdayContainer.appendChild(container);
+            }
+            updateWeekdays();
+            return self.weekdayContainer;
+        }
+        function updateWeekdays() {
+            var firstDayOfWeek = self.l10n.firstDayOfWeek;
+            var weekdays = self.l10n.weekdays.shorthand.slice();
+            if (firstDayOfWeek > 0 && firstDayOfWeek < weekdays.length) {
+                weekdays = weekdays.splice(firstDayOfWeek, weekdays.length).concat(weekdays.splice(0, firstDayOfWeek));
+            }
+            for (var i = self.config.showMonths; i--;) {
+                self.weekdayContainer.children[i].innerHTML = "\n      <span class='flatpickr-weekday'>\n        " + weekdays.join("</span><span class='flatpickr-weekday'>") + "\n      </span>\n      ";
+            }
+        }
+        /* istanbul ignore next */
+        function buildWeeks() {
+            self.calendarContainer.classList.add("hasWeeks");
+            var weekWrapper = createElement("div", "flatpickr-weekwrapper");
+            weekWrapper.appendChild(createElement("span", "flatpickr-weekday", self.l10n.weekAbbreviation));
+            var weekNumbers = createElement("div", "flatpickr-weeks");
+            weekWrapper.appendChild(weekNumbers);
+            return {
+                weekWrapper: weekWrapper,
+                weekNumbers: weekNumbers
+            };
+        }
+        function changeMonth(value, is_offset) {
+            if (is_offset === void 0) { is_offset = true; }
+            var delta = is_offset ? value : value - self.currentMonth;
+            if ((delta < 0 && self._hidePrevMonthArrow === true) ||
+                (delta > 0 && self._hideNextMonthArrow === true))
+                return;
+            self.currentMonth += delta;
+            if (self.currentMonth < 0 || self.currentMonth > 11) {
+                self.currentYear += self.currentMonth > 11 ? 1 : -1;
+                self.currentMonth = (self.currentMonth + 12) % 12;
+                triggerEvent("onYearChange");
+            }
+            buildDays();
+            triggerEvent("onMonthChange");
+            updateNavigationCurrentMonth();
+        }
+        function clear(triggerChangeEvent, toInitial) {
+            if (triggerChangeEvent === void 0) { triggerChangeEvent = true; }
+            if (toInitial === void 0) { toInitial = true; }
+            self.input.value = "";
+            if (self.altInput !== undefined)
+                self.altInput.value = "";
+            if (self.mobileInput !== undefined)
+                self.mobileInput.value = "";
+            self.selectedDates = [];
+            self.latestSelectedDateObj = undefined;
+            if (toInitial === true) {
+                self.currentYear = self._initialDate.getFullYear();
+                self.currentMonth = self._initialDate.getMonth();
+            }
+            self.showTimeInput = false;
+            if (self.config.enableTime === true) {
+                setDefaultHours();
+            }
+            self.redraw();
+            if (triggerChangeEvent)
+                // triggerChangeEvent is true (default) or an Event
+                triggerEvent("onChange");
+        }
+        function close() {
+            self.isOpen = false;
+            if (!self.isMobile) {
+                if (self.calendarContainer !== undefined) {
+                    self.calendarContainer.classList.remove("open");
+                }
+                if (self._input !== undefined) {
+                    self._input.classList.remove("active");
+                }
+            }
+            triggerEvent("onClose");
+        }
+        function destroy() {
+            if (self.config !== undefined)
+                triggerEvent("onDestroy");
+            for (var i = self._handlers.length; i--;) {
+                var h = self._handlers[i];
+                h.element.removeEventListener(h.event, h.handler, h.options);
+            }
+            self._handlers = [];
+            if (self.mobileInput) {
+                if (self.mobileInput.parentNode)
+                    self.mobileInput.parentNode.removeChild(self.mobileInput);
+                self.mobileInput = undefined;
+            }
+            else if (self.calendarContainer && self.calendarContainer.parentNode) {
+                if (self.config.static && self.calendarContainer.parentNode) {
+                    var wrapper = self.calendarContainer.parentNode;
+                    wrapper.lastChild && wrapper.removeChild(wrapper.lastChild);
+                    if (wrapper.parentNode) {
+                        while (wrapper.firstChild)
+                            wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+                        wrapper.parentNode.removeChild(wrapper);
+                    }
+                }
+                else
+                    self.calendarContainer.parentNode.removeChild(self.calendarContainer);
+            }
+            if (self.altInput) {
+                self.input.type = "text";
+                if (self.altInput.parentNode)
+                    self.altInput.parentNode.removeChild(self.altInput);
+                delete self.altInput;
+            }
+            if (self.input) {
+                self.input.type = self.input._type;
+                self.input.classList.remove("flatpickr-input");
+                self.input.removeAttribute("readonly");
+                self.input.value = "";
+            }
+            [
+                "_showTimeInput",
+                "latestSelectedDateObj",
+                "_hideNextMonthArrow",
+                "_hidePrevMonthArrow",
+                "__hideNextMonthArrow",
+                "__hidePrevMonthArrow",
+                "isMobile",
+                "isOpen",
+                "selectedDateElem",
+                "minDateHasTime",
+                "maxDateHasTime",
+                "days",
+                "daysContainer",
+                "_input",
+                "_positionElement",
+                "innerContainer",
+                "rContainer",
+                "monthNav",
+                "todayDateElem",
+                "calendarContainer",
+                "weekdayContainer",
+                "prevMonthNav",
+                "nextMonthNav",
+                "currentMonthElement",
+                "currentYearElement",
+                "navigationCurrentMonth",
+                "selectedDateElem",
+                "config",
+            ].forEach(function (k) {
+                try {
+                    delete self[k];
+                }
+                catch (_) { }
+            });
+        }
+        function isCalendarElem(elem) {
+            if (self.config.appendTo && self.config.appendTo.contains(elem))
+                return true;
+            return self.calendarContainer.contains(elem);
+        }
+        function documentClick(e) {
+            if (self.isOpen && !self.config.inline) {
+                var eventTarget_1 = getEventTarget(e);
+                var isCalendarElement = isCalendarElem(eventTarget_1);
+                var isInput = eventTarget_1 === self.input ||
+                    eventTarget_1 === self.altInput ||
+                    self.element.contains(eventTarget_1) ||
+                    // web components
+                    // e.path is not present in all browsers. circumventing typechecks
+                    (e.path &&
+                        e.path.indexOf &&
+                        (~e.path.indexOf(self.input) ||
+                            ~e.path.indexOf(self.altInput)));
+                var lostFocus = e.type === "blur"
+                    ? isInput &&
+                        e.relatedTarget &&
+                        !isCalendarElem(e.relatedTarget)
+                    : !isInput &&
+                        !isCalendarElement &&
+                        !isCalendarElem(e.relatedTarget);
+                var isIgnored = !self.config.ignoredFocusElements.some(function (elem) {
+                    return elem.contains(eventTarget_1);
+                });
+                if (lostFocus && isIgnored) {
+                    updateTime();
+                    self.close();
+                    if (self.config.mode === "range" && self.selectedDates.length === 1) {
+                        self.clear(false);
+                        self.redraw();
+                    }
+                }
+            }
+        }
+        function changeYear(newYear) {
+            if (!newYear ||
+                (self.config.minDate && newYear < self.config.minDate.getFullYear()) ||
+                (self.config.maxDate && newYear > self.config.maxDate.getFullYear()))
+                return;
+            var newYearNum = newYear, isNewYear = self.currentYear !== newYearNum;
+            self.currentYear = newYearNum || self.currentYear;
+            if (self.config.maxDate &&
+                self.currentYear === self.config.maxDate.getFullYear()) {
+                self.currentMonth = Math.min(self.config.maxDate.getMonth(), self.currentMonth);
+            }
+            else if (self.config.minDate &&
+                self.currentYear === self.config.minDate.getFullYear()) {
+                self.currentMonth = Math.max(self.config.minDate.getMonth(), self.currentMonth);
+            }
+            if (isNewYear) {
+                self.redraw();
+                triggerEvent("onYearChange");
+            }
+        }
+        function isEnabled(date, timeless) {
+            if (timeless === void 0) { timeless = true; }
+            var dateToCheck = self.parseDate(date, undefined, timeless); // timeless
+            if ((self.config.minDate &&
+                dateToCheck &&
+                compareDates(dateToCheck, self.config.minDate, timeless !== undefined ? timeless : !self.minDateHasTime) < 0) ||
+                (self.config.maxDate &&
+                    dateToCheck &&
+                    compareDates(dateToCheck, self.config.maxDate, timeless !== undefined ? timeless : !self.maxDateHasTime) > 0))
+                return false;
+            if (self.config.enable.length === 0 && self.config.disable.length === 0)
+                return true;
+            if (dateToCheck === undefined)
+                return false;
+            var bool = self.config.enable.length > 0, array = bool ? self.config.enable : self.config.disable;
+            for (var i = 0, d = void 0; i < array.length; i++) {
+                d = array[i];
+                if (typeof d === "function" &&
+                    d(dateToCheck) // disabled by function
+                )
+                    return bool;
+                else if (d instanceof Date &&
+                    dateToCheck !== undefined &&
+                    d.getTime() === dateToCheck.getTime())
+                    // disabled by date
+                    return bool;
+                else if (typeof d === "string" && dateToCheck !== undefined) {
+                    // disabled by date string
+                    var parsed = self.parseDate(d, undefined, true);
+                    return parsed && parsed.getTime() === dateToCheck.getTime()
+                        ? bool
+                        : !bool;
+                }
+                else if (
+                // disabled by range
+                typeof d === "object" &&
+                    dateToCheck !== undefined &&
+                    d.from &&
+                    d.to &&
+                    dateToCheck.getTime() >= d.from.getTime() &&
+                    dateToCheck.getTime() <= d.to.getTime())
+                    return bool;
+            }
+            return !bool;
+        }
+        function isInView(elem) {
+            if (self.daysContainer !== undefined)
+                return (elem.className.indexOf("hidden") === -1 &&
+                    self.daysContainer.contains(elem));
+            return false;
+        }
+        function onKeyDown(e) {
+            // e.key                      e.keyCode
+            // "Backspace"                        8
+            // "Tab"                              9
+            // "Enter"                           13
+            // "Escape"     (IE "Esc")           27
+            // "ArrowLeft"  (IE "Left")          37
+            // "ArrowUp"    (IE "Up")            38
+            // "ArrowRight" (IE "Right")         39
+            // "ArrowDown"  (IE "Down")          40
+            // "Delete"     (IE "Del")           46
+            var isInput = e.target === self._input;
+            var allowInput = self.config.allowInput;
+            var allowKeydown = self.isOpen && (!allowInput || !isInput);
+            var allowInlineKeydown = self.config.inline && isInput && !allowInput;
+            if (e.keyCode === 13 && isInput) {
+                if (allowInput) {
+                    self.setDate(self._input.value, true, e.target === self.altInput
+                        ? self.config.altFormat
+                        : self.config.dateFormat);
+                    return e.target.blur();
+                }
+                else
+                    self.open();
+            }
+            else if (isCalendarElem(e.target) ||
+                allowKeydown ||
+                allowInlineKeydown) {
+                var isTimeObj = !!self.timeContainer &&
+                    self.timeContainer.contains(e.target);
+                switch (e.keyCode) {
+                    case 13:
+                        if (isTimeObj) {
+                            updateTime();
+                            focusAndClose();
+                        }
+                        else
+                            selectDate(e);
+                        break;
+                    case 27: // escape
+                        e.preventDefault();
+                        focusAndClose();
+                        break;
+                    case 8:
+                    case 46:
+                        if (isInput && !self.config.allowInput) {
+                            e.preventDefault();
+                            self.clear();
+                        }
+                        break;
+                    case 37:
+                    case 39:
+                        if (!isTimeObj) {
+                            e.preventDefault();
+                            if (self.daysContainer !== undefined &&
+                                (allowInput === false ||
+                                    (document.activeElement && isInView(document.activeElement)))) {
+                                var delta_1 = e.keyCode === 39 ? 1 : -1;
+                                if (!e.ctrlKey)
+                                    focusOnDay(undefined, delta_1);
+                                else {
+                                    e.stopPropagation();
+                                    changeMonth(delta_1);
+                                    focusOnDay(getFirstAvailableDay(1), 0);
+                                }
+                            }
+                        }
+                        else if (self.hourElement)
+                            self.hourElement.focus();
+                        break;
+                    case 38:
+                    case 40:
+                        e.preventDefault();
+                        var delta = e.keyCode === 40 ? 1 : -1;
+                        if ((self.daysContainer && e.target.$i !== undefined) ||
+                            e.target === self.input) {
+                            if (e.ctrlKey) {
+                                e.stopPropagation();
+                                changeYear(self.currentYear - delta);
+                                focusOnDay(getFirstAvailableDay(1), 0);
+                            }
+                            else if (!isTimeObj)
+                                focusOnDay(undefined, delta * 7);
+                        }
+                        else if (self.config.enableTime) {
+                            if (!isTimeObj && self.hourElement)
+                                self.hourElement.focus();
+                            updateTime(e);
+                            self._debouncedChange();
+                        }
+                        break;
+                    case 9:
+                        if (isTimeObj) {
+                            var elems = [
+                                self.hourElement,
+                                self.minuteElement,
+                                self.secondElement,
+                                self.amPM,
+                            ].filter(function (x) { return x; });
+                            var i = elems.indexOf(e.target);
+                            if (i !== -1) {
+                                var target = elems[i + (e.shiftKey ? -1 : 1)];
+                                if (target !== undefined) {
+                                    e.preventDefault();
+                                    target.focus();
+                                }
+                                else if (e.shiftKey) {
+                                    e.preventDefault();
+                                    self._input.focus();
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (self.amPM !== undefined && e.target === self.amPM) {
+                switch (e.key) {
+                    case self.l10n.amPM[0].charAt(0):
+                    case self.l10n.amPM[0].charAt(0).toLowerCase():
+                        self.amPM.textContent = self.l10n.amPM[0];
+                        setHoursFromInputs();
+                        updateValue();
+                        break;
+                    case self.l10n.amPM[1].charAt(0):
+                    case self.l10n.amPM[1].charAt(0).toLowerCase():
+                        self.amPM.textContent = self.l10n.amPM[1];
+                        setHoursFromInputs();
+                        updateValue();
+                        break;
+                }
+            }
+            triggerEvent("onKeyDown", e);
+        }
+        function onMouseOver(elem) {
+            if (self.selectedDates.length !== 1 ||
+                (elem &&
+                    (!elem.classList.contains("flatpickr-day") ||
+                        elem.classList.contains("disabled"))))
+                return;
+            var hoverDate = elem
+                ? elem.dateObj.getTime()
+                : self.days.firstElementChild.dateObj.getTime(), initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(), rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()), rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime()), lastDate = self.daysContainer.lastChild
+                .lastChild.dateObj.getTime();
+            var containsDisabled = false;
+            var minRange = 0, maxRange = 0;
+            for (var t = rangeStartDate; t < lastDate; t += duration.DAY) {
+                if (!isEnabled(new Date(t), true)) {
+                    containsDisabled =
+                        containsDisabled || (t > rangeStartDate && t < rangeEndDate);
+                    if (t < initialDate && (!minRange || t > minRange))
+                        minRange = t;
+                    else if (t > initialDate && (!maxRange || t < maxRange))
+                        maxRange = t;
+                }
+            }
+            for (var m = 0; m < self.config.showMonths; m++) {
+                var month = self.daysContainer.children[m];
+                var prevMonth = self.daysContainer.children[m - 1];
+                var _loop_1 = function (i, l) {
+                    var dayElem = month.children[i], date = dayElem.dateObj;
+                    var timestamp = date.getTime();
+                    var outOfRange = (minRange > 0 && timestamp < minRange) ||
+                        (maxRange > 0 && timestamp > maxRange);
+                    if (outOfRange) {
+                        dayElem.classList.add("notAllowed");
+                        ["inRange", "startRange", "endRange"].forEach(function (c) {
+                            dayElem.classList.remove(c);
+                        });
+                        return "continue";
+                    }
+                    else if (containsDisabled && !outOfRange)
+                        return "continue";
+                    ["startRange", "inRange", "endRange", "notAllowed"].forEach(function (c) {
+                        dayElem.classList.remove(c);
+                    });
+                    if (elem !== undefined) {
+                        elem.classList.add(hoverDate < self.selectedDates[0].getTime()
+                            ? "startRange"
+                            : "endRange");
+                        if (month.contains(elem) ||
+                            !(m > 0 &&
+                                prevMonth &&
+                                prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
+                            if (initialDate < hoverDate && timestamp === initialDate)
+                                dayElem.classList.add("startRange");
+                            else if (initialDate > hoverDate && timestamp === initialDate)
+                                dayElem.classList.add("endRange");
+                            if (timestamp >= minRange &&
+                                (maxRange === 0 || timestamp <= maxRange) &&
+                                isBetween(timestamp, initialDate, hoverDate))
+                                dayElem.classList.add("inRange");
+                        }
+                    }
+                };
+                for (var i = 0, l = month.children.length; i < l; i++) {
+                    _loop_1(i, l);
+                }
+            }
+        }
+        function onResize() {
+            if (self.isOpen && !self.config.static && !self.config.inline)
+                positionCalendar();
+        }
+        function setDefaultTime() {
+            self.setDate(self.config.minDate !== undefined
+                ? new Date(self.config.minDate.getTime())
+                : new Date(), false);
             setDefaultHours();
             updateValue();
-          }
-
-          if (self.config.allowInput === false && (e === undefined || !self.timeContainer.contains(e.relatedTarget))) {
-            setTimeout(function () {
-              return self.hourElement.select();
-            }, 50);
-          }
         }
-      }
-
-      function minMaxDateSetter(type) {
-        return function (date) {
-          var dateObj = self.config["_" + type + "Date"] = self.parseDate(date, self.config.dateFormat);
-          var inverseDateObj = self.config["_" + (type === "min" ? "max" : "min") + "Date"];
-
-          if (dateObj !== undefined) {
-            self[type === "min" ? "minDateHasTime" : "maxDateHasTime"] = dateObj.getHours() > 0 || dateObj.getMinutes() > 0 || dateObj.getSeconds() > 0;
-          }
-
-          if (self.selectedDates) {
-            self.selectedDates = self.selectedDates.filter(function (d) {
-              return isEnabled(d);
+        function open(e, positionElement) {
+            if (positionElement === void 0) { positionElement = self._positionElement; }
+            if (self.isMobile === true) {
+                if (e) {
+                    e.preventDefault();
+                    e.target && e.target.blur();
+                }
+                if (self.mobileInput !== undefined) {
+                    self.mobileInput.focus();
+                    self.mobileInput.click();
+                }
+                triggerEvent("onOpen");
+                return;
+            }
+            if (self._input.disabled || self.config.inline)
+                return;
+            var wasOpen = self.isOpen;
+            self.isOpen = true;
+            if (!wasOpen) {
+                self.calendarContainer.classList.add("open");
+                self._input.classList.add("active");
+                triggerEvent("onOpen");
+                positionCalendar(positionElement);
+            }
+            if (self.config.enableTime === true && self.config.noCalendar === true) {
+                if (self.selectedDates.length === 0) {
+                    setDefaultTime();
+                }
+                if (self.config.allowInput === false &&
+                    (e === undefined ||
+                        !self.timeContainer.contains(e.relatedTarget))) {
+                    setTimeout(function () { return self.hourElement.select(); }, 50);
+                }
+            }
+        }
+        function minMaxDateSetter(type) {
+            return function (date) {
+                var dateObj = (self.config["_" + type + "Date"] = self.parseDate(date, self.config.dateFormat));
+                var inverseDateObj = self.config["_" + (type === "min" ? "max" : "min") + "Date"];
+                if (dateObj !== undefined) {
+                    self[type === "min" ? "minDateHasTime" : "maxDateHasTime"] =
+                        dateObj.getHours() > 0 ||
+                            dateObj.getMinutes() > 0 ||
+                            dateObj.getSeconds() > 0;
+                }
+                if (self.selectedDates) {
+                    self.selectedDates = self.selectedDates.filter(function (d) { return isEnabled(d); });
+                    if (!self.selectedDates.length && type === "min")
+                        setHoursFromDate(dateObj);
+                    updateValue();
+                }
+                if (self.daysContainer) {
+                    redraw();
+                    if (dateObj !== undefined)
+                        self.currentYearElement[type] = dateObj.getFullYear().toString();
+                    else
+                        self.currentYearElement.removeAttribute(type);
+                    self.currentYearElement.disabled =
+                        !!inverseDateObj &&
+                            dateObj !== undefined &&
+                            inverseDateObj.getFullYear() === dateObj.getFullYear();
+                }
+            };
+        }
+        function parseConfig() {
+            var boolOpts = [
+                "wrap",
+                "weekNumbers",
+                "allowInput",
+                "clickOpens",
+                "time_24hr",
+                "enableTime",
+                "noCalendar",
+                "altInput",
+                "shorthandCurrentMonth",
+                "inline",
+                "static",
+                "enableSeconds",
+                "disableMobile",
+            ];
+            var userConfig = __assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
+            var formats$$1 = {};
+            self.config.parseDate = userConfig.parseDate;
+            self.config.formatDate = userConfig.formatDate;
+            Object.defineProperty(self.config, "enable", {
+                get: function () { return self.config._enable; },
+                set: function (dates) {
+                    self.config._enable = parseDateRules(dates);
+                }
             });
-            if (!self.selectedDates.length && type === "min") setHoursFromDate(dateObj);
+            Object.defineProperty(self.config, "disable", {
+                get: function () { return self.config._disable; },
+                set: function (dates) {
+                    self.config._disable = parseDateRules(dates);
+                }
+            });
+            var timeMode = userConfig.mode === "time";
+            if (!userConfig.dateFormat && (userConfig.enableTime || timeMode)) {
+                formats$$1.dateFormat =
+                    userConfig.noCalendar || timeMode
+                        ? "H:i" + (userConfig.enableSeconds ? ":S" : "")
+                        : flatpickr.defaultConfig.dateFormat +
+                            " H:i" +
+                            (userConfig.enableSeconds ? ":S" : "");
+            }
+            if (userConfig.altInput &&
+                (userConfig.enableTime || timeMode) &&
+                !userConfig.altFormat) {
+                formats$$1.altFormat =
+                    userConfig.noCalendar || timeMode
+                        ? "h:i" + (userConfig.enableSeconds ? ":S K" : " K")
+                        : flatpickr.defaultConfig.altFormat +
+                            (" h:i" + (userConfig.enableSeconds ? ":S" : "") + " K");
+            }
+            Object.defineProperty(self.config, "minDate", {
+                get: function () { return self.config._minDate; },
+                set: minMaxDateSetter("min")
+            });
+            Object.defineProperty(self.config, "maxDate", {
+                get: function () { return self.config._maxDate; },
+                set: minMaxDateSetter("max")
+            });
+            var minMaxTimeSetter = function (type) { return function (val) {
+                self.config[type === "min" ? "_minTime" : "_maxTime"] = self.parseDate(val, "H:i");
+            }; };
+            Object.defineProperty(self.config, "minTime", {
+                get: function () { return self.config._minTime; },
+                set: minMaxTimeSetter("min")
+            });
+            Object.defineProperty(self.config, "maxTime", {
+                get: function () { return self.config._maxTime; },
+                set: minMaxTimeSetter("max")
+            });
+            if (userConfig.mode === "time") {
+                self.config.noCalendar = true;
+                self.config.enableTime = true;
+            }
+            Object.assign(self.config, formats$$1, userConfig);
+            for (var i = 0; i < boolOpts.length; i++)
+                self.config[boolOpts[i]] =
+                    self.config[boolOpts[i]] === true ||
+                        self.config[boolOpts[i]] === "true";
+            HOOKS.filter(function (hook) { return self.config[hook] !== undefined; }).forEach(function (hook) {
+                self.config[hook] = arrayify(self.config[hook] || []).map(bindToInstance);
+            });
+            self.isMobile =
+                !self.config.disableMobile &&
+                    !self.config.inline &&
+                    self.config.mode === "single" &&
+                    !self.config.disable.length &&
+                    !self.config.enable.length &&
+                    !self.config.weekNumbers &&
+                    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            for (var i = 0; i < self.config.plugins.length; i++) {
+                var pluginConf = self.config.plugins[i](self) || {};
+                for (var key in pluginConf) {
+                    if (HOOKS.indexOf(key) > -1) {
+                        self.config[key] = arrayify(pluginConf[key])
+                            .map(bindToInstance)
+                            .concat(self.config[key]);
+                    }
+                    else if (typeof userConfig[key] === "undefined")
+                        self.config[key] = pluginConf[key];
+                }
+            }
+            triggerEvent("onParseConfig");
+        }
+        function setupLocale() {
+            if (typeof self.config.locale !== "object" &&
+                typeof flatpickr.l10ns[self.config.locale] === "undefined")
+                self.config.errorHandler(new Error("flatpickr: invalid locale " + self.config.locale));
+            self.l10n = __assign({}, flatpickr.l10ns["default"], (typeof self.config.locale === "object"
+                ? self.config.locale
+                : self.config.locale !== "default"
+                    ? flatpickr.l10ns[self.config.locale]
+                    : undefined));
+            tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
+            self.formatDate = createDateFormatter(self);
+            self.parseDate = createDateParser({ config: self.config, l10n: self.l10n });
+        }
+        function positionCalendar(customPositionElement) {
+            if (self.calendarContainer === undefined)
+                return;
+            triggerEvent("onPreCalendarPosition");
+            var positionElement = customPositionElement || self._positionElement;
+            var calendarHeight = Array.prototype.reduce.call(self.calendarContainer.children, (function (acc, child) { return acc + child.offsetHeight; }), 0), calendarWidth = self.calendarContainer.offsetWidth, configPos = self.config.position.split(" "), configPosVertical = configPos[0], configPosHorizontal = configPos.length > 1 ? configPos[1] : null, inputBounds = positionElement.getBoundingClientRect(), distanceFromBottom = window.innerHeight - inputBounds.bottom, showOnTop = configPosVertical === "above" ||
+                (configPosVertical !== "below" &&
+                    distanceFromBottom < calendarHeight &&
+                    inputBounds.top > calendarHeight);
+            var top = window.pageYOffset +
+                inputBounds.top +
+                (!showOnTop ? positionElement.offsetHeight + 2 : -calendarHeight - 2);
+            toggleClass(self.calendarContainer, "arrowTop", !showOnTop);
+            toggleClass(self.calendarContainer, "arrowBottom", showOnTop);
+            if (self.config.inline)
+                return;
+            var left = window.pageXOffset +
+                inputBounds.left -
+                (configPosHorizontal != null && configPosHorizontal === "center"
+                    ? (calendarWidth - inputBounds.width) / 2
+                    : 0);
+            var right = window.document.body.offsetWidth - inputBounds.right;
+            var rightMost = left + calendarWidth > window.document.body.offsetWidth;
+            var centerMost = right + calendarWidth > window.document.body.offsetWidth;
+            toggleClass(self.calendarContainer, "rightMost", rightMost);
+            if (self.config.static)
+                return;
+            self.calendarContainer.style.top = top + "px";
+            if (!rightMost) {
+                self.calendarContainer.style.left = left + "px";
+                self.calendarContainer.style.right = "auto";
+            }
+            else if (!centerMost) {
+                self.calendarContainer.style.left = "auto";
+                self.calendarContainer.style.right = right + "px";
+            }
+            else {
+                var doc = document.styleSheets[0];
+                var bodyWidth = window.document.body.offsetWidth;
+                var centerLeft = Math.max(0, bodyWidth / 2 - calendarWidth / 2);
+                var centerBefore = ".flatpickr-calendar.centerMost:before";
+                var centerAfter = ".flatpickr-calendar.centerMost:after";
+                var centerIndex = doc.cssRules.length;
+                var centerStyle = "{left:" + inputBounds.left + "px;right:auto;}";
+                toggleClass(self.calendarContainer, "rightMost", false);
+                toggleClass(self.calendarContainer, "centerMost", true);
+                doc.insertRule(centerBefore + "," + centerAfter + centerStyle, centerIndex);
+                self.calendarContainer.style.left = centerLeft + "px";
+                self.calendarContainer.style.right = "auto";
+            }
+        }
+        function redraw() {
+            if (self.config.noCalendar || self.isMobile)
+                return;
+            updateNavigationCurrentMonth();
+            buildDays();
+        }
+        function focusAndClose() {
+            self._input.focus();
+            if (window.navigator.userAgent.indexOf("MSIE") !== -1 ||
+                navigator.msMaxTouchPoints !== undefined) {
+                // hack - bugs in the way IE handles focus keeps the calendar open
+                setTimeout(self.close, 0);
+            }
+            else {
+                self.close();
+            }
+        }
+        function selectDate(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var isSelectable = function (day) {
+                return day.classList &&
+                    day.classList.contains("flatpickr-day") &&
+                    !day.classList.contains("disabled") &&
+                    !day.classList.contains("notAllowed");
+            };
+            var t = findParent(e.target, isSelectable);
+            if (t === undefined)
+                return;
+            var target = t;
+            var selectedDate = (self.latestSelectedDateObj = new Date(target.dateObj.getTime()));
+            var shouldChangeMonth = (selectedDate.getMonth() < self.currentMonth ||
+                selectedDate.getMonth() >
+                    self.currentMonth + self.config.showMonths - 1) &&
+                self.config.mode !== "range";
+            self.selectedDateElem = target;
+            if (self.config.mode === "single")
+                self.selectedDates = [selectedDate];
+            else if (self.config.mode === "multiple") {
+                var selectedIndex = isDateSelected(selectedDate);
+                if (selectedIndex)
+                    self.selectedDates.splice(parseInt(selectedIndex), 1);
+                else
+                    self.selectedDates.push(selectedDate);
+            }
+            else if (self.config.mode === "range") {
+                if (self.selectedDates.length === 2) {
+                    self.clear(false, false);
+                }
+                self.latestSelectedDateObj = selectedDate;
+                self.selectedDates.push(selectedDate);
+                // unless selecting same date twice, sort ascendingly
+                if (compareDates(selectedDate, self.selectedDates[0], true) !== 0)
+                    self.selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
+            }
+            setHoursFromInputs();
+            if (shouldChangeMonth) {
+                var isNewYear = self.currentYear !== selectedDate.getFullYear();
+                self.currentYear = selectedDate.getFullYear();
+                self.currentMonth = selectedDate.getMonth();
+                if (isNewYear)
+                    triggerEvent("onYearChange");
+                triggerEvent("onMonthChange");
+            }
+            updateNavigationCurrentMonth();
+            buildDays();
             updateValue();
-          }
-
-          if (self.daysContainer) {
-            redraw();
-            if (dateObj !== undefined) self.currentYearElement[type] = dateObj.getFullYear().toString();else self.currentYearElement.removeAttribute(type);
-            self.currentYearElement.disabled = !!inverseDateObj && dateObj !== undefined && inverseDateObj.getFullYear() === dateObj.getFullYear();
-          }
+            if (self.config.enableTime)
+                setTimeout(function () { return (self.showTimeInput = true); }, 50);
+            // maintain focus
+            if (!shouldChangeMonth &&
+                self.config.mode !== "range" &&
+                self.config.showMonths === 1)
+                focusOnDayElem(target);
+            else if (self.selectedDateElem !== undefined &&
+                self.hourElement === undefined) {
+                self.selectedDateElem && self.selectedDateElem.focus();
+            }
+            if (self.hourElement !== undefined)
+                self.hourElement !== undefined && self.hourElement.focus();
+            if (self.config.closeOnSelect) {
+                var single = self.config.mode === "single" && !self.config.enableTime;
+                var range = self.config.mode === "range" &&
+                    self.selectedDates.length === 2 &&
+                    !self.config.enableTime;
+                if (single || range) {
+                    focusAndClose();
+                }
+            }
+            triggerChange();
+        }
+        var CALLBACKS = {
+            locale: [setupLocale, updateWeekdays],
+            showMonths: [buildMonths, setCalendarWidth, buildWeekdays]
         };
-      }
-
-      function parseConfig() {
-        var boolOpts = ["wrap", "weekNumbers", "allowInput", "clickOpens", "time_24hr", "enableTime", "noCalendar", "altInput", "shorthandCurrentMonth", "inline", "static", "enableSeconds", "disableMobile"];
-        var userConfig = Object.assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
-        var formats$$1 = {};
-        self.config.parseDate = userConfig.parseDate;
-        self.config.formatDate = userConfig.formatDate;
-        Object.defineProperty(self.config, "enable", {
-          get: function get() {
-            return self.config._enable;
-          },
-          set: function set(dates) {
-            self.config._enable = parseDateRules(dates);
-          }
-        });
-        Object.defineProperty(self.config, "disable", {
-          get: function get() {
-            return self.config._disable;
-          },
-          set: function set(dates) {
-            self.config._disable = parseDateRules(dates);
-          }
-        });
-        var timeMode = userConfig.mode === "time";
-
-        if (!userConfig.dateFormat && (userConfig.enableTime || timeMode)) {
-          formats$$1.dateFormat = userConfig.noCalendar || timeMode ? "H:i" + (userConfig.enableSeconds ? ":S" : "") : flatpickr.defaultConfig.dateFormat + " H:i" + (userConfig.enableSeconds ? ":S" : "");
+        function set(option, value) {
+            if (option !== null && typeof option === "object")
+                Object.assign(self.config, option);
+            else {
+                self.config[option] = value;
+                if (CALLBACKS[option] !== undefined)
+                    CALLBACKS[option].forEach(function (x) { return x(); });
+                else if (HOOKS.indexOf(option) > -1)
+                    self.config[option] = arrayify(value);
+            }
+            self.redraw();
+            updateValue(false);
         }
-
-        if (userConfig.altInput && (userConfig.enableTime || timeMode) && !userConfig.altFormat) {
-          formats$$1.altFormat = userConfig.noCalendar || timeMode ? "h:i" + (userConfig.enableSeconds ? ":S K" : " K") : flatpickr.defaultConfig.altFormat + (" h:i" + (userConfig.enableSeconds ? ":S" : "") + " K");
+        function setSelectedDate(inputDate, format) {
+            var dates = [];
+            if (inputDate instanceof Array)
+                dates = inputDate.map(function (d) { return self.parseDate(d, format); });
+            else if (inputDate instanceof Date || typeof inputDate === "number")
+                dates = [self.parseDate(inputDate, format)];
+            else if (typeof inputDate === "string") {
+                switch (self.config.mode) {
+                    case "single":
+                    case "time":
+                        dates = [self.parseDate(inputDate, format)];
+                        break;
+                    case "multiple":
+                        dates = inputDate
+                            .split(self.config.conjunction)
+                            .map(function (date) { return self.parseDate(date, format); });
+                        break;
+                    case "range":
+                        dates = inputDate
+                            .split(self.l10n.rangeSeparator)
+                            .map(function (date) { return self.parseDate(date, format); });
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+                self.config.errorHandler(new Error("Invalid date supplied: " + JSON.stringify(inputDate)));
+            self.selectedDates = dates.filter(function (d) { return d instanceof Date && isEnabled(d, false); });
+            if (self.config.mode === "range")
+                self.selectedDates.sort(function (a, b) { return a.getTime() - b.getTime(); });
         }
-
-        Object.defineProperty(self.config, "minDate", {
-          get: function get() {
-            return self.config._minDate;
-          },
-          set: minMaxDateSetter("min")
-        });
-        Object.defineProperty(self.config, "maxDate", {
-          get: function get() {
-            return self.config._maxDate;
-          },
-          set: minMaxDateSetter("max")
-        });
-
-        var minMaxTimeSetter = function minMaxTimeSetter(type) {
-          return function (val) {
-            self.config[type === "min" ? "_minTime" : "_maxTime"] = self.parseDate(val, "H:i");
-          };
-        };
-
-        Object.defineProperty(self.config, "minTime", {
-          get: function get() {
-            return self.config._minTime;
-          },
-          set: minMaxTimeSetter("min")
-        });
-        Object.defineProperty(self.config, "maxTime", {
-          get: function get() {
-            return self.config._maxTime;
-          },
-          set: minMaxTimeSetter("max")
-        });
-
-        if (userConfig.mode === "time") {
-          self.config.noCalendar = true;
-          self.config.enableTime = true;
+        function setDate(date, triggerChange, format) {
+            if (triggerChange === void 0) { triggerChange = false; }
+            if (format === void 0) { format = self.config.dateFormat; }
+            if ((date !== 0 && !date) || (date instanceof Array && date.length === 0))
+                return self.clear(triggerChange);
+            setSelectedDate(date, format);
+            self.showTimeInput = self.selectedDates.length > 0;
+            self.latestSelectedDateObj = self.selectedDates[0];
+            self.redraw();
+            jumpToDate();
+            setHoursFromDate();
+            updateValue(triggerChange);
+            if (triggerChange)
+                triggerEvent("onChange");
         }
-
-        Object.assign(self.config, formats$$1, userConfig);
-
-        for (var i = 0; i < boolOpts.length; i++) {
-          self.config[boolOpts[i]] = self.config[boolOpts[i]] === true || self.config[boolOpts[i]] === "true";
+        function parseDateRules(arr) {
+            return arr
+                .slice()
+                .map(function (rule) {
+                if (typeof rule === "string" ||
+                    typeof rule === "number" ||
+                    rule instanceof Date) {
+                    return self.parseDate(rule, undefined, true);
+                }
+                else if (rule &&
+                    typeof rule === "object" &&
+                    rule.from &&
+                    rule.to)
+                    return {
+                        from: self.parseDate(rule.from, undefined),
+                        to: self.parseDate(rule.to, undefined)
+                    };
+                return rule;
+            })
+                .filter(function (x) { return x; }); // remove falsy values
         }
-
-        HOOKS.filter(function (hook) {
-          return self.config[hook] !== undefined;
-        }).forEach(function (hook) {
-          self.config[hook] = arrayify(self.config[hook] || []).map(bindToInstance);
-        });
-        self.isMobile = !self.config.disableMobile && !self.config.inline && self.config.mode === "single" && !self.config.disable.length && !self.config.enable.length && !self.config.weekNumbers && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-        for (var _i = 0; _i < self.config.plugins.length; _i++) {
-          var pluginConf = self.config.plugins[_i](self) || {};
-
-          for (var key in pluginConf) {
-            if (HOOKS.indexOf(key) > -1) {
-              self.config[key] = arrayify(pluginConf[key]).map(bindToInstance).concat(self.config[key]);
-            } else if (typeof userConfig[key] === "undefined") self.config[key] = pluginConf[key];
-          }
+        function setupDates() {
+            self.selectedDates = [];
+            self.now = self.parseDate(self.config.now) || new Date();
+            // Workaround IE11 setting placeholder as the input's value
+            var preloadedDate = self.config.defaultDate ||
+                ((self.input.nodeName === "INPUT" ||
+                    self.input.nodeName === "TEXTAREA") &&
+                    self.input.placeholder &&
+                    self.input.value === self.input.placeholder
+                    ? null
+                    : self.input.value);
+            if (preloadedDate)
+                setSelectedDate(preloadedDate, self.config.dateFormat);
+            self._initialDate =
+                self.selectedDates.length > 0
+                    ? self.selectedDates[0]
+                    : self.config.minDate &&
+                        self.config.minDate.getTime() > self.now.getTime()
+                        ? self.config.minDate
+                        : self.config.maxDate &&
+                            self.config.maxDate.getTime() < self.now.getTime()
+                            ? self.config.maxDate
+                            : self.now;
+            self.currentYear = self._initialDate.getFullYear();
+            self.currentMonth = self._initialDate.getMonth();
+            if (self.selectedDates.length > 0)
+                self.latestSelectedDateObj = self.selectedDates[0];
+            if (self.config.minTime !== undefined)
+                self.config.minTime = self.parseDate(self.config.minTime, "H:i");
+            if (self.config.maxTime !== undefined)
+                self.config.maxTime = self.parseDate(self.config.maxTime, "H:i");
+            self.minDateHasTime =
+                !!self.config.minDate &&
+                    (self.config.minDate.getHours() > 0 ||
+                        self.config.minDate.getMinutes() > 0 ||
+                        self.config.minDate.getSeconds() > 0);
+            self.maxDateHasTime =
+                !!self.config.maxDate &&
+                    (self.config.maxDate.getHours() > 0 ||
+                        self.config.maxDate.getMinutes() > 0 ||
+                        self.config.maxDate.getSeconds() > 0);
+            Object.defineProperty(self, "showTimeInput", {
+                get: function () { return self._showTimeInput; },
+                set: function (bool) {
+                    self._showTimeInput = bool;
+                    if (self.calendarContainer)
+                        toggleClass(self.calendarContainer, "showTimeInput", bool);
+                    self.isOpen && positionCalendar();
+                }
+            });
         }
-
-        triggerEvent("onParseConfig");
-      }
-
-      function setupLocale() {
-        if (typeof self.config.locale !== "object" && typeof flatpickr.l10ns[self.config.locale] === "undefined") self.config.errorHandler(new Error("flatpickr: invalid locale " + self.config.locale));
-        self.l10n = Object.assign({}, flatpickr.l10ns.default, typeof self.config.locale === "object" ? self.config.locale : self.config.locale !== "default" ? flatpickr.l10ns[self.config.locale] : undefined);
-        tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
-        self.formatDate = createDateFormatter(self);
-        self.parseDate = createDateParser({
-          config: self.config,
-          l10n: self.l10n
-        });
-      }
-
-      function positionCalendar(customPositionElement) {
-        if (self.calendarContainer === undefined) return;
-        triggerEvent("onPreCalendarPosition");
-        var positionElement = customPositionElement || self._positionElement;
-        var calendarHeight = Array.prototype.reduce.call(self.calendarContainer.children, function (acc, child) {
-          return acc + child.offsetHeight;
-        }, 0),
-            calendarWidth = self.calendarContainer.offsetWidth,
-            configPos = self.config.position.split(" "),
-            configPosVertical = configPos[0],
-            configPosHorizontal = configPos.length > 1 ? configPos[1] : null,
-            inputBounds = positionElement.getBoundingClientRect(),
-            distanceFromBottom = window.innerHeight - inputBounds.bottom,
-            showOnTop = configPosVertical === "above" || configPosVertical !== "below" && distanceFromBottom < calendarHeight && inputBounds.top > calendarHeight;
-        var top = window.pageYOffset + inputBounds.top + (!showOnTop ? positionElement.offsetHeight + 2 : -calendarHeight - 2);
-        toggleClass(self.calendarContainer, "arrowTop", !showOnTop);
-        toggleClass(self.calendarContainer, "arrowBottom", showOnTop);
-        if (self.config.inline) return;
-        var left = window.pageXOffset + inputBounds.left - (configPosHorizontal != null && configPosHorizontal === "center" ? (calendarWidth - inputBounds.width) / 2 : 0);
-        var right = window.document.body.offsetWidth - inputBounds.right;
-        var rightMost = left + calendarWidth > window.document.body.offsetWidth;
-        toggleClass(self.calendarContainer, "rightMost", rightMost);
-        if (self.config.static) return;
-        self.calendarContainer.style.top = top + "px";
-
-        if (!rightMost) {
-          self.calendarContainer.style.left = left + "px";
-          self.calendarContainer.style.right = "auto";
-        } else {
-          self.calendarContainer.style.left = "auto";
-          self.calendarContainer.style.right = right + "px";
+        function setupInputs() {
+            self.input = self.config.wrap
+                ? element.querySelector("[data-input]")
+                : element;
+            /* istanbul ignore next */
+            if (!self.input) {
+                self.config.errorHandler(new Error("Invalid input element specified"));
+                return;
+            }
+            // hack: store previous type to restore it after destroy()
+            self.input._type = self.input.type;
+            self.input.type = "text";
+            self.input.classList.add("flatpickr-input");
+            self._input = self.input;
+            if (self.config.altInput) {
+                // replicate self.element
+                self.altInput = createElement(self.input.nodeName, self.input.className + " " + self.config.altInputClass);
+                self._input = self.altInput;
+                self.altInput.placeholder = self.input.placeholder;
+                self.altInput.disabled = self.input.disabled;
+                self.altInput.required = self.input.required;
+                self.altInput.tabIndex = self.input.tabIndex;
+                self.altInput.type = "text";
+                self.input.setAttribute("type", "hidden");
+                if (!self.config.static && self.input.parentNode)
+                    self.input.parentNode.insertBefore(self.altInput, self.input.nextSibling);
+            }
+            if (!self.config.allowInput)
+                self._input.setAttribute("readonly", "readonly");
+            self._positionElement = self.config.positionElement || self._input;
         }
-      }
-
-      function redraw() {
-        if (self.config.noCalendar || self.isMobile) return;
-        updateNavigationCurrentMonth();
-        buildDays();
-      }
-
-      function focusAndClose() {
-        self._input.focus();
-
-        if (window.navigator.userAgent.indexOf("MSIE") !== -1 || navigator.msMaxTouchPoints !== undefined) {
-          setTimeout(self.close, 0);
-        } else {
-          self.close();
+        function setupMobile() {
+            var inputType = self.config.enableTime
+                ? self.config.noCalendar
+                    ? "time"
+                    : "datetime-local"
+                : "date";
+            self.mobileInput = createElement("input", self.input.className + " flatpickr-mobile");
+            self.mobileInput.step = self.input.getAttribute("step") || "any";
+            self.mobileInput.tabIndex = 1;
+            self.mobileInput.type = inputType;
+            self.mobileInput.disabled = self.input.disabled;
+            self.mobileInput.required = self.input.required;
+            self.mobileInput.placeholder = self.input.placeholder;
+            self.mobileFormatStr =
+                inputType === "datetime-local"
+                    ? "Y-m-d\\TH:i:S"
+                    : inputType === "date"
+                        ? "Y-m-d"
+                        : "H:i:S";
+            if (self.selectedDates.length > 0) {
+                self.mobileInput.defaultValue = self.mobileInput.value = self.formatDate(self.selectedDates[0], self.mobileFormatStr);
+            }
+            if (self.config.minDate)
+                self.mobileInput.min = self.formatDate(self.config.minDate, "Y-m-d");
+            if (self.config.maxDate)
+                self.mobileInput.max = self.formatDate(self.config.maxDate, "Y-m-d");
+            self.input.type = "hidden";
+            if (self.altInput !== undefined)
+                self.altInput.type = "hidden";
+            try {
+                if (self.input.parentNode)
+                    self.input.parentNode.insertBefore(self.mobileInput, self.input.nextSibling);
+            }
+            catch (_a) { }
+            bind(self.mobileInput, "change", function (e) {
+                self.setDate(e.target.value, false, self.mobileFormatStr);
+                triggerEvent("onChange");
+                triggerEvent("onClose");
+            });
         }
-      }
-
-      function selectDate(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        var isSelectable = function isSelectable(day) {
-          return day.classList && day.classList.contains("flatpickr-day") && !day.classList.contains("disabled") && !day.classList.contains("notAllowed");
-        };
-
-        var t = findParent(e.target, isSelectable);
-        if (t === undefined) return;
-        var target = t;
-        var selectedDate = self.latestSelectedDateObj = new Date(target.dateObj.getTime());
-        var shouldChangeMonth = (selectedDate.getMonth() < self.currentMonth || selectedDate.getMonth() > self.currentMonth + self.config.showMonths - 1) && self.config.mode !== "range";
-        self.selectedDateElem = target;
-        if (self.config.mode === "single") self.selectedDates = [selectedDate];else if (self.config.mode === "multiple") {
-          var selectedIndex = isDateSelected(selectedDate);
-          if (selectedIndex) self.selectedDates.splice(parseInt(selectedIndex), 1);else self.selectedDates.push(selectedDate);
-        } else if (self.config.mode === "range") {
-          if (self.selectedDates.length === 2) self.clear(false);
-          self.selectedDates.push(selectedDate);
-          if (compareDates(selectedDate, self.selectedDates[0], true) !== 0) self.selectedDates.sort(function (a, b) {
-            return a.getTime() - b.getTime();
-          });
+        function toggle(e) {
+            if (self.isOpen === true)
+                return self.close();
+            self.open(e);
         }
-        setHoursFromInputs();
-
-        if (shouldChangeMonth) {
-          var isNewYear = self.currentYear !== selectedDate.getFullYear();
-          self.currentYear = selectedDate.getFullYear();
-          self.currentMonth = selectedDate.getMonth();
-          if (isNewYear) triggerEvent("onYearChange");
-          triggerEvent("onMonthChange");
+        function triggerEvent(event, data) {
+            // If the instance has been destroyed already, all hooks have been removed
+            if (self.config === undefined)
+                return;
+            var hooks = self.config[event];
+            if (hooks !== undefined && hooks.length > 0) {
+                for (var i = 0; hooks[i] && i < hooks.length; i++)
+                    hooks[i](self.selectedDates, self.input.value, self, data);
+            }
+            if (event === "onChange") {
+                self.input.dispatchEvent(createEvent("change"));
+                // many front-end frameworks bind to the input event
+                self.input.dispatchEvent(createEvent("input"));
+            }
         }
-
-        updateNavigationCurrentMonth();
-        buildDays();
-        updateValue();
-        if (self.config.enableTime) setTimeout(function () {
-          return self.showTimeInput = true;
-        }, 50);
-        if (!shouldChangeMonth && self.config.mode !== "range" && self.config.showMonths === 1) focusOnDayElem(target);else self.selectedDateElem && self.selectedDateElem.focus();
-        if (self.hourElement !== undefined) setTimeout(function () {
-          return self.hourElement !== undefined && self.hourElement.select();
-        }, 451);
-
-        if (self.config.closeOnSelect) {
-          var single = self.config.mode === "single" && !self.config.enableTime;
-          var range = self.config.mode === "range" && self.selectedDates.length === 2 && !self.config.enableTime;
-
-          if (single || range) {
-            focusAndClose();
-          }
+        function createEvent(name) {
+            var e = document.createEvent("Event");
+            e.initEvent(name, true, true);
+            return e;
         }
-
-        triggerChange();
-      }
-
-      var CALLBACKS = {
-        locale: [setupLocale, updateWeekdays],
-        showMonths: [buildMonths, setCalendarWidth, buildWeekdays]
-      };
-
-      function set(option, value) {
-        if (option !== null && typeof option === "object") Object.assign(self.config, option);else {
-          self.config[option] = value;
-          if (CALLBACKS[option] !== undefined) CALLBACKS[option].forEach(function (x) {
-            return x();
-          });else if (HOOKS.indexOf(option) > -1) self.config[option] = arrayify(value);
+        function isDateSelected(date) {
+            for (var i = 0; i < self.selectedDates.length; i++) {
+                if (compareDates(self.selectedDates[i], date) === 0)
+                    return "" + i;
+            }
+            return false;
         }
-        self.redraw();
-        jumpToDate();
-        updateValue(false);
-      }
-
-      function setSelectedDate(inputDate, format) {
-        var dates = [];
-        if (inputDate instanceof Array) dates = inputDate.map(function (d) {
-          return self.parseDate(d, format);
-        });else if (inputDate instanceof Date || typeof inputDate === "number") dates = [self.parseDate(inputDate, format)];else if (typeof inputDate === "string") {
-          switch (self.config.mode) {
-            case "single":
-            case "time":
-              dates = [self.parseDate(inputDate, format)];
-              break;
-
-            case "multiple":
-              dates = inputDate.split(self.config.conjunction).map(function (date) {
-                return self.parseDate(date, format);
-              });
-              break;
-
-            case "range":
-              dates = inputDate.split(self.l10n.rangeSeparator).map(function (date) {
-                return self.parseDate(date, format);
-              });
-              break;
-
-            default:
-              break;
-          }
-        } else self.config.errorHandler(new Error("Invalid date supplied: " + JSON.stringify(inputDate)));
-        self.selectedDates = dates.filter(function (d) {
-          return d instanceof Date && isEnabled(d, false);
-        });
-        if (self.config.mode === "range") self.selectedDates.sort(function (a, b) {
-          return a.getTime() - b.getTime();
-        });
-      }
-
-      function setDate(date, triggerChange, format) {
-        if (triggerChange === void 0) {
-          triggerChange = false;
+        function isDateInRange(date) {
+            if (self.config.mode !== "range" || self.selectedDates.length < 2)
+                return false;
+            return (compareDates(date, self.selectedDates[0]) >= 0 &&
+                compareDates(date, self.selectedDates[1]) <= 0);
         }
-
-        if (format === void 0) {
-          format = self.config.dateFormat;
+        function updateNavigationCurrentMonth() {
+            if (self.config.noCalendar || self.isMobile || !self.monthNav)
+                return;
+            self.yearElements.forEach(function (yearElement, i) {
+                var d = new Date(self.currentYear, self.currentMonth, 1);
+                d.setMonth(self.currentMonth + i);
+                self.monthElements[i].textContent =
+                    monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) +
+                        " ";
+                yearElement.value = d.getFullYear().toString();
+            });
+            self._hidePrevMonthArrow =
+                self.config.minDate !== undefined &&
+                    (self.currentYear === self.config.minDate.getFullYear()
+                        ? self.currentMonth <= self.config.minDate.getMonth()
+                        : self.currentYear < self.config.minDate.getFullYear());
+            self._hideNextMonthArrow =
+                self.config.maxDate !== undefined &&
+                    (self.currentYear === self.config.maxDate.getFullYear()
+                        ? self.currentMonth + 1 > self.config.maxDate.getMonth()
+                        : self.currentYear > self.config.maxDate.getFullYear());
         }
-
-        if (date !== 0 && !date || date instanceof Array && date.length === 0) return self.clear(triggerChange);
-        setSelectedDate(date, format);
-        self.showTimeInput = self.selectedDates.length > 0;
-        self.latestSelectedDateObj = self.selectedDates[0];
-        self.redraw();
-        jumpToDate();
-        setHoursFromDate();
-        updateValue(triggerChange);
-        if (triggerChange) triggerEvent("onChange");
-      }
-
-      function parseDateRules(arr) {
-        return arr.slice().map(function (rule) {
-          if (typeof rule === "string" || typeof rule === "number" || rule instanceof Date) {
-            return self.parseDate(rule, undefined, true);
-          } else if (rule && typeof rule === "object" && rule.from && rule.to) return {
-            from: self.parseDate(rule.from, undefined),
-            to: self.parseDate(rule.to, undefined)
-          };
-
-          return rule;
-        }).filter(function (x) {
-          return x;
-        });
-      }
-
-      function setupDates() {
-        self.selectedDates = [];
-        self.now = self.parseDate(self.config.now) || new Date();
-        var preloadedDate = self.config.defaultDate || ((self.input.nodeName === "INPUT" || self.input.nodeName === "TEXTAREA") && self.input.placeholder && self.input.value === self.input.placeholder ? null : self.input.value);
-        if (preloadedDate) setSelectedDate(preloadedDate, self.config.dateFormat);
-        var initialDate = self.selectedDates.length > 0 ? self.selectedDates[0] : self.config.minDate && self.config.minDate.getTime() > self.now.getTime() ? self.config.minDate : self.config.maxDate && self.config.maxDate.getTime() < self.now.getTime() ? self.config.maxDate : self.now;
-        self.currentYear = initialDate.getFullYear();
-        self.currentMonth = initialDate.getMonth();
-        if (self.selectedDates.length > 0) self.latestSelectedDateObj = self.selectedDates[0];
-        if (self.config.minTime !== undefined) self.config.minTime = self.parseDate(self.config.minTime, "H:i");
-        if (self.config.maxTime !== undefined) self.config.maxTime = self.parseDate(self.config.maxTime, "H:i");
-        self.minDateHasTime = !!self.config.minDate && (self.config.minDate.getHours() > 0 || self.config.minDate.getMinutes() > 0 || self.config.minDate.getSeconds() > 0);
-        self.maxDateHasTime = !!self.config.maxDate && (self.config.maxDate.getHours() > 0 || self.config.maxDate.getMinutes() > 0 || self.config.maxDate.getSeconds() > 0);
-        Object.defineProperty(self, "showTimeInput", {
-          get: function get() {
-            return self._showTimeInput;
-          },
-          set: function set(bool) {
-            self._showTimeInput = bool;
-            if (self.calendarContainer) toggleClass(self.calendarContainer, "showTimeInput", bool);
-            self.isOpen && positionCalendar();
-          }
-        });
-      }
-
-      function setupInputs() {
-        self.input = self.config.wrap ? element.querySelector("[data-input]") : element;
-
-        if (!self.input) {
-          self.config.errorHandler(new Error("Invalid input element specified"));
-          return;
+        function getDateStr(format) {
+            return self.selectedDates
+                .map(function (dObj) { return self.formatDate(dObj, format); })
+                .filter(function (d, i, arr) {
+                return self.config.mode !== "range" ||
+                    self.config.enableTime ||
+                    arr.indexOf(d) === i;
+            })
+                .join(self.config.mode !== "range"
+                ? self.config.conjunction
+                : self.l10n.rangeSeparator);
         }
-
-        self.input._type = self.input.type;
-        self.input.type = "text";
-        self.input.classList.add("flatpickr-input");
-        self._input = self.input;
-
-        if (self.config.altInput) {
-          self.altInput = createElement(self.input.nodeName, self.input.className + " " + self.config.altInputClass);
-          self._input = self.altInput;
-          self.altInput.placeholder = self.input.placeholder;
-          self.altInput.disabled = self.input.disabled;
-          self.altInput.required = self.input.required;
-          self.altInput.tabIndex = self.input.tabIndex;
-          self.altInput.type = "text";
-          self.input.setAttribute("type", "hidden");
-          if (!self.config.static && self.input.parentNode) self.input.parentNode.insertBefore(self.altInput, self.input.nextSibling);
+        /**
+         * Updates the values of inputs associated with the calendar
+         */
+        function updateValue(triggerChange) {
+            if (triggerChange === void 0) { triggerChange = true; }
+            if (self.selectedDates.length === 0)
+                return self.clear(triggerChange);
+            if (self.mobileInput !== undefined && self.mobileFormatStr) {
+                self.mobileInput.value =
+                    self.latestSelectedDateObj !== undefined
+                        ? self.formatDate(self.latestSelectedDateObj, self.mobileFormatStr)
+                        : "";
+            }
+            self.input.value = getDateStr(self.config.dateFormat);
+            if (self.altInput !== undefined) {
+                self.altInput.value = getDateStr(self.config.altFormat);
+            }
+            if (triggerChange !== false)
+                triggerEvent("onValueUpdate");
         }
-
-        if (!self.config.allowInput) self._input.setAttribute("readonly", "readonly");
-        self._positionElement = self.config.positionElement || self._input;
-      }
-
-      function setupMobile() {
-        var inputType = self.config.enableTime ? self.config.noCalendar ? "time" : "datetime-local" : "date";
-        self.mobileInput = createElement("input", self.input.className + " flatpickr-mobile");
-        self.mobileInput.step = self.input.getAttribute("step") || "any";
-        self.mobileInput.tabIndex = 1;
-        self.mobileInput.type = inputType;
-        self.mobileInput.disabled = self.input.disabled;
-        self.mobileInput.required = self.input.required;
-        self.mobileInput.placeholder = self.input.placeholder;
-        self.mobileFormatStr = inputType === "datetime-local" ? "Y-m-d\\TH:i:S" : inputType === "date" ? "Y-m-d" : "H:i:S";
-
-        if (self.selectedDates.length > 0) {
-          self.mobileInput.defaultValue = self.mobileInput.value = self.formatDate(self.selectedDates[0], self.mobileFormatStr);
+        function onMonthNavClick(e) {
+            e.preventDefault();
+            var isPrevMonth = self.prevMonthNav.contains(e.target);
+            var isNextMonth = self.nextMonthNav.contains(e.target);
+            if (isPrevMonth || isNextMonth) {
+                changeMonth(isPrevMonth ? -1 : 1);
+            }
+            else if (self.yearElements.indexOf(e.target) >= 0) {
+                e.target.select();
+            }
+            else if (e.target.classList.contains("arrowUp")) {
+                self.changeYear(self.currentYear + 1);
+            }
+            else if (e.target.classList.contains("arrowDown")) {
+                self.changeYear(self.currentYear - 1);
+            }
         }
-
-        if (self.config.minDate) self.mobileInput.min = self.formatDate(self.config.minDate, "Y-m-d");
-        if (self.config.maxDate) self.mobileInput.max = self.formatDate(self.config.maxDate, "Y-m-d");
-        self.input.type = "hidden";
-        if (self.altInput !== undefined) self.altInput.type = "hidden";
-
-        try {
-          if (self.input.parentNode) self.input.parentNode.insertBefore(self.mobileInput, self.input.nextSibling);
-        } catch (_a) {}
-
-        bind(self.mobileInput, "change", function (e) {
-          self.setDate(e.target.value, false, self.mobileFormatStr);
-          triggerEvent("onChange");
-          triggerEvent("onClose");
-        });
-      }
-
-      function toggle(e) {
-        if (self.isOpen === true) return self.close();
-        self.open(e);
-      }
-
-      function triggerEvent(event, data) {
-        if (self.config === undefined) return;
-        var hooks = self.config[event];
-
-        if (hooks !== undefined && hooks.length > 0) {
-          for (var i = 0; hooks[i] && i < hooks.length; i++) {
-            hooks[i](self.selectedDates, self.input.value, self, data);
-          }
+        function timeWrapper(e) {
+            e.preventDefault();
+            var isKeyDown = e.type === "keydown", input = e.target;
+            if (self.amPM !== undefined && e.target === self.amPM) {
+                self.amPM.textContent =
+                    self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
+            }
+            var min = parseFloat(input.getAttribute("min")), max = parseFloat(input.getAttribute("max")), step = parseFloat(input.getAttribute("step")), curValue = parseInt(input.value, 10), delta = e.delta ||
+                (isKeyDown ? (e.which === 38 ? 1 : -1) : 0);
+            var newValue = curValue + step * delta;
+            if (typeof input.value !== "undefined" && input.value.length === 2) {
+                var isHourElem = input === self.hourElement, isMinuteElem = input === self.minuteElement;
+                if (newValue < min) {
+                    newValue =
+                        max +
+                            newValue +
+                            int(!isHourElem) +
+                            (int(isHourElem) && int(!self.amPM));
+                    if (isMinuteElem)
+                        incrementNumInput(undefined, -1, self.hourElement);
+                }
+                else if (newValue > max) {
+                    newValue =
+                        input === self.hourElement ? newValue - max - int(!self.amPM) : min;
+                    if (isMinuteElem)
+                        incrementNumInput(undefined, 1, self.hourElement);
+                }
+                if (self.amPM &&
+                    isHourElem &&
+                    (step === 1
+                        ? newValue + curValue === 23
+                        : Math.abs(newValue - curValue) > step)) {
+                    self.amPM.textContent =
+                        self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
+                }
+                input.value = pad(newValue);
+            }
         }
-
-        if (event === "onChange") {
-          self.input.dispatchEvent(createEvent("change"));
-          self.input.dispatchEvent(createEvent("input"));
-        }
-      }
-
-      function createEvent(name) {
-        var e = document.createEvent("Event");
-        e.initEvent(name, true, true);
-        return e;
-      }
-
-      function isDateSelected(date) {
-        for (var i = 0; i < self.selectedDates.length; i++) {
-          if (compareDates(self.selectedDates[i], date) === 0) return "" + i;
-        }
-
-        return false;
-      }
-
-      function isDateInRange(date) {
-        if (self.config.mode !== "range" || self.selectedDates.length < 2) return false;
-        return compareDates(date, self.selectedDates[0]) >= 0 && compareDates(date, self.selectedDates[1]) <= 0;
-      }
-
-      function updateNavigationCurrentMonth() {
-        if (self.config.noCalendar || self.isMobile || !self.monthNav) return;
-        self.yearElements.forEach(function (yearElement, i) {
-          var d = new Date(self.currentYear, self.currentMonth, 1);
-          d.setMonth(self.currentMonth + i);
-          self.monthElements[i].textContent = monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) + " ";
-          yearElement.value = d.getFullYear().toString();
-        });
-        self._hidePrevMonthArrow = self.config.minDate !== undefined && (self.currentYear === self.config.minDate.getFullYear() ? self.currentMonth <= self.config.minDate.getMonth() : self.currentYear < self.config.minDate.getFullYear());
-        self._hideNextMonthArrow = self.config.maxDate !== undefined && (self.currentYear === self.config.maxDate.getFullYear() ? self.currentMonth + 1 > self.config.maxDate.getMonth() : self.currentYear > self.config.maxDate.getFullYear());
-      }
-
-      function getDateStr(format) {
-        return self.selectedDates.map(function (dObj) {
-          return self.formatDate(dObj, format);
-        }).filter(function (d, i, arr) {
-          return self.config.mode !== "range" || self.config.enableTime || arr.indexOf(d) === i;
-        }).join(self.config.mode !== "range" ? self.config.conjunction : self.l10n.rangeSeparator);
-      }
-
-      function updateValue(triggerChange) {
-        if (triggerChange === void 0) {
-          triggerChange = true;
-        }
-
-        if (self.selectedDates.length === 0) return self.clear(triggerChange);
-
-        if (self.mobileInput !== undefined && self.mobileFormatStr) {
-          self.mobileInput.value = self.latestSelectedDateObj !== undefined ? self.formatDate(self.latestSelectedDateObj, self.mobileFormatStr) : "";
-        }
-
-        self.input.value = getDateStr(self.config.dateFormat);
-
-        if (self.altInput !== undefined) {
-          self.altInput.value = getDateStr(self.config.altFormat);
-        }
-
-        if (triggerChange !== false) triggerEvent("onValueUpdate");
-      }
-
-      function onMonthNavClick(e) {
-        e.preventDefault();
-        var isPrevMonth = self.prevMonthNav.contains(e.target);
-        var isNextMonth = self.nextMonthNav.contains(e.target);
-
-        if (isPrevMonth || isNextMonth) {
-          changeMonth(isPrevMonth ? -1 : 1);
-        } else if (self.yearElements.indexOf(e.target) >= 0) {
-          e.target.select();
-        } else if (e.target.classList.contains("arrowUp")) {
-          self.changeYear(self.currentYear + 1);
-        } else if (e.target.classList.contains("arrowDown")) {
-          self.changeYear(self.currentYear - 1);
-        }
-      }
-
-      function timeWrapper(e) {
-        e.preventDefault();
-        var isKeyDown = e.type === "keydown",
-            input = e.target;
-
-        if (self.amPM !== undefined && e.target === self.amPM) {
-          self.amPM.textContent = self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
-        }
-
-        var min = parseFloat(input.getAttribute("data-min")),
-            max = parseFloat(input.getAttribute("data-max")),
-            step = parseFloat(input.getAttribute("data-step")),
-            curValue = parseInt(input.value, 10),
-            delta = e.delta || (isKeyDown ? e.which === 38 ? 1 : -1 : 0);
-        var newValue = curValue + step * delta;
-
-        if (typeof input.value !== "undefined" && input.value.length === 2) {
-          var isHourElem = input === self.hourElement,
-              isMinuteElem = input === self.minuteElement;
-
-          if (newValue < min) {
-            newValue = max + newValue + int(!isHourElem) + (int(isHourElem) && int(!self.amPM));
-            if (isMinuteElem) incrementNumInput(undefined, -1, self.hourElement);
-          } else if (newValue > max) {
-            newValue = input === self.hourElement ? newValue - max - int(!self.amPM) : min;
-            if (isMinuteElem) incrementNumInput(undefined, 1, self.hourElement);
-          }
-
-          if (self.amPM && isHourElem && (step === 1 ? newValue + curValue === 23 : Math.abs(newValue - curValue) > step)) {
-            self.amPM.textContent = self.l10n.amPM[int(self.amPM.textContent === self.l10n.amPM[0])];
-          }
-
-          input.value = pad(newValue);
-        }
-      }
-
-      init();
-      return self;
+        init();
+        return self;
     }
-
+    /* istanbul ignore next */
     function _flatpickr(nodeList, config) {
-      var nodes = Array.prototype.slice.call(nodeList);
-      var instances = [];
-
-      for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-
-        try {
-          if (node.getAttribute("data-fp-omit") !== null) continue;
-
-          if (node._flatpickr !== undefined) {
-            node._flatpickr.destroy();
-
-            node._flatpickr = undefined;
-          }
-
-          node._flatpickr = FlatpickrInstance(node, config || {});
-          instances.push(node._flatpickr);
-        } catch (e) {
-          console.error(e);
+        // static list
+        var nodes = Array.prototype.slice
+            .call(nodeList)
+            .filter(function (x) { return x instanceof HTMLElement; });
+        var instances = [];
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            try {
+                if (node.getAttribute("data-fp-omit") !== null)
+                    continue;
+                if (node._flatpickr !== undefined) {
+                    node._flatpickr.destroy();
+                    node._flatpickr = undefined;
+                }
+                node._flatpickr = FlatpickrInstance(node, config || {});
+                instances.push(node._flatpickr);
+            }
+            catch (e) {
+                console.error(e);
+            }
         }
-      }
-
-      return instances.length === 1 ? instances[0] : instances;
+        return instances.length === 1 ? instances[0] : instances;
     }
-
+    /* istanbul ignore next */
     if (typeof HTMLElement !== "undefined") {
-      HTMLCollection.prototype.flatpickr = NodeList.prototype.flatpickr = function (config) {
-        return _flatpickr(this, config);
-      };
-
-      HTMLElement.prototype.flatpickr = function (config) {
-        return _flatpickr([this], config);
-      };
+        // browser env
+        HTMLCollection.prototype.flatpickr = NodeList.prototype.flatpickr = function (config) {
+            return _flatpickr(this, config);
+        };
+        HTMLElement.prototype.flatpickr = function (config) {
+            return _flatpickr([this], config);
+        };
     }
-
-    var flatpickr = function flatpickr(selector, config) {
-      if (selector instanceof NodeList) return _flatpickr(selector, config);else if (typeof selector === "string") return _flatpickr(window.document.querySelectorAll(selector), config);
-      return _flatpickr([selector], config);
+    /* istanbul ignore next */
+    var flatpickr = function (selector, config) {
+        if (typeof selector === "string") {
+            return _flatpickr(window.document.querySelectorAll(selector), config);
+        }
+        else if (selector instanceof Node) {
+            return _flatpickr([selector], config);
+        }
+        else {
+            return _flatpickr(selector, config);
+        }
     };
-
+    /* istanbul ignore next */
     flatpickr.defaultConfig = defaults;
     flatpickr.l10ns = {
-      en: Object.assign({}, english),
-      default: Object.assign({}, english)
+        en: __assign({}, english),
+        "default": __assign({}, english)
     };
-
     flatpickr.localize = function (l10n) {
-      flatpickr.l10ns.default = Object.assign({}, flatpickr.l10ns.default, l10n);
+        flatpickr.l10ns["default"] = __assign({}, flatpickr.l10ns["default"], l10n);
     };
-
     flatpickr.setDefaults = function (config) {
-      flatpickr.defaultConfig = Object.assign({}, flatpickr.defaultConfig, config);
+        flatpickr.defaultConfig = __assign({}, flatpickr.defaultConfig, config);
     };
-
     flatpickr.parseDate = createDateParser({});
     flatpickr.formatDate = createDateFormatter({});
     flatpickr.compareDates = compareDates;
-
+    /* istanbul ignore next */
     if (typeof jQuery !== "undefined") {
-      jQuery.fn.flatpickr = function (config) {
-        return _flatpickr(this, config);
-      };
+        jQuery.fn.flatpickr = function (config) {
+            return _flatpickr(this, config);
+        };
     }
-
     Date.prototype.fp_incr = function (days) {
-      return new Date(this.getFullYear(), this.getMonth(), this.getDate() + (typeof days === "string" ? parseInt(days, 10) : days));
+        return new Date(this.getFullYear(), this.getMonth(), this.getDate() + (typeof days === "string" ? parseInt(days, 10) : days));
     };
-
     if (typeof window !== "undefined") {
-      window.flatpickr = flatpickr;
+        window.flatpickr = flatpickr;
     }
 
     return flatpickr;
 
-})));
+}));
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
@@ -19117,7 +20614,7 @@ __webpack_require__(/*! core-js/modules/es6.regexp.match */ "./node_modules/core
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-__webpack_require__(/*! whatwg-fetch */ "./node_modules/whatwg-fetch/fetch.js");
+var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
 
 var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
 
@@ -19142,6 +20639,12 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var _fetchPonyfill = (0, _fetchPonyfill2.default)({
+  Promise: _nativePromiseOnly.default
+}),
+    fetch = _fetchPonyfill.fetch,
+    Headers = _fetchPonyfill.Headers;
 
 var isBoolean = function isBoolean(val) {
   return _typeof(val) === _typeof(true);
@@ -19210,7 +20713,7 @@ function () {
     if (!path) {
       // Allow user to create new projects if this was instantiated without
       // a url
-      this.projectUrl = "".concat(this.base, "/project");
+      this.projectUrl = Formio.projectUrl || "".concat(this.base, "/project");
       this.projectsUrl = "".concat(this.base, "/project");
       this.projectId = false;
       this.query = '';
@@ -19974,7 +21477,7 @@ function () {
       }
 
       var requestToken = options.headers.get('x-jwt-token');
-      var result = fetch(url, options).then(function (response) {
+      var result = Formio.fetch(url, options).then(function (response) {
         // Allow plugins to respond.
         response = Formio.pluginAlter('requestResponse', response, Formio);
 
@@ -20651,13 +22154,8 @@ function () {
 exports.default = Formio;
 Formio.libraries = {};
 Formio.Promise = _nativePromiseOnly.default;
-
-if (typeof Headers !== 'undefined') {
-  Formio.Headers = Headers;
-} else {
-  Formio.Headers = {};
-}
-
+Formio.fetch = fetch;
+Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
 Formio.projectUrlSet = false;
@@ -21407,6 +22905,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
@@ -21416,8 +22916,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 // Initialize the available forms.
 _Formio.default.forms = {}; // Allow people to register components.
@@ -21473,7 +22971,7 @@ function (_NestedComponent) {
 
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(Webform).call(this, null, getOptions(options))); // Keep track of all available forms globally.
 
-    _Formio.default.forms[_this2.id] = _assertThisInitialized(_assertThisInitialized(_this2)); // Set the base url.
+    _Formio.default.forms[_this2.id] = _assertThisInitialized(_this2); // Set the base url.
 
     if (_this2.options.baseUrl) {
       _Formio.default.setBaseUrl(_this2.options.baseUrl);
@@ -21532,9 +23030,9 @@ function (_NestedComponent) {
     _this2.savingDraft = true;
 
     if (_this2.options.saveDraftThrottle) {
-      _this2.triggerSaveDraft = _lodash.default.throttle(_this2.saveDraft.bind(_assertThisInitialized(_assertThisInitialized(_this2))), _this2.options.saveDraftThrottle);
+      _this2.triggerSaveDraft = _lodash.default.throttle(_this2.saveDraft.bind(_assertThisInitialized(_this2)), _this2.options.saveDraftThrottle);
     } else {
-      _this2.triggerSaveDraft = _this2.saveDraft.bind(_assertThisInitialized(_assertThisInitialized(_this2)));
+      _this2.triggerSaveDraft = _this2.saveDraft.bind(_assertThisInitialized(_this2));
     }
 
     _this2.customErrors = [];
@@ -23020,6 +24518,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
@@ -23029,8 +24529,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 __webpack_require__(/*! ./components/builder */ "./node_modules/formiojs/components/builder.js");
 
@@ -23048,7 +24546,7 @@ function (_Webform) {
     _this.builderHeight = 0;
     _this.dragContainers = [];
     _this.sidebarContainers = [];
-    _this.updateDraggable = _lodash.default.debounce(_this.refreshDraggable.bind(_assertThisInitialized(_assertThisInitialized(_this))), 200); // Setup the builder options.
+    _this.updateDraggable = _lodash.default.debounce(_this.refreshDraggable.bind(_assertThisInitialized(_this)), 200); // Setup the builder options.
 
     _this.options.builder = _lodash.default.defaultsDeep({}, _this.options.builder, _this.defaultComponents); // Turn off if explicitely said to do so...
 
@@ -26514,8 +28012,6 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
-
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_modules/core-js/modules/es6.regexp.constructor.js");
@@ -26529,6 +28025,8 @@ __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/c
 __webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
@@ -26564,6 +28062,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
@@ -26577,8 +28077,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 var CKEDITOR = 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/master/build/ckeditor.js';
 /**
@@ -26882,7 +28380,7 @@ function (_Component) {
      * @type {BaseComponent}
      */
 
-    _this.root = _assertThisInitialized(_assertThisInitialized(_this));
+    _this.root = _assertThisInitialized(_this);
     _this.options.name = _this.options.name || 'data';
     /**
      * The validators that are assigned to this component.
@@ -26937,7 +28435,7 @@ function (_Component) {
      */
 
 
-    _this.triggerRedraw = _lodash.default.debounce(_this.redraw.bind(_assertThisInitialized(_assertThisInitialized(_this))), 100); // To force this component to be invalid.
+    _this.triggerRedraw = _lodash.default.debounce(_this.redraw.bind(_assertThisInitialized(_this)), 100); // To force this component to be invalid.
 
     _this.invalid = false; // Determine if the component has been built.
 
@@ -27125,21 +28623,34 @@ function (_Component) {
       this.attachLogic();
     }
   }, {
+    key: "attachRefreshEvent",
+    value: function attachRefreshEvent(refreshData) {
+      var _this4 = this;
+
+      this.on('change', function (event) {
+        if (refreshData === 'data') {
+          _this4.refresh(_this4.data);
+        } else if (event.changed && event.changed.component && event.changed.component.key === refreshData & // Make sure the changed component is not in a different "context". Solves issues where refreshOn being set
+        // in fields inside EditGrids could alter their state from other rows (which is bad).
+        _this4.inContext(event.changed.instance)) {
+          _this4.refresh(event.changed.value);
+        }
+      }, true);
+    }
+  }, {
     key: "attachRefreshOn",
     value: function attachRefreshOn() {
-      var _this4 = this;
+      var _this5 = this;
 
       // If they wish to refresh on a value, then add that here.
       if (this.component.refreshOn) {
-        this.on('change', function (event) {
-          if (_this4.component.refreshOn === 'data') {
-            _this4.refresh(_this4.data);
-          } else if (event.changed && event.changed.component && event.changed.component.key === _this4.component.refreshOn & // Make sure the changed component is not in a different "context". Solves issues where refreshOn being set
-          // in fields inside EditGrids could alter their state from other rows (which is bad).
-          _this4.inContext(event.changed.instance)) {
-            _this4.refresh(event.changed.value);
-          }
-        }, true);
+        if (Array.isArray(this.component.refreshOn)) {
+          this.component.refreshOn.forEach(function (refreshData) {
+            _this5.attachRefreshEvent(refreshData);
+          });
+        } else {
+          this.attachRefreshEvent(this.component.refreshOn);
+        }
       }
     }
   }, {
@@ -27226,7 +28737,7 @@ function (_Component) {
   }, {
     key: "createModal",
     value: function createModal() {
-      var _this5 = this;
+      var _this6 = this;
 
       var modalBody = this.ce('div');
       var modalOverlay = this.ce('div', {
@@ -27250,7 +28761,7 @@ function (_Component) {
         dialog.close();
       });
       this.addEventListener(dialog, 'close', function () {
-        _this5.removeChildFrom(dialog, document.body);
+        _this6.removeChildFrom(dialog, document.body);
       });
       document.body.appendChild(dialog);
       dialog.body = modalBody;
@@ -27258,7 +28769,7 @@ function (_Component) {
       dialog.close = function () {
         dialog.dispatchEvent(new CustomEvent('close'));
 
-        _this5.removeChildFrom(dialog, document.body);
+        _this6.removeChildFrom(dialog, document.body);
       };
 
       return dialog;
@@ -27422,7 +28933,7 @@ function (_Component) {
   }, {
     key: "buildRows",
     value: function buildRows(values) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (!this.tbody) {
         return;
@@ -27434,26 +28945,26 @@ function (_Component) {
       values = values || this.dataValue;
 
       _lodash.default.each(values, function (value, index) {
-        var tr = _this6.ce('tr');
+        var tr = _this7.ce('tr');
 
         if (allowReorder) {
-          tr.appendChild(_this6.ce('td', {
+          tr.appendChild(_this7.ce('td', {
             class: 'formio-drag-column'
-          }, _this6.dragButton()));
+          }, _this7.dragButton()));
         }
 
-        var td = _this6.ce('td');
+        var td = _this7.ce('td');
 
-        _this6.buildInput(td, value, index);
+        _this7.buildInput(td, value, index);
 
         tr.appendChild(td);
 
-        if (!_this6.shouldDisable) {
-          var tdAdd = _this6.ce('td', {
+        if (!_this7.shouldDisable) {
+          var tdAdd = _this7.ce('td', {
             class: 'formio-remove-column'
           });
 
-          tdAdd.appendChild(_this6.removeButton(index));
+          tdAdd.appendChild(_this7.removeButton(index));
           tr.appendChild(tdAdd);
         }
 
@@ -27463,7 +28974,7 @@ function (_Component) {
           };
         }
 
-        _this6.tbody.appendChild(tr);
+        _this7.tbody.appendChild(tr);
       });
 
       if (!this.shouldDisable) {
@@ -27537,7 +29048,7 @@ function (_Component) {
   }, {
     key: "addButton",
     value: function addButton(justIcon) {
-      var _this7 = this;
+      var _this8 = this;
 
       var addButton = this.ce('button', {
         class: 'btn btn-primary formio-button-add-row'
@@ -27545,7 +29056,7 @@ function (_Component) {
       this.addEventListener(addButton, 'click', function (event) {
         event.preventDefault();
 
-        _this7.addValue();
+        _this8.addValue();
       });
       var addIcon = this.ce('i', {
         class: this.iconClass('plus')
@@ -27586,7 +29097,7 @@ function (_Component) {
   }, {
     key: "removeButton",
     value: function removeButton(index) {
-      var _this8 = this;
+      var _this9 = this;
 
       var removeButton = this.ce('button', {
         type: 'button',
@@ -27595,7 +29106,7 @@ function (_Component) {
       this.addEventListener(removeButton, 'click', function (event) {
         event.preventDefault();
 
-        _this8.removeValue(index);
+        _this9.removeValue(index);
       });
       var removeIcon = this.ce('i', {
         class: this.iconClass('remove-circle')
@@ -27979,7 +29490,7 @@ function (_Component) {
      * @return {null}
      */
     value: function createWidget() {
-      var _this9 = this;
+      var _this10 = this;
 
       // Return null if no widget is found.
       if (!this.component.widget) {
@@ -27998,10 +29509,10 @@ function (_Component) {
 
       var widget = new _widgets.default[settings.type](settings, this.component);
       widget.on('update', function () {
-        return _this9.updateValue();
+        return _this10.updateValue();
       }, true);
       widget.on('redraw', function () {
-        return _this9.redraw();
+        return _this10.redraw();
       }, true);
       this._widget = widget;
       return widget;
@@ -28019,10 +29530,10 @@ function (_Component) {
   }, {
     key: "destroyInputs",
     value: function destroyInputs() {
-      var _this10 = this;
+      var _this11 = this;
 
       _lodash.default.each(this.inputs, function (input) {
-        input = _this10.performInputMapping(input);
+        input = _this11.performInputMapping(input);
 
         if (input.mask) {
           input.mask.destroy();
@@ -28166,7 +29677,7 @@ function (_Component) {
      * @param data
      */
     value: function fieldLogic(data) {
-      var _this11 = this;
+      var _this12 = this;
 
       data = data || this.rootValue;
       var logics = this.logic; // If there aren't logic, don't go further.
@@ -28178,10 +29689,10 @@ function (_Component) {
       var newComponent = _lodash.default.cloneDeep(this.originalComponent);
 
       var changed = logics.reduce(function (changed, logic) {
-        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this11.data, data, _this11.root ? _this11.root._form : {}, _this11);
+        var result = FormioUtils.checkTrigger(newComponent, logic.trigger, _this12.data, data, _this12.root ? _this12.root._form : {}, _this12);
 
         if (result) {
-          changed |= _this11.applyActions(logic.actions, result, data, newComponent);
+          changed |= _this12.applyActions(logic.actions, result, data, newComponent);
         }
 
         return changed;
@@ -28197,19 +29708,19 @@ function (_Component) {
   }, {
     key: "applyActions",
     value: function applyActions(actions, result, data, newComponent) {
-      var _this12 = this;
+      var _this13 = this;
 
       return actions.reduce(function (changed, action) {
         switch (action.type) {
           case 'property':
-            FormioUtils.setActionProperty(newComponent, action, _this12.data, data, newComponent, result, _this12);
+            FormioUtils.setActionProperty(newComponent, action, _this13.data, data, newComponent, result, _this13);
             break;
 
           case 'value':
             {
-              var oldValue = _this12.getValue();
+              var oldValue = _this13.getValue();
 
-              var newValue = _this12.evaluate(action.value, {
+              var newValue = _this13.evaluate(action.value, {
                 value: _lodash.default.clone(oldValue),
                 data: data,
                 component: newComponent,
@@ -28217,7 +29728,7 @@ function (_Component) {
               }, 'value');
 
               if (!_lodash.default.isEqual(oldValue, newValue)) {
-                _this12.setValue(newValue);
+                _this13.setValue(newValue);
 
                 changed = true;
               }
@@ -28243,7 +29754,7 @@ function (_Component) {
   }, {
     key: "addInputError",
     value: function addInputError(message, dirty) {
-      var _this13 = this;
+      var _this14 = this;
 
       if (!message) {
         return;
@@ -28260,7 +29771,7 @@ function (_Component) {
 
       this.addClass(this.element, 'has-error');
       this.inputs.forEach(function (input) {
-        return _this13.addClass(_this13.performInputMapping(input), 'is-invalid');
+        return _this14.addClass(_this14.performInputMapping(input), 'is-invalid');
       });
 
       if (dirty && this.options.highlightErrors) {
@@ -28413,7 +29924,7 @@ function (_Component) {
   }, {
     key: "addInputSubmitListener",
     value: function addInputSubmitListener(input) {
-      var _this14 = this;
+      var _this15 = this;
 
       if (!this.options.submitOnEnter) {
         return;
@@ -28426,7 +29937,7 @@ function (_Component) {
           event.preventDefault();
           event.stopPropagation();
 
-          _this14.emit('submitButton');
+          _this15.emit('submitButton');
         }
       });
     }
@@ -28439,10 +29950,10 @@ function (_Component) {
   }, {
     key: "addInputEventListener",
     value: function addInputEventListener(input) {
-      var _this15 = this;
+      var _this16 = this;
 
       this.addEventListener(input, this.info.changeEvent, function () {
-        return _this15.updateValue({
+        return _this16.updateValue({
           modified: true
         });
       });
@@ -28476,38 +29987,38 @@ function (_Component) {
   }, {
     key: "addFocusBlurEvents",
     value: function addFocusBlurEvents(element) {
-      var _this16 = this;
+      var _this17 = this;
 
       this.addEventListener(element, 'focus', function () {
-        if (_this16.root.focusedComponent !== _this16) {
-          if (_this16.root.pendingBlur) {
-            _this16.root.pendingBlur();
+        if (_this17.root.focusedComponent !== _this17) {
+          if (_this17.root.pendingBlur) {
+            _this17.root.pendingBlur();
           }
 
-          _this16.root.focusedComponent = _this16;
+          _this17.root.focusedComponent = _this17;
 
-          _this16.emit('focus', _this16);
-        } else if (_this16.root.focusedComponent === _this16 && _this16.root.pendingBlur) {
-          _this16.root.pendingBlur.cancel();
+          _this17.emit('focus', _this17);
+        } else if (_this17.root.focusedComponent === _this17 && _this17.root.pendingBlur) {
+          _this17.root.pendingBlur.cancel();
 
-          _this16.root.pendingBlur = null;
+          _this17.root.pendingBlur = null;
         }
       });
       this.addEventListener(element, 'blur', function () {
-        _this16.root.pendingBlur = FormioUtils.delay(function () {
-          _this16.emit('blur', _this16);
+        _this17.root.pendingBlur = FormioUtils.delay(function () {
+          _this17.emit('blur', _this17);
 
-          if (_this16.component.validateOn === 'blur') {
-            _this16.root.triggerChange({}, {
-              instance: _this16,
-              component: _this16.component,
-              value: _this16.dataValue,
+          if (_this17.component.validateOn === 'blur') {
+            _this17.root.triggerChange({}, {
+              instance: _this17,
+              component: _this17.component,
+              value: _this17.dataValue,
               flags: {}
             });
           }
 
-          _this16.root.focusedComponent = null;
-          _this16.root.pendingBlur = null;
+          _this17.root.focusedComponent = null;
+          _this17.root.pendingBlur = null;
         });
       });
     }
@@ -28531,7 +30042,7 @@ function (_Component) {
   }, {
     key: "addQuill",
     value: function addQuill(element, settings, onChange) {
-      var _this17 = this;
+      var _this18 = this;
 
       settings = _lodash.default.isEmpty(settings) ? this.wysiwygDefault : settings; // Lazy load the quill css.
 
@@ -28546,22 +30057,22 @@ function (_Component) {
           return _nativePromiseOnly.default.reject();
         }
 
-        _this17.quill = new Quill(element, settings);
+        _this18.quill = new Quill(element, settings);
         /** This block of code adds the [source] capabilities.  See https://codepen.io/anon/pen/ZyEjrQ **/
 
         var txtArea = document.createElement('textarea');
         txtArea.setAttribute('class', 'quill-source-code');
 
-        _this17.quill.addContainer('ql-custom').appendChild(txtArea);
+        _this18.quill.addContainer('ql-custom').appendChild(txtArea);
 
         var qlSource = element.parentNode.querySelector('.ql-source');
 
         if (qlSource) {
-          _this17.addEventListener(qlSource, 'click', function (event) {
+          _this18.addEventListener(qlSource, 'click', function (event) {
             event.preventDefault();
 
             if (txtArea.style.display === 'inherit') {
-              _this17.quill.setContents(_this17.quill.clipboard.convert(txtArea.value));
+              _this18.quill.setContents(_this18.quill.clipboard.convert(txtArea.value));
             }
 
             txtArea.style.display = txtArea.style.display === 'none' ? 'inherit' : 'none';
@@ -28571,8 +30082,8 @@ function (_Component) {
         // Make sure to select cursor when they click on the element.
 
 
-        _this17.addEventListener(element, 'click', function () {
-          return _this17.quill.focus();
+        _this18.addEventListener(element, 'click', function () {
+          return _this18.quill.focus();
         }); // Allows users to skip toolbar items when tabbing though form
 
 
@@ -28582,12 +30093,12 @@ function (_Component) {
           elm[i].setAttribute('tabindex', '-1');
         }
 
-        _this17.quill.on('text-change', function () {
-          txtArea.value = _this17.quill.root.innerHTML;
+        _this18.quill.on('text-change', function () {
+          txtArea.value = _this18.quill.root.innerHTML;
           onChange(txtArea);
         });
 
-        return _this17.quill;
+        return _this18.quill;
       });
     }
     /**
@@ -28933,7 +30444,7 @@ function (_Component) {
   }, {
     key: "setCustomValidity",
     value: function setCustomValidity(message, dirty) {
-      var _this18 = this;
+      var _this19 = this;
 
       if (this.errorElement && this.errorContainer) {
         this.errorElement.innerHTML = '';
@@ -28950,7 +30461,7 @@ function (_Component) {
         this.addInputError(message, dirty);
       } else {
         this.inputs.forEach(function (input) {
-          return _this18.removeClass(_this18.performInputMapping(input), 'is-invalid');
+          return _this19.removeClass(_this19.performInputMapping(input), 'is-invalid');
         });
 
         if (this.options.highlightErrors) {
@@ -28962,7 +30473,7 @@ function (_Component) {
       }
 
       this.inputs.forEach(function (input) {
-        input = _this18.performInputMapping(input);
+        input = _this19.performInputMapping(input);
 
         if (typeof input.setCustomValidity === 'function') {
           input.setCustomValidity(message, dirty);
@@ -28972,14 +30483,14 @@ function (_Component) {
   }, {
     key: "shouldSkipValidation",
     value: function shouldSkipValidation(data, dirty, rowData) {
-      var _this19 = this;
+      var _this20 = this;
 
       var rules = [// Force valid if component is hidden.
       function () {
-        return !_this19.visible;
+        return !_this20.visible;
       }, // Force valid if component is conditionally hidden.
       function () {
-        return !_this19.checkCondition(rowData, data);
+        return !_this20.checkCondition(rowData, data);
       }];
       return rules.some(function (pred) {
         return pred();
@@ -29156,7 +30667,7 @@ function (_Component) {
   }, {
     key: "selectOptions",
     value: function selectOptions(select, tag, options, defaultValue) {
-      var _this20 = this;
+      var _this21 = this;
 
       _lodash.default.each(options, function (option) {
         var attrs = {
@@ -29167,9 +30678,9 @@ function (_Component) {
           attrs.selected = 'selected';
         }
 
-        var optionElement = _this20.ce('option', attrs);
+        var optionElement = _this21.ce('option', attrs);
 
-        optionElement.appendChild(_this20.text(option.label));
+        optionElement.appendChild(_this21.text(option.label));
         select.appendChild(optionElement);
       });
     }
@@ -29237,11 +30748,11 @@ function (_Component) {
   }, {
     key: "autofocus",
     value: function autofocus() {
-      var _this21 = this;
+      var _this22 = this;
 
       if (this.component.autofocus) {
         this.on('render', function () {
-          return _this21.focus();
+          return _this22.focus();
         }, true);
       }
     }
@@ -29299,26 +30810,26 @@ function (_Component) {
   }, {
     key: "attachLogic",
     value: function attachLogic() {
-      var _this22 = this;
+      var _this23 = this;
 
       this.logic.forEach(function (logic) {
         if (logic.trigger.type === 'event') {
-          var event = _this22.interpolate(logic.trigger.event);
+          var event = _this23.interpolate(logic.trigger.event);
 
-          _this22.on(event, function () {
-            var newComponent = _lodash.default.cloneDeep(_this22.originalComponent);
+          _this23.on(event, function () {
+            var newComponent = _lodash.default.cloneDeep(_this23.originalComponent);
 
             for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
               args[_key3] = arguments[_key3];
             }
 
-            if (_this22.applyActions(logic.actions, args, _this22.data, newComponent)) {
+            if (_this23.applyActions(logic.actions, args, _this23.data, newComponent)) {
               // If component definition changed, replace it.
-              if (!_lodash.default.isEqual(_this22.component, newComponent)) {
-                _this22.component = newComponent;
+              if (!_lodash.default.isEqual(_this23.component, newComponent)) {
+                _this23.component = newComponent;
               }
 
-              _this22.redraw();
+              _this23.redraw();
             }
           }, true);
         }
@@ -29658,7 +31169,7 @@ function (_Component) {
      */
     ,
     set: function set(disabled) {
-      var _this23 = this;
+      var _this24 = this;
 
       // Do not allow a component to be disabled if it should be always...
       if (!disabled && this.shouldDisable || disabled && !this.shouldDisable) {
@@ -29675,7 +31186,7 @@ function (_Component) {
 
 
       _lodash.default.each(this.inputs, function (input) {
-        return _this23.setDisabled(_this23.performInputMapping(input), disabled);
+        return _this24.setDisabled(_this24.performInputMapping(input), disabled);
       });
     }
   }]);
@@ -37688,7 +39199,7 @@ function (_NestedComponent) {
       if (!rowsValid) {
         this.setCustomValidity('Please correct rows before proceeding.', dirty);
         return false;
-      } else if (!rowsClosed) {
+      } else if (!rowsClosed && !this.component.inlineEdit) {
         this.setCustomValidity('Please save all rows before proceeding.', dirty);
         return false;
       }
@@ -38923,8 +40434,6 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
-
 __webpack_require__(/*! core-js/modules/es6.regexp.search */ "./node_modules/core-js/modules/es6.regexp.search.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_modules/core-js/modules/es6.regexp.constructor.js");
@@ -38932,6 +40441,16 @@ __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_module
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+
+__webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
 
 __webpack_require__(/*! core-js/modules/es6.typed.uint8-array */ "./node_modules/core-js/modules/es6.typed.uint8-array.js");
 
@@ -39035,7 +40554,13 @@ function (_BaseComponent) {
 
     _classCallCheck(this, FileComponent);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(FileComponent).call(this, component, options, data));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(FileComponent).call(this, component, options, data)); // Called when our files are ready.
+
+    _this.filesReady = new Promise(function (resolve, reject) {
+      _this.filesReadyResolve = resolve;
+      _this.filesReadyReject = reject;
+    });
+    _this.loadingImages = [];
     _this.support = {
       filereader: typeof FileReader != 'undefined',
       dnd: 'draggable' in document.createElement('span'),
@@ -39051,10 +40576,44 @@ function (_BaseComponent) {
       return this.dataValue;
     }
   }, {
+    key: "loadImage",
+    value: function loadImage(fileInfo) {
+      return this.fileService.downloadFile(fileInfo).then(function (result) {
+        return result.url;
+      });
+    }
+  }, {
     key: "setValue",
     value: function setValue(value) {
-      this.dataValue = value || [];
-      this.refreshDOM();
+      var _this2 = this;
+
+      var newValue = value || [];
+      this.dataValue = newValue;
+
+      if (this.component.image) {
+        this.loadingImages = [];
+        var images = Array.isArray(newValue) ? newValue : [newValue];
+        images.map(function (fileInfo) {
+          if (fileInfo && Object.keys(fileInfo).length) {
+            _this2.loadingImages.push(_this2.loadImage(fileInfo));
+          }
+        });
+
+        if (this.loadingImages.length) {
+          Promise.all(this.loadingImages).then(function () {
+            _this2.refreshDOM();
+
+            setTimeout(function () {
+              return _this2.filesReadyResolve();
+            }, 100);
+          }).catch(function () {
+            return _this2.filesReadyReject();
+          });
+        }
+      } else {
+        this.refreshDOM();
+        this.filesReadyResolve();
+      }
     }
   }, {
     key: "validateMultiple",
@@ -39129,7 +40688,7 @@ function (_BaseComponent) {
   }, {
     key: "buildFileList",
     value: function buildFileList() {
-      var _this2 = this;
+      var _this3 = this;
 
       var value = this.dataValue;
       return this.ce('ul', {
@@ -39147,13 +40706,13 @@ function (_BaseComponent) {
       }, this.ce('strong', {}, this.text('Size'))), this.hasTypes ? this.ce('div', {
         class: 'col-md-2'
       }, this.ce('strong', {}, this.text('Type'))) : null])), Array.isArray(value) ? value.map(function (fileInfo, index) {
-        return _this2.createFileListItem(fileInfo, index);
+        return _this3.createFileListItem(fileInfo, index);
       }) : null]);
     }
   }, {
     key: "buildHiddenFileInput",
     value: function buildHiddenFileInput() {
-      var _this3 = this;
+      var _this4 = this;
 
       // Input needs to be in DOM and "visible" (opacity 0 is fine) for IE to display file dialog.
       return this.ce('input', {
@@ -39162,16 +40721,16 @@ function (_BaseComponent) {
         tabindex: -1,
         // prevent focus
         onChange: function onChange() {
-          _this3.upload(_this3.hiddenFileInputElement.files);
+          _this4.upload(_this4.hiddenFileInputElement.files);
 
-          _this3.hiddenFileInputElement.value = '';
+          _this4.hiddenFileInputElement.value = '';
         }
       });
     }
   }, {
     key: "createFileListItem",
     value: function createFileListItem(fileInfo, index) {
-      var _this4 = this;
+      var _this5 = this;
 
       var fileService = this.fileService;
       return this.ce('li', {
@@ -39183,15 +40742,15 @@ function (_BaseComponent) {
       }, !this.disabled && !this.shouldDisable ? this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick(event) {
-          if (fileInfo && _this4.component.storage === 'url') {
+          if (fileInfo && _this5.component.storage === 'url') {
             fileService.makeRequest('', fileInfo.url, 'delete');
           }
 
           event.preventDefault();
 
-          _this4.splice(index);
+          _this5.splice(index);
 
-          _this4.refreshDOM();
+          _this5.refreshDOM();
         }
       }) : null), this.ce('div', {
         class: "col-md-".concat(this.hasTypes ? '7' : '9')
@@ -39217,17 +40776,17 @@ function (_BaseComponent) {
   }, {
     key: "createTypeSelect",
     value: function createTypeSelect(file) {
-      var _this5 = this;
+      var _this6 = this;
 
       return this.ce('select', {
         class: 'file-type',
         onChange: function onChange(event) {
           file.fileType = event.target.value;
 
-          _this5.triggerChange();
+          _this6.triggerChange();
         }
       }, this.component.fileTypes.map(function (type) {
-        return _this5.ce('option', {
+        return _this6.ce('option', {
           value: type.value,
           class: 'test',
           selected: type.value === file.fileType ? 'selected' : undefined
@@ -39237,50 +40796,48 @@ function (_BaseComponent) {
   }, {
     key: "buildImageList",
     value: function buildImageList() {
-      var _this6 = this;
+      var _this7 = this;
 
       var value = this.dataValue;
       return this.ce('div', {}, Array.isArray(value) ? value.map(function (fileInfo, index) {
-        return _this6.createImageListItem(fileInfo, index);
+        return _this7.createImageListItem(fileInfo, index);
       }) : null);
     }
   }, {
     key: "createImageListItem",
     value: function createImageListItem(fileInfo, index) {
-      var _this7 = this;
+      var _this8 = this;
 
-      var image;
-      var fileService = this.fileService;
+      var image = this.ce('img', {
+        alt: fileInfo.originalName || fileInfo.name,
+        style: "width:".concat(this.component.imageSize, "px")
+      });
 
-      if (fileService) {
-        fileService.downloadFile(fileInfo).then(function (result) {
-          image.src = result.url;
+      if (this.loadingImages[index]) {
+        this.loadingImages[index].then(function (url) {
+          image.src = url;
         });
       }
 
-      return this.ce('div', {}, this.ce('span', {}, [image = this.ce('img', {
-        src: '',
-        alt: fileInfo.originalName || fileInfo.name,
-        style: "width:".concat(this.component.imageSize, "px")
-      }), !this.disabled ? this.ce('i', {
+      return this.ce('div', {}, this.ce('span', {}, [image, !this.disabled ? this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick(event) {
-          if (fileInfo && _this7.component.storage === 'url') {
-            fileService.makeRequest('', fileInfo.url, 'delete');
+          if (fileInfo && _this8.component.storage === 'url') {
+            _this8.fileService.makeRequest('', fileInfo.url, 'delete');
           }
 
           event.preventDefault();
 
-          _this7.splice(index);
+          _this8.splice(index);
 
-          _this7.refreshDOM();
+          _this8.refreshDOM();
         }
       }) : null]));
     }
   }, {
     key: "startVideo",
     value: function startVideo() {
-      var _this8 = this;
+      var _this9 = this;
 
       navigator.getMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
       navigator.getMedia({
@@ -39300,16 +40857,16 @@ function (_BaseComponent) {
         audio: false
       }, function (stream) {
         if (navigator.mozGetUserMedia) {
-          _this8.video.mozSrcObject = stream;
+          _this9.video.mozSrcObject = stream;
         } else {
-          _this8.video.srcObject = stream;
+          _this9.video.srcObject = stream;
         }
 
-        var width = parseInt(_this8.component.webcamSize) || 320;
+        var width = parseInt(_this9.component.webcamSize) || 320;
 
-        _this8.video.setAttribute('width', width);
+        _this9.video.setAttribute('width', width);
 
-        _this8.video.play();
+        _this9.video.play();
       }, function (err) {
         console.log(err);
       });
@@ -39317,7 +40874,7 @@ function (_BaseComponent) {
   }, {
     key: "takePicture",
     value: function takePicture() {
-      var _this9 = this;
+      var _this10 = this;
 
       this.canvas.setAttribute('width', this.video.videoWidth);
       this.canvas.setAttribute('height', this.video.videoHeight);
@@ -39325,13 +40882,13 @@ function (_BaseComponent) {
       this.canvas.toBlob(function (blob) {
         blob.name = "photo-".concat(Date.now(), ".png");
 
-        _this9.upload([blob]);
+        _this10.upload([blob]);
       });
     }
   }, {
     key: "buildUpload",
     value: function buildUpload() {
-      var _this10 = this;
+      var _this11 = this;
 
       // Drop event must change this pointer so need a reference to parent this.
       var element = this; // Declare Camera Instace
@@ -39349,7 +40906,7 @@ function (_BaseComponent) {
             camera.getPicture(function (success) {
               window.resolveLocalFileSystemURL(success, function (fileEntry) {
                 fileEntry.file(function (file) {
-                  _this10.upload([file]);
+                  _this11.upload([file]);
                 });
               });
             }, null, {
@@ -39365,7 +40922,7 @@ function (_BaseComponent) {
             camera.getPicture(function (success) {
               window.resolveLocalFileSystemURL(success, function (fileEntry) {
                 fileEntry.file(function (file) {
-                  _this10.upload([file]);
+                  _this11.upload([file]);
                 });
               });
             }, null, {
@@ -39405,9 +40962,9 @@ function (_BaseComponent) {
         title: 'Use Web Camera',
         onClick: function onClick(event) {
           event.preventDefault();
-          _this10.cameraMode = !_this10.cameraMode;
+          _this11.cameraMode = !_this11.cameraMode;
 
-          _this10.refreshDOM();
+          _this11.refreshDOM();
         }
       }, this.ce('i', {
         class: this.iconClass('camera')
@@ -39419,14 +40976,14 @@ function (_BaseComponent) {
       }), this.photo = this.ce('img')]), this.ce('div', {
         class: 'btn btn-primary',
         onClick: function onClick() {
-          _this10.takePicture();
+          _this11.takePicture();
         }
       }, 'Take Photo'), this.ce('div', {
         class: 'btn btn-default',
         onClick: function onClick() {
-          _this10.cameraMode = !_this10.cameraMode;
+          _this11.cameraMode = !_this11.cameraMode;
 
-          _this10.refreshDOM();
+          _this11.refreshDOM();
         }
       }, 'Switch to file upload')] : this.ce('div'));
 
@@ -39439,7 +40996,7 @@ function (_BaseComponent) {
   }, {
     key: "buildBrowseLink",
     value: function buildBrowseLink() {
-      var _this11 = this;
+      var _this12 = this;
 
       this.browseLink = this.ce('a', {
         href: '#',
@@ -39447,10 +41004,10 @@ function (_BaseComponent) {
           event.preventDefault(); // There is no direct way to trigger a file dialog. To work around this, create an input of type file and trigger
           // a click event on it.
 
-          if (typeof _this11.hiddenFileInputElement.trigger === 'function') {
-            _this11.hiddenFileInputElement.trigger('click');
+          if (typeof _this12.hiddenFileInputElement.trigger === 'function') {
+            _this12.hiddenFileInputElement.trigger('click');
           } else {
-            _this11.hiddenFileInputElement.click();
+            _this12.hiddenFileInputElement.click();
           }
         },
         class: 'browse'
@@ -39514,7 +41071,7 @@ function (_BaseComponent) {
   }, {
     key: "createUploadStatus",
     value: function createUploadStatus(fileUpload) {
-      var _this12 = this;
+      var _this13 = this;
 
       var container;
       return container = this.ce('div', {
@@ -39526,7 +41083,7 @@ function (_BaseComponent) {
       }, [fileUpload.originalName, this.ce('i', {
         class: this.iconClass('remove'),
         onClick: function onClick() {
-          return _this12.removeChildFrom(container, _this12.uploadStatusList);
+          return _this13.removeChildFrom(container, _this13.uploadStatusList);
         }
       })]), this.ce('div', {
         class: 'fileSize control-label col-sm-2 text-right'
@@ -39657,7 +41214,7 @@ function (_BaseComponent) {
   }, {
     key: "upload",
     value: function upload(files) {
-      var _this13 = this;
+      var _this14 = this;
 
       // Only allow one upload if not multiple.
       if (!this.component.multiple) {
@@ -39676,77 +41233,82 @@ function (_BaseComponent) {
             message: 'Starting upload'
           }; // Check file pattern
 
-          if (_this13.component.filePattern && !_this13.validatePattern(file, _this13.component.filePattern)) {
+          if (_this14.component.filePattern && !_this14.validatePattern(file, _this14.component.filePattern)) {
             fileUpload.status = 'error';
-            fileUpload.message = "File is the wrong type; it must be ".concat(_this13.component.filePattern);
+            fileUpload.message = "File is the wrong type; it must be ".concat(_this14.component.filePattern);
           } // Check file minimum size
 
 
-          if (_this13.component.fileMinSize && !_this13.validateMinSize(file, _this13.component.fileMinSize)) {
+          if (_this14.component.fileMinSize && !_this14.validateMinSize(file, _this14.component.fileMinSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = "File is too small; it must be at least ".concat(_this13.component.fileMinSize);
+            fileUpload.message = "File is too small; it must be at least ".concat(_this14.component.fileMinSize);
           } // Check file maximum size
 
 
-          if (_this13.component.fileMaxSize && !_this13.validateMaxSize(file, _this13.component.fileMaxSize)) {
+          if (_this14.component.fileMaxSize && !_this14.validateMaxSize(file, _this14.component.fileMaxSize)) {
             fileUpload.status = 'error';
-            fileUpload.message = "File is too big; it must be at most ".concat(_this13.component.fileMaxSize);
+            fileUpload.message = "File is too big; it must be at most ".concat(_this14.component.fileMaxSize);
           } // Get a unique name for this file to keep file collisions from occurring.
 
 
-          var dir = _this13.interpolate(_this13.component.dir || '');
+          var dir = _this14.interpolate(_this14.component.dir || '');
 
-          var fileService = _this13.fileService;
+          var fileService = _this14.fileService;
 
           if (!fileService) {
             fileUpload.status = 'error';
             fileUpload.message = 'File Service not provided.';
           }
 
-          var uploadStatus = _this13.createUploadStatus(fileUpload);
+          var uploadStatus = _this14.createUploadStatus(fileUpload);
 
-          _this13.uploadStatusList.appendChild(uploadStatus);
+          _this14.uploadStatusList.appendChild(uploadStatus);
 
           if (fileUpload.status !== 'error') {
-            if (_this13.component.privateDownload) {
+            if (_this14.component.privateDownload) {
               file.private = true;
             }
 
-            var _this13$component = _this13.component,
-                storage = _this13$component.storage,
-                url = _this13$component.url,
-                options = _this13$component.options;
+            var _this14$component = _this14.component,
+                storage = _this14$component.storage,
+                url = _this14$component.url,
+                options = _this14$component.options;
             fileService.uploadFile(storage, file, fileName, dir, function (evt) {
               fileUpload.status = 'progress';
               fileUpload.progress = parseInt(100.0 * evt.loaded / evt.total);
               delete fileUpload.message;
               var originalStatus = uploadStatus;
-              uploadStatus = _this13.createUploadStatus(fileUpload);
+              uploadStatus = _this14.createUploadStatus(fileUpload);
 
-              _this13.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+              _this14.uploadStatusList.replaceChild(uploadStatus, originalStatus);
             }, url, options).then(function (fileInfo) {
-              _this13.removeChildFrom(uploadStatus, _this13.uploadStatusList); // Default to first type.
+              _this14.removeChildFrom(uploadStatus, _this14.uploadStatusList); // Default to first type.
 
 
-              if (_this13.hasTypes) {
-                fileInfo.fileType = _this13.component.fileTypes[0].value;
+              if (_this14.hasTypes) {
+                fileInfo.fileType = _this14.component.fileTypes[0].value;
               }
 
               fileInfo.originalName = file.name;
+              var files = _this14.dataValue;
 
-              _this13.dataValue.push(fileInfo);
+              if (!files || !Array.isArray(files)) {
+                files = [];
+              }
 
-              _this13.refreshDOM();
+              files.push(fileInfo);
 
-              _this13.triggerChange();
+              _this14.setValue(_this14.dataValue);
+
+              _this14.triggerChange();
             }).catch(function (response) {
               fileUpload.status = 'error';
               fileUpload.message = response;
               delete fileUpload.progress;
               var originalStatus = uploadStatus;
-              uploadStatus = _this13.createUploadStatus(fileUpload);
+              uploadStatus = _this14.createUploadStatus(fileUpload);
 
-              _this13.uploadStatusList.replaceChild(uploadStatus, originalStatus);
+              _this14.uploadStatusList.replaceChild(uploadStatus, originalStatus);
             });
           }
         });
@@ -39786,6 +41348,11 @@ function (_BaseComponent) {
       this.browseLink.focus();
     }
   }, {
+    key: "dataReady",
+    get: function get() {
+      return this.filesReady;
+    }
+  }, {
     key: "defaultSchema",
     get: function get() {
       return FileComponent.schema();
@@ -39822,7 +41389,13 @@ function (_BaseComponent) {
         return this.root.formio;
       }
 
-      return new _Formio.default();
+      var formio = new _Formio.default(); // If a form is loaded, then make sure to set the correct formUrl.
+
+      if (this.root && this.root._form && this.root._form._id) {
+        formio.formUrl = "".concat(formio.projectUrl, "/form/").concat(this.root._form._id);
+      }
+
+      return formio;
     }
   }]);
 
@@ -43400,6 +44973,17 @@ function (_BaseComponent) {
     get: function get() {
       return NumberComponent.schema();
     }
+  }, {
+    key: "defaultValue",
+    get: function get() {
+      var defaultValue = _get(_getPrototypeOf(NumberComponent.prototype), "defaultValue", this);
+
+      if (!defaultValue && this.component.defaultValue === 0) {
+        defaultValue = this.component.defaultValue;
+      }
+
+      return defaultValue;
+    }
   }]);
 
   return NumberComponent;
@@ -45326,7 +46910,7 @@ __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
 
-var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/assets/scripts/dist/choices.js */ "./node_modules/choices.js/assets/scripts/dist/choices.js"));
+var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/public/assets/scripts/choices.js */ "./node_modules/choices.js/public/assets/scripts/choices.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
@@ -45352,6 +46936,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 function set(target, property, value, receiver) { if (typeof Reflect !== "undefined" && Reflect.set) { set = Reflect.set; } else { set = function set(target, property, value, receiver) { var base = _superPropBase(target, property); var desc; if (base) { desc = Object.getOwnPropertyDescriptor(base, property); if (desc.set) { desc.set.call(receiver, value); return true; } else if (!desc.writable) { return false; } } desc = Object.getOwnPropertyDescriptor(receiver, property); if (desc) { if (!desc.writable) { return false; } desc.value = value; Object.defineProperty(receiver, property, desc); } else { _defineProperty(receiver, property, value); } return true; }; } return set(target, property, value, receiver); }
 
 function _set(target, property, value, receiver, isStrict) { var s = set(target, property, value, receiver || target); if (!s && isStrict) { throw new Error('failed to set property'); } return value; }
@@ -45371,8 +46957,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 var SelectComponent =
 /*#__PURE__*/
@@ -45434,7 +47018,7 @@ function (_BaseComponent) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(SelectComponent).call(this, component, options, data)); // Trigger an update.
 
-    _this.triggerUpdate = _lodash.default.debounce(_this.updateItems.bind(_assertThisInitialized(_assertThisInitialized(_this))), 100); // Keep track of the select options.
+    _this.triggerUpdate = _lodash.default.debounce(_this.updateItems.bind(_assertThisInitialized(_this)), 100); // Keep track of the select options.
 
     _this.selectOptions = []; // Keep track of the last batch of items loaded.
 
@@ -45541,7 +47125,10 @@ function (_BaseComponent) {
         value: value,
         label: label
       };
-      this.selectOptions.push(option);
+
+      if (value) {
+        this.selectOptions.push(option);
+      }
 
       if (this.choices) {
         return;
@@ -45575,14 +47162,15 @@ function (_BaseComponent) {
         if (this.choices) {
           // Add the currently selected choices if they don't already exist.
           var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
-
-          _lodash.default.each(currentChoices, function (choice) {
-            _this2.addCurrentChoices(choice, items);
-          });
+          return currentChoices.reduce(function (defaultAdded, choice) {
+            return _this2.addCurrentChoices(choice, items) || defaultAdded;
+          }, false);
         } else if (!this.component.multiple) {
           this.addPlaceholder(this.selectInput);
         }
       }
+
+      return false;
     }
     /**
      * Return if the list is loading from scroll. or not.
@@ -45774,7 +47362,7 @@ function (_BaseComponent) {
         _this4.setItems(response, !!search);
 
         if (scrollTop) {
-          _this4.choices.choiceList.scrollTo(0, 0);
+          _this4.choices.choiceList.scrollToTop();
         }
       }).catch(function (err) {
         _this4.stopInfiniteScroll();
@@ -46009,38 +47597,38 @@ function (_BaseComponent) {
       this.choices = new _choices.default(input, choicesOptions);
 
       if (this.component.multiple) {
-        this.focusableElement = this.choices.input;
+        this.focusableElement = this.choices.input.element;
       } else {
-        this.focusableElement = this.choices.containerInner;
-        this.choices.containerOuter.setAttribute('tabIndex', '-1');
+        this.focusableElement = this.choices.containerInner.element;
+        this.choices.containerOuter.element.setAttribute('tabIndex', '-1');
 
         if (useSearch) {
-          this.addEventListener(this.choices.containerOuter, 'focus', function () {
+          this.addEventListener(this.choices.containerOuter.element, 'focus', function () {
             return _this5.focusableElement.focus();
           });
         }
       }
 
-      this.scrollList = this.choices.choiceList;
+      this.scrollList = this.choices.choiceList.element;
 
       this.onScroll = function () {
         if (!_this5.scrollLoading && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight) {
           _this5.scrollTop = _this5.scrollList.scrollTop;
           _this5.scrollLoading = true;
 
-          _this5.triggerUpdate(_this5.choices.input.value);
+          _this5.triggerUpdate(_this5.choices.input.element.value);
         }
       };
 
       this.scrollList.addEventListener('scroll', this.onScroll);
       this.addFocusBlurEvents(this.focusableElement);
       this.focusableElement.setAttribute('tabIndex', tabIndex);
-      this.setInputStyles(this.choices.containerOuter); // If a search field is provided, then add an event listener to update items on search.
+      this.setInputStyles(this.choices.containerOuter.element); // If a search field is provided, then add an event listener to update items on search.
 
       if (this.component.searchField) {
         // Make sure to clear the search when no value is provided.
-        if (this.choices && this.choices.input) {
-          this.addEventListener(this.choices.input, 'input', function (event) {
+        if (this.choices && this.choices.input && this.choices.input.element) {
+          this.addEventListener(this.choices.input.element, 'input', function (event) {
             if (!event.target.value) {
               _this5.triggerUpdate();
             }
@@ -46063,14 +47651,19 @@ function (_BaseComponent) {
         _this5.update();
       });
 
-      if (placeholderValue && this.choices.isSelectOneElement) {
+      if (placeholderValue && this.choices._isSelectOneElement) {
         this.addEventListener(input, 'removeItem', function () {
-          var items = _this5.choices.store.getItemsFilteredByActive();
+          var items = _this5.choices._store.activeItems;
 
           if (!items.length) {
             _this5.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
           }
         });
+      } // Add value options.
+
+
+      if (this.addValueOptions()) {
+        this.restoreValue();
       } // Force the disabled state with getters and setters.
 
 
@@ -46136,9 +47729,20 @@ function (_BaseComponent) {
 
 
         if (!found) {
-          this.addOption(this.itemValue(value), this.itemTemplate(value));
+          if (this.choices) {
+            this.choices.setChoices([{
+              value: this.itemValue(value),
+              label: this.itemTemplate(value)
+            }], 'value', 'label', true);
+          } else {
+            this.addOption(this.itemValue(value), this.itemTemplate(value));
+          }
+
+          return true;
         }
       }
+
+      return false;
     }
   }, {
     key: "getView",
@@ -46229,7 +47833,7 @@ function (_BaseComponent) {
             _this7.addCurrentChoices(choice, _this7.selectOptions);
           });
 
-          this.choices.setChoices(this.selectOptions, 'value', 'label', true).setValueByChoice(value);
+          this.choices.setChoices(this.selectOptions, 'value', 'label', true).setChoiceByValue(value);
         } else if (hasPreviousValue) {
           this.choices.removeActiveItems();
         }
@@ -46434,11 +48038,11 @@ function (_BaseComponent) {
       }
 
       if (disabled) {
-        this.setDisabled(this.choices.containerInner, true);
+        this.setDisabled(this.choices.containerInner.element, true);
         this.focusableElement.removeAttribute('tabIndex');
         this.choices.disable();
       } else {
-        this.setDisabled(this.choices.containerInner, false);
+        this.setDisabled(this.choices.containerInner.element, false);
         this.focusableElement.setAttribute('tabIndex', this.component.tabindex || 0);
         this.choices.enable();
       }
@@ -48466,6 +50070,10 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
+var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -48536,6 +50144,7 @@ function (_NestedComponent) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(TabsComponent).call(this, component, options, data));
     _this.currentTab = 0;
+    _this.validityTabs = [];
     return _this;
   }
 
@@ -48662,6 +50271,62 @@ function (_NestedComponent) {
       this.addClass(this.tabLinks[index], 'active').addClass(this.tabLinks[index].tabLink, 'active').addClass(this.tabs[index], 'active');
       this.triggerChange();
     }
+    /**
+     * Return all the components within all the tabs.
+     */
+
+  }, {
+    key: "getAllComponents",
+    value: function getAllComponents() {
+      // If the validity tabs are set, then this usually means we are getting the components that have
+      // triggered errors and need to iterate through these to display them.
+      if (this.validityTabs && this.validityTabs.length) {
+        var comps = this.validityTabs.reduce(function (components, component) {
+          if (component && component.getAllComponents) {
+            component = component.getAllComponents();
+          }
+
+          return components.concat(component);
+        }, []);
+        this.validityTabs = [];
+        return comps;
+      }
+
+      return _get(_getPrototypeOf(TabsComponent.prototype), "getAllComponents", this).call(this);
+    }
+    /**
+     * Checks the validity by checking all tabs validity.
+     *
+     * @param data
+     * @param dirty
+     */
+
+  }, {
+    key: "checkValidity",
+    value: function checkValidity(data, dirty) {
+      var _this5 = this;
+
+      if (!this.checkCondition(null, data)) {
+        this.setCustomValidity('');
+        return true;
+      }
+
+      var isValid = _Base.default.prototype.checkValidity.call(this, data, dirty);
+
+      this.validityTabs = [];
+      return this.component.components.reduce(function (check, comp) {
+        var tabComp = _lodash.default.clone(comp);
+
+        tabComp.type = 'panel';
+        tabComp.internal = true;
+
+        var component = _this5.createComponent(tabComp);
+
+        _this5.validityTabs.push(component);
+
+        return component.checkValidity(data, dirty) && check;
+      }, isValid);
+    }
   }, {
     key: "destroy",
     value: function destroy() {
@@ -48705,13 +50370,13 @@ function (_NestedComponent) {
   }, {
     key: "schema",
     get: function get() {
-      var _this5 = this;
+      var _this6 = this;
 
       var schema = _get(_getPrototypeOf(TabsComponent.prototype), "schema", this);
 
       schema.components = this.component.components.map(function (tab, index) {
-        if (index === _this5.currentTab) {
-          tab.components = _this5.getComponents().map(function (component) {
+        if (index === _this6.currentTab) {
+          tab.components = _this6.getComponents().map(function (component) {
             return component.schema;
           });
         }
@@ -48833,7 +50498,7 @@ __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
-var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/assets/scripts/dist/choices.js */ "./node_modules/choices.js/assets/scripts/dist/choices.js"));
+var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/public/assets/scripts/choices.js */ "./node_modules/choices.js/public/assets/scripts/choices.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
@@ -48938,7 +50603,7 @@ function (_BaseComponent) {
         maxItemCount: this.component.maxTags,
         removeItemButton: true
       });
-      this.choices.itemList.tabIndex = input.tabIndex;
+      this.choices.itemList.element.tabIndex = input.tabIndex;
     }
   }, {
     key: "setValue",
@@ -76860,7 +78525,7 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
-__webpack_require__(/*! whatwg-fetch */ "./node_modules/whatwg-fetch/fetch.js");
+var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
 
 var _jsonLogicJs = _interopRequireDefault(__webpack_require__(/*! json-logic-js */ "./node_modules/json-logic-js/logic.js"));
 
@@ -76904,6 +78569,11 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+var _fetchPonyfill = (0, _fetchPonyfill2.default)({
+  Promise: _nativePromiseOnly.default
+}),
+    fetch = _fetchPonyfill.fetch;
 
 // Configure JsonLogic
 _operators.lodashOperators.forEach(function (name) {
@@ -80503,9 +82173,10 @@ function (_EventEmitter) {
       if (!lngs) lngs = this.languages;
       if (!ns) ns = this.options.ns;
       if (!callback) callback = noop;
-      this.services.backendConnector.reload(lngs, ns, function () {
-        deferred.resolve();
-        callback(null);
+      this.services.backendConnector.reload(lngs, ns, function (err) {
+        deferred.resolve(); // not rejecting on err (as err is only a loading translation failed warning)
+
+        callback(err);
       });
       return deferred;
     }
@@ -93093,483 +94764,6 @@ module.exports = function(module) {
 	}
 	return module;
 };
-
-
-/***/ }),
-
-/***/ "./node_modules/whatwg-fetch/fetch.js":
-/*!********************************************!*\
-  !*** ./node_modules/whatwg-fetch/fetch.js ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-(function(self) {
-  'use strict';
-
-  if (self.fetch) {
-    return
-  }
-
-  var support = {
-    searchParams: 'URLSearchParams' in self,
-    iterable: 'Symbol' in self && 'iterator' in Symbol,
-    blob: 'FileReader' in self && 'Blob' in self && (function() {
-      try {
-        new Blob()
-        return true
-      } catch(e) {
-        return false
-      }
-    })(),
-    formData: 'FormData' in self,
-    arrayBuffer: 'ArrayBuffer' in self
-  }
-
-  if (support.arrayBuffer) {
-    var viewClasses = [
-      '[object Int8Array]',
-      '[object Uint8Array]',
-      '[object Uint8ClampedArray]',
-      '[object Int16Array]',
-      '[object Uint16Array]',
-      '[object Int32Array]',
-      '[object Uint32Array]',
-      '[object Float32Array]',
-      '[object Float64Array]'
-    ]
-
-    var isDataView = function(obj) {
-      return obj && DataView.prototype.isPrototypeOf(obj)
-    }
-
-    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
-      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
-    }
-  }
-
-  function normalizeName(name) {
-    if (typeof name !== 'string') {
-      name = String(name)
-    }
-    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
-      throw new TypeError('Invalid character in header field name')
-    }
-    return name.toLowerCase()
-  }
-
-  function normalizeValue(value) {
-    if (typeof value !== 'string') {
-      value = String(value)
-    }
-    return value
-  }
-
-  // Build a destructive iterator for the value list
-  function iteratorFor(items) {
-    var iterator = {
-      next: function() {
-        var value = items.shift()
-        return {done: value === undefined, value: value}
-      }
-    }
-
-    if (support.iterable) {
-      iterator[Symbol.iterator] = function() {
-        return iterator
-      }
-    }
-
-    return iterator
-  }
-
-  function Headers(headers) {
-    this.map = {}
-
-    if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
-        this.append(name, value)
-      }, this)
-    } else if (Array.isArray(headers)) {
-      headers.forEach(function(header) {
-        this.append(header[0], header[1])
-      }, this)
-    } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
-        this.append(name, headers[name])
-      }, this)
-    }
-  }
-
-  Headers.prototype.append = function(name, value) {
-    name = normalizeName(name)
-    value = normalizeValue(value)
-    var oldValue = this.map[name]
-    this.map[name] = oldValue ? oldValue+','+value : value
-  }
-
-  Headers.prototype['delete'] = function(name) {
-    delete this.map[normalizeName(name)]
-  }
-
-  Headers.prototype.get = function(name) {
-    name = normalizeName(name)
-    return this.has(name) ? this.map[name] : null
-  }
-
-  Headers.prototype.has = function(name) {
-    return this.map.hasOwnProperty(normalizeName(name))
-  }
-
-  Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = normalizeValue(value)
-  }
-
-  Headers.prototype.forEach = function(callback, thisArg) {
-    for (var name in this.map) {
-      if (this.map.hasOwnProperty(name)) {
-        callback.call(thisArg, this.map[name], name, this)
-      }
-    }
-  }
-
-  Headers.prototype.keys = function() {
-    var items = []
-    this.forEach(function(value, name) { items.push(name) })
-    return iteratorFor(items)
-  }
-
-  Headers.prototype.values = function() {
-    var items = []
-    this.forEach(function(value) { items.push(value) })
-    return iteratorFor(items)
-  }
-
-  Headers.prototype.entries = function() {
-    var items = []
-    this.forEach(function(value, name) { items.push([name, value]) })
-    return iteratorFor(items)
-  }
-
-  if (support.iterable) {
-    Headers.prototype[Symbol.iterator] = Headers.prototype.entries
-  }
-
-  function consumed(body) {
-    if (body.bodyUsed) {
-      return Promise.reject(new TypeError('Already read'))
-    }
-    body.bodyUsed = true
-  }
-
-  function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
-        resolve(reader.result)
-      }
-      reader.onerror = function() {
-        reject(reader.error)
-      }
-    })
-  }
-
-  function readBlobAsArrayBuffer(blob) {
-    var reader = new FileReader()
-    var promise = fileReaderReady(reader)
-    reader.readAsArrayBuffer(blob)
-    return promise
-  }
-
-  function readBlobAsText(blob) {
-    var reader = new FileReader()
-    var promise = fileReaderReady(reader)
-    reader.readAsText(blob)
-    return promise
-  }
-
-  function readArrayBufferAsText(buf) {
-    var view = new Uint8Array(buf)
-    var chars = new Array(view.length)
-
-    for (var i = 0; i < view.length; i++) {
-      chars[i] = String.fromCharCode(view[i])
-    }
-    return chars.join('')
-  }
-
-  function bufferClone(buf) {
-    if (buf.slice) {
-      return buf.slice(0)
-    } else {
-      var view = new Uint8Array(buf.byteLength)
-      view.set(new Uint8Array(buf))
-      return view.buffer
-    }
-  }
-
-  function Body() {
-    this.bodyUsed = false
-
-    this._initBody = function(body) {
-      this._bodyInit = body
-      if (!body) {
-        this._bodyText = ''
-      } else if (typeof body === 'string') {
-        this._bodyText = body
-      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
-        this._bodyBlob = body
-      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
-        this._bodyFormData = body
-      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-        this._bodyText = body.toString()
-      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
-        this._bodyArrayBuffer = bufferClone(body.buffer)
-        // IE 10-11 can't handle a DataView body.
-        this._bodyInit = new Blob([this._bodyArrayBuffer])
-      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
-        this._bodyArrayBuffer = bufferClone(body)
-      } else {
-        throw new Error('unsupported BodyInit type')
-      }
-
-      if (!this.headers.get('content-type')) {
-        if (typeof body === 'string') {
-          this.headers.set('content-type', 'text/plain;charset=UTF-8')
-        } else if (this._bodyBlob && this._bodyBlob.type) {
-          this.headers.set('content-type', this._bodyBlob.type)
-        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-          this.headers.set('content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
-        }
-      }
-    }
-
-    if (support.blob) {
-      this.blob = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return Promise.resolve(this._bodyBlob)
-        } else if (this._bodyArrayBuffer) {
-          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as blob')
-        } else {
-          return Promise.resolve(new Blob([this._bodyText]))
-        }
-      }
-
-      this.arrayBuffer = function() {
-        if (this._bodyArrayBuffer) {
-          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
-        } else {
-          return this.blob().then(readBlobAsArrayBuffer)
-        }
-      }
-    }
-
-    this.text = function() {
-      var rejected = consumed(this)
-      if (rejected) {
-        return rejected
-      }
-
-      if (this._bodyBlob) {
-        return readBlobAsText(this._bodyBlob)
-      } else if (this._bodyArrayBuffer) {
-        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
-      } else if (this._bodyFormData) {
-        throw new Error('could not read FormData body as text')
-      } else {
-        return Promise.resolve(this._bodyText)
-      }
-    }
-
-    if (support.formData) {
-      this.formData = function() {
-        return this.text().then(decode)
-      }
-    }
-
-    this.json = function() {
-      return this.text().then(JSON.parse)
-    }
-
-    return this
-  }
-
-  // HTTP methods whose capitalization should be normalized
-  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT']
-
-  function normalizeMethod(method) {
-    var upcased = method.toUpperCase()
-    return (methods.indexOf(upcased) > -1) ? upcased : method
-  }
-
-  function Request(input, options) {
-    options = options || {}
-    var body = options.body
-
-    if (input instanceof Request) {
-      if (input.bodyUsed) {
-        throw new TypeError('Already read')
-      }
-      this.url = input.url
-      this.credentials = input.credentials
-      if (!options.headers) {
-        this.headers = new Headers(input.headers)
-      }
-      this.method = input.method
-      this.mode = input.mode
-      if (!body && input._bodyInit != null) {
-        body = input._bodyInit
-        input.bodyUsed = true
-      }
-    } else {
-      this.url = String(input)
-    }
-
-    this.credentials = options.credentials || this.credentials || 'omit'
-    if (options.headers || !this.headers) {
-      this.headers = new Headers(options.headers)
-    }
-    this.method = normalizeMethod(options.method || this.method || 'GET')
-    this.mode = options.mode || this.mode || null
-    this.referrer = null
-
-    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
-      throw new TypeError('Body not allowed for GET or HEAD requests')
-    }
-    this._initBody(body)
-  }
-
-  Request.prototype.clone = function() {
-    return new Request(this, { body: this._bodyInit })
-  }
-
-  function decode(body) {
-    var form = new FormData()
-    body.trim().split('&').forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split('=')
-        var name = split.shift().replace(/\+/g, ' ')
-        var value = split.join('=').replace(/\+/g, ' ')
-        form.append(decodeURIComponent(name), decodeURIComponent(value))
-      }
-    })
-    return form
-  }
-
-  function parseHeaders(rawHeaders) {
-    var headers = new Headers()
-    // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
-    // https://tools.ietf.org/html/rfc7230#section-3.2
-    var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ')
-    preProcessedHeaders.split(/\r?\n/).forEach(function(line) {
-      var parts = line.split(':')
-      var key = parts.shift().trim()
-      if (key) {
-        var value = parts.join(':').trim()
-        headers.append(key, value)
-      }
-    })
-    return headers
-  }
-
-  Body.call(Request.prototype)
-
-  function Response(bodyInit, options) {
-    if (!options) {
-      options = {}
-    }
-
-    this.type = 'default'
-    this.status = options.status === undefined ? 200 : options.status
-    this.ok = this.status >= 200 && this.status < 300
-    this.statusText = 'statusText' in options ? options.statusText : 'OK'
-    this.headers = new Headers(options.headers)
-    this.url = options.url || ''
-    this._initBody(bodyInit)
-  }
-
-  Body.call(Response.prototype)
-
-  Response.prototype.clone = function() {
-    return new Response(this._bodyInit, {
-      status: this.status,
-      statusText: this.statusText,
-      headers: new Headers(this.headers),
-      url: this.url
-    })
-  }
-
-  Response.error = function() {
-    var response = new Response(null, {status: 0, statusText: ''})
-    response.type = 'error'
-    return response
-  }
-
-  var redirectStatuses = [301, 302, 303, 307, 308]
-
-  Response.redirect = function(url, status) {
-    if (redirectStatuses.indexOf(status) === -1) {
-      throw new RangeError('Invalid status code')
-    }
-
-    return new Response(null, {status: status, headers: {location: url}})
-  }
-
-  self.Headers = Headers
-  self.Request = Request
-  self.Response = Response
-
-  self.fetch = function(input, init) {
-    return new Promise(function(resolve, reject) {
-      var request = new Request(input, init)
-      var xhr = new XMLHttpRequest()
-
-      xhr.onload = function() {
-        var options = {
-          status: xhr.status,
-          statusText: xhr.statusText,
-          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
-        }
-        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
-        var body = 'response' in xhr ? xhr.response : xhr.responseText
-        resolve(new Response(body, options))
-      }
-
-      xhr.onerror = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.ontimeout = function() {
-        reject(new TypeError('Network request failed'))
-      }
-
-      xhr.open(request.method, request.url, true)
-
-      if (request.credentials === 'include') {
-        xhr.withCredentials = true
-      } else if (request.credentials === 'omit') {
-        xhr.withCredentials = false
-      }
-
-      if ('responseType' in xhr && support.blob) {
-        xhr.responseType = 'blob'
-      }
-
-      request.headers.forEach(function(value, name) {
-        xhr.setRequestHeader(name, value)
-      })
-
-      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit)
-    })
-  }
-  self.fetch.polyfill = true
-})(typeof self !== 'undefined' ? self : this);
 
 
 /***/ }),
