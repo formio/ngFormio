@@ -6,6 +6,7 @@ var pathType = 'Subdomains';
 /** DO NOT CHANGE THESE LINES!! **/
 var onPremise = false;
 var hostedPDFServer = '';
+var sso = '';
 /*******************************/
 
 // Parse query string
@@ -61,9 +62,13 @@ if (onPremise) {
   pdfServer = hostedPDFServer || 'https://files.form.io';
   pathType = 'Subdirectories';
 }
+
+Formio.setProjectUrl(formioBase);
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
+  sso: sso,
+  loading: (sso ? Formio.ssoInit(sso) : false),
   pathType: pathType,
   forceSSL: false,
   pdfPrice: 10,

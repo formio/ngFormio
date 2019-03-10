@@ -955,7 +955,13 @@ angular
         $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
       };
 
-      if (!$rootScope.user) {
+      // If the app is loading then go home.
+      if (AppConfig.loading) {
+        AppConfig.loading.then(() => {
+          $state.go('home');
+        });
+      }
+      else if (!$rootScope.user) {
         Formio.currentUser().then(function(user) {
           $rootScope.user = user;
           if (!$rootScope.user) {

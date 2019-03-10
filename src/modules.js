@@ -31,6 +31,7 @@ import 'angular-file-saver';
 import 'angular-ui-ace';
 import 'ui-select';
 import 'angular-ckeditor/angular-ckeditor';
+import 'formiojs/dist/formio.min.js';
 import 'ng-formio/dist/formio.js';
 import 'angular-drag-and-drop-lists';
 import 'ng-tags-input';
