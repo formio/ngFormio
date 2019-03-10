@@ -63,12 +63,24 @@ if (onPremise) {
   pathType = 'Subdirectories';
 }
 
+Formio.setBaseUrl(apiBase);
 Formio.setProjectUrl(formioBase);
+var disable = false;
+var loading = false;
+if (sso) {
+  var token = Formio.getToken();
+  loading = Formio.ssoInit(sso);
+  if (!loading && !token) {
+    // We are starting the handshake process with SSO, disable the app for now.
+    disable = true;
+  }
+}
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
   sso: sso,
-  loading: (sso ? Formio.ssoInit(sso) : false),
+  loading: loading,
+  disable: disable,
   pathType: pathType,
   forceSSL: false,
   pdfPrice: 10,
