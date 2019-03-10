@@ -54,6 +54,10 @@ angular
       formioComponentsProvider,
       COMMON_OPTIONS
     ) {
+      if (AppConfig.disable) {
+        return;
+      }
+
       // Change the form builder options for encrypted to be enterprise only.
       COMMON_OPTIONS.encrypted.label = 'Encrypted (Enterprise Only)';
       COMMON_OPTIONS.dbIndex.label = 'Database Index (Enterprise Only)';
@@ -884,6 +888,10 @@ angular
       $timeout,
       $templateCache
     ) {
+      if (AppConfig.disable) {
+        return;
+      }
+
       // Ensure they are logged.
       $rootScope.$on('$stateChangeStart', function(event, toState) {
         $rootScope.userToken = Formio.getToken();
@@ -955,7 +963,13 @@ angular
         $window.open(AppConfig.tutorial, 'formio-tutorial', 'height=640,width=960');
       };
 
-      if (!$rootScope.user) {
+      // If the app is loading then go home.
+      if (AppConfig.loading) {
+        AppConfig.loading.then(() => {
+          $state.go('home');
+        });
+      }
+      else if (!$rootScope.user) {
         Formio.currentUser().then(function(user) {
           $rootScope.user = user;
           if (!$rootScope.user) {
