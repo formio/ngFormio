@@ -24,7 +24,8 @@ module.exports = {
       "window.jQuery": "jquery",
       "jQuery": "jquery",
       "$": "jquery",
-      "ckeditor": 'CKEditor'
+      "ckeditor": 'CKEditor',
+      "window.Formio": "Formio"
     })
   ],
   module: {
