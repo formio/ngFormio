@@ -1592,7 +1592,7 @@ app.controller('FormImportController', [
   }
 ]);
 
-app.controller('FormShareController', ['$scope', function($scope) {
+app.controller('FormShareController', ['$scope', '$rootScope', function($scope, $rootScope) {
   $scope.publicForm = null;
   $scope.previewUrl = '';
   $scope.preview = '';
@@ -1622,8 +1622,9 @@ app.controller('FormShareController', ['$scope', function($scope) {
 
   // Method to load the preview.
   var loadPreview = function() {
-    $scope.previewUrl = 'https://formview.io/#/';
-    $scope.previewUrl += $scope.currentProject.name + '/' + $scope.currentForm.path + '?';
+    $scope.previewUrl = $rootScope.onPremise ? $scope.projectUrl + '/manage/view/#/' : 'https://formview.io/#/';
+    $scope.previewUrl += $rootScope.onPremise ? 'form/' : $scope.currentProject.name + '/';
+    $scope.previewUrl += $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
     if ($scope.options.theme) {
       $scope.previewUrl += '&theme=' + $scope.options.theme.toLowerCase();

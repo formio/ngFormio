@@ -15,9 +15,19 @@
   <div class="help-block">The redirect callback for after authentication.</div>
 </div>
 <div class="form-group">
+  <label for="idPath">Query Parameters</label>
+  <input ng-model="currentProject.settings.saml.query" type="text" class="form-control" id="query" name="query" placeholder="providerId=1234">
+  <div class="help-block">Additional query parameters to send to the SAML provider when authenticating.</div>
+</div>
+<div class="form-group">
   <label for="idPath">ID Path</label>
   <input ng-model="currentProject.settings.saml.idPath" type="text" class="form-control" id="idPath" name="idPath" placeholder="id">
   <div class="help-block">The path within the SAML profile that contains the user ID.</div>
+</div>
+<div class="form-group">
+  <label for="idPath">Roles Path</label>
+  <input ng-model="currentProject.settings.saml.rolesPath" type="text" class="form-control" id="rolesPath" name="rolesPath" placeholder="roles">
+  <div class="help-block">The path within the SAML profile that contains the user roles.</div>
 </div>
 <div class="form-group">
   <label>Role Mappings</label>
