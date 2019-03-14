@@ -16922,7 +16922,7 @@ exports.PatchError = PatchError;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.5, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.7, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
@@ -18369,7 +18369,6 @@ exports.PatchError = PatchError;
                     return elem.contains(eventTarget_1);
                 });
                 if (lostFocus && isIgnored) {
-                    updateTime();
                     self.close();
                     if (self.config.mode === "range" && self.selectedDates.length === 1) {
                         self.clear(false);
@@ -18742,7 +18741,7 @@ exports.PatchError = PatchError;
                 "disableMobile",
             ];
             var userConfig = __assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
-            var formats$$1 = {};
+            var formats = {};
             self.config.parseDate = userConfig.parseDate;
             self.config.formatDate = userConfig.formatDate;
             Object.defineProperty(self.config, "enable", {
@@ -18759,7 +18758,7 @@ exports.PatchError = PatchError;
             });
             var timeMode = userConfig.mode === "time";
             if (!userConfig.dateFormat && (userConfig.enableTime || timeMode)) {
-                formats$$1.dateFormat =
+                formats.dateFormat =
                     userConfig.noCalendar || timeMode
                         ? "H:i" + (userConfig.enableSeconds ? ":S" : "")
                         : flatpickr.defaultConfig.dateFormat +
@@ -18769,7 +18768,7 @@ exports.PatchError = PatchError;
             if (userConfig.altInput &&
                 (userConfig.enableTime || timeMode) &&
                 !userConfig.altFormat) {
-                formats$$1.altFormat =
+                formats.altFormat =
                     userConfig.noCalendar || timeMode
                         ? "h:i" + (userConfig.enableSeconds ? ":S K" : " K")
                         : flatpickr.defaultConfig.altFormat +
@@ -18798,7 +18797,7 @@ exports.PatchError = PatchError;
                 self.config.noCalendar = true;
                 self.config.enableTime = true;
             }
-            Object.assign(self.config, formats$$1, userConfig);
+            Object.assign(self.config, formats, userConfig);
             for (var i = 0; i < boolOpts.length; i++)
                 self.config[boolOpts[i]] =
                     self.config[boolOpts[i]] === true ||
@@ -18879,6 +18878,9 @@ exports.PatchError = PatchError;
             }
             else {
                 var doc = document.styleSheets[0];
+                // some testing environments don't have css support
+                if (doc === undefined)
+                    return;
                 var bodyWidth = window.document.body.offsetWidth;
                 var centerLeft = Math.max(0, bodyWidth / 2 - calendarWidth / 2);
                 var centerBefore = ".flatpickr-calendar.centerMost:before";
@@ -32220,6 +32222,8 @@ var _ = _interopRequireDefault(__webpack_require__(/*! . */ "./node_modules/form
 
 var _Address = _interopRequireDefault(__webpack_require__(/*! ./address/Address.form */ "./node_modules/formiojs/components/address/Address.form.js"));
 
+var _Base = _interopRequireDefault(__webpack_require__(/*! ./base/Base.form */ "./node_modules/formiojs/components/base/Base.form.js"));
+
 var _Button = _interopRequireDefault(__webpack_require__(/*! ./button/Button.form */ "./node_modules/formiojs/components/button/Button.form.js"));
 
 var _Checkbox = _interopRequireDefault(__webpack_require__(/*! ./checkbox/Checkbox.form */ "./node_modules/formiojs/components/checkbox/Checkbox.form.js"));
@@ -32258,6 +32262,10 @@ var _HTML = _interopRequireDefault(__webpack_require__(/*! ./html/HTML.form */ "
 
 var _Location = _interopRequireDefault(__webpack_require__(/*! ./location/Location.form */ "./node_modules/formiojs/components/location/Location.form.js"));
 
+var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit.form */ "./node_modules/formiojs/components/modaledit/ModalEdit.form.js"));
+
+var _NestedComponent = _interopRequireDefault(__webpack_require__(/*! ./nested/NestedComponent.form */ "./node_modules/formiojs/components/nested/NestedComponent.form.js"));
+
 var _Number = _interopRequireDefault(__webpack_require__(/*! ./number/Number.form */ "./node_modules/formiojs/components/number/Number.form.js"));
 
 var _Panel = _interopRequireDefault(__webpack_require__(/*! ./panel/Panel.form */ "./node_modules/formiojs/components/panel/Panel.form.js"));
@@ -32267,6 +32275,8 @@ var _Password = _interopRequireDefault(__webpack_require__(/*! ./password/Passwo
 var _PhoneNumber = _interopRequireDefault(__webpack_require__(/*! ./phonenumber/PhoneNumber.form */ "./node_modules/formiojs/components/phonenumber/PhoneNumber.form.js"));
 
 var _Radio = _interopRequireDefault(__webpack_require__(/*! ./radio/Radio.form */ "./node_modules/formiojs/components/radio/Radio.form.js"));
+
+var _ReCaptcha = _interopRequireDefault(__webpack_require__(/*! ./recaptcha/ReCaptcha.form */ "./node_modules/formiojs/components/recaptcha/ReCaptcha.form.js"));
 
 var _Resource = _interopRequireDefault(__webpack_require__(/*! ./resource/Resource.form */ "./node_modules/formiojs/components/resource/Resource.form.js"));
 
@@ -32292,17 +32302,16 @@ var _Time = _interopRequireDefault(__webpack_require__(/*! ./time/Time.form */ "
 
 var _Tree = _interopRequireDefault(__webpack_require__(/*! ./tree/Tree.form */ "./node_modules/formiojs/components/tree/Tree.form.js"));
 
-var _Well = _interopRequireDefault(__webpack_require__(/*! ./well/Well.form */ "./node_modules/formiojs/components/well/Well.form.js"));
-
-var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit.form */ "./node_modules/formiojs/components/modaledit/ModalEdit.form.js"));
-
 var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown.form */ "./node_modules/formiojs/components/unknown/Unknown.form.js"));
 
-var _ReCaptcha = _interopRequireDefault(__webpack_require__(/*! ./recaptcha/ReCaptcha.form */ "./node_modules/formiojs/components/recaptcha/ReCaptcha.form.js"));
+var _Url = _interopRequireDefault(__webpack_require__(/*! ./url/Url.form */ "./node_modules/formiojs/components/url/Url.form.js"));
+
+var _Well = _interopRequireDefault(__webpack_require__(/*! ./well/Well.form */ "./node_modules/formiojs/components/well/Well.form.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _.default.address.editForm = _Address.default;
+_.default.base.editForm = _Base.default;
 _.default.button.editForm = _Button.default;
 _.default.checkbox.editForm = _Checkbox.default;
 _.default.columns.editForm = _Columns.default;
@@ -32322,11 +32331,14 @@ _.default.form.editForm = _Form.default;
 _.default.hidden.editForm = _Hidden.default;
 _.default.htmlelement.editForm = _HTML.default;
 _.default.location.editForm = _Location.default;
+_.default.modaledit.editForm = _ModalEdit.default;
+_.default.nested.editForm = _NestedComponent.default;
 _.default.number.editForm = _Number.default;
 _.default.panel.editForm = _Panel.default;
 _.default.password.editForm = _Password.default;
 _.default.phoneNumber.editForm = _PhoneNumber.default;
 _.default.radio.editForm = _Radio.default;
+_.default.recaptcha.editForm = _ReCaptcha.default;
 _.default.resource.editForm = _Resource.default;
 _.default.select.editForm = _Select.default;
 _.default.selectboxes.editForm = _SelectBoxes.default;
@@ -32339,10 +32351,9 @@ _.default.textarea.editForm = _TextArea.default;
 _.default.textfield.editForm = _TextField.default;
 _.default.time.editForm = _Time.default;
 _.default.tree.editForm = _Tree.default;
-_.default.well.editForm = _Well.default;
-_.default.modaledit.editForm = _ModalEdit.default;
 _.default.unknown.editForm = _Unknown.default;
-_.default.recaptcha.editForm = _ReCaptcha.default;
+_.default.url.editForm = _Url.default;
+_.default.well.editForm = _Well.default;
 var _default = _.default;
 exports.default = _default;
 
@@ -42877,15 +42888,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _NestedComponent = _interopRequireDefault(__webpack_require__(/*! ./nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
-
 var _Address = _interopRequireDefault(__webpack_require__(/*! ./address/Address */ "./node_modules/formiojs/components/address/Address.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ./base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
-var _Content = _interopRequireDefault(__webpack_require__(/*! ./content/Content */ "./node_modules/formiojs/components/content/Content.js"));
+var _Button = _interopRequireDefault(__webpack_require__(/*! ./button/Button */ "./node_modules/formiojs/components/button/Button.js"));
+
+var _Checkbox = _interopRequireDefault(__webpack_require__(/*! ./checkbox/Checkbox */ "./node_modules/formiojs/components/checkbox/Checkbox.js"));
+
+var _Column = _interopRequireDefault(__webpack_require__(/*! ./columns/Column */ "./node_modules/formiojs/components/columns/Column.js"));
+
+var _Columns = _interopRequireDefault(__webpack_require__(/*! ./columns/Columns */ "./node_modules/formiojs/components/columns/Columns.js"));
 
 var _Container = _interopRequireDefault(__webpack_require__(/*! ./container/Container */ "./node_modules/formiojs/components/container/Container.js"));
+
+var _Content = _interopRequireDefault(__webpack_require__(/*! ./content/Content */ "./node_modules/formiojs/components/content/Content.js"));
+
+var _Currency = _interopRequireDefault(__webpack_require__(/*! ./currency/Currency */ "./node_modules/formiojs/components/currency/Currency.js"));
 
 var _DataGrid = _interopRequireDefault(__webpack_require__(/*! ./datagrid/DataGrid */ "./node_modules/formiojs/components/datagrid/DataGrid.js"));
 
@@ -42899,122 +42918,114 @@ var _EditGrid = _interopRequireDefault(__webpack_require__(/*! ./editgrid/EditGr
 
 var _EditTable = _interopRequireDefault(__webpack_require__(/*! ./edittable/EditTable */ "./node_modules/formiojs/components/edittable/EditTable.js"));
 
+var _Email = _interopRequireDefault(__webpack_require__(/*! ./email/Email */ "./node_modules/formiojs/components/email/Email.js"));
+
+var _Fieldset = _interopRequireDefault(__webpack_require__(/*! ./fieldset/Fieldset */ "./node_modules/formiojs/components/fieldset/Fieldset.js"));
+
+var _File = _interopRequireDefault(__webpack_require__(/*! ./file/File */ "./node_modules/formiojs/components/file/File.js"));
+
+var _Form = _interopRequireDefault(__webpack_require__(/*! ./form/Form */ "./node_modules/formiojs/components/form/Form.js"));
+
 var _HTML = _interopRequireDefault(__webpack_require__(/*! ./html/HTML */ "./node_modules/formiojs/components/html/HTML.js"));
 
 var _Hidden = _interopRequireDefault(__webpack_require__(/*! ./hidden/Hidden */ "./node_modules/formiojs/components/hidden/Hidden.js"));
 
-var _Form = _interopRequireDefault(__webpack_require__(/*! ./form/Form */ "./node_modules/formiojs/components/form/Form.js"));
+var _Location = _interopRequireDefault(__webpack_require__(/*! ./location/Location */ "./node_modules/formiojs/components/location/Location.js"));
 
-var _TextField = _interopRequireDefault(__webpack_require__(/*! ./textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
+var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit */ "./node_modules/formiojs/components/modaledit/ModalEdit.js"));
 
-var _PhoneNumber = _interopRequireDefault(__webpack_require__(/*! ./phonenumber/PhoneNumber */ "./node_modules/formiojs/components/phonenumber/PhoneNumber.js"));
-
-var _Email = _interopRequireDefault(__webpack_require__(/*! ./email/Email */ "./node_modules/formiojs/components/email/Email.js"));
-
-var _Url = _interopRequireDefault(__webpack_require__(/*! ./url/Url */ "./node_modules/formiojs/components/url/Url.js"));
-
-var _Time = _interopRequireDefault(__webpack_require__(/*! ./time/Time */ "./node_modules/formiojs/components/time/Time.js"));
-
-var _Checkbox = _interopRequireDefault(__webpack_require__(/*! ./checkbox/Checkbox */ "./node_modules/formiojs/components/checkbox/Checkbox.js"));
-
-var _Currency = _interopRequireDefault(__webpack_require__(/*! ./currency/Currency */ "./node_modules/formiojs/components/currency/Currency.js"));
-
-var _Fieldset = _interopRequireDefault(__webpack_require__(/*! ./fieldset/Fieldset */ "./node_modules/formiojs/components/fieldset/Fieldset.js"));
-
-var _Signature = _interopRequireDefault(__webpack_require__(/*! ./signature/Signature */ "./node_modules/formiojs/components/signature/Signature.js"));
-
-var _Select = _interopRequireDefault(__webpack_require__(/*! ./select/Select */ "./node_modules/formiojs/components/select/Select.js"));
-
-var _Resource = _interopRequireDefault(__webpack_require__(/*! ./resource/Resource */ "./node_modules/formiojs/components/resource/Resource.js"));
-
-var _TextArea = _interopRequireDefault(__webpack_require__(/*! ./textarea/TextArea */ "./node_modules/formiojs/components/textarea/TextArea.js"));
-
-var _Tags = _interopRequireDefault(__webpack_require__(/*! ./tags/Tags */ "./node_modules/formiojs/components/tags/Tags.js"));
-
-var _Button = _interopRequireDefault(__webpack_require__(/*! ./button/Button */ "./node_modules/formiojs/components/button/Button.js"));
+var _NestedComponent = _interopRequireDefault(__webpack_require__(/*! ./nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
 var _Number = _interopRequireDefault(__webpack_require__(/*! ./number/Number */ "./node_modules/formiojs/components/number/Number.js"));
 
-var _Password = _interopRequireDefault(__webpack_require__(/*! ./password/Password */ "./node_modules/formiojs/components/password/Password.js"));
-
 var _Panel = _interopRequireDefault(__webpack_require__(/*! ./panel/Panel */ "./node_modules/formiojs/components/panel/Panel.js"));
 
-var _Column = _interopRequireDefault(__webpack_require__(/*! ./columns/Column */ "./node_modules/formiojs/components/columns/Column.js"));
+var _Password = _interopRequireDefault(__webpack_require__(/*! ./password/Password */ "./node_modules/formiojs/components/password/Password.js"));
 
-var _Columns = _interopRequireDefault(__webpack_require__(/*! ./columns/Columns */ "./node_modules/formiojs/components/columns/Columns.js"));
-
-var _Table = _interopRequireDefault(__webpack_require__(/*! ./table/Table */ "./node_modules/formiojs/components/table/Table.js"));
-
-var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown */ "./node_modules/formiojs/components/unknown/Unknown.js"));
+var _PhoneNumber = _interopRequireDefault(__webpack_require__(/*! ./phonenumber/PhoneNumber */ "./node_modules/formiojs/components/phonenumber/PhoneNumber.js"));
 
 var _Radio = _interopRequireDefault(__webpack_require__(/*! ./radio/Radio */ "./node_modules/formiojs/components/radio/Radio.js"));
 
+var _ReCaptcha = _interopRequireDefault(__webpack_require__(/*! ./recaptcha/ReCaptcha */ "./node_modules/formiojs/components/recaptcha/ReCaptcha.js"));
+
+var _Resource = _interopRequireDefault(__webpack_require__(/*! ./resource/Resource */ "./node_modules/formiojs/components/resource/Resource.js"));
+
+var _Select = _interopRequireDefault(__webpack_require__(/*! ./select/Select */ "./node_modules/formiojs/components/select/Select.js"));
+
 var _SelectBoxes = _interopRequireDefault(__webpack_require__(/*! ./selectboxes/SelectBoxes */ "./node_modules/formiojs/components/selectboxes/SelectBoxes.js"));
+
+var _Signature = _interopRequireDefault(__webpack_require__(/*! ./signature/Signature */ "./node_modules/formiojs/components/signature/Signature.js"));
 
 var _Survey = _interopRequireDefault(__webpack_require__(/*! ./survey/Survey */ "./node_modules/formiojs/components/survey/Survey.js"));
 
-var _Well = _interopRequireDefault(__webpack_require__(/*! ./well/Well */ "./node_modules/formiojs/components/well/Well.js"));
-
-var _Location = _interopRequireDefault(__webpack_require__(/*! ./location/Location */ "./node_modules/formiojs/components/location/Location.js"));
-
-var _File = _interopRequireDefault(__webpack_require__(/*! ./file/File */ "./node_modules/formiojs/components/file/File.js"));
+var _Table = _interopRequireDefault(__webpack_require__(/*! ./table/Table */ "./node_modules/formiojs/components/table/Table.js"));
 
 var _Tabs = _interopRequireDefault(__webpack_require__(/*! ./tabs/Tabs */ "./node_modules/formiojs/components/tabs/Tabs.js"));
 
+var _Tags = _interopRequireDefault(__webpack_require__(/*! ./tags/Tags */ "./node_modules/formiojs/components/tags/Tags.js"));
+
+var _TextArea = _interopRequireDefault(__webpack_require__(/*! ./textarea/TextArea */ "./node_modules/formiojs/components/textarea/TextArea.js"));
+
+var _TextField = _interopRequireDefault(__webpack_require__(/*! ./textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
+
+var _Time = _interopRequireDefault(__webpack_require__(/*! ./time/Time */ "./node_modules/formiojs/components/time/Time.js"));
+
 var _Tree = _interopRequireDefault(__webpack_require__(/*! ./tree/Tree */ "./node_modules/formiojs/components/tree/Tree.js"));
 
-var _ReCaptcha = _interopRequireDefault(__webpack_require__(/*! ./recaptcha/ReCaptcha */ "./node_modules/formiojs/components/recaptcha/ReCaptcha.js"));
+var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown */ "./node_modules/formiojs/components/unknown/Unknown.js"));
 
-var _ModalEdit = _interopRequireDefault(__webpack_require__(/*! ./modaledit/ModalEdit */ "./node_modules/formiojs/components/modaledit/ModalEdit.js"));
+var _Url = _interopRequireDefault(__webpack_require__(/*! ./url/Url */ "./node_modules/formiojs/components/url/Url.js"));
+
+var _Well = _interopRequireDefault(__webpack_require__(/*! ./well/Well */ "./node_modules/formiojs/components/well/Well.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _default = {
-  nested: _NestedComponent.default,
   address: _Address.default,
   base: _Base.default,
-  content: _Content.default,
+  button: _Button.default,
+  checkbox: _Checkbox.default,
+  column: _Column.default,
+  columns: _Columns.default,
   container: _Container.default,
+  content: _Content.default,
+  currency: _Currency.default,
   datagrid: _DataGrid.default,
   datamap: _DataMap.default,
   datetime: _DateTime.default,
   day: _Day.default,
-  htmlelement: _HTML.default,
-  hidden: _Hidden.default,
   editgrid: _EditGrid.default,
   edittable: _EditTable.default,
-  form: _Form.default,
-  textfield: _TextField.default,
-  phoneNumber: _PhoneNumber.default,
   email: _Email.default,
-  url: _Url.default,
-  time: _Time.default,
-  checkbox: _Checkbox.default,
-  currency: _Currency.default,
   fieldset: _Fieldset.default,
-  signature: _Signature.default,
-  select: _Select.default,
-  resource: _Resource.default,
-  textarea: _TextArea.default,
-  tags: _Tags.default,
-  button: _Button.default,
-  number: _Number.default,
-  password: _Password.default,
-  panel: _Panel.default,
-  tabs: _Tabs.default,
-  column: _Column.default,
-  columns: _Columns.default,
-  table: _Table.default,
-  unknown: _Unknown.default,
-  radio: _Radio.default,
-  selectboxes: _SelectBoxes.default,
-  survey: _Survey.default,
-  well: _Well.default,
-  location: _Location.default,
   file: _File.default,
-  tree: _Tree.default,
+  form: _Form.default,
+  hidden: _Hidden.default,
+  htmlelement: _HTML.default,
+  location: _Location.default,
+  modaledit: _ModalEdit.default,
+  nested: _NestedComponent.default,
+  number: _Number.default,
+  panel: _Panel.default,
+  password: _Password.default,
+  phoneNumber: _PhoneNumber.default,
+  radio: _Radio.default,
   recaptcha: _ReCaptcha.default,
-  modaledit: _ModalEdit.default
+  resource: _Resource.default,
+  select: _Select.default,
+  selectboxes: _SelectBoxes.default,
+  signature: _Signature.default,
+  survey: _Survey.default,
+  table: _Table.default,
+  tabs: _Tabs.default,
+  tags: _Tags.default,
+  textarea: _TextArea.default,
+  textfield: _TextField.default,
+  time: _Time.default,
+  tree: _Tree.default,
+  unknown: _Unknown.default,
+  url: _Url.default,
+  well: _Well.default
 };
 exports.default = _default;
 
@@ -45181,7 +45192,8 @@ function (_NestedComponent) {
         input: false,
         tableView: false,
         dataGridLabel: false,
-        persistent: false
+        persistent: false,
+        lazyLoad: false
       }].concat(extend));
     }
   }, {
@@ -45199,9 +45211,13 @@ function (_NestedComponent) {
   }]);
 
   function PanelComponent(component, options, data) {
+    var _this;
+
     _classCallCheck(this, PanelComponent);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(PanelComponent).call(this, component, options, data));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(PanelComponent).call(this, component, options, data));
+    _this.lazyLoaded = false;
+    return _this;
   }
 
   _createClass(PanelComponent, [{
@@ -45225,6 +45241,37 @@ function (_NestedComponent) {
         var newIcon = this.getCollapseIcon();
         this.panelTitle.replaceChild(newIcon, this.collapseIcon);
         this.collapseIcon = newIcon;
+      }
+    }
+  }, {
+    key: "checkValidity",
+    value: function checkValidity(data, dirty) {
+      // Make sure to toggle the collapsed state before checking validity.
+      if (dirty && this.component.lazyLoad && this.component.collapsible && this.collapsed && !this.lazyLoaded) {
+        this.lazyLoaded = true;
+        this.addComponents();
+      }
+
+      return _get(_getPrototypeOf(PanelComponent.prototype), "checkValidity", this).call(this, data, dirty);
+    }
+  }, {
+    key: "addComponents",
+    value: function addComponents(element, data, options, state) {
+      // If they are lazy loading, then only add the components if they toggle the collapsed state.
+      if (this.component.lazyLoad && this.component.collapsible && this.collapsed && !this.lazyLoaded) {
+        return;
+      }
+
+      return _get(_getPrototypeOf(PanelComponent.prototype), "addComponents", this).call(this, element, data, options, state);
+    }
+  }, {
+    key: "toggleCollapse",
+    value: function toggleCollapse() {
+      _get(_getPrototypeOf(PanelComponent.prototype), "toggleCollapse", this).call(this);
+
+      if (this.component.lazyLoad && this.component.collapsible && !this.collapsed && !this.lazyLoaded) {
+        this.lazyLoaded = true;
+        this.addComponents();
       }
     }
   }, {
@@ -45478,6 +45525,20 @@ var _default = [{
     json: {
       '===': [{
         var: 'data.collapsible'
+      }, true]
+    }
+  }
+}, {
+  weight: 652,
+  type: 'checkbox',
+  label: 'Lazy Load Contents',
+  tooltip: 'Lazy loads the contents only when the panel is opened.',
+  key: 'lazyLoad',
+  input: true,
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.collapsed'
       }, true]
     }
   }
@@ -47349,7 +47410,7 @@ function (_BaseComponent) {
 
 
       if (this.component.filter) {
-        url += "&".concat(this.interpolate(this.component.filter));
+        url += (!url.includes('?') ? '?' : '&') + this.interpolate(this.component.filter);
       } // Make the request.
 
 
@@ -47566,7 +47627,7 @@ function (_BaseComponent) {
         }
       }
 
-      var choicesOptions = _objectSpread({}, customOptions, {
+      var choicesOptions = _objectSpread({
         removeItemButton: this.component.disabled ? false : _lodash.default.get(this.component, 'removeItemButton', true),
         itemSelectText: '',
         classNames: {
@@ -47589,7 +47650,7 @@ function (_BaseComponent) {
           threshold: _lodash.default.get(this, 'component.searchThreshold', 0.3)
         }, _lodash.default.get(this, 'component.fuseOptions', {})),
         itemComparer: _lodash.default.isEqual
-      });
+      }, customOptions);
 
       var tabIndex = input.tabIndex;
       this.addPlaceholder(input);
@@ -53298,6 +53359,31 @@ var _default = [{
   ignore: true
 }];
 exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/url/Url.form.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/components/url/Url.form.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = _default;
+
+var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _default() {
+  return _TextField.default.apply(void 0, arguments);
+}
 
 /***/ }),
 
