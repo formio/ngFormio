@@ -45243,11 +45243,16 @@ function (_NestedComponent) {
         this.collapseIcon = newIcon;
       }
     }
+    /**
+     * Return if this panel is lazy loadable.
+     * @return {boolean}
+     */
+
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
       // Make sure to toggle the collapsed state before checking validity.
-      if (dirty && this.component.lazyLoad && this.component.collapsible && this.collapsed && !this.lazyLoaded) {
+      if (dirty && this.lazyLoadable) {
         this.lazyLoaded = true;
         this.addComponents();
       }
@@ -45258,7 +45263,7 @@ function (_NestedComponent) {
     key: "addComponents",
     value: function addComponents(element, data, options, state) {
       // If they are lazy loading, then only add the components if they toggle the collapsed state.
-      if (this.component.lazyLoad && this.component.collapsible && this.collapsed && !this.lazyLoaded) {
+      if (this.lazyLoadable) {
         return;
       }
 
@@ -45267,12 +45272,12 @@ function (_NestedComponent) {
   }, {
     key: "toggleCollapse",
     value: function toggleCollapse() {
-      _get(_getPrototypeOf(PanelComponent.prototype), "toggleCollapse", this).call(this);
-
-      if (this.component.lazyLoad && this.component.collapsible && !this.collapsed && !this.lazyLoaded) {
+      if (this.lazyLoadable) {
         this.lazyLoaded = true;
         this.addComponents();
       }
+
+      _get(_getPrototypeOf(PanelComponent.prototype), "toggleCollapse", this).call(this);
     }
   }, {
     key: "build",
@@ -45327,6 +45332,11 @@ function (_NestedComponent) {
     key: "className",
     get: function get() {
       return "panel panel-".concat(this.component.theme, " ").concat(_get(_getPrototypeOf(PanelComponent.prototype), "className", this));
+    }
+  }, {
+    key: "lazyLoadable",
+    get: function get() {
+      return !this.options.builder && this.component.lazyLoad && this.component.collapsible && this.collapsed && !this.lazyLoaded;
     }
   }]);
 
