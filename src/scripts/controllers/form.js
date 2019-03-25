@@ -605,6 +605,7 @@ app.controller('FormController', [
       baseUrl: $scope.baseUrl,
       building: true,
       sideBarScrollOffset: 60,
+      enableEditJsonButton: true,
       builder: {
         basic: {
           title: 'Basic Components',
