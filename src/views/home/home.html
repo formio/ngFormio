@@ -25,7 +25,7 @@
 <div class="new-project-row" ng-if="showHeader" ng-class="{'new-project-row-min': !showWelcome()}" >
   <div class="container">
     <div class="new-project-section">
-      <h2 class="new-project-header text-center"><strong>Free 30 Day Enterprise Plan Trial</strong></h2>
+      <h2 class="new-project-header text-center" ng-if="!onPremise"><strong>Free 30 Day Enterprise Plan Trial</strong></h2>
       <div class="text-center">
         <h3>To get started select the framework for your application</h3>
       </div>

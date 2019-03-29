@@ -45,6 +45,6 @@
     <div class="col-md-1"><span class="btn btn-default" ng-click="removeRow($index)"><i class="glyphicon glyphicon-remove-circle"></i></span></div>
   </div>
   <span class="btn btn-primary" ng-click="addRow()">Add Role Mapping</span>
-  <p class="text-muted">Map claims values to form.io roles to assign user's to roles.</p>
+  <p class="text-muted">Map claims values to form.io roles to assign user's to roles. To allow for everyone who authenticates to get the role, then provide <strong>Everyone</strong> for the <strong>SAML Role</strong> name.</p>
 </div>
 <button ng-disabled="!minPlan('commercial')" class="btn btn-primary" ng-click="saveSAML()">Save Settings</button>
