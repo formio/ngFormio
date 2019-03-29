@@ -532,6 +532,8 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-js/modules/es6.array.find.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
@@ -594,8 +596,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! formiojs/components/Components */ "./node_modules/formiojs/components/Components.js"));
 
@@ -921,6 +921,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
@@ -12266,6 +12268,28 @@ __webpack_require__(/*! ./_object-sap */ "./node_modules/core-js/modules/_object
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/es6.object.to-string.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/core-js/modules/es6.object.to-string.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// 19.1.3.6 Object.prototype.toString()
+var classof = __webpack_require__(/*! ./_classof */ "./node_modules/core-js/modules/_classof.js");
+var test = {};
+test[__webpack_require__(/*! ./_wks */ "./node_modules/core-js/modules/_wks.js")('toStringTag')] = 'z';
+if (test + '' != '[object z]') {
+  __webpack_require__(/*! ./_redefine */ "./node_modules/core-js/modules/_redefine.js")(Object.prototype, 'toString', function toString() {
+    return '[object ' + classof(this) + ']';
+  }, true);
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/es6.promise.js":
 /*!*****************************************************!*\
   !*** ./node_modules/core-js/modules/es6.promise.js ***!
@@ -19454,7 +19478,7 @@ __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_module
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
 
@@ -20152,6 +20176,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
@@ -20278,6 +20304,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -20595,6 +20623,8 @@ __webpack_require__(/*! core-js/modules/es6.number.constructor */ "./node_module
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
 
@@ -21137,7 +21167,8 @@ function () {
         return _nativePromiseOnly.default.reject('You must be authenticated to generate a temporary auth token.');
       }
 
-      return this.makeRequest('tempToken', "".concat(this.projectUrl, "/token"), 'GET', null, {
+      var authUrl = Formio.authUrl || this.projectUrl;
+      return this.makeRequest('tempToken', "".concat(authUrl, "/token"), 'GET', null, {
         ignoreCache: true,
         header: new Headers({
           'x-expire': expire,
@@ -21741,6 +21772,11 @@ function () {
       Formio.projectUrlSet = true;
     }
   }, {
+    key: "setAuthUrl",
+    value: function setAuthUrl(url) {
+      Formio.authUrl = url;
+    }
+  }, {
     key: "getAppUrl",
     value: function getAppUrl() {
       console.warn('Formio.getAppUrl() is deprecated. Use Formio.getProjectUrl instead.');
@@ -21880,13 +21916,18 @@ function () {
   }, {
     key: "currentUser",
     value: function currentUser(formio, options) {
-      var projectUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
-      projectUrl += '/current';
+      var authUrl = Formio.authUrl;
+
+      if (!authUrl) {
+        authUrl = formio ? formio.projectUrl : Formio.projectUrl || Formio.baseUrl;
+      }
+
+      authUrl += '/current';
       var user = Formio.getUser(options);
 
       if (user) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly.default.resolve(user), {
-          url: projectUrl,
+          url: authUrl,
           method: 'GET',
           options: options
         });
@@ -21896,13 +21937,13 @@ function () {
 
       if ((!options || !options.external) && !token) {
         return Formio.pluginAlter('wrapStaticRequestPromise', _nativePromiseOnly.default.resolve(null), {
-          url: projectUrl,
+          url: authUrl,
           method: 'GET',
           options: options
         });
       }
 
-      return Formio.makeRequest(formio, 'currentUser', projectUrl, 'GET', null, options).then(function (response) {
+      return Formio.makeRequest(formio, 'currentUser', authUrl, 'GET', null, options).then(function (response) {
         Formio.setUser(response, options);
         return response;
       });
@@ -21915,7 +21956,7 @@ function () {
       Formio.setToken(null, options);
       Formio.setUser(null, options);
       Formio.clearCache();
-      var projectUrl = formio ? formio.projectUrl : Formio.baseUrl;
+      var projectUrl = Formio.authUrl ? Formio.authUrl : formio ? formio.projectUrl : Formio.baseUrl;
       return Formio.makeRequest(formio, 'logout', "".concat(projectUrl, "/logout"));
     }
   }, {
@@ -21983,7 +22024,8 @@ function () {
       } // go to the saml sso endpoint for this project.
 
 
-      window.location.href = "".concat(Formio.projectUrl, "/saml/sso?relay=").concat(encodeURI(options.relay));
+      var authUrl = Formio.authUrl || Formio.projectUrl;
+      window.location.href = "".concat(authUrl, "/saml/sso?relay=").concat(encodeURI(options.relay));
       return false;
     }
   }, {
@@ -22160,6 +22202,7 @@ Formio.fetch = fetch;
 Formio.Headers = Headers;
 Formio.baseUrl = 'https://api.form.io';
 Formio.projectUrl = Formio.baseUrl;
+Formio.authUrl = '';
 Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
@@ -22872,8 +22915,6 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
-
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
@@ -24055,6 +24096,7 @@ function (_NestedComponent) {
     key: "cancel",
     value: function cancel(noconfirm) {
       if (noconfirm || confirm('Are you sure you want to cancel?')) {
+        this.emit('resetForm');
         this.resetValue();
         return true;
       } else {
@@ -24475,6 +24517,8 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
 
@@ -25112,7 +25156,7 @@ function (_Webform) {
         'data-target': "#group-".concat(info.key)
       }, this.text(info.title)); // Add a listener when it is clicked.
 
-      if (!(0, _utils.bootstrapVersion)()) {
+      if (!(0, _utils.bootstrapVersion)(this.options)) {
         this.addEventListener(groupAnchor, 'click', function (event) {
           event.preventDefault();
           var clickedGroupId = event.target.getAttribute('data-target').replace('#group-', '');
@@ -25169,7 +25213,7 @@ function (_Webform) {
       var groupBodyClass = 'panel-collapse collapse';
 
       if (info.default) {
-        switch ((0, _utils.bootstrapVersion)()) {
+        switch ((0, _utils.bootstrapVersion)(this.options)) {
           case 4:
             groupBodyClass += ' show';
             break;
@@ -25605,11 +25649,13 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
-__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
 
@@ -26526,6 +26572,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
 var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown */ "./node_modules/formiojs/components/unknown/Unknown.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
@@ -27192,6 +27240,8 @@ exports.default = void 0;
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
@@ -28028,7 +28078,7 @@ __webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/cor
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
@@ -29537,7 +29587,7 @@ function (_Component) {
       _lodash.default.each(this.inputs, function (input) {
         input = _this11.performInputMapping(input);
 
-        if (input.mask) {
+        if (input.mask && input.mask.destroy) {
           input.mask.destroy();
         }
 
@@ -30333,7 +30383,7 @@ function (_Component) {
 
 
       var calculatedValue = this.evaluate(this.component.calculateValue, {
-        value: [],
+        value: this.defaultValue,
         data: data
       }, 'value'); // If this is the firstPass, and the dataValue is different than to the calculatedValue.
 
@@ -32424,6 +32474,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.search */ "./node_modules/core-js/modules/es6.regexp.search.js");
@@ -33314,6 +33366,8 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
@@ -33951,6 +34005,8 @@ __webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
@@ -34333,8 +34389,6 @@ __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_mod
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
-
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -35658,6 +35712,10 @@ __webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
@@ -35666,7 +35724,7 @@ __webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
 
@@ -36679,6 +36737,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
@@ -37179,6 +37239,8 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
@@ -37632,6 +37694,8 @@ __webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es7.string.pad-start */ "./node_modules/core-js/modules/es7.string.pad-start.js");
 
@@ -38594,7 +38658,7 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -39583,13 +39647,15 @@ __webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
 
-__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
-
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -40463,6 +40529,8 @@ __webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.typed.uint8-array */ "./node_modules/core-js/modules/es6.typed.uint8-array.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
@@ -40472,6 +40540,8 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./no
 var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 var _downloadjs = _interopRequireDefault(__webpack_require__(/*! downloadjs */ "./node_modules/downloadjs/download.js"));
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -41378,6 +41448,16 @@ function (_BaseComponent) {
     get: function get() {
       var value = _get(_getPrototypeOf(FileComponent.prototype), "defaultValue", this);
 
+      if (_lodash.default.isEqual(value, []) && this.options.flatten) {
+        return [{
+          storage: '',
+          name: '',
+          size: 0,
+          type: '',
+          originalName: ''
+        }];
+      }
+
       return Array.isArray(value) ? value : [];
     }
   }, {
@@ -41669,8 +41749,6 @@ __webpack_require__(/*! core-js/modules/es6.reflect.set */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
-
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
@@ -41958,6 +42036,11 @@ function (_BaseComponent) {
         if (this.component.form) {
           this.formSrc = "".concat(rootSrc, "/").concat(this.component.form);
         }
+      } // Add revision version if set.
+
+
+      if (this.component.formRevision || this.component.formRevision === 0) {
+        this.formSrc += "/v/".concat(this.component.formRevision);
       } // Determine if we already have a loaded form object.
 
 
@@ -42255,12 +42338,11 @@ function (_BaseComponent) {
     }
   }, {
     key: "nosubmit",
-    set: function set() {
-      var value = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      this._nosubmit = value;
+    set: function set(value) {
+      this._nosubmit = !!value;
 
       if (this.subForm) {
-        this.subForm.nosubmit = value;
+        this.subForm.nosubmit = !!value;
       }
     },
     get: function get() {
@@ -42369,6 +42451,14 @@ var _default = [{
   key: 'form',
   weight: 10,
   tooltip: 'The form to load within this form component.'
+}, {
+  type: 'textfield',
+  input: true,
+  label: 'Form Revision',
+  placeholder: 'Current',
+  tooltip: 'You can lock the nested form to a specific revision by entering the revision number here.',
+  key: 'formRevision',
+  weight: 11
 }, {
   type: 'checkbox',
   input: true,
@@ -43443,6 +43533,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
@@ -43831,13 +43923,15 @@ __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
-
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.find-index */ "./node_modules/core-js/modules/es6.array.find-index.js");
 
@@ -44720,6 +44814,8 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.string.repeat */ "./node_modules/core-js/modules/es6.string.repeat.js");
 
 __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
@@ -45362,9 +45458,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
 
@@ -45910,6 +46010,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
@@ -46374,6 +46476,8 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
@@ -46981,6 +47085,8 @@ __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/public/assets/scripts/choices.js */ "./node_modules/choices.js/public/assets/scripts/choices.js"));
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
@@ -47225,17 +47331,13 @@ function (_BaseComponent) {
   }, {
     key: "addValueOptions",
     value: function addValueOptions(items) {
-      var _this2 = this;
-
       items = items || [];
 
       if (!this.selectOptions.length) {
         if (this.choices) {
           // Add the currently selected choices if they don't already exist.
           var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
-          return currentChoices.reduce(function (defaultAdded, choice) {
-            return _this2.addCurrentChoices(choice, items) || defaultAdded;
-          }, false);
+          return this.addCurrentChoices(currentChoices, items);
         } else if (!this.component.multiple) {
           this.addPlaceholder(this.selectInput);
         }
@@ -47261,7 +47363,7 @@ function (_BaseComponent) {
   }, {
     key: "setItems",
     value: function setItems(items, fromSearch) {
-      var _this3 = this;
+      var _this2 = this;
 
       // If the items is a string, then parse as JSON.
       if (typeof items == 'string') {
@@ -47327,7 +47429,7 @@ function (_BaseComponent) {
 
 
       _lodash.default.each(items, function (item) {
-        _this3.addOption(_this3.itemValue(item), _this3.itemTemplate(item));
+        _this2.addOption(_this2.itemValue(item), _this2.itemTemplate(item));
       });
 
       if (this.choices) {
@@ -47360,7 +47462,7 @@ function (_BaseComponent) {
   }, {
     key: "loadItems",
     value: function loadItems(url, search, headers, options, method, body) {
-      var _this4 = this;
+      var _this3 = this;
 
       options = options || {}; // See if they have not met the minimum search requirements.
 
@@ -47414,7 +47516,7 @@ function (_BaseComponent) {
       if (!_lodash.default.isEmpty(query)) {
         // Add the query string.
         url += (!url.includes('?') ? '?' : '&') + _Formio.default.serialize(query, function (item) {
-          return _this4.interpolate(item);
+          return _this3.interpolate(item);
         });
       } // Add filter capability
 
@@ -47428,26 +47530,26 @@ function (_BaseComponent) {
       this.loading = true;
 
       _Formio.default.makeRequest(this.options.formio, 'select', url, method, body, options).then(function (response) {
-        var scrollTop = !_this4.scrollLoading && _this4.currentItems.length === 0;
+        var scrollTop = !_this3.scrollLoading && _this3.currentItems.length === 0;
 
-        _this4.setItems(response, !!search);
+        _this3.setItems(response, !!search);
 
         if (scrollTop) {
-          _this4.choices.choiceList.scrollToTop();
+          _this3.choices.choiceList.scrollToTop();
         }
       }).catch(function (err) {
-        _this4.stopInfiniteScroll();
+        _this3.stopInfiniteScroll();
 
-        _this4.loading = false;
+        _this3.loading = false;
 
-        _this4.itemsLoadedResolve();
+        _this3.itemsLoadedResolve();
 
-        _this4.emit('componentError', {
-          component: _this4.component,
+        _this3.emit('componentError', {
+          component: _this3.component,
           message: err.toString()
         });
 
-        console.warn("Unable to load resources for ".concat(_this4.key));
+        console.warn("Unable to load resources for ".concat(_this3.key));
       });
     }
     /**
@@ -47600,7 +47702,7 @@ function (_BaseComponent) {
 
     /* eslint-disable max-statements */
     value: function addInput(input, container) {
-      var _this5 = this;
+      var _this4 = this;
 
       _get(_getPrototypeOf(SelectComponent.prototype), "addInput", this).call(this, input, container);
 
@@ -47612,13 +47714,13 @@ function (_BaseComponent) {
         this.triggerUpdate();
         this.focusableElement = input;
         this.addEventListener(input, 'focus', function () {
-          return _this5.update();
+          return _this4.update();
         });
         this.addEventListener(input, 'keydown', function (event) {
           var keyCode = event.keyCode;
 
           if ([8, 46].includes(keyCode)) {
-            _this5.setValue(null);
+            _this4.setValue(null);
           }
         });
         return;
@@ -47675,7 +47777,7 @@ function (_BaseComponent) {
 
         if (useSearch) {
           this.addEventListener(this.choices.containerOuter.element, 'focus', function () {
-            return _this5.focusableElement.focus();
+            return _this4.focusableElement.focus();
           });
         }
       }
@@ -47683,11 +47785,11 @@ function (_BaseComponent) {
       this.scrollList = this.choices.choiceList.element;
 
       this.onScroll = function () {
-        if (!_this5.scrollLoading && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight) {
-          _this5.scrollTop = _this5.scrollList.scrollTop;
-          _this5.scrollLoading = true;
+        if (!_this4.scrollLoading && _this4.scrollList.scrollTop + _this4.scrollList.clientHeight >= _this4.scrollList.scrollHeight) {
+          _this4.scrollTop = _this4.scrollList.scrollTop;
+          _this4.scrollLoading = true;
 
-          _this5.triggerUpdate(_this5.choices.input.element.value);
+          _this4.triggerUpdate(_this4.choices.input.element.value);
         }
       };
 
@@ -47701,33 +47803,33 @@ function (_BaseComponent) {
         if (this.choices && this.choices.input && this.choices.input.element) {
           this.addEventListener(this.choices.input.element, 'input', function (event) {
             if (!event.target.value) {
-              _this5.triggerUpdate();
+              _this4.triggerUpdate();
             }
           });
         }
 
         this.addEventListener(input, 'search', function (event) {
-          return _this5.triggerUpdate(event.detail.value);
+          return _this4.triggerUpdate(event.detail.value);
         });
         this.addEventListener(input, 'stopSearch', function () {
-          return _this5.triggerUpdate();
+          return _this4.triggerUpdate();
         });
       }
 
       this.addEventListener(input, 'showDropdown', function () {
-        if (_this5.dataValue) {
-          _this5.triggerUpdate();
+        if (_this4.dataValue) {
+          _this4.triggerUpdate();
         }
 
-        _this5.update();
+        _this4.update();
       });
 
       if (placeholderValue && this.choices._isSelectOneElement) {
         this.addEventListener(input, 'removeItem', function () {
-          var items = _this5.choices._store.activeItems;
+          var items = _this4.choices._store.activeItems;
 
           if (!items.length) {
-            _this5.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
+            _this4.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
           }
         });
       } // Add value options.
@@ -47773,10 +47875,19 @@ function (_BaseComponent) {
 
   }, {
     key: "addCurrentChoices",
-    value: function addCurrentChoices(value, items) {
-      var _this6 = this;
+    value: function addCurrentChoices(values, items) {
+      var _this5 = this;
 
-      if (value) {
+      if (!values) {
+        return false;
+      }
+
+      var notFoundValuesToAdd = [];
+      var added = values.reduce(function (defaultAdded, value) {
+        if (!value) {
+          return defaultAdded;
+        }
+
         var found = false; // Make sure that `items` and `this.selectOptions` points
         // to the same reference. Because `this.selectOptions` is
         // internal property and all items are populated by
@@ -47784,7 +47895,7 @@ function (_BaseComponent) {
         // 'label' and 'value' properties. This assumption allows
         // us to read correct value from the item.
 
-        var isSelectOptions = items === this.selectOptions;
+        var isSelectOptions = items === _this5.selectOptions;
 
         if (items && items.length) {
           _lodash.default.each(items, function (choice) {
@@ -47793,27 +47904,34 @@ function (_BaseComponent) {
               return false;
             }
 
-            found |= _lodash.default.isEqual(_this6.itemValue(choice, isSelectOptions), value);
+            found |= _lodash.default.isEqual(_this5.itemValue(choice, isSelectOptions), value);
             return found ? false : true;
           });
         } // Add the default option if no item is found.
 
 
         if (!found) {
-          if (this.choices) {
-            this.choices.setChoices([{
-              value: this.itemValue(value),
-              label: this.itemTemplate(value)
-            }], 'value', 'label', true);
-          } else {
-            this.addOption(this.itemValue(value), this.itemTemplate(value));
-          }
-
+          notFoundValuesToAdd.push({
+            value: _this5.itemValue(value),
+            label: _this5.itemTemplate(value)
+          });
           return true;
+        }
+
+        return found || defaultAdded;
+      }, false);
+
+      if (notFoundValuesToAdd.length) {
+        if (this.choices) {
+          this.choices.setChoices(notFoundValuesToAdd, 'value', 'label', true);
+        } else {
+          notFoundValuesToAdd.map(function (notFoundValue) {
+            _this5.addOption(notFoundValue.value, notFoundValue.label);
+          });
         }
       }
 
-      return false;
+      return added;
     }
   }, {
     key: "getView",
@@ -47864,8 +47982,6 @@ function (_BaseComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this7 = this;
-
       flags = this.getFlags.apply(this, arguments);
       var previousValue = this.dataValue;
 
@@ -47899,11 +48015,7 @@ function (_BaseComponent) {
           this.choices.removeActiveItems(); // Add the currently selected choices if they don't already exist.
 
           var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
-
-          _lodash.default.each(currentChoices, function (choice) {
-            _this7.addCurrentChoices(choice, _this7.selectOptions);
-          });
-
+          this.addCurrentChoices(currentChoices, this.selectOptions);
           this.choices.setChoices(this.selectOptions, 'value', 'label', true).setChoiceByValue(value);
         } else if (hasPreviousValue) {
           this.choices.removeActiveItems();
@@ -47965,7 +48077,7 @@ function (_BaseComponent) {
   }, {
     key: "asString",
     value: function asString(value) {
-      var _this8 = this;
+      var _this6 = this;
 
       value = value || this.getValue();
 
@@ -47992,7 +48104,7 @@ function (_BaseComponent) {
       if (Array.isArray(value)) {
         var _items = [];
         value.forEach(function (item) {
-          return _items.push(_this8.itemTemplate(item));
+          return _items.push(_this6.itemTemplate(item));
         });
         return _items.length > 0 ? _items.join('<br />') : '-';
       }
@@ -48075,7 +48187,7 @@ function (_BaseComponent) {
   }, {
     key: "requestHeaders",
     get: function get() {
-      var _this9 = this;
+      var _this7 = this;
 
       // Create the headers object.
       var headers = new _Formio.default.Headers(); // Add custom headers to the url.
@@ -48084,7 +48196,7 @@ function (_BaseComponent) {
         try {
           _lodash.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this9.interpolate(header.value));
+              headers.set(header.key, _this7.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -48703,6 +48815,10 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -49383,6 +49499,8 @@ __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/cor
 __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -50137,8 +50255,6 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
-
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
@@ -50859,8 +50975,6 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
-
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
@@ -51159,6 +51273,10 @@ function (_TextFieldComponent) {
         } catch (err) {
           console.warn(err);
         }
+      }
+
+      if (!_lodash.default.isString(value)) {
+        value = '';
       }
 
       return value;
@@ -52471,7 +52589,7 @@ __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/mo
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -53779,11 +53897,13 @@ exports.default = _default;
 "use strict";
 
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
-__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54447,6 +54567,8 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
 var _utils = __webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/utils.js");
@@ -54559,6 +54681,8 @@ exports.escapeRegExCharacters = escapeRegExCharacters;
 exports.getValue = getValue;
 exports.getStrings = getStrings;
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
@@ -54567,6 +54691,8 @@ __webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
@@ -54574,8 +54700,6 @@ __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/co
 __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
 
 __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
-
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 var _get = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js"));
 
@@ -55375,11 +55499,13 @@ __webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
-__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
 
-__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
@@ -56391,7 +56517,11 @@ function uniqueKey(map, base) {
  */
 
 
-function bootstrapVersion() {
+function bootstrapVersion(options) {
+  if (options.bootstrap) {
+    return options.bootstrap;
+  }
+
   if (typeof $ === 'function' && typeof $().collapse === 'function') {
     return parseInt($.fn.collapse.Constructor.VERSION.split('.')[0], 10);
   }
