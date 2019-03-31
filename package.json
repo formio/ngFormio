@@ -6,6 +6,7 @@
     "start": "node app",
     "manager": "rm -rf dist/manager && mkdir dist/manager && cp -av ./node_modules/formmanager/dist/. dist/manager",
     "build": "webpack -p && npm run manager",
+    "build:dev": "webpack && npm run manager",
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
