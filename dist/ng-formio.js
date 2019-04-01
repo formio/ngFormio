@@ -132,7 +132,6 @@ var _default = angular.module('formio').directive('formBuilder', function () {
       $scope.options = $scope.options || {}; // Initialize the builder.
 
       $scope.initBuilder = function (element) {
-        console.log('init');
         builderElement = element;
         builderElement.innerHTML = '';
         builder = new _formiojs.Formio.FormBuilder(builderElement, $scope.form, $scope.options);
@@ -154,8 +153,6 @@ var _default = angular.module('formio').directive('formBuilder', function () {
         }
       });
       $scope.$watch('form', function (form) {
-        console.log('changed', form);
-
         if (!form || !form.components) {
           return;
         }
@@ -167,7 +164,7 @@ var _default = angular.module('formio').directive('formBuilder', function () {
             }
 
             if ($scope.url) {
-              builder.builder.url = $scope.url;
+              builder.webform.url = $scope.url;
             }
           });
         }
@@ -21578,15 +21575,22 @@ function () {
       formParam = formParam || this.form;
       var element;
 
-      if (this.instance) {
+      if (this.instance && this.instance.webform) {
         element = this.instance.webform.element;
+      }
+
+      if (this.instance) {
         this.instance.destroy();
       }
 
       if (typeof formParam === 'string') {
         return new _Formio.default(formParam).loadForm().then(function (form) {
           _this2.instance = _this2.create(form.display);
-          _this2.instance.webform.element = element;
+
+          if (_this2.instance.webform) {
+            _this2.instance.webform.element = element;
+          }
+
           _this2.instance.url = formParam;
           _this2.instance.nosubmit = false;
           _this2._form = _this2.instance.form = form;
@@ -21596,7 +21600,11 @@ function () {
         });
       } else {
         this.instance = this.create(formParam.display);
-        this.instance.webform.element = element;
+
+        if (this.instance.webform) {
+          this.instance.webform.element = element;
+        }
+
         this._form = this.instance.form = formParam;
         return this.instance.ready;
       }
@@ -24979,7 +24987,6 @@ function (_NestedComponent) {
   }, {
     key: "init",
     value: function init() {
-      console.log('init');
       this._submission = this._submission || {}; // Remove any existing components.
 
       if (this.components && this.components.length) {
@@ -25044,7 +25051,6 @@ function (_NestedComponent) {
     value: function attach(element) {
       var _this10 = this;
 
-      console.log('webform attach');
       this.element = element;
       this.loadRefs(element, {
         webform: 'single'
