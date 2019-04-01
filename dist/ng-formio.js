@@ -24022,7 +24022,9 @@ function (_NestedComponent) {
 
   }, {
     key: "onChange",
-    value: function onChange(flags, changed) {
+    value: function onChange() {
+      var flags = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var changed = arguments.length > 1 ? arguments[1] : undefined;
       var isChangeEventEmitted = false; // For any change events, clear any custom errors for that component.
 
       if (changed && changed.component) {
@@ -24036,6 +24038,7 @@ function (_NestedComponent) {
       var value = _lodash.default.clone(this._submission);
 
       value.changed = changed;
+      flags.noValidate = !changed;
       value.isValid = this.checkData(value.data, flags, changed ? changed.instance : null);
       this.showElement(true);
       this.loading = false;
@@ -44407,7 +44410,7 @@ function (_BaseComponent) {
       } // Return if the value is valid.
 
 
-      return valid;
+      return !!valid;
     }
   }, {
     key: "checkConditions",
@@ -47402,6 +47405,7 @@ function (_BaseComponent) {
         // and we should skip over the loading.
         if (this.currentItems.length && items.length && _lodash.default.isEqual(this.currentItems[0], items[0]) && _lodash.default.isEqual(this.currentItems[1], items[1])) {
           this.stopInfiniteScroll();
+          this.loading = false;
           return;
         } // If we have gone beyond our limit, then stop.
 
