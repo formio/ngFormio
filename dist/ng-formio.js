@@ -28231,7 +28231,7 @@ var FormioUtils = _interopRequireWildcard(__webpack_require__(/*! ../../../utils
 
 var _Validator = _interopRequireDefault(__webpack_require__(/*! ../../Validator */ "./node_modules/formiojs/components/Validator.js"));
 
-var _templates = _interopRequireDefault(__webpack_require__(/*! ../../../templates */ "./node_modules/formiojs/templates/index.js"));
+var _Templates = _interopRequireDefault(__webpack_require__(/*! ../../../templates/Templates */ "./node_modules/formiojs/templates/Templates.js"));
 
 var _Element2 = _interopRequireDefault(__webpack_require__(/*! ../../../Element */ "./node_modules/formiojs/Element.js"));
 
@@ -28742,7 +28742,7 @@ function (_Element) {
         for (var _iterator = names[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var _name = _step.value;
 
-          if (this.options.templates[_name]) {
+          if (_Templates.default.current[_name]) {
             var _iteratorNormalCompletion3 = true;
             var _didIteratorError3 = false;
             var _iteratorError3 = undefined;
@@ -28751,8 +28751,8 @@ function (_Element) {
               for (var _iterator3 = modes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
                 var mode = _step3.value;
 
-                if (this.options.templates[_name][mode]) {
-                  return this.options.templates[_name][mode];
+                if (_Templates.default.current[_name][mode]) {
+                  return _Templates.default.current[_name][mode];
                 }
               }
             } catch (err) {
@@ -28789,7 +28789,7 @@ function (_Element) {
 
       var name = names[names.length - 1];
 
-      if (!_templates.default['bootstrap'][name]) {
+      if (!_Templates.default.templates['bootstrap'][name]) {
         return "Unknown template: ".concat(name);
       }
 
@@ -28801,11 +28801,11 @@ function (_Element) {
         for (var _iterator2 = modes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var _mode = _step2.value;
 
-          if (_templates.default['bootstrap'][name][_mode]) {
-            return _templates.default['bootstrap'][name][_mode];
+          if (_Templates.default.templates['bootstrap'][name][_mode]) {
+            return _Templates.default.templates['bootstrap'][name][_mode];
           }
 
-          return _templates.default['bootstrap'][name]['form'];
+          return _Templates.default.templates['bootstrap'][name]['form'];
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -29264,8 +29264,8 @@ function (_Element) {
   }, {
     key: "iconClass",
     value: function iconClass(name, spinning) {
-      var iconset = this.options.iconset || this.options.templates.defaultIconset;
-      return this.options.templates ? this.options.templates.iconClass(iconset, name, spinning) : name;
+      var iconset = this.options.iconset || _Templates.default.current.defaultIconset || 'fa';
+      return _Templates.default.current.hasOwnProperty('iconClass') ? _Templates.default.current.iconClass(iconset, name, spinning) : name;
     }
     /**
      * The readible name for this component.
@@ -30244,11 +30244,7 @@ function (_Element) {
   }, {
     key: "template",
     set: function set(template) {
-      // Only import templates once.
-      if (!this.options.templateLoaded) {
-        this.options.templates = _lodash.default.merge({}, _templates.default[template], this.options.templates || {});
-        this.options.templateLoaded = true;
-      }
+      _Templates.default.template = template;
     }
   }, {
     key: "labelInfo",
@@ -30356,7 +30352,7 @@ function (_Element) {
   }, {
     key: "transform",
     get: function get() {
-      return this.options.templates ? this.options.templates.transform.bind(this.options.templates) : function (type, value) {
+      return _Templates.default.current.hasOwnProperty('transform') ? _Templates.default.current.transform.bind(_Templates.default.current) : function (type, value) {
         return value;
       };
     }
@@ -52840,6 +52836,12 @@ Object.defineProperty(exports, "Components", {
     return _Components.default;
   }
 });
+Object.defineProperty(exports, "Templates", {
+  enumerable: true,
+  get: function get() {
+    return _Templates.default;
+  }
+});
 Object.defineProperty(exports, "Formio", {
   enumerable: true,
   get: function get() {
@@ -52863,6 +52865,8 @@ var _components = _interopRequireDefault(__webpack_require__(/*! ./components */
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js"));
 
+var _Templates = _interopRequireDefault(__webpack_require__(/*! ./templates/Templates */ "./node_modules/formiojs/templates/Templates.js"));
+
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
 var _Form2 = _interopRequireDefault(__webpack_require__(/*! ./Form */ "./node_modules/formiojs/Form.js"));
@@ -52874,6 +52878,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _Components.default.setComponents(_components.default);
 
 _Formio.default.Components = _Components.default;
+_Formio.default.Templates = _Templates.default;
 
 /***/ }),
 
@@ -53597,6 +53602,77 @@ var XHR = {
 };
 var _default = XHR;
 exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/templates/Templates.js":
+/*!******************************************************!*\
+  !*** ./node_modules/formiojs/templates/Templates.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _index = _interopRequireDefault(__webpack_require__(/*! ./index */ "./node_modules/formiojs/templates/index.js"));
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Templates =
+/*#__PURE__*/
+function () {
+  function Templates() {
+    _classCallCheck(this, Templates);
+  }
+
+  _createClass(Templates, null, [{
+    key: "templates",
+    get: function get() {
+      if (!Templates._templates) {
+        Templates._templates = _index.default;
+      }
+
+      return Templates._templates;
+    }
+  }, {
+    key: "current",
+    set: function set(templates) {
+      Templates._current = templates;
+    },
+    get: function get() {
+      if (Templates._current) {
+        return Templates._current;
+      }
+
+      return Templates.templates.bootstrap;
+    }
+  }, {
+    key: "templateName",
+    set: function set(template) {
+      if (Templates.templates.hasOwnProperty(template)) {
+        Templates._current = Templates.templates[template];
+      }
+    }
+  }]);
+
+  return Templates;
+}();
+
+exports.default = Templates;
 
 /***/ }),
 
