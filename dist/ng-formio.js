@@ -53622,8 +53622,6 @@ exports.default = void 0;
 
 var _index = _interopRequireDefault(__webpack_require__(/*! ./index */ "./node_modules/formiojs/templates/index.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -53661,11 +53659,18 @@ function () {
       return Templates.templates.bootstrap;
     }
   }, {
-    key: "templateName",
-    set: function set(template) {
-      if (Templates.templates.hasOwnProperty(template)) {
-        Templates._current = Templates.templates[template];
+    key: "framework",
+    set: function set(framework) {
+      if (Templates.templates.hasOwnProperty(framework)) {
+        Templates._framework = framework;
+        Templates._current = Templates.templates[framework];
+        return true;
       }
+
+      return false;
+    },
+    get: function get() {
+      return Templates._framework;
     }
   }]);
 
