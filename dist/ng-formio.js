@@ -21551,13 +21551,13 @@ function () {
 
       switch (display) {
         case 'wizard':
-          return new _Wizard.default(this.options);
+          return new _Wizard.default(this.element, this.options);
 
         case 'pdf':
-          return new _PDF.default(this.options);
+          return new _PDF.default(this.element, this.options);
 
         default:
-          return new _Webform.default(this.options);
+          return new _Webform.default(this.element, this.options);
       }
     }
     /**
@@ -21573,11 +21573,6 @@ function () {
       var _this2 = this;
 
       formParam = formParam || this.form;
-      var element;
-
-      if (this.instance && this.instance.webform) {
-        element = this.instance.webform.element;
-      }
 
       if (this.instance) {
         this.instance.destroy();
@@ -21586,11 +21581,6 @@ function () {
       if (typeof formParam === 'string') {
         return new _Formio.default(formParam).loadForm().then(function (form) {
           _this2.instance = _this2.create(form.display);
-
-          if (_this2.instance.webform) {
-            _this2.instance.webform.element = element;
-          }
-
           _this2.instance.url = formParam;
           _this2.instance.nosubmit = false;
           _this2._form = _this2.instance.form = form;
@@ -21600,11 +21590,6 @@ function () {
         });
       } else {
         this.instance = this.create(formParam.display);
-
-        if (this.instance.webform) {
-          this.instance.webform.element = element;
-        }
-
         this._form = this.instance.form = formParam;
         return this.instance.ready;
       }
@@ -21855,11 +21840,11 @@ function (_Form) {
     key: "create",
     value: function create(display) {
       if (display === 'wizard') {
-        return new _WizardBuilder.default(this.options);
+        return new _WizardBuilder.default(this.element, this.options);
       } else if (display === 'pdf') {
-        return new _PDFBuilder.default(this.options);
+        return new _PDFBuilder.default(this.element, this.options);
       } else {
-        return new _WebformBuilder.default(this.options);
+        return new _WebformBuilder.default(this.element, this.options);
       }
     }
   }]);
@@ -24305,10 +24290,9 @@ function (_NestedComponent) {
 
     _classCallCheck(this, Webform);
 
-    var element;
-    var options;
+    var element, options;
 
-    if (arguments[0] instanceof HTMLElement) {
+    if (arguments[0] instanceof HTMLElement || arguments[1]) {
       element = arguments[0];
       options = arguments[1];
     } else {
@@ -25838,12 +25822,22 @@ function (_Component) {
   _inherits(WebformBuilder, _Component);
 
   // eslint-disable-next-line max-statements
-  function WebformBuilder(options) {
+  function WebformBuilder() {
     var _this;
 
     _classCallCheck(this, WebformBuilder);
 
+    var element, options;
+
+    if (arguments[0] instanceof HTMLElement || arguments[1]) {
+      element = arguments[0];
+      options = arguments[1];
+    } else {
+      options = arguments[0];
+    }
+
     _this = _possibleConstructorReturn(this, _getPrototypeOf(WebformBuilder).call(this, null, options));
+    _this.element = element;
     _this.builderHeight = 0;
     _this.schemas = {};
     _this.sideBarScroll = _lodash.default.get(_this.options, 'sideBarScroll', true);
@@ -26027,7 +26021,9 @@ function (_Component) {
       } // Add container to draggable list.
 
 
-      _this.dragula.containers.push(containerElement); // Since we added a wrapper, need to return the original element so that we can find the components inside it.
+      if (_this.dragula) {
+        _this.dragula.containers.push(containerElement);
+      } // Since we added a wrapper, need to return the original element so that we can find the components inside it.
 
 
       return element.children[0];
@@ -26113,7 +26109,19 @@ function (_Component) {
   _createClass(WebformBuilder, [{
     key: "createForm",
     value: function createForm(options) {
-      return new _Webform.default(options);
+      this.webform = new _Webform.default(options);
+
+      if (this.element) {
+        this.loadRefs(this.element, {
+          form: 'single'
+        });
+
+        if (this.refs.form) {
+          this.webform.element = this.refs.form;
+        }
+      }
+
+      return this.webform;
     }
     /**
      * Called when everything is ready.
@@ -26395,7 +26403,7 @@ function (_Component) {
 
       var editFormOptions = _lodash.default.get(this, 'options.editForm', {});
 
-      this.editForm = new _Webform.default(_lodash.default.omit(this.options, ['hooks', 'builder', 'events', 'attachMode']), _objectSpread({
+      this.editForm = new _Webform.default(_objectSpread({}, _lodash.default.omit(this.options, ['hooks', 'builder', 'events', 'attachMode']), {
         language: this.options.language
       }, editFormOptions)); // Allow editForm overrides per component.
 
