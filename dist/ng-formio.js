@@ -20781,14 +20781,15 @@ function () {
 
   _createClass(Element, [{
     key: "on",
-    value: function on(event, cb) {
+    value: function on(event, cb, internal) {
       if (!this.events) {
         return;
       }
 
       var type = "".concat(this.options.namespace, ".").concat(event); // Store the component id in the handler so that we can determine which events are for this component.
 
-      cb.id = this.id; // Register for this event.
+      cb.id = this.id;
+      cb.internal = internal; // Register for this event.
 
       return this.events.on(type, cb);
     }
@@ -20907,7 +20908,7 @@ function () {
 
       _lodash.default.each(this.events._events, function (events, type) {
         _lodash.default.each(events, function (listener) {
-          if (listener && _this3.id === listener.id) {
+          if (listener && _this3.id === listener.id && listener.internal) {
             _this3.events.off(type, listener);
           }
         });
@@ -23732,11 +23733,11 @@ function (_Webform) {
         _this5.setSubmission(submission).then(function () {
           return _this5.submit();
         });
-      }); // Trigger when this form is ready.
+      }, true); // Trigger when this form is ready.
 
       this.on('iframe-ready', function () {
         return _this5.iframeReadyResolve();
-      });
+      }, true);
       this.appendChild(this.element, [this.zoomIn, this.zoomOut, this.iframe]);
 
       if (!this.options.readOnly && _lodash.default.find(this.form.components, function (component) {
@@ -23886,11 +23887,11 @@ function (_WebformBuilder) {
 
         _this2.on('resetForm', function () {
           return _this2.resetValue();
-        });
+        }, true);
 
         _this2.on('refreshData', function () {
           return _this2.updateValue();
-        });
+        }, true);
 
         setTimeout(function () {
           _this2.onChange();
@@ -25058,7 +25059,7 @@ function (_NestedComponent) {
       }, true);
       this.on('refreshData', function () {
         return _this10.updateValue();
-      });
+      }, true);
       this.currentForm = this;
       setTimeout(function () {
         return _this10.emit('render');
@@ -26046,10 +26047,10 @@ function (_Component) {
         removeComponent: 'single',
         editComponent: 'single',
         copyComponent: 'single',
-        pasteComponnt: 'single'
+        pasteComponent: 'single'
       });
 
-      if (component.refs.copyButton) {
+      if (component.refs.copyComponent) {
         new _tooltip.default(component.refs.copyComponent, {
           trigger: 'hover',
           placement: 'top',
@@ -26060,7 +26061,7 @@ function (_Component) {
         });
       }
 
-      if (component.refs.pasteButton) {
+      if (component.refs.pasteComponent) {
         var pasteToolTip = new _tooltip.default(component.refs.pasteComponent, {
           trigger: 'hover',
           placement: 'top',
@@ -26565,10 +26566,11 @@ function (_Component) {
           var schema = JSON.parse(data);
           window.sessionStorage.removeItem('formio.clipboard');
 
-          _builder.default.uniquify(this._form.components, schema);
+          _builder.default.uniquify(this.webform.components, schema);
 
-          component.parent.addComponent(schema, false, false, component.element.nextSibling);
+          component.parent.addComponent(schema, false, component.element.nextElementSibling.lastElementChild);
           this.form = this.schema;
+          this.emit('saveComponent');
         }
       }
     }
@@ -27182,7 +27184,11 @@ function (_Webform) {
 
       var panels = this.calculateVisiblePanels();
 
-      if (!_lodash.default.isEqual(panels, this.panels)) {
+      if (!_lodash.default.isEqual(panels.map(function (panel) {
+        return panel.key;
+      }), this.panels.map(function (panel) {
+        return panel.key;
+      }))) {
         // If visible panels changes we need to completely rebuild to add new pages.
         this.rebuild();
       }
@@ -29066,7 +29072,7 @@ function (_Element) {
         _this5.inContext(event.changed.instance)) {
           _this5.refresh(event.changed.value);
         }
-      });
+      }, true);
     }
   }, {
     key: "attachRefreshOn",
@@ -29778,7 +29784,7 @@ function (_Element) {
           noUpdateEvent: true
         });
       } else {
-        var defaultValue = this.defaultValue;
+        var defaultValue = this.component.multiple ? [] : this.defaultValue;
 
         if (defaultValue) {
           this.setValue(defaultValue, {
@@ -30189,7 +30195,7 @@ function (_Element) {
 
               _this14.redraw();
             }
-          });
+          }, true);
         }
       });
     }
@@ -30234,7 +30240,7 @@ function (_Element) {
       if (this.component.autofocus) {
         this.on('render', function () {
           return _this15.focus();
-        });
+        }, true);
       }
     }
   }, {
@@ -31973,10 +31979,10 @@ function (_Multivalue) {
       var widget = new _widgets.default[settings.type](settings, this.component);
       widget.on('update', function () {
         return _this3.updateValue(null, widget.getValue(), index);
-      });
+      }, true);
       widget.on('redraw', function () {
         return _this3.redraw();
-      });
+      }, true);
       this._widget = widget;
       return widget;
     }
@@ -32228,7 +32234,7 @@ function (_Field) {
     key: "addNewValue",
     value: function addNewValue(value) {
       if (value === undefined) {
-        value = this.emptyValue;
+        value = this.component.defaultValue ? this.component.defaultValue : this.emptyValue;
       }
 
       var dataValue = this.dataValue || [];
@@ -32652,7 +32658,7 @@ function (_Field) {
     key: "addComponent",
     value: function addComponent(component, data, before, noAdd) {
       data = data || this.data;
-      var comp = this.createComponent(component, this.options, data, before ? before.component : null);
+      var comp = this.createComponent(component, this.options, data, before ? before : null);
 
       if (noAdd) {
         return comp;
@@ -34235,7 +34241,7 @@ function (_Field) {
           _this.disabled = true;
 
           _this.redraw();
-        });
+        }, true);
         this.on('submitDone', function () {
           _this.loading = false;
           _this.disabled = false;
@@ -34249,7 +34255,7 @@ function (_Field) {
           _this.removeClass(_this.refs.buttonMessageContainer, 'has-error');
 
           _this.setContent(_this.refs.buttonMessage, _this.t('complete'));
-        });
+        }, true);
 
         onChange = function onChange(value, isValid) {
           _this.removeClass(_this.refs.button, 'btn-success submit-success');
@@ -34288,11 +34294,11 @@ function (_Field) {
         this.on('requestButton', function () {
           _this.loading = true;
           _this.disabled = true;
-        });
+        }, true);
         this.on('requestDone', function () {
           _this.loading = false;
           _this.disabled = false;
-        });
+        }, true);
       }
 
       this.on('change', function (value) {
@@ -34304,14 +34310,14 @@ function (_Field) {
         if (onChange) {
           onChange(value, value.isValid);
         }
-      });
+      }, true);
       this.on('error', function () {
         _this.loading = false;
 
         if (onError) {
           onError();
         }
-      });
+      }, true);
       this.addEventListener(this.refs.button, 'click', this.onClick.bind(this));
 
       if (this.canDisable) {
@@ -35668,6 +35674,11 @@ function (_NestedComponent) {
       this.rows = this.groupByRow();
     }
   }, {
+    key: "labelIsHidden",
+    value: function labelIsHidden() {
+      return true;
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this3 = this;
@@ -36269,7 +36280,7 @@ function (_Component) {
           if (_this.refs.html) {
             _this.setContent(_this.refs.html, _this.content);
           }
-        });
+        }, true);
       }
 
       _get(_getPrototypeOf(ContentComponent.prototype), "attach", this).call(this, element);
@@ -42578,7 +42589,7 @@ function (_Component) {
 
       this.on('nosubmit', function (value) {
         _this2.nosubmit = value;
-      });
+      }, true);
     }
   }, {
     key: "destroy",
@@ -43488,7 +43499,7 @@ function (_Component) {
           if (_this.refs.html) {
             _this.setContent(_this.refs.html, _this.content);
           }
-        });
+        }, true);
       }
 
       _get(_getPrototypeOf(HTMLComponent.prototype), "attach", this).call(this, element);
@@ -44051,7 +44062,7 @@ function (_Input) {
       _this.delimiter = '';
     }
 
-    _this.decimalLimit = (0, _utils.getNumberDecimalLimit)(_this.component); // Currencies to override BrowserLanguage Config. Object key {}
+    _this.decimalLimit = _lodash.default.get(_this.component, 'decimalLimit', (0, _utils.getNumberDecimalLimit)(_this.component)); // Currencies to override BrowserLanguage Config. Object key {}
 
     if (_lodash.default.has(_this.options, "languageOverride.".concat(_this.options.language))) {
       var override = _lodash.default.get(_this.options, "languageOverride.".concat(_this.options.language));
@@ -44066,7 +44077,7 @@ function (_Input) {
       requireDecimal: _lodash.default.get(_this.component, 'requireDecimal', false),
       thousandsSeparatorSymbol: _lodash.default.get(_this.component, 'thousandsSeparator', _this.delimiter),
       decimalSymbol: _lodash.default.get(_this.component, 'decimalSymbol', _this.decimalSeparator),
-      decimalLimit: _lodash.default.get(_this.component, 'decimalLimit', _this.decimalLimit),
+      decimalLimit: _this.decimalLimit,
       allowNegative: _lodash.default.get(_this.component, 'allowNegative', true),
       allowDecimal: _lodash.default.get(_this.component, 'allowDecimal', !(_this.component.validate && _this.component.validate.integer))
     });
@@ -50337,7 +50348,7 @@ function (_TextFieldComponent) {
 
         default:
           this.addEventListener(element, this.inputInfo.changeEvent, function () {
-            _this.updateValue(null, element.value, index);
+            _this.updateValue(null, null, index);
           });
       }
 
@@ -50545,7 +50556,7 @@ function (_TextFieldComponent) {
 
       info.type = this.component.wysiwyg ? 'div' : 'textarea';
 
-      if (this.component.hasOwnProperty('spellcheck')) {
+      if (this.component.rows) {
         info.attr.rows = this.component.rows;
       }
 
@@ -59611,9 +59622,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
-/* harmony import */ var _logger_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./logger.js */ "./node_modules/i18next/dist/es/logger.js");
-/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
+/* harmony import */ var _logger_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./logger.js */ "./node_modules/i18next/dist/es/logger.js");
+/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
+
 
 
 
@@ -59647,11 +59661,13 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Connector);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(Connector).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_10__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _this.backend = backend;
     _this.store = store;
     _this.languageUtils = services.languageUtils;
     _this.options = options;
-    _this.logger = _logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].create('backendConnector');
+    _this.logger = _logger_js__WEBPACK_IMPORTED_MODULE_9__["default"].create('backendConnector');
     _this.state = {};
     _this.queue = [];
 
@@ -59730,7 +59746,7 @@ function (_EventEmitter) {
       var loaded = {}; // callback if ready
 
       this.queue.forEach(function (q) {
-        _utils_js__WEBPACK_IMPORTED_MODULE_7__["pushPath"](q.loaded, [lng], ns);
+        _utils_js__WEBPACK_IMPORTED_MODULE_8__["pushPath"](q.loaded, [lng], ns);
         remove(q.pending, name);
         if (err) q.errors.push(err);
 
@@ -59866,7 +59882,7 @@ function (_EventEmitter) {
   }]);
 
   return Connector;
-}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__["default"]);
+}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_10__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (Connector);
 
@@ -60632,8 +60648,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
+
 
 
 
@@ -60659,6 +60678,8 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ResourceStore);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(ResourceStore).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_7__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _this.data = data || {};
     _this.options = options;
 
@@ -60698,7 +60719,7 @@ function (_EventEmitter) {
         path = lng.split('.');
       }
 
-      return _utils_js__WEBPACK_IMPORTED_MODULE_7__["getPath"](this.data, path);
+      return _utils_js__WEBPACK_IMPORTED_MODULE_8__["getPath"](this.data, path);
     }
   }, {
     key: "addResource",
@@ -60718,7 +60739,7 @@ function (_EventEmitter) {
       }
 
       this.addNamespaces(ns);
-      _utils_js__WEBPACK_IMPORTED_MODULE_7__["setPath"](this.data, path, value);
+      _utils_js__WEBPACK_IMPORTED_MODULE_8__["setPath"](this.data, path, value);
       if (!options.silent) this.emit('added', lng, ns, key, value);
     }
   }, {
@@ -60753,15 +60774,15 @@ function (_EventEmitter) {
       }
 
       this.addNamespaces(ns);
-      var pack = _utils_js__WEBPACK_IMPORTED_MODULE_7__["getPath"](this.data, path) || {};
+      var pack = _utils_js__WEBPACK_IMPORTED_MODULE_8__["getPath"](this.data, path) || {};
 
       if (deep) {
-        _utils_js__WEBPACK_IMPORTED_MODULE_7__["deepExtend"](pack, resources, overwrite);
+        _utils_js__WEBPACK_IMPORTED_MODULE_8__["deepExtend"](pack, resources, overwrite);
       } else {
         pack = _babel_runtime_helpers_objectSpread__WEBPACK_IMPORTED_MODULE_0___default()({}, pack, resources);
       }
 
-      _utils_js__WEBPACK_IMPORTED_MODULE_7__["setPath"](this.data, path, pack);
+      _utils_js__WEBPACK_IMPORTED_MODULE_8__["setPath"](this.data, path, pack);
       if (!options.silent) this.emit('added', lng, ns, resources);
     }
   }, {
@@ -60800,7 +60821,7 @@ function (_EventEmitter) {
   }]);
 
   return ResourceStore;
-}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_6__["default"]);
+}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_7__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (ResourceStore);
 
@@ -60861,6 +60882,8 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Translator);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(Translator).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _utils_js__WEBPACK_IMPORTED_MODULE_11__["copy"](['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector', 'i18nFormat'], services, _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this)));
     _this.options = options;
 
@@ -61379,6 +61402,8 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, I18n);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(I18n).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _this.options = Object(_defaults_js__WEBPACK_IMPORTED_MODULE_16__["transformOptions"])(options);
     _this.services = {};
     _this.logger = _logger_js__WEBPACK_IMPORTED_MODULE_8__["default"];
@@ -92941,7 +92966,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.7
+ * @version 1.15.0
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -94545,7 +94570,14 @@ function flip(data, options) {
 
     // flip the variation if required
     var isVertical = ['top', 'bottom'].indexOf(placement) !== -1;
-    var flippedVariation = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
+
+    // flips variation if reference element overflows boundaries
+    var flippedVariationByRef = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
+
+    // flips variation if popper content overflows boundaries
+    var flippedVariationByContent = !!options.flipVariationsByContent && (isVertical && variation === 'start' && overflowsRight || isVertical && variation === 'end' && overflowsLeft || !isVertical && variation === 'start' && overflowsBottom || !isVertical && variation === 'end' && overflowsTop);
+
+    var flippedVariation = flippedVariationByRef || flippedVariationByContent;
 
     if (overlapsRef || overflowsBoundaries || flippedVariation) {
       // this boolean to detect any flip loop
@@ -95152,7 +95184,23 @@ var modifiers = {
      * The popper will never be placed outside of the defined boundaries
      * (except if `keepTogether` is enabled)
      */
-    boundariesElement: 'viewport'
+    boundariesElement: 'viewport',
+    /**
+     * @prop {Boolean} flipVariations=false
+     * The popper will switch placement variation between `-start` and `-end` when
+     * the reference element overlaps its boundaries.
+     *
+     * The original placement should have a set variation.
+     */
+    flipVariations: false,
+    /**
+     * @prop {Boolean} flipVariationsByContent=false
+     * The popper will switch placement variation between `-start` and `-end` when
+     * the popper element overlaps its reference boundaries.
+     *
+     * The original placement should have a set variation.
+     */
+    flipVariationsByContent: false
   },
 
   /**
@@ -95369,8 +95417,8 @@ var Popper = function () {
   /**
    * Creates a new Popper.js instance.
    * @class Popper
-   * @param {HTMLElement|referenceObject} reference - The reference element used to position the popper
-   * @param {HTMLElement} popper - The HTML element used as the popper
+   * @param {Element|referenceObject} reference - The reference element used to position the popper
+   * @param {Element} popper - The HTML / XML element used as the popper
    * @param {Object} options - Your custom options to override the ones defined in [Defaults](#defaults)
    * @return {Object} instance - The generated Popper.js instance
    */
