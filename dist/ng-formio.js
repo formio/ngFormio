@@ -15784,11 +15784,14 @@ exports.getValueByPointer = getValueByPointer;
  * @param operation The operation to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
  * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return `{newDocument, result}` after the operation
  */
-function applyOperation(document, operation, validateOperation, mutateDocument) {
+function applyOperation(document, operation, validateOperation, mutateDocument, banPrototypeModifications, index) {
     if (validateOperation === void 0) { validateOperation = false; }
     if (mutateDocument === void 0) { mutateDocument = true; }
+    if (banPrototypeModifications === void 0) { banPrototypeModifications = true; }
+    if (index === void 0) { index = 0; }
     if (validateOperation) {
         if (typeof validateOperation == 'function') {
             validateOperation(operation, 0, document, operation.path);
@@ -15819,7 +15822,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument) 
         else if (operation.op === 'test') {
             returnValue.test = areEquals(document, operation.value);
             if (returnValue.test === false) {
-                throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
             }
             returnValue.newDocument = document;
             return returnValue;
@@ -15835,7 +15838,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument) 
         }
         else {
             if (validateOperation) {
-                throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', 0, operation, document);
+                throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
             }
             else {
                 return returnValue;
@@ -15862,6 +15865,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument) 
         }
         while (true) {
             key = keys[t];
+            if (banPrototypeModifications && key == '__proto__') {
+                throw new TypeError('JSON-Patch: modifying `__proto__` prop is banned for security reasons, if this was on purpose, please set `banPrototypeModifications` flag false and pass it to this function. More info in fast-json-patch README');
+            }
             if (validateOperation) {
                 if (existingPathFragment === undefined) {
                     if (obj[key] === undefined) {
@@ -15882,7 +15888,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument) 
                 }
                 else {
                     if (validateOperation && !helpers_1.isInteger(key)) {
-                        throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", 0, operation.path, operation);
+                        throw new exports.JsonPatchError("Expected an unsigned base-10 integer value, making the new referenced value the array element with the zero-based index", "OPERATION_PATH_ILLEGAL_ARRAY_INDEX", index, operation, document);
                     } // only parse key when it's an integer for `arr.prop` to work
                     else if (helpers_1.isInteger(key)) {
                         key = ~~key;
@@ -15890,11 +15896,11 @@ function applyOperation(document, operation, validateOperation, mutateDocument) 
                 }
                 if (t >= len) {
                     if (validateOperation && operation.op === "add" && key > obj.length) {
-                        throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", 0, operation.path, operation);
+                        throw new exports.JsonPatchError("The specified index MUST NOT be greater than the number of elements in the array", "OPERATION_VALUE_OUT_OF_BOUNDS", index, operation, document);
                     }
                     var returnValue = arrOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {
-                        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
                     }
                     return returnValue;
                 }
@@ -15906,7 +15912,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument) 
                 if (t >= len) {
                     var returnValue = objOps[operation.op].call(operation, obj, key, document); // Apply patch
                     if (returnValue.test === false) {
-                        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+                        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
                     }
                     return returnValue;
                 }
@@ -15927,10 +15933,12 @@ exports.applyOperation = applyOperation;
  * @param patch The patch to apply
  * @param validateOperation `false` is without validation, `true` to use default jsonpatch's validation, or you can pass a `validateOperation` callback to be used for validation.
  * @param mutateDocument Whether to mutate the original document or clone it before applying
+ * @param banPrototypeModifications Whether to ban modifications to `__proto__`, defaults to `true`.
  * @return An array of `{newDocument, result}` after the patch
  */
-function applyPatch(document, patch, validateOperation, mutateDocument) {
+function applyPatch(document, patch, validateOperation, mutateDocument, banPrototypeModifications) {
     if (mutateDocument === void 0) { mutateDocument = true; }
+    if (banPrototypeModifications === void 0) { banPrototypeModifications = true; }
     if (validateOperation) {
         if (!Array.isArray(patch)) {
             throw new exports.JsonPatchError('Patch sequence must be an array', 'SEQUENCE_NOT_AN_ARRAY');
@@ -15941,7 +15949,8 @@ function applyPatch(document, patch, validateOperation, mutateDocument) {
     }
     var results = new Array(patch.length);
     for (var i = 0, length_1 = patch.length; i < length_1; i++) {
-        results[i] = applyOperation(document, patch[i], validateOperation);
+        // we don't need to pass mutateDocument argument because if it was true, we already deep cloned the object, we'll just pass `true`
+        results[i] = applyOperation(document, patch[i], validateOperation, true, banPrototypeModifications, i);
         document = results[i].newDocument; // in case root was replaced
     }
     results.newDocument = document;
@@ -15957,10 +15966,10 @@ exports.applyPatch = applyPatch;
  * @param operation The operation to apply
  * @return The updated document
  */
-function applyReducer(document, operation) {
+function applyReducer(document, operation, index) {
     var operationResult = applyOperation(document, operation);
     if (operationResult.test === false) {
-        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', 0, operation, document);
+        throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
     }
     return operationResult.newDocument;
 }
@@ -16062,11 +16071,11 @@ exports.validate = validate;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var equalsOptions = { strict: true };
-var _equals = __webpack_require__(/*! deep-equal */ "./node_modules/deep-equal/index.js");
-var areEquals = function (a, b) {
-    return _equals(a, b, equalsOptions);
-};
+/*!
+ * https://github.com/Starcounter-Jack/JSON-Patch
+ * (c) 2017 Joachim Wester
+ * MIT license
+ */
 var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
 var core_1 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
 /* export all core functions */
@@ -16233,9 +16242,13 @@ function _generate(mirror, obj, patches, path) {
                 }
             }
         }
-        else {
+        else if (Array.isArray(mirror) === Array.isArray(obj)) {
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
+        }
+        else {
+            patches.push({ op: "replace", path: path, value: obj });
+            changed = true;
         }
     }
     if (!deleted && newKeys.length == oldKeys.length) {
@@ -16268,16 +16281,16 @@ exports.compare = compare;
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester
  * MIT license
  */
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -16414,15 +16427,25 @@ function hasUndefined(obj) {
     return false;
 }
 exports.hasUndefined = hasUndefined;
+function patchErrorMessageFormatter(message, args) {
+    var messageParts = [message];
+    for (var key in args) {
+        var value = typeof args[key] === 'object' ? JSON.stringify(args[key], null, 2) : args[key]; // pretty print
+        if (typeof value !== 'undefined') {
+            messageParts.push(key + ": " + value);
+        }
+    }
+    return messageParts.join('\n');
+}
 var PatchError = (function (_super) {
     __extends(PatchError, _super);
     function PatchError(message, name, index, operation, tree) {
-        _super.call(this, message);
-        this.message = message;
+        _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree }));
         this.name = name;
         this.index = index;
         this.operation = operation;
         this.tree = tree;
+        this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
     }
     return PatchError;
 }(Error));
@@ -21477,7 +21500,7 @@ function () {
 
       var cacheKey = btoa(url); // Get the cached promise to save multiple loads.
 
-      if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
+      if (!Formio.ignoreCache && !opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
         return _nativePromiseOnly.default.resolve((0, _cloneDeep2.default)(Formio.cache[cacheKey]));
       } // Set up and fetch request
 
@@ -21587,7 +21610,7 @@ function () {
         } // Cache the response.
 
 
-        if (method === 'GET') {
+        if (!Formio.ignoreCache && method === 'GET') {
           Formio.cache[cacheKey] = (0, _cloneDeep2.default)(result);
         }
 
@@ -22196,6 +22219,7 @@ function () {
 
 
 exports.default = Formio;
+Formio.ignoreCache = false;
 Formio.libraries = {};
 Formio.Promise = _nativePromiseOnly.default;
 Formio.fetch = fetch;
@@ -25573,7 +25597,7 @@ function (_Webform) {
           return el.classList.contains('drag-copy');
         },
         accepts: function accepts(el, target) {
-          return !target.classList.contains('no-drop');
+          return !el.contains(target) && !target.classList.contains('no-drop');
         }
       }).on('drop', function (element, target, source, sibling) {
         return _this9.onDrop(element, target, source, sibling);
@@ -28997,7 +29021,7 @@ function (_Component) {
       var allowReorder = this.allowReorder;
       this.inputs = [];
       this.tbody.innerHTML = '';
-      values = values || this.dataValue;
+      values = values && values.length > 0 ? values : this.dataValue;
 
       _lodash.default.each(values, function (value, index) {
         var tr = _this7.ce('tr');
@@ -41991,13 +42015,16 @@ function (_BaseComponent) {
         srcOptions.viewAsHtml = this.options.viewAsHtml;
       }
 
+      if (this.options && this.options.hide) {
+        srcOptions.hide = this.options.hide;
+      }
+
+      if (this.options && this.options.show) {
+        srcOptions.show = this.options.show;
+      }
+
       if (_lodash.default.has(this.options, 'language')) {
         srcOptions.language = this.options.language;
-      } // Make sure that if reference is provided, the form must submit.
-
-
-      if (this.component.reference) {
-        this.component.submit = true;
       }
 
       if (this.component.src) {
@@ -42110,17 +42137,17 @@ function (_BaseComponent) {
         this.subForm.setPristine(pristine);
       }
     }
+  }, {
+    key: "beforeNext",
+
     /**
      * Submit the form before the next page is triggered.
      */
-
-  }, {
-    key: "beforeNext",
     value: function beforeNext() {
       var _this5 = this;
 
       // If we wish to submit the form on next page, then do that here.
-      if (this.component.submit) {
+      if (this.shouldSubmit) {
         return this.loadSubForm().then(function () {
           return _this5.subForm.submitForm().then(function (result) {
             _this5.dataValue = result.submission;
@@ -42147,7 +42174,7 @@ function (_BaseComponent) {
       var submission = this.dataValue; // This submission has already been submitted, so just return the reference data.
 
       if (submission && submission._id && submission.form) {
-        this.dataValue = this.component.reference ? {
+        this.dataValue = this.shouldSubmit ? {
           _id: submission._id,
           form: submission.form
         } : submission;
@@ -42155,14 +42182,14 @@ function (_BaseComponent) {
       } // This submission has not been submitted yet.
 
 
-      if (this.component.submit) {
+      if (this.shouldSubmit) {
         return this.loadSubForm().then(function () {
           return _this6.subForm.submitForm().then(function (result) {
             _this6.subForm.loading = false;
-            _this6.dataValue = _this6.component.reference ? {
+            _this6.dataValue = {
               _id: result.submission._id,
               form: result.submission.form
-            } : result.submission;
+            };
             return _this6.dataValue;
           }).catch(function () {});
         });
@@ -42192,8 +42219,22 @@ function (_BaseComponent) {
     }
   }, {
     key: "setValue",
-    value: function setValue(submission, flags) {
+    value: function setValue(submission, flags, norecurse) {
       var _this7 = this;
+
+      if (this.subForm || norecurse) {
+        if (!norecurse && submission && submission._id && this.subForm.formio && !flags.noload && (_lodash.default.isEmpty(submission.data) || this.shouldSubmit)) {
+          var submissionUrl = "".concat(this.subForm.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
+          this.subForm.setUrl(submissionUrl, this.options);
+          this.subForm.nosubmit = false;
+          this.subForm.loadSubmission().then(function (sub) {
+            return _this7.setValue(sub, flags, true);
+          });
+          return _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
+        } else {
+          return this.subForm ? this.subForm.setValue(submission, flags) : _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
+        }
+      }
 
       var changed = _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
 
@@ -42206,15 +42247,8 @@ function (_BaseComponent) {
         subForm = this.loadSubForm();
       }
 
-      subForm.then(function (form) {
-        if (submission && submission._id && form.formio && !flags.noload && _lodash.default.isEmpty(submission.data)) {
-          var submissionUrl = "".concat(form.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
-          form.setUrl(submissionUrl, _this7.options);
-          form.nosubmit = false;
-          form.loadSubmission();
-        } else {
-          form.setValue(submission, flags);
-        }
+      subForm.then(function () {
+        return _this7.setValue(submission, flags, true);
       });
       return changed;
     }
@@ -42368,6 +42402,11 @@ function (_BaseComponent) {
       this.subForm.getComponents().forEach(function (component) {
         component.currentForm = _this8;
       });
+    }
+  }, {
+    key: "shouldSubmit",
+    get: function get() {
+      return !this.component.hasOwnProperty('reference') || this.component.reference;
     }
   }, {
     key: "visible",
@@ -47534,11 +47573,12 @@ function (_BaseComponent) {
       this.loading = true;
 
       _Formio.default.makeRequest(this.options.formio, 'select', url, method, body, options).then(function (response) {
+        _this3.loading = false;
         var scrollTop = !_this3.scrollLoading && _this3.currentItems.length === 0;
 
         _this3.setItems(response, !!search);
 
-        if (scrollTop) {
+        if (scrollTop && _this3.choices) {
           _this3.choices.choiceList.scrollToTop();
         }
       }).catch(function (err) {
@@ -51095,6 +51135,25 @@ function (_TextFieldComponent) {
       }
     }
   }, {
+    key: "updateEditorValue",
+
+    /**
+     * Updates the editor value.
+     *
+     * @param newValue
+     */
+    value: function updateEditorValue(newValue) {
+      newValue = this.getConvertedValue(this.removeBlanks(newValue));
+
+      if (newValue !== this.dataValue && (!_lodash.default.isEmpty(newValue) || !_lodash.default.isEmpty(this.dataValue))) {
+        this.updateValue({
+          modified: true
+        }, newValue);
+      }
+    }
+    /* eslint-disable max-statements */
+
+  }, {
     key: "createInput",
     value: function createInput(container) {
       var _this3 = this;
@@ -51134,12 +51193,7 @@ function (_TextFieldComponent) {
           _this3.editor = ace.edit(_this3.input);
 
           _this3.editor.on('change', function () {
-            var newValue = _this3.getConvertedValue(_this3.editor.getValue()); // Do not bother to update if they are both empty.
-
-
-            if (!_lodash.default.isEmpty(newValue) || !_lodash.default.isEmpty(_this3.dataValue)) {
-              _this3.updateValue(null, newValue);
-            }
+            return _this3.updateEditorValue(_this3.editor.getValue());
           });
 
           _this3.editor.getSession().setTabSize(2);
@@ -51160,23 +51214,22 @@ function (_TextFieldComponent) {
 
       if (this.component.editor === 'ckeditor') {
         this.editorReady = this.addCKE(this.input, null, function (newValue) {
-          return _this3.updateValue(null, newValue);
+          return _this3.updateEditorValue(newValue);
         }).then(function (editor) {
           _this3.editor = editor;
 
           if (_this3.options.readOnly || _this3.component.disabled) {
             _this3.editor.isReadOnly = true;
-          } // Set the default rows.
-
-
-          var value = '';
-          var numRows = parseInt(_this3.component.rows, 10);
-
-          for (var i = 0; i < numRows; i++) {
-            value += '<p></p>';
           }
 
-          editor.data.set(value);
+          var numRows = parseInt(_this3.component.rows, 10);
+
+          if (_lodash.default.isFinite(numRows) && _lodash.default.has(editor, 'ui.view.editable.editableElement')) {
+            // Default height is 21px with 10px margin + a 14px top margin.
+            var editorHeight = numRows * 31 + 14;
+            editor.ui.view.editable.editableElement.style.height = "".concat(editorHeight, "px");
+          }
+
           return editor;
         });
         return this.input;
@@ -51196,7 +51249,7 @@ function (_TextFieldComponent) {
 
 
       this.editorReady = this.addQuill(this.input, this.component.wysiwyg, function () {
-        _this3.updateValue(null, _this3.getConvertedValue(_this3.quill.root.innerHTML));
+        return _this3.updateEditorValue(_this3.quill.root.innerHTML);
       }).then(function (quill) {
         if (_this3.component.isUploadEnabled) {
           quill.getModule('toolbar').addHandler('image', imageHandler);
@@ -51268,6 +51321,8 @@ function (_TextFieldComponent) {
         fileInput.click();
       }
     }
+    /* eslint-enable max-statements */
+
   }, {
     key: "setConvertedValue",
     value: function setConvertedValue(value) {
@@ -51297,7 +51352,7 @@ function (_TextFieldComponent) {
           return input;
         }
 
-        return input.replace(/<p>&nbsp;<\/p>/g, '').replace(/<p><br><\/p>/g, '');
+        return input.replace(/<p>&nbsp;<\/p>|<p><br><\/p>|<p><br>&nbsp;<\/p>/g, '');
       };
 
       if (Array.isArray(value)) {
@@ -54593,7 +54648,7 @@ var _default = {
     var formKeys = {};
     (0, _utils.eachComponent)(form.components, function (comp) {
       formKeys[comp.key] = true;
-    }); // Recurse into all child components.
+    }, true); // Recurse into all child components.
 
     (0, _utils.eachComponent)([component], function (component) {
       // Skip key uniquification if this component doesn't have a key.
@@ -57212,9 +57267,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
-/* harmony import */ var _logger_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./logger.js */ "./node_modules/i18next/dist/es/logger.js");
-/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
+/* harmony import */ var _logger_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./logger.js */ "./node_modules/i18next/dist/es/logger.js");
+/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
+
 
 
 
@@ -57248,11 +57306,13 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Connector);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(Connector).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_10__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _this.backend = backend;
     _this.store = store;
     _this.languageUtils = services.languageUtils;
     _this.options = options;
-    _this.logger = _logger_js__WEBPACK_IMPORTED_MODULE_8__["default"].create('backendConnector');
+    _this.logger = _logger_js__WEBPACK_IMPORTED_MODULE_9__["default"].create('backendConnector');
     _this.state = {};
     _this.queue = [];
 
@@ -57331,7 +57391,7 @@ function (_EventEmitter) {
       var loaded = {}; // callback if ready
 
       this.queue.forEach(function (q) {
-        _utils_js__WEBPACK_IMPORTED_MODULE_7__["pushPath"](q.loaded, [lng], ns);
+        _utils_js__WEBPACK_IMPORTED_MODULE_8__["pushPath"](q.loaded, [lng], ns);
         remove(q.pending, name);
         if (err) q.errors.push(err);
 
@@ -57467,7 +57527,7 @@ function (_EventEmitter) {
   }]);
 
   return Connector;
-}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__["default"]);
+}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_10__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (Connector);
 
@@ -58233,8 +58293,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _EventEmitter_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./EventEmitter.js */ "./node_modules/i18next/dist/es/EventEmitter.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils.js */ "./node_modules/i18next/dist/es/utils.js");
+
 
 
 
@@ -58260,6 +58323,8 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ResourceStore);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(ResourceStore).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_7__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _this.data = data || {};
     _this.options = options;
 
@@ -58299,7 +58364,7 @@ function (_EventEmitter) {
         path = lng.split('.');
       }
 
-      return _utils_js__WEBPACK_IMPORTED_MODULE_7__["getPath"](this.data, path);
+      return _utils_js__WEBPACK_IMPORTED_MODULE_8__["getPath"](this.data, path);
     }
   }, {
     key: "addResource",
@@ -58319,7 +58384,7 @@ function (_EventEmitter) {
       }
 
       this.addNamespaces(ns);
-      _utils_js__WEBPACK_IMPORTED_MODULE_7__["setPath"](this.data, path, value);
+      _utils_js__WEBPACK_IMPORTED_MODULE_8__["setPath"](this.data, path, value);
       if (!options.silent) this.emit('added', lng, ns, key, value);
     }
   }, {
@@ -58354,15 +58419,15 @@ function (_EventEmitter) {
       }
 
       this.addNamespaces(ns);
-      var pack = _utils_js__WEBPACK_IMPORTED_MODULE_7__["getPath"](this.data, path) || {};
+      var pack = _utils_js__WEBPACK_IMPORTED_MODULE_8__["getPath"](this.data, path) || {};
 
       if (deep) {
-        _utils_js__WEBPACK_IMPORTED_MODULE_7__["deepExtend"](pack, resources, overwrite);
+        _utils_js__WEBPACK_IMPORTED_MODULE_8__["deepExtend"](pack, resources, overwrite);
       } else {
         pack = _babel_runtime_helpers_objectSpread__WEBPACK_IMPORTED_MODULE_0___default()({}, pack, resources);
       }
 
-      _utils_js__WEBPACK_IMPORTED_MODULE_7__["setPath"](this.data, path, pack);
+      _utils_js__WEBPACK_IMPORTED_MODULE_8__["setPath"](this.data, path, pack);
       if (!options.silent) this.emit('added', lng, ns, resources);
     }
   }, {
@@ -58401,7 +58466,7 @@ function (_EventEmitter) {
   }]);
 
   return ResourceStore;
-}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_6__["default"]);
+}(_EventEmitter_js__WEBPACK_IMPORTED_MODULE_7__["default"]);
 
 /* harmony default export */ __webpack_exports__["default"] = (ResourceStore);
 
@@ -58462,6 +58527,8 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Translator);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(Translator).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _utils_js__WEBPACK_IMPORTED_MODULE_11__["copy"](['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector', 'i18nFormat'], services, _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this)));
     _this.options = options;
 
@@ -58980,6 +59047,8 @@ function (_EventEmitter) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, I18n);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(I18n).call(this));
+    _EventEmitter_js__WEBPACK_IMPORTED_MODULE_9__["default"].call(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_7___default()(_this))); // <=IE10 fix (unable to call parent constructor)
+
     _this.options = Object(_defaults_js__WEBPACK_IMPORTED_MODULE_16__["transformOptions"])(options);
     _this.services = {};
     _this.logger = _logger_js__WEBPACK_IMPORTED_MODULE_8__["default"];
@@ -90542,7 +90611,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.7
+ * @version 1.15.0
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -92146,7 +92215,14 @@ function flip(data, options) {
 
     // flip the variation if required
     var isVertical = ['top', 'bottom'].indexOf(placement) !== -1;
-    var flippedVariation = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
+
+    // flips variation if reference element overflows boundaries
+    var flippedVariationByRef = !!options.flipVariations && (isVertical && variation === 'start' && overflowsLeft || isVertical && variation === 'end' && overflowsRight || !isVertical && variation === 'start' && overflowsTop || !isVertical && variation === 'end' && overflowsBottom);
+
+    // flips variation if popper content overflows boundaries
+    var flippedVariationByContent = !!options.flipVariationsByContent && (isVertical && variation === 'start' && overflowsRight || isVertical && variation === 'end' && overflowsLeft || !isVertical && variation === 'start' && overflowsBottom || !isVertical && variation === 'end' && overflowsTop);
+
+    var flippedVariation = flippedVariationByRef || flippedVariationByContent;
 
     if (overlapsRef || overflowsBoundaries || flippedVariation) {
       // this boolean to detect any flip loop
@@ -92753,7 +92829,23 @@ var modifiers = {
      * The popper will never be placed outside of the defined boundaries
      * (except if `keepTogether` is enabled)
      */
-    boundariesElement: 'viewport'
+    boundariesElement: 'viewport',
+    /**
+     * @prop {Boolean} flipVariations=false
+     * The popper will switch placement variation between `-start` and `-end` when
+     * the reference element overlaps its boundaries.
+     *
+     * The original placement should have a set variation.
+     */
+    flipVariations: false,
+    /**
+     * @prop {Boolean} flipVariationsByContent=false
+     * The popper will switch placement variation between `-start` and `-end` when
+     * the popper element overlaps its reference boundaries.
+     *
+     * The original placement should have a set variation.
+     */
+    flipVariationsByContent: false
   },
 
   /**
@@ -92970,8 +93062,8 @@ var Popper = function () {
   /**
    * Creates a new Popper.js instance.
    * @class Popper
-   * @param {HTMLElement|referenceObject} reference - The reference element used to position the popper
-   * @param {HTMLElement} popper - The HTML element used as the popper
+   * @param {Element|referenceObject} reference - The reference element used to position the popper
+   * @param {Element} popper - The HTML / XML element used as the popper
    * @param {Object} options - Your custom options to override the ones defined in [Defaults](#defaults)
    * @return {Object} instance - The generated Popper.js instance
    */
