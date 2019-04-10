@@ -1149,7 +1149,6 @@ angular
       $templateCache.put('views/project/env/integrations/data/hubspot.html', require('../views/project/env/integrations/data/hubspot.html'));
       $templateCache.put('views/project/env/integrations/data/sqlconnector.html', require('../views/project/env/integrations/data/sqlconnector.html'));
       $templateCache.put('views/project/env/integrations/data/atlassian.html', require('../views/project/env/integrations/data/atlassian.html'));
-      $templateCache.put('views/project/env/integrations/data/moxtra.html', require('../views/project/env/integrations/data/moxtra.html'));
       $templateCache.put('views/project/env/integrations/email/smtp.html', require('../views/project/env/integrations/email/smtp.html'));
       $templateCache.put('views/project/env/integrations/email/sendgrid.html', require('../views/project/env/integrations/email/sendgrid.html'));
       $templateCache.put('views/project/env/integrations/email/mailgun.html', require('../views/project/env/integrations/email/mailgun.html'));
