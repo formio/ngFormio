@@ -1094,7 +1094,7 @@ angular
       //   - Any attribute beginning with 'data-'
       //   - Any inline style
       //   - Any class name
-      CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
+      // CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
 
       // Preload ng-include templates into cache.
     // <ng-include src="embedView"></ng-include>
