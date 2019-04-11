@@ -136,18 +136,22 @@ var _default = angular.module('formio').directive('formBuilder', function () {
         builderElement.innerHTML = '';
         builder = new _formiojs.Formio.FormBuilder(builderElement, $scope.form, $scope.options);
         builderReady = builder.setDisplay($scope.form.display);
-      }; // Detect when the display changes.
+      };
 
+      $scope.display = $scope.form.display; // Detect when the display changes.
 
       $scope.$watch('form.display', function (display) {
         if (builderReady && display) {
           builderReady.then(function () {
-            if (display !== builder.form.display) {
+            if (display !== $scope.display) {
+              builder.form.display = display;
               builder.setDisplay(display);
             }
 
+            $scope.display = display;
+
             if ($scope.url) {
-              builder.webform.url = $scope.url;
+              builder.instance.url = $scope.url;
             }
           });
         }
@@ -164,7 +168,7 @@ var _default = angular.module('formio').directive('formBuilder', function () {
             }
 
             if ($scope.url) {
-              builder.webform.url = $scope.url;
+              builder.instance.url = $scope.url;
             }
           });
         }
@@ -20906,14 +20910,6 @@ function () {
     value: function removeEventListeners() {
       var _this3 = this;
 
-      _lodash.default.each(this.events._events, function (events, type) {
-        _lodash.default.each(events, function (listener) {
-          if (listener && _this3.id === listener.id && listener.internal) {
-            _this3.events.off(type, listener);
-          }
-        });
-      });
-
       this.eventHandlers.forEach(function (handler) {
         if (_this3.id === handler.id && handler.type && handler.obj && handler.obj.removeEventListener) {
           handler.obj.removeEventListener(handler.type, handler.func);
@@ -20925,6 +20921,19 @@ function () {
       });
       this.inputMasks = [];
     }
+  }, {
+    key: "removeAllEvents",
+    value: function removeAllEvents() {
+      var _this4 = this;
+
+      _lodash.default.each(this.events._events, function (events, type) {
+        _lodash.default.each(events, function (listener) {
+          if (listener && _this4.id === listener.id) {
+            _this4.events.off(type, listener);
+          }
+        });
+      });
+    }
     /**
      * Removes all event listeners attached to this component.
      */
@@ -20933,6 +20942,7 @@ function () {
     key: "destroy",
     value: function destroy() {
       this.removeEventListeners();
+      this.removeAllEvents();
     }
     /**
      * Append an HTML DOM element to a container.
@@ -21027,11 +21037,11 @@ function () {
   }, {
     key: "appendChild",
     value: function appendChild(element, child) {
-      var _this4 = this;
+      var _this5 = this;
 
       if (Array.isArray(child)) {
         child.forEach(function (oneChild) {
-          return _this4.appendChild(element, oneChild);
+          return _this5.appendChild(element, oneChild);
         });
       } else if (child instanceof HTMLElement || child instanceof Text) {
         element.appendChild(child);
@@ -21132,7 +21142,7 @@ function () {
   }, {
     key: "attr",
     value: function attr(element, _attr) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!element) {
         return;
@@ -21142,7 +21152,7 @@ function () {
         if (typeof value !== 'undefined') {
           if (key.indexOf('on') === 0) {
             // If this is an event, add a listener.
-            _this5.addEventListener(element, key.substr(2).toLowerCase(), value);
+            _this6.addEventListener(element, key.substr(2).toLowerCase(), value);
           } else {
             // Otherwise it is just an attribute.
             element.setAttribute(key, value);
@@ -26283,6 +26293,8 @@ function (_Component) {
         target.formioContainer.push(info);
       }
 
+      this.emit('addComponent', info);
+
       if (isNew && !this.options.noNewEdit) {
         this.editComponent(info, target, isNew);
       } // Cause parent to rebuild so component becomes visible.
@@ -26775,12 +26787,21 @@ function (_Webform) {
    *    - breadcrumbSettings.clickable: true (default) determines if the breadcrumb bar is clickable or not
    *    - buttonSettings.show*(Previous, Next, Cancel): true (default) determines if the button is shown or not
    */
-  function Wizard(element, options) {
+  function Wizard() {
     var _this;
 
     _classCallCheck(this, Wizard);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Wizard).call(this, element, options));
+    var element, options;
+
+    if (arguments[0] instanceof HTMLElement || arguments[1]) {
+      element = arguments[0];
+      options = arguments[1];
+    } else {
+      options = arguments[0];
+    }
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Wizard).call(this, null, options));
     _this.panels = [];
     _this.pages = [];
     _this.globalComponents = [];
@@ -27110,7 +27131,20 @@ function (_Webform) {
       }
 
       this.wizard = form;
-      this.component.components = form.components;
+      this.component.components = form.components || []; // Check if there are no panel components.
+
+      if (this.component.components.filter(function (component) {
+        return component.type === 'panel';
+      }).length === 0) {
+        this.component.components = [{
+          type: 'panel',
+          title: 'Page 1',
+          label: 'Page 1',
+          key: 'page1',
+          components: this.component.components
+        }];
+      }
+
       return _get(_getPrototypeOf(Wizard.prototype), "setForm", this).call(this, form);
     }
   }, {
@@ -27353,17 +27387,21 @@ function (_WebformBuilder) {
   _inherits(WizardBuilder, _WebformBuilder);
 
   function WizardBuilder() {
-    var _getPrototypeOf2;
-
     var _this;
 
     _classCallCheck(this, WizardBuilder);
 
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+    var element, options;
+
+    if (arguments[0] instanceof HTMLElement || arguments[1]) {
+      element = arguments[0];
+      options = arguments[1];
+    } else {
+      options = arguments[0];
     }
 
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(WizardBuilder)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(WizardBuilder).call(this, null, options)); // this.element = element;
+
     _this._form = {
       components: [{
         title: 'Page 1',
@@ -27372,6 +27410,7 @@ function (_WebformBuilder) {
         key: 'page1'
       }]
     };
+    _this.page = 0;
     return _this;
   }
 
@@ -27396,9 +27435,6 @@ function (_WebformBuilder) {
         addPage: 'multiple',
         gotoPage: 'multiple'
       });
-
-      _get(_getPrototypeOf(WizardBuilder.prototype), "attach", this).call(this, element);
-
       this.refs.addPage.forEach(function (link) {
         _this2.addEventListener(link, 'click', function (event) {
           event.preventDefault();
@@ -27413,6 +27449,7 @@ function (_WebformBuilder) {
           _this2.setPage(index);
         });
       });
+      return _get(_getPrototypeOf(WizardBuilder.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "rebuild",
@@ -27442,11 +27479,26 @@ function (_WebformBuilder) {
       this.rebuild();
     }
   }, {
+    key: "setPage",
+    value: function setPage(index) {
+      if (index === this.page) {
+        return;
+      }
+
+      this.page = index;
+      this.rebuild();
+    }
+  }, {
     key: "pages",
     get: function get() {
       return _lodash.default.filter(this._form.components, {
         type: 'panel'
       });
+    }
+  }, {
+    key: "currentPage",
+    get: function get() {
+      return this.pages && this.pages.length >= this.page ? this.pages[this.page] : null;
     }
   }, {
     key: "form",
@@ -27468,6 +27520,11 @@ function (_WebformBuilder) {
 
       this.rebuild();
     },
+    get: function get() {
+      return this._form;
+    }
+  }, {
+    key: "schema",
     get: function get() {
       return this._form;
     }
@@ -48306,6 +48363,11 @@ function (_Input) {
       }
     }
   }, {
+    key: "labelIsHidden",
+    value: function labelIsHidden() {
+      return true;
+    }
+  }, {
     key: "setValue",
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
@@ -48333,13 +48395,17 @@ function (_Input) {
           this.refs.canvas.style.display = 'inherit';
         }
 
-        this.refs.signatureImage.style.display = 'none';
+        if (this.refs.signatureImage) {
+          this.refs.signatureImage.style.display = 'none';
+        }
       } else {
         if (this.refs.canvas) {
           this.refs.canvas.style.display = 'none';
         }
 
-        this.refs.signatureImage.style.display = 'inherit';
+        if (this.refs.signatureImage) {
+          this.refs.signatureImage.style.display = 'inherit';
+        }
       }
     }
   }, {
@@ -48479,10 +48545,16 @@ function (_Input) {
       if (this.signaturePad) {
         if (disabled) {
           this.signaturePad.off();
-          this.refresh.classList.add('disabled');
+
+          if (this.refs.refresh) {
+            this.refs.refresh.classList.add('disabled');
+          }
         } else {
           this.signaturePad.on();
-          this.refresh.classList.remove('disabled');
+
+          if (this.refs.refresh) {
+            this.refs.refresh.classList.remove('disabled');
+          }
         }
       }
     }
@@ -53836,7 +53908,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div id=\"builder-sidebar-{{id}}\" class=\"accordion panel-group\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"card form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"card-header form-builder-group-header\">\n      <h5 class=\"mb-0\">\n        <button class=\"btn btn-block btn-default builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' show' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"card-body no-drop p-2\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-sm btn-block formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n      {% if (groups[groupKey].groups) { %}\n        {% for (var subgroupKey in groups[groupKey].groups) { %}\n          <div class=\"card form-builder-panel\" ref=\"group-panel-{{subgroupKey}}\">\n            <div class=\"card-header panel-heading form-builder-group-header\">\n              <h5 class=\"mb-0\">\n                <button class=\"btn btn-block builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{subgroupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].groups[subgroupKey].title}}</button>\n              </h5>\n            </div>\n            <div class=\"panel-collapse collapse {{groups[groupKey].groups[subgroupKey].default ? ' show' : ''}}\" id=\"group-{{subgroupKey}}\" ref=\"sidebar-group\">\n              <div id=\"group-container-{{subgroupKey}}\" class=\"card-body no-drop p-2\" ref=\"sidebar-container\">\n                {% groups[groupKey].groups[subgroupKey].componentOrder.forEach(function(componentKey) { %}\n                <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-sm btn-block formcomponent drag-copy\">\n                  <i class=\"{{groups[groupKey].groups[subgroupKey].components[componentKey].icon}}\" style=\"margin-right: 5px;\"></i>\n                  {{groups[groupKey].groups[subgroupKey].components[componentKey].title}}\n                </span>\n                {% }) %}\n              </div>\n            </div>\n          </div>\n        {% } %}\n      {% } %}\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div id=\"builder-sidebar-{{id}}\" class=\"accordion panel-group\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"card form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"card-header form-builder-group-header\">\n      <h5 class=\"mb-0\">\n        <button class=\"btn btn-block btn-default builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' show' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"card-body no-drop p-2\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-sm btn-block formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
 var _default = {
   form: form
 };
@@ -55115,7 +55187,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div id=\"builder-sidebar-{{id}}\" class=\"accordion panel-group\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"panel panel-default form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"panel-heading form-builder-group-header\">\n      <h5 class=\"mb-0 panel-title\">\n        <button class=\"btn btn-block builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' in' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"panel-body no-drop\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-xs btn-block formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n      {% if (groups[groupKey].groups) { %}\n        {% for (var subgroupKey in groups[groupKey].groups) { %}\n          <div class=\"panel panel-default form-builder-panel\" ref=\"group-panel-{{subgroupKey}}\">\n            <div class=\"panel-heading form-builder-group-header\">\n              <h5 class=\"mb-0 panel-title\">\n                <button class=\"btn btn-block builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{subgroupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].groups[subgroupKey].title}}</button>\n              </h5>\n            </div>\n            <div class=\"panel-collapse collapse {{groups[groupKey].groups[subgroupKey].default ? ' in' : ''}}\" id=\"group-{{subgroupKey}}\" ref=\"sidebar-group\">\n              <div id=\"group-container-{{subgroupKey}}\" class=\"panel-body no-drop\" ref=\"sidebar-container\">\n                {% groups[groupKey].groups[subgroupKey].componentOrder.forEach(function(componentKey) { %}\n                <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-xs btn-block formcomponent drag-copy\">\n                  <i class=\"{{groups[groupKey].groups[subgroupKey].components[componentKey].icon}}\" style=\"margin-right: 5px;\"></i>\n                  {{groups[groupKey].groups[subgroupKey].components[componentKey].title}}\n                </span>\n                {% }) %}\n              </div>\n            </div>\n          </div>\n        {% } %}\n      {% } %}\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div id=\"builder-sidebar-{{id}}\" class=\"accordion panel-group\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"panel panel-default form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"panel-heading form-builder-group-header\">\n      <h5 class=\"mb-0 panel-title\">\n        <button class=\"btn btn-block builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' in' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"panel-body no-drop\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-xs btn-block formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
 var _default = {
   form: form
 };
@@ -56080,7 +56152,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div id=\"builder-sidebar-{{id}}\" class=\"ui segments\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"ui segment secondary form-builder-panel\" style=\"padding: 0\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"form-builder-group-header\">\n      <h5 class=\"panel-title\">\n        <button class=\"ui button basic fluid builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n  </div>\n  <div class=\"ui segment\" style=\"padding: 0\">\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' in' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"card-body panel-body no-drop\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"ui button mini primary fluid formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n      {% if (groups[groupKey].groups) { %}\n        {% for (var subgroupKey in groups[groupKey].groups) { %}\n          <div class=\"card panel panel-default form-builder-panel\" ref=\"group-panel-{{subgroupKey}}\">\n            <div class=\"card-header panel-heading form-builder-group-header\">\n              <h5 class=\"mb-0 panel-title\">\n                <button class=\"btn btn-block builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{subgroupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].groups[subgroupKey].title}}</button>\n              </h5>\n            </div>\n            <div class=\"panel-collapse collapse {{groups[groupKey].groups[subgroupKey].default ? ' in' : ''}}\" id=\"group-{{subgroupKey}}\" ref=\"sidebar-group\">\n              <div id=\"group-container-{{subgroupKey}}\" class=\"card-body panel-body no-drop\" ref=\"sidebar-container\">\n                {% groups[groupKey].groups[subgroupKey].componentOrder.forEach(function(componentKey) { %}\n                <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-xs btn-block formcomponent drag-copy\">\n                  <i class=\"{{groups[groupKey].groups[subgroupKey].components[componentKey].icon}}\" style=\"margin-right: 5px;\"></i>\n                  {{groups[groupKey].groups[subgroupKey].components[componentKey].title}}\n                </span>\n                {% }) %}\n              </div>\n            </div>\n          </div>\n        {% } %}\n      {% } %}\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div id=\"builder-sidebar-{{id}}\" class=\"ui segments\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"ui segment secondary form-builder-panel\" style=\"padding: 0\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"form-builder-group-header\">\n      <h5 class=\"panel-title\">\n        <button class=\"ui button basic fluid builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n  </div>\n  <div class=\"ui segment\" style=\"padding: 0\">\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' in' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"card-body panel-body no-drop\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"ui button mini primary fluid formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
 var _default = {
   form: form
 };

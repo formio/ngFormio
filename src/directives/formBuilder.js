@@ -27,15 +27,19 @@ export default angular.module('formio').directive('formBuilder', function() {
           builderReady = builder.setDisplay($scope.form.display);
         };
 
+        $scope.display = $scope.form.display;
+
         // Detect when the display changes.
         $scope.$watch('form.display', display => {
           if (builderReady && display) {
             builderReady.then(() => {
-              if (display !== builder.form.display) {
+              if (display !== $scope.display) {
+                builder.form.display = display;
                 builder.setDisplay(display);
               }
+              $scope.display = display;
               if ($scope.url) {
-                builder.webform.url = $scope.url;
+                builder.instance.url = $scope.url;
               }
             });
           }
@@ -51,7 +55,7 @@ export default angular.module('formio').directive('formBuilder', function() {
                 builder.setForm(form);
               }
               if ($scope.url) {
-                builder.webform.url = $scope.url;
+                builder.instance.url = $scope.url;
               }
             });
           }
