@@ -1,5 +1,10 @@
 'use strict';
 
+import {Templates, Formio} from 'formiojs';
+
+Templates.framework = 'bootstrap3';
+Formio.icons = 'fa';
+
 /**
  * @ngdoc overview
  * @name formioApp
