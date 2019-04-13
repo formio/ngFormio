@@ -16,7 +16,7 @@
   "dependencies": {
     "@babel/core": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
-    "@progress/kendo-ui": "^2019.1.403",
+    "@progress/kendo-ui": "^2019.1.412",
     "ajv": "^6.10.0",
     "angular": "^1.7.8",
     "angular-base64": "^2.0.5",
@@ -56,10 +56,10 @@
     "gulp": "^4.0.0",
     "gulp-s3": "^0.11.0",
     "html-dnd": "^1.2.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "lodash": "^4.17.11",
-    "mini-css-extract-plugin": "^0.5.0",
-    "mocha": "^6.1.2",
+    "mini-css-extract-plugin": "^0.6.0",
+    "mocha": "^6.1.3",
     "mocha-tags": "^1.0.1",
     "moment": "^2.24.0",
     "ng-dialog": "^1.4.0",
@@ -70,7 +70,7 @@
     "node-sass": "^4.11.0",
     "number-abbreviate": "^2.0.0",
     "protractor": "^5.4.2",
-    "protractor-helpers": "^1.1.494",
+    "protractor-helpers": "^1.1.497",
     "raw-loader": "^1.0.0",
     "request": "^2.88.0",
     "require-dir": "^1.0.0",
@@ -79,12 +79,12 @@
     "selenium-server-standalone-jar": "^3.14.0",
     "signature_pad": "^2.3.2",
     "style-loader": "^0.23.1",
-    "swagger-ui": "^3.22.0",
+    "swagger-ui": "^3.22.1",
     "ui-select": "^0.19.8",
-    "webdriverio": "^5.7.9",
+    "webdriverio": "^5.7.13",
     "webdriverjs-angular": "^0.1.3",
-    "webpack": "^4.29.6",
+    "webpack": "^4.30.0",
     "webpack-cli": "^3.3.0",
-    "webpack-dev-server": "^3.3.0"
+    "webpack-dev-server": "^3.3.1"
   }
 }

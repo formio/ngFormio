@@ -304,6 +304,8 @@ app.controller('ProjectController', [
       angular.element('#' + formType + '-loader').hide();
     });
     $scope.forms = [];
+    Formio.setBaseUrl(AppConfig.apiBase);
+    Formio.setProjectUrl(AppConfig.formioBase);
     $scope.formio = new Formio('/project/' + $stateParams.projectId);
     $scope.localFormio = $scope.formio;
     $scope.currentProject = {_id: $stateParams.projectId, access: []};

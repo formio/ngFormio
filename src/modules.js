@@ -28,7 +28,7 @@ import 'number-abbreviate';
 import 'angular-ui-ace';
 import 'ui-select';
 import 'angular-ckeditor/angular-ckeditor';
-import 'formiojs/dist/formio.min.js';
+import 'formiojs';
 import 'ng-formio/lib/module';
 import 'ng-formio/lib/filters';
 import 'ng-formio/lib/providers';
