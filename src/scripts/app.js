@@ -610,6 +610,8 @@ angular
       $q,
       ngDialog
     ) {
+      Formio.setBaseUrl(AppConfig.apiBase);
+      Formio.setProjectUrl(AppConfig.formioBase);
       $rootScope.showHeader = true;
       $rootScope.activeSideBar = 'home';
       $rootScope.currentProject = null;
