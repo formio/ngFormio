@@ -26,31 +26,58 @@ app.controller('TeamCreateController', [
   '$rootScope',
   '$scope',
   '$state',
+  'Formio',
   'FormioAlerts',
+  'AppConfig',
   function(
     $rootScope,
     $scope,
     $state,
-    FormioAlerts
+    Formio,
+    FormioAlerts,
+    AppConfig,
   ) {
-
-    $scope.team = {data: {}};
+    $scope.teamFormObj = {components: []};
+    $scope.team = {data: {}, metadata: {}};
     $scope.team.data.members = [];
     $scope.team.data.admins = [];
-    $scope.team.data.members.push({
-      _id: $rootScope.user._id,
-      data: {
-        name: $rootScope.user.data.name || $rootScope.user.data.email.substr(0, $rootScope.user.data.email.indexOf('@'))
+    const teamFormio = (new Formio($rootScope.teamForm));
+    teamFormio.loadForm().then((form) => {
+      if ($rootScope.onPremise && AppConfig.sso) {
+        form.components.splice(form.components.length - 2, 0, {
+          type: 'checkbox',
+          label: 'SSO Team',
+          description: 'Check this if you wish this team to be mapped to a Single-Sign-On Role',
+          key: 'ssoteam',
+          input: true
+        });
+      }
+
+      $scope.teamFormObj = form;
+    });
+
+    Formio.currentUser().then(function(user) {
+      if (user && (user.data.name || user.data.email)) {
+        $scope.team.data.members.push({
+          _id: user._id,
+          data: {
+            name: user.data.name || user.data.email.substr(0, user.data.email.indexOf('@'))
+          }
+        });
       }
     });
 
-    $scope.$on('formSubmission', function(event, team) {
+    $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
-      FormioAlerts.addAlert({
-        type: 'success',
-        message: 'New team created!'
+      $scope.team.metadata.ssoteam = $scope.team.data.ssoteam;
+      delete $scope.team.data.ssoteam;
+      teamFormio.saveSubmission($scope.team).then((team) => {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'New team created!'
+        });
+        $state.go('team.view', { teamId: team._id });
       });
-      $state.go('team.view', { teamId: team._id });
     });
   }
 ]);
@@ -77,7 +104,7 @@ app.controller('TeamViewController', [
     TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
-
+    $scope.ssoPortal = $rootScope.onPremise && AppConfig.sso;
     $scope.activeView = 'members';
     $scope.switchView = function(view) {
       $scope.activeView = view;
@@ -96,7 +123,9 @@ app.controller('TeamViewController', [
 
     $scope.isAdmin = false;
     $scope.loadTeamPromise.then(function() {
-      $scope.isAdmin = $scope.team.owner === $rootScope.user._id || _.find($scope.team.data.admins, {_id: $rootScope.user._id});
+      Formio.currentUser().then(function(user) {
+        $scope.isAdmin = $scope.team.owner === user._id || _.find($scope.team.data.admins, {_id: user._id});
+      });
     });
 
     $scope.leaveTeam = function(id) {
@@ -140,6 +169,20 @@ app.controller('TeamViewController', [
         });
     };
 
+    $scope.saveTeam = function() {
+      $scope.formio.saveSubmission(angular.copy($scope.team)).then(function() {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Team membership updated.'
+        });
+      }).catch(function(err) {
+        FormioAlerts.addAlert({
+          type: 'danger',
+          message: err.message
+        });
+      });
+    };
+
     $scope.changeRole = function(member, role) {
       $scope.add.Person = undefined;
 
@@ -153,17 +196,7 @@ app.controller('TeamViewController', [
         $scope.team.data[role] = $scope.team.data[role] || [];
         $scope.team.data[role].push(member);
       }
-      $scope.formio.saveSubmission(angular.copy($scope.team)).then(function() {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Team membership updated.'
-        });
-      }).catch(function(err) {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: err.message
-        });
-      });
+      $scope.saveTeam();
     };
   }
 ]);

@@ -3,6 +3,15 @@
     <ul class="list-group">
       <li class="list-group-item">
         <h3>{{ team.data.name }}</h3>
+        <div ng-if="ssoPortal">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="team.metadata.ssoteam" ng-change="saveTeam()">
+              SSO Team
+            </label>
+          </div>
+          <p clas="text-muted">Check this if you wish this team to be mapped to a Single-Sign-On Role</p>
+        </div>
         <!--<a ng-if="team.owner === user._id" ui-sref="team.edit()">Edit</a>-->
       </li>
       <li class="list-group-item">

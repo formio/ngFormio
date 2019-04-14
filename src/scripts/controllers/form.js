@@ -1766,9 +1766,13 @@ app.factory('FormioAlerts', [
         if(errors && (Object.keys(errors).length || errors.length) > 0) {
           _.each(errors, (function(e) {
             if(e.message || _.isString(e)) {
+              let message = e.message || e;
+              if (e.hasOwnProperty('value')) {
+                message += ' (' + e.value + ')';
+              }
               this.addAlert({
                 type: 'danger',
-                message: _.escape(e.message || e),
+                message: _.escape(message),
                 element: e.path
               });
             }
