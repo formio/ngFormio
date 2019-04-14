@@ -2174,7 +2174,7 @@ if (typeof self !== 'undefined') {
 var result = Object(_ponyfill_js__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"])(root);
 /* harmony default export */ __webpack_exports__["a"] = (result);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(16)(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3), __webpack_require__(14)(module)))
 
 /***/ }),
 /* 3 */
@@ -2326,7 +2326,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = exports.TEMPLATES = void 0;
 
-var _classnames = _interopRequireDefault(__webpack_require__(29));
+var _classnames = _interopRequireDefault(__webpack_require__(27));
 
 var _utils = __webpack_require__(0);
 
@@ -3267,25 +3267,23 @@ var _fuse = _interopRequireDefault(__webpack_require__(11));
 
 var _deepmerge = _interopRequireDefault(__webpack_require__(12));
 
-__webpack_require__(13);
+var _store = _interopRequireDefault(__webpack_require__(13));
 
-var _store = _interopRequireDefault(__webpack_require__(15));
-
-var _components = __webpack_require__(22);
+var _components = __webpack_require__(20);
 
 var _constants = __webpack_require__(1);
 
 var _templates = __webpack_require__(5);
 
-var _choices = __webpack_require__(30);
+var _choices = __webpack_require__(28);
 
-var _items = __webpack_require__(31);
+var _items = __webpack_require__(29);
 
-var _groups = __webpack_require__(32);
+var _groups = __webpack_require__(30);
 
-var _misc = __webpack_require__(33);
+var _misc = __webpack_require__(31);
 
-var _general = __webpack_require__(34);
+var _general = __webpack_require__(32);
 
 var _utils = __webpack_require__(0);
 
@@ -3738,13 +3736,13 @@ function () {
       var label = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
       var replaceChoices = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-      if (!this._isSelectElement || !choices.length || !value) {
+      if (!this._isSelectElement || !value) {
         return this;
       } // Clear choices if needed
 
 
       if (replaceChoices) {
-        this._clearChoices();
+        this.clearChoices();
       }
 
       this.containerOuter.removeLoadingState();
@@ -3776,6 +3774,11 @@ function () {
       this._setLoading(false);
 
       return this;
+    }
+  }, {
+    key: "clearChoices",
+    value: function clearChoices() {
+      this._store.dispatch((0, _choices.clearChoices)());
     }
   }, {
     key: "clearStore",
@@ -4720,7 +4723,7 @@ function () {
       var target = event.target,
           shiftKey = event.shiftKey; // If we have our mouse down on the scrollbar and are on IE11...
 
-      if (target === this.choiceList && (0, _utils.isIE11)()) {
+      if (this.choiceList.element.contains(target) && (0, _utils.isIE11)()) {
         this._isScrollingOnIe = true;
       }
 
@@ -5074,11 +5077,6 @@ function () {
           keyCode: keyCode
         });
       }
-    }
-  }, {
-    key: "_clearChoices",
-    value: function _clearChoices() {
-      this._store.dispatch((0, _choices.clearChoices)());
     }
   }, {
     key: "_addGroup",
@@ -6633,65 +6631,6 @@ var deepmerge_1 = deepmerge;
 "use strict";
 
 
-__webpack_require__(14);
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports) {
-
-// Polyfill for creating CustomEvents on IE9/10/11
-
-// code pulled from:
-// https://github.com/d4tocchini/customevent-polyfill
-// https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
-
-try {
-    var ce = new window.CustomEvent('test');
-    ce.preventDefault();
-    if (ce.defaultPrevented !== true) {
-        // IE has problems with .preventDefault() on custom events
-        // http://stackoverflow.com/questions/23349191
-        throw new Error('Could not prevent default');
-    }
-} catch(e) {
-  var CustomEvent = function(event, params) {
-    var evt, origPrevent;
-    params = params || {
-      bubbles: false,
-      cancelable: false,
-      detail: undefined
-    };
-
-    evt = document.createEvent("CustomEvent");
-    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-    origPrevent = evt.preventDefault;
-    evt.preventDefault = function () {
-      origPrevent.call(this);
-      try {
-        Object.defineProperty(this, 'defaultPrevented', {
-          get: function () {
-            return true;
-          }
-        });
-      } catch(e) {
-        this.defaultPrevented = true;
-      }
-    };
-    return evt;
-  };
-
-  CustomEvent.prototype = window.Event.prototype;
-  window.CustomEvent = CustomEvent; // expose definition to window
-}
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -6699,7 +6638,7 @@ exports.default = void 0;
 
 var _redux = __webpack_require__(6);
 
-var _index = _interopRequireDefault(__webpack_require__(17));
+var _index = _interopRequireDefault(__webpack_require__(15));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6921,7 +6860,7 @@ function () {
 exports.default = Store;
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = function(originalModule) {
@@ -6951,7 +6890,7 @@ module.exports = function(originalModule) {
 
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6964,13 +6903,13 @@ exports.default = void 0;
 
 var _redux = __webpack_require__(6);
 
-var _items = _interopRequireDefault(__webpack_require__(18));
+var _items = _interopRequireDefault(__webpack_require__(16));
 
-var _groups = _interopRequireDefault(__webpack_require__(19));
+var _groups = _interopRequireDefault(__webpack_require__(17));
 
-var _choices = _interopRequireDefault(__webpack_require__(20));
+var _choices = _interopRequireDefault(__webpack_require__(18));
 
-var _general = _interopRequireDefault(__webpack_require__(21));
+var _general = _interopRequireDefault(__webpack_require__(19));
 
 var _utils = __webpack_require__(0);
 
@@ -7002,7 +6941,7 @@ var _default = rootReducer;
 exports.default = _default;
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7078,7 +7017,7 @@ function items() {
 }
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7120,7 +7059,7 @@ function groups() {
 }
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7252,7 +7191,7 @@ function choices() {
 }
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7290,7 +7229,7 @@ var _default = general;
 exports.default = _default;
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7336,22 +7275,22 @@ Object.defineProperty(exports, "WrappedSelect", {
   }
 });
 
-var _dropdown = _interopRequireDefault(__webpack_require__(23));
+var _dropdown = _interopRequireDefault(__webpack_require__(21));
 
-var _container = _interopRequireDefault(__webpack_require__(24));
+var _container = _interopRequireDefault(__webpack_require__(22));
 
-var _input = _interopRequireDefault(__webpack_require__(25));
+var _input = _interopRequireDefault(__webpack_require__(23));
 
-var _list = _interopRequireDefault(__webpack_require__(26));
+var _list = _interopRequireDefault(__webpack_require__(24));
 
-var _wrappedInput = _interopRequireDefault(__webpack_require__(27));
+var _wrappedInput = _interopRequireDefault(__webpack_require__(25));
 
-var _wrappedSelect = _interopRequireDefault(__webpack_require__(28));
+var _wrappedSelect = _interopRequireDefault(__webpack_require__(26));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7445,7 +7384,7 @@ function () {
 exports.default = Dropdown;
 
 /***/ }),
-/* 24 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7694,7 +7633,7 @@ function () {
 exports.default = Container;
 
 /***/ }),
-/* 25 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7901,7 +7840,7 @@ function () {
 exports.default = Input;
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8028,7 +7967,7 @@ function () {
 exports.default = List;
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8110,7 +8049,7 @@ function (_WrappedElement) {
 exports.default = WrappedInput;
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8208,7 +8147,7 @@ function (_WrappedElement) {
 exports.default = WrappedSelect;
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -8265,7 +8204,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8332,7 +8271,7 @@ var clearChoices = function clearChoices() {
 exports.clearChoices = clearChoices;
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8390,7 +8329,7 @@ var highlightItem = function highlightItem(id, highlighted) {
 exports.highlightItem = highlightItem;
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8417,7 +8356,7 @@ var addGroup = function addGroup(value, id, active, disabled) {
 exports.addGroup = addGroup;
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8446,7 +8385,7 @@ var resetTo = function resetTo(state) {
 exports.resetTo = resetTo;
 
 /***/ }),
-/* 34 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -24621,7 +24560,14 @@ function (_Webform) {
     _this.sidebarContainers = [];
     _this.updateDraggable = _lodash.default.debounce(_this.refreshDraggable.bind(_assertThisInitialized(_this)), 200); // Setup the builder options.
 
-    _this.options.builder = _lodash.default.defaultsDeep({}, _this.options.builder, _this.defaultComponents); // Turn off if explicitely said to do so...
+    _this.options.builder = _lodash.default.defaultsDeep({}, _this.options.builder, _this.defaultComponents);
+    _this.options.enableButtons = _lodash.default.defaults({}, _this.options.enableButtons, {
+      remove: true,
+      copy: true,
+      paste: true,
+      edit: true,
+      editJson: false
+    }); // Turn off if explicitely said to do so...
 
     _lodash.default.each(_this.defaultComponents, function (config, key) {
       if (config === false) {
@@ -24727,8 +24673,21 @@ function (_Webform) {
           pasteTooltip.hide();
 
           _this.pasteComponent(comp);
-        }); // Set in paste mode if we have an item in our clipboard.
+        });
 
+        var editJsonButton = _this.ce('div', {
+          class: 'btn btn-xxs btn-default component-settings-button component-settings-button-edit-json'
+        }, _this.getIcon('wrench'));
+
+        _this.addEventListener(editJsonButton, 'click', function () {
+          return _this.editComponent(comp, true);
+        });
+
+        new _tooltip.default(editJsonButton, {
+          trigger: 'hover',
+          placement: 'top',
+          title: _this.t('Edit JSON')
+        }); // Set in paste mode if we have an item in our clipboard.
 
         if (window.sessionStorage) {
           var data = window.sessionStorage.getItem('formio.clipboard');
@@ -24741,7 +24700,7 @@ function (_Webform) {
 
         comp.prepend(_this.ce('div', {
           class: 'component-btn-group'
-        }, [removeButton, copyButton, pasteButton, editButton]));
+        }, [_this.options.enableButtons.remove ? removeButton : null, _this.options.enableButtons.copy ? copyButton : null, _this.options.enableButtons.paste ? pasteButton : null, _this.options.enableButtons.editJson ? editJsonButton : null, _this.options.enableButtons.edit ? editButton : null]));
       }
 
       if (!container.noDrop) {
@@ -24897,13 +24856,15 @@ function (_Webform) {
 
   }, {
     key: "editComponent",
-    value: function editComponent(component) {
+    value: function editComponent(component, isJsonEdit) {
       var _this5 = this;
 
       var componentCopy = _lodash.default.cloneDeep(component);
 
       var componentClass = _Components.default.components[componentCopy.component.type];
-      var isCustom = componentClass === undefined;
+      var isCustom = componentClass === undefined; //custom component should be edited as JSON
+
+      isJsonEdit = isJsonEdit || isCustom;
       componentClass = isCustom ? _Components.default.components.unknown : componentClass; // Make sure we only have one dialog open at a time.
 
       if (this.dialog) {
@@ -24966,7 +24927,25 @@ function (_Webform) {
       var overrides = _lodash.default.get(this.options, "editForm.".concat(componentCopy.component.type), {}); // Get the editform for this component.
 
 
-      var editForm = componentClass.editForm(_lodash.default.cloneDeep(overrides)); // Change the defaultValue component to be reflective.
+      var editForm; //custom component has its own Edit Form defined
+
+      if (isJsonEdit && !isCustom) {
+        editForm = {
+          'components': [{
+            'type': 'textarea',
+            'as': 'json',
+            'editor': 'ace',
+            'weight': 10,
+            'input': true,
+            'key': 'componentJson',
+            'label': 'Component JSON',
+            'tooltip': 'Edit the JSON for this component.'
+          }]
+        };
+      } else {
+        editForm = componentClass.editForm(_lodash.default.cloneDeep(overrides));
+      } // Change the defaultValue component to be reflective.
+
 
       this.defaultValueComponent = (0, _utils.getComponent)(editForm.components, 'defaultValue');
 
@@ -24988,8 +24967,8 @@ function (_Webform) {
 
       this.editForm.on('change', function (event) {
         if (event.changed) {
-          // See if this is a manually modified key. Treat custom component keys as manually modified
-          if (event.changed.component && event.changed.component.key === 'key' || isCustom) {
+          // See if this is a manually modified key. Treat JSON edited component keys as manually modified
+          if (event.changed.component && event.changed.component.key === 'key' || isJsonEdit) {
             componentCopy.keyModified = true;
           } // Set the component JSON to the new data.
 
@@ -24997,7 +24976,7 @@ function (_Webform) {
           var editFormData = _this5.editForm.getValue().data; //for custom component use value in 'componentJson' field as JSON of component
 
 
-          if (editFormData.type === 'custom' && editFormData.componentJson) {
+          if ((editFormData.type === 'custom' || isJsonEdit) && editFormData.componentJson) {
             componentCopy.component = editFormData.componentJson;
           } else {
             componentCopy.component = editFormData;
@@ -25010,7 +24989,7 @@ function (_Webform) {
 
       this.editForm.formReady.then(function () {
         //for custom component populate component setting with component JSON
-        if (isCustom) {
+        if (isJsonEdit) {
           _this5.editForm.setValue({
             data: {
               componentJson: _lodash.default.cloneDeep(componentCopy.component)
@@ -25043,9 +25022,9 @@ function (_Webform) {
 
         event.preventDefault();
         var originalComponent = component.component;
-        component.isNew = false; //for custom component use value in 'componentJson' field as JSON of component
+        component.isNew = false; //for JSON Edit use value in 'componentJson' field as JSON of component
 
-        if (isCustom) {
+        if (isJsonEdit) {
           component.component = _this5.editForm.data.componentJson;
         } else {
           component.component = componentCopy.component;
@@ -25867,18 +25846,33 @@ function (_Webform) {
       }));
     }
   }, {
+    key: "beforeNext",
+    value: function beforeNext() {
+      var _this3 = this;
+
+      return new _nativePromiseOnly.default(function (resolve, reject) {
+        _this3.hook('beforeNext', _this3.currentPage(), _this3.submission, function (err) {
+          if (err) {
+            reject(err);
+          }
+
+          _get(_getPrototypeOf(Wizard.prototype), "beforeNext", _this3).call(_this3).then(resolve).catch(reject);
+        });
+      });
+    }
+  }, {
     key: "nextPage",
     value: function nextPage() {
-      var _this3 = this;
+      var _this4 = this;
 
       // Read-only forms should not worry about validation before going to next page, nor should they submit.
       if (this.options.readOnly) {
         return this.setPage(this.getNextPage(this.submission.data, this.page)).then(function () {
-          _this3._nextPage = _this3.getNextPage(_this3.submission.data, _this3.page);
+          _this4._nextPage = _this4.getNextPage(_this4.submission.data, _this4.page);
 
-          _this3.emit('nextPage', {
-            page: _this3.page,
-            submission: _this3.submission
+          _this4.emit('nextPage', {
+            page: _this4.page,
+            submission: _this4.submission
           });
         });
       } // Validate the form builed, before go to the next page
@@ -25889,12 +25883,12 @@ function (_Webform) {
           noValidate: true
         });
         return this.beforeNext().then(function () {
-          return _this3.setPage(_this3.getNextPage(_this3.submission.data, _this3.page)).then(function () {
-            _this3._nextPage = _this3.getNextPage(_this3.submission.data, _this3.page);
+          return _this4.setPage(_this4.getNextPage(_this4.submission.data, _this4.page)).then(function () {
+            _this4._nextPage = _this4.getNextPage(_this4.submission.data, _this4.page);
 
-            _this3.emit('nextPage', {
-              page: _this3.page,
-              submission: _this3.submission
+            _this4.emit('nextPage', {
+              page: _this4.page,
+              submission: _this4.submission
             });
           });
         });
@@ -25905,13 +25899,13 @@ function (_Webform) {
   }, {
     key: "prevPage",
     value: function prevPage() {
-      var _this4 = this;
+      var _this5 = this;
 
       var prevPage = this.getPreviousPage();
       return this.setPage(prevPage).then(function () {
-        _this4.emit('prevPage', {
-          page: _this4.page,
-          submission: _this4.submission
+        _this5.emit('prevPage', {
+          page: _this5.page,
+          submission: _this5.submission
         });
       });
     }
@@ -25992,18 +25986,18 @@ function (_Webform) {
   }, {
     key: "buildPages",
     value: function buildPages(form) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.pages = [];
       form.components.forEach(function (component) {
         if (component.type === 'panel') {
           // Ensure that this page can be seen.
-          if ((0, _utils.checkCondition)(component, _this5.data, _this5.data, _this5.wizard, _this5)) {
-            _this5.pages.push(component);
+          if ((0, _utils.checkCondition)(component, _this6.data, _this6.data, _this6.wizard, _this6)) {
+            _this6.pages.push(component);
           }
         } else if (component.type === 'hidden') {
           // Global components are hidden components that can propagate between pages.
-          _this5.globalComponents.push(component);
+          _this6.globalComponents.push(component);
         }
       });
       this.buildWizardHeader();
@@ -26023,14 +26017,14 @@ function (_Webform) {
   }, {
     key: "build",
     value: function build() {
-      var _this6 = this;
+      var _this7 = this;
 
       _get(_getPrototypeOf(Wizard.prototype), "build", this).call(this);
 
       this.formReady.then(function () {
-        _this6.buildWizardHeader();
+        _this7.buildWizardHeader();
 
-        _this6.buildWizardNav();
+        _this7.buildWizardNav();
       });
     }
   }, {
@@ -26070,7 +26064,7 @@ function (_Webform) {
   }, {
     key: "buildWizardHeader",
     value: function buildWizardHeader() {
-      var _this7 = this;
+      var _this8 = this;
 
       if (this.wizardHeader) {
         this.wizardHeader.innerHTML = '';
@@ -26106,45 +26100,45 @@ function (_Webform) {
         // Iterate over predicates and returns first non-undefined value
         var clickableFlag = (0, _utils.firstNonNil)([// Now page (Panel) can override `breadcrumbSettings.clickable` option
         _lodash.default.get(page, 'breadcrumbClickable'), // Set clickable based on breadcrumb settings
-        _this7.options.breadcrumbSettings.clickable]);
-        var clickable = _this7.page !== i && clickableFlag;
+        _this8.options.breadcrumbSettings.clickable]);
+        var clickable = _this8.page !== i && clickableFlag;
         var pageClass = 'page-item ';
-        pageClass += i === _this7.page ? 'active' : clickable ? '' : 'disabled';
+        pageClass += i === _this8.page ? 'active' : clickable ? '' : 'disabled';
 
-        var pageButton = _this7.ce('li', {
+        var pageButton = _this8.ce('li', {
           class: pageClass,
           style: clickable ? 'cursor: pointer;' : ''
         }); // Navigate to the page as they click on it.
 
 
         if (clickable) {
-          _this7.addEventListener(pageButton, 'click', function (event) {
-            _this7.emit('wizardNavigationClicked', _this7.pages[i]);
+          _this8.addEventListener(pageButton, 'click', function (event) {
+            _this8.emit('wizardNavigationClicked', _this8.pages[i]);
 
             event.preventDefault();
 
-            _this7.setPage(i);
+            _this8.setPage(i);
           });
         }
 
-        var pageLabel = _this7.ce('span', {
+        var pageLabel = _this8.ce('span', {
           class: 'page-link'
         });
 
         var pageTitle = page.title;
 
         if (currentPage.breadcrumb.toLowerCase() === 'condensed') {
-          pageTitle = i === _this7.page || showHistory ? page.title : i + 1;
+          pageTitle = i === _this8.page || showHistory ? page.title : i + 1;
 
           if (!pageTitle) {
             pageTitle = i + 1;
           }
         }
 
-        pageLabel.appendChild(_this7.text(pageTitle));
+        pageLabel.appendChild(_this8.text(pageTitle));
         pageButton.appendChild(pageLabel);
 
-        _this7.wizardHeaderList.appendChild(pageButton);
+        _this8.wizardHeaderList.appendChild(pageButton);
       });
     }
   }, {
@@ -26162,7 +26156,7 @@ function (_Webform) {
   }, {
     key: "onChange",
     value: function onChange(flags, changed) {
-      var _this8 = this;
+      var _this9 = this;
 
       _get(_getPrototypeOf(Wizard.prototype), "onChange", this).call(this, flags, changed); // Only rebuild if there is a page change.
 
@@ -26175,9 +26169,9 @@ function (_Webform) {
         }
 
         if ((0, _utils.hasCondition)(component)) {
-          var hasPage = _this8.pages && _this8.pages[pageIndex] && _this8.pageId(_this8.pages[pageIndex]) === _this8.pageId(component);
+          var hasPage = _this9.pages && _this9.pages[pageIndex] && _this9.pageId(_this9.pages[pageIndex]) === _this9.pageId(component);
 
-          var shouldShow = (0, _utils.checkCondition)(component, _this8.data, _this8.data, _this8.wizard, _this8);
+          var shouldShow = (0, _utils.checkCondition)(component, _this9.data, _this9.data, _this9.wizard, _this9);
 
           if (shouldShow && !hasPage || !shouldShow && hasPage) {
             rebuild = true;
@@ -26212,7 +26206,7 @@ function (_Webform) {
   }, {
     key: "buildWizardNav",
     value: function buildWizardNav(nextPage) {
-      var _this9 = this;
+      var _this10 = this;
 
       if (this.wizardNav) {
         this.wizardNav.innerHTML = '';
@@ -26244,44 +26238,44 @@ function (_Webform) {
         method: 'submit',
         class: 'btn btn-primary'
       }].forEach(function (button) {
-        if (!_this9.hasButton(button.name, nextPage)) {
+        if (!_this10.hasButton(button.name, nextPage)) {
           return;
         }
 
-        var buttonWrapper = _this9.ce('li', {
+        var buttonWrapper = _this10.ce('li', {
           class: 'list-inline-item'
         });
 
         var buttonProp = "".concat(button.name, "Button");
 
-        var buttonElement = _this9[buttonProp] = _this9.ce('button', {
+        var buttonElement = _this10[buttonProp] = _this10.ce('button', {
           class: "".concat(button.class, " btn-wizard-nav-").concat(button.name)
         });
 
-        buttonElement.appendChild(_this9.text(_this9.t(button.name)));
+        buttonElement.appendChild(_this10.text(_this10.t(button.name)));
 
-        _this9.addEventListener(_this9[buttonProp], 'click', function (event) {
+        _this10.addEventListener(_this10[buttonProp], 'click', function (event) {
           event.preventDefault(); // Disable the button until done.
 
           buttonElement.setAttribute('disabled', 'disabled');
 
-          _this9.setLoading(buttonElement, true); // Call the button method, then re-enable the button.
+          _this10.setLoading(buttonElement, true); // Call the button method, then re-enable the button.
 
 
-          _this9[button.method]().then(function () {
+          _this10[button.method]().then(function () {
             buttonElement.removeAttribute('disabled');
 
-            _this9.setLoading(buttonElement, false);
+            _this10.setLoading(buttonElement, false);
           }).catch(function () {
             buttonElement.removeAttribute('disabled');
 
-            _this9.setLoading(buttonElement, false);
+            _this10.setLoading(buttonElement, false);
           });
         });
 
-        buttonWrapper.appendChild(_this9[buttonProp]);
+        buttonWrapper.appendChild(_this10[buttonProp]);
 
-        _this9.wizardNav.appendChild(buttonWrapper);
+        _this10.wizardNav.appendChild(buttonWrapper);
       });
     }
   }, {
@@ -30806,7 +30800,8 @@ function (_Component) {
         name: this.options.name,
         type: this.component.inputType || 'text',
         class: 'form-control',
-        lang: this.options.language
+        lang: this.options.language,
+        id: this.key || this.id
       };
 
       if (this.component.placeholder) {
@@ -33678,7 +33673,7 @@ function (_BaseComponent) {
       flags = this.getFlags.apply(this, arguments);
 
       if (this.setCheckedState(value) !== undefined) {
-        return this.updateValue(flags);
+        return this.updateValue(flags, value);
       }
     }
   }, {
@@ -33692,6 +33687,23 @@ function (_BaseComponent) {
       _get(_getPrototypeOf(CheckBoxComponent.prototype), "destroy", this).call(this);
 
       this.removeShortcut();
+    }
+  }, {
+    key: "updateValue",
+    value: function updateValue(flags, value) {
+      var changed = _get(_getPrototypeOf(CheckBoxComponent.prototype), "updateValue", this).call(this, flags, value);
+
+      if (changed) {
+        var checkedClass = 'checkbox-checked';
+
+        if (this.getValue()) {
+          this.addClass(this.element, checkedClass);
+        } else {
+          this.removeClass(this.element, checkedClass);
+        }
+      }
+
+      return changed;
     }
   }, {
     key: "defaultSchema",
@@ -47924,7 +47936,7 @@ function (_BaseComponent) {
 
   }, {
     key: "addCurrentChoices",
-    value: function addCurrentChoices(values, items) {
+    value: function addCurrentChoices(values, items, keyValue) {
       var _this5 = this;
 
       if (!values) {
@@ -47953,7 +47965,8 @@ function (_BaseComponent) {
               return false;
             }
 
-            found |= _lodash.default.isEqual(_this5.itemValue(choice, isSelectOptions), value);
+            var itemValue = keyValue ? choice.value : _this5.itemValue(choice, isSelectOptions);
+            found |= _lodash.default.isEqual(itemValue, value);
             return found ? false : true;
           });
         } // Add the default option if no item is found.
@@ -47972,7 +47985,7 @@ function (_BaseComponent) {
 
       if (notFoundValuesToAdd.length) {
         if (this.choices) {
-          this.choices.setChoices(notFoundValuesToAdd, 'value', 'label', true);
+          this.choices.setChoices(notFoundValuesToAdd, 'value', 'label');
         } else {
           notFoundValuesToAdd.map(function (notFoundValue) {
             _this5.addOption(notFoundValue.value, notFoundValue.label);
@@ -48064,8 +48077,12 @@ function (_BaseComponent) {
           this.choices.removeActiveItems(); // Add the currently selected choices if they don't already exist.
 
           var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
-          this.addCurrentChoices(currentChoices, this.selectOptions);
-          this.choices.setChoices(this.selectOptions, 'value', 'label', true).setChoiceByValue(value);
+
+          if (!this.addCurrentChoices(currentChoices, this.selectOptions, true)) {
+            this.choices.setChoices(this.selectOptions, 'value', 'label', true);
+          }
+
+          this.choices.setChoiceByValue(value);
         } else if (hasPreviousValue) {
           this.choices.removeActiveItems();
         }
@@ -51430,18 +51447,27 @@ function (_TextFieldComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
+      var _this5 = this;
+
       value = value || '';
 
       if (this.options.readOnly || this.htmlView) {
         // For readOnly, just view the contents.
         if (this.input) {
+          if (Array.isArray(value)) {
+            value = value.join('<br/><br/>');
+          }
+
           this.input.innerHTML = this.interpolate(value);
         }
 
         this.dataValue = value;
         return;
       } else if (this.isPlain) {
-        return _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, this.setConvertedValue(value), flags);
+        value = Array.isArray(value) ? value.map(function (val) {
+          return _this5.setConvertedValue(val);
+        }) : this.setConvertedValue(value);
+        return _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, value, flags);
       } // Set the value when the editor is ready.
 
 
@@ -51484,11 +51510,7 @@ function (_TextFieldComponent) {
         return this.getConvertedValue(_get(_getPrototypeOf(TextAreaComponent.prototype), "getValue", this).call(this));
       }
 
-      if (this.editor || this.quill) {
-        return this.dataValue;
-      }
-
-      return this.component.multiple ? [] : '';
+      return this.dataValue;
     }
   }, {
     key: "elementInfo",
@@ -51823,6 +51845,8 @@ __webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
+__webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
+
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
@@ -51893,10 +51917,8 @@ function (_BaseComponent) {
       } //if component should have multiple masks
 
 
-      var id = "".concat(this.key);
       var attr = this.info.attr;
       attr.class += ' formio-multiple-mask-input';
-      attr.id = id;
       var textInput = this.ce('input', attr);
       var inputGroup = this.ce('div', {
         class: 'input-group formio-multiple-mask-container'
@@ -51955,6 +51977,31 @@ function (_BaseComponent) {
       }
     }
   }, {
+    key: "removeTags",
+    value: function removeTags(value) {
+      if (!value) {
+        return;
+      }
+
+      var removeEditorBlank = function removeEditorBlank(input) {
+        if (typeof input !== 'string') {
+          return input;
+        }
+
+        return input.replace(/<(.*?)>/g, '');
+      };
+
+      if (Array.isArray(value)) {
+        value.forEach(function (input, index) {
+          value[index] = removeEditorBlank(input);
+        });
+      } else {
+        value = removeEditorBlank(value);
+      }
+
+      return value;
+    }
+  }, {
     key: "onChange",
     value: function onChange(flags, fromRoot) {
       _get(_getPrototypeOf(TextFieldComponent.prototype), "onChange", this).call(this, flags, fromRoot);
@@ -51964,7 +52011,8 @@ function (_BaseComponent) {
       }
 
       if (this.charCount) {
-        this.setCounter('characters', this.charCount, this.dataValue.length, this.maxCharCount);
+        var value = this.component.wysiwyg ? this.removeTags(this.dataValue) : this.dataValue;
+        this.setCounter('characters', this.charCount, value.length, this.maxCharCount);
       }
     }
   }, {
@@ -94445,7 +94493,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var popper_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! popper.js */ "./node_modules/popper.js/dist/esm/popper.js");
 /**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.3.1
+ * @version 1.3.2
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -94736,12 +94784,12 @@ var Tooltip = function () {
       });
 
       this._popperOptions.modifiers = _extends({}, this._popperOptions.modifiers, {
-        arrow: {
-          element: this.options.arrowSelector
-        },
-        offset: {
+        arrow: _extends({}, this._popperOptions.modifiers && this._popperOptions.modifiers.arrow, {
+          element: options.arrowSelector
+        }),
+        offset: _extends({}, this._popperOptions.modifiers && this._popperOptions.modifiers.offset, {
           offset: options.offset
-        }
+        })
       });
 
       if (options.boundariesElement) {
@@ -94908,8 +94956,8 @@ var Tooltip = function () {
       this._isOpening = false;
       // defaults to 0
       var computedDelay = delay && delay.hide || delay || 0;
+      window.clearTimeout(this._showTimeout);
       window.setTimeout(function () {
-        window.clearTimeout(_this4._showTimeout);
         if (_this4._isOpen === false) {
           return;
         }
@@ -94941,7 +94989,7 @@ var Tooltip = function () {
         }
         return;
       }
-      var titleNode = this._tooltipNode.parentNode.querySelector(this.options.innerSelector);
+      var titleNode = this._tooltipNode.querySelector(this.options.innerSelector);
       this._clearTitleContent(titleNode, this.options.html, this.reference.getAttribute('title') || this.options.title);
       this._addTitleContent(this.reference, title, this.options.html, titleNode);
       this.options.title = title;

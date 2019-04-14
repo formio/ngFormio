@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "3.14.3",
+  "version": "3.15.0-beta.1",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/ng-formio.js",
   "scripts": {
@@ -12,12 +12,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "angular": "^1.7.8",
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.4.3",
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/plugin-proposal-optional-chaining": "^7.2.0",
     "@babel/preset-env": "^7.4.3",
+    "angular": "^1.7.8",
     "autoprefixer": "^9.5.1",
     "babel-loader": "^8.0.5",
     "core-js": "^2.6.5",
@@ -25,7 +25,7 @@
     "eslint-loader": "^2.1.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^3.0.1",
-    "formiojs": "^3.19.7",
+    "formiojs": "^3.20.0-beta.2",
     "hoek": "^6.1.3",
     "html-loader": "^0.5.5",
     "json-loader": "^0.5.7",
@@ -34,7 +34,7 @@
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "uglifyjs-webpack-plugin": "^2.1.2",
-    "webpack": "^4.29.6",
+    "webpack": "^4.30.0",
     "webpack-cli": "^3.3.0",
     "webpack-merge": "^4.1.4",
     "webpack-node-externals": "^1.7.2"
