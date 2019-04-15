@@ -38,7 +38,7 @@ export default app.directive('formio', function() {
 
           if ($scope.src || $scope.form) {
             $scope.initialized = true;
-            Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(formio => {
+            Formio.createForm($scope.element, $scope.src || $scope.form, _.cloneDeep($scope.options)).then(formio => {
               formio.nosubmit = $scope.noSubmit;
               $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
               $scope.formio = formio;

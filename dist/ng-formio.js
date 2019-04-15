@@ -245,7 +245,7 @@ var _default = app.directive('formio', function () {
         if ($scope.src || $scope.form) {
           $scope.initialized = true;
 
-          _formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, $scope.options).then(function (formio) {
+          _formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, _.cloneDeep($scope.options)).then(function (formio) {
             formio.nosubmit = $scope.noSubmit;
             $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
             $scope.formio = formio;
@@ -20723,7 +20723,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var Element =
 /*#__PURE__*/
 function () {
-  function Element(options, id) {
+  function Element(options) {
     _classCallCheck(this, Element);
 
     /**
@@ -20742,7 +20742,7 @@ function () {
      * @type {string}
      */
 
-    this.id = id || FormioUtils.getRandomComponentId();
+    this.id = FormioUtils.getRandomComponentId();
     /**
      * An array of event handlers so that the destry command can deregister them.
      * @type {Array}
@@ -22932,7 +22932,11 @@ function () {
       Formio.tokens[tokenName] = token;
 
       if (!token) {
-        Formio.setUser(null, opts); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+        if (!opts.fromUser) {
+          opts.fromToken = true;
+          Formio.setUser(null, opts);
+        } // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
+
 
         try {
           return localStorage.removeItem(tokenName);
@@ -22985,7 +22989,11 @@ function () {
       var userName = "".concat(opts.namespace || Formio.namespace || 'formio', "User");
 
       if (!user) {
-        Formio.setToken(null, opts); // Emit an event on the cleared user.
+        if (!opts.fromToken) {
+          opts.fromUser = true;
+          Formio.setToken(null, opts);
+        } // Emit an event on the cleared user.
+
 
         Formio.events.emit('formio.user', null); // iOS in private browse mode will throw an error but we can't detect ahead of time that we are in private mode.
 
@@ -24982,6 +24990,8 @@ function (_NestedComponent) {
   }, {
     key: "init",
     value: function init() {
+      var _this9 = this;
+
       this._submission = this._submission || {}; // Remove any existing components.
 
       if (this.components && this.components.length) {
@@ -25004,18 +25014,47 @@ function (_NestedComponent) {
         this.build();
       }
 
+      this.on('submitButton', function (options) {
+        return _this9.submit(false, options);
+      }, true);
+      this.on('checkValidity', function (data) {
+        return _this9.checkValidity(null, true, data);
+      }, true);
+      this.on('requestUrl', function (args) {
+        return _this9.submitUrl(args.url, args.headers);
+      }, true);
+      this.on('resetForm', function () {
+        return _this9.resetValue();
+      }, true);
+      this.on('deleteSubmission', function () {
+        return _this9.deleteSubmission();
+      }, true);
+      this.on('refreshData', function () {
+        return _this9.updateValue();
+      }, true);
       return this.formReady;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this.off('submitButton');
+      this.off('checkValidity');
+      this.off('requestUrl');
+      this.off('resetForm');
+      this.off('deleteSubmission');
+      this.off('refreshData');
+      return _get(_getPrototypeOf(Webform.prototype), "destroy", this).call(this);
     }
   }, {
     key: "build",
     value: function build(element) {
-      var _this9 = this;
+      var _this10 = this;
 
       element = element || this.element;
 
       if (element) {
         return this.ready.then(function () {
-          return _get(_getPrototypeOf(Webform.prototype), "build", _this9).call(_this9, element);
+          return _get(_getPrototypeOf(Webform.prototype), "build", _this10).call(_this10, element);
         });
       }
 
@@ -25044,7 +25083,7 @@ function (_NestedComponent) {
   }, {
     key: "attach",
     value: function attach(element) {
-      var _this10 = this;
+      var _this11 = this;
 
       this.element = element;
       this.loadRefs(element, {
@@ -25052,27 +25091,9 @@ function (_NestedComponent) {
       });
       var childPromise = this.attachComponents(this.refs.webform);
       this.refs.webform.addEventListener('keydown', this.executeShortcuts.bind(this));
-      this.on('submitButton', function (options) {
-        return _this10.submit(false, options);
-      }, true);
-      this.on('checkValidity', function (data) {
-        return _this10.checkValidity(null, true, data);
-      }, true);
-      this.on('requestUrl', function (args) {
-        return _this10.submitUrl(args.url, args.headers);
-      }, true);
-      this.on('resetForm', function () {
-        return _this10.resetValue();
-      }, true);
-      this.on('deleteSubmission', function () {
-        return _this10.deleteSubmission();
-      }, true);
-      this.on('refreshData', function () {
-        return _this10.updateValue();
-      }, true);
       this.currentForm = this;
       setTimeout(function () {
-        return _this10.emit('render');
+        return _this11.emit('render');
       }, 1);
       return childPromise;
     }
@@ -25144,7 +25165,7 @@ function (_NestedComponent) {
   }, {
     key: "showErrors",
     value: function showErrors(error, triggerEvent) {
-      var _this11 = this;
+      var _this12 = this;
 
       this.loading = false;
       var errors = this.errors;
@@ -25178,7 +25199,7 @@ function (_NestedComponent) {
         }
 
         components.forEach(function (path) {
-          var component = _this11.getComponent(path, _lodash.default.identity);
+          var component = _this12.getComponent(path, _lodash.default.identity);
 
           var components = _lodash.default.compact(Array.isArray(component) ? component : [component]);
 
@@ -25315,12 +25336,12 @@ function (_NestedComponent) {
   }, {
     key: "deleteSubmission",
     value: function deleteSubmission() {
-      var _this12 = this;
+      var _this13 = this;
 
       return this.formio.deleteSubmission().then(function () {
-        _this12.emit('submissionDeleted', _this12.submission);
+        _this13.emit('submissionDeleted', _this13.submission);
 
-        _this12.resetValue();
+        _this13.resetValue();
       });
     }
     /**
@@ -25342,24 +25363,24 @@ function (_NestedComponent) {
   }, {
     key: "submitForm",
     value: function submitForm() {
-      var _this13 = this;
+      var _this14 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       return new Promise(function (resolve, reject) {
         // Read-only forms should never submit.
-        if (_this13.options.readOnly) {
+        if (_this14.options.readOnly) {
           return resolve({
-            submission: _this13.submission,
+            submission: _this14.submission,
             saved: false
           });
         } // Add in metadata about client submitting the form
 
 
-        _this13.submission.metadata = _this13.submission.metadata || {};
+        _this14.submission.metadata = _this14.submission.metadata || {};
 
-        _lodash.default.defaults(_this13.submission.metadata, {
-          timezone: _lodash.default.get(_this13, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
-          offset: parseInt(_lodash.default.get(_this13, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
+        _lodash.default.defaults(_this14.submission.metadata, {
+          timezone: _lodash.default.get(_this14, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
+          offset: parseInt(_lodash.default.get(_this14, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
           referrer: document.referrer,
           browserName: navigator.appName,
           userAgent: navigator.userAgent,
@@ -25367,12 +25388,12 @@ function (_NestedComponent) {
           onLine: navigator.onLine
         });
 
-        var submission = _lodash.default.cloneDeep(_this13.submission || {});
+        var submission = _lodash.default.cloneDeep(_this14.submission || {});
 
         submission.state = options.state || 'submitted';
         var isDraft = submission.state === 'draft';
 
-        _this13.hook('beforeSubmit', submission, function (err) {
+        _this14.hook('beforeSubmit', submission, function (err) {
           if (err) {
             return reject(err);
           }
@@ -25381,11 +25402,11 @@ function (_NestedComponent) {
             return reject('Invalid Submission');
           }
 
-          if (!isDraft && !_this13.checkValidity(submission.data, true)) {
+          if (!isDraft && !_this14.checkValidity(submission.data, true)) {
             return reject();
           }
 
-          _this13.getAllComponents().forEach(function (comp) {
+          _this14.getAllComponents().forEach(function (comp) {
             var _comp$component = comp.component,
                 persistent = _comp$component.persistent,
                 key = _comp$component.key;
@@ -25395,7 +25416,7 @@ function (_NestedComponent) {
             }
           });
 
-          _this13.hook('customValidation', submission, function (err) {
+          _this14.hook('customValidation', submission, function (err) {
             if (err) {
               // If string is returned, cast to object.
               if (typeof err === 'string') {
@@ -25407,19 +25428,19 @@ function (_NestedComponent) {
 
               err = Array.isArray(err) ? err : [err]; // Set as custom errors.
 
-              _this13.customErrors = err;
+              _this14.customErrors = err;
               return reject();
             }
 
-            _this13.loading = true; // Use the form action to submit the form if available.
+            _this14.loading = true; // Use the form action to submit the form if available.
 
-            var submitFormio = _this13.formio;
+            var submitFormio = _this14.formio;
 
-            if (_this13._form && _this13._form.action) {
-              submitFormio = new _Formio.default(_this13._form.action, _this13.formio ? _this13.formio.options : {});
+            if (_this14._form && _this14._form.action) {
+              submitFormio = new _Formio.default(_this14._form.action, _this14.formio ? _this14.formio.options : {});
             }
 
-            if (_this13.nosubmit || !submitFormio) {
+            if (_this14.nosubmit || !submitFormio) {
               return resolve({
                 submission: submission,
                 saved: false
@@ -25441,16 +25462,16 @@ function (_NestedComponent) {
   }, {
     key: "executeSubmit",
     value: function executeSubmit(options) {
-      var _this14 = this;
+      var _this15 = this;
 
       this.submitted = true;
       this.submitting = true;
       return this.submitForm(options).then(function (_ref) {
         var submission = _ref.submission,
             saved = _ref.saved;
-        return _this14.onSubmit(submission, saved);
+        return _this15.onSubmit(submission, saved);
       }).catch(function (err) {
-        return Promise.reject(_this14.onSubmissionError(err));
+        return Promise.reject(_this15.onSubmissionError(err));
       });
     }
     /**
@@ -25477,11 +25498,11 @@ function (_NestedComponent) {
   }, {
     key: "submit",
     value: function submit(before, options) {
-      var _this15 = this;
+      var _this16 = this;
 
       if (!before) {
         return this.beforeSubmit(options).then(function () {
-          return _this15.executeSubmit(options);
+          return _this16.executeSubmit(options);
         });
       } else {
         return this.executeSubmit(options);
@@ -25490,7 +25511,7 @@ function (_NestedComponent) {
   }, {
     key: "submitUrl",
     value: function submitUrl(URL, headers) {
-      var _this16 = this;
+      var _this17 = this;
 
       if (!URL) {
         return console.warn('Missing URL argument');
@@ -25506,7 +25527,7 @@ function (_NestedComponent) {
       if (headers && headers.length > 0) {
         headers.map(function (e) {
           if (e.header !== '' && e.value !== '') {
-            settings.headers[e.header] = _this16.interpolate(e.value, submission);
+            settings.headers[e.header] = _this17.interpolate(e.value, submission);
           }
         });
       }
@@ -25516,9 +25537,9 @@ function (_NestedComponent) {
           _Formio.default.makeStaticRequest(API_URL, settings.method, submission, {
             headers: settings.headers
           }).then(function () {
-            _this16.emit('requestDone');
+            _this17.emit('requestDone');
 
-            _this16.setAlert('success', '<p> Success </p>');
+            _this17.setAlert('success', '<p> Success </p>');
           });
         } catch (e) {
           this.showErrors("".concat(e.statusText, " ").concat(e.status));
@@ -25549,10 +25570,10 @@ function (_NestedComponent) {
   }, {
     key: "language",
     set: function set(lang) {
-      var _this17 = this;
+      var _this18 = this;
 
       return new Promise(function (resolve, reject) {
-        _this17.options.language = lang;
+        _this18.options.language = lang;
 
         try {
           _i18next.default.changeLanguage(lang, function (err) {
@@ -25560,9 +25581,9 @@ function (_NestedComponent) {
               return reject(err);
             }
 
-            _this17.redraw();
+            _this18.redraw();
 
-            _this17.emit('languageChanged');
+            _this18.emit('languageChanged');
 
             resolve();
           });
@@ -25602,11 +25623,11 @@ function (_NestedComponent) {
   }, {
     key: "ready",
     get: function get() {
-      var _this18 = this;
+      var _this19 = this;
 
       return this.formReady.then(function () {
-        return _get(_getPrototypeOf(Webform.prototype), "ready", _this18).then(function () {
-          return _this18.loadingSubmission ? _this18.submissionReady : true;
+        return _get(_getPrototypeOf(Webform.prototype), "ready", _this19).then(function () {
+          return _this19.loadingSubmission ? _this19.submissionReady : true;
         });
       });
     }
@@ -26983,7 +27004,7 @@ function (_Webform) {
     key: "setPage",
     value: function setPage(num) {
       if (num === this.page) {
-        return;
+        return Promise.resolve();
       }
 
       if (!this.wizard.full && num >= 0 && num < this.pages.length) {
@@ -28525,7 +28546,7 @@ function (_Element) {
       template: 'bootstrap3',
       renderMode: 'form',
       attachMode: 'full'
-    }, options || {}), component && component.id ? component.id : null)); // Save off the original component.
+    }, options || {}))); // Save off the original component.
 
     _this.originalComponent = _lodash.default.cloneDeep(component);
     /**
@@ -32547,6 +32568,15 @@ function (_Field) {
           }
         }
       });
+    }
+  }, {
+    key: "flattenComponents",
+    value: function flattenComponents() {
+      var result = {};
+      this.everyComponent(function (component) {
+        result[component.key] = component;
+      });
+      return result;
     }
     /**
      * Perform an iteration over each component within this container component.
@@ -40356,12 +40386,15 @@ function (_NestedComponent) {
   _createClass(EditGridComponent, [{
     key: "init",
     value: function init() {
+      var _this2 = this;
+
       this.components = this.components || [];
       var dataValue = this.dataValue || [];
-      this.editRows = dataValue.map(function (row) {
+      this.editRows = dataValue.map(function (row, rowIndex) {
         return {
           isOpen: false,
-          data: row
+          data: row,
+          components: _this2.createRowComponents(row, rowIndex)
         };
       }); // In builder we need one row so the components will show up.
 
@@ -40371,9 +40404,9 @@ function (_NestedComponent) {
     }
   }, {
     key: "render",
-    value: function render() {
+    value: function render(children) {
       var dataValue = this.dataValue || [];
-      return _get(_getPrototypeOf(EditGridComponent.prototype), "render", this).call(this, this.renderTemplate('editgrid', {
+      return _get(_getPrototypeOf(EditGridComponent.prototype), "render", this).call(this, children || this.renderTemplate('editgrid', {
         editgridKey: this.editgridKey,
         header: this.renderString(_lodash.default.get(this.component, 'templates.header'), {
           components: this.component.components,
@@ -40396,20 +40429,20 @@ function (_NestedComponent) {
     key: "attach",
     value: function attach(element) {
       var _this$loadRefs,
-          _this2 = this;
+          _this3 = this;
 
       this.loadRefs(element, (_this$loadRefs = {}, _defineProperty(_this$loadRefs, "".concat(this.editgridKey, "-addRow"), 'multiple'), _defineProperty(_this$loadRefs, "".concat(this.editgridKey, "-removeRow"), 'multiple'), _defineProperty(_this$loadRefs, "".concat(this.editgridKey, "-saveRow"), 'multiple'), _defineProperty(_this$loadRefs, "".concat(this.editgridKey, "-cancelRow"), 'multiple'), _defineProperty(_this$loadRefs, this.editgridKey, 'multiple'), _this$loadRefs));
       this.refs["".concat(this.editgridKey, "-addRow")].forEach(function (addButton) {
-        _this2.addEventListener(addButton, 'click', _this2.addRow.bind(_this2));
+        _this3.addEventListener(addButton, 'click', _this3.addRow.bind(_this3));
       });
       var openRowCount = 0;
       this.refs[this.editgridKey].forEach(function (row, rowIndex) {
-        if (_this2.editRows[rowIndex].isOpen) {
-          _this2.attachComponents(row, _this2.editRows[rowIndex].components);
+        if (_this3.editRows[rowIndex].isOpen) {
+          _this3.attachComponents(row, _this3.editRows[rowIndex].components);
 
-          _this2.addEventListener(_this2.refs["".concat(_this2.editgridKey, "-saveRow")][openRowCount], 'click', _this2.saveRow.bind(_this2, rowIndex));
+          _this3.addEventListener(_this3.refs["".concat(_this3.editgridKey, "-saveRow")][openRowCount], 'click', _this3.saveRow.bind(_this3, rowIndex));
 
-          _this2.addEventListener(_this2.refs["".concat(_this2.editgridKey, "-cancelRow")][openRowCount], 'click', _this2.cancelRow.bind(_this2, rowIndex));
+          _this3.addEventListener(_this3.refs["".concat(_this3.editgridKey, "-cancelRow")][openRowCount], 'click', _this3.cancelRow.bind(_this3, rowIndex));
 
           openRowCount++;
         } else {
@@ -40417,11 +40450,11 @@ function (_NestedComponent) {
           [{
             class: 'removeRow',
             event: 'click',
-            action: _this2.removeRow.bind(_this2, rowIndex)
+            action: _this3.removeRow.bind(_this3, rowIndex)
           }, {
             class: 'editRow',
             event: 'click',
-            action: _this2.editRow.bind(_this2, rowIndex)
+            action: _this3.editRow.bind(_this3, rowIndex)
           }].forEach(function (action) {
             var elements = row.getElementsByClassName(action.class);
             Array.prototype.forEach.call(elements, function (element) {
@@ -40442,7 +40475,7 @@ function (_NestedComponent) {
   }, {
     key: "renderRow",
     value: function renderRow(row, rowIndex) {
-      var _this3 = this;
+      var _this4 = this;
 
       var dataValue = this.dataValue || [];
 
@@ -40453,8 +40486,15 @@ function (_NestedComponent) {
           row: dataValue[rowIndex],
           rowIndex: rowIndex,
           components: this.component.components,
+          flattenedComponents: this.flattenComponents(rowIndex),
           getView: function getView(component, data) {
-            return _Components.default.create(component, _this3.options, data, true).getView(data);
+            console.log('getView() method is depricated, consider usage of flattenedComponents[componentKey].getView(data)');
+
+            var builtComponent = _Components.default.create(component, _this4.options, data, true);
+
+            var result = builtComponent.getView(data);
+            builtComponent.destroy();
+            return result;
           }
         });
       }
@@ -40494,6 +40534,47 @@ function (_NestedComponent) {
 
 
       return valid;
+    }
+  }, {
+    key: "everyComponent",
+    value: function everyComponent(fn, rowIndex) {
+      var components = this.getComponents(rowIndex);
+
+      _lodash.default.each(components, function (component, index) {
+        if (fn(component, components, index) === false) {
+          return false;
+        }
+
+        if (typeof component.everyComponent === 'function') {
+          if (component.everyComponent(fn) === false) {
+            return false;
+          }
+        }
+      });
+    }
+  }, {
+    key: "flattenComponents",
+    value: function flattenComponents(rowIndex) {
+      var result = {};
+      this.everyComponent(function (component) {
+        result[component.key] = component;
+      }, rowIndex);
+      return result;
+    }
+  }, {
+    key: "getComponents",
+    value: function getComponents(rowIndex) {
+      return this.options.builder ? _get(_getPrototypeOf(EditGridComponent.prototype), "getComponents", this).call(this) : _lodash.default.isNumber(rowIndex) ? this.editRows[rowIndex].components || [] : this.editRows.reduce(function (result, row) {
+        return result.concat(row.components || []);
+      }, []);
+    }
+  }, {
+    key: "destroyComponents",
+    value: function destroyComponents(rowIndex) {
+      var components = this.getComponents(rowIndex).slice();
+      components.forEach(function (comp) {
+        return comp.destroy();
+      });
     }
   }, {
     key: "addRow",
@@ -40538,7 +40619,6 @@ function (_NestedComponent) {
         editRow.data = dataSnapshot;
       }
 
-      editRow.components = this.createRowComponents(editRow.data, rowIndex);
       this.redraw();
     }
   }, {
@@ -40578,6 +40658,7 @@ function (_NestedComponent) {
         this.clearErrors(rowIndex);
       } else {
         this.clearErrors(rowIndex);
+        this.destroyComponents(rowIndex);
 
         if (this.component.inlineEdit) {
           this.splice(rowIndex);
@@ -40636,6 +40717,7 @@ function (_NestedComponent) {
         return;
       }
 
+      this.destroyComponents(rowIndex);
       this.splice(rowIndex);
       this.editRows.splice(rowIndex, 1);
       this.updateValue();
@@ -40646,18 +40728,18 @@ function (_NestedComponent) {
   }, {
     key: "createRowComponents",
     value: function createRowComponents(row, rowIndex) {
-      var _this4 = this;
+      var _this5 = this;
 
       var components = [];
       this.component.components.map(function (col, colIndex) {
         var column = _lodash.default.clone(col);
 
-        var options = _lodash.default.clone(_this4.options);
+        var options = _lodash.default.clone(_this5.options);
 
         options.name += "[".concat(rowIndex, "]");
         options.row = "".concat(rowIndex, "-").concat(colIndex);
 
-        var comp = _this4.createComponent(_lodash.default.assign({}, column, {
+        var comp = _this5.createComponent(_lodash.default.assign({}, column, {
           row: options.row
         }), options, row);
 
@@ -40707,7 +40789,7 @@ function (_NestedComponent) {
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!this.checkCondition(null, data)) {
         this.setCustomValidity('');
@@ -40718,7 +40800,7 @@ function (_NestedComponent) {
       var rowsClosed = true;
       this.editRows.forEach(function (editRow, rowIndex) {
         // Trigger all errors on the row.
-        var rowValid = _this5.validateRow(rowIndex, dirty);
+        var rowValid = _this6.validateRow(rowIndex, dirty);
 
         rowsValid &= rowValid; // Any open rows causes validation to fail.
 
@@ -40755,7 +40837,7 @@ function (_NestedComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this6 = this;
+      var _this7 = this;
 
       if (!value) {
         return;
@@ -40773,7 +40855,7 @@ function (_NestedComponent) {
       this.dataValue = value; // Refresh editRow data when data changes.
 
       this.dataValue.forEach(function (row, rowIndex) {
-        var editRow = _this6.editRows[rowIndex];
+        var editRow = _this7.editRows[rowIndex];
 
         if (editRow) {
           editRow.data = row;
@@ -40785,8 +40867,8 @@ function (_NestedComponent) {
             });
           }
         } else {
-          _this6.editRows[rowIndex] = {
-            components: [],
+          _this7.editRows[rowIndex] = {
+            components: _this7.createRowComponents(row, rowIndex),
             isOpen: false,
             data: row
           };
@@ -45280,7 +45362,7 @@ function (_Field) {
         return this.dataValue;
       }
 
-      var value = '';
+      var value = this.dataValue;
 
       if (!this.refs.input) {
         return value;
@@ -47031,8 +47113,8 @@ function (_Field) {
       } // Choices will return undefined if nothing is selected. We really want '' to be empty.
 
 
-      if (value === undefined || value === null) {
-        value = '';
+      if (value === undefined || value === null || value === '') {
+        value = this.dataValue;
       }
 
       return value;
@@ -54938,7 +55020,7 @@ exports.default = void 0;
 var flat = "{% component.components.forEach(function(tab, index) { %}\n  <div class=\"mb-2 card border\">\n    <div class=\"card-header bg-default\">\n      <h4 class=\"mb-0 card-title\">{{ t(tab.label) }}</h4>\n    </div>\n    <div class=\"card-body\">\n      {{ tabComponents[index] }}\n    </div>\n  </div>\n{% }) %}\n";
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"card\">\n  <div class=\"card-header\">\n    <ul class=\"nav nav-tabs card-header-tabs\">\n      {% component.components.forEach(function(tab, index) { %}\n      <li class=\"nav-item{{ currentTab === index ? ' active' : ''}}\" role=\"presentation\" ref=\"{{tabLikey}}\">\n        <a class=\"nav-link{{ currentTab === index ? ' active' : ''}}\" href=\"#{{tab.key}}\" ref=\"{{tabLinkKey}}\">{{t(tab.label)}}</a>\n      </li>\n      {% }) %}\n    </ul>\n  </div>\n  {% component.components.forEach(function(tab, index) { %}\n  <div \n    role=\"tabpanel\" \n    class=\"card-body tab-pane{{ currentTab === index ? ' active' : ''}}\"\n    style=\"display: {{currentTab === index ? 'block' : 'none'}}\" \n    ref=\"{{tabKey}}\"\"\n  >\n    {{tabComponents[index]}}\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div class=\"card\">\n  <div class=\"card-header\">\n    <ul class=\"nav nav-tabs card-header-tabs\">\n      {% component.components.forEach(function(tab, index) { %}\n      <li class=\"nav-item{{ currentTab === index ? ' active' : ''}}\" role=\"presentation\" ref=\"{{tabLikey}}\">\n        <a class=\"nav-link{{ currentTab === index ? ' active' : ''}}\" href=\"#{{tab.key}}\" ref=\"{{tabLinkKey}}\">{{t(tab.label)}}</a>\n      </li>\n      {% }) %}\n    </ul>\n  </div>\n  {% component.components.forEach(function(tab, index) { %}\n  <div\n    role=\"tabpanel\"\n    class=\"card-body tab-pane{{ currentTab === index ? ' active' : ''}}\"\n    style=\"display: {{currentTab === index ? 'block' : 'none'}}\"\n    ref=\"{{tabKey}}\"\n  >\n    {{tabComponents[index]}}\n  </div>\n  {% }) %}\n</div>\n";
 var _default = {
   flat: flat,
   form: form
