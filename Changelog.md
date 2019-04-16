@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.3.6
+### Changed
+ - Removed Moxtra
+
+### Added
+ - The ability to pick the "page" that a control is added to a PDF by modifying the component overlay settings.
+
 ## 6.2.x
 ### Changed
  - Adding Project configurations
