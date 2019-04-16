@@ -2108,7 +2108,7 @@ app.controller('FormActionEditController', [
 
         if(actionInfo && actionInfo.name === 'oauth') {
           // Show warning if button component has no options
-          var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
+          var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings.button');
           if(JSON.parse(buttonComponent.data.json).length === 0) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
           }

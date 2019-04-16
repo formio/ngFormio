@@ -64,7 +64,7 @@
     "moment": "^2.24.0",
     "ng-dialog": "^1.4.0",
     "ng-file-upload": "^12.2.13",
-    "ng-formio": "^4.0.0-beta.8",
+    "ng-formio": "^4.0.0-beta.9",
     "ng-sortable": "^1.3.8",
     "ng-tags-input": "^3.2.0",
     "node-sass": "^4.11.0",
