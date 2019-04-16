@@ -240,6 +240,12 @@ var _default = app.directive('formio', function () {
 
         if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
           $scope.options.readOnly = $scope.readOnly;
+        } // Add the live form parameter to the url.
+
+
+        if ($scope.src && $scope.src.indexOf('live=') === -1) {
+          $scope.src += $scope.src.indexOf('?') === -1 ? '?' : '&';
+          $scope.src += 'live=1';
         }
 
         if ($scope.src || $scope.form) {

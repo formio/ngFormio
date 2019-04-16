@@ -36,6 +36,12 @@ export default app.directive('formio', function() {
             $scope.options.readOnly = $scope.readOnly;
           }
 
+          // Add the live form parameter to the url.
+          if ($scope.src && ($scope.src.indexOf('live=') === -1)) {
+            $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
+            $scope.src += 'live=1';
+          }
+
           if ($scope.src || $scope.form) {
             $scope.initialized = true;
             Formio.createForm($scope.element, $scope.src || $scope.form, _.cloneDeep($scope.options)).then(formio => {
