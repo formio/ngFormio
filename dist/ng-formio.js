@@ -218,6 +218,7 @@ var _default = app.directive('formio', function () {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
+      hideComponents: '=?',
       noSubmit: '=?',
       options: '<?'
     },
@@ -240,8 +241,17 @@ var _default = app.directive('formio', function () {
 
         if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
           $scope.options.readOnly = $scope.readOnly;
-        } // Add the live form parameter to the url.
+        } // Allow legacy hideComponents support.
 
+
+        if (!$scope.options.hasOwnProperty('hide') && $scope.hideComponents) {
+          $scope.options.hide = $scope.hideComponents.reduce(function (option, key) {
+            option[key] = true;
+            return option;
+          }, {});
+        }
+
+        console.log('here', $scope.hideComponents, $scope.options); // Add the live form parameter to the url.
 
         if ($scope.src && $scope.src.indexOf('live=') === -1) {
           $scope.src += $scope.src.indexOf('?') === -1 ? '?' : '&';

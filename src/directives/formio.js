@@ -10,6 +10,7 @@ export default app.directive('formio', function() {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
+      hideComponents: '=?',
       noSubmit: '=?',
       options: '<?'
     },
@@ -34,6 +35,14 @@ export default app.directive('formio', function() {
           // Set read only if using legacy option.
           if (!$scope.options.hasOwnProperty('readOnly') && $scope.readOnly !== undefined) {
             $scope.options.readOnly = $scope.readOnly;
+          }
+
+          // Allow legacy hideComponents support.
+          if (!$scope.options.hasOwnProperty('hide') && $scope.hideComponents) {
+            $scope.options.hide = $scope.hideComponents.reduce((option, key) => {
+              option[key] = true;
+              return option;
+            }, {});
           }
 
           // Add the live form parameter to the url.
