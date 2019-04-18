@@ -1,13 +1,13 @@
 {
   "name": "ng-formio",
-  "version": "4.0.0-beta.9",
+  "version": "4.0.0-beta.10",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/ng-formio.js",
   "scripts": {
     "test": "node test/test",
     "build": "babel --verbose ./src --ignore=*.spec.js --out-dir ./lib && webpack --config config/webpack.dev.js && webpack --config config/webpack.prod.js",
     "tagbuild": "VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && npm run build && git add -A && git commit -m \"Build $Version\" || true && git push origin 4.x && git tag v$VERSION && git push origin --tags",
-    "release": "npm run tagbuild && npm publish;"
+    "release": "npm run tagbuild && npm publish --tag beta;"
   },
   "author": "",
   "license": "ISC",
