@@ -249,9 +249,8 @@ var _default = app.directive('formio', function () {
             option[key] = true;
             return option;
           }, {});
-        }
+        } // Add the live form parameter to the url.
 
-        console.log('here', $scope.hideComponents, $scope.options); // Add the live form parameter to the url.
 
         if ($scope.src && $scope.src.indexOf('live=') === -1) {
           $scope.src += $scope.src.indexOf('?') === -1 ? '?' : '&';
@@ -299,8 +298,8 @@ var _default = app.directive('formio', function () {
               break;
 
             case 'submit':
-              var submission = args[1];
-              args[0] = submission.saved ? 'formSubmission' : 'formSubmit';
+              args[0] = $scope.formio.nosubmit || !$scope.formio._src ? 'formSubmission' : 'formSubmit';
+              console.log('submit', args, $scope.formio);
               break;
 
             case 'submitDone':
@@ -21032,8 +21031,8 @@ function () {
     key: "ce",
     value: function ce(type, attr) {
       var children = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-      console.warn('Call to deprecated this.ce(). Dom elements should be created with templates, not manually with ce.'); // Create the element.
-
+      // console.warn('Call to deprecated this.ce(). Dom elements should be created with templates, not manually with ce.');
+      // Create the element.
       var element = document.createElement(type); // Add attributes.
 
       if (attr) {
@@ -25066,11 +25065,11 @@ function (_NestedComponent) {
     value: function build(element) {
       var _this10 = this;
 
-      element = element || this.element;
-
-      if (element) {
+      if (element || this.element) {
         return this.ready.then(function () {
-          return _get(_getPrototypeOf(Webform.prototype), "build", _this10).call(_this10, element);
+          element = element || _this10.element;
+
+          _get(_getPrototypeOf(Webform.prototype), "build", _this10).call(_this10, element);
         });
       }
 
@@ -28757,7 +28756,9 @@ function (_Element) {
 
   _createClass(Component, [{
     key: "init",
-    value: function init() {// Can be overridden
+    value: function init() {
+      // Attach the refresh on events.
+      this.attachRefreshOn();
     }
   }, {
     key: "destroy",
@@ -29110,9 +29111,7 @@ function (_Element) {
           html: true,
           title: title.replace(/(?:\r\n|\r|\n)/g, '<br />')
         });
-      }); // Attach the refresh on events.
-
-      this.attachRefreshOn(); // Attach logic.
+      }); // Attach logic.
 
       this.attachLogic(); // this.restoreValue();
 
@@ -44270,7 +44269,7 @@ function (_Input) {
       var val = this.refs.input[index].value;
 
       if (!val) {
-        return '';
+        return undefined;
       }
 
       return this.parseNumber(val);
@@ -44344,9 +44343,15 @@ function (_Input) {
       return NumberComponent.schema();
     }
   }, {
-    key: "emptyValue",
+    key: "defaultValue",
     get: function get() {
-      return '';
+      var defaultValue = _get(_getPrototypeOf(NumberComponent.prototype), "defaultValue", this);
+
+      if (!defaultValue && this.component.defaultValue === 0) {
+        defaultValue = this.component.defaultValue;
+      }
+
+      return defaultValue;
     }
   }, {
     key: "inputInfo",
@@ -46480,17 +46485,13 @@ function (_Field) {
   }, {
     key: "addValueOptions",
     value: function addValueOptions(items) {
-      var _this2 = this;
-
       items = items || [];
 
       if (!this.selectOptions.length) {
         if (this.choices) {
           // Add the currently selected choices if they don't already exist.
           var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
-          return currentChoices.reduce(function (defaultAdded, choice) {
-            return _this2.addCurrentChoices(choice, items) || defaultAdded;
-          }, false);
+          return this.addCurrentChoices(currentChoices, items);
         } else if (!this.component.multiple) {
           this.addPlaceholder();
         }
@@ -46519,7 +46520,7 @@ function (_Field) {
   }, {
     key: "setItems",
     value: function setItems(items, fromSearch) {
-      var _this3 = this;
+      var _this2 = this;
 
       // If the items is a string, then parse as JSON.
       if (typeof items == 'string') {
@@ -46557,6 +46558,7 @@ function (_Field) {
         // and we should skip over the loading.
         if (this.currentItems.length && items.length && _lodash.default.isEqual(this.currentItems[0], items[0]) && _lodash.default.isEqual(this.currentItems[1], items[1])) {
           this.stopInfiniteScroll();
+          this.loading = false;
           return;
         } // If we have gone beyond our limit, then stop.
 
@@ -46584,7 +46586,7 @@ function (_Field) {
 
 
       _lodash.default.each(items, function (item) {
-        _this3.addOption(_this3.itemValue(item), _this3.itemTemplate(item));
+        _this2.addOption(_this2.itemValue(item), _this2.itemTemplate(item));
       });
 
       if (this.choices) {
@@ -46616,7 +46618,7 @@ function (_Field) {
   }, {
     key: "loadItems",
     value: function loadItems(url, search, headers, options, method, body) {
-      var _this4 = this;
+      var _this3 = this;
 
       options = options || {}; // See if they have not met the minimum search requirements.
 
@@ -46670,13 +46672,13 @@ function (_Field) {
       if (!_lodash.default.isEmpty(query)) {
         // Add the query string.
         url += (!url.includes('?') ? '?' : '&') + _Formio.default.serialize(query, function (item) {
-          return _this4.interpolate(item);
+          return _this3.interpolate(item);
         });
       } // Add filter capability
 
 
       if (this.component.filter) {
-        url += "&".concat(this.interpolate(this.component.filter));
+        url += (!url.includes('?') ? '?' : '&') + this.interpolate(this.component.filter);
       } // Make the request.
 
 
@@ -46684,26 +46686,27 @@ function (_Field) {
       this.loading = true;
 
       _Formio.default.makeRequest(this.options.formio, 'select', url, method, body, options).then(function (response) {
-        var scrollTop = !_this4.scrollLoading && _this4.currentItems.length === 0;
+        _this3.loading = false;
+        var scrollTop = !_this3.scrollLoading && _this3.currentItems.length === 0;
 
-        _this4.setItems(response, !!search);
+        _this3.setItems(response, !!search);
 
-        if (scrollTop) {
-          _this4.choices.choiceList.scrollToTop();
+        if (scrollTop && _this3.choices) {
+          _this3.choices.choiceList.scrollToTop();
         }
       }).catch(function (err) {
-        _this4.stopInfiniteScroll();
+        _this3.stopInfiniteScroll();
 
-        _this4.loading = false;
+        _this3.loading = false;
 
-        _this4.itemsLoadedResolve();
+        _this3.itemsLoadedResolve();
 
-        _this4.emit('componentError', {
-          component: _this4.component,
+        _this3.emit('componentError', {
+          component: _this3.component,
           message: err.toString()
         });
 
-        console.warn("Unable to load resources for ".concat(_this4.key));
+        console.warn("Unable to load resources for ".concat(_this3.key));
       });
     }
     /**
@@ -46887,7 +46890,7 @@ function (_Field) {
   }, {
     key: "attach",
     value: function attach(element) {
-      var _this5 = this;
+      var _this4 = this;
 
       _get(_getPrototypeOf(SelectComponent.prototype), "attach", this).call(this, element);
 
@@ -46901,20 +46904,20 @@ function (_Field) {
       }
 
       this.addEventListener(input, this.inputInfo.changeEvent, function () {
-        return _this5.updateValue();
+        return _this4.updateValue();
       });
 
       if (this.component.widget === 'html5') {
         this.triggerUpdate();
         this.focusableElement = input;
         this.addEventListener(input, 'focus', function () {
-          return _this5.update();
+          return _this4.update();
         });
         this.addEventListener(input, 'keydown', function (event) {
           var keyCode = event.keyCode;
 
           if ([8, 46].includes(keyCode)) {
-            _this5.setValue(null);
+            _this4.setValue(null);
           }
         });
         return;
@@ -46971,7 +46974,7 @@ function (_Field) {
 
         if (useSearch) {
           this.addEventListener(this.choices.containerOuter.element, 'focus', function () {
-            return _this5.focusableElement.focus();
+            return _this4.focusableElement.focus();
           });
         }
       }
@@ -46979,11 +46982,11 @@ function (_Field) {
       this.scrollList = this.choices.choiceList.element;
 
       this.onScroll = function () {
-        if (!_this5.scrollLoading && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight) {
-          _this5.scrollTop = _this5.scrollList.scrollTop;
-          _this5.scrollLoading = true;
+        if (!_this4.scrollLoading && _this4.scrollList.scrollTop + _this4.scrollList.clientHeight >= _this4.scrollList.scrollHeight) {
+          _this4.scrollTop = _this4.scrollList.scrollTop;
+          _this4.scrollLoading = true;
 
-          _this5.triggerUpdate(_this5.choices.input.element.value);
+          _this4.triggerUpdate(_this4.choices.input.element.value);
         }
       };
 
@@ -46995,40 +46998,40 @@ function (_Field) {
         if (this.choices && this.choices.input && this.choices.input.element) {
           this.addEventListener(this.choices.input.element, 'input', function (event) {
             if (!event.target.value) {
-              _this5.triggerUpdate();
+              _this4.triggerUpdate();
             }
           });
         }
 
         this.addEventListener(input, 'search', function (event) {
-          return _this5.triggerUpdate(event.detail.value);
+          return _this4.triggerUpdate(event.detail.value);
         });
         this.addEventListener(input, 'stopSearch', function () {
-          return _this5.triggerUpdate();
+          return _this4.triggerUpdate();
         });
       }
 
       this.addEventListener(input, 'showDropdown', function () {
-        if (_this5.dataValue) {
-          _this5.triggerUpdate();
+        if (_this4.dataValue) {
+          _this4.triggerUpdate();
         }
 
-        _this5.update();
+        _this4.update();
       });
 
       if (placeholderValue && this.choices._isSelectOneElement) {
         this.addEventListener(input, 'removeItem', function () {
-          var items = _this5.choices._store.activeItems;
+          var items = _this4.choices._store.activeItems;
 
           if (!items.length) {
-            _this5.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
+            _this4.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
           }
         });
       } // Add value options.
 
 
       if (this.addValueOptions()) {
-        this.restoreValue();
+        this.choices.setChoiceByValue(this.dataValue); // this.restoreValue();
       } // Force the disabled state with getters and setters.
 
 
@@ -47054,10 +47057,19 @@ function (_Field) {
      * @param {*} value
      * @param {Array} items
      */
-    value: function addCurrentChoices(value, items) {
-      var _this6 = this;
+    value: function addCurrentChoices(values, items, keyValue) {
+      var _this5 = this;
 
-      if (value) {
+      if (!values) {
+        return false;
+      }
+
+      var notFoundValuesToAdd = [];
+      var added = values.reduce(function (defaultAdded, value) {
+        if (!value) {
+          return defaultAdded;
+        }
+
         var found = false; // Make sure that `items` and `this.selectOptions` points
         // to the same reference. Because `this.selectOptions` is
         // internal property and all items are populated by
@@ -47065,7 +47077,7 @@ function (_Field) {
         // 'label' and 'value' properties. This assumption allows
         // us to read correct value from the item.
 
-        var isSelectOptions = items === this.selectOptions;
+        var isSelectOptions = items === _this5.selectOptions;
 
         if (items && items.length) {
           _lodash.default.each(items, function (choice) {
@@ -47074,27 +47086,35 @@ function (_Field) {
               return false;
             }
 
-            found |= _lodash.default.isEqual(_this6.itemValue(choice, isSelectOptions), value);
+            var itemValue = keyValue ? choice.value : _this5.itemValue(choice, isSelectOptions);
+            found |= _lodash.default.isEqual(itemValue, value);
             return found ? false : true;
           });
         } // Add the default option if no item is found.
 
 
         if (!found) {
-          if (this.choices) {
-            this.choices.setChoices([{
-              value: this.itemValue(value),
-              label: this.itemTemplate(value)
-            }], 'value', 'label', true);
-          } else {
-            this.addOption(this.itemValue(value), this.itemTemplate(value));
-          }
-
+          notFoundValuesToAdd.push({
+            value: _this5.itemValue(value),
+            label: _this5.itemTemplate(value)
+          });
           return true;
+        }
+
+        return found || defaultAdded;
+      }, false);
+
+      if (notFoundValuesToAdd.length) {
+        if (this.choices) {
+          this.choices.setChoices(notFoundValuesToAdd, 'value', 'label');
+        } else {
+          notFoundValuesToAdd.map(function (notFoundValue) {
+            _this5.addOption(notFoundValue.value, notFoundValue.label);
+          });
         }
       }
 
-      return false;
+      return added;
     }
   }, {
     key: "getView",
@@ -47145,8 +47165,6 @@ function (_Field) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this7 = this;
-
       flags = this.getFlags.apply(this, arguments);
       var previousValue = this.dataValue;
 
@@ -47174,10 +47192,6 @@ function (_Field) {
 
       this.addValueOptions();
 
-      if (!this.element) {
-        return;
-      }
-
       if (this.choices) {
         // Now set the value.
         if (hasValue) {
@@ -47185,11 +47199,11 @@ function (_Field) {
 
           var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
 
-          _lodash.default.each(currentChoices, function (choice) {
-            _this7.addCurrentChoices(choice, _this7.selectOptions);
-          });
+          if (!this.addCurrentChoices(currentChoices, this.selectOptions, true)) {
+            this.choices.setChoices(this.selectOptions, 'value', 'label', true);
+          }
 
-          this.choices.setChoices(this.selectOptions, 'value', 'label', true).setChoiceByValue(value);
+          this.choices.setChoiceByValue(value);
         } else if (hasPreviousValue) {
           this.choices.removeActiveItems();
         }
@@ -47252,7 +47266,7 @@ function (_Field) {
   }, {
     key: "asString",
     value: function asString(value) {
-      var _this8 = this;
+      var _this6 = this;
 
       value = value || this.getValue();
 
@@ -47279,7 +47293,7 @@ function (_Field) {
       if (Array.isArray(value)) {
         var _items = [];
         value.forEach(function (item) {
-          return _items.push(_this8.itemTemplate(item));
+          return _items.push(_this6.itemTemplate(item));
         });
         return _items.length > 0 ? _items.join('<br />') : '-';
       }
@@ -47391,7 +47405,7 @@ function (_Field) {
   }, {
     key: "requestHeaders",
     get: function get() {
-      var _this9 = this;
+      var _this7 = this;
 
       // Create the headers object.
       var headers = new Headers(); // Add custom headers to the url.
@@ -47400,7 +47414,7 @@ function (_Field) {
         try {
           _lodash.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this9.interpolate(header.value));
+              headers.set(header.key, _this7.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -49793,8 +49807,6 @@ function (_NestedComponent) {
     key: "detach",
     value: function detach(all) {
       _get(_getPrototypeOf(TabsComponent.prototype), "detach", this).call(this, all);
-
-      delete this.columns;
     }
     /**
      * Set the current tab.
