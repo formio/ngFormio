@@ -106,7 +106,7 @@
             </ul>
           </li>
           <li class="dropdown user-dropdown" ng-cloak>
-            <a ng-if="authenticated" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name }}<b class="caret"></b></a>
+            <a ng-if="authenticated" class="dropdown-toggle" id="user-menu" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-user"></i> {{ user.data.name || 'User' }}<b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li ng-if="!user.data.issuer"><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
               <li ng-if="!onPremise"><a ui-sref="profile.payment.view()"><i class="fa fa-credit-card"></i> Payment Info</a></li>
