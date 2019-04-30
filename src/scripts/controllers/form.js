@@ -2710,7 +2710,7 @@ app.controller('FormPermissionController', [
     $scope,
     FormioAlerts
   ) {
-    $scope.$on('permissionsChange', function() {
+    const saveForm = function() {
       $scope.formio.saveForm(angular.copy($scope.form)).then(function(form) {
         $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
@@ -2723,7 +2723,34 @@ app.controller('FormPermissionController', [
           message: err.message
         });
       });
+    };
+
+    $scope.groupSelfAccess = '';
+    $scope.setGroupSelfAccess = function(target) {
+      const groupPerm = _.find($scope.form.submissionAccess, {type: 'group'});
+      if (groupPerm) {
+        groupPerm.permission = target.groupSelfAccess;
+      }
+      else {
+        if (!$scope.form.submissionAccess) {
+          $scope.form.submissionAccess = [];
+        }
+        $scope.form.submissionAccess.push({
+          type: 'group',
+          permission: target.groupSelfAccess
+        });
+      }
+      saveForm();
+    };
+
+    $scope.loadFormPromise.then(function(form) {
+      const groupPerm = _.find(form.submissionAccess, {type: 'group'});
+      if (groupPerm) {
+        $scope.groupSelfAccess = groupPerm.permission;
+      }
     });
+
+    $scope.$on('permissionsChange', () => saveForm());
   }
 ]);
 
