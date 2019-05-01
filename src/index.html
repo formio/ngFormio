@@ -111,7 +111,10 @@
               <li ng-if="!user.data.issuer"><a ui-sref="profile.view()"><i class="fa fa-user"></i> Profile</a></li>
               <li ng-if="!onPremise"><a ui-sref="profile.payment.view()"><i class="fa fa-credit-card"></i> Payment Info</a></li>
               <li class="divider"></li>
-              <li><a href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a></li>
+              <li>
+                <a ng-if="!appConfig.ssoLogout" href="" id="logout" ng-click="logout()"><i class="fa fa-power-off"></i> Log Out</a>
+                <a ng-if="appConfig.ssoLogout" ng-href="{{ appConfig.ssoLogout }}" id="logout"><i class="fa fa-power-off"></i> Log Out</a>
+              </li>
             </ul>
           </li>
         </ul>
