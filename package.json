@@ -47,7 +47,7 @@
     "file-loader": "^3.0.1",
     "font-awesome": "^4.7.0",
     "formiojs": "^3.20.4",
-    "formmanager": "github:formio/formmanager#v1.21.0",
+    "formmanager": "github:formio/formmanager#v1.24.0",
     "html-dnd": "^1.2.0",
     "jquery": "^3.4.0",
     "lodash": "^4.17.11",
