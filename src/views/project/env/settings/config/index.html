@@ -15,55 +15,6 @@
         <strong>Do not put any private information within these settings as they are available to the public.</strong>
       </div>
       <formio form="configForm" submission="configuration"></formio>
-      <div ng-if="onPremise">
-        <p>These configurations can also be used to configure the parameters for the <strong>Form Manager</strong> application. The following configurations apply.</p>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Key</th>
-              <th>Description</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>title</td>
-              <td>The title you would like to give to the Form Manager Application</td>
-              <td>Form Manager</td>
-            </tr>
-            <tr>
-              <td>logo</td>
-              <td>The url for the logo to present within the Form Manager</td>
-              <td>https://manager.form.io/assets/logo.png</td>
-            </tr>
-            <tr>
-              <td>logoHeight</td>
-              <td>The height of the logo within the Form Manager</td>
-              <td>40px</td>
-            </tr>
-            <tr>
-              <td>js</td>
-              <td>The URL to a custom JavaScript file that allows for custom components and logic.</td>
-              <td>https://yoursite.com/js/custom.js</td>
-            </tr>
-            <tr>
-              <td>css</td>
-              <td>The URL to a custom CSS file for custom styling. This can also be used to change the Bootswatch theme as follows.</td>
-              <td>assets/lib/bootswatch/dist/cosmo/bootstrap.min.css</td>
-            </tr>
-            <tr>
-              <td>navbar</td>
-              <td>The class to apply to the Navbar to allow for inverted, etc.</td>
-              <td>navbar-dark bg-primary</td>
-            </tr>
-            <tr>
-              <td>sso</td>
-              <td>The type of Single Sign On to perform. Currently only supports "saml".</td>
-              <td>saml</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
     <button class="btn btn-primary" ng-click="saveConfiguration()">Save</button>
   </div>
@@ -81,6 +32,13 @@
         <pre>
 {"one": "Item One", "two": "Item Two"}
 </pre>
+      </div>
+    </div>
+    <div class="panel panel-success" ng-if="onPremise">
+      <div class="panel-heading">Form Manager Configurations</div>
+      <div class="panel-body">
+        <p>These configurations can also be used to configure the parameters for the <strong>Form Manager</strong> application. Click the link below to view all of the <strong>Form Manager Configurations</strong>.</p>
+        <a class="btn btn-primary" href="https://help.form.io/userguide/portalsso/#form-manager-configurations" target="_blank">Form Manager Configurations</a>
       </div>
     </div>
   </div>
