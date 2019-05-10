@@ -606,7 +606,13 @@ app.controller('FormController', [
     $scope.iframeCode = '';
     $scope.embedCode = '';
     $scope.setiframeCode = function(gotoUrl) {
-      var embedCode = '<script src="https://unpkg.com/formiojs@latest/dist/formio.embed.js?src=';
+      let embedCode = '<script src="';
+      if ($scope.projectUrl && AppConfig.onPremise) {
+        embedCode += `${$scope.projectUrl}/manage/view/assets/lib/offline/formio.offline.min.js?src=`;
+      }
+      else {
+        embedCode += 'https://unpkg.com/formiojs@latest/dist/formio.embed.js?src=';
+      }
       embedCode += $scope.projectUrl + '/' + $scope.form.path;
       embedCode += '"></script>';
       $scope.embedCode = embedCode;
@@ -628,7 +634,12 @@ app.controller('FormController', [
       iframeCode +=    'h.appendChild(s);';
       iframeCode += '})(document, window);';
       iframeCode += '</script>';
-      iframeCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      if ($scope.projectUrl && AppConfig.onPremise) {
+        iframeCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="' + $scope.projectUrl + '/manage/view/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      }
+      else {
+        iframeCode += '<iframe id="formio-form-' + $scope.form._id + '" style="width:100%;border:none;" height="600px" src="https://formview.io/#/' + $scope.currentProject.name + '/' + $scope.form.path + '?iframe=1&header=0"></iframe>';
+      }
       $scope.iframeCode = iframeCode;
     };
 
@@ -714,7 +725,7 @@ app.controller('FormController', [
       }
     });
 
-    $scope.$watch('currentProject', function() {
+    $scope.loadProjectPromise.then(() => {
       $scope.setiframeCode();
     });
 

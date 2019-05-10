@@ -308,14 +308,15 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
     $scope.unsecurePortal = 'http://' + window.location.host;
-    $scope.hasFormManager = false;
+    $scope.hasFormManager = (localStorage.getItem('formManager') === 'true');
     const checkFormManager = function() {
-      if (AppConfig.onPremise) {
+      if (!$scope.hasFormManager) {
         Formio.request(
           'https://license.form.io/check/manager?project=' + $scope.projectUrl
         ).then(function(project) {
           if (project && project.enabled) {
             $scope.hasFormManager = true;
+            localStorage.setItem('formManager', 'true');
             if(!$scope.$$phase) {
               $scope.$apply();
             }
