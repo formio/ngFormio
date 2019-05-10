@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.4.4
+### Fixed
+ - Embed codes for the deployed portal.
+
+### Changed
+ - Upgraded form manager.
+ - Upgraded form view pro.
+
 ## 6.4.0
 ### Added
  - Group Self Access feature.
