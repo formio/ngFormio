@@ -13763,6 +13763,70 @@ module.exports = eventmap;
 
 /***/ }),
 
+/***/ "./node_modules/custom-event-polyfill/polyfill.js":
+/*!********************************************************!*\
+  !*** ./node_modules/custom-event-polyfill/polyfill.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// Polyfill for creating CustomEvents on IE9/10/11
+
+// code pulled from:
+// https://github.com/d4tocchini/customevent-polyfill
+// https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
+
+(function() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    var ce = new window.CustomEvent('test', { cancelable: true });
+    ce.preventDefault();
+    if (ce.defaultPrevented !== true) {
+      // IE has problems with .preventDefault() on custom events
+      // http://stackoverflow.com/questions/23349191
+      throw new Error('Could not prevent default');
+    }
+  } catch (e) {
+    var CustomEvent = function(event, params) {
+      var evt, origPrevent;
+      params = params || {};
+      params.bubbles = !!params.bubbles;
+      params.cancelable = !!params.cancelable;
+
+      evt = document.createEvent('CustomEvent');
+      evt.initCustomEvent(
+        event,
+        params.bubbles,
+        params.cancelable,
+        params.detail
+      );
+      origPrevent = evt.preventDefault;
+      evt.preventDefault = function() {
+        origPrevent.call(this);
+        try {
+          Object.defineProperty(this, 'defaultPrevented', {
+            get: function() {
+              return true;
+            }
+          });
+        } catch (e) {
+          this.defaultPrevented = true;
+        }
+      };
+      return evt;
+    };
+
+    CustomEvent.prototype = window.Event.prototype;
+    window.CustomEvent = CustomEvent; // expose definition to window
+  }
+})();
+
+
+/***/ }),
+
 /***/ "./node_modules/custom-event/index.js":
 /*!********************************************!*\
   !*** ./node_modules/custom-event/index.js ***!
@@ -19430,10 +19494,6 @@ __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/cor
 
 __webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
 
-__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
-
-__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
-
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_modules/core-js/modules/es6.regexp.constructor.js");
@@ -19667,8 +19727,10 @@ function () {
     value: function destroy() {
       var _this3 = this;
 
+      var full = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
       _lodash.default.each(this.events._events, function (events, type) {
-        _lodash.default.each(events, function (listener) {
+        _lodash.default.each(_lodash.default.castArray(events), function (listener) {
           if (listener && _this3.id === listener.id && listener.internal) {
             _this3.events.off(type, listener);
           }
@@ -19686,6 +19748,10 @@ function () {
         return mask.destroy();
       });
       this.inputMasks = [];
+
+      if (full) {
+        this.events.removeAllListeners();
+      }
     }
     /**
      * Append an HTML DOM element to a container.
@@ -19916,7 +19982,7 @@ function () {
       }
 
       className = " ".concat(className, " ");
-      return " ".concat(element.className, " ").replace(/[\n\t\r]/g, ' ').indexOf(className) > -1;
+      return " ".concat(element.className, " ").replace(/[\n\t\r\f]/g, ' ').indexOf(className) > -1;
     }
     /**
      * Adds a class to a DOM element.
@@ -19930,16 +19996,13 @@ function () {
   }, {
     key: "addClass",
     value: function addClass(element, className) {
-      if (!element) {
+      if (!element || this.hasClass(element, className)) {
         return this;
       }
 
       var classes = element.getAttribute('class');
-
-      if (!(classes === null || classes === void 0 ? void 0 : classes.includes(className))) {
-        element.setAttribute('class', "".concat(classes, " ").concat(className));
-      }
-
+      var classesNew = classes ? "".concat(classes, " ").concat(className) : className;
+      element.setAttribute('class', classesNew);
       return this;
     }
     /**
@@ -19954,16 +20017,15 @@ function () {
   }, {
     key: "removeClass",
     value: function removeClass(element, className) {
-      if (!element) {
+      if (!element || !this.hasClass(element, className)) {
         return this;
-      }
+      } // $1: preceding whitespace or start, $2: class name, $3: trailing whitespace or end
 
-      var classes = element.getAttribute('class');
 
-      if (classes) {
-        element.setAttribute('class', classes.replace(new RegExp(" ".concat(className), 'g'), ''));
-      }
+      var pattern = "([ \\t\\n\\f\\r]+|^)(".concat(className, ")([ \\t\\n\\f\\r]+|$)");
+      var classes = element.getAttribute('class'); // this removes the class including its preceding white space, but leaves the trailing whitespace as is
 
+      element.setAttribute('class', classes.replace(new RegExp(pattern, 'gm'), '$3').trim());
       return this;
     }
     /**
@@ -20610,6 +20672,8 @@ var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-p
 
 var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
 
+__webpack_require__(/*! custom-event-polyfill */ "./node_modules/custom-event-polyfill/polyfill.js");
+
 var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitter */ "./node_modules/formiojs/EventEmitter.js"));
 
 var _browserCookies = _interopRequireDefault(__webpack_require__(/*! browser-cookies */ "./node_modules/browser-cookies/src/browser-cookies.js"));
@@ -20618,6 +20682,8 @@ var _shallowCopy = _interopRequireDefault(__webpack_require__(/*! shallow-copy *
 
 var providers = _interopRequireWildcard(__webpack_require__(/*! ./providers */ "./node_modules/formiojs/providers/index.js"));
 
+var _intersection2 = _interopRequireDefault(__webpack_require__(/*! lodash/intersection */ "./node_modules/lodash/intersection.js"));
+
 var _get2 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js"));
 
 var _cloneDeep2 = _interopRequireDefault(__webpack_require__(/*! lodash/cloneDeep */ "./node_modules/lodash/cloneDeep.js"));
@@ -20625,6 +20691,14 @@ var _cloneDeep2 = _interopRequireDefault(__webpack_require__(/*! lodash/cloneDee
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -21234,77 +21308,105 @@ function () {
         });
       });
       return Formio.pluginAlter('wrapFileRequestPromise', request, requestArgs);
-    } // Determine if the user can submit the form.
+    }
+    /**
+     * Returns the user permissions to a form and submission.
+     *
+     * @param user - The user or current user if undefined. For anonymous, use "null"
+     * @param form - The form or current form if undefined. For no form check, use "null"
+     * @param submission - The submisison or "index" if undefined.
+     *
+     * @return {create: boolean, read: boolean, edit: boolean, delete: boolean}
+     */
 
   }, {
-    key: "canSubmit",
-    value: function canSubmit() {
-      /* eslint-disable max-statements, max-depth */
-      return _nativePromiseOnly.default.all([this.loadForm(), this.currentUser(), this.accessInfo()]).then(function (results) {
+    key: "userPermissions",
+    value: function userPermissions(user, form, submission) {
+      return _nativePromiseOnly.default.all([form !== undefined ? _nativePromiseOnly.default.resolve(form) : this.loadForm(), user !== undefined ? _nativePromiseOnly.default.resolve(user) : this.currentUser(), this.accessInfo()]).then(function (results) {
         var form = results.shift();
-        var user = results.shift();
-        var access = results.shift(); // Get the anonymous and admin roles.
-
-        var anonRole = {};
-        var adminRole = {};
+        var user = results.shift() || {
+          _id: false,
+          roles: []
+        };
+        var access = results.shift();
+        var permMap = {
+          create: 'create',
+          read: 'read',
+          update: 'edit',
+          delete: 'delete'
+        };
+        var perms = {
+          user: user,
+          form: form,
+          access: access,
+          create: false,
+          read: false,
+          edit: false,
+          delete: false
+        };
 
         for (var roleName in access.roles) {
           if (access.roles.hasOwnProperty(roleName)) {
             var role = access.roles[roleName];
 
-            if (role.default) {
-              anonRole = role;
-            }
-
-            if (role.admin) {
-              adminRole = role;
+            if (role.default && user._id === false) {
+              // User is anonymous. Add the anonymous role.
+              user.roles.push(role._id);
+            } else if (role.admin && user.roles.indexOf(role._id) !== -1) {
+              perms.create = true;
+              perms.read = true;
+              perms.delete = true;
+              perms.edit = true;
+              return perms;
             }
           }
         }
 
-        var canSubmit = false;
-        var canSubmitAnonymously = false; // If the user is an admin, then they can submit this form.
+        if (form && form.submissionAccess) {
+          for (var i = 0; i < form.submissionAccess.length; i++) {
+            var permission = form.submissionAccess[i];
 
-        if (user && user.roles.includes(adminRole._id)) {
-          return true;
-        }
+            var _permission$type$spli = permission.type.split('_'),
+                _permission$type$spli2 = _slicedToArray(_permission$type$spli, 2),
+                perm = _permission$type$spli2[0],
+                scope = _permission$type$spli2[1];
 
-        for (var i in form.submissionAccess) {
-          if (form.submissionAccess.hasOwnProperty(i)) {
-            var subRole = form.submissionAccess[i];
-
-            if (subRole.type === 'create_all' || subRole.type === 'create_own') {
-              for (var j in subRole.roles) {
-                if (subRole.roles.hasOwnProperty(j)) {
-                  // Check if anonymous is allowed.
-                  if (anonRole._id === subRole.roles[j]) {
-                    canSubmitAnonymously = true;
-                  } // Check if the logged in user has the appropriate role.
-
-
-                  if (user && user.roles.includes(subRole.roles[j])) {
-                    canSubmit = true;
-                    break;
-                  }
-                }
-              }
-
-              if (canSubmit) {
-                break;
+            if (['create', 'read', 'update', 'delete'].includes(perm)) {
+              if ((0, _intersection2.default)(permission.roles, user.roles).length) {
+                perms[permMap[perm]] = scope === 'all' || !submission || user._id === submission.owner;
               }
             }
           }
-        } // If their user cannot submit, but anonymous can, then delete token and allow submission.
-
-
-        if (!canSubmit && canSubmitAnonymously) {
-          canSubmit = true;
-          Formio.setUser(null);
         }
 
-        return canSubmit;
+        return perms;
       });
-      /* eslint-enable max-statements, max-depth */
+    }
+    /**
+     * Determine if the current user can submit a form.
+     * @return {*}
+     */
+
+  }, {
+    key: "canSubmit",
+    value: function canSubmit() {
+      var _this7 = this;
+
+      return this.userPermissions().then(function (perms) {
+        // If there is user and they cannot create, then check anonymous user permissions.
+        if (!perms.create && Formio.getUser()) {
+          return _this7.userPermissions(null).then(function (anonPerms) {
+            if (anonPerms.create) {
+              Formio.setUser(null);
+              return true;
+            }
+
+            return false;
+          });
+        }
+
+        return perms.create;
+      });
     }
   }, {
     key: "getUrlParts",
@@ -21452,11 +21554,16 @@ function () {
 
       if (token && !opts.noToken) {
         headers.append('x-jwt-token', token);
-      }
+      } // The fetch-ponyfill can't handle a proper Headers class anymore. Change it back to an object.
 
+
+      var headerObj = {};
+      headers.forEach(function (value, name) {
+        headerObj[name] = value;
+      });
       var options = {
         method: method,
-        headers: headers,
+        headers: headerObj,
         mode: 'cors'
       };
 
@@ -21471,7 +21578,7 @@ function () {
         opts.namespace = options.namespace || Formio.namespace;
       }
 
-      var requestToken = options.headers.get('x-jwt-token');
+      var requestToken = options.headers['x-jwt-token'];
       var result = Formio.fetch(url, options).then(function (response) {
         // Allow plugins to respond.
         response = Formio.pluginAlter('requestResponse', response, Formio);
@@ -21779,12 +21886,22 @@ function () {
   }, {
     key: "registerPlugin",
     value: function registerPlugin(plugin, name) {
-      Formio.plugins.push(plugin);
-      Formio.plugins.sort(function (a, b) {
-        return (b.priority || 0) - (a.priority || 0);
+      var found = false;
+      Formio.plugins.forEach(function (existing) {
+        if (existing.__name === name) {
+          found = true;
+        }
       });
-      plugin.__name = name;
-      (plugin.init || Formio.noop).call(plugin, Formio);
+
+      if (!found) {
+        // Do not register already registered plugins.
+        Formio.plugins.push(plugin);
+        Formio.plugins.sort(function (a, b) {
+          return (b.priority || 0) - (a.priority || 0);
+        });
+        plugin.__name = name;
+        (plugin.init || Formio.noop).call(plugin, Formio);
+      }
     }
   }, {
     key: "getPlugin",
@@ -21973,10 +22090,12 @@ function () {
         uri = uri.substring(0, uri.indexOf('?'));
         window.history.replaceState({}, document.title, uri);
         return retVal;
-      } // Only continue if we are not authenticated.
+      }
 
-
-      if (Formio.getToken()) {
+      if (options.forceAuth) {
+        Formio.setUser(null);
+      } else if (Formio.getToken()) {
+        // If we are not forcing the authentication and we have a token, then return here.
         return false;
       } // Set the relay if not provided.
 
@@ -21987,7 +22106,7 @@ function () {
 
 
       var authUrl = Formio.authUrl || Formio.projectUrl;
-      window.location.href = "".concat(authUrl, "/saml/sso?relay=").concat(encodeURI(options.relay));
+      window.location.href = "".concat(authUrl, "/saml/sso?relay=").concat(encodeURIComponent(options.relay));
       return false;
     }
   }, {
@@ -22008,26 +22127,26 @@ function () {
       return new _nativePromiseOnly.default(function (resolve, reject) {
         var Okta = options.OktaAuth;
         delete options.OktaAuth;
-        var authClient = new Okta(options);
-        var accessToken = authClient.tokenManager.get('accessToken');
-
-        if (accessToken) {
-          resolve(Formio.oAuthCurrentUser(options.formio, accessToken.accessToken));
-        } else if (location.hash) {
-          authClient.token.parseFromUrl().then(function (token) {
-            authClient.tokenManager.add('accessToken', token);
-            resolve(Formio.oAuthCurrentUser(options.formio, token.accessToken));
-          }).catch(function (err) {
-            console.warn(err);
-            reject(err);
-          });
-        } else {
-          authClient.token.getWithRedirect({
-            responseType: 'token',
-            scopes: options.scopes
-          });
-          resolve(false);
-        }
+        var authClient = Okta;
+        authClient.tokenManager.get('accessToken').then(function (accessToken) {
+          if (accessToken) {
+            resolve(Formio.oAuthCurrentUser(options.formio, accessToken.accessToken));
+          } else if (location.hash) {
+            authClient.token.parseFromUrl().then(function (token) {
+              authClient.tokenManager.add('accessToken', token);
+              resolve(Formio.oAuthCurrentUser(options.formio, token.accessToken));
+            }).catch(function (err) {
+              console.warn(err);
+              reject(err);
+            });
+          } else {
+            authClient.token.getWithRedirect({
+              responseType: 'token',
+              scopes: options.scopes
+            });
+            resolve(false);
+          }
+        });
       });
     }
   }, {
@@ -23253,6 +23372,12 @@ function (_NestedComponent) {
         }
       });
     }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      delete _Formio.default.forms[this.id];
+      return _get(_getPrototypeOf(Webform.prototype), "destroy", this).call(this);
+    }
     /**
      * Sets the the outside wrapper element of the Form.
      *
@@ -23837,6 +23962,10 @@ function (_NestedComponent) {
     value: function build(state) {
       var _this12 = this;
 
+      // Clear any existing event handlers in case this is a rebuild
+      this.eventHandlers.forEach(function (h) {
+        return _this12.removeEventListener(h.obj, h.type);
+      });
       this.on('submitButton', function (options) {
         return _this12.submit(false, options);
       }, true);
@@ -24601,7 +24730,7 @@ function (_Webform) {
             attr: 'role',
             value: 'alert'
           }],
-          content: 'Drag and Drop a form component'
+          content: _this.t('Drag and Drop a form component')
         }];
       }
 
@@ -24894,7 +25023,7 @@ function (_Webform) {
         class: 'col col-sm-6'
       }, this.ce('p', {
         class: 'lead'
-      }, "".concat(componentInfo.title, " Component"))), this.ce('div', {
+      }, "".concat(this.t(componentInfo.title), " ").concat(this.t('Component')))), this.ce('div', {
         class: 'col col-sm-6'
       }, [this.ce('div', {
         class: 'pull-right',
@@ -25041,9 +25170,9 @@ function (_Webform) {
         _this5.dialog.close();
       });
       this.addEventListener(this.dialog, 'close', function () {
-        _this5.editForm.destroy();
+        _this5.editForm.destroy(true);
 
-        _this5.preview.destroy();
+        _this5.preview.destroy(true);
 
         if (component.isNew) {
           _this5.deleteComponent(component);
@@ -25093,9 +25222,15 @@ function (_Webform) {
         var schema = JSON.parse(data);
         window.sessionStorage.removeItem('formio.clipboard');
 
-        _builder.default.uniquify(this._form, schema);
+        _builder.default.uniquify(this._form, schema); // If this is an empty "nested" component, and it is empty, then paste the component inside this component.
 
-        component.parent.addComponent(schema, false, false, component.element.nextSibling);
+
+        if (typeof component.addComponent === 'function' && !component.components.length) {
+          component.addComponent(schema);
+        } else {
+          component.parent.addComponent(schema, false, false, component.element.nextSibling);
+        }
+
         this.form = this.schema;
       }
     }
@@ -25556,7 +25691,7 @@ function (_Webform) {
       if (!this.getComponents().length) {
         this.submitButton = this.addComponent({
           type: 'button',
-          label: 'Submit',
+          label: this.t('Submit'),
           key: 'submit',
           size: 'md',
           block: false,
@@ -25860,6 +25995,8 @@ function (_Webform) {
       return new _nativePromiseOnly.default(function (resolve, reject) {
         _this3.hook('beforeNext', _this3.currentPage(), _this3.submission, function (err) {
           if (err) {
+            _this3.showErrors(err, true);
+
             reject(err);
           }
 
@@ -28476,8 +28613,7 @@ function (_Component) {
 
     _classCallCheck(this, BaseComponent);
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(BaseComponent).call(this, options, component && component.id ? component.id : null));
-    _this.originalComponent = _lodash.default.cloneDeep(component); // Determine if we are inside a datagrid.
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(BaseComponent).call(this, options, component && component.id ? component.id : null)); // Determine if we are inside a datagrid.
 
     _this.inDataGrid = _this.options.inDataGrid;
     _this.options.inDataGrid = false;
@@ -28506,7 +28642,9 @@ function (_Component) {
 
     _this.component = _lodash.default.defaultsDeep(component || {}, _this.defaultSchema); // Add the id to the component.
 
-    _this.component.id = _this.id;
+    _this.component.id = _this.id; // Set the original component.
+
+    _this.originalComponent = _lodash.default.cloneDeep(_this.component);
     /**
      * The bounding HTML Element which this component is rendered.
      * @type {null}
@@ -28955,11 +29093,12 @@ function (_Component) {
         class: 'formio-dialog-close pull-right btn btn-default btn-xs',
         'aria-label': 'close'
       });
+      var modalBodyContainer = this.ce('div', {
+        class: 'formio-dialog-content'
+      }, [modalBody, closeDialog]);
       var dialog = this.ce('div', {
         class: 'formio-dialog formio-dialog-theme-default component-settings'
-      }, [modalOverlay, this.ce('div', {
-        class: 'formio-dialog-content'
-      }, [modalBody, closeDialog])]);
+      }, [modalOverlay, modalBodyContainer]);
       this.addEventListener(modalOverlay, 'click', function (event) {
         event.preventDefault();
         dialog.close();
@@ -28973,6 +29112,7 @@ function (_Component) {
       });
       document.body.appendChild(dialog);
       dialog.body = modalBody;
+      dialog.bodyContainer = modalBodyContainer;
 
       dialog.close = function () {
         dialog.dispatchEvent(new CustomEvent('close'));
@@ -29060,6 +29200,7 @@ function (_Component) {
         instance: this,
         component: this.component,
         row: this.data,
+        value: this.key && this.hasValue() ? this.dataValue : this.emptyValue,
         rowIndex: this.rowIndex,
         data: this.rootValue,
         submission: this.root ? this.root._submission : {},
@@ -29712,8 +29853,12 @@ function (_Component) {
 
       if (!_widgets.default.hasOwnProperty(settings.type)) {
         return null;
-      } // Create the widget.
+      } // Pass along some options.
 
+
+      settings.icons = this.options.icons;
+      settings.i18n = this.options.i18n;
+      settings.language = this.options.language; // Create the widget.
 
       var widget = new _widgets.default[settings.type](settings, this.component);
       widget.on('update', function () {
@@ -29766,7 +29911,7 @@ function (_Component) {
   }, {
     key: "destroy",
     value: function destroy() {
-      var state = _get(_getPrototypeOf(BaseComponent.prototype), "destroy", this).call(this) || {};
+      var state = _get(_getPrototypeOf(BaseComponent.prototype), "destroy", this).apply(this, arguments) || {};
       this.destroyInputs();
       state.calculatedValue = this.calculatedValue;
       return state;
@@ -30536,7 +30681,7 @@ function (_Component) {
       } // Check to ensure that the calculated value is different than the previously calculated value.
 
 
-      if (allowOverride && this.calculatedValue !== null && !_lodash.default.isEqual(dataValue, this.calculatedValue)) {
+      if (allowOverride && this.calculatedValue !== null && this.calculatedValue !== this.emptyValue && !_lodash.default.isEqual(dataValue, this.calculatedValue)) {
         return false;
       } // Calculate the new value.
 
@@ -30546,7 +30691,7 @@ function (_Component) {
         data: data
       }, 'value'); // If this is the firstPass, and the dataValue is different than to the calculatedValue.
 
-      if (allowOverride && firstPass && !this.isEmpty(dataValue) && !_lodash.default.isEqual(dataValue, calculatedValue)) {
+      if (allowOverride && firstPass && dataValue !== this.emptyValue && !_lodash.default.isEqual(dataValue, calculatedValue)) {
         // Return that we have a change so it will perform another pass.
         this.calculatedValue = calculatedValue;
         return true;
@@ -31495,10 +31640,10 @@ var _default = [{
     data: {
       values: [{
         label: 'True',
-        value: true
+        value: 'true'
       }, {
         label: 'False',
-        value: false
+        value: 'false'
       }]
     }
   }, {
@@ -33640,6 +33785,13 @@ function (_BaseComponent) {
 
       if (!this.labelIsHidden()) {
         className += " ".concat(this.component.inputType || 'checkbox');
+      } // If the element is already created, don't recreate.
+
+
+      if (this.element) {
+        //update class for case when Logic changed container class (customClass)
+        this.element.className = className;
+        return this.element;
       }
 
       this.element = this.ce('div', {
@@ -33749,6 +33901,14 @@ function (_BaseComponent) {
         return;
       }
 
+      var inputId = this.id;
+
+      if (this.options.row) {
+        inputId += "-".concat(this.options.row);
+      }
+
+      inputId += "-".concat(this.root.id);
+      this.info.attr.id = inputId;
       var input = this.ce(this.info.type, this.info.attr);
       this.errorContainer = container;
       return input;
@@ -35856,6 +36016,8 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base.form */ 
 
 var _DataGridEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/DataGrid.edit.display */ "./node_modules/formiojs/components/datagrid/editForm/DataGrid.edit.display.js"));
 
+var _DataGridEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/DataGrid.edit.validation */ "./node_modules/formiojs/components/datagrid/editForm/DataGrid.edit.validation.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
@@ -35866,6 +36028,9 @@ function _default() {
   return _Base.default.apply(void 0, [[{
     key: 'display',
     components: _DataGridEdit.default
+  }, {
+    key: 'validation',
+    components: _DataGridEdit2.default
   }]].concat(extend));
 }
 
@@ -36847,6 +37012,41 @@ var _default = [{
       var: 'data.enableRowGroups'
     }
   }
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/datagrid/editForm/DataGrid.edit.validation.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/formiojs/components/datagrid/editForm/DataGrid.edit.validation.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  weight: 110,
+  key: 'validate.minLength',
+  label: 'Minimum Length',
+  placeholder: 'Minimum Length',
+  type: 'number',
+  tooltip: 'The minimum length requirement this field must meet.',
+  input: true
+}, {
+  weight: 120,
+  key: 'validate.maxLength',
+  label: 'Maximum Length',
+  placeholder: 'Maximum Length',
+  type: 'number',
+  tooltip: 'The maximum length requirement this field must meet.',
+  input: true
 }];
 exports.default = _default;
 
@@ -44783,7 +44983,7 @@ function (_BaseComponent) {
   }, {
     key: "destroy",
     value: function destroy() {
-      var state = _get(_getPrototypeOf(NestedComponent.prototype), "destroy", this).call(this) || {};
+      var state = _get(_getPrototypeOf(NestedComponent.prototype), "destroy", this).apply(this, arguments) || {};
       this.destroyComponents(state);
       return state;
     }
@@ -47221,6 +47421,22 @@ var _default = [{
   placeholder: 'Enter the fields to select.',
   weight: 51
 }, {
+  type: 'textfield',
+  input: true,
+  key: 'filter',
+  label: 'Filter Query',
+  description: 'The filter query for results.',
+  tooltip: 'Use this to provide additional filtering using query parameters.',
+  weight: 51.3
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'sort',
+  label: 'Sort Query',
+  description: 'The sort query for results.',
+  tooltip: 'Use this to provide additional sorting using query parameters.',
+  weight: 51.6
+}, {
   type: 'tags',
   input: true,
   key: 'searchFields',
@@ -47600,7 +47816,10 @@ function (_BaseComponent) {
     value: function stopInfiniteScroll() {
       // Remove the infinite scroll listener.
       this.scrollLoading = false;
-      this.scrollList.removeEventListener('scroll', this.onScroll);
+
+      if (this.scrollList) {
+        this.scrollList.removeEventListener('scroll', this.onScroll);
+      }
     }
     /* eslint-disable max-statements */
 
@@ -48422,7 +48641,7 @@ function (_BaseComponent) {
           label: 'Loading...',
           disabled: true
         }]), 'value', 'label', true);
-      } else {
+      } else if (this.scrollList) {
         var loadingItem = this.scrollList.querySelector('.choices__item--disabled');
 
         if (loadingItem) {
@@ -50761,6 +50980,13 @@ function (_NestedComponent) {
 
         _this3.tabs.push(tabPanel);
       });
+
+      if (this.element) {
+        this.appendChild(this.element, [this.tabsBar, this.tabsContent]);
+        this.element.className = this.className;
+        return this.element;
+      }
+
       this.element = this.ce('div', {
         id: this.id,
         class: this.className
@@ -55974,13 +56200,7 @@ __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_module
 
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
-__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
-
-__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
-
 __webpack_require__(/*! core-js/modules/es6.regexp.match */ "./node_modules/core-js/modules/es6.regexp.match.js");
-
-__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
@@ -55988,7 +56208,13 @@ __webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/core-js/modules/es7.array.includes.js");
+
+__webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
@@ -56079,9 +56305,15 @@ function evaluate(func, args, ret, tokenize) {
 
   if (!args.form && args.instance) {
     args.form = _lodash.default.get(args.instance, 'root._form', {});
+  } // Deeply cloning the form is expensive - only do it if it looks like the function needs it
+
+
+  if (func.toString().includes('form')) {
+    args.form = _lodash.default.cloneDeep(args.form);
+  } else {
+    delete args.form;
   }
 
-  args.form = _lodash.default.cloneDeep(args.form);
   var componentKey = args.component.key;
 
   if (typeof func === 'string') {
@@ -59702,6 +59934,7 @@ function (_EventEmitter) {
       var _this4 = this;
 
       var deferred = Object(_utils_js__WEBPACK_IMPORTED_MODULE_18__["defer"])();
+      this.emit('languageChanging', lng);
 
       var done = function done(err, l) {
         _this4.translator.changeLanguage(l);
@@ -62473,6 +62706,38 @@ module.exports = WeakMap;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_apply.js":
+/*!***************************************!*\
+  !*** ./node_modules/lodash/_apply.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * A faster alternative to `Function#apply`, this function invokes `func`
+ * with the `this` binding of `thisArg` and the arguments of `args`.
+ *
+ * @private
+ * @param {Function} func The function to invoke.
+ * @param {*} thisArg The `this` binding of `func`.
+ * @param {Array} args The arguments to invoke `func` with.
+ * @returns {*} Returns the result of `func`.
+ */
+function apply(func, thisArg, args) {
+  switch (args.length) {
+    case 0: return func.call(thisArg);
+    case 1: return func.call(thisArg, args[0]);
+    case 2: return func.call(thisArg, args[0], args[1]);
+    case 3: return func.call(thisArg, args[0], args[1], args[2]);
+  }
+  return func.apply(thisArg, args);
+}
+
+module.exports = apply;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_arrayEach.js":
 /*!*******************************************!*\
   !*** ./node_modules/lodash/_arrayEach.js ***!
@@ -62538,6 +62803,67 @@ function arrayFilter(array, predicate) {
 }
 
 module.exports = arrayFilter;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_arrayIncludes.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_arrayIncludes.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/lodash/_baseIndexOf.js");
+
+/**
+ * A specialized version of `_.includes` for arrays without support for
+ * specifying an index to search from.
+ *
+ * @private
+ * @param {Array} [array] The array to inspect.
+ * @param {*} target The value to search for.
+ * @returns {boolean} Returns `true` if `target` is found, else `false`.
+ */
+function arrayIncludes(array, value) {
+  var length = array == null ? 0 : array.length;
+  return !!length && baseIndexOf(array, value, 0) > -1;
+}
+
+module.exports = arrayIncludes;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_arrayIncludesWith.js":
+/*!***************************************************!*\
+  !*** ./node_modules/lodash/_arrayIncludesWith.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * This function is like `arrayIncludes` except that it accepts a comparator.
+ *
+ * @private
+ * @param {Array} [array] The array to inspect.
+ * @param {*} target The value to search for.
+ * @param {Function} comparator The comparator invoked per element.
+ * @returns {boolean} Returns `true` if `target` is found, else `false`.
+ */
+function arrayIncludesWith(array, value, comparator) {
+  var index = -1,
+      length = array == null ? 0 : array.length;
+
+  while (++index < length) {
+    if (comparator(value, array[index])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+module.exports = arrayIncludesWith;
 
 
 /***/ }),
@@ -63410,6 +63736,91 @@ module.exports = baseIndexOf;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_baseIntersection.js":
+/*!**************************************************!*\
+  !*** ./node_modules/lodash/_baseIntersection.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var SetCache = __webpack_require__(/*! ./_SetCache */ "./node_modules/lodash/_SetCache.js"),
+    arrayIncludes = __webpack_require__(/*! ./_arrayIncludes */ "./node_modules/lodash/_arrayIncludes.js"),
+    arrayIncludesWith = __webpack_require__(/*! ./_arrayIncludesWith */ "./node_modules/lodash/_arrayIncludesWith.js"),
+    arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/lodash/_arrayMap.js"),
+    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/lodash/_baseUnary.js"),
+    cacheHas = __webpack_require__(/*! ./_cacheHas */ "./node_modules/lodash/_cacheHas.js");
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMin = Math.min;
+
+/**
+ * The base implementation of methods like `_.intersection`, without support
+ * for iteratee shorthands, that accepts an array of arrays to inspect.
+ *
+ * @private
+ * @param {Array} arrays The arrays to inspect.
+ * @param {Function} [iteratee] The iteratee invoked per element.
+ * @param {Function} [comparator] The comparator invoked per element.
+ * @returns {Array} Returns the new array of shared values.
+ */
+function baseIntersection(arrays, iteratee, comparator) {
+  var includes = comparator ? arrayIncludesWith : arrayIncludes,
+      length = arrays[0].length,
+      othLength = arrays.length,
+      othIndex = othLength,
+      caches = Array(othLength),
+      maxLength = Infinity,
+      result = [];
+
+  while (othIndex--) {
+    var array = arrays[othIndex];
+    if (othIndex && iteratee) {
+      array = arrayMap(array, baseUnary(iteratee));
+    }
+    maxLength = nativeMin(array.length, maxLength);
+    caches[othIndex] = !comparator && (iteratee || (length >= 120 && array.length >= 120))
+      ? new SetCache(othIndex && array)
+      : undefined;
+  }
+  array = arrays[0];
+
+  var index = -1,
+      seen = caches[0];
+
+  outer:
+  while (++index < length && result.length < maxLength) {
+    var value = array[index],
+        computed = iteratee ? iteratee(value) : value;
+
+    value = (comparator || value !== 0) ? value : 0;
+    if (!(seen
+          ? cacheHas(seen, computed)
+          : includes(result, computed, comparator)
+        )) {
+      othIndex = othLength;
+      while (--othIndex) {
+        var cache = caches[othIndex];
+        if (!(cache
+              ? cacheHas(cache, computed)
+              : includes(arrays[othIndex], computed, comparator))
+            ) {
+          continue outer;
+        }
+      }
+      if (seen) {
+        seen.push(computed);
+      }
+      result.push(value);
+    }
+  }
+  return result;
+}
+
+module.exports = baseIntersection;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_baseIsArguments.js":
 /*!*************************************************!*\
   !*** ./node_modules/lodash/_baseIsArguments.js ***!
@@ -64157,6 +64568,34 @@ module.exports = baseRepeat;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_baseRest.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_baseRest.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var identity = __webpack_require__(/*! ./identity */ "./node_modules/lodash/identity.js"),
+    overRest = __webpack_require__(/*! ./_overRest */ "./node_modules/lodash/_overRest.js"),
+    setToString = __webpack_require__(/*! ./_setToString */ "./node_modules/lodash/_setToString.js");
+
+/**
+ * The base implementation of `_.rest` which doesn't validate or coerce arguments.
+ *
+ * @private
+ * @param {Function} func The function to apply a rest parameter to.
+ * @param {number} [start=func.length-1] The start position of the rest parameter.
+ * @returns {Function} Returns the new function.
+ */
+function baseRest(func, start) {
+  return setToString(overRest(func, start, identity), func + '');
+}
+
+module.exports = baseRest;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_baseSet.js":
 /*!*****************************************!*\
   !*** ./node_modules/lodash/_baseSet.js ***!
@@ -64211,6 +64650,39 @@ function baseSet(object, path, value, customizer) {
 }
 
 module.exports = baseSet;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseSetToString.js":
+/*!*************************************************!*\
+  !*** ./node_modules/lodash/_baseSetToString.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var constant = __webpack_require__(/*! ./constant */ "./node_modules/lodash/constant.js"),
+    defineProperty = __webpack_require__(/*! ./_defineProperty */ "./node_modules/lodash/_defineProperty.js"),
+    identity = __webpack_require__(/*! ./identity */ "./node_modules/lodash/identity.js");
+
+/**
+ * The base implementation of `setToString` without support for hot loop shorting.
+ *
+ * @private
+ * @param {Function} func The function to modify.
+ * @param {Function} string The `toString` result.
+ * @returns {Function} Returns `func`.
+ */
+var baseSetToString = !defineProperty ? identity : function(func, string) {
+  return defineProperty(func, 'toString', {
+    'configurable': true,
+    'enumerable': false,
+    'value': constant(string),
+    'writable': true
+  });
+};
+
+module.exports = baseSetToString;
 
 
 /***/ }),
@@ -64381,6 +64853,31 @@ function cacheHas(cache, key) {
 }
 
 module.exports = cacheHas;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_castArrayLikeObject.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/lodash/_castArrayLikeObject.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isArrayLikeObject = __webpack_require__(/*! ./isArrayLikeObject */ "./node_modules/lodash/isArrayLikeObject.js");
+
+/**
+ * Casts `value` to an empty array if it's not an array like object.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {Array|Object} Returns the cast array-like object.
+ */
+function castArrayLikeObject(value) {
+  return isArrayLikeObject(value) ? value : [];
+}
+
+module.exports = castArrayLikeObject;
 
 
 /***/ }),
@@ -66948,6 +67445,53 @@ module.exports = overArg;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_overRest.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_overRest.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var apply = __webpack_require__(/*! ./_apply */ "./node_modules/lodash/_apply.js");
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max;
+
+/**
+ * A specialized version of `baseRest` which transforms the rest array.
+ *
+ * @private
+ * @param {Function} func The function to apply a rest parameter to.
+ * @param {number} [start=func.length-1] The start position of the rest parameter.
+ * @param {Function} transform The rest array transform.
+ * @returns {Function} Returns the new function.
+ */
+function overRest(func, start, transform) {
+  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
+  return function() {
+    var args = arguments,
+        index = -1,
+        length = nativeMax(args.length - start, 0),
+        array = Array(length);
+
+    while (++index < length) {
+      array[index] = args[start + index];
+    }
+    index = -1;
+    var otherArgs = Array(start + 1);
+    while (++index < start) {
+      otherArgs[index] = args[index];
+    }
+    otherArgs[start] = transform(array);
+    return apply(func, this, otherArgs);
+  };
+}
+
+module.exports = overRest;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_root.js":
 /*!**************************************!*\
   !*** ./node_modules/lodash/_root.js ***!
@@ -67048,6 +67592,79 @@ function setToArray(set) {
 }
 
 module.exports = setToArray;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_setToString.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/_setToString.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var baseSetToString = __webpack_require__(/*! ./_baseSetToString */ "./node_modules/lodash/_baseSetToString.js"),
+    shortOut = __webpack_require__(/*! ./_shortOut */ "./node_modules/lodash/_shortOut.js");
+
+/**
+ * Sets the `toString` method of `func` to return `string`.
+ *
+ * @private
+ * @param {Function} func The function to modify.
+ * @param {Function} string The `toString` result.
+ * @returns {Function} Returns `func`.
+ */
+var setToString = shortOut(baseSetToString);
+
+module.exports = setToString;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_shortOut.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_shortOut.js ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/** Used to detect hot functions by number of calls within a span of milliseconds. */
+var HOT_COUNT = 800,
+    HOT_SPAN = 16;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeNow = Date.now;
+
+/**
+ * Creates a function that'll short out and invoke `identity` instead
+ * of `func` when it's called `HOT_COUNT` or more times in `HOT_SPAN`
+ * milliseconds.
+ *
+ * @private
+ * @param {Function} func The function to restrict.
+ * @returns {Function} Returns the new shortable function.
+ */
+function shortOut(func) {
+  var count = 0,
+      lastCalled = 0;
+
+  return function() {
+    var stamp = nativeNow(),
+        remaining = HOT_SPAN - (stamp - lastCalled);
+
+    lastCalled = stamp;
+    if (remaining > 0) {
+      if (++count >= HOT_COUNT) {
+        return arguments[0];
+      }
+    } else {
+      count = 0;
+    }
+    return func.apply(undefined, arguments);
+  };
+}
+
+module.exports = shortOut;
 
 
 /***/ }),
@@ -67655,6 +68272,43 @@ module.exports = cloneDeep;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/constant.js":
+/*!*****************************************!*\
+  !*** ./node_modules/lodash/constant.js ***!
+  \*****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Creates a function that returns `value`.
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @category Util
+ * @param {*} value The value to return from the new function.
+ * @returns {Function} Returns the new constant function.
+ * @example
+ *
+ * var objects = _.times(2, _.constant({ 'a': 1 }));
+ *
+ * console.log(objects);
+ * // => [{ 'a': 1 }, { 'a': 1 }]
+ *
+ * console.log(objects[0] === objects[1]);
+ * // => true
+ */
+function constant(value) {
+  return function() {
+    return value;
+  };
+}
+
+module.exports = constant;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/eq.js":
 /*!***********************************!*\
   !*** ./node_modules/lodash/eq.js ***!
@@ -67983,6 +68637,47 @@ module.exports = identity;
 
 /***/ }),
 
+/***/ "./node_modules/lodash/intersection.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/intersection.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/lodash/_arrayMap.js"),
+    baseIntersection = __webpack_require__(/*! ./_baseIntersection */ "./node_modules/lodash/_baseIntersection.js"),
+    baseRest = __webpack_require__(/*! ./_baseRest */ "./node_modules/lodash/_baseRest.js"),
+    castArrayLikeObject = __webpack_require__(/*! ./_castArrayLikeObject */ "./node_modules/lodash/_castArrayLikeObject.js");
+
+/**
+ * Creates an array of unique values that are included in all given arrays
+ * using [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * for equality comparisons. The order and references of result values are
+ * determined by the first array.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Array
+ * @param {...Array} [arrays] The arrays to inspect.
+ * @returns {Array} Returns the new array of intersecting values.
+ * @example
+ *
+ * _.intersection([2, 1], [2, 3]);
+ * // => [2]
+ */
+var intersection = baseRest(function(arrays) {
+  var mapped = arrayMap(arrays, castArrayLikeObject);
+  return (mapped.length && mapped[0] === arrays[0])
+    ? baseIntersection(mapped)
+    : [];
+});
+
+module.exports = intersection;
+
+
+/***/ }),
+
 /***/ "./node_modules/lodash/isArguments.js":
 /*!********************************************!*\
   !*** ./node_modules/lodash/isArguments.js ***!
@@ -68107,6 +68802,50 @@ function isArrayLike(value) {
 }
 
 module.exports = isArrayLike;
+
+
+/***/ }),
+
+/***/ "./node_modules/lodash/isArrayLikeObject.js":
+/*!**************************************************!*\
+  !*** ./node_modules/lodash/isArrayLikeObject.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+
+/**
+ * This method is like `_.isArrayLike` except that it also checks if `value`
+ * is an object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array-like object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArrayLikeObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLikeObject(document.body.children);
+ * // => true
+ *
+ * _.isArrayLikeObject('abc');
+ * // => false
+ *
+ * _.isArrayLikeObject(_.noop);
+ * // => false
+ */
+function isArrayLikeObject(value) {
+  return isObjectLike(value) && isArrayLike(value);
+}
+
+module.exports = isArrayLikeObject;
 
 
 /***/ }),
@@ -86558,7 +87297,7 @@ module.exports = trim;
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//! moment-timezone.js
-//! version : 0.5.23
+//! version : 0.5.25
 //! Copyright (c) JS Foundation and other contributors
 //! license : MIT
 //! github.com/moment/moment-timezone
@@ -86584,7 +87323,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	// 	return moment;
 	// }
 
-	var VERSION = "0.5.23",
+	var VERSION = "0.5.25",
 		zones = {},
 		links = {},
 		names = {},
@@ -87107,7 +87846,9 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 				offset = offset / 60;
 			}
 			if (mom.utcOffset !== undefined) {
+				var z = mom._z;
 				mom.utcOffset(-offset, keepTime);
+				mom._z = z;
 			} else {
 				mom.zone(offset, keepTime);
 			}
@@ -87144,10 +87885,19 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		};
 	}
 
-	fn.zoneName = abbrWrap(fn.zoneName);
-	fn.zoneAbbr = abbrWrap(fn.zoneAbbr);
-	fn.utc      = resetZoneWrap(fn.utc);
+	function resetZoneWrap2 (old) {
+		return function () {
+			if (arguments.length > 0) this._z = null;
+			return old.apply(this, arguments);
+		};
+	}
 
+	fn.zoneName  = abbrWrap(fn.zoneName);
+	fn.zoneAbbr  = abbrWrap(fn.zoneAbbr);
+	fn.utc       = resetZoneWrap(fn.utc);
+	fn.local     = resetZoneWrap(fn.local);
+	fn.utcOffset = resetZoneWrap2(fn.utcOffset);
+	
 	moment.tz.setDefault = function(name) {
 		if (major < 2 || (major === 2 && minor < 9)) {
 			logError('Moment Timezone setDefault() requires Moment.js >= 2.9.0. You are using Moment.js ' + moment.version + '.');
