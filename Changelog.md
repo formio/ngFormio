@@ -4,9 +4,31 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+<<<<<<< HEAD
 ## [Unreleased]
 ### Added
  - Enabled Edit JSON button in builder
+=======
+## 6.4.4
+### Fixed
+ - Embed codes for the deployed portal.
+
+### Changed
+ - Upgraded form manager.
+ - Upgraded form view pro.
+
+## 6.4.0
+### Added
+ - Group Self Access feature.
+ - Updated form manager with merge capabilities.
+ - Updated form manager with click-away form building protection.
+ - Updated form view pro with offline support.
+ - Allow SAML to provide a logout link.
+ - Force the SAML SSO to re-authentication for every page refresh to ensure valid auth.
+ 
+### Changed
+ - Upgraded @babel/core@7.4.4, @babel/preset-env@7.4.4, @progress/kendo-ui@2019.1.424, copy-webpack-plugin@5.0.3, mocha@6.1.4, protractor-helpers@1.1.509, swagger-ui@3.22.1, webpack-cli@3.3.1, formiojs@3.20.4, jquery@3.4.0, node-sass@4.12.0, webdriverio@5.8.0, webpack@4.30.0
+>>>>>>> 5730f9b498b1a554c5fc06992cd0cab6f4957538
 
 ## 6.3.6
 ### Changed

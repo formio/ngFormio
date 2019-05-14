@@ -83,13 +83,26 @@
       </div>
       <div class="panel-body">
         <div class="well">
-          <p>Self Access Permissions allow Submissions of this Resource to access themselves, as the owner. You can define granular access control with the Own Submission permissions below.</p>
+          <p><strong>Self Access</strong> allows Submissions of this Resource to access themselves, as the owner of the submission. This works by assigning the _id of every submission within this resource to the "owner" property of that submission.</p>
+          <div ng-if="form._id" class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="selfAccessPermissions" ng-change="toggleSelfAccessPermissions()">
+              Enable <strong>Self Access</strong>
+            </label>
+          </div>
         </div>
-        <div ng-if="form._id" class="checkbox">
-          <label>
-            <input type="checkbox" ng-model="selfAccessPermissions" ng-change="toggleSelfAccessPermissions()">
-            Enable
-          </label>
+        <div class="well">
+          <p><strong>Group Self Access</strong> works by first assuming this resource is a "group" in which an authenticated user is assigned. This provides a way for members of that group to have certain access to the group submission itself.</p>
+          <div class="form-group">
+            <label class="control-label">
+              <select ng-model="groupSelfAccess" ng-change="setGroupSelfAccess(this)">
+                <option value="">None</option>
+                <option value="admin">Admin - Group members can view, edit, and delete.</option>
+                <option value="write">Write - Group members can view and edit.</option>
+                <option value="read">Read - Group members can only view.</option>
+              </select>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -101,12 +114,11 @@
       </div>
       <div class="panel-body">
         <p>By default the only user who can access a submission is the owner of the submission in <strong>submission.owner</strong>.</p>
-        <p> However, sometimes an administrator or manager will create an account for users in which case the user cannot modify their own object. Self Access Permissions allow a user who does not own their own object to be able to still edit it as if they are the owner. This allows them to do things like change their password and update their account information regardless of who created their account.</p>
+        <p>However, sometimes an administrator or manager will create an account for users in which case the user cannot modify their own object. Self Access Permissions allow a user who does not own their own object to be able to still edit it as if they are the owner. This allows them to do things like change their password and update their account information regardless of who created their account.</p>
       </div>
     </div>
   </div>
 </div>
-
 <div class="row">
   <div class="col-md-8">
     <div class="panel panel-success">

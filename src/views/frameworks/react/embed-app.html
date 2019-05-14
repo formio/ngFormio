@@ -14,7 +14,12 @@
       import { Form } from 'react-formio';
 
       ReactDOM.render(
-      &nbsp;&nbsp;&lt;Form src="{{ variables.projectUrl }}/demographics" onSubmitDone={function(submission)} { // do something }" /&gt;, document.getElementById('example')
+        &nbsp;&nbsp;&lt;Form src="{{ variables.projectUrl }}/demographics" onSubmitDone={
+          &nbsp;&nbsp;&nbsp;&nbsp;function(submission) {
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// do something
+          &nbsp;&nbsp;&nbsp;&nbsp;}
+        &nbsp;&nbsp;} /&gt;,
+        &nbsp;&nbsp;document.getElementById('example')
       );</code></pre>      </li>
       <li class="list-group-item">
         <div class="list-group-item-title">
@@ -33,7 +38,8 @@
       };
 
       ReactDOM.render(
-      &nbsp;&nbsp;&lt;Form form={form} submission={submission} onChange={function() {}} onSubmit={function() {}} /&gt;, document.getElementById('example')
+      &nbsp;&nbsp;&lt;Form form={form} submission={submission} onChange={function() {}} onSubmit={function() {}} /&gt;,
+      &nbsp;&nbsp;document.getElementById('example')
       );</code></pre>      </li>
       </li>
       <!--<li class="list-group-item">-->
