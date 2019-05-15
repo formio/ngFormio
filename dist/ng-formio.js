@@ -21007,6 +21007,32 @@ function () {
       return this.delete('project', opts);
     }
   }, {
+    key: "loadFormRevision",
+    value: function loadFormRevision(vid, query, opts) {
+      if (!this.formUrl && !this.vUrl) {
+        return _nativePromiseOnly.default.reject('No form url set.');
+      } // Set the version url if not set.
+
+
+      if (vid && !this.vUrl) {
+        this.vId = vid;
+        this.vUrl = "".concat(this.formUrl, "/v/").concat(vid);
+      } // If they specified a revision form, load the revised form components.
+
+
+      if (query && isObject(query)) {
+        query = Formio.serialize(query.params);
+      }
+
+      if (query) {
+        query = this.query ? "".concat(this.query, "&").concat(query) : "?".concat(query);
+      } else {
+        query = this.query;
+      }
+
+      return this.makeRequest('form', this.vUrl + query, 'get', null, opts);
+    }
+  }, {
     key: "loadForm",
     value: function loadForm(query, opts) {
       var _this2 = this;
@@ -21020,20 +21046,9 @@ function () {
 
         if (currentForm.revisions === 'current' && _this2.submissionId) {
           return currentForm;
-        } // If they specified a revision form, load the revised form components.
-
-
-        if (query && isObject(query)) {
-          query = Formio.serialize(query.params);
         }
 
-        if (query) {
-          query = _this2.query ? "".concat(_this2.query, "&").concat(query) : "?".concat(query);
-        } else {
-          query = _this2.query;
-        }
-
-        return _this2.makeRequest('form', _this2.vUrl + query, 'get', null, opts).then(function (revisionForm) {
+        return _this2.loadFormRevision(_this2.vId, query, opts).then(function (revisionForm) {
           currentForm.components = revisionForm.components; // Using object.assign so we don't cross polinate multiple form loads.
 
           return Object.assign({}, currentForm);
@@ -23674,36 +23689,61 @@ function (_NestedComponent) {
      */
 
   }, {
-    key: "setSubmission",
+    key: "setSubmissionValue",
 
+    /**
+     * Explicitely sets the submission value directly without waiting on any form loads etc.
+     *
+     * @param submission
+     * @return {*}
+     */
+    value: function setSubmissionValue(submission, flags) {
+      var _this7 = this;
+
+      this.submissionSet = true;
+
+      if (!this.setValue(submission, flags)) {
+        if (this.hasChanged(submission, this.getValue())) {
+          this.triggerChange({
+            noValidate: true
+          });
+        }
+      }
+
+      return this.dataReady.then(function () {
+        return _this7.submissionReadyResolve(submission);
+      });
+    }
     /**
      * Sets a submission and returns the promise when it is ready.
      * @param submission
      * @param flags
      * @return {Promise.<TResult>}
      */
+
+  }, {
+    key: "setSubmission",
     value: function setSubmission(submission, flags) {
-      var _this7 = this;
+      var _this8 = this;
 
       return this.onSubmission = this.formReady.then(function () {
-        // If nothing changed, still trigger an update.
-        _this7.submissionSet = true;
+        _this8.submissionSet = true;
 
-        if (!_this7.setValue(submission, flags)) {
-          if (_this7.hasChanged(submission, _this7.getValue())) {
-            _this7.triggerChange({
-              noValidate: true
+        if (submission._fvid && _this8._form.revisions === 'original' && submission._fvid !== _this8._form._vid) {
+          return _this8.formio.loadFormRevision(submission._fvid).then(function (revision) {
+            _this8._form._vid = submission._fvid;
+            _this8._form.components = revision.components;
+            return _this8.setForm(_this8._form).then(function () {
+              return _this8.setSubmissionValue(submission, flags);
             });
-          }
+          });
+        } else {
+          return _this8.setSubmissionValue(submission, flags);
         }
-
-        return _this7.dataReady.then(function () {
-          return _this7.submissionReadyResolve(submission);
-        });
       }, function (err) {
-        return _this7.submissionReadyReject(err);
+        return _this8.submissionReadyReject(err);
       }).catch(function (err) {
-        return _this7.submissionReadyReject(err);
+        return _this8.submissionReadyReject(err);
       });
     }
     /**
@@ -23713,7 +23753,7 @@ function (_NestedComponent) {
   }, {
     key: "saveDraft",
     value: function saveDraft() {
-      var _this8 = this;
+      var _this9 = this;
 
       if (!this.draftEnabled) {
         return;
@@ -23736,9 +23776,9 @@ function (_NestedComponent) {
       if (!this.savingDraft) {
         this.savingDraft = true;
         this.formio.saveSubmission(draft).then(function (sub) {
-          _this8.savingDraft = false;
+          _this9.savingDraft = false;
 
-          _this8.emit('saveDraft', sub);
+          _this9.emit('saveDraft', sub);
         });
       }
     }
@@ -23751,7 +23791,7 @@ function (_NestedComponent) {
   }, {
     key: "restoreDraft",
     value: function restoreDraft(userId) {
-      var _this9 = this;
+      var _this10 = this;
 
       if (!this.formio) {
         console.warn('Cannot restore draft because there is no formio instance.');
@@ -23768,19 +23808,19 @@ function (_NestedComponent) {
         if (submissions.length > 0) {
           var draft = _lodash.default.cloneDeep(submissions[0]);
 
-          return _this9.setSubmission(draft).then(function () {
-            _this9.draftEnabled = true;
-            _this9.savingDraft = false;
+          return _this10.setSubmission(draft).then(function () {
+            _this10.draftEnabled = true;
+            _this10.savingDraft = false;
 
-            _this9.emit('restoreDraft', draft);
+            _this10.emit('restoreDraft', draft);
           });
         } // Enable drafts so that we can keep track of changes.
 
 
-        _this9.draftEnabled = true;
-        _this9.savingDraft = false;
+        _this10.draftEnabled = true;
+        _this10.savingDraft = false;
 
-        _this9.emit('restoreDraft', null);
+        _this10.emit('restoreDraft', null);
       });
     }
   }, {
@@ -23840,7 +23880,7 @@ function (_NestedComponent) {
   }, {
     key: "createForm",
     value: function createForm(form) {
-      var _this10 = this;
+      var _this11 = this;
 
       /**
        * {@link BaseComponent.component}
@@ -23852,21 +23892,21 @@ function (_NestedComponent) {
       }
 
       return this.onFormBuild = this.render().then(function () {
-        _this10.formReadyResolve();
+        _this11.formReadyResolve();
 
-        _this10.onFormBuild = null;
+        _this11.onFormBuild = null;
 
-        _this10.setValue(_this10.submission);
+        _this11.setValue(_this11.submission);
 
-        if (!_this10.changing) {
-          _this10.triggerChange();
+        if (!_this11.changing) {
+          _this11.triggerChange();
         }
 
         return form;
       }).catch(function (err) {
         console.warn(err);
 
-        _this10.formReadyReject(err);
+        _this11.formReadyReject(err);
       });
     }
     /**
@@ -23877,30 +23917,30 @@ function (_NestedComponent) {
   }, {
     key: "render",
     value: function render() {
-      var _this11 = this;
+      var _this12 = this;
 
       return this.onElement.then(function () {
-        var state = _this11.clear();
+        var state = _this12.clear();
 
-        _this11.showElement(false);
+        _this12.showElement(false);
 
-        clearTimeout(_this11.build(state));
-        _this11.isBuilt = true;
+        clearTimeout(_this12.build(state));
+        _this12.isBuilt = true;
 
-        _this11.on('resetForm', function () {
-          return _this11.resetValue();
+        _this12.on('resetForm', function () {
+          return _this12.resetValue();
         }, true);
 
-        _this11.on('deleteSubmission', function () {
-          return _this11.deleteSubmission();
+        _this12.on('deleteSubmission', function () {
+          return _this12.deleteSubmission();
         }, true);
 
-        _this11.on('refreshData', function () {
-          return _this11.updateValue();
+        _this12.on('refreshData', function () {
+          return _this12.updateValue();
         }, true);
 
         setTimeout(function () {
-          return _this11.emit('render');
+          return _this12.emit('render');
         }, 1);
       });
     }
@@ -23960,25 +24000,25 @@ function (_NestedComponent) {
   }, {
     key: "build",
     value: function build(state) {
-      var _this12 = this;
+      var _this13 = this;
 
       // Clear any existing event handlers in case this is a rebuild
       this.eventHandlers.forEach(function (h) {
-        return _this12.removeEventListener(h.obj, h.type);
+        return _this13.removeEventListener(h.obj, h.type);
       });
       this.on('submitButton', function (options) {
-        return _this12.submit(false, options);
+        return _this13.submit(false, options);
       }, true);
       this.on('checkValidity', function (data) {
-        return _this12.checkValidity(null, true, data);
+        return _this13.checkValidity(null, true, data);
       }, true);
       this.addComponents(null, null, null, state);
       this.currentForm = this;
       this.on('requestUrl', function (args) {
-        return _this12.submitUrl(args.url, args.headers);
+        return _this13.submitUrl(args.url, args.headers);
       }, true);
       return setTimeout(function () {
-        _this12.onChange({
+        _this13.onChange({
           noEmit: true
         });
       }, 1);
@@ -23993,7 +24033,7 @@ function (_NestedComponent) {
   }, {
     key: "showErrors",
     value: function showErrors(error, triggerEvent) {
-      var _this13 = this;
+      var _this14 = this;
 
       this.loading = false;
       var errors = this.errors;
@@ -24027,7 +24067,7 @@ function (_NestedComponent) {
         }
 
         components.forEach(function (path) {
-          var component = _this13.getComponent(path, _lodash.default.identity);
+          var component = _this14.getComponent(path, _lodash.default.identity);
 
           var components = _lodash.default.compact(Array.isArray(component) ? component : [component]);
 
@@ -24173,12 +24213,12 @@ function (_NestedComponent) {
   }, {
     key: "deleteSubmission",
     value: function deleteSubmission() {
-      var _this14 = this;
+      var _this15 = this;
 
       return this.formio.deleteSubmission().then(function () {
-        _this14.emit('submissionDeleted', _this14.submission);
+        _this15.emit('submissionDeleted', _this15.submission);
 
-        _this14.resetValue();
+        _this15.resetValue();
       });
     }
     /**
@@ -24201,24 +24241,24 @@ function (_NestedComponent) {
   }, {
     key: "submitForm",
     value: function submitForm() {
-      var _this15 = this;
+      var _this16 = this;
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       return new _nativePromiseOnly.default(function (resolve, reject) {
         // Read-only forms should never submit.
-        if (_this15.options.readOnly) {
+        if (_this16.options.readOnly) {
           return resolve({
-            submission: _this15.submission,
+            submission: _this16.submission,
             saved: false
           });
         } // Add in metadata about client submitting the form
 
 
-        _this15.submission.metadata = _this15.submission.metadata || {};
+        _this16.submission.metadata = _this16.submission.metadata || {};
 
-        _lodash.default.defaults(_this15.submission.metadata, {
-          timezone: _lodash.default.get(_this15, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
-          offset: parseInt(_lodash.default.get(_this15, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
+        _lodash.default.defaults(_this16.submission.metadata, {
+          timezone: _lodash.default.get(_this16, '_submission.metadata.timezone', (0, _utils.currentTimezone)()),
+          offset: parseInt(_lodash.default.get(_this16, '_submission.metadata.offset', (0, _moment.default)().utcOffset()), 10),
           referrer: document.referrer,
           browserName: navigator.appName,
           userAgent: navigator.userAgent,
@@ -24226,12 +24266,12 @@ function (_NestedComponent) {
           onLine: navigator.onLine
         });
 
-        var submission = _lodash.default.cloneDeep(_this15.submission || {});
+        var submission = _lodash.default.cloneDeep(_this16.submission || {});
 
         submission.state = options.state || 'submitted';
         var isDraft = submission.state === 'draft';
 
-        _this15.hook('beforeSubmit', submission, function (err) {
+        _this16.hook('beforeSubmit', submission, function (err) {
           if (err) {
             return reject(err);
           }
@@ -24240,11 +24280,11 @@ function (_NestedComponent) {
             return reject('Invalid Submission');
           }
 
-          if (!isDraft && !_this15.checkValidity(submission.data, true)) {
+          if (!isDraft && !_this16.checkValidity(submission.data, true)) {
             return reject();
           }
 
-          _this15.getAllComponents().forEach(function (comp) {
+          _this16.getAllComponents().forEach(function (comp) {
             var _comp$component = comp.component,
                 persistent = _comp$component.persistent,
                 key = _comp$component.key;
@@ -24254,7 +24294,7 @@ function (_NestedComponent) {
             }
           });
 
-          _this15.hook('customValidation', submission, function (err) {
+          _this16.hook('customValidation', submission, function (err) {
             if (err) {
               // If string is returned, cast to object.
               if (typeof err === 'string') {
@@ -24266,19 +24306,19 @@ function (_NestedComponent) {
 
               err = Array.isArray(err) ? err : [err]; // Set as custom errors.
 
-              _this15.customErrors = err;
+              _this16.customErrors = err;
               return reject();
             }
 
-            _this15.loading = true; // Use the form action to submit the form if available.
+            _this16.loading = true; // Use the form action to submit the form if available.
 
-            var submitFormio = _this15.formio;
+            var submitFormio = _this16.formio;
 
-            if (_this15._form && _this15._form.action) {
-              submitFormio = new _Formio.default(_this15._form.action, _this15.formio ? _this15.formio.options : {});
+            if (_this16._form && _this16._form.action) {
+              submitFormio = new _Formio.default(_this16._form.action, _this16.formio ? _this16.formio.options : {});
             }
 
-            if (_this15.nosubmit || !submitFormio) {
+            if (_this16.nosubmit || !submitFormio) {
               return resolve({
                 submission: submission,
                 saved: false
@@ -24300,16 +24340,16 @@ function (_NestedComponent) {
   }, {
     key: "executeSubmit",
     value: function executeSubmit(options) {
-      var _this16 = this;
+      var _this17 = this;
 
       this.submitted = true;
       this.submitting = true;
       return this.submitForm(options).then(function (_ref) {
         var submission = _ref.submission,
             saved = _ref.saved;
-        return _this16.onSubmit(submission, saved);
+        return _this17.onSubmit(submission, saved);
       }).catch(function (err) {
-        return _nativePromiseOnly.default.reject(_this16.onSubmissionError(err));
+        return _nativePromiseOnly.default.reject(_this17.onSubmissionError(err));
       });
     }
     /**
@@ -24336,11 +24376,11 @@ function (_NestedComponent) {
   }, {
     key: "submit",
     value: function submit(before, options) {
-      var _this17 = this;
+      var _this18 = this;
 
       if (!before) {
         return this.beforeSubmit(options).then(function () {
-          return _this17.executeSubmit(options);
+          return _this18.executeSubmit(options);
         });
       } else {
         return this.executeSubmit(options);
@@ -24349,7 +24389,7 @@ function (_NestedComponent) {
   }, {
     key: "submitUrl",
     value: function submitUrl(URL, headers) {
-      var _this18 = this;
+      var _this19 = this;
 
       if (!URL) {
         return console.warn('Missing URL argument');
@@ -24365,7 +24405,7 @@ function (_NestedComponent) {
       if (headers && headers.length > 0) {
         headers.map(function (e) {
           if (e.header !== '' && e.value !== '') {
-            settings.headers[e.header] = _this18.interpolate(e.value, submission);
+            settings.headers[e.header] = _this19.interpolate(e.value, submission);
           }
         });
       }
@@ -24375,9 +24415,9 @@ function (_NestedComponent) {
           _Formio.default.makeStaticRequest(API_URL, settings.method, submission, {
             headers: settings.headers
           }).then(function () {
-            _this18.emit('requestDone');
+            _this19.emit('requestDone');
 
-            _this18.setAlert('success', '<p> Success </p>');
+            _this19.setAlert('success', '<p> Success </p>');
           });
         } catch (e) {
           this.showErrors("".concat(e.statusText, " ").concat(e.status));
@@ -24408,10 +24448,10 @@ function (_NestedComponent) {
   }, {
     key: "language",
     set: function set(lang) {
-      var _this19 = this;
+      var _this20 = this;
 
       return new _nativePromiseOnly.default(function (resolve, reject) {
-        _this19.options.language = lang;
+        _this20.options.language = lang;
 
         try {
           _i18next.default.changeLanguage(lang, function (err) {
@@ -24419,9 +24459,9 @@ function (_NestedComponent) {
               return reject(err);
             }
 
-            _this19.redraw();
+            _this20.redraw();
 
-            _this19.emit('languageChanged');
+            _this20.emit('languageChanged');
 
             resolve();
           });
@@ -24461,10 +24501,10 @@ function (_NestedComponent) {
   }, {
     key: "ready",
     get: function get() {
-      var _this20 = this;
+      var _this21 = this;
 
       return this.formReady.then(function () {
-        return _this20.loadingSubmission ? _this20.submissionReady : true;
+        return _this21.loadingSubmission ? _this21.submissionReady : true;
       });
     }
     /**
@@ -37734,7 +37774,7 @@ function (_BaseComponent) {
     /* eslint-disable camelcase */
 
 
-    _this.component.widget = {
+    _this.originalComponent.widget = _this.component.widget = {
       type: 'calendar',
       timezone: timezone,
       displayInTimezone: _lodash.default.get(_this.component, 'displayInTimezone', 'viewer'),
@@ -42337,7 +42377,9 @@ function (_BaseComponent) {
           _this3.subForm.on('change', function () {
             _this3.dataValue = _this3.subForm.getValue();
 
-            _this3.triggerChange();
+            _this3.triggerChange({
+              noEmit: true
+            });
           });
         });
 
@@ -42622,6 +42664,8 @@ function (_BaseComponent) {
     value: function setValue(submission, flags, norecurse) {
       var _this7 = this;
 
+      this._submission = submission;
+
       if (this.subForm || norecurse) {
         if (!norecurse && submission && submission._id && this.subForm.formio && !flags.noload && (_lodash.default.isEmpty(submission.data) || this.shouldSubmit)) {
           var submissionUrl = "".concat(this.subForm.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
@@ -42636,7 +42680,7 @@ function (_BaseComponent) {
         }
       }
 
-      var changed = _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
+      var changed = _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, this._submission, flags);
 
       var hidden = this.isHidden();
       var subForm;
@@ -42648,7 +42692,7 @@ function (_BaseComponent) {
       }
 
       subForm.then(function () {
-        return _this7.setValue(submission, flags, true);
+        return _this7.setValue(_this7._submission, flags, true);
       });
       return changed;
     }
@@ -48052,7 +48096,7 @@ function (_BaseComponent) {
 
       switch (this.component.dataSrc) {
         case 'values':
-          this.component.valueProperty = 'value';
+          this.component.valueProperty = this.originalComponent.valueProperty = 'value';
           this.setItems(this.component.data.values);
           break;
 
