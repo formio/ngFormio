@@ -28665,6 +28665,11 @@ function (_Component) {
 
     _this._hasCondition = null;
     /**
+     * A persistent data object that can persist between component instances.
+     */
+
+    _this.persist = {};
+    /**
      * The data object in which this component resides.
      * @type {*}
      */
@@ -30285,12 +30290,9 @@ function (_Component) {
     value: function onChange(flags, fromRoot) {
       flags = flags || {};
 
-      if (!flags.noValidate) {
-        this.pristine = false;
-      }
-
       if (flags.modified) {
         // Add a modified class if this element was manually modified.
+        this.pristine = false;
         this.addClass(this.getElement(), 'formio-modified');
       } // If we are supposed to validate on blur, then don't trigger validation yet.
 
@@ -42372,14 +42374,10 @@ function (_BaseComponent) {
         _this3.subForm.parentVisible = _this3.visible;
 
         _this3.subForm.on('change', function () {
-          _this3.subForm.off('change');
+          _this3.dataValue = _this3.subForm.getValue();
 
-          _this3.subForm.on('change', function () {
-            _this3.dataValue = _this3.subForm.getValue();
-
-            _this3.triggerChange({
-              noEmit: true
-            });
+          _this3.triggerChange({
+            noEmit: true
           });
         });
 
@@ -44647,6 +44645,12 @@ function (_BaseComponent) {
 
       comp.parent = this;
       comp.root = this.root || this;
+
+      if (state && state.persist) {
+        comp.persist = state.persist;
+        delete state.persist;
+      }
+
       comp.build(state);
       comp.isBuilt = true;
 
@@ -44726,7 +44730,8 @@ function (_BaseComponent) {
     key: "removeComponent",
     value: function removeComponent(component, components) {
       components = components || this.components;
-      var state = component.destroy();
+      var state = component.destroy() || {};
+      state.persist = component.persist;
       var element = component.getElement();
 
       if (element && element.parentNode) {
@@ -47481,14 +47486,6 @@ var _default = [{
   tooltip: 'Use this to provide additional sorting using query parameters.',
   weight: 51.6
 }, {
-  type: 'tags',
-  input: true,
-  key: 'searchFields',
-  label: 'Search Fields',
-  tooltip: 'A list of search filters based on the fields of the resource. See the <a target=\'_blank\' href=\'https://github.com/travist/resourcejs#filtering-the-results\'>Resource.js documentation</a> for the format of these filters.',
-  placeholder: 'The fields to query on the server',
-  weight: 52
-}, {
   type: 'textarea',
   input: true,
   key: 'template',
@@ -47498,6 +47495,83 @@ var _default = [{
   rows: 3,
   weight: 53,
   tooltip: 'The HTML template for the result data items.'
+}, {
+  type: 'checkbox',
+  input: true,
+  weight: 54,
+  key: 'searchEnabled',
+  label: 'Enable Search',
+  defaultValue: true,
+  tooltip: 'When checked, the select dropdown will allow for searching.'
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'searchField',
+  label: 'Search Field for Query',
+  weight: 55,
+  description: 'Name of URL query parameter (leave blank for client-side search)',
+  tooltip: 'The name of the search querystring parameter used when sending a request to filter results with. The server at the URL must handle this query parameter with \'__regex\' appended. Leave empty to use client-side search within the list of choices.',
+  conditional: {
+    json: {
+      '!=': [{
+        var: 'data.searchEnabled'
+      }, '']
+    }
+  }
+}, {
+  type: 'number',
+  input: true,
+  key: 'minSearch',
+  weight: 56,
+  label: 'Server-Side Search: Minimum Input Length',
+  tooltip: 'The minimum amount of characters to be typed before a search query is made.',
+  defaultValue: 0,
+  conditional: {
+    json: {
+      and: [{
+        '!=': [{
+          var: 'data.searchEnabled'
+        }, '']
+      }, {
+        '!=': [{
+          var: 'data.searchField'
+        }, '']
+      }]
+    }
+  }
+}, {
+  label: 'Client-Side Search Threshold',
+  mask: false,
+  tableView: true,
+  alwaysEnabled: false,
+  type: 'number',
+  input: true,
+  key: 'searchThreshold',
+  validate: {
+    min: 0,
+    customMessage: '',
+    json: '',
+    max: 1
+  },
+  delimiter: false,
+  requireDecimal: false,
+  encrypted: false,
+  defaultValue: 0.1,
+  weight: 57,
+  tooltip: 'At what point does the match algorithm for static search give up. A threshold of 0.0 requires a perfect match, a threshold of 1.0 would match anything.',
+  conditional: {
+    json: {
+      and: [{
+        '!=': [{
+          var: 'data.searchEnabled'
+        }, '']
+      }, {
+        '==': [{
+          var: 'data.searchField'
+        }, '']
+      }]
+    }
+  }
 }];
 exports.default = _default;
 
@@ -48248,6 +48322,8 @@ function (_BaseComponent) {
         }
       }
 
+      var searchField = this.component.searchField;
+
       var choicesOptions = _objectSpread({
         removeItemButton: this.component.disabled ? false : _lodash.default.get(this.component, 'removeItemButton', true),
         itemSelectText: '',
@@ -48264,8 +48340,8 @@ function (_BaseComponent) {
         shouldSort: false,
         position: this.component.dropdown || 'auto',
         searchEnabled: useSearch,
-        searchChoices: !this.component.searchField,
-        searchFields: _lodash.default.get(this, 'component.searchFields', ['label']),
+        searchChoices: !searchField,
+        searchFields: this.component.searchFields || (searchField ? ["value.".concat(searchField)] : ['label']),
         fuseOptions: Object.assign({
           include: 'score',
           threshold: _lodash.default.get(this, 'component.searchThreshold', 0.3)
@@ -51596,6 +51672,16 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
@@ -51737,9 +51823,11 @@ function (_TextFieldComponent) {
 
       if (newValue !== this.dataValue && (!_lodash.default.isEmpty(newValue) || !_lodash.default.isEmpty(this.dataValue))) {
         this.updateValue({
-          modified: true
+          modified: !this.autoModified
         }, newValue);
       }
+
+      this.autoModified = false;
     }
     /* eslint-disable max-statements */
 
@@ -51901,15 +51989,19 @@ function (_TextFieldComponent) {
               uploadUrl = _this4$component.uploadUrl,
               uploadOptions = _this4$component.uploadOptions,
               uploadDir = _this4$component.uploadDir;
+          var requestData;
 
           _this4.root.formio.uploadFile(uploadStorage, files[0], (0, _utils.uniqueName)(files[0].name), uploadDir || '', //should pass empty string if undefined
           null, uploadUrl, uploadOptions).then(function (result) {
+            requestData = result;
             return _this4.root.formio.downloadFile(result);
           }).then(function (result) {
             quillInstance.quill.enable(true);
             var Delta = Quill.import('delta');
             quillInstance.quill.updateContents(new Delta().retain(range.index).delete(range.length).insert({
               image: result.url
+            }, {
+              alt: JSON.stringify(requestData)
             }), Quill.sources.USER);
             fileInput.value = '';
           }).catch(function (error) {
@@ -51934,12 +52026,20 @@ function (_TextFieldComponent) {
 
       if (this.editorReady) {
         this.editorReady.then(function (editor) {
+          _this5.autoModified = true;
+
           if (_this5.component.editor === 'ace') {
             editor.setValue(_this5.setConvertedValue(value));
           } else if (_this5.component.editor === 'ckeditor') {
             editor.data.set(_this5.setConvertedValue(value));
           } else {
-            editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+            if (_this5.component.isUploadEnabled) {
+              _this5.setAsyncConvertedValue(value).then(function (result) {
+                editor.setContents(editor.clipboard.convert(result));
+              });
+            } else {
+              editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+            }
           }
         });
       }
@@ -51960,6 +52060,52 @@ function (_TextFieldComponent) {
       }
 
       return value;
+    }
+  }, {
+    key: "setAsyncConvertedValue",
+    value: function setAsyncConvertedValue(value) {
+      if (this.component.as && this.component.as === 'json' && value) {
+        try {
+          value = JSON.stringify(value, null, 2);
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+
+      if (!_lodash.default.isString(value)) {
+        value = '';
+      }
+
+      var htmlDoc = new DOMParser().parseFromString(value, 'text/html');
+      var images = htmlDoc.getElementsByTagName('img');
+
+      if (images.length) {
+        return this.setImagesUrl(images).then(function () {
+          value = htmlDoc.getElementsByTagName('body')[0].firstElementChild;
+          return new XMLSerializer().serializeToString(value);
+        });
+      } else {
+        return Promise.resolve(value);
+      }
+    }
+  }, {
+    key: "setImagesUrl",
+    value: function setImagesUrl(images) {
+      var _this6 = this;
+
+      return Promise.all(_lodash.default.map(images, function (image) {
+        var requestData;
+
+        try {
+          requestData = JSON.parse(image.getAttribute('alt'));
+        } catch (error) {
+          console.warn(error);
+        }
+
+        return _this6.root.formio.downloadFile(requestData).then(function (result) {
+          image.setAttribute('src', result.url);
+        });
+      }));
     }
   }, {
     key: "removeBlanks",
@@ -51999,7 +52145,7 @@ function (_TextFieldComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this6 = this;
+      var _this7 = this;
 
       value = value || '';
 
@@ -52017,7 +52163,7 @@ function (_TextFieldComponent) {
         return;
       } else if (this.isPlain) {
         value = Array.isArray(value) ? value.map(function (val) {
-          return _this6.setConvertedValue(val);
+          return _this7.setConvertedValue(val);
         }) : this.setConvertedValue(value);
         return _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, value, flags);
       } // Set the value when the editor is ready.
