@@ -4,11 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-<<<<<<< HEAD
-## [Unreleased]
-### Added
- - Enabled Edit JSON button in builder
-=======
+## 6.4.5
+### Fixed
+ - Copy/Import functionality for display and properties.
+
 ## 6.4.4
 ### Fixed
  - Embed codes for the deployed portal.
