@@ -24961,7 +24961,7 @@ function (_Webform) {
 
       var remove = true;
 
-      if (component.type === 'components' && component.getComponents().length > 0) {
+      if (typeof component.getComponents === 'function' && component.getComponents().length > 0) {
         var message = 'Removing this component will also remove all of its children. Are you sure you want to do this?';
         remove = window.confirm(this.t(message));
       }
@@ -33767,6 +33767,31 @@ function (_BaseComponent) {
   }
 
   _createClass(CheckBoxComponent, [{
+    key: "getRadioGroupItems",
+    value: function getRadioGroupItems() {
+      var _this = this;
+
+      if (!this.isRadioCheckbox) {
+        return [];
+      }
+
+      return this.currentForm ? this.currentForm.getAllComponents().filter(function (c) {
+        return c.isRadioCheckbox && c.component.name === _this.component.name;
+      }) : [];
+    }
+  }, {
+    key: "getRadioGroupValue",
+    value: function getRadioGroupValue() {
+      if (!this.isRadioCheckbox) {
+        return null;
+      }
+
+      var selectedRadios = this.getRadioGroupItems().filter(function (c) {
+        return c.input.checked;
+      });
+      return _lodash.default.get(selectedRadios, '[0].component.value');
+    }
+  }, {
     key: "elementInfo",
     value: function elementInfo() {
       var info = _get(_getPrototypeOf(CheckBoxComponent.prototype), "elementInfo", this).call(this);
@@ -33958,7 +33983,7 @@ function (_BaseComponent) {
   }, {
     key: "getValueAt",
     value: function getValueAt(index) {
-      if (this.component.name) {
+      if (this.isRadioCheckbox) {
         return this.inputs[index].checked ? this.component.value : '';
       }
 
@@ -33967,13 +33992,7 @@ function (_BaseComponent) {
   }, {
     key: "getValue",
     value: function getValue() {
-      var value = _get(_getPrototypeOf(CheckBoxComponent.prototype), "getValue", this).call(this);
-
-      if (this.component.name) {
-        return value ? this.setCheckedState(value) : this.setCheckedState(this.dataValue);
-      } else {
-        return value;
-      }
+      return _get(_getPrototypeOf(CheckBoxComponent.prototype), "getValue", this).call(this);
     }
   }, {
     key: "setCheckedState",
@@ -33982,7 +34001,7 @@ function (_BaseComponent) {
         return;
       }
 
-      if (this.component.name) {
+      if (this.isRadioCheckbox) {
         this.input.value = value === this.component.value ? this.component.value : 0;
         this.input.checked = value === this.component.value ? 1 : 0;
       } else if (value === 'on') {
@@ -33999,12 +34018,6 @@ function (_BaseComponent) {
         this.input.checked = 0;
       }
 
-      if (this.input.checked) {
-        this.input.setAttribute('checked', true);
-      } else {
-        this.input.removeAttribute('checked');
-      }
-
       return value;
     }
   }, {
@@ -34012,9 +34025,12 @@ function (_BaseComponent) {
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
 
-      if (this.setCheckedState(value) !== undefined) {
-        return this.updateValue(flags, value);
+      if (this.isRadioCheckbox && !value) {
+        return;
       }
+
+      this.setCheckedState(value);
+      return this.updateValue(flags, value);
     }
   }, {
     key: "getView",
@@ -34031,16 +34047,32 @@ function (_BaseComponent) {
   }, {
     key: "updateValue",
     value: function updateValue(flags, value) {
+      var _this2 = this;
+
+      if (this.isRadioCheckbox) {
+        if (value === undefined && this.input.checked) {
+          // Force all siblings elements in radio group to unchecked
+          this.getRadioGroupItems().filter(function (c) {
+            return c !== _this2 && c.input.checked;
+          }).forEach(function (c) {
+            return c.input.checked = false;
+          });
+          value = this.component.value;
+        } else {
+          value = this.getRadioGroupValue();
+        }
+      } else if (flags && flags.modified && this.input.checked && value === undefined) {
+        value = true;
+      }
+
       var changed = _get(_getPrototypeOf(CheckBoxComponent.prototype), "updateValue", this).call(this, flags, value);
 
-      if (changed) {
-        var checkedClass = 'checkbox-checked';
-
-        if (this.getValue()) {
-          this.addClass(this.element, checkedClass);
-        } else {
-          this.removeClass(this.element, checkedClass);
-        }
+      if (this.input.checked) {
+        this.input.setAttribute('checked', true);
+        this.addClass(this.element, 'checkbox-checked');
+      } else {
+        this.input.removeAttribute('checked');
+        this.removeClass(this.element, 'checkbox-checked');
       }
 
       return changed;
@@ -34053,12 +34085,17 @@ function (_BaseComponent) {
   }, {
     key: "defaultValue",
     get: function get() {
-      return this.component.name ? '' : (this.component.defaultValue || false).toString() === 'true';
+      return this.isRadioCheckbox ? '' : (this.component.defaultValue || false).toString() === 'true';
     }
   }, {
     key: "hasSetValue",
     get: function get() {
       return this.hasValue();
+    }
+  }, {
+    key: "isRadioCheckbox",
+    get: function get() {
+      return this.component.inputType === 'radio';
     }
   }, {
     key: "emptyValue",
@@ -34070,8 +34107,10 @@ function (_BaseComponent) {
     set: function set(value) {
       var setValue = _set(_getPrototypeOf(CheckBoxComponent.prototype), "dataValue", value, this, true);
 
-      if (this.component.name) {
+      if (this.isRadioCheckbox) {
         _lodash.default.set(this.data, this.component.key, setValue === this.component.value);
+
+        this.setCheckedState(setValue);
       }
 
       return setValue;
@@ -34079,7 +34118,7 @@ function (_BaseComponent) {
     get: function get() {
       var getValue = _get(_getPrototypeOf(CheckBoxComponent.prototype), "dataValue", this);
 
-      if (this.component.name) {
+      if (this.isRadioCheckbox) {
         _lodash.default.set(this.data, this.component.key, getValue === this.component.value);
       }
 
@@ -34088,7 +34127,7 @@ function (_BaseComponent) {
   }, {
     key: "key",
     get: function get() {
-      return this.component.name ? this.component.name : _get(_getPrototypeOf(CheckBoxComponent.prototype), "key", this);
+      return this.isRadioCheckbox ? this.component.name : _get(_getPrototypeOf(CheckBoxComponent.prototype), "key", this);
     }
   }], [{
     key: "schema",
@@ -34266,10 +34305,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
@@ -34280,6 +34315,10 @@ function _superPropBase(object, property) { while (!Object.prototype.hasOwnPrope
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -34288,6 +34327,22 @@ var ColumnComponent =
 /*#__PURE__*/
 function (_NestedComponent) {
   _inherits(ColumnComponent, _NestedComponent);
+
+  _createClass(ColumnComponent, null, [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _NestedComponent2.default.schema.apply(_NestedComponent2.default, [{
+        label: 'Column',
+        key: 'column',
+        type: 'column',
+        input: false
+      }].concat(extend));
+    }
+  }]);
 
   function ColumnComponent(component, options, data) {
     var _this;
@@ -34312,6 +34367,11 @@ function (_NestedComponent) {
       }
 
       return _get(_getPrototypeOf(ColumnComponent.prototype), "conditionallyVisible", this).call(this, data);
+    }
+  }, {
+    key: "defaultSchema",
+    get: function get() {
+      return ColumnComponent.schema();
     }
   }, {
     key: "className",
@@ -34599,7 +34659,9 @@ function (_NestedComponent) {
       container.noDrop = true;
 
       _lodash.default.each(this.component.columns, function (column, index) {
-        column.type = 'column';
+        column.type = 'column'; //fix input: true issue for existent forms
+
+        column.input = false;
         column.hideOnChildrenHidden = _this4.component.hideOnChildrenHidden;
 
         var component = _this4.addComponent(column, container, _this4.data, null, null, state);
@@ -36671,6 +36733,13 @@ function (_NestedComponent) {
     }
     /* eslint-enable max-statements */
 
+  }, {
+    key: "resetValue",
+    value: function resetValue() {
+      _get(_getPrototypeOf(DataGridComponent.prototype), "resetValue", this).call(this);
+
+      this.buildRows();
+    }
     /**
      * Get the value of this component.
      *
@@ -41727,7 +41796,7 @@ function (_BaseComponent) {
       if (this.component.storage && files && files.length) {
         // files is not really an array and does not have a forEach method, so fake it.
         Array.prototype.forEach.call(files, function (file) {
-          var fileName = (0, _utils.uniqueName)(file.name);
+          var fileName = (0, _utils.uniqueName)(file.name, _this14.component.fileNameTemplate, _this14.evalContext());
           var fileUpload = {
             originalName: file.name,
             name: fileName,
@@ -41772,13 +41841,14 @@ function (_BaseComponent) {
             if (fileService.uploadsInProgress === undefined) {
               var cssClass = 'uploads-in-progress';
 
-              var submitButton = _this14.root.element.querySelector('.formio-component-submit').querySelector('button');
+              var submitComponent = _this14.root.element.querySelector('.formio-component-submit');
 
+              var submitButton = submitComponent ? submitComponent.querySelector('button') : null;
               var array = new Array();
               fileService.uploadsInProgress = {
                 array: array,
                 add: function add(item) {
-                  if (cssClass && array.length === 0) {
+                  if (submitButton && cssClass && array.length === 0) {
                     submitButton.classList.add(cssClass);
                   }
 
@@ -41787,7 +41857,7 @@ function (_BaseComponent) {
                 remove: function remove(item) {
                   array.splice(array.indexOf(item), 1);
 
-                  if (cssClass && array.length === 0) {
+                  if (submitButton && cssClass && array.length === 0) {
                     submitButton.classList.remove(cssClass);
                   }
                 },
@@ -42047,6 +42117,13 @@ var _default = [{
   placeholder: '(optional) Enter a directory for the files',
   tooltip: 'This will place all the files uploaded in this field in the directory',
   weight: 20
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'fileNameTemplate',
+  label: 'File Name Template',
+  tooltip: 'Specify template for name of uploaded file(s). Regular template variables are available (`data`, `component`, `user`, `value`, `moment` etc.), also `fileName`, `guid` variables are available. `guid` part must be present, if not found in template, will be added at the end.',
+  weight: 25
 }, {
   type: 'checkbox',
   input: true,
@@ -47277,9 +47354,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-js/modules/es6.array.from.js");
+
+__webpack_require__(/*! core-js/modules/es6.regexp.to-string */ "./node_modules/core-js/modules/es6.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
+
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
 
 __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
 
@@ -47294,6 +47381,14 @@ var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -47393,6 +47488,10 @@ function (_SelectComponent) {
         dialog.body.appendChild(formioForm);
         var form = new _Webform.default(formioForm);
         form.on('submit', function (submission) {
+          if (_this2.component.multiple) {
+            submission = [].concat(_toConsumableArray(_this2.dataValue), [submission]);
+          }
+
           _this2.setValue(submission);
 
           form.destroy();
@@ -47659,6 +47758,8 @@ __webpack_require__(/*! core-js/modules/es7.array.includes */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/core-js/modules/es6.string.includes.js");
 
+__webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.replace */ "./node_modules/core-js/modules/es6.regexp.replace.js");
 
 __webpack_require__(/*! core-js/modules/es6.promise */ "./node_modules/core-js/modules/es6.promise.js");
@@ -47861,10 +47962,29 @@ function (_BaseComponent) {
       return data;
     }
   }, {
+    key: "addAutofillHoneyInput",
+    value: function addAutofillHoneyInput(container, input) {
+      var _this2 = this;
+
+      var autofillInput = this.ce('input', {
+        type: 'text',
+        name: this.info.attr.name,
+        style: 'display: none'
+      });
+      input.addEventListener('change', function (event) {
+        autofillInput.value = JSON.stringify(event.detail.value);
+      });
+      autofillInput.addEventListener('change', function (event) {
+        _this2.updateValue({}, JSON.parse(event.target.value));
+      });
+      container.appendChild(autofillInput);
+    }
+  }, {
     key: "createInput",
     value: function createInput(container) {
       this.selectContainer = container;
       this.selectInput = _get(_getPrototypeOf(SelectComponent.prototype), "createInput", this).call(this, container);
+      this.addAutofillHoneyInput(this.selectContainer, this.selectInput);
     }
     /**
      * Adds an option to the select dropdown.
@@ -47944,7 +48064,7 @@ function (_BaseComponent) {
   }, {
     key: "setItems",
     value: function setItems(items, fromSearch) {
-      var _this2 = this;
+      var _this3 = this;
 
       // If the items is a string, then parse as JSON.
       if (typeof items == 'string') {
@@ -48011,7 +48131,7 @@ function (_BaseComponent) {
 
 
       _lodash.default.each(items, function (item) {
-        _this2.addOption(_this2.itemValue(item), _this2.itemTemplate(item));
+        _this3.addOption(_this3.itemValue(item), _this3.itemTemplate(item));
       });
 
       if (this.choices) {
@@ -48044,7 +48164,7 @@ function (_BaseComponent) {
   }, {
     key: "loadItems",
     value: function loadItems(url, search, headers, options, method, body) {
-      var _this3 = this;
+      var _this4 = this;
 
       options = options || {}; // See if they have not met the minimum search requirements.
 
@@ -48098,7 +48218,7 @@ function (_BaseComponent) {
       if (!_lodash.default.isEmpty(query)) {
         // Add the query string.
         url += (!url.includes('?') ? '?' : '&') + _Formio.default.serialize(query, function (item) {
-          return _this3.interpolate(item);
+          return _this4.interpolate(item);
         });
       } // Add filter capability
 
@@ -48112,27 +48232,27 @@ function (_BaseComponent) {
       this.loading = true;
 
       _Formio.default.makeRequest(this.options.formio, 'select', url, method, body, options).then(function (response) {
-        _this3.loading = false;
-        var scrollTop = !_this3.scrollLoading && _this3.currentItems.length === 0;
+        _this4.loading = false;
+        var scrollTop = !_this4.scrollLoading && _this4.currentItems.length === 0;
 
-        _this3.setItems(response, !!search);
+        _this4.setItems(response, !!search);
 
-        if (scrollTop && _this3.choices) {
-          _this3.choices.choiceList.scrollToTop();
+        if (scrollTop && _this4.choices) {
+          _this4.choices.choiceList.scrollToTop();
         }
       }).catch(function (err) {
-        _this3.stopInfiniteScroll();
+        _this4.stopInfiniteScroll();
 
-        _this3.loading = false;
+        _this4.loading = false;
 
-        _this3.itemsLoadedResolve();
+        _this4.itemsLoadedResolve();
 
-        _this3.emit('componentError', {
-          component: _this3.component,
+        _this4.emit('componentError', {
+          component: _this4.component,
           message: err.toString()
         });
 
-        console.warn("Unable to load resources for ".concat(_this3.key));
+        console.warn("Unable to load resources for ".concat(_this4.key));
       });
     }
     /**
@@ -48285,7 +48405,7 @@ function (_BaseComponent) {
 
     /* eslint-disable max-statements */
     value: function addInput(input, container) {
-      var _this4 = this;
+      var _this5 = this;
 
       _get(_getPrototypeOf(SelectComponent.prototype), "addInput", this).call(this, input, container);
 
@@ -48297,13 +48417,13 @@ function (_BaseComponent) {
         this.triggerUpdate();
         this.focusableElement = input;
         this.addEventListener(input, 'focus', function () {
-          return _this4.update();
+          return _this5.update();
         });
         this.addEventListener(input, 'keydown', function (event) {
           var keyCode = event.keyCode;
 
           if ([8, 46].includes(keyCode)) {
-            _this4.setValue(null);
+            _this5.setValue(null);
           }
         });
         return;
@@ -48362,7 +48482,7 @@ function (_BaseComponent) {
 
         if (useSearch) {
           this.addEventListener(this.choices.containerOuter.element, 'focus', function () {
-            return _this4.focusableElement.focus();
+            return _this5.focusableElement.focus();
           });
         }
       }
@@ -48370,11 +48490,11 @@ function (_BaseComponent) {
       this.scrollList = this.choices.choiceList.element;
 
       this.onScroll = function () {
-        if (!_this4.scrollLoading && _this4.scrollList.scrollTop + _this4.scrollList.clientHeight >= _this4.scrollList.scrollHeight) {
-          _this4.scrollTop = _this4.scrollList.scrollTop;
-          _this4.scrollLoading = true;
+        if (!_this5.scrollLoading && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight) {
+          _this5.scrollTop = _this5.scrollList.scrollTop;
+          _this5.scrollLoading = true;
 
-          _this4.triggerUpdate(_this4.choices.input.element.value);
+          _this5.triggerUpdate(_this5.choices.input.element.value);
         }
       };
 
@@ -48388,33 +48508,33 @@ function (_BaseComponent) {
         if (this.choices && this.choices.input && this.choices.input.element) {
           this.addEventListener(this.choices.input.element, 'input', function (event) {
             if (!event.target.value) {
-              _this4.triggerUpdate();
+              _this5.triggerUpdate();
             }
           });
         }
 
         this.addEventListener(input, 'search', function (event) {
-          return _this4.triggerUpdate(event.detail.value);
+          return _this5.triggerUpdate(event.detail.value);
         });
         this.addEventListener(input, 'stopSearch', function () {
-          return _this4.triggerUpdate();
+          return _this5.triggerUpdate();
         });
       }
 
       this.addEventListener(input, 'showDropdown', function () {
-        if (_this4.dataValue) {
-          _this4.triggerUpdate();
+        if (_this5.dataValue) {
+          _this5.triggerUpdate();
         }
 
-        _this4.update();
+        _this5.update();
       });
 
       if (placeholderValue && this.choices._isSelectOneElement) {
         this.addEventListener(input, 'removeItem', function () {
-          var items = _this4.choices._store.activeItems;
+          var items = _this5.choices._store.activeItems;
 
           if (!items.length) {
-            _this4.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
+            _this5.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
           }
         });
       } // Add value options.
@@ -48461,7 +48581,7 @@ function (_BaseComponent) {
   }, {
     key: "addCurrentChoices",
     value: function addCurrentChoices(values, items, keyValue) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!values) {
         return false;
@@ -48480,7 +48600,7 @@ function (_BaseComponent) {
         // 'label' and 'value' properties. This assumption allows
         // us to read correct value from the item.
 
-        var isSelectOptions = items === _this5.selectOptions;
+        var isSelectOptions = items === _this6.selectOptions;
 
         if (items && items.length) {
           _lodash.default.each(items, function (choice) {
@@ -48489,7 +48609,7 @@ function (_BaseComponent) {
               return false;
             }
 
-            var itemValue = keyValue ? choice.value : _this5.itemValue(choice, isSelectOptions);
+            var itemValue = keyValue ? choice.value : _this6.itemValue(choice, isSelectOptions);
             found |= _lodash.default.isEqual(itemValue, value);
             return found ? false : true;
           });
@@ -48498,8 +48618,8 @@ function (_BaseComponent) {
 
         if (!found) {
           notFoundValuesToAdd.push({
-            value: _this5.itemValue(value),
-            label: _this5.itemTemplate(value)
+            value: _this6.itemValue(value),
+            label: _this6.itemTemplate(value)
           });
           return true;
         }
@@ -48512,7 +48632,7 @@ function (_BaseComponent) {
           this.choices.setChoices(notFoundValuesToAdd, 'value', 'label');
         } else {
           notFoundValuesToAdd.map(function (notFoundValue) {
-            _this5.addOption(notFoundValue.value, notFoundValue.label);
+            _this6.addOption(notFoundValue.value, notFoundValue.label);
           });
         }
       }
@@ -48667,7 +48787,7 @@ function (_BaseComponent) {
   }, {
     key: "asString",
     value: function asString(value) {
-      var _this6 = this;
+      var _this7 = this;
 
       value = value || this.getValue();
 
@@ -48694,7 +48814,7 @@ function (_BaseComponent) {
       if (Array.isArray(value)) {
         var _items = [];
         value.forEach(function (item) {
-          return _items.push(_this6.itemTemplate(item));
+          return _items.push(_this7.itemTemplate(item));
         });
         return _items.length > 0 ? _items.join('<br />') : '-';
       }
@@ -48777,7 +48897,7 @@ function (_BaseComponent) {
   }, {
     key: "requestHeaders",
     get: function get() {
-      var _this7 = this;
+      var _this8 = this;
 
       // Create the headers object.
       var headers = new _Formio.default.Headers(); // Add custom headers to the url.
@@ -48786,7 +48906,7 @@ function (_BaseComponent) {
         try {
           _lodash.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this7.interpolate(header.value));
+              headers.set(header.key, _this8.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -52017,7 +52137,7 @@ function (_TextFieldComponent) {
     }
   }, {
     key: "setWysiwygValue",
-    value: function setWysiwygValue(value) {
+    value: function setWysiwygValue(value, skipSetting) {
       var _this5 = this;
 
       if (this.isPlain || this.options.readOnly || this.options.htmlView) {
@@ -52028,17 +52148,19 @@ function (_TextFieldComponent) {
         this.editorReady.then(function (editor) {
           _this5.autoModified = true;
 
-          if (_this5.component.editor === 'ace') {
-            editor.setValue(_this5.setConvertedValue(value));
-          } else if (_this5.component.editor === 'ckeditor') {
-            editor.data.set(_this5.setConvertedValue(value));
-          } else {
-            if (_this5.component.isUploadEnabled) {
-              _this5.setAsyncConvertedValue(value).then(function (result) {
-                editor.setContents(editor.clipboard.convert(result));
-              });
+          if (!skipSetting) {
+            if (_this5.component.editor === 'ace') {
+              editor.setValue(_this5.setConvertedValue(value));
+            } else if (_this5.component.editor === 'ckeditor') {
+              editor.data.set(_this5.setConvertedValue(value));
             } else {
-              editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+              if (_this5.component.isUploadEnabled) {
+                _this5.setAsyncConvertedValue(value).then(function (result) {
+                  editor.setContents(editor.clipboard.convert(result));
+                });
+              } else {
+                editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+              }
             }
           }
         });
@@ -52147,6 +52269,8 @@ function (_TextFieldComponent) {
     value: function setValue(value, flags) {
       var _this7 = this;
 
+      var skipSetting = _lodash.default.isEqual(value, this.getValue());
+
       value = value || '';
 
       if (this.options.readOnly || this.htmlView) {
@@ -52170,7 +52294,7 @@ function (_TextFieldComponent) {
 
 
       this.dataValue = value;
-      this.setWysiwygValue(value, flags);
+      this.setWysiwygValue(value, skipSetting, flags);
       this.updateValue(flags);
     }
   }, {
@@ -56388,6 +56512,8 @@ __webpack_require__(/*! core-js/modules/es6.number.constructor */ "./node_module
 
 __webpack_require__(/*! core-js/modules/es6.regexp.constructor */ "./node_modules/core-js/modules/es6.regexp.constructor.js");
 
+__webpack_require__(/*! core-js/modules/es6.object.assign */ "./node_modules/core-js/modules/es6.object.assign.js");
+
 __webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
 
 __webpack_require__(/*! core-js/modules/es6.regexp.match */ "./node_modules/core-js/modules/es6.regexp.match.js");
@@ -56861,15 +56987,31 @@ function interpolate(rawTemplate, data) {
 /**
  * Make a filename guaranteed to be unique.
  * @param name
+ * @param template
+ * @param evalContext
  * @returns {string}
  */
 
 
-function uniqueName(name) {
-  var parts = name.toLowerCase().replace(/[^0-9a-z.]/g, '').split('.');
-  var fileName = parts[0];
-  var ext = parts.length > 1 ? ".".concat(_lodash.default.last(parts)) : '';
-  return "".concat(fileName.substr(0, 10), "-").concat(guid()).concat(ext);
+function uniqueName(name, template, evalContext) {
+  template = template || '{{fileName}}-{{guid}}'; //include guid in template anyway, to prevent overwriting issue if filename matches existing file
+
+  if (!template.includes('{{guid}}')) {
+    template = "".concat(template, "-{{guid}}");
+  }
+
+  var parts = name.split('.');
+  var fileName = parts.slice(0, parts.length - 1).join('.');
+  var extension = parts.length > 1 ? ".".concat(_lodash.default.last(parts)) : ''; //allow only 100 characters from original name to avoid issues with filename length restrictions
+
+  fileName = fileName.substr(0, 100);
+  evalContext = Object.assign(evalContext || {}, {
+    fileName: fileName,
+    guid: guid()
+  }); //only letters, numbers, dots, dashes, underscores and spaces are allowed. Anything else will be replaced with dash
+
+  var uniqueName = "".concat(interpolate(template, evalContext)).concat(extension).replace(/[^0-9a-zA-Z.\-_ ]/g, '-');
+  return uniqueName;
 }
 
 function guid() {
