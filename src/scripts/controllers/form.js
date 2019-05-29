@@ -132,7 +132,9 @@ app.config([
           params: {
             formType: type,
             components: null,
-            form: null
+            display: null,
+            properties: null,
+            form: null,
           }
         })
         .state(parentName + '.import', {
@@ -197,10 +199,10 @@ app.config([
         .state(parentName + '.form.settings', {
           url: '/settings',
           templateUrl: 'views/form/form-settings.html',
-          controller: ['$scope', function ($scope) {
+          controller: ['$scope', 'AppConfig', function ($scope, AppConfig) {
             $scope.disableCollection = function () {
               // Don't allow collections for hosted projects
-              if (_.get($scope, 'localProject._id') === _.get($scope, 'currentProject._id')) {
+              if (!AppConfig.onPremise) {
                 return true;
               }
               if (!$scope.minPlan('commercial')) {
@@ -582,12 +584,13 @@ app.controller('FormController', [
     else {
       $scope.form = {
         title: '',
-        display: 'form',
+        display: $stateParams.display || 'form',
         type: formType,
         components: $stateParams.components || [],
         access: [],
         submissionAccess: [],
-        settings: {}
+        settings: {},
+        properties: $stateParams.properties || {},
       };
     }
 
@@ -1162,7 +1165,11 @@ app.controller('FormEditController', [
     ($scope.loadFormPromise || $q.when()).then(checkDraft);
 
     $scope.copy = function() {
-      $state.go('project.' + $scope.formInfo.type + '.create', {components: _.cloneDeep($scope.form.components)});
+      $state.go('project.' + $scope.formInfo.type + '.create', {
+        components: _.cloneDeep($scope.form.components),
+        display: $scope.form.display,
+        properties: _.cloneDeep($scope.form.properties),
+      });
     };
 
     // Track any modifications for save/cancel prompt on navigation away from the builder.
@@ -1583,7 +1590,7 @@ app.controller('FormImportController', [
     $scope.importForm = function() {
       (new Formio($scope.embedURL, {base: $scope.baseUrl})).loadForm(null, {noToken: true})
         .then(function(form) {
-          $state.go('project.' + form.type + '.create', { components: form.components});
+          $state.go('project.' + form.type + '.create', _.pick(form, ['components', 'display', 'properties']));
         })
         .catch(function(error) {
           FormioAlerts.warn('Error fetching form: ' + _.escape(error));
