@@ -199,10 +199,10 @@ app.config([
         .state(parentName + '.form.settings', {
           url: '/settings',
           templateUrl: 'views/form/form-settings.html',
-          controller: ['$scope', function ($scope) {
+          controller: ['$scope', 'AppConfig', function ($scope, AppConfig) {
             $scope.disableCollection = function () {
               // Don't allow collections for hosted projects
-              if (_.get($scope, 'localProject._id') === _.get($scope, 'currentProject._id')) {
+              if (!AppConfig.onPremise) {
                 return true;
               }
               if (!$scope.minPlan('commercial')) {
