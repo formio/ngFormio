@@ -74,7 +74,7 @@
     "request": "^2.88.0",
     "require-dir": "^1.0.0",
     "sass-loader": "^7.1.0",
-    "seamless": "^1.4.0",
+    "seamless": "^1.4.1",
     "selenium-server-standalone-jar": "^3.14.0",
     "signature_pad": "^2.3.2",
     "style-loader": "^0.23.1",
