@@ -52,6 +52,8 @@
     "font-awesome": "^4.7.0",
     "formiojs": "^3.21.2",
     "formmanager": "github:formio/formmanager#v1.32.0",
+    "gulp": "^4.0.2",
+    "gulp-s3": "^0.11.0",
     "html-dnd": "^1.2.0",
     "jquery": "^3.4.1",
     "lodash": "^4.17.11",
