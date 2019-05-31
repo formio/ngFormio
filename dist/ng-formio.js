@@ -22602,7 +22602,7 @@ window.addEventListener('message', function (event) {
   var eventData = null;
 
   try {
-    eventData = JSON.parse(event.data);
+    eventData = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
   } catch (err) {
     eventData = null;
   } // If this form exists, then emit the event within this form.
@@ -22748,8 +22748,8 @@ function (_WebformBuilder) {
     }
   }, {
     key: "addComponentTo",
-    value: function addComponentTo(parent, schema, element, sibling) {
-      var comp = _get(_getPrototypeOf(PDFBuilder.prototype), "addComponentTo", this).call(this, parent, schema, element, sibling);
+    value: function addComponentTo(schema, parent, element, sibling) {
+      var comp = _get(_getPrototypeOf(PDFBuilder.prototype), "addComponentTo", this).call(this, schema, parent, element, sibling);
 
       comp.isNew = true;
 
@@ -22833,7 +22833,7 @@ function (_WebformBuilder) {
         width: 100,
         height: 20
       };
-      this.addComponentTo(this, schema, this.getContainer());
+      this.addComponentTo(schema, this, this.getContainer());
       this.disableDropZone();
       return false;
     } // Don't need to add a submit button here... the pdfForm will already do this.
@@ -22880,7 +22880,7 @@ function (_WebformBuilder) {
         this.addClass(this.pdfForm.element, 'formio-pdf-builder');
       }
 
-      this.pdfForm.destroy();
+      this.pdfForm.destroy(true);
       this.pdfForm.on('iframe-elementUpdate', function (schema) {
         var component = _this5.getComponentById(schema.id);
 
@@ -23390,7 +23390,12 @@ function (_NestedComponent) {
   }, {
     key: "destroy",
     value: function destroy() {
-      delete _Formio.default.forms[this.id];
+      var preserveGlobal = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      if (!preserveGlobal) {
+        delete _Formio.default.forms[this.id];
+      }
+
       return _get(_getPrototypeOf(Webform.prototype), "destroy", this).call(this);
     }
     /**
