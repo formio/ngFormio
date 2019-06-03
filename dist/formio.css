@@ -3296,11 +3296,9 @@ dialog.fixed {
 td > .form-group {
   margin-bottom: 0; }
 
-.signature-pad .element {
-  position: relative; }
-
 .signature-pad-body {
-  overflow: hidden; }
+  overflow: hidden;
+  position: relative; }
 
 .signature-pad-canvas {
   border-radius: 4px;
@@ -3864,6 +3862,23 @@ td .formio-component-modaledit .formio-modaledit-view-container {
 .formio-component.alert-danger .help-block {
   color: inherit; }
 
+.tree__level_even {
+  background-color: #f6f6f6; }
+
+.tree__node-content {
+  margin-bottom: 10px; }
+
+.tree__node-children {
+  margin: 0; }
+
+.formio-wizard-builder-component-title {
+  color: #6c757d;
+  text-align: center;
+  padding: .5rem; }
+
+.formio-wizard-position {
+  position: relative; }
+
 .formbuilder {
   position: relative; }
 
@@ -3912,7 +3927,7 @@ td .formio-component-modaledit .formio-modaledit-view-container {
 .formbuilder .formio-component-content, .formbuilder .formio-component-form, .formbuilder .formio-component-hidden {
   border: 2px dashed #ddd; }
 
-.formbuilder .formio-component-hidden {
+.formbuilder .formio-component-form, .formbuilder .formio-component-hidden {
   height: 3em;
   text-align: center;
   color: #aaa;
@@ -3968,5 +3983,10 @@ td .formio-component-modaledit .formio-modaledit-view-container {
 
 .panel-body .drag-and-drop-alert {
   margin-bottom: 0; }
+
+.builder-sidebar_scroll {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 15px; }
 
 /*# sourceMappingURL=formio.css.map*/
