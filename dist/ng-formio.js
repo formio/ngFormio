@@ -30428,7 +30428,7 @@ function (_Component) {
   }, {
     key: "addCKE",
     value: function addCKE(element, settings, onChange) {
-      settings = _lodash.default.isEmpty(settings) ? null : settings;
+      settings = _lodash.default.isEmpty(settings) ? {} : settings;
       return _Formio.default.requireLibrary('ckeditor', 'ClassicEditor', CKEDITOR, true).then(function () {
         if (!element.parentNode) {
           return _nativePromiseOnly.default.reject();
