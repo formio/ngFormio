@@ -2547,6 +2547,7 @@ app.controller('FormSubmissionsController', [
                   })
                   .then(options.success)
                   .catch(function(err) {
+                    console.warn(err);
                     FormioAlerts.onError(err);
                     options.error(err);
                   });
@@ -2558,6 +2559,7 @@ app.controller('FormSubmissionsController', [
                     options.success();
                   })
                   .catch(function(err) {
+                    console.warn(err);
                     FormioAlerts.onError(err);
                     options.error(err);
                   }));
