@@ -2822,6 +2822,14 @@ app.controller('SAMLController', [
   ) {
     $scope.projectSP = '';
     $scope.loadProjectPromise.then(function(project) {
+      $scope.exampleJSON = JSON.stringify({
+        entryPoint: 'https://ad.example.net/adfs/ls/',
+        issuer: 'https://your-app.example.net/login/callback',
+        callbackUrl: 'https://your-app.example.net/login/callback',
+        cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
+        authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows',
+        identifierFormat: null
+      }, null, 2);
       $scope.projectSP = _.get($scope.currentProject, 'settings.saml.sp', `<EntityDescriptor
  xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
