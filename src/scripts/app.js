@@ -1,6 +1,6 @@
 'use strict';
 
-import {Templates, Formio} from 'formiojs';
+import {Templates, Formio} from 'ng-formio';
 
 Templates.framework = 'bootstrap3';
 Formio.icons = 'fa';
