@@ -21698,9 +21698,7 @@ function (_Element) {
       _this.options = args[2];
 
       _this.setForm(args[1]).then(function () {
-        _this.build().then(function () {
-          return _this.readyResolve(_this.instance);
-        }).catch(_this.readyReject);
+        return _this.readyResolve(_this.instance);
       }).catch(_this.readyReject);
     } else if (args[0]) {
       _this.element = null;
@@ -26457,10 +26455,12 @@ function (_Component) {
   }, {
     key: "detach",
     value: function detach() {
-      // if (this.dragula) {
-      //   this.dragula.destroy();
-      // }
-      // this.dragula = null;
+      if (this.dragula) {
+        this.dragula.destroy();
+      }
+
+      this.dragula = null;
+
       if (this.sideBarScroll && _Templates.default.current.clearBuilderSidebarScroll) {
         _Templates.default.current.clearBuilderSidebarScroll.call(this, this);
       }
@@ -26931,6 +26931,7 @@ function (_Component) {
       }
 
       this.webform.form = value;
+      this.rebuild();
     }
   }, {
     key: "schema",
@@ -32671,7 +32672,11 @@ function (_Field) {
     key: "addNewValue",
     value: function addNewValue(value) {
       if (value === undefined) {
-        value = this.component.defaultValue ? this.component.defaultValue : this.emptyValue;
+        value = this.component.defaultValue ? this.component.defaultValue : this.emptyValue; // If default is an empty aray, default back to empty value.
+
+        if (Array.isArray(value) && value.length === 0) {
+          value = this.emptyValue;
+        }
       }
 
       var dataValue = this.dataValue || [];
