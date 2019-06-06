@@ -3871,14 +3871,6 @@ td .formio-component-modaledit .formio-modaledit-view-container {
 .tree__node-children {
   margin: 0; }
 
-.formio-wizard-builder-component-title {
-  color: #6c757d;
-  text-align: center;
-  padding: .5rem; }
-
-.formio-wizard-position {
-  position: relative; }
-
 .formbuilder {
   position: relative; }
 
@@ -3988,5 +3980,13 @@ td .formio-component-modaledit .formio-modaledit-view-container {
   position: -webkit-sticky;
   position: sticky;
   top: 15px; }
+
+.formio-wizard-builder-component-title {
+  color: #6c757d;
+  text-align: center;
+  padding: .5rem; }
+
+.formio-wizard-position {
+  position: relative; }
 
 /*# sourceMappingURL=formio.css.map*/

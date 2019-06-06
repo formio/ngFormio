@@ -135,7 +135,7 @@ var _default = angular.module('formio').directive('formBuilder', function () {
         builderElement = element;
         builderElement.innerHTML = '';
         builder = new _formiojs.Formio.FormBuilder(builderElement, $scope.form, $scope.options);
-        builderReady = builder.setDisplay($scope.form.display);
+        builderReady = builder.ready;
       };
 
       $scope.display = $scope.form.display; // Detect when the display changes.
@@ -299,7 +299,6 @@ var _default = app.directive('formio', function () {
 
             case 'submit':
               args[0] = $scope.formio.nosubmit || !$scope.formio._src ? 'formSubmission' : 'formSubmit';
-              console.log('submit', args, $scope.formio);
               break;
 
             case 'submitDone':
@@ -18079,7 +18078,10 @@ exports.PatchError = PatchError;
 
         function parseHeaders(rawHeaders) {
           var headers = new Headers()
-          rawHeaders.split(/\r?\n/).forEach(function(line) {
+          // Replace instances of \r\n and \n followed by at least one space or horizontal tab with a space
+          // https://tools.ietf.org/html/rfc7230#section-3.2
+          var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, ' ')
+          preProcessedHeaders.split(/\r?\n/).forEach(function(line) {
             var parts = line.split(':')
             var key = parts.shift().trim()
             if (key) {
@@ -18098,7 +18100,7 @@ exports.PatchError = PatchError;
           }
 
           this.type = 'default'
-          this.status = 'status' in options ? options.status : 200
+          this.status = options.status === undefined ? 200 : options.status
           this.ok = this.status >= 200 && this.status < 300
           this.statusText = 'statusText' in options ? options.statusText : 'OK'
           this.headers = new Headers(options.headers)
@@ -18165,6 +18167,8 @@ exports.PatchError = PatchError;
 
             if (request.credentials === 'include') {
               xhr.withCredentials = true
+            } else if (request.credentials === 'omit') {
+              xhr.withCredentials = false
             }
 
             if ('responseType' in xhr && support.blob) {
@@ -18211,7 +18215,7 @@ exports.PatchError = PatchError;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.5.7, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.6.1, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
@@ -18394,7 +18398,8 @@ exports.PatchError = PatchError;
         scrollTitle: "Scroll to increment",
         toggleTitle: "Click to toggle",
         amPM: ["AM", "PM"],
-        yearAriaLabel: "Year"
+        yearAriaLabel: "Year",
+        time_24hr: false
     };
 
     var pad = function (number) { return ("0" + number).slice(-2); };
@@ -18469,10 +18474,10 @@ exports.PatchError = PatchError;
         return event.target;
     }
 
-    var do_nothing = function () { return undefined; };
+    var doNothing = function () { return undefined; };
     var monthToStr = function (monthNumber, shorthand, locale) { return locale.months[shorthand ? "shorthand" : "longhand"][monthNumber]; };
     var revFormat = {
-        D: do_nothing,
+        D: doNothing,
         F: function (dateObj, monthName, locale) {
             dateObj.setMonth(locale.months.longhand.indexOf(monthName));
         },
@@ -18496,9 +18501,11 @@ exports.PatchError = PatchError;
             dateObj.setSeconds(parseFloat(seconds));
         },
         U: function (_, unixSeconds) { return new Date(parseFloat(unixSeconds) * 1000); },
-        W: function (dateObj, weekNum) {
+        W: function (dateObj, weekNum, locale) {
             var weekNumber = parseInt(weekNum);
-            return new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0);
+            var date = new Date(dateObj.getFullYear(), 0, 2 + (weekNumber - 1) * 7, 0, 0, 0, 0);
+            date.setDate(date.getDate() - date.getDay() + locale.firstDayOfWeek);
+            return date;
         },
         Y: function (dateObj, year) {
             dateObj.setFullYear(parseFloat(year));
@@ -18516,7 +18523,7 @@ exports.PatchError = PatchError;
         j: function (dateObj, day) {
             dateObj.setDate(parseFloat(day));
         },
-        l: do_nothing,
+        l: doNothing,
         m: function (dateObj, month) {
             dateObj.setMonth(parseFloat(month) - 1);
         },
@@ -18529,7 +18536,7 @@ exports.PatchError = PatchError;
         u: function (_, unixMillSeconds) {
             return new Date(parseFloat(unixMillSeconds));
         },
-        w: do_nothing,
+        w: doNothing,
         y: function (dateObj, year) {
             dateObj.setFullYear(2000 + parseFloat(year));
         }
@@ -18649,7 +18656,7 @@ exports.PatchError = PatchError;
                 return undefined;
             var locale = customLocale || l10n;
             var parsedDate;
-            var date_orig = date;
+            var dateOrig = date;
             if (date instanceof Date)
                 parsedDate = new Date(date.getTime());
             else if (typeof date !== "string" &&
@@ -18703,7 +18710,7 @@ exports.PatchError = PatchError;
             }
             /* istanbul ignore next */
             if (!(parsedDate instanceof Date && !isNaN(parsedDate.getTime()))) {
-                config.errorHandler(new Error("Invalid date provided: " + date_orig));
+                config.errorHandler(new Error("Invalid date provided: " + dateOrig));
                 return undefined;
             }
             if (timeless === true)
@@ -18754,11 +18761,13 @@ exports.PatchError = PatchError;
     var DEBOUNCED_CHANGE_MS = 300;
     function FlatpickrInstance(element, instanceConfig) {
         var self = {
-            config: __assign({}, flatpickr.defaultConfig),
+            config: __assign({}, defaults, flatpickr.defaultConfig),
             l10n: english
         };
         self.parseDate = createDateParser({ config: self.config, l10n: self.l10n });
         self._handlers = [];
+        self.pluginElements = [];
+        self.loadedPlugins = [];
         self._bind = bind;
         self._setHoursFromDate = setHoursFromDate;
         self._positionCalendar = positionCalendar;
@@ -18938,21 +18947,21 @@ exports.PatchError = PatchError;
             var minutes = self.config.defaultMinute;
             var seconds = self.config.defaultSeconds;
             if (self.config.minDate !== undefined) {
-                var min_hr = self.config.minDate.getHours();
-                var min_minutes = self.config.minDate.getMinutes();
-                hours = Math.max(hours, min_hr);
-                if (hours === min_hr)
-                    minutes = Math.max(min_minutes, minutes);
-                if (hours === min_hr && minutes === min_minutes)
+                var minHr = self.config.minDate.getHours();
+                var minMinutes = self.config.minDate.getMinutes();
+                hours = Math.max(hours, minHr);
+                if (hours === minHr)
+                    minutes = Math.max(minMinutes, minutes);
+                if (hours === minHr && minutes === minMinutes)
                     seconds = self.config.minDate.getSeconds();
             }
             if (self.config.maxDate !== undefined) {
-                var max_hr = self.config.maxDate.getHours();
-                var max_minutes = self.config.maxDate.getMinutes();
-                hours = Math.min(hours, max_hr);
-                if (hours === max_hr)
-                    minutes = Math.min(max_minutes, minutes);
-                if (hours === max_hr && minutes === max_minutes)
+                var maxHr = self.config.maxDate.getHours();
+                var maxMinutes = self.config.maxDate.getMinutes();
+                hours = Math.min(hours, maxHr);
+                if (hours === maxHr)
+                    minutes = Math.min(maxMinutes, minutes);
+                if (hours === maxHr && minutes === maxMinutes)
                     seconds = self.config.maxDate.getSeconds();
             }
             setHours(hours, minutes, seconds);
@@ -19049,12 +19058,10 @@ exports.PatchError = PatchError;
                         onMouseOver(e.target);
                 });
             bind(window.document.body, "keydown", onKeyDown);
-            if (!self.config.static)
-                bind(self._input, "keydown", onKeyDown);
             if (!self.config.inline && !self.config.static)
                 bind(window, "resize", debouncedResize);
             if (window.ontouchstart !== undefined)
-                bind(window.document, "click", documentClick);
+                bind(window.document, "touchstart", documentClick);
             else
                 bind(window.document, "mousedown", onClick(documentClick));
             bind(window.document, "focus", documentClick, { capture: true });
@@ -19090,8 +19097,9 @@ exports.PatchError = PatchError;
         /**
          * Set the calendar view to a particular date.
          * @param {Date} jumpDate the date to set the view to
+         * @param {boolean} triggerChange if change events should be triggered
          */
-        function jumpToDate(jumpDate) {
+        function jumpToDate(jumpDate, triggerChange) {
             var jumpTo = jumpDate !== undefined
                 ? self.parseDate(jumpDate)
                 : self.latestSelectedDateObj ||
@@ -19100,6 +19108,8 @@ exports.PatchError = PatchError;
                         : self.config.maxDate && self.config.maxDate < self.now
                             ? self.config.maxDate
                             : self.now);
+            var oldYear = self.currentYear;
+            var oldMonth = self.currentMonth;
             try {
                 if (jumpTo !== undefined) {
                     self.currentYear = jumpTo.getFullYear();
@@ -19110,6 +19120,14 @@ exports.PatchError = PatchError;
                 /* istanbul ignore next */
                 e.message = "Invalid date supplied: " + jumpTo;
                 self.config.errorHandler(e);
+            }
+            if (triggerChange && self.currentYear !== oldYear) {
+                triggerEvent("onYearChange");
+                buildMonthSwitch();
+            }
+            if (triggerChange &&
+                (self.currentYear !== oldYear || self.currentMonth !== oldMonth)) {
+                triggerEvent("onMonthChange");
             }
             self.redraw();
         }
@@ -19221,7 +19239,7 @@ exports.PatchError = PatchError;
                 }
             }
             else {
-                dayElement.classList.add("disabled");
+                dayElement.classList.add("flatpickr-disabled");
             }
             if (self.config.mode === "range") {
                 if (isDateInRange(date) && !isDateSelected(date))
@@ -19342,10 +19360,52 @@ exports.PatchError = PatchError;
                 onMouseOver();
             }
         }
+        function buildMonthSwitch() {
+            if (self.config.showMonths > 1)
+                return;
+            var shouldBuildMonth = function (month) {
+                if (self.config.minDate !== undefined &&
+                    self.currentYear === self.config.minDate.getFullYear() &&
+                    month < self.config.minDate.getMonth()) {
+                    return false;
+                }
+                return !(self.config.maxDate !== undefined &&
+                    self.currentYear === self.config.maxDate.getFullYear() &&
+                    month > self.config.maxDate.getMonth());
+            };
+            self.monthsDropdownContainer.tabIndex = -1;
+            self.monthsDropdownContainer.innerHTML = "";
+            for (var i = 0; i < 12; i++) {
+                if (!shouldBuildMonth(i))
+                    continue;
+                var month = createElement("option", "flatpickr-monthDropdown-month");
+                month.value = new Date(self.currentYear, i).getMonth().toString();
+                month.textContent = monthToStr(i, false, self.l10n);
+                month.tabIndex = -1;
+                if (self.currentMonth === i) {
+                    month.selected = true;
+                }
+                self.monthsDropdownContainer.appendChild(month);
+            }
+        }
         function buildMonth() {
             var container = createElement("div", "flatpickr-month");
             var monthNavFragment = window.document.createDocumentFragment();
-            var monthElement = createElement("span", "cur-month");
+            var monthElement;
+            if (self.config.showMonths > 1) {
+                monthElement = createElement("span", "cur-month");
+            }
+            else {
+                self.monthsDropdownContainer = createElement("select", "flatpickr-monthDropdown-months");
+                bind(self.monthsDropdownContainer, "change", function (e) {
+                    var target = e.target;
+                    var selectedMonth = parseInt(target.value, 10);
+                    self.changeMonth(selectedMonth - self.currentMonth);
+                    triggerEvent("onMonthChange");
+                });
+                buildMonthSwitch();
+                monthElement = self.monthsDropdownContainer;
+            }
             var yearInput = createNumberInput("cur-year", { tabindex: "-1" });
             var yearElement = yearInput.getElementsByTagName("input")[0];
             yearElement.setAttribute("aria-label", self.l10n.yearAriaLabel);
@@ -19397,7 +19457,7 @@ exports.PatchError = PatchError;
                 get: function () { return self.__hidePrevMonthArrow; },
                 set: function (bool) {
                     if (self.__hidePrevMonthArrow !== bool) {
-                        toggleClass(self.prevMonthNav, "disabled", bool);
+                        toggleClass(self.prevMonthNav, "flatpickr-disabled", bool);
                         self.__hidePrevMonthArrow = bool;
                     }
                 }
@@ -19406,7 +19466,7 @@ exports.PatchError = PatchError;
                 get: function () { return self.__hideNextMonthArrow; },
                 set: function (bool) {
                     if (self.__hideNextMonthArrow !== bool) {
-                        toggleClass(self.nextMonthNav, "disabled", bool);
+                        toggleClass(self.nextMonthNav, "flatpickr-disabled", bool);
                         self.__hideNextMonthArrow = bool;
                     }
                 }
@@ -19504,9 +19564,9 @@ exports.PatchError = PatchError;
                 weekNumbers: weekNumbers
             };
         }
-        function changeMonth(value, is_offset) {
-            if (is_offset === void 0) { is_offset = true; }
-            var delta = is_offset ? value : value - self.currentMonth;
+        function changeMonth(value, isOffset) {
+            if (isOffset === void 0) { isOffset = true; }
+            var delta = isOffset ? value : value - self.currentMonth;
             if ((delta < 0 && self._hidePrevMonthArrow === true) ||
                 (delta > 0 && self._hideNextMonthArrow === true))
                 return;
@@ -19515,6 +19575,7 @@ exports.PatchError = PatchError;
                 self.currentYear += self.currentMonth > 11 ? 1 : -1;
                 self.currentMonth = (self.currentMonth + 12) % 12;
                 triggerEvent("onYearChange");
+                buildMonthSwitch();
             }
             buildDays();
             triggerEvent("onMonthChange");
@@ -19617,6 +19678,7 @@ exports.PatchError = PatchError;
                 "weekdayContainer",
                 "prevMonthNav",
                 "nextMonthNav",
+                "monthsDropdownContainer",
                 "currentMonthElement",
                 "currentYearElement",
                 "navigationCurrentMonth",
@@ -19684,6 +19746,7 @@ exports.PatchError = PatchError;
             if (isNewYear) {
                 self.redraw();
                 triggerEvent("onYearChange");
+                buildMonthSwitch();
             }
         }
         function isEnabled(date, timeless) {
@@ -19759,8 +19822,9 @@ exports.PatchError = PatchError;
                         : self.config.dateFormat);
                     return e.target.blur();
                 }
-                else
+                else {
                     self.open();
+                }
             }
             else if (isCalendarElem(e.target) ||
                 allowKeydown ||
@@ -19770,6 +19834,7 @@ exports.PatchError = PatchError;
                 switch (e.keyCode) {
                     case 13:
                         if (isTimeObj) {
+                            e.preventDefault();
                             updateTime();
                             focusAndClose();
                         }
@@ -19789,7 +19854,7 @@ exports.PatchError = PatchError;
                         break;
                     case 37:
                     case 39:
-                        if (!isTimeObj) {
+                        if (!isTimeObj && !isInput) {
                             e.preventDefault();
                             if (self.daysContainer !== undefined &&
                                 (allowInput === false ||
@@ -19821,6 +19886,9 @@ exports.PatchError = PatchError;
                             else if (!isTimeObj)
                                 focusOnDay(undefined, delta * 7);
                         }
+                        else if (e.target === self.currentYearElement) {
+                            changeYear(self.currentYear - delta);
+                        }
                         else if (self.config.enableTime) {
                             if (!isTimeObj && self.hourElement)
                                 self.hourElement.focus();
@@ -19835,19 +19903,22 @@ exports.PatchError = PatchError;
                                 self.minuteElement,
                                 self.secondElement,
                                 self.amPM,
-                            ].filter(function (x) { return x; });
+                            ]
+                                .concat(self.pluginElements)
+                                .filter(function (x) { return x; });
                             var i = elems.indexOf(e.target);
                             if (i !== -1) {
                                 var target = elems[i + (e.shiftKey ? -1 : 1)];
-                                if (target !== undefined) {
-                                    e.preventDefault();
-                                    target.focus();
-                                }
-                                else if (e.shiftKey) {
-                                    e.preventDefault();
-                                    self._input.focus();
-                                }
+                                e.preventDefault();
+                                (target || self._input).focus();
                             }
+                        }
+                        else if (!self.config.noCalendar &&
+                            self.daysContainer &&
+                            self.daysContainer.contains(e.target) &&
+                            e.shiftKey) {
+                            e.preventDefault();
+                            self._input.focus();
                         }
                         break;
                     default:
@@ -19870,21 +19941,22 @@ exports.PatchError = PatchError;
                         break;
                 }
             }
-            triggerEvent("onKeyDown", e);
+            if (isInput || isCalendarElem(e.target)) {
+                triggerEvent("onKeyDown", e);
+            }
         }
         function onMouseOver(elem) {
             if (self.selectedDates.length !== 1 ||
                 (elem &&
                     (!elem.classList.contains("flatpickr-day") ||
-                        elem.classList.contains("disabled"))))
+                        elem.classList.contains("flatpickr-disabled"))))
                 return;
             var hoverDate = elem
                 ? elem.dateObj.getTime()
-                : self.days.firstElementChild.dateObj.getTime(), initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(), rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()), rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime()), lastDate = self.daysContainer.lastChild
-                .lastChild.dateObj.getTime();
+                : self.days.firstElementChild.dateObj.getTime(), initialDate = self.parseDate(self.selectedDates[0], undefined, true).getTime(), rangeStartDate = Math.min(hoverDate, self.selectedDates[0].getTime()), rangeEndDate = Math.max(hoverDate, self.selectedDates[0].getTime());
             var containsDisabled = false;
             var minRange = 0, maxRange = 0;
-            for (var t = rangeStartDate; t < lastDate; t += duration.DAY) {
+            for (var t = rangeStartDate; t < rangeEndDate; t += duration.DAY) {
                 if (!isEnabled(new Date(t), true)) {
                     containsDisabled =
                         containsDisabled || (t > rangeStartDate && t < rangeEndDate);
@@ -19896,7 +19968,6 @@ exports.PatchError = PatchError;
             }
             for (var m = 0; m < self.config.showMonths; m++) {
                 var month = self.daysContainer.children[m];
-                var prevMonth = self.daysContainer.children[m - 1];
                 var _loop_1 = function (i, l) {
                     var dayElem = month.children[i], date = dayElem.dateObj;
                     var timestamp = date.getTime();
@@ -19915,22 +19986,17 @@ exports.PatchError = PatchError;
                         dayElem.classList.remove(c);
                     });
                     if (elem !== undefined) {
-                        elem.classList.add(hoverDate < self.selectedDates[0].getTime()
+                        elem.classList.add(hoverDate <= self.selectedDates[0].getTime()
                             ? "startRange"
                             : "endRange");
-                        if (month.contains(elem) ||
-                            !(m > 0 &&
-                                prevMonth &&
-                                prevMonth.lastChild.dateObj.getTime() >= timestamp)) {
-                            if (initialDate < hoverDate && timestamp === initialDate)
-                                dayElem.classList.add("startRange");
-                            else if (initialDate > hoverDate && timestamp === initialDate)
-                                dayElem.classList.add("endRange");
-                            if (timestamp >= minRange &&
-                                (maxRange === 0 || timestamp <= maxRange) &&
-                                isBetween(timestamp, initialDate, hoverDate))
-                                dayElem.classList.add("inRange");
-                        }
+                        if (initialDate < hoverDate && timestamp === initialDate)
+                            dayElem.classList.add("startRange");
+                        else if (initialDate > hoverDate && timestamp === initialDate)
+                            dayElem.classList.add("endRange");
+                        if (timestamp >= minRange &&
+                            (maxRange === 0 || timestamp <= maxRange) &&
+                            isBetween(timestamp, initialDate, hoverDate))
+                            dayElem.classList.add("inRange");
                     }
                 };
                 for (var i = 0, l = month.children.length; i < l; i++) {
@@ -19945,7 +20011,7 @@ exports.PatchError = PatchError;
         function setDefaultTime() {
             self.setDate(self.config.minDate !== undefined
                 ? new Date(self.config.minDate.getTime())
-                : new Date(), false);
+                : new Date(), true);
             setDefaultHours();
             updateValue();
         }
@@ -20047,21 +20113,24 @@ exports.PatchError = PatchError;
             });
             var timeMode = userConfig.mode === "time";
             if (!userConfig.dateFormat && (userConfig.enableTime || timeMode)) {
+                var defaultDateFormat = flatpickr.defaultConfig.dateFormat || defaults.dateFormat;
                 formats.dateFormat =
                     userConfig.noCalendar || timeMode
                         ? "H:i" + (userConfig.enableSeconds ? ":S" : "")
-                        : flatpickr.defaultConfig.dateFormat +
-                            " H:i" +
-                            (userConfig.enableSeconds ? ":S" : "");
+                        : defaultDateFormat + " H:i" + (userConfig.enableSeconds ? ":S" : "");
             }
             if (userConfig.altInput &&
                 (userConfig.enableTime || timeMode) &&
                 !userConfig.altFormat) {
+                var defaultAltFormat = flatpickr.defaultConfig.altFormat || defaults.altFormat;
                 formats.altFormat =
                     userConfig.noCalendar || timeMode
                         ? "h:i" + (userConfig.enableSeconds ? ":S K" : " K")
-                        : flatpickr.defaultConfig.altFormat +
-                            (" h:i" + (userConfig.enableSeconds ? ":S" : "") + " K");
+                        : defaultAltFormat + (" h:i" + (userConfig.enableSeconds ? ":S" : "") + " K");
+            }
+            if (!userConfig.altInputClass) {
+                self.config.altInputClass =
+                    self.input.className + " " + self.config.altInputClass;
             }
             Object.defineProperty(self.config, "minDate", {
                 get: function () { return self.config._minDate; },
@@ -20126,6 +20195,11 @@ exports.PatchError = PatchError;
                     ? flatpickr.l10ns[self.config.locale]
                     : undefined));
             tokenRegex.K = "(" + self.l10n.amPM[0] + "|" + self.l10n.amPM[1] + "|" + self.l10n.amPM[0].toLowerCase() + "|" + self.l10n.amPM[1].toLowerCase() + ")";
+            var userConfig = __assign({}, instanceConfig, JSON.parse(JSON.stringify(element.dataset || {})));
+            if (userConfig.time_24hr === undefined &&
+                flatpickr.defaultConfig.time_24hr === undefined) {
+                self.config.time_24hr = self.l10n.time_24hr;
+            }
             self.formatDate = createDateFormatter(self);
             self.parseDate = createDateParser({ config: self.config, l10n: self.l10n });
         }
@@ -20206,7 +20280,7 @@ exports.PatchError = PatchError;
             var isSelectable = function (day) {
                 return day.classList &&
                     day.classList.contains("flatpickr-day") &&
-                    !day.classList.contains("disabled") &&
+                    !day.classList.contains("flatpickr-disabled") &&
                     !day.classList.contains("notAllowed");
             };
             var t = findParent(e.target, isSelectable);
@@ -20243,8 +20317,10 @@ exports.PatchError = PatchError;
                 var isNewYear = self.currentYear !== selectedDate.getFullYear();
                 self.currentYear = selectedDate.getFullYear();
                 self.currentMonth = selectedDate.getMonth();
-                if (isNewYear)
+                if (isNewYear) {
                     triggerEvent("onYearChange");
+                    buildMonthSwitch();
+                }
                 triggerEvent("onMonthChange");
             }
             updateNavigationCurrentMonth();
@@ -20276,11 +20352,18 @@ exports.PatchError = PatchError;
         }
         var CALLBACKS = {
             locale: [setupLocale, updateWeekdays],
-            showMonths: [buildMonths, setCalendarWidth, buildWeekdays]
+            showMonths: [buildMonths, setCalendarWidth, buildWeekdays],
+            minDate: [jumpToDate],
+            maxDate: [jumpToDate]
         };
         function set(option, value) {
-            if (option !== null && typeof option === "object")
+            if (option !== null && typeof option === "object") {
                 Object.assign(self.config, option);
+                for (var key in option) {
+                    if (CALLBACKS[key] !== undefined)
+                        CALLBACKS[key].forEach(function (x) { return x(); });
+                }
+            }
             else {
                 self.config[option] = value;
                 if (CALLBACKS[option] !== undefined)
@@ -20330,10 +20413,13 @@ exports.PatchError = PatchError;
                 return self.clear(triggerChange);
             setSelectedDate(date, format);
             self.showTimeInput = self.selectedDates.length > 0;
-            self.latestSelectedDateObj = self.selectedDates[0];
+            self.latestSelectedDateObj = self.selectedDates[self.selectedDates.length - 1];
             self.redraw();
             jumpToDate();
             setHoursFromDate();
+            if (self.selectedDates.length === 0) {
+                self.clear(false);
+            }
             updateValue(triggerChange);
             if (triggerChange)
                 triggerEvent("onChange");
@@ -20426,7 +20512,7 @@ exports.PatchError = PatchError;
             self._input = self.input;
             if (self.config.altInput) {
                 // replicate self.element
-                self.altInput = createElement(self.input.nodeName, self.input.className + " " + self.config.altInputClass);
+                self.altInput = createElement(self.input.nodeName, self.config.altInputClass);
                 self._input = self.altInput;
                 self.altInput.placeholder = self.input.placeholder;
                 self.altInput.disabled = self.input.disabled;
@@ -20525,9 +20611,13 @@ exports.PatchError = PatchError;
             self.yearElements.forEach(function (yearElement, i) {
                 var d = new Date(self.currentYear, self.currentMonth, 1);
                 d.setMonth(self.currentMonth + i);
-                self.monthElements[i].textContent =
-                    monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) +
-                        " ";
+                if (self.config.showMonths > 1) {
+                    self.monthElements[i].textContent =
+                        monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) + " ";
+                }
+                else {
+                    self.monthsDropdownContainer.value = d.getMonth().toString();
+                }
                 yearElement.value = d.getFullYear().toString();
             });
             self._hidePrevMonthArrow =
@@ -20558,8 +20648,6 @@ exports.PatchError = PatchError;
          */
         function updateValue(triggerChange) {
             if (triggerChange === void 0) { triggerChange = true; }
-            if (self.selectedDates.length === 0)
-                return self.clear(triggerChange);
             if (self.mobileInput !== undefined && self.mobileFormatStr) {
                 self.mobileInput.value =
                     self.latestSelectedDateObj !== undefined
@@ -20574,7 +20662,6 @@ exports.PatchError = PatchError;
                 triggerEvent("onValueUpdate");
         }
         function onMonthNavClick(e) {
-            e.preventDefault();
             var isPrevMonth = self.prevMonthNav.contains(e.target);
             var isNextMonth = self.nextMonthNav.contains(e.target);
             if (isPrevMonth || isNextMonth) {
@@ -20657,7 +20744,9 @@ exports.PatchError = PatchError;
         return instances.length === 1 ? instances[0] : instances;
     }
     /* istanbul ignore next */
-    if (typeof HTMLElement !== "undefined") {
+    if (typeof HTMLElement !== "undefined" &&
+        typeof HTMLCollection !== "undefined" &&
+        typeof NodeList !== "undefined") {
         // browser env
         HTMLCollection.prototype.flatpickr = NodeList.prototype.flatpickr = function (config) {
             return _flatpickr(this, config);
@@ -20679,7 +20768,7 @@ exports.PatchError = PatchError;
         }
     };
     /* istanbul ignore next */
-    flatpickr.defaultConfig = defaults;
+    flatpickr.defaultConfig = {};
     flatpickr.l10ns = {
         en: __assign({}, english),
         "default": __assign({}, english)
@@ -20694,11 +20783,12 @@ exports.PatchError = PatchError;
     flatpickr.formatDate = createDateFormatter({});
     flatpickr.compareDates = compareDates;
     /* istanbul ignore next */
-    if (typeof jQuery !== "undefined") {
+    if (typeof jQuery !== "undefined" && typeof jQuery.fn !== "undefined") {
         jQuery.fn.flatpickr = function (config) {
             return _flatpickr(this, config);
         };
     }
+    // eslint-disable-next-line @typescript-eslint/camelcase
     Date.prototype.fp_incr = function (days) {
         return new Date(this.getFullYear(), this.getMonth(), this.getDate() + (typeof days === "string" ? parseInt(days, 10) : days));
     };
@@ -21677,7 +21767,9 @@ function (_Element) {
           _this2.instance.nosubmit = false;
           _this2._form = _this2.instance.form = form;
           return _this2.instance.ready.then(function () {
-            return _this2.instance.loadSubmission();
+            if (_this2.instance.loadSubmission) {
+              return _this2.instance.loadSubmission();
+            }
           });
         });
       } else {
@@ -21978,7 +22070,11 @@ _Formio.default.builder = function () {
     args[_key] = arguments[_key];
   }
 
-  return _construct(FormBuilder, args).build();
+  var builder = _construct(FormBuilder, args);
+
+  return builder.ready.then(function () {
+    builder.build();
+  });
 };
 
 _Formio.default.FormBuilder = FormBuilder;
@@ -26408,9 +26504,7 @@ function (_Component) {
           info = info[0];
 
           if (target !== source) {
-            // If the target is different from the source, rebuild the source now that the item has been removed.
-            source.formioComponent.rebuild(); // Ensure the key remains unique in its new container.
-
+            // Ensure the key remains unique in its new container.
             _builder.default.uniquify(target.formioContainer, info);
           }
         }
@@ -26437,10 +26531,25 @@ function (_Component) {
 
       if (isNew && !this.options.noNewEdit) {
         this.editComponent(info, target, isNew);
-      } // Cause parent to rebuild so component becomes visible.
+      } // Only rebuild the parts needing to be rebuilt.
 
 
-      target.formioComponent.rebuild();
+      if (target !== source) {
+        if (source.formioContainer && source.contains(target)) {
+          source.formioComponent.rebuild();
+        } else if (target.contains(source)) {
+          target.formioComponent.rebuild();
+        } else {
+          if (source.formioContainer) {
+            source.formioComponent.rebuild();
+          }
+
+          target.formioComponent.rebuild();
+        }
+      } else {
+        // If they are the same, only rebuild one.
+        target.formioComponent.rebuild();
+      }
     }
   }, {
     key: "setForm",
@@ -26587,7 +26696,20 @@ function (_Component) {
       this.updateComponent(componentCopy);
       this.editForm.on('change', function (event) {
         if (event.changed) {
-          // See if this is a manually modified key. Treat custom component keys as manually modified
+          // Set the component to the componentJson if this is a custom component.
+          if (isCustom && event.data.componentJson) {
+            var componentJson = event.data.componentJson; // First empty the existing data object.
+
+            for (var prop in event.data) {
+              if (event.data.hasOwnProperty(prop)) {
+                delete event.data[prop];
+              }
+            }
+
+            _lodash.default.merge(event.data, componentJson);
+          } // See if this is a manually modified key. Treat custom component keys as manually modified
+
+
           if (event.changed.component && event.changed.component.key === 'key' || isCustom) {
             componentCopy.keyModified = true;
           }
@@ -26602,11 +26724,6 @@ function (_Component) {
                     return false;
                   }
                 });
-              } // Set the component to the componentJson if this is a custom component.
-
-
-              if (event.data.type === 'custom' && event.data.componentJson) {
-                event.data = event.data.componentJson;
               }
 
               if (_this4._form) {
@@ -28072,7 +28189,7 @@ var _default = {
           return true;
         }
 
-        return value.trim().split(/\s+/).length <= maxWords;
+        return _lodash.default.words(value).length <= maxWords;
       }
     },
     minWords: {
@@ -28080,7 +28197,7 @@ var _default = {
       message: function message(component, setting) {
         return component.t(component.errorMessage('minWords'), {
           field: component.errorLabel,
-          length: setting + 1,
+          length: setting - 1,
           data: component.data
         });
       },
@@ -28091,7 +28208,7 @@ var _default = {
           return true;
         }
 
-        return value.trim().split(/\s+/).length >= minWords;
+        return _lodash.default.words(value).length >= minWords;
       }
     },
     email: {
@@ -28836,7 +28953,7 @@ function (_Element) {
      * @type {[string]}
      */
 
-    _this.validators = ['required', 'minLength', 'maxLength', 'custom', 'pattern', 'json', 'mask'];
+    _this.validators = ['required', 'minLength', 'maxLength', 'minWords', 'maxWords', 'custom', 'pattern', 'json', 'mask'];
     /**
      * Used to trigger a new change in this component.
      * @type {function} - Call to trigger a change in this component.
@@ -28942,7 +29059,7 @@ function (_Element) {
     value: function destroy() {
       _get(_getPrototypeOf(Component.prototype), "destroy", this).call(this);
 
-      this.detach(); // Can be overridden
+      this.detach();
     }
   }, {
     key: "getModifiedSchema",
@@ -29020,47 +29137,59 @@ function (_Element) {
         modes.push('form');
       }
 
-      var templates = this.options.template ? _Templates.default.templates[this.options.template] : _Templates.default.current;
+      var result = null;
+
+      if (this.options.templates) {
+        result = this.checkTemplate(this.options.templates, names, modes);
+
+        if (result) {
+          return result;
+        }
+      }
+
+      var frameworkTemplates = this.options.template ? _Templates.default.templates[this.options.template] : _Templates.default.current;
+      result = this.checkTemplate(frameworkTemplates, names, modes);
+
+      if (result) {
+        return result;
+      } // Default back to bootstrap if not defined.
+
+
+      var name = names[names.length - 1];
+      var templatesByName = _Templates.default.defaultTemplates[name];
+
+      if (!templatesByName) {
+        return "Unknown template: ".concat(name);
+      }
+
+      var templateByMode = this.checkTemplateMode(templatesByName, modes);
+
+      if (templateByMode) {
+        return templateByMode;
+      }
+
+      return templatesByName.form;
+    }
+  }, {
+    key: "checkTemplate",
+    value: function checkTemplate(templates, names, modes) {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
         for (var _iterator = names[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var _name = _step.value;
-          var _templatesByName = templates[_name];
+          var name = _step.value;
+          var templatesByName = templates[name];
 
-          if (_templatesByName) {
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+          if (templatesByName) {
+            var templateByMode = this.checkTemplateMode(templatesByName, modes);
 
-            try {
-              for (var _iterator3 = modes[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                var mode = _step3.value;
-                var templateByMode = _templatesByName[mode];
-
-                if (templateByMode) {
-                  return templateByMode;
-                }
-              }
-            } catch (err) {
-              _didIteratorError3 = true;
-              _iteratorError3 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-                  _iterator3.return();
-                }
-              } finally {
-                if (_didIteratorError3) {
-                  throw _iteratorError3;
-                }
-              }
+            if (templateByMode) {
+              return templateByMode;
             }
           }
-        } // Default back to bootstrap if not defined.
-
+        }
       } catch (err) {
         _didIteratorError = true;
         _iteratorError = err;
@@ -29076,24 +29205,22 @@ function (_Element) {
         }
       }
 
-      var name = names[names.length - 1];
-      var templatesByName = _Templates.default.defaultTemplates[name];
-
-      if (!templatesByName) {
-        return "Unknown template: ".concat(name);
-      }
-
+      return null;
+    }
+  }, {
+    key: "checkTemplateMode",
+    value: function checkTemplateMode(templatesByName, modes) {
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
       var _iteratorError2 = undefined;
 
       try {
         for (var _iterator2 = modes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _mode = _step2.value;
-          var _templateByMode = templatesByName[_mode];
+          var mode = _step2.value;
+          var templateByMode = templatesByName[mode];
 
-          if (_templateByMode) {
-            return _templateByMode;
+          if (templateByMode) {
+            return templateByMode;
           }
         }
       } catch (err) {
@@ -29111,7 +29238,7 @@ function (_Element) {
         }
       }
 
-      return templatesByName.form;
+      return null;
     }
   }, {
     key: "renderTemplate",
@@ -29129,7 +29256,8 @@ function (_Element) {
       data.transform = this.transform;
       data.id = data.id || this.id;
       data.key = data.key || this.key;
-      data.value = data.value || this.dataValue; // Allow more specific template names
+      data.value = data.value || this.dataValue;
+      data.builder = this.options.attachMode === 'builder'; // Allow more specific template names
 
       var names = ["".concat(name, "-").concat(this.component.type, "-").concat(this.key), "".concat(name, "-").concat(this.component.type), "".concat(name, "-").concat(this.key), "".concat(name)]; // Allow template alters.
       // console.log(`render${name.charAt(0).toUpperCase() + name.substring(1, name.length)}`);
@@ -32049,8 +32177,6 @@ __webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es6.function.name */ "./node_modules/core-js/modules/es6.function.name.js");
 
-__webpack_require__(/*! core-js/modules/es6.regexp.split */ "./node_modules/core-js/modules/es6.regexp.split.js");
-
 __webpack_require__(/*! core-js/modules/es6.array.find */ "./node_modules/core-js/modules/es6.array.find.js");
 
 var _Multivalue2 = _interopRequireDefault(__webpack_require__(/*! ../multivalue/Multivalue */ "./node_modules/formiojs/components/_classes/multivalue/Multivalue.js"));
@@ -32178,7 +32304,7 @@ function (_Multivalue) {
         if (this.refs.wordcount && this.refs.wordcount[index]) {
           var maxWords = _lodash.default.parseInt(_lodash.default.get(this.component, 'validate.maxWords', 0), 10);
 
-          this.setCounter('words', this.refs.wordcount[index], value.trim().split(/\s+/).length, maxWords);
+          this.setCounter('words', this.refs.wordcount[index], _lodash.default.words(value).length, maxWords);
         }
       }
 
@@ -32384,7 +32510,8 @@ function (_Multivalue) {
     get: function get() {
       var maxWords = _lodash.default.parseInt(_lodash.default.get(this.component, 'validate.maxWords'), 10);
 
-      var wordCount = this.dataValue.trim().split(/\s+/).length;
+      var wordCount = _lodash.default.words(this.dataValue).length;
+
       return maxWords - wordCount;
     }
   }, {
@@ -32743,7 +32870,7 @@ function (_Field) {
       }
 
       return _Field2.default.schema.apply(_Field2.default, [{
-        tree: true
+        tree: false
       }].concat(extend));
     }
   }]);
@@ -36136,9 +36263,6 @@ var _default = [{
   key: 'tooltip',
   ignore: true
 }, {
-  key: 'hideLabel',
-  ignore: true
-}, {
   key: 'autofocus',
   ignore: true
 }, {
@@ -36152,6 +36276,7 @@ var _default = [{
   label: 'Column Properties',
   addAnother: 'Add Column',
   tooltip: 'The width, offset, push, and pull settings for each column.',
+  reorder: true,
   components: [{
     type: 'hidden',
     key: 'components',
@@ -37669,6 +37794,8 @@ __webpack_require__(/*! core-js/modules/es6.string.includes */ "./node_modules/c
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
+var _dragula = _interopRequireDefault(__webpack_require__(/*! dragula */ "./node_modules/dragula/dragula.js"));
+
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/nested/NestedComponent */ "./node_modules/formiojs/components/_classes/nested/NestedComponent.js"));
 
 var _Component = _interopRequireDefault(__webpack_require__(/*! ../_classes/component/Component */ "./node_modules/formiojs/components/_classes/component/Component.js"));
@@ -37869,9 +37996,7 @@ function (_NestedComponent) {
   }, {
     key: "hasExtraColumn",
     value: function hasExtraColumn() {
-      var rmPlacement = _lodash.default.get(this, 'component.removePlacement', 'col');
-
-      return this.hasRemoveButtons() && rmPlacement === 'col' || this.options.attachMode === 'builder';
+      return this.hasRemoveButtons() && this.options.attachMode === 'builder';
     }
   }, {
     key: "hasRemoveButtons",
@@ -37897,7 +38022,6 @@ function (_NestedComponent) {
     key: "render",
     value: function render() {
       return _get(_getPrototypeOf(DataGridComponent.prototype), "render", this).call(this, this.renderTemplate('datagrid', {
-        removePlacement: _lodash.default.get(this, 'component.removePlacement', 'col'),
         rows: this.getRows(),
         columns: this.getColumns(),
         groups: this.hasRowGroups() ? this.getGroups() : [],
@@ -37912,6 +38036,7 @@ function (_NestedComponent) {
         hasGroups: this.hasRowGroups(),
         numColumns: _lodash.default.filter(this.visibleColumns).length + (this.hasExtraColumn() ? 1 : 0),
         datagridKey: this.datagridKey,
+        allowReorder: this.allowReorder,
         builder: this.options.attachMode === 'builder',
         placeholder: this.renderTemplate('builderPlaceholder', {
           position: this.componentComponents.length
@@ -37951,6 +38076,20 @@ function (_NestedComponent) {
           _this2 = this;
 
       this.loadRefs(element, (_this$loadRefs = {}, _defineProperty(_this$loadRefs, "".concat(this.datagridKey, "-row"), 'multiple'), _defineProperty(_this$loadRefs, "".concat(this.datagridKey, "-tbody"), 'single'), _defineProperty(_this$loadRefs, "".concat(this.datagridKey, "-addRow"), 'multiple'), _defineProperty(_this$loadRefs, "".concat(this.datagridKey, "-removeRow"), 'multiple'), _defineProperty(_this$loadRefs, "".concat(this.datagridKey, "-group-header"), 'multiple'), _defineProperty(_this$loadRefs, this.datagridKey, 'multiple'), _this$loadRefs));
+
+      if (this.allowReorder) {
+        this.refs["".concat(this.datagridKey, "-row")].forEach(function (row, index) {
+          row.dragInfo = {
+            index: index
+          };
+        });
+        this.dragula = (0, _dragula.default)([this.refs["".concat(this.datagridKey, "-tbody")]], {
+          moves: function moves(_draggedElement, _oldParent, clickedElement) {
+            return clickedElement.classList.contains('formio-drag-button');
+          }
+        }).on('drop', this.onReorder.bind(this));
+      }
+
       this.refs["".concat(this.datagridKey, "-addRow")].forEach(function (addButton) {
         _this2.addEventListener(addButton, 'click', _this2.addRow.bind(_this2));
       });
@@ -37982,6 +38121,29 @@ function (_NestedComponent) {
       });
 
       _get(_getPrototypeOf(DataGridComponent.prototype), "attach", this).call(this, element);
+    }
+  }, {
+    key: "onReorder",
+    value: function onReorder(element, _target, _source, sibling) {
+      if (!element.dragInfo || sibling && !sibling.dragInfo) {
+        console.warn('There is no Drag Info available for either dragged or sibling element');
+        return;
+      }
+
+      var oldPosition = element.dragInfo.index; //should drop at next sibling position; no next sibling means drop to last position
+
+      var newPosition = sibling ? sibling.dragInfo.index : this.dataValue.length;
+      var movedBelow = newPosition > oldPosition;
+
+      var dataValue = _lodash.default.cloneDeep(this.dataValue);
+
+      var draggedRowData = dataValue[oldPosition]; //insert element at new position
+
+      dataValue.splice(newPosition, 0, draggedRowData); //remove element from old position (if was moved above, after insertion it's at +1 index)
+
+      dataValue.splice(movedBelow ? oldPosition : oldPosition + 1, 1); //need to re-build rows to re-calculate indexes and other indexed fields for component instance (like rows for ex.)
+
+      this.setValue(dataValue);
     }
   }, {
     key: "addRow",
@@ -38127,6 +38289,7 @@ function (_NestedComponent) {
           }
         });
       });
+      this.triggerChange(flags, changed);
 
       if (changed) {
         this.redraw();
@@ -38260,6 +38423,11 @@ function (_NestedComponent) {
     get: function get() {
       return "datagrid-".concat(this.key);
     }
+  }, {
+    key: "allowReorder",
+    get: function get() {
+      return !this.options.readOnly && _lodash.default.get(this.component, 'reorder', false);
+    }
   }]);
 
   return DataGridComponent;
@@ -38322,6 +38490,12 @@ var _default = [{
   customConditional: 'show = !data.enableRowGroups',
   calculateValue: 'value = data.enableRowGroups ? true : data.disableAddingRemovingRows;'
 }, {
+  type: 'checkbox',
+  label: 'Allow Reorder',
+  key: 'reorder',
+  weight: 407,
+  input: true
+}, {
   type: 'textfield',
   label: 'Add Another Text',
   key: 'addAnother',
@@ -38351,24 +38525,6 @@ var _default = [{
     }]
   },
   weight: 411,
-  customConditional: 'show = !data.disableAddingRemovingRows'
-}, {
-  type: 'select',
-  label: 'Remove Button Placement',
-  key: 'removePlacement',
-  defaultValue: 'col',
-  dataSrc: 'values',
-  data: {
-    values: [{
-      label: 'Right Most Column',
-      value: 'col'
-    }, {
-      label: 'Row Top-Right corner',
-      value: 'corner'
-    }]
-  },
-  weight: 412,
-  input: true,
   customConditional: 'show = !data.disableAddingRemovingRows'
 }, {
   type: 'checkbox',
@@ -38401,6 +38557,7 @@ var _default = [{
   type: 'datagrid',
   input: true,
   key: 'rowGroups',
+  reorder: true,
   components: [{
     label: 'Label',
     allowMultipleMasks: false,
@@ -39710,7 +39867,11 @@ function (_Field) {
       if (this.component.fields[name].type === 'number') {
         val = this.refs[name].value;
       } else if (this.component.fields[name].type === 'select') {
-        val = this.refs[name].options[this.refs[name].selectedIndex].value;
+        var selectedIndex = this.refs[name].selectedIndex;
+
+        if (selectedIndex !== -1) {
+          val = this.refs[name].options[selectedIndex].value;
+        }
       }
 
       val = parseInt(val, 10);
@@ -43315,6 +43476,10 @@ function (_Component) {
   }, {
     key: "root",
     set: function set(inst) {
+      if (!inst) {
+        return;
+      }
+
       this._root = inst;
       this.nosubmit = inst.nosubmit;
     },
@@ -44317,9 +44482,11 @@ exports.default = _default;
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField.form */ "./node_modules/formiojs/components/textfield/TextField.form.js"));
 
-var _NumberEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.data */ "./node_modules/formiojs/components/number/editForm/Number.edit.data.js"));
+var _NumberEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.display */ "./node_modules/formiojs/components/number/editForm/Number.edit.display.js"));
 
-var _NumberEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.validation */ "./node_modules/formiojs/components/number/editForm/Number.edit.validation.js"));
+var _NumberEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.data */ "./node_modules/formiojs/components/number/editForm/Number.edit.data.js"));
+
+var _NumberEdit3 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Number.edit.validation */ "./node_modules/formiojs/components/number/editForm/Number.edit.validation.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44329,11 +44496,14 @@ function _default() {
   }
 
   return _TextField.default.apply(void 0, [[{
-    key: 'data',
+    key: 'display',
     components: _NumberEdit.default
   }, {
-    key: 'validation',
+    key: 'data',
     components: _NumberEdit2.default
+  }, {
+    key: 'validation',
+    components: _NumberEdit3.default
   }]].concat(extend));
 }
 
@@ -44458,7 +44628,7 @@ function (_Input) {
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(NumberComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
     _this.validators = _this.validators.concat(['min', 'max']);
     var separators = (0, _utils.getNumberSeparators)(_this.options.language);
-    _this.decimalSeparator = _this.options.decimalSeparator || separators.decimalSeparator;
+    _this.decimalSeparator = _this.options.decimalSeparator = _this.options.decimalSeparator || separators.decimalSeparator;
 
     if (_this.component.delimiter) {
       if (_this.options.hasOwnProperty('thousandsSeparator')) {
@@ -44470,7 +44640,7 @@ function (_Input) {
       _this.delimiter = '';
     }
 
-    _this.decimalLimit = _lodash.default.get(_this.component, 'decimalLimit', (0, _utils.getNumberDecimalLimit)(_this.component)); // Currencies to override BrowserLanguage Config. Object key {}
+    _this.decimalLimit = (0, _utils.getNumberDecimalLimit)(_this.component); // Currencies to override BrowserLanguage Config. Object key {}
 
     if (_lodash.default.has(_this.options, "languageOverride.".concat(_this.options.language))) {
       var override = _lodash.default.get(_this.options, "languageOverride.".concat(_this.options.language));
@@ -44485,7 +44655,7 @@ function (_Input) {
       requireDecimal: _lodash.default.get(_this.component, 'requireDecimal', false),
       thousandsSeparatorSymbol: _lodash.default.get(_this.component, 'thousandsSeparator', _this.delimiter),
       decimalSymbol: _lodash.default.get(_this.component, 'decimalSymbol', _this.decimalSeparator),
-      decimalLimit: _this.decimalLimit,
+      decimalLimit: _lodash.default.get(_this.component, 'decimalLimit', _this.decimalLimit),
       allowNegative: _lodash.default.get(_this.component, 'allowNegative', true),
       allowDecimal: _lodash.default.get(_this.component, 'allowDecimal', !(_this.component.validate && _this.component.validate.integer))
     });
@@ -44682,6 +44852,31 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/components/number/editForm/Number.edit.display.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/number/editForm/Number.edit.display.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'inputMask',
+  ignore: true
+}, {
+  key: 'allowMultipleMasks',
+  ignore: true
+}];
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/components/number/editForm/Number.edit.validation.js":
 /*!************************************************************************************!*\
   !*** ./node_modules/formiojs/components/number/editForm/Number.edit.validation.js ***!
@@ -44697,13 +44892,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _default = [{
-  key: 'validate.unique',
+  key: 'unique',
   ignore: true
 }, {
   key: 'validate.minLength',
   ignore: true
 }, {
   key: 'validate.maxLength',
+  ignore: true
+}, {
+  key: 'validate.minWords',
+  ignore: true
+}, {
+  key: 'validate.maxWords',
   ignore: true
 }, {
   key: 'validate.pattern',
@@ -45343,6 +45544,12 @@ exports.default = void 0;
 var _default = [{
   key: 'unique',
   ignore: true
+}, {
+  key: 'validate.minWords',
+  ignore: true
+}, {
+  key: 'validate.maxWords',
+  ignore: true
 }];
 exports.default = _default;
 
@@ -45808,6 +46015,7 @@ var _default = [{
   key: 'values',
   tooltip: 'The radio button values that can be picked for this field. Values are text submitted with the form data. Labels are text that appears next to the radio buttons on the form.',
   weight: 10,
+  reorder: true,
   defaultValue: [{
     label: '',
     value: ''
@@ -46522,6 +46730,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+__webpack_require__(/*! core-js/modules/es6.string.iterator */ "./node_modules/core-js/modules/es6.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.from */ "./node_modules/core-js/modules/es6.array.from.js");
+
 __webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
 
 __webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
@@ -46565,6 +46777,14 @@ var _Form = _interopRequireDefault(__webpack_require__(/*! ../../Form */ "./node
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
@@ -47110,10 +47330,8 @@ function (_Field) {
         return;
       }
 
-      this.addEventListener(input, this.inputInfo.changeEvent, function (event) {
-        // Check if event was fired from removeItem
-        var newValue = event.detail.value === _this4.dataValue ? '' : event.detail.value;
-        return _this4.updateValue({}, newValue);
+      this.addEventListener(input, this.inputInfo.changeEvent, function () {
+        return _this4.updateValue();
       });
 
       if (this.component.widget === 'html5') {
@@ -47273,6 +47491,10 @@ function (_Field) {
           var formUrl = "".concat(projectUrl, "/form/").concat(_this4.component.data.resource);
           new _Form.default(formioForm, formUrl, {}).ready.then(function (form) {
             form.on('submit', function (submission) {
+              if (_this4.component.multiple) {
+                submission = [].concat(_toConsumableArray(_this4.dataValue), [submission]);
+              }
+
               _this4.setValue(submission);
 
               dialog.close();
@@ -47863,6 +48085,11 @@ var _default = [{
   key: 'data.values',
   tooltip: 'Values to use as the data source. Labels are shown in the select field. Values are the corresponding values saved with the submission.',
   weight: 10,
+  reorder: true,
+  defaultValue: [{
+    label: '',
+    value: ''
+  }],
   components: [{
     label: 'Label',
     key: 'label',
@@ -49296,6 +49523,7 @@ var _default = [{
   key: 'questions',
   tooltip: 'The questions you would like to ask in this survey question.',
   weight: 0,
+  reorder: true,
   defaultValue: [{
     label: '',
     value: ''
@@ -49324,6 +49552,7 @@ var _default = [{
   key: 'values',
   tooltip: 'The values that can be selected per question. Example: \'Satisfied\', \'Very Satisfied\', etc.',
   weight: 1,
+  reorder: true,
   defaultValue: [{
     label: '',
     value: ''
@@ -50117,6 +50346,7 @@ var _default = [{
   input: true,
   label: 'Tabs',
   weight: 50,
+  reorder: true,
   components: [{
     type: 'textfield',
     input: true,
@@ -51687,6 +51917,7 @@ var _default = [{
   key: 'inputMasks',
   label: 'Input Masks',
   customConditional: 'show = data.allowMultipleMasks === true;',
+  reorder: true,
   components: [{
     type: 'textfield',
     key: 'label',
@@ -51765,6 +51996,22 @@ var _default = [{
   placeholder: 'Maximum Length',
   type: 'number',
   tooltip: 'The maximum length requirement this field must meet.',
+  input: true
+}, {
+  weight: 125,
+  key: 'validate.minWords',
+  label: 'Minimum Word Length',
+  placeholder: 'Minimum Word Length',
+  type: 'number',
+  tooltip: 'The minimum amount of words that can be added to this field.',
+  input: true
+}, {
+  weight: 126,
+  key: 'validate.maxWords',
+  label: 'Maximum Word Length',
+  placeholder: 'Maximum Word Length',
+  type: 'number',
+  tooltip: 'The maximum amount of words that can be added to this field.',
   input: true
 }, {
   weight: 130,
@@ -52380,7 +52627,7 @@ function (_NestedComponent) {
     get: function get() {
       return {
         title: 'Tree',
-        icon: 'fa fa-indent',
+        icon: 'indent',
         group: 'data',
         weight: 30,
         schema: TreeComponent.schema()
@@ -52407,6 +52654,10 @@ function (_NestedComponent) {
   _createClass(TreeComponent, [{
     key: "init",
     value: function init() {
+      if (this.builderMode) {
+        return _get(_getPrototypeOf(TreeComponent.prototype), "init", this).call(this);
+      }
+
       this.components = [];
       this.componentOptions = _objectSpread({}, this.options, {
         parent: this,
@@ -52421,7 +52672,9 @@ function (_NestedComponent) {
     value: function destroy() {
       _get(_getPrototypeOf(TreeComponent.prototype), "destroy", this).call(this);
 
-      this.removeComponents(this._viewComponents);
+      if (!this.builderMode) {
+        this.removeComponents(this._viewComponents);
+      }
     }
   }, {
     key: "createComponents",
@@ -52445,80 +52698,6 @@ function (_NestedComponent) {
         return component.destroy();
       });
     }
-  }, {
-    key: "interateNodeComponents",
-    value: function interateNodeComponents(components, fn) {
-      _lodash.default.each(components, function (component, index) {
-        if (fn(component, components, index) === false) {
-          return false;
-        }
-
-        if (typeof component.everyComponent === 'function') {
-          if (component.everyComponent(fn) === false) {
-            return false;
-          }
-        }
-      });
-    }
-  }, {
-    key: "flattenNodeComponents",
-    value: function flattenNodeComponents(components) {
-      var result = {};
-      this.interateNodeComponents(components, function (component) {
-        result[component.key] = component;
-      });
-      return result;
-    } // updateNodeData(node = {}, data) {
-    //   if (this.hasChanged(node.persistentData, data)) {
-    //     node.data = data;
-    //     node.commitData();
-    //     if (node.hasData) {
-    //       node.components.forEach(cmp => {
-    //         this.setNestedValue(cmp, node.data, null, false);
-    //       });
-    //     }
-    //   }
-    //   return node;
-    // }
-    // updateNodeChildren(node = {}, spec = {}) {
-    //   const oldChildren = _.get(node, 'children', []);
-    //   const newChildren = _.get(spec, 'children', []);
-    //   const nextChildren = newChildren.map(
-    //     (next, index) => {
-    //       const prev = oldChildren[index];
-    //       // if we already have node, just update it
-    //       if (prev instanceof Node) {
-    //         return prev;
-    //       }
-    //       // if there new node, create new instance
-    //       else {
-    //         return this.createNode(node, next, false);
-    //       }
-    //     }
-    //   );
-    //   // filter nodes, that should be destroyed
-    //   const rest = oldChildren.filter(ch => !nextChildren.includes(ch));
-    //   rest.forEach(this.removeNode);
-    //   node.children = nextChildren;
-    //   return node;
-    // }
-    // addNodeCs(node) {
-    //   node.components = this.createComponents(node.data);
-    //   return node;
-    // }
-    // updateNode(node = {}, spec = {}) {
-    //   const { children =  [] } = spec;
-    //   this.updateNodeChildren(node, spec);
-    //   this.updateNodeData(node, spec.data);
-    //   if (node.hasData && _.isEmpty(node.components)) {
-    //     this.addNodeCs(node);
-    //   }
-    //   children.forEach((childSpec, index) => {
-    //     this.updateNode(node.children[index], childSpec);
-    //   });
-    //   return node;
-    // }
-
   }, {
     key: "render",
     value: function render() {
@@ -52671,6 +52850,16 @@ function (_NestedComponent) {
   }, {
     key: "attachComponents",
     value: function attachComponents(node) {
+      if (this.builderMode) {
+        var _get2;
+
+        for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+          args[_key3 - 1] = arguments[_key3];
+        }
+
+        return (_get2 = _get(_getPrototypeOf(TreeComponent.prototype), "attachComponents", this)).call.apply(_get2, [this, node].concat(args));
+      }
+
       this.loadRefs.call(node, node.refs.content, {
         nodeEdit: 'single'
       });
@@ -52863,6 +53052,11 @@ function (_NestedComponent) {
       });
     }
   }, {
+    key: "getValue",
+    value: function getValue() {
+      return this.dataValue;
+    }
+  }, {
     key: "updateTree",
     value: function updateTree() {
       this.updateValue({}, this.tree.value);
@@ -52919,9 +53113,7 @@ function (_NestedComponent) {
   }, {
     key: "emptyValue",
     get: function get() {
-      return {
-        children: []
-      };
+      return {};
     }
   }, {
     key: "viewComponents",
@@ -52959,36 +53151,23 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = _default;
 
-var _Component = _interopRequireDefault(__webpack_require__(/*! ../_classes/component/Component.form */ "./node_modules/formiojs/components/_classes/component/Component.form.js"));
-
 var _UnknownEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Unknown.edit.display */ "./node_modules/formiojs/components/unknown/editForm/Unknown.edit.display.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
-  for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
-    extend[_key] = arguments[_key];
-  }
-
-  return _Component.default.apply(void 0, [[{
-    key: 'display',
-    components: _UnknownEdit.default
-  }, {
-    key: 'data',
-    ignore: true
-  }, {
-    key: 'validation',
-    ignore: true
-  }, {
-    key: 'api',
-    ignore: true
-  }, {
-    key: 'conditional',
-    ignore: true
-  }, {
-    key: 'logic',
-    ignore: true
-  }]].concat(extend));
+  return {
+    components: [{
+      type: 'tabs',
+      key: 'tabs',
+      components: [{
+        label: 'Custom',
+        key: 'display',
+        weight: 0,
+        components: _UnknownEdit.default
+      }]
+    }]
+  };
 }
 
 /***/ }),
@@ -53065,7 +53244,7 @@ function (_Component) {
     get: function get() {
       return {
         title: 'Custom',
-        icon: 'fa fa-cubes',
+        icon: 'cubes',
         group: 'advanced',
         documentation: 'https://help.form.io/userguide/form-components/#custom',
         weight: 120,
@@ -53112,66 +53291,6 @@ var _default = [{
   key: 'componentJson',
   label: 'Custom Element JSON',
   tooltip: 'Enter the JSON for this custom element.'
-}, {
-  key: 'label',
-  ignore: true
-}, {
-  key: 'hideLabel',
-  ignore: true
-}, {
-  key: 'labelPosition',
-  ignore: true
-}, {
-  key: 'placeholder',
-  ignore: true
-}, {
-  key: 'description',
-  ignore: true
-}, {
-  key: 'tooltip',
-  ignore: true
-}, {
-  key: 'errorLabel',
-  ignore: true
-}, {
-  key: 'customClass',
-  ignore: true
-}, {
-  key: 'tabindex',
-  ignore: true
-}, {
-  key: 'persistent',
-  ignore: true
-}, {
-  key: 'multiple',
-  ignore: true
-}, {
-  key: 'clearOnHide',
-  ignore: true
-}, {
-  key: 'protected',
-  ignore: true
-}, {
-  key: 'hidden',
-  ignore: true
-}, {
-  key: 'mask',
-  ignore: true
-}, {
-  key: 'dataGridLabel',
-  ignore: true
-}, {
-  key: 'disabled',
-  ignore: true
-}, {
-  key: 'autofocus',
-  ignore: true
-}, {
-  key: 'tableView',
-  ignore: true
-}, {
-  key: 'alwaysEnabled',
-  ignore: true
 }];
 exports.default = _default;
 
@@ -53579,6 +53698,8 @@ var _default = {
         pattern: '{{field}} does not match the pattern {{pattern}}',
         minLength: '{{field}} must be longer than {{length}} characters.',
         maxLength: '{{field}} must be shorter than {{length}} characters.',
+        minWords: '{{field}} must have more than {{length}} words.',
+        maxWords: '{{field}} must have less than {{length}} words.',
         min: '{{field}} cannot be less than {{min}}.',
         max: '{{field}} cannot be greater than {{max}}.',
         maxDate: '{{field}} should not contain date after {{- maxDate}}',
@@ -54718,7 +54839,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<table class=\"table datagrid-table table-bordered\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \" {% if (component.layoutFixed) { %}style=\"table-layout: fixed;\"{% } %}>\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n      <th>\n        {% if (!builder && hasAddButton && hasTopSubmit) { %}\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> Add Another\n        </button>\n        {% } %}\n      </th>\n      {% } %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody ref=\"{{datagridKey}}-tbody\">\n    {% rows.forEach(function(row) { %}\n    {% if (hasGroups && groups[index]) { %}\n    <tr ref=\"{{datagridKey}}-group-header\" class=\"datagrid-group-header{{hasToggle ? ' clickable' : ''}}\">\n      <td\n        ref=\"{{datagridKey}}-group-label\"\n        colspan=\"{{numColumns}}\"\n        class=\"datagrid-group-label\">{{groups[index].label}}</td>\n    </tr>\n    {% } %}\n    <tr ref=\"{{datagridKey}}-row\">\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn && (removePlacement === 'col')) { %}\n        {% if (!builder && hasRemoveButtons) { %}\n        <td>\n          <button type=\"button\" class=\"btn btn-secondary formio-button-remove-row\" ref=\"{{datagridKey}}-removeRow\">\n            <i class=\"{{iconClass('remove-circle')}}\"></i>\n          </button>\n        </td>\n        {% } %}\n        {% if (builder) { %}\n        <td ref=\"{{key}}-container\">\n          {{placeholder}}\n        </td>\n        {% } %}\n      {% } else if (removePlacement === 'corner') { %}\n        <button type=\"button\" tabindex=\"-1\" class=\"btn btn-xxs btn-danger formio-{{ component.type }}-remove\" ref=\"{{datagridKey}}-removeRow\">\n          <i class=\"{{ iconClass('remove') }}\"></i>\n        </button>\n      {% } %}\n    </tr>\n    {% }) %}\n  </tbody>\n  {% if (!builder && hasAddButton && hasBottomSubmit) { %}\n  <tfoot>\n    <tr>\n      <td colspan=\"{{numColumns}}\">\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n        </button>\n      </td>\n    </tr>\n  </tfoot>\n  {% } %}\n</table>\n";
+var form = "<table class=\"table datagrid-table table-bordered\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \" {% if (component.layoutFixed) { %}style=\"table-layout: fixed;\"{% } %}>\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% if (component.reorder) { %}<th></th>{% } %}\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n      <th>\n        {% if (!builder && hasAddButton && hasTopSubmit) { %}\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> Add Another\n        </button>\n        {% } %}\n      </th>\n      {% } %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody ref=\"{{datagridKey}}-tbody\">\n    {% rows.forEach(function(row) { %}\n    {% if (hasGroups && groups[index]) { %}\n    <tr ref=\"{{datagridKey}}-group-header\" class=\"datagrid-group-header{{hasToggle ? ' clickable' : ''}}\">\n      <td\n        ref=\"{{datagridKey}}-group-label\"\n        colspan=\"{{numColumns}}\"\n        class=\"datagrid-group-label\">{{groups[index].label}}</td>\n    </tr>\n    {% } %}\n    <tr ref=\"{{datagridKey}}-row\">\n      {% if (component.reorder) { %}\n        <td>\n          <button type=\"button\" class=\"formio-drag-button btn btn-default fa fa-bars\"></button>\n        </td>\n      {% } %}\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n        {% if (!builder && hasRemoveButtons) { %}\n        <td>\n          <button type=\"button\" class=\"btn btn-secondary formio-button-remove-row\" ref=\"{{datagridKey}}-removeRow\">\n            <i class=\"{{iconClass('remove-circle')}}\"></i>\n          </button>\n        </td>\n        {% } %}\n        {% if (builder) { %}\n        <td ref=\"{{key}}-container\">\n          {{placeholder}}\n        </td>\n        {% } %}\n      {% } %}\n    </tr>\n    {% }) %}\n  </tbody>\n  {% if (!builder && hasAddButton && hasBottomSubmit) { %}\n  <tfoot>\n    <tr>\n      <td colspan=\"{{numColumns + 1}}\">\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n        </button>\n      </td>\n    </tr>\n  </tfoot>\n  {% } %}\n</table>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<table class=\"table datagrid-table table-bordered\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \">\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody>\n    {% rows.forEach(function(row) { %}\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n    </tr>\n    {% }) %}\n  </tbody>\n</table>\n";
@@ -55920,7 +56041,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<table class=\"table datagrid-table table-bordered\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-condensed' : ''}}\n    \" {% if (component.layoutFixed) { %}style=\"table-layout: fixed;\"{% } %}>\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n      <th>\n        {% if (!builder && hasAddButton && hasTopSubmit) { %}\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> Add Another\n        </button>\n        {% } %}\n      </th>\n      {% } %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody ref=\"{{datagridKey}}-tbody\">\n    {% rows.forEach(function(row, index) { %}\n    {% if (hasGroups && groups[index]) { %}\n    <tr ref=\"{{datagridKey}}-group-header\" class=\"datagrid-group-header{{hasToggle ? ' clickable' : ''}}\">\n      <td\n        ref=\"{{datagridKey}}-group-label\"\n        colspan=\"{{numColumns}}\"\n        class=\"datagrid-group-label\">{{groups[index].label}}</td>\n    </tr>\n    {% } %}\n    <tr ref=\"{{datagridKey}}-row\">\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn && hasRemoveButtons && (removePlacement === 'col')) { %}\n      <td>\n        <button type=\"button\" class=\"btn btn-default formio-button-remove-row\" ref=\"{{datagridKey}}-removeRow\">\n          <i class=\"{{iconClass('remove-circle')}}\"></i>\n        </button>\n      </td>\n      {% } else if (removePlacement === 'corner') { %}\n        <button type=\"button\" tabindex=\"-1\" class=\"btn btn-xxs btn-danger formio-{{ component.type }}-remove\" ref=\"{{datagridKey}}-removeRow\">\n          <i class=\"{{ iconClass('remove') }}\"></i>\n        </button>\n      {% } %}\n    </tr>\n    {% }) %}\n  </tbody>\n  {% if (hasAddButton && hasBottomSubmit) { %}\n  <tfoot>\n    <tr>\n      <td colspan=\"{{numColumns}}\">\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n        </button>\n      </td>\n    </tr>\n  </tfoot>\n  {% } %}\n</table>\n";
+var form = "<table class=\"table datagrid-table table-bordered\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-condensed' : ''}}\n    \" {% if (component.layoutFixed) { %}style=\"table-layout: fixed;\"{% } %}>\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% if (component.reorder) { %}<th></th>{% } %}\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n      <th>\n        {% if (!builder && hasAddButton && hasTopSubmit) { %}\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> Add Another\n        </button>\n        {% } %}\n      </th>\n      {% } %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody ref=\"{{datagridKey}}-tbody\">\n    {% rows.forEach(function(row, index) { %}\n    {% if (hasGroups && groups[index]) { %}\n    <tr ref=\"{{datagridKey}}-group-header\" class=\"datagrid-group-header{{hasToggle ? ' clickable' : ''}}\">\n      <td\n        ref=\"{{datagridKey}}-group-label\"\n        colspan=\"{{numColumns}}\"\n        class=\"datagrid-group-label\">{{groups[index].label}}</td>\n    </tr>\n    {% } %}\n    <tr ref=\"{{datagridKey}}-row\">\n      {% if (component.reorder) { %}\n        <td>\n          <button type=\"button\" class=\"formio-drag-button btn btn-default fa fa-bars\"></button>\n        </td>\n      {% } %}\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n        {% if (!builder && hasRemoveButtons) { %}\n        <td>\n          <button type=\"button\" class=\"btn btn-default formio-button-remove-row\" ref=\"{{datagridKey}}-removeRow\">\n            <i class=\"{{iconClass('remove-circle')}}\"></i>\n          </button>\n        </td>\n        {% } %}\n        {% if (builder) { %}\n        <td ref=\"{{key}}-container\">\n          {{placeholder}}\n        </td>\n        {% } %}\n      {% } %}\n    </tr>\n    {% }) %}\n  </tbody>\n  {% if (hasAddButton && hasBottomSubmit) { %}\n  <tfoot>\n    <tr>\n      <td colspan=\"{{numColumns + 1}}\">\n        <button class=\"btn btn-primary formio-button-add-row\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n        </button>\n      </td>\n    </tr>\n  </tfoot>\n  {% } %}\n</table>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<table class=\"table datagrid-table table-bordered\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-condensed' : ''}}\n    \">\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody>\n    {% rows.forEach(function(row) { %}\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n    </tr>\n    {% }) %}\n  </tbody>\n</table>\n";
@@ -56852,6 +56973,30 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/templates/semantic/builderWizard/index.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/formiojs/templates/semantic/builderWizard/index.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/* babel-plugin-inline-import './form.hbs' */
+var form = "<div class=\"formio builder ui grid formbuilder\">\n  <div class=\"four wide column formcomponents\">\n    {{sidebar}}\n  </div>\n  <div class=\"twelve wide column formarea\">\n    <div class=\"ui breadcrumb\" style=\"margin-bottom: 0.5em\">\n      {% pages.forEach(function(page, pageIndex) { %}\n        <div title=\"{{page.title}}\" class=\"{% if (pageIndex === self.currentPage) { %} active section {% } else { %} section {% } %} wizard-page-label\" ref=\"gotoPage\">{{page.title}}</div>\n        <div class=\"divider\">/</div>\n      {% }) %}\n      <div title=\"{{t('Create Page')}}\" class=\"section wizard-page-label\" ref=\"addPage\"><i class=\"{{iconClass('plus')}}\"></i> {{t('Page')}}</div>\n    </div>\n    <div ref=\"form\">\n      {{form}}\n    </div>\n  </div>\n</div>\n";
+var _default = {
+  form: form
+};
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/templates/semantic/button/index.js":
 /*!******************************************************************!*\
   !*** ./node_modules/formiojs/templates/semantic/button/index.js ***!
@@ -56997,7 +57142,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<table class=\"ui table datagrid-table\n    {{ component.striped ? 'striped' : ''}}\n    {{ component.bordered ? 'celled' : ''}}\n    {{ component.hover ? 'selectable' : ''}}\n    {{ component.condensed ? 'compact' : 'padded'}}\n    \" {% if (component.layoutFixed) { %}style=\"table-layout: fixed;\"{% } %}>\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n      <th>\n        {% if (hasAddButton && hasTopSubmit) { %}\n        <button class=\"ui button primary\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> Add Another\n        </button>\n        {% } %}\n      </th>\n      {% } %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody ref=\"{{datagridKey}}-tbody\">\n    {% rows.forEach(function(row) { %}\n    {% if (hasGroups && groups[index]) { %}\n    <tr ref=\"{{datagridKey}}-group-header\" class=\"datagrid-group-header{{hasToggle ? ' clickable' : ''}}\">\n      <td\n        ref=\"{{datagridKey}}-group-label\"\n        colspan=\"{{numColumns}}\"\n        class=\"datagrid-group-label\">{{groups[index].label}}</td>\n    </tr>\n    {% } %}\n    <tr ref=\"{{datagridKey}}-row\">\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn && hasRemoveButtons && (removePlacement === 'col')) { %}\n      <td>\n        <button type=\"button\" class=\"ui icon button secondary\" ref=\"{{datagridKey}}-removeRow\">\n          <i class=\"{{iconClass('remove-circle')}}\"></i>\n        </button>\n      </td>\n      {% } else if (removePlacement === 'corner') { %}\n        <button type=\"button\" tabindex=\"-1\" class=\"btn-xss ui icon button secondary formio-{{ component.type }}-remove\" ref=\"{{datagridKey}}-removeRow\">\n          <i class=\"{{ iconClass('remove') }}\"></i>\n        </button>\n      {% } %}\n    </tr>\n    {% }) %}\n  </tbody>\n  {% if (hasAddButton && hasBottomSubmit) { %}\n  <tfoot>\n    <tr>\n      <td colspan=\"{{numColumns}}\">\n        <button class=\"ui button primary\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n        </button>\n      </td>\n    </tr>\n  </tfoot>\n  {% } %}\n</table>\n";
+var form = "<table class=\"ui table datagrid-table\n    {{ component.striped ? 'striped' : ''}}\n    {{ component.bordered ? 'celled' : ''}}\n    {{ component.hover ? 'selectable' : ''}}\n    {{ component.condensed ? 'compact' : 'padded'}}\n    \" {% if (component.layoutFixed) { %}style=\"table-layout: fixed;\"{% } %}>\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% if (component.reorder) { %}<th></th>{% } %}\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n      <th>\n        {% if (hasAddButton && hasTopSubmit) { %}\n        <button class=\"ui button primary\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> Add Another\n        </button>\n        {% } %}\n      </th>\n      {% } %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody ref=\"{{datagridKey}}-tbody\">\n    {% rows.forEach(function(row) { %}\n    {% if (hasGroups && groups[index]) { %}\n    <tr ref=\"{{datagridKey}}-group-header\" class=\"datagrid-group-header{{hasToggle ? ' clickable' : ''}}\">\n      <td\n        ref=\"{{datagridKey}}-group-label\"\n        colspan=\"{{numColumns}}\"\n        class=\"datagrid-group-label\">{{groups[index].label}}</td>\n    </tr>\n    {% } %}\n    <tr ref=\"{{datagridKey}}-row\">\n      {% if (component.reorder) { %}\n        <td>\n          <button type=\"button\" class=\"formio-drag-button fa fa-bars\"></button>\n        </td>\n      {% } %}\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n      {% if (hasExtraColumn) { %}\n        {% if (!builder && hasRemoveButtons) { %}\n        <td>\n          <button type=\"button\" class=\"btn-xss ui icon button secondary formio-{{ component.type }}-remove\" ref=\"{{datagridKey}}-removeRow\">\n            <i class=\"{{iconClass('remove')}}\"></i>\n          </button>\n        </td>\n        {% } %}\n        {% if (builder) { %}\n        <td ref=\"{{key}}-container\">\n          {{placeholder}}\n        </td>\n        {% } %}\n      {% } %}\n    </tr>\n    {% }) %}\n  </tbody>\n  {% if (hasAddButton && hasBottomSubmit) { %}\n  <tfoot>\n    <tr>\n      <td colspan=\"{{numColumns + 1}}\">\n        <button class=\"ui button primary\" ref=\"{{datagridKey}}-addRow\">\n          <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n        </button>\n      </td>\n    </tr>\n  </tfoot>\n  {% } %}\n</table>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<table class=\"ui table datagrid-table\n    {{ component.striped ? 'striped' : ''}}\n    {{ component.bordered ? 'celled' : ''}}\n    {{ component.hover ? 'selectable' : ''}}\n    {{ component.condensed ? 'compact' : 'padded'}}\n    \">\n  {% if (hasHeader) { %}\n  <thead>\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <th class=\"{{col.validate && col.validate.required ? 'field-required' : ''}}\">\n        {{ col.hideLabel ? '' : t(col.label || col.title) }}\n        {% if (col.tooltip) { %} <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{col.tooltip}}\"></i>{% } %}\n      </th>\n      {% } %}\n      {% }) %}\n    </tr>\n  </thead>\n  {% } %}\n  <tbody>\n    {% rows.forEach(function(row) { %}\n    <tr>\n      {% columns.forEach(function(col) { %}\n      {% if (visibleColumns[col.key]) { %}\n      <td ref=\"{{datagridKey}}\">\n        {{row[col.key]}}\n      </td>\n      {% } %}\n      {% }) %}\n    </tr>\n    {% }) %}\n  </tbody>\n</table>\n";
@@ -57231,6 +57376,8 @@ var _builderPlaceholder = _interopRequireDefault(__webpack_require__(/*! ./build
 
 var _builderSidebar = _interopRequireDefault(__webpack_require__(/*! ./builderSidebar */ "./node_modules/formiojs/templates/semantic/builderSidebar/index.js"));
 
+var _builderWizard = _interopRequireDefault(__webpack_require__(/*! ./builderWizard */ "./node_modules/formiojs/templates/semantic/builderWizard/index.js"));
+
 var _button = _interopRequireDefault(__webpack_require__(/*! ./button */ "./node_modules/formiojs/templates/semantic/button/index.js"));
 
 var _checkbox = _interopRequireDefault(__webpack_require__(/*! ./checkbox */ "./node_modules/formiojs/templates/semantic/checkbox/index.js"));
@@ -57335,6 +57482,7 @@ var _default = {
   builderEditForm: _builderEditForm.default,
   builderPlaceholder: _builderPlaceholder.default,
   builderSidebar: _builderSidebar.default,
+  builderWizard: _builderWizard.default,
   button: _button.default,
   checkbox: _checkbox.default,
   columns: _columns.default,
@@ -57775,7 +57923,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"formio-wizard-position\">\n  <nav aria-label=\"navigation\">\n    <div class=\"ui steps\">\n      {% panels.forEach(function(panel, index) { %}\n      <a class=\"{{currentPage === index ? ' active' : ''}} step\" ref=\"{{wizardKey}}-link\">\n        <div class=\"content\">\n          <div class=\"title\">{{panel.title}}</div>\n        </div>\n      </a>\n      {% }) %}\n    </div>\n  </nav>\n  <div class=\"wizard-page\" ref=\"{{wizardKey}}\">\n    {{components}}\n  </div>\n  <ul class=\"ui horizontal list\">\n    {% if (buttons.cancel) { %}\n    <li class=\"item\">\n      <button class=\"ui button secondary btn-wizard-nav-cancel\" ref=\"{{wizardKey}}-cancel\">{{t('cancel')}}</button>\n    </li>\n    {% } %}\n    {% if (buttons.previous) { %}\n    <li class=\"item\">\n      <button class=\"ui button primary btn-wizard-nav-previous\" ref=\"{{wizardKey}}-previous\">{{t('previous')}}</button>\n    </li>\n    {% } %}\n    {% if (buttons.next) { %}\n    <li class=\"item\">\n      <button class=\"ui button primary btn-wizard-nav-next\" ref=\"{{wizardKey}}-next\">{{t('next')}}</button>\n    </li>\n    {% } %}\n    {% if (buttons.submit) { %}\n    <li class=\"item\">\n      <button class=\"ui button primary btn-wizard-nav-submit\" ref=\"{{wizardKey}}-submit\">{{t('submit')}}</button>\n    </li>\n    {% } %}\n  </ul>\n</div>\n";
+var form = "<div class=\"formio-wizard-position\">\n  <nav aria-label=\"navigation\">\n    <div class=\"ui steps\">\n      {% panels.forEach(function(panel, index) { %}\n      <a class=\"{{currentPage === index ? ' active' : ''}} step\" ref=\"{{wizardKey}}-link\">\n        <div class=\"content\">\n          <div class=\"title\">{{panel.title}}</div>\n        </div>\n      </a>\n      {% }) %}\n    </div>\n  </nav>\n  <div class=\"wizard-page\" ref=\"{{wizardKey}}\">\n    {{components}}\n  </div>\n  <div class=\"ui horizontal list\">\n    {% if (buttons.cancel) { %}\n    <div class=\"item\">\n      <button class=\"ui button secondary btn-wizard-nav-cancel\" ref=\"{{wizardKey}}-cancel\">{{t('cancel')}}</button>\n    </div>\n    {% } %}\n    {% if (buttons.previous) { %}\n    <div class=\"item\">\n      <button class=\"ui button primary btn-wizard-nav-previous\" ref=\"{{wizardKey}}-previous\">{{t('previous')}}</button>\n    </div>\n    {% } %}\n    {% if (buttons.next) { %}\n    <div class=\"item\">\n      <button class=\"ui button primary btn-wizard-nav-next\" ref=\"{{wizardKey}}-next\">{{t('next')}}</button>\n    </div>\n    {% } %}\n    {% if (buttons.submit) { %}\n    <div class=\"item\">\n      <button class=\"ui button primary btn-wizard-nav-submit\" ref=\"{{wizardKey}}-submit\">{{t('submit')}}</button>\n    </div>\n    {% } %}\n  </div>\n</div>\n";
 
 /* babel-plugin-inline-import './builder.hbs' */
 var builder = "<div class=\"formio-wizard-builder-component-title\">{{ t(component.title) }}</div>\n";
@@ -57826,7 +57974,7 @@ var _default = {
     var formKeys = {};
     (0, _utils.eachComponent)(container, function (comp) {
       formKeys[comp.key] = true;
-    }); // Recurse into all child components.
+    }, true); // Recurse into all child components.
 
     (0, _utils.eachComponent)([component], function (component) {
       // Skip key uniquification if this component doesn't have a key.

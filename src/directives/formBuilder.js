@@ -24,7 +24,7 @@ export default angular.module('formio').directive('formBuilder', function() {
           builderElement = element;
           builderElement.innerHTML = '';
           builder = new Formio.FormBuilder(builderElement, $scope.form, $scope.options);
-          builderReady = builder.setDisplay($scope.form.display);
+          builderReady = builder.ready;
         };
 
         $scope.display = $scope.form.display;

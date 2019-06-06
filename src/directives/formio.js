@@ -91,7 +91,6 @@ export default app.directive('formio', function() {
                 break;
               case 'submit':
                 args[0] = ($scope.formio.nosubmit || !$scope.formio._src) ? 'formSubmission' : 'formSubmit';
-                console.log('submit', args, $scope.formio);
                 break;
               case 'submitDone':
                 args[0] = 'formSubmission';
