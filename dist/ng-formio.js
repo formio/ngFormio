@@ -768,6 +768,18 @@ exports.default = _default;
 "use strict";
 
 
+__webpack_require__(/*! core-js/modules/web.dom.iterable */ "./node_modules/core-js/modules/web.dom.iterable.js");
+
+__webpack_require__(/*! core-js/modules/es6.array.iterator */ "./node_modules/core-js/modules/es6.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.to-string */ "./node_modules/core-js/modules/es6.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es6.object.keys */ "./node_modules/core-js/modules/es6.object.keys.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 __webpack_require__(/*! ./module */ "./lib/module.js");
 
 __webpack_require__(/*! ./filters */ "./lib/filters/index.js");
@@ -779,6 +791,18 @@ __webpack_require__(/*! ./directives */ "./lib/directives/index.js");
 __webpack_require__(/*! ./factories */ "./lib/factories/index.js");
 
 __webpack_require__(/*! formiojs/dist/formio.full.min.css */ "./node_modules/formiojs/dist/formio.full.min.css");
+
+var _formiojs = __webpack_require__(/*! formiojs */ "./node_modules/formiojs/index.js");
+
+Object.keys(_formiojs).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _formiojs[key];
+    }
+  });
+});
 
 /***/ }),
 
