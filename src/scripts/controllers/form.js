@@ -608,6 +608,7 @@ app.controller('FormController', [
       baseUrl: $scope.baseUrl,
       building: true,
       sideBarScrollOffset: 60,
+      bootstrap: 3,
       builder: {
         // basic: {
         //   title: 'Basic Components',
