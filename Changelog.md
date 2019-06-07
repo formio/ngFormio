@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.4.8
+### Added
+ - Direct SAML passport configuration options.
+
 ## 6.4.7
 ### Changed
  - Upgraded formmanager and dependencies.
