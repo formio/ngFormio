@@ -609,74 +609,7 @@ app.controller('FormController', [
       building: true,
       sideBarScrollOffset: 60,
       bootstrap: 3,
-      builder: {
-        // basic: {
-        //   title: 'Basic Components',
-        //   weight: 0,
-        //   default: true,
-        //   components: {
-        //     textfield: true,
-        //     number: true,
-        //     password: true,
-        //     textarea: true,
-        //     checkbox: true,
-        //     selectboxes: true,
-        //     select: true,
-        //     radio: true,
-        //     htmlelement: true,
-        //     content: true,
-        //     button: true
-        //   }
-        // },
-        // advanced: {
-        //   title: 'Advanced',
-        //   weight: 10,
-        //   components: {
-        //     email: true,
-        //     phoneNumber: true,
-        //     address: true,
-        //     datetime: true,
-        //     day: true,
-        //     time: true,
-        //     currency: true,
-        //     resource: true,
-        //     signature: true,
-        //     tags: true,
-        //     survey: true
-        //   }
-        // },
-        // layout: {
-        //   title: 'Layout',
-        //   weight: 20,
-        //   components: {
-        //     columns: true,
-        //     fieldset: true,
-        //     panel: true,
-        //     tabs: true,
-        //     table: true,
-        //     well: true
-        //   }
-        // },
-        // data: {
-        //   title: 'Data',
-        //   weight: 30,
-        //   components: {
-        //     hidden: true,
-        //     container: true,
-        //     datagrid: true,
-        //     editgrid: true
-        //   }
-        // },
-        // premium: {
-        //   title: 'Premium',
-        //   weight: 40,
-        //   components: {
-        //     file: true,
-        //     form: true,
-        //     unknown: true
-        //   }
-        // }
-      }
+      builder: {}
     };
 
     $scope.formio.loadForms({params: {
