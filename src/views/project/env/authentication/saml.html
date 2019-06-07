@@ -1,18 +1,34 @@
 <upgrade-warning ng-if="!minPlan('team') && projectSettingsVisible()" warning="Upgrade your project to team pro or above to configure SAML settings."></upgrade-warning>
 <h2>SAML</h2>
-<div class="form-group">
-  <label for="saml_idp">Identity Provider XML</label>
-  <textarea ng-model="currentProject.settings.saml.idp" class="form-control" rows="5" id="saml_idp" placeholder="&lt;EntityDescriptor&#10; xmlns:md=&#34;urn:oasis:names:tc:SAML:2.0:metadata&#34;&#10; xmlns:saml=&#34;urn:oasis:names:tc:SAML:2.0:assertion&#34;&#10; xmlns:ds=&#34;http://www.w3.org/2000/09/xmldsig#&#34;&#10; entityID=&#34;http://localhost:3000/sso/metadata&#34;&gt;&#10;    &lt;SPSSODescriptor WantAssertionsSigned=&#34;true&#34; protocolSupportEnumeration=&#34;urn:oasis:names:tc:SAML:2.0:protocol&#34;&gt;&#10;        &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&lt;/NameIDFormat&gt;&#10;        &lt;AssertionConsumerService isDefault=&#34;true&#34; index=&#34;0&#34; Binding=&#34;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&#34; Location=&#34;http://localhost:3000/sso/acs&#34;/&gt;&#10;    &lt;/SPSSODescriptor&gt;&#10;&lt;/EntityDescriptor&gt;"></textarea>
-</div>
-<div class="form-group">
-  <label for="issuer">Issuer</label>
-  <input ng-model="currentProject.settings.saml.issuer" type="text" class="form-control" id="issuer" name="issuer" placeholder="onelogin_saml">
-  <div class="help-block">The SAML issuer.</div>
-</div>
-<div class="form-group">
-  <label for="callbackUrl">Callback Url</label>
-  <input ng-model="currentProject.settings.saml.callbackUrl" type="text" class="form-control" id="callbackUrl" name="callbackUrl" placeholder="http://myserver.com/myendpoint">
-  <div class="help-block">The redirect callback for after authentication.</div>
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" ng-class="{'active': (!samlConfig || (samlConfig === 'xml'))}"><a ng-click="samlConfig = 'xml'"aria-controls="home" role="tab">Service Provider XML</a></li>
+  <li role="presentation" ng-class="{'active': (samlConfig === 'passport')}"><a ng-click="samlConfig = 'passport'" aria-controls="profile" role="tab">Passport Config</a></li>
+</ul>
+<div class="panel panel-default" style="margin-top: -1px;">
+  <div class="panel-body">
+    <div ng-if="!samlConfig || (samlConfig === 'xml')">
+      <div class="form-group">
+        <p>This is the XML metadata of a SAML Service Provider. If your provider does not provide this XML, then it can be generated using the <a href="https://www.samltool.com/sp_metadata.php" target="_blank">Online Service Provider XML Generator</a></p>
+        <textarea ng-model="currentProject.settings.saml.idp" class="form-control" rows="5" id="saml_idp" placeholder="&lt;EntityDescriptor&#10; xmlns:md=&#34;urn:oasis:names:tc:SAML:2.0:metadata&#34;&#10; xmlns:saml=&#34;urn:oasis:names:tc:SAML:2.0:assertion&#34;&#10; xmlns:ds=&#34;http://www.w3.org/2000/09/xmldsig#&#34;&#10; entityID=&#34;http://localhost:3000/sso/metadata&#34;&gt;&#10;    &lt;SPSSODescriptor WantAssertionsSigned=&#34;true&#34; protocolSupportEnumeration=&#34;urn:oasis:names:tc:SAML:2.0:protocol&#34;&gt;&#10;        &lt;NameIDFormat&gt;urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&lt;/NameIDFormat&gt;&#10;        &lt;AssertionConsumerService isDefault=&#34;true&#34; index=&#34;0&#34; Binding=&#34;urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST&#34; Location=&#34;http://localhost:3000/sso/acs&#34;/&gt;&#10;    &lt;/SPSSODescriptor&gt;&#10;&lt;/EntityDescriptor&gt;"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="issuer">Issuer</label>
+        <input ng-model="currentProject.settings.saml.issuer" type="text" class="form-control" id="issuer" name="issuer" placeholder="onelogin_saml">
+        <div class="help-block">The SAML issuer.</div>
+      </div>
+      <div class="form-group">
+        <label for="callbackUrl">Callback Url</label>
+        <input ng-model="currentProject.settings.saml.callbackUrl" type="text" class="form-control" id="callbackUrl" name="callbackUrl" placeholder="http://myserver.com/myendpoint">
+        <div class="help-block">The redirect callback for after authentication.</div>
+      </div>
+    </div>
+    <div ng-if="samlConfig === 'passport'">
+      <div class="form-group">
+        <p>This is the JSON configuration used to pass directly to the SAML Passport Configuration. For an example of how this is configured, please go to  <a href="https://github.com/bergie/passport-saml#config-parameter-details" target="_blank">SAML Passport Configuration Documentation</a></p>
+        <textarea ng-model="currentProject.settings.saml.passport" class="form-control" rows="5" id="saml_passport" placeholder="{{ exampleJSON }}"></textarea>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="form-group">
   <label for="idPath">Query Parameters</label>
