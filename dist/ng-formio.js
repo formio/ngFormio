@@ -21778,13 +21778,9 @@ function (_Element) {
 
       formParam = formParam || this.form;
 
-      if (this.instance) {
-        this.instance.destroy();
-      }
-
       if (typeof formParam === 'string') {
         return new _Formio.default(formParam).loadForm().then(function (form) {
-          _this2.instance = _this2.create(form.display);
+          _this2.instance = _this2.instance || _this2.create(form.display);
           _this2.instance.url = formParam;
           _this2.instance.nosubmit = false;
           _this2._form = _this2.instance.form = form;
@@ -21795,7 +21791,7 @@ function (_Element) {
           });
         });
       } else {
-        this.instance = this.create(formParam.display);
+        this.instance = this.instance || this.create(formParam.display);
         this._form = this.instance.form = formParam;
         return this.instance.ready;
       }
@@ -21817,8 +21813,13 @@ function (_Element) {
      */
     value: function setDisplay(display) {
       this.form.display = display;
-      this.setForm(this.form);
-      return this.build();
+
+      if (this.instance && this.instance.form.display !== display) {
+        this.instance.destroy();
+        this.instance = this.create(display);
+      }
+
+      return this.setForm(this.form);
     }
   }, {
     key: "empty",
@@ -25310,12 +25311,21 @@ function (_NestedComponent) {
         webform: 'single'
       });
       var childPromise = this.attachComponents(this.refs.webform);
-      this.refs.webform.addEventListener('keydown', this.executeShortcuts.bind(this));
+      this.element.addEventListener('keydown', this.executeShortcuts.bind(this));
       this.currentForm = this;
       setTimeout(function () {
         return _this11.emit('render');
       }, 1);
       return childPromise;
+    }
+  }, {
+    key: "detach",
+    value: function detach() {
+      if (this.element) {
+        this.element.removeEventListener('keydown', this.executeShortcuts.bind(this));
+      }
+
+      return _get(_getPrototypeOf(Webform.prototype), "detach", this).call(this);
     }
   }, {
     key: "resetValue",
@@ -26000,7 +26010,7 @@ Webform.setAppUrl = _Formio.default.setAppUrl;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function($) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26042,6 +26052,8 @@ var _dragula = _interopRequireDefault(__webpack_require__(/*! dragula */ "./node
 var _tooltip = _interopRequireDefault(__webpack_require__(/*! tooltip.js */ "./node_modules/tooltip.js/dist/esm/tooltip.js"));
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js"));
+
+var _utils = __webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 var _formUtils = __webpack_require__(/*! ./utils/formUtils */ "./node_modules/formiojs/utils/formUtils.js");
 
@@ -26131,15 +26143,25 @@ function (_Component) {
     _this.groups = {};
     _this.groupOrder = [];
 
-    for (var group in _this.builder) {
+    var _loop = function _loop(group) {
       if (_this.builder[group]) {
         _this.builder[group].key = group;
         _this.groups[group] = _this.builder[group];
         _this.groups[group].components = _this.groups[group].components || {};
         _this.groups[group].componentOrder = _this.groups[group].componentOrder || [];
+        _this.groups[group].subgroups = Object.keys(_this.groups[group].groups || {}).map(function (groupKey) {
+          _this.groups[group].groups[groupKey].componentOrder = Object.keys(_this.groups[group].groups[groupKey].components).map(function (key) {
+            return key;
+          });
+          return _this.groups[group].groups[groupKey];
+        });
 
         _this.groupOrder.push(_this.groups[group]);
       }
+    };
+
+    for (var group in _this.builder) {
+      _loop(group);
     }
 
     _this.groupOrder = _this.groupOrder.filter(function (group) {
@@ -26165,8 +26187,8 @@ function (_Component) {
     // Add the components in each group.
 
 
-    for (var _group in _this.groups) {
-      var info = _this.groups[_group];
+    for (var group in _this.groups) {
+      var info = _this.groups[group];
 
       for (var key in info.components) {
         var comp = info.components[key];
@@ -26183,10 +26205,10 @@ function (_Component) {
     } // Need to create a component order for each group.
 
 
-    var _loop = function _loop(_group2) {
-      if (_this.groups[_group2] && _this.groups[_group2].components) {
-        _this.groups[_group2].componentOrder = Object.keys(_this.groups[_group2].components).map(function (key) {
-          return _this.groups[_group2].components[key];
+    var _loop2 = function _loop2(_group) {
+      if (_this.groups[_group] && _this.groups[_group].components) {
+        _this.groups[_group].componentOrder = Object.keys(_this.groups[_group].components).map(function (key) {
+          return _this.groups[_group].components[key];
         }).filter(function (component) {
           return component && !component.ignore;
         }).sort(function (a, b) {
@@ -26197,8 +26219,8 @@ function (_Component) {
       }
     };
 
-    for (var _group2 in _this.groups) {
-      _loop(_group2);
+    for (var _group in _this.groups) {
+      _loop2(_group);
     }
 
     _this.options.hooks = _this.options.hooks || {};
@@ -26397,11 +26419,28 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       return this.renderTemplate('builder', {
         sidebar: this.renderTemplate('builderSidebar', {
           scrollEnabled: this.sideBarScroll,
           groupOrder: this.groupOrder,
-          groups: this.groups
+          groupId: "builder-sidebar-".concat(this.id),
+          groups: this.groupOrder.map(function (groupKey) {
+            return _this2.renderTemplate('builderSidebarGroup', {
+              group: _this2.groups[groupKey],
+              groupKey: groupKey,
+              groupId: "builder-sidebar-".concat(_this2.id),
+              subgroups: _this2.groups[groupKey].subgroups.map(function (group) {
+                return _this2.renderTemplate('builderSidebarGroup', {
+                  group: group,
+                  groupKey: group.key,
+                  groupId: "builder-sidebar-".concat(groupKey),
+                  subgroups: []
+                });
+              })
+            });
+          })
         }),
         form: this.webform.render()
       });
@@ -26409,7 +26448,7 @@ function (_Component) {
   }, {
     key: "attach",
     value: function attach(element) {
-      var _this2 = this;
+      var _this3 = this;
 
       _get(_getPrototypeOf(WebformBuilder.prototype), "attach", this).call(this, element);
 
@@ -26424,20 +26463,17 @@ function (_Component) {
 
       if (this.sideBarScroll && _Templates.default.current.handleBuilderSidebarScroll) {
         _Templates.default.current.handleBuilderSidebarScroll.call(this, this);
-      } // See if we have bootstrap.js installed.
+      }
 
-
-      var hasBootstrapJS = typeof $ === 'function' && typeof $().collapse === 'function';
-
-      if (!hasBootstrapJS) {
+      if (!(0, _utils.bootstrapVersion)(this.options)) {
         // Initialize
         this.refs['sidebar-group'].forEach(function (group) {
           group.style.display = group.getAttribute('data-default') === 'true' ? 'inherit' : 'none';
         }); // Click event
 
         this.refs['sidebar-anchor'].forEach(function (anchor, index) {
-          _this2.addEventListener(anchor, 'click', function () {
-            _this2.refs['sidebar-group'].forEach(function (group, groupIndex) {
+          _this3.addEventListener(anchor, 'click', function () {
+            _this3.refs['sidebar-group'].forEach(function (group, groupIndex) {
               group.style.display = groupIndex === index ? 'inherit' : 'none';
             });
           }, true);
@@ -26472,7 +26508,7 @@ function (_Component) {
           return !el.contains(target) && !target.classList.contains('no-drop');
         }
       }).on('drop', function (element, target, source, sibling) {
-        return _this2.onDrop(element, target, source, sibling);
+        return _this3.onDrop(element, target, source, sibling);
       });
       return this.webform.attach(this.refs.form);
     }
@@ -26578,7 +26614,7 @@ function (_Component) {
   }, {
     key: "setForm",
     value: function setForm(form) {
-      var _this3 = this;
+      var _this4 = this;
 
       //populate isEnabled for recaptcha form settings
       var isRecaptchaEnabled = false;
@@ -26605,7 +26641,7 @@ function (_Component) {
       this.emit('change', form);
       return _get(_getPrototypeOf(WebformBuilder.prototype), "setForm", this).call(this, form).then(function (retVal) {
         setTimeout(function () {
-          return _this3.builderHeight = _this3.refs.form.offsetHeight;
+          return _this4.builderHeight = _this4.refs.form.offsetHeight;
         }, 200);
         return retVal;
       });
@@ -26656,7 +26692,7 @@ function (_Component) {
   }, {
     key: "editComponent",
     value: function editComponent(component, parent, isNew) {
-      var _this4 = this;
+      var _this5 = this;
 
       if (!component.key) {
         return;
@@ -26742,7 +26778,7 @@ function (_Component) {
             // Ensure this component has a key.
             if (isNew) {
               if (!event.data.keyModified) {
-                _this4.editForm.everyComponent(function (component) {
+                _this5.editForm.everyComponent(function (component) {
                   if (component.key === 'key' && component.parent.component.key === 'tabs') {
                     component.setValue(_lodash.default.camelCase(event.data.label || event.data.placeholder || event.data.type));
                     return false;
@@ -26750,74 +26786,74 @@ function (_Component) {
                 });
               }
 
-              if (_this4._form) {
+              if (_this5._form) {
                 // Set a unique key for this component.
-                _builder.default.uniquify(_this4._form.components, event.data);
+                _builder.default.uniquify(_this5._form.components, event.data);
               }
             }
           } // Update the component.
 
 
-          _this4.updateComponent(event.data);
+          _this5.updateComponent(event.data);
         }
       });
       this.addEventListener(this.componentEdit.querySelector('[ref="cancelButton"]'), 'click', function (event) {
         event.preventDefault();
 
-        _this4.editForm.detach();
+        _this5.editForm.detach();
 
-        _this4.emit('cancelComponent', component);
+        _this5.emit('cancelComponent', component);
 
-        _this4.dialog.close();
+        _this5.dialog.close();
       });
       this.addEventListener(this.componentEdit.querySelector('[ref="removeButton"]'), 'click', function (event) {
         event.preventDefault(); // Since we are already removing the component, don't trigger another remove.
 
         saved = true;
 
-        _this4.editForm.detach();
+        _this5.editForm.detach();
 
-        _this4.removeComponent(component, parent);
+        _this5.removeComponent(component, parent);
 
-        _this4.dialog.close();
+        _this5.dialog.close();
       });
       this.addEventListener(this.componentEdit.querySelector('[ref="saveButton"]'), 'click', function (event) {
-        if (!_this4.editForm.checkValidity(_this4.editForm.data, true)) {
+        if (!_this5.editForm.checkValidity(_this5.editForm.data, true)) {
           return;
         }
 
         event.preventDefault();
         saved = true;
 
-        _this4.editForm.detach();
+        _this5.editForm.detach();
 
-        var parentContainer = parent ? parent.formioContainer : _this4.container;
-        var parentComponent = parent ? parent.formioComponent : _this4;
+        var parentContainer = parent ? parent.formioContainer : _this5.container;
+        var parentComponent = parent ? parent.formioComponent : _this5;
         var index = parentContainer.indexOf(component);
 
-        _this4.dialog.close();
+        _this5.dialog.close();
 
         if (index !== -1) {
           var originalComponent = parentContainer[index];
-          parentContainer[index] = _this4.editForm.submission.data;
+          parentContainer[index] = _this5.editForm.submission.data;
           parentComponent.rebuild();
 
-          _this4.emit('saveComponent', component, originalComponent);
+          _this5.emit('saveComponent', component, originalComponent);
         }
       });
       this.addEventListener(this.dialog, 'close', function () {
-        _this4.editForm.detach();
+        _this5.editForm.detach();
 
-        _this4.preview.destroy();
+        _this5.preview.destroy();
 
         if (isNew && !saved) {
-          _this4.removeComponent(component, parent);
+          _this5.removeComponent(component, parent);
         } // Clean up.
 
 
-        _this4.removeEventListener(_this4.dialog, 'close');
+        _this5.removeEventListener(_this5.dialog, 'close');
 
-        _this4.dialog = null;
+        _this5.dialog = null;
       }); // Called when we edit a component.
 
       this.emit('editComponent', component);
@@ -26908,24 +26944,24 @@ function (_Component) {
     get: function get() {
       return {
         basic: {
-          title: 'Standard',
+          title: 'Basic',
           weight: 0,
           default: true
         },
-        common: {
-          title: 'Common',
+        advanced: {
+          title: 'Advanced',
           weight: 10
         },
         layout: {
           title: 'Layout',
           weight: 20
         },
-        advanced: {
-          title: 'Advanced',
-          weight: 30
-        },
         data: {
           title: 'Data',
+          weight: 30
+        },
+        premium: {
+          title: 'Premium',
           weight: 40
         }
       };
@@ -26973,7 +27009,6 @@ function (_Component) {
 }(_Component2.default);
 
 exports.default = WebformBuilder;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
 
 /***/ }),
 
@@ -27092,7 +27127,7 @@ function (_Webform) {
       options = arguments[0];
     }
 
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(Wizard).call(this, null, options));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Wizard).call(this, element, options));
     _this.panels = [];
     _this.pages = [];
     _this.globalComponents = [];
@@ -28933,6 +28968,12 @@ function (_Element) {
 
     _this.error = '';
     /**
+     * Tool tip text after processing
+     * @type {string}
+     */
+
+    _this.tooltip = '';
+    /**
      * The row path of this component.
      * @type {number}
      */
@@ -29285,7 +29326,7 @@ function (_Element) {
       data.builder = this.options.attachMode === 'builder'; // Allow more specific template names
 
       var names = ["".concat(name, "-").concat(this.component.type, "-").concat(this.key), "".concat(name, "-").concat(this.component.type), "".concat(name, "-").concat(this.key), "".concat(name)]; // Allow template alters.
-      // console.log(`render${name.charAt(0).toUpperCase() + name.substring(1, name.length)}`);
+      // console.log(`render${name.charAt(0).toUpperCase() + name.substring(1, name.length)}`, data);
 
       return this.hook("render".concat(name.charAt(0).toUpperCase() + name.substring(1, name.length)), this.interpolate(this.getTemplate(names, mode), data), data, mode);
     }
@@ -29438,13 +29479,13 @@ function (_Element) {
         tooltip: 'multiple'
       });
       this.refs.tooltip.forEach(function (tooltip, index) {
-        var title = _this4.interpolate(tooltip.getAttribute('data-title') || _this4.component.tooltip);
+        var title = _this4.interpolate(tooltip.getAttribute('data-title') || _this4.component.tooltip).replace(/(?:\r\n|\r|\n)/g, '<br />');
 
         _this4.tooltips[index] = new _tooltip.default(tooltip, {
           trigger: 'hover click',
           placement: 'right',
           html: true,
-          title: title.replace(/(?:\r\n|\r|\n)/g, '<br />')
+          title: title
         });
       }); // Attach logic.
 
@@ -34356,7 +34397,7 @@ function (_TextFieldComponent) {
     get: function get() {
       return {
         title: 'Address',
-        group: 'common',
+        group: 'advanced',
         icon: 'home',
         documentation: 'http://help.form.io/userguide/#address',
         weight: 35,
@@ -35786,9 +35827,6 @@ var _default = [{
   key: 'placeholder',
   ignore: true
 }, {
-  key: 'description',
-  ignore: true
-}, {
   type: 'select',
   input: true,
   weight: 350,
@@ -35873,104 +35911,6 @@ var _default = [{
   ignore: true
 }];
 exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/components/columns/Column.js":
-/*!************************************************************!*\
-  !*** ./node_modules/formiojs/components/columns/Column.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-__webpack_require__(/*! core-js/modules/es7.symbol.async-iterator */ "./node_modules/core-js/modules/es7.symbol.async-iterator.js");
-
-__webpack_require__(/*! core-js/modules/es6.symbol */ "./node_modules/core-js/modules/es6.symbol.js");
-
-__webpack_require__(/*! core-js/modules/es6.reflect.get */ "./node_modules/core-js/modules/es6.reflect.get.js");
-
-var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/nested/NestedComponent */ "./node_modules/formiojs/components/_classes/nested/NestedComponent.js"));
-
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var ColumnComponent =
-/*#__PURE__*/
-function (_NestedComponent) {
-  _inherits(ColumnComponent, _NestedComponent);
-
-  function ColumnComponent(component, options, data) {
-    var _this;
-
-    _classCallCheck(this, ColumnComponent);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(ColumnComponent).call(this, component, options, data));
-    _this.noEdit = true;
-    _this.noField = true;
-    return _this;
-  }
-
-  _createClass(ColumnComponent, [{
-    key: "conditionallyVisible",
-    value: function conditionallyVisible(data) {
-      if (!this.component.hideOnChildrenHidden) {
-        return _get(_getPrototypeOf(ColumnComponent.prototype), "conditionallyVisible", this).call(this, data);
-      } // Check children components for visibility.
-
-
-      if (_lodash.default.every(this.getComponents(), ['visible', false])) {
-        return false;
-      }
-
-      return _get(_getPrototypeOf(ColumnComponent.prototype), "conditionallyVisible", this).call(this, data);
-    }
-  }, {
-    key: "className",
-    get: function get() {
-      var comp = this.component;
-      var width = " col-sm-".concat(comp.width ? comp.width : 6);
-      var offset = " col-sm-offset-".concat(comp.offset ? comp.offset : 0);
-      var push = " col-sm-push-".concat(comp.push ? comp.push : 0);
-      var pull = " col-sm-pull-".concat(comp.pull ? comp.pull : 0);
-      return "col".concat(width).concat(offset).concat(push).concat(pull);
-    }
-  }]);
-
-  return ColumnComponent;
-}(_NestedComponent2.default);
-
-exports.default = ColumnComponent;
 
 /***/ }),
 
@@ -36108,6 +36048,7 @@ function (_NestedComponent) {
         input: false,
         tableView: false,
         persistent: false,
+        autoAdjust: false,
         hideOnChildrenHidden: false
       }].concat(extend));
     }
@@ -36191,12 +36132,38 @@ function (_NestedComponent) {
       });
     }
   }, {
-    key: "groupByRow",
+    key: "justifyRow",
+    value: function justifyRow(columns) {
+      var visible = _lodash.default.filter(columns, 'visible');
 
+      var nbColumns = columns.length;
+      var nbVisible = visible.length;
+
+      if (nbColumns > 0 && nbVisible > 0) {
+        var w = Math.floor(this.gridSize / nbVisible);
+        var totalWidth = w * nbVisible;
+        var span = this.gridSize - totalWidth;
+
+        _lodash.default.each(visible, function (column) {
+          column.component.width = w;
+        }); // In case when row is not fully filled,
+        // extending last col to fill empty space.
+
+
+        _lodash.default.last(visible).component.width += span;
+
+        _lodash.default.each(visible, function (col) {
+          col.element.setAttribute('class', col.className);
+        });
+      }
+    }
     /**
      * Group columns in rows.
      * @return {Array.<ColumnComponent[]>}
      */
+
+  }, {
+    key: "groupByRow",
     value: function groupByRow() {
       var _this5 = this;
 
@@ -36223,6 +36190,23 @@ function (_NestedComponent) {
       }, initVal);
 
       return _lodash.default.concat(result.rows, [result.stack]);
+    }
+  }, {
+    key: "justify",
+    value: function justify() {
+      _lodash.default.each(this.columns, this.justifyRow.bind(this));
+    }
+  }, {
+    key: "checkConditions",
+    value: function checkConditions(data) {
+      if (this.component.autoAdjust) {
+        var result = _get(_getPrototypeOf(ColumnsComponent.prototype), "checkConditions", this).call(this, data);
+
+        this.justify();
+        return result;
+      } else {
+        return _get(_getPrototypeOf(ColumnsComponent.prototype), "checkConditions", this).call(this, data);
+      }
     }
   }, {
     key: "detach",
@@ -36298,6 +36282,9 @@ var _default = [{
   key: 'tabindex',
   ignore: true
 }, {
+  key: 'disabled',
+  ignore: true
+}, {
   weight: 150,
   type: 'datagrid',
   input: true,
@@ -36331,6 +36318,13 @@ var _default = [{
     defaultValue: 0,
     label: 'Pull'
   }]
+}, {
+  weight: 160,
+  type: 'checkbox',
+  label: 'Auto adjust columns',
+  tooltip: 'Will automatically adjust columns based on if nested components are hidden.',
+  key: 'autoAdjust',
+  input: true
 }, {
   weight: 161,
   type: 'checkbox',
@@ -37070,7 +37064,7 @@ function (_NumberComponent) {
     get: function get() {
       return {
         title: 'Currency',
-        group: 'common',
+        group: 'advanced',
         icon: 'usd',
         documentation: 'http://help.form.io/userguide/#currency',
         weight: 70,
@@ -37723,6 +37717,12 @@ var _default = [{
   ignore: true
 }, {
   key: 'allowMultipleMasks',
+  ignore: true
+}, {
+  key: 'showWordCount',
+  ignore: true
+}, {
+  key: 'showCharCount',
   ignore: true
 }, {
   type: 'textfield',
@@ -39231,7 +39231,7 @@ function (_Input) {
     get: function get() {
       return {
         title: 'Date / Time',
-        group: 'common',
+        group: 'advanced',
         icon: 'calendar',
         documentation: 'http://help.form.io/userguide/#datetime',
         weight: 40,
@@ -40309,7 +40309,7 @@ function (_Field) {
     get: function get() {
       return {
         title: 'Day',
-        group: 'common',
+        group: 'advanced',
         icon: 'calendar',
         documentation: 'http://help.form.io/userguide/#day',
         weight: 50,
@@ -40777,7 +40777,7 @@ function (_NestedComponent) {
         icon: 'tasks',
         group: 'data',
         documentation: 'http://help.form.io/userguide/#editgrid',
-        weight: 40,
+        weight: 30,
         schema: EditGridComponent.schema()
       };
     }
@@ -41524,6 +41524,15 @@ function _default() {
   return _TextField.default.apply(void 0, [[{
     key: 'display',
     components: _EmailEdit.default
+  }, {
+    key: 'validation',
+    components: [{
+      key: 'validate.minWords',
+      ignore: true
+    }, {
+      key: 'validate.maxWords',
+      ignore: true
+    }]
   }]].concat(extend));
 }
 
@@ -41629,7 +41638,7 @@ function (_TextFieldComponent) {
     get: function get() {
       return {
         title: 'Email',
-        group: 'common',
+        group: 'advanced',
         icon: 'at',
         documentation: 'http://help.form.io/userguide/#email',
         weight: 10,
@@ -41669,6 +41678,12 @@ var _default = [{
   ignore: true
 }, {
   key: 'allowMultipleMasks',
+  ignore: true
+}, {
+  key: 'showWordCount',
+  ignore: true
+}, {
+  key: 'showCharCount',
   ignore: true
 }];
 exports.default = _default;
@@ -42300,8 +42315,6 @@ function (_Field) {
 
         if (loadingImages.length) {
           Promise.all(loadingImages).then(function () {
-            _this4.redraw();
-
             _this4.filesReadyResolve();
           }).catch(function () {
             return _this4.filesReadyReject();
@@ -42629,7 +42642,7 @@ function (_Field) {
     get: function get() {
       return {
         title: 'File',
-        group: 'advanced',
+        group: 'premium',
         icon: 'file',
         documentation: 'http://help.form.io/userguide/#file',
         weight: 100,
@@ -43587,7 +43600,7 @@ function (_Component) {
       return {
         title: 'Nested Form',
         icon: 'wpforms',
-        group: 'advanced',
+        group: 'premium',
         documentation: 'http://help.form.io/userguide/#form',
         weight: 110,
         schema: FormComponent.schema()
@@ -44420,8 +44433,6 @@ var _Password = _interopRequireDefault(__webpack_require__(/*! ./password/Passwo
 
 var _Panel = _interopRequireDefault(__webpack_require__(/*! ./panel/Panel */ "./node_modules/formiojs/components/panel/Panel.js"));
 
-var _Column = _interopRequireDefault(__webpack_require__(/*! ./columns/Column */ "./node_modules/formiojs/components/columns/Column.js"));
-
 var _Columns = _interopRequireDefault(__webpack_require__(/*! ./columns/Columns */ "./node_modules/formiojs/components/columns/Columns.js"));
 
 var _Table = _interopRequireDefault(__webpack_require__(/*! ./table/Table */ "./node_modules/formiojs/components/table/Table.js"));
@@ -44478,7 +44489,6 @@ var _default = {
   password: _Password.default,
   panel: _Panel.default,
   tabs: _Tabs.default,
-  column: _Column.default,
   columns: _Columns.default,
   table: _Table.default,
   radio: _Radio.default,
@@ -45611,6 +45621,15 @@ function _default() {
   }
 
   return _TextField.default.apply(void 0, [[{
+    key: 'display',
+    components: [{
+      key: 'showWordCount',
+      ignore: true
+    }, {
+      key: 'showCharCount',
+      ignore: true
+    }]
+  }, {
     key: 'validation',
     components: _PhoneNumberEdit.default
   }]].concat(extend));
@@ -45695,7 +45714,7 @@ function (_TextFieldComponent) {
     get: function get() {
       return {
         title: 'Phone Number',
-        group: 'common',
+        group: 'advanced',
         icon: 'phone-square',
         weight: 30,
         documentation: 'http://help.form.io/userguide/#phonenumber',
@@ -45733,6 +45752,12 @@ var _default = [{
   ignore: true
 }, {
   key: 'validate.pattern',
+  ignore: true
+}, {
+  key: 'validate.minWords',
+  ignore: true
+}, {
+  key: 'validate.maxWords',
   ignore: true
 }];
 exports.default = _default;
@@ -46038,6 +46063,9 @@ var _builder = _interopRequireDefault(__webpack_require__(/*! ../../../utils/bui
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var _default = [{
+  key: 'multiple',
+  ignore: true
+}, {
   type: 'datagrid',
   input: true,
   label: 'Values',
@@ -46103,11 +46131,10 @@ var _builder = _interopRequireDefault(__webpack_require__(/*! ../../../utils/bui
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _default = [// {
-  //   key: 'labelPosition',
-  //   ignore: fal
-  // },
-];
+var _default = [{
+  key: 'placeholder',
+  ignore: true
+}];
 exports.default = _default;
 
 /***/ }),
@@ -46351,7 +46378,7 @@ function (_Component) {
     get: function get() {
       return {
         title: 'reCAPTCHA',
-        group: 'advanced',
+        group: 'premium',
         icon: 'refresh',
         documentation: 'http://help.form.io/userguide/#recaptcha',
         weight: 40,
@@ -46589,7 +46616,7 @@ function (_SelectComponent) {
     get: function get() {
       return {
         title: 'Resource',
-        group: 'advanced',
+        group: 'premium',
         icon: 'files-o',
         weight: 90,
         documentation: 'http://help.form.io/userguide/#resource',
@@ -49161,7 +49188,7 @@ function (_Input) {
     get: function get() {
       return {
         title: 'Signature',
-        group: 'common',
+        group: 'advanced',
         icon: 'pencil',
         weight: 120,
         documentation: 'http://help.form.io/userguide/#signature',
@@ -49514,7 +49541,7 @@ function (_Field) {
         title: 'Survey',
         group: 'advanced',
         icon: 'list',
-        weight: 20,
+        weight: 110,
         documentation: 'http://help.form.io/userguide/#survey',
         schema: SurveyComponent.schema()
       };
@@ -49987,6 +50014,9 @@ var _default = [{
   key: 'tabindex',
   ignore: true
 }, {
+  key: 'disabled',
+  ignore: true
+}, {
   type: 'number',
   label: 'Number of Rows',
   key: 'numRows',
@@ -50368,6 +50398,9 @@ var _default = [{
   ignore: true
 }, {
   key: 'tabindex',
+  ignore: true
+}, {
+  key: 'disabled',
   ignore: true
 }, {
   key: 'components',
@@ -51959,6 +51992,31 @@ var _default = [{
     input: true
   }]
 }, {
+  weight: 413,
+  type: 'checkbox',
+  input: true,
+  key: 'allowMultipleMasks',
+  label: 'Allow Multiple Masks'
+}, {
+  weight: 417,
+  type: 'datagrid',
+  input: true,
+  key: 'inputMasks',
+  label: 'Input Masks',
+  customConditional: 'show = data.allowMultipleMasks === true;',
+  reorder: true,
+  components: [{
+    type: 'textfield',
+    key: 'label',
+    label: 'Label',
+    input: true
+  }, {
+    type: 'textfield',
+    key: 'mask',
+    label: 'Mask',
+    input: true
+  }]
+}, {
   weight: 320,
   type: 'textfield',
   input: true,
@@ -52236,7 +52294,7 @@ function (_TextFieldComponent) {
       return {
         title: 'Time',
         icon: 'clock-o',
-        group: 'common',
+        group: 'advanced',
         documentation: 'http://help.form.io/userguide/#time',
         weight: 55,
         schema: TimeComponent.schema()
@@ -52658,7 +52716,7 @@ function (_NestedComponent) {
         title: 'Tree',
         icon: 'indent',
         group: 'data',
-        weight: 30,
+        weight: 40,
         schema: TreeComponent.schema()
       };
     }
@@ -53274,7 +53332,7 @@ function (_Component) {
       return {
         title: 'Custom',
         icon: 'cubes',
-        group: 'advanced',
+        group: 'premium',
         documentation: 'https://help.form.io/userguide/form-components/#custom',
         weight: 120,
         schema: UnknownComponent.schema()
@@ -53396,7 +53454,7 @@ function (_TextFieldComponent) {
     get: function get() {
       return {
         title: 'Url',
-        group: 'common',
+        group: 'advanced',
         icon: 'link',
         documentation: 'http://help.form.io/userguide/#url',
         weight: 20,
@@ -54644,7 +54702,31 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div id=\"builder-sidebar-{{id}}\" class=\"accordion builder-sidebar{{scrollEnabled ? ' builder-sidebar_scroll' : ''}}\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"card form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"card-header form-builder-group-header\" id=\"heading-{{groupKey}}\">\n      <h5 class=\"mb-0\">\n        <button\n          class=\"btn btn-block btn-default builder-group-button\"\n          data-toggle=\"collapse\"\n          data-target=\"#group-{{groupKey}}\"\n          aria-expanded=\"{{groups[groupKey].default}}\"\n          aria-controls=\"group-{{groupKey}}\"\n          ref=\"sidebar-anchor\"\n        >\n          {{groups[groupKey].title}}\n        </button>\n      </h5>\n    </div>\n    <div\n      id=\"group-{{groupKey}}\"\n      class=\"collapse {{groups[groupKey].default ? ' show' : ''}}\"\n      data-parent=\"#builder-sidebar-{{id}}\"\n      data-default=\"{{groups[groupKey].default}}\"\n      aria-labelledby=\"heading-{{groupKey}}\"\n      ref=\"sidebar-group\"\n    >\n      <div id=\"group-container-{{groupKey}}\" class=\"card-body no-drop p-2\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-sm btn-block formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div id=\"{{groupId}}\" class=\"accordion builder-sidebar{{scrollEnabled ? ' builder-sidebar_scroll' : ''}}\" ref=\"sidebar\">\n  {% groups.forEach(function(group) { %}\n  {{ group }}\n  {% }) %}\n</div>\n";
+var _default = {
+  form: form
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/templates/bootstrap/builderSidebarGroup/index.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/formiojs/templates/bootstrap/builderSidebarGroup/index.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/* babel-plugin-inline-import './form.hbs' */
+var form = "<div class=\"card form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n  <div class=\"card-header form-builder-group-header\" id=\"heading-{{groupKey}}\">\n    <h5 class=\"mb-0\">\n      <button\n        class=\"btn btn-block btn-default builder-group-button\"\n        data-toggle=\"collapse\"\n        data-target=\"#group-{{groupKey}}\"\n        aria-expanded=\"{{group.default}}\"\n        aria-controls=\"group-{{groupKey}}\"\n        ref=\"sidebar-anchor\"\n      >\n        {{group.title}}\n      </button>\n    </h5>\n  </div>\n  <div\n    id=\"group-{{groupKey}}\"\n    class=\"collapse {{group.default ? ' show' : ''}}\"\n    data-parent=\"{{groupId}}\"\n    data-default=\"{{group.default}}\"\n    aria-labelledby=\"heading-{{groupKey}}\"\n    ref=\"sidebar-group\"\n  >\n    <div id=\"group-container-{{groupKey}}\" class=\"card-body no-drop p-2\" ref=\"sidebar-container\">\n      {% group.componentOrder.forEach(function(componentKey) { %}\n      <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-sm btn-block formcomponent drag-copy\">\n        {% if (group.components[componentKey].icon) { %}\n          <i class=\"{{iconClass(group.components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n        {% } %}\n        {{group.components[componentKey].title}}\n        </span>\n      {% }) %}\n      {{subgroups.join('')}}\n    </div>\n  </div>\n</div>\n";
 var _default = {
   form: form
 };
@@ -55166,6 +55248,8 @@ var _builderPlaceholder = _interopRequireDefault(__webpack_require__(/*! ./build
 
 var _builderSidebar = _interopRequireDefault(__webpack_require__(/*! ./builderSidebar */ "./node_modules/formiojs/templates/bootstrap/builderSidebar/index.js"));
 
+var _builderSidebarGroup = _interopRequireDefault(__webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/formiojs/templates/bootstrap/builderSidebarGroup/index.js"));
+
 var _builderWizard = _interopRequireDefault(__webpack_require__(/*! ./builderWizard */ "./node_modules/formiojs/templates/bootstrap/builderWizard/index.js"));
 
 var _button = _interopRequireDefault(__webpack_require__(/*! ./button */ "./node_modules/formiojs/templates/bootstrap/button/index.js"));
@@ -55272,6 +55356,7 @@ var _default = _objectSpread({
   builderEditForm: _builderEditForm.default,
   builderPlaceholder: _builderPlaceholder.default,
   builderSidebar: _builderSidebar.default,
+  builderSidebarGroup: _builderSidebarGroup.default,
   builderWizard: _builderWizard.default,
   button: _button.default,
   checkbox: _checkbox.default,
@@ -55999,7 +56084,31 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div id=\"builder-sidebar-{{id}}\" class=\"panel-group builder-sidebar{{scrollEnabled ? ' builder-sidebar_scroll' : ''}}\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"panel panel-default form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"panel-heading form-builder-group-header\">\n      <h5 class=\"panel-title\">\n        <button\n          class=\"btn btn-block builder-group-button\"\n          data-toggle=\"collapse\"\n          data-parent=\"#builder-sidebar-{{id}}\"\n          href=\"#group-{{groupKey}}\"\n          ref=\"sidebar-anchor\"\n        >\n          {{groups[groupKey].title}}\n        </button>\n      </h5>\n    </div>\n    <div\n      id=\"group-{{groupKey}}\"\n      class=\"panel-collapse collapse{{groups[groupKey].default ? ' in' : ''}}\"\n      data-default=\"{{groups[groupKey].default}}\"\n      ref=\"sidebar-group\"\n    >\n      <div id=\"group-container-{{groupKey}}\" class=\"panel-body no-drop\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-xs btn-block formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div id=\"{{groupId}}\" class=\"panel-group builder-sidebar{{scrollEnabled ? ' builder-sidebar_scroll' : ''}}\" ref=\"sidebar\">\n  {% groups.forEach(function(group) { %}\n    {{ group }}\n  {% }) %}\n</div>\n";
+var _default = {
+  form: form
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/templates/bootstrap3/builderSidebarGroup/index.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/formiojs/templates/bootstrap3/builderSidebarGroup/index.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/* babel-plugin-inline-import './form.hbs' */
+var form = "<div class=\"panel panel-default form-builder-panel\" ref=\"group-panel-{{groupKey}}\">\n  <div class=\"panel-heading form-builder-group-header\">\n    <h5 class=\"panel-title\">\n      <button\n        class=\"btn btn-block builder-group-button\"\n        data-toggle=\"collapse\"\n        data-parent=\"#{{groupId}}\"\n        href=\"#group-{{groupKey}}\"\n        ref=\"sidebar-anchor\"\n      >\n        {{group.title}}\n      </button>\n    </h5>\n  </div>\n  <div\n    id=\"group-{{groupKey}}\"\n    class=\"panel-collapse collapse{{group.default ? ' in' : ''}}\"\n    data-default=\"{{group.default}}\"\n    ref=\"sidebar-group\"\n  >\n    <div id=\"group-container-{{groupKey}}\" class=\"panel-body no-drop\" ref=\"sidebar-container\">\n      {% group.componentOrder.forEach(function(componentKey) { %}\n      <span data-type=\"{{componentKey}}\" class=\"btn btn-primary btn-xs btn-block formcomponent drag-copy\">\n        {% if (group.components[componentKey].icon) { %}\n          <i class=\"{{iconClass(group.components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n        {% } %}\n        {{group.components[componentKey].title}}\n      </span>\n      {% }) %}\n      {{subgroups.join('')}}\n    </div>\n  </div>\n</div>\n\n";
 var _default = {
   form: form
 };
@@ -56316,6 +56425,8 @@ var _builderPlaceholder = _interopRequireDefault(__webpack_require__(/*! ./build
 
 var _builderSidebar = _interopRequireDefault(__webpack_require__(/*! ./builderSidebar */ "./node_modules/formiojs/templates/bootstrap3/builderSidebar/index.js"));
 
+var _builderSidebarGroup = _interopRequireDefault(__webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/formiojs/templates/bootstrap3/builderSidebarGroup/index.js"));
+
 var _columns = _interopRequireDefault(__webpack_require__(/*! ./columns */ "./node_modules/formiojs/templates/bootstrap3/columns/index.js"));
 
 var _datagrid = _interopRequireDefault(__webpack_require__(/*! ./datagrid */ "./node_modules/formiojs/templates/bootstrap3/datagrid/index.js"));
@@ -56414,6 +56525,7 @@ var _default = {
   builderEditForm: _builderEditForm.default,
   builderPlaceholder: _builderPlaceholder.default,
   builderSidebar: _builderSidebar.default,
+  builderSidebarGroup: _builderSidebarGroup.default,
   columns: _columns.default,
   datagrid: _datagrid.default,
   day: _day.default,
@@ -56994,7 +57106,31 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div id=\"builder-sidebar-{{id}}\" class=\"ui segments\" ref=\"sidebar\">\n  {% groupOrder.forEach(function(groupKey, index) { %}\n  <div class=\"ui segment secondary form-builder-panel\" style=\"padding: 0\" ref=\"group-panel-{{groupKey}}\">\n    <div class=\"form-builder-group-header\">\n      <h5 class=\"panel-title\">\n        <button class=\"ui button basic fluid builder-group-button\" data-toggle=\"collapse\" data-parent=\"#builder-sidebar-{{id}}\" data-target=\"#group-{{groupKey}}\" ref=\"sidebar-anchor\">{{groups[groupKey].title}}</button>\n      </h5>\n    </div>\n  </div>\n  <div class=\"ui segment\" style=\"padding: 0\">\n    <div class=\"panel-collapse collapse {{groups[groupKey].default ? ' in' : ''}}\" data-default=\"{{groups[groupKey].default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n      <div id=\"group-container-{{groupKey}}\" class=\"card-body panel-body no-drop\" ref=\"sidebar-container\">\n        {% groups[groupKey].componentOrder.forEach(function(componentKey) { %}\n        <span data-type=\"{{componentKey}}\" class=\"ui button mini primary fluid formcomponent drag-copy\">\n          <i class=\"{{iconClass(groups[groupKey].components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n          {{groups[groupKey].components[componentKey].title}}\n        </span>\n        {% }) %}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div id=\"builder-sidebar-{{id}}\" class=\"ui segments\" ref=\"sidebar\">\n  {% groups.forEach(function(group) { %}\n    {{ group }}\n  {% }) %}\n</div>\n";
+var _default = {
+  form: form
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/templates/semantic/builderSidebarGroup/index.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/formiojs/templates/semantic/builderSidebarGroup/index.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/* babel-plugin-inline-import './form.hbs' */
+var form = "<div class=\"ui segment secondary form-builder-panel\" style=\"padding: 0\" ref=\"group-panel-{{groupKey}}\">\n  <div class=\"form-builder-group-header\">\n    <h5 class=\"panel-title\">\n      <button\n        class=\"ui button basic fluid builder-group-button\"\n        data-toggle=\"collapse\"\n        data-parent=\"{{groupId}}\"\n        data-target=\"#group-{{groupKey}}\"\n        ref=\"sidebar-anchor\"\n      >\n        {{group.title}}\n      </button>\n    </h5>\n  </div>\n</div>\n<div class=\"ui segment\" style=\"padding: 0\">\n  <div class=\"panel-collapse collapse {{group.default ? ' in' : ''}}\" data-default=\"{{group.default}}\" id=\"group-{{groupKey}}\" ref=\"sidebar-group\">\n    <div id=\"group-container-{{groupKey}}\" class=\"card-body panel-body no-drop\" ref=\"sidebar-container\">\n      {% group.componentOrder.forEach(function(componentKey) { %}\n      <span data-type=\"{{componentKey}}\" class=\"ui button mini primary fluid formcomponent drag-copy\">\n        {% if (group.components[componentKey].icon) { %}\n          <i class=\"{{iconClass(group.components[componentKey].icon)}}\" style=\"margin-right: 5px;\"></i>\n        {% } %}\n        {{group.components[componentKey].title}}\n        </span>\n      {% }) %}\n      {{subgroups.join('')}}\n    </div>\n  </div>\n</div>\n";
 var _default = {
   form: form
 };
@@ -57255,7 +57391,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "{% if (!label.hidden && label.labelPosition !== 'bottom') { %}\n  <label class=\"{{label.className}}\">\n    {% if (!label.hidden) { %}\n      {{ t(component.label) }}\n      {% if (component.tooltip) { %} \n        <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}}\" data-title=\"{{component.tooltip}}\"></i>\n      {% } %}\n    {% } %}  \n  </label>\n{% } %}\n{{element}}\n{% if (!label.hidden && label.labelPosition === 'bottom') { %}\n  <label class=\"{{label.className}}\">\n  {{t(component.label)}}\n  {% if (component.tooltip) { %}\n    <i class=\"{{iconClass('question-sign')}}\"></i>\n  {% } %}\n  </label>\n{% } %}\n{% if (component.description) { %}\n  <div class=\"help-block\">{{t(component.description)}}</div>\n{% } %}\n";
+var form = "{% if (!label.hidden && label.labelPosition !== 'bottom') { %}\n  <label class=\"{{label.className}}\">\n    {% if (!label.hidden) { %}\n      {{ t(component.label) }}\n      {% if (component.tooltip) { %}\n        <span data-tooltip=\"{{tooltip}}\" data-position=\"right center\">\n          <i class=\"{{iconClass('question-sign')}}\"></i>\n        </span>\n      {% } %}\n    {% } %}\n  </label>\n{% } %}\n{{element}}\n{% if (!label.hidden && label.labelPosition === 'bottom') { %}\n  <label class=\"{{label.className}}\">\n  {{t(component.label)}}\n  {% if (component.tooltip) { %}\n    <i class=\"{{iconClass('question-sign')}}\"></i>\n  {% } %}\n  </label>\n{% } %}\n{% if (component.description) { %}\n  <div class=\"help-block\">{{t(component.description)}}</div>\n{% } %}\n";
 var _default = {
   form: form
 };
@@ -57405,6 +57541,8 @@ var _builderPlaceholder = _interopRequireDefault(__webpack_require__(/*! ./build
 
 var _builderSidebar = _interopRequireDefault(__webpack_require__(/*! ./builderSidebar */ "./node_modules/formiojs/templates/semantic/builderSidebar/index.js"));
 
+var _builderSidebarGroup = _interopRequireDefault(__webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/formiojs/templates/semantic/builderSidebarGroup/index.js"));
+
 var _builderWizard = _interopRequireDefault(__webpack_require__(/*! ./builderWizard */ "./node_modules/formiojs/templates/semantic/builderWizard/index.js"));
 
 var _button = _interopRequireDefault(__webpack_require__(/*! ./button */ "./node_modules/formiojs/templates/semantic/button/index.js"));
@@ -57511,6 +57649,7 @@ var _default = {
   builderEditForm: _builderEditForm.default,
   builderPlaceholder: _builderPlaceholder.default,
   builderSidebar: _builderSidebar.default,
+  builderSidebarGroup: _builderSidebarGroup.default,
   builderWizard: _builderWizard.default,
   button: _button.default,
   checkbox: _checkbox.default,
@@ -58053,11 +58192,13 @@ var _default = {
     return result;
   },
   getAvailableShortcuts: function getAvailableShortcuts(form, component) {
+    // For some reason form and component are not passing in. Just send default list.
     if (!component) {
-      return [];
+      return this.getAlphaShortcuts();
     }
 
-    return [''].concat(_lodash.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), this.getBindedShortcuts(form.components, component)));
+    return [''].concat(_lodash.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), [] // this.getBindedShortcuts(form.components, component))
+    ));
   }
 };
 exports.default = _default;
@@ -59948,7 +60089,11 @@ function uniqueKey(map, base) {
  */
 
 
-function bootstrapVersion() {
+function bootstrapVersion(options) {
+  if (options.bootstrap) {
+    return options.bootstrap;
+  }
+
   if (typeof $ === 'function' && typeof $().collapse === 'function') {
     return parseInt($.fn.collapse.Constructor.VERSION.split('.')[0], 10);
   }
