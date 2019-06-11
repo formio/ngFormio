@@ -32439,8 +32439,7 @@ function (_Component) {
     key: "redraw",
     value: function redraw() {
       // Don't bother if we have not built yet.
-      // Don't redraw if it's builder - because component would lose builder buttons
-      if (!this.isBuilt || this.options.builder) {
+      if (!this.isBuilt) {
         return;
       }
 
