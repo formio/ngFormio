@@ -32950,6 +32950,28 @@ function (_Component) {
           return _nativePromiseOnly.default.reject();
         }
 
+        if (settings.rows && _lodash.default.isFinite(settings.rows)) {
+          /* eslint-disable no-inner-declarations */
+          function NumRowsPlugin(editor) {
+            this.editor = editor;
+          }
+
+          NumRowsPlugin.prototype.init = function () {
+            var editorHeight = settings.rows * 31 + 14;
+            this.editor.ui.view.editable.extendTemplate({
+              attributes: {
+                style: {
+                  minHeight: "".concat(editorHeight, "px")
+                }
+              }
+            });
+          };
+          /* eslint-enable no-inner-declarations */
+
+
+          ClassicEditor.builtinPlugins.push(NumRowsPlugin);
+        }
+
         return ClassicEditor.create(element, settings).then(function (editor) {
           editor.model.document.on('change', function () {
             return onChange(editor.data.get());
@@ -55244,7 +55266,9 @@ function (_TextFieldComponent) {
       }
 
       if (this.component.editor === 'ckeditor') {
-        this.editorReady = this.addCKE(this.input, null, function (newValue) {
+        var settings = this.component.wysiwyg.hasOwnProperty('toolbar') ? this.component.wysiwyg : {};
+        settings.rows = parseInt(this.component.rows, 10);
+        this.editorReady = this.addCKE(this.input, settings, function (newValue) {
           return _this3.updateEditorValue(newValue);
         }).then(function (editor) {
           _this3.editor = editor;
@@ -55253,21 +55277,13 @@ function (_TextFieldComponent) {
             _this3.editor.isReadOnly = true;
           }
 
-          var numRows = parseInt(_this3.component.rows, 10);
-
-          if (_lodash.default.isFinite(numRows) && _lodash.default.has(editor, 'ui.view.editable.editableElement')) {
-            // Default height is 21px with 10px margin + a 14px top margin.
-            var editorHeight = numRows * 31 + 14;
-            editor.ui.view.editable.editableElement.style.height = "".concat(editorHeight, "px");
-          }
-
           return editor;
         });
         return this.input;
       } // Normalize the configurations.
 
 
-      if (this.component.wysiwyg && this.component.wysiwyg.toolbarGroups) {
+      if (this.component.wysiwyg && (this.component.wysiwyg.hasOwnProperty('toolbarGroups') || this.component.wysiwyg.hasOwnProperty('toolbar'))) {
         console.warn('The WYSIWYG settings are configured for CKEditor. For this renderer, you will need to use configurations for the Quill Editor. See https://quilljs.com/docs/configuration for more information.');
         this.component.wysiwyg = this.wysiwygDefault;
         this.emit('componentEdit', this);
@@ -55811,6 +55827,10 @@ var _default = [{
   conditional: {
     json: {
       or: [{
+        '===': [{
+          var: 'data.editor'
+        }, 'ckeditor']
+      }, {
         '===': [{
           var: 'data.editor'
         }, 'quill']
