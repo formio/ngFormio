@@ -41,7 +41,7 @@
   },
   "peerDependencies": {
     "angular": "^1.7.8",
-    "formiojs": "^3.21.4"
+    "formiojs": "^3.22.2"
   },
   "browserify": {
     "transform": [
