@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-beta.8
+### Fixed
+ - Renderer to fix CKEditor rows property.
+
+### Added
+ - CKEditor configurations for TextArea components.
+
 ## 6.4.8
 ### Added
  - Direct SAML passport configuration options.
