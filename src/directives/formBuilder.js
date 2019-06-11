@@ -34,13 +34,9 @@ export default angular.module('formio').directive('formBuilder', function() {
           if (builderReady && display) {
             builderReady.then(() => {
               if (display !== $scope.display) {
-                builder.form.display = display;
                 builder.setDisplay(display);
               }
               $scope.display = display;
-              if ($scope.url) {
-                builder.instance.url = $scope.url;
-              }
             });
           }
         });
