@@ -117,7 +117,7 @@ module.exports = {
       {
         test: /\.html/,
         exclude: /src\/index\.html$/,
-        use: ['raw-loader']
+        use: 'raw-loader'
       }
     ]
   },
