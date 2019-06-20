@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.4.9
+### Fixed
+ - Issue where the Form Manager button would show up when it shouldn't.
+
+### Changed
+ - Upgraded dependencies.
+
 ## 6.4.8
 ### Added
  - Direct SAML passport configuration options.
