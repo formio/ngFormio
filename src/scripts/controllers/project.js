@@ -311,7 +311,7 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
     $scope.unsecurePortal = 'http://' + window.location.host;
-    $scope.hasFormManager = (localStorage.getItem('formManager') === 'true');
+    $scope.hasFormManager = (localStorage.getItem('formManager-' + $stateParams.projectId) === 'true');
     const checkFormManager = function() {
       if (!$scope.hasFormManager) {
         Formio.request(
@@ -319,7 +319,7 @@ app.controller('ProjectController', [
         ).then(function(project) {
           if (project && project.enabled) {
             $scope.hasFormManager = true;
-            localStorage.setItem('formManager', 'true');
+            localStorage.setItem('formManager-' + $stateParams.projectId, 'true');
             if(!$scope.$$phase) {
               $scope.$apply();
             }
