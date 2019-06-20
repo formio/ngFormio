@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-beta.13
+### Fixed
+ - The inline embed script when using deployed portal to set the base and project properties.
+
 ## 7.0.0-beta.12
 ### Fixed
  - Issue with the Form Manager button so that it will not show up unless the project is enabled.
@@ -24,6 +28,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - CKEditor configurations for TextArea components.
+
+## 6.4.10
+### Fixed
+ - The inline embed script when using deployed portal to set the base and project properties.
+
+## 6.4.9
+### Fixed
+ - Issue where the Form Manager button would show up when it shouldn't.
+
+### Changed
+ - Upgraded dependencies.
 
 ## 6.4.8
 ### Added

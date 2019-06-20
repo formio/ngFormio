@@ -716,7 +716,10 @@ app.controller('FormController', [
     $scope.setiframeCode = function(gotoUrl) {
       let embedCode = '<script src="';
       if ($scope.projectUrl && AppConfig.onPremise) {
-        embedCode += `${$scope.projectUrl}/manage/view/assets/lib/offline/formio.offline.min.js?src=`;
+        embedCode += `${$scope.projectUrl}/manage/view/assets/lib/offline/formio.offline.min.js`;
+        embedCode += `?base=${$scope.baseUrl}`;
+        embedCode += `&project=${$scope.projectUrl}`;
+        embedCode += '&src=';
       }
       else {
         embedCode += 'https://unpkg.com/formiojs@latest/dist/formio.embed.js?src=';
