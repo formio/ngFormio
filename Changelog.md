@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-beta.11
+### Changed
+ - Upgrade core renderer to 3.22.8
+ - Upgrade form-manager to 1.34.0 with following changes to formview pro.  https://github.com/formio/pro.formview.io/blob/master/Changlog.md#1340
+
+## 7.0.0-beta.10
+### Changed
+ - Upgraded @progress/kendo-ui@2019.2.619, core-js@3.1.4, dompurify@1.0.11, formiojs@3.22.7, ng-formio@3.17.4, protractor-helpers@1.1.558, webdriverio@5.10.7, webpack-dev-server@3.7.2
+ - Upgraded core renderer to 3.22.7 https://github.com/formio/formio.js/blob/master/Changelog.md#3227
+
 ## 7.0.0-beta.8
 ### Fixed
  - Renderer to fix CKEditor rows property.
