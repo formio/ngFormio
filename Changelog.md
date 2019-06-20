@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-beta.12
+### Fixed
+ - Issue with the Form Manager button so that it will not show up unless the project is enabled.
+
 ## 7.0.0-beta.11
 ### Changed
  - Upgrade core renderer to 3.22.8
