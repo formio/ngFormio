@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - The inline embed script when using deployed portal to set the base and project properties.
 
+### Changed
+ - Upgraded protractor-helpers@1.1.560, webpack@4.35.0
+
 ## 7.0.0-beta.12
 ### Fixed
  - Issue with the Form Manager button so that it will not show up unless the project is enabled.

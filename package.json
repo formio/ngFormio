@@ -70,7 +70,7 @@
     "node-sass": "^4.12.0",
     "number-abbreviate": "^2.0.0",
     "protractor": "^5.4.2",
-    "protractor-helpers": "^1.1.558",
+    "protractor-helpers": "^1.1.560",
     "raw-loader": "^1.0.0",
     "request": "^2.88.0",
     "require-dir": "^1.0.0",
@@ -83,7 +83,7 @@
     "ui-select": "^0.19.8",
     "webdriverio": "^5.10.7",
     "webdriverjs-angular": "^0.1.3",
-    "webpack": "^4.34.0",
+    "webpack": "^4.35.0",
     "webpack-cli": "^3.3.4",
     "webpack-dev-server": "^3.7.2"
   },
