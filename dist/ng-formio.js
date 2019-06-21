@@ -50993,7 +50993,15 @@ function (_BaseComponent) {
           var items = _this5.choices._store.activeItems;
 
           if (!items.length) {
-            _this5.choices._addItem(placeholderValue, placeholderValue, 0, -1, null, true, null);
+            _this5.choices._addItem({
+              value: placeholderValue,
+              label: placeholderValue,
+              choiceId: 0,
+              groupId: -1,
+              customProperties: null,
+              placeholder: true,
+              keyCode: null
+            });
           }
         });
       } // Add value options.
@@ -54571,6 +54579,14 @@ function (_TextFieldComponent) {
       var _this3 = this;
 
       if (this.isPlain || this.options.readOnly || this.options.htmlView) {
+        if (this.autoExpand) {
+          this.element.childNodes.forEach(function (element) {
+            if (element.nodeName === 'TEXTAREA') {
+              _this3.addAutoExpanding(element);
+            }
+          });
+        }
+
         return;
       }
 
@@ -54807,6 +54823,84 @@ function (_TextFieldComponent) {
       }));
     }
   }, {
+    key: "addAutoExpanding",
+    value: function addAutoExpanding(textarea) {
+      var heightOffset = null;
+      var previousHeight = null;
+
+      var changeOverflow = function changeOverflow(value) {
+        var width = textarea.style.width;
+        textarea.style.width = '0px';
+        textarea.offsetWidth;
+        textarea.style.width = width;
+        textarea.style.overflowY = value;
+      };
+
+      var preventParentScroll = function preventParentScroll(element, changeSize) {
+        var nodeScrolls = [];
+
+        while (element && element.parentNode && element.parentNode instanceof Element) {
+          if (element.parentNode.scrollTop) {
+            nodeScrolls.push({
+              node: element.parentNode,
+              scrollTop: element.parentNode.scrollTop
+            });
+          }
+
+          element = element.parentNode;
+        }
+
+        changeSize();
+        nodeScrolls.forEach(function (nodeScroll) {
+          nodeScroll.node.scrollTop = nodeScroll.scrollTop;
+        });
+      };
+
+      var resize = function resize() {
+        if (textarea.scrollHeight === 0) {
+          return;
+        }
+
+        preventParentScroll(textarea, function () {
+          textarea.style.height = '';
+          textarea.style.height = "".concat(textarea.scrollHeight + heightOffset, "px");
+        });
+      };
+
+      var update = function update() {
+        resize();
+        var styleHeight = Math.round(parseFloat(textarea.style.height));
+        var computed = window.getComputedStyle(textarea, null);
+        var currentHeight = textarea.offsetHeight;
+
+        if (currentHeight < styleHeight && computed.overflowY === 'hidden') {
+          changeOverflow('scroll');
+        } else if (computed.overflowY !== 'hidden') {
+          changeOverflow('hidden');
+        }
+
+        resize();
+        currentHeight = textarea.offsetHeight;
+
+        if (previousHeight !== currentHeight) {
+          previousHeight = currentHeight;
+          update();
+        }
+      };
+
+      var computedStyle = window.getComputedStyle(textarea, null);
+      textarea.style.resize = 'none';
+      heightOffset = parseFloat(computedStyle.borderTopWidth) + parseFloat(computedStyle.borderBottomWidth) || 0;
+
+      if (window) {
+        this.addEventListener(window, 'resize', update);
+      }
+
+      this.addEventListener(textarea, 'input', update);
+      this.updateSize = update;
+      update();
+    }
+  }, {
     key: "removeBlanks",
     value: function removeBlanks(value) {
       if (!value) {
@@ -54830,6 +54924,15 @@ function (_TextFieldComponent) {
       }
 
       return value;
+    }
+  }, {
+    key: "onChange",
+    value: function onChange() {
+      _get(_getPrototypeOf(TextAreaComponent.prototype), "onChange", this).call(this);
+
+      if (this.updateSize) {
+        this.updateSize();
+      }
     }
   }, {
     key: "hasChanged",
@@ -54896,6 +54999,10 @@ function (_TextFieldComponent) {
         });
       }
 
+      if (this.updateSize) {
+        this.removeEventListener(window, 'resize', this.updateSize);
+      }
+
       return _get(_getPrototypeOf(TextAreaComponent.prototype), "destroy", this).call(this);
     }
   }, {
@@ -54938,6 +55045,11 @@ function (_TextFieldComponent) {
     key: "htmlView",
     get: function get() {
       return this.options.readOnly && this.component.wysiwyg;
+    }
+  }, {
+    key: "autoExpand",
+    get: function get() {
+      return this.component.autoExpand;
     }
   }, {
     key: "defaultValue",
@@ -55019,6 +55131,20 @@ var _default = [{
     }]
   },
   weight: 415
+}, {
+  type: 'checkbox',
+  input: true,
+  key: 'autoExpand',
+  label: 'Auto Expand',
+  tooltip: 'This will make the TextArea auto expand it\'s height as the user is typing into the area.',
+  weight: 415,
+  conditional: {
+    json: {
+      '==': [{
+        var: 'data.editor'
+      }, '']
+    }
+  }
 }, {
   type: 'checkbox',
   input: true,
@@ -59729,7 +59855,7 @@ function addTemplateHash(template) {
 
 
 function interpolate(rawTemplate, data) {
-  var template = _lodash.default.isNumber(rawTemplate) ? templateHashCache[rawTemplate] : templateCache[rawTemplate] = templateCache[rawTemplate] || interpolateTemplate(rawTemplate);
+  var template = _lodash.default.isNumber(rawTemplate) && templateHashCache.hasOwnProperty(rawTemplate) ? templateHashCache[rawTemplate] : templateCache[rawTemplate] = templateCache[rawTemplate] || interpolateTemplate(rawTemplate);
 
   if (typeof template === 'function') {
     try {
