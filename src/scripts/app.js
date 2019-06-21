@@ -474,6 +474,11 @@ angular
           templateUrl: 'views/project/access/index.html',
             controller: 'AccessController'
         })
+        .state('project.actions', {
+          url: '/actions',
+          templateUrl: 'views/project/actions/index.html',
+            controller: 'ActionsController'
+        })
         .state('project.roles', {
           abstract: true,
           url: '/roles',

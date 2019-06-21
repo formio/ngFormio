@@ -1,3 +1,4 @@
+import './actions.js';
 import './access.js';
 import './controllers.js';
 import './feedback.js';
