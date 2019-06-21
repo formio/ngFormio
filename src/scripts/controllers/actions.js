@@ -31,9 +31,5 @@ app.controller('ActionsController', [
     $scope.$watch('handler', (value) => filter('handler', value));
     $scope.$watch('method', (value) => filter('method', value));
     $scope.$watch('actionState', (value) => filter('state', value));
-
-    $scope.viewRow = (action) => {
-      console.log('view', action);
-    }
   }
 ]);
