@@ -4,6 +4,57 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.4.10
+### Fixed
+ - The inline embed script when using deployed portal to set the base and project properties.
+
+## 6.4.9
+### Fixed
+ - Issue where the Form Manager button would show up when it shouldn't.
+
+### Changed
+ - Upgraded dependencies.
+
+## 6.4.8
+### Added
+ - Direct SAML passport configuration options.
+
+## 6.4.7
+### Changed
+ - Upgraded formmanager and dependencies.
+
+## 6.4.6
+### Changed
+ - Upgraded Form Manager + Form View Pro to latest version
+ - Upgraded  @babel/core@7.4.5, @babel/preset-env@7.4.5, babel-loader@8.0.6, protractor-helpers@1.1.538, swagger-ui@3.22.2, @progress/kendo-ui@2019.2.529, express@4.17.1, formiojs@3.21.2, webdriverio@5.9.4, webpack@4.32.2, webpack-dev-server@3.4.1, chartist@0.11.2, mini-css-extract-plugin@0.7.0
+            
+### Fixed
+ - Fix on premise check for collections setting.
+
+## 6.4.5
+### Fixed
+ - Copy/Import functionality for display and properties.
+
+## 6.4.4
+### Fixed
+ - Embed codes for the deployed portal.
+
+### Changed
+ - Upgraded form manager.
+ - Upgraded form view pro.
+
+## 6.4.0
+### Added
+ - Group Self Access feature.
+ - Updated form manager with merge capabilities.
+ - Updated form manager with click-away form building protection.
+ - Updated form view pro with offline support.
+ - Allow SAML to provide a logout link.
+ - Force the SAML SSO to re-authentication for every page refresh to ensure valid auth.
+ 
+### Changed
+ - Upgraded @babel/core@7.4.4, @babel/preset-env@7.4.4, @progress/kendo-ui@2019.1.424, copy-webpack-plugin@5.0.3, mocha@6.1.4, protractor-helpers@1.1.509, swagger-ui@3.22.1, webpack-cli@3.3.1, formiojs@3.20.4, jquery@3.4.0, node-sass@4.12.0, webdriverio@5.8.0, webpack@4.30.0
+
 ## 6.3.6
 ### Changed
  - Removed Moxtra

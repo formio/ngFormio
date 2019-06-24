@@ -311,14 +311,15 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
     $scope.unsecurePortal = 'http://' + window.location.host;
-    $scope.hasFormManager = false;
+    $scope.hasFormManager = (localStorage.getItem('formManager-' + $stateParams.projectId) === 'true');
     const checkFormManager = function() {
-      if (AppConfig.onPremise) {
+      if (!$scope.hasFormManager) {
         Formio.request(
           'https://license.form.io/check/manager?project=' + $scope.projectUrl
         ).then(function(project) {
           if (project && project.enabled) {
             $scope.hasFormManager = true;
+            localStorage.setItem('formManager-' + $stateParams.projectId, 'true');
             if(!$scope.$$phase) {
               $scope.$apply();
             }
@@ -2824,6 +2825,14 @@ app.controller('SAMLController', [
   ) {
     $scope.projectSP = '';
     $scope.loadProjectPromise.then(function(project) {
+      $scope.exampleJSON = JSON.stringify({
+        entryPoint: 'https://ad.example.net/adfs/ls/',
+        issuer: 'https://your-app.example.net/login/callback',
+        callbackUrl: 'https://your-app.example.net/login/callback',
+        cert: 'MIICizCCAfQCCQCY8tKaMc0BMjANBgkqh ... W==',
+        authnContext: 'http://schemas.microsoft.com/ws/2008/06/identity/authenticationmethod/windows',
+        identifierFormat: null
+      }, null, 2);
       $scope.projectSP = _.get($scope.currentProject, 'settings.saml.sp', `<EntityDescriptor
  xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
