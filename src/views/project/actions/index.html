@@ -2,8 +2,6 @@
   <div class="project-section-inner-content">
     <h2>Actions Log</h2>
     <div class="description">This page shows a list of actions that have been triggered.</div>
-    {{query}}
-
     <table class="table">
       <thead>
       <tr>
@@ -78,6 +76,11 @@
         </tr>
       </tbody>
     </table>
+    <div ng-if="!actions.length">
+      <div class="alert alert-warning">
+        No action logs were found.
+      </div>
+    </div>
 
     <bgf-pagination
       collection="actions"
