@@ -25,7 +25,7 @@ app.factory('PrimaryProject', [
         scope.highestRoleQ = $scope.highestRoleQ;
 
         // Load project environments
-        $http.get(AppConfig.apiBase + '/project?project=' + project._id).then(function (result) {
+        $http.get(AppConfig.apiBase + '/project?project=' + project._id + '&type=stage').then(function (result) {
           scope.environments = result.data;
           _.assign($scope, scope);
 
