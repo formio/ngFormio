@@ -24177,6 +24177,8 @@ function (_Webform) {
     value: function setForm(form) {
       var _this3 = this;
 
+      var formCopy = _lodash.default.cloneDeep(form);
+
       return _get(_getPrototypeOf(PDF.prototype), "setForm", this).call(this, form).then(function () {
         if (_this3.formio) {
           form.projectUrl = _this3.formio.projectUrl;
@@ -24191,7 +24193,7 @@ function (_Webform) {
 
         _this3.postMessage({
           name: 'form',
-          data: form
+          data: formCopy
         });
 
         return form;
@@ -24301,7 +24303,7 @@ function (_Webform) {
       this.appendChild(this.element, [this.zoomIn, this.zoomOut, this.iframe]);
 
       if (!this.options.readOnly && _lodash.default.find(this.form.components, function (component) {
-        return component.type === 'button' && component.action === 'submit';
+        return component.type === 'button' && component.action === 'submit' && !component.hidden;
       })) {
         this.submitButton = this.ce('button', {
           type: 'button',
@@ -24688,6 +24690,23 @@ function (_WebformBuilder) {
     key: "setForm",
     value: function setForm(form) {
       var _this6 = this;
+
+      // If this is a brand new form, make sure it has a submit button component
+      if (!form.created && !_lodash.default.find(form.components || [], {
+        type: 'button',
+        action: 'submit'
+      })) {
+        form.components.push({
+          type: 'button',
+          label: this.t('Submit'),
+          key: 'submit',
+          size: 'md',
+          block: false,
+          action: 'submit',
+          disableOnInvalid: true,
+          theme: 'primary'
+        });
+      }
 
       return _get(_getPrototypeOf(PDFBuilder.prototype), "setForm", this).call(this, form).then(function () {
         return _this6.ready.then(function () {
@@ -31598,7 +31617,7 @@ function (_Component) {
         trigger: 'hover click',
         placement: 'right',
         html: true,
-        title: this.interpolate(component.tooltip).replace(/(?:\r\n|\r|\n)/g, '<br />')
+        title: this.interpolate(this.t(component.tooltip)).replace(/(?:\r\n|\r|\n)/g, '<br />')
       });
     }
     /**
@@ -32152,7 +32171,7 @@ function (_Component) {
     key: "clearOnHide",
     value: function clearOnHide(show) {
       // clearOnHide defaults to true for old forms (without the value set) so only trigger if the value is false.
-      if (this.component.clearOnHide !== false && !this.options.readOnly) {
+      if (this.component.clearOnHide !== false && !this.options.readOnly && !this.options.showHiddenFields) {
         if (!show) {
           this.deleteValue();
         } else if (!this.hasValue()) {
@@ -32601,7 +32620,7 @@ function (_Component) {
       } // Check to ensure that the calculated value is different than the previously calculated value.
 
 
-      if (allowOverride && this.calculatedValue !== null && this.calculatedValue !== this.emptyValue && !_lodash.default.isEqual(dataValue, this.calculatedValue)) {
+      if (allowOverride && this.calculatedValue !== null && !_lodash.default.isEqual(dataValue, this.calculatedValue)) {
         return false;
       } // Calculate the new value.
 
@@ -32611,7 +32630,7 @@ function (_Component) {
         data: data
       }, 'value'); // If this is the firstPass, and the dataValue is different than to the calculatedValue.
 
-      if (allowOverride && firstPass && dataValue !== this.emptyValue && !_lodash.default.isEqual(dataValue, calculatedValue)) {
+      if (allowOverride && firstPass && !this.isEmpty(dataValue) && !_lodash.default.isEqual(dataValue, calculatedValue)) {
         // Return that we have a change so it will perform another pass.
         this.calculatedValue = calculatedValue;
         return true;
@@ -33358,7 +33377,7 @@ function (_Component) {
   }, {
     key: "dataValue",
     get: function get() {
-      if (!this.key) {
+      if (!this.key || !this.visible && this.component.clearOnHide) {
         return this.emptyValue;
       }
 
@@ -33375,7 +33394,7 @@ function (_Component) {
      */
     ,
     set: function set(value) {
-      if (!this.key) {
+      if (!this.key || !this.visible && this.component.clearOnHide) {
         return value;
       }
 
@@ -52631,7 +52650,10 @@ function (_BaseComponent) {
       this.restoreValue(); // disable the signature pad if the form in ViewOnly mode
 
       if (this.shouldDisable || this.viewOnly) {
-        this.disabled = true;
+        this.disabled = true; // In view mode, ensure the padBody background color is set
+        // in case the source image is a different aspect ratio
+
+        this.padBody.style.backgroundColor = this.component.backgroundColor;
       }
 
       this.autofocus();
@@ -54928,7 +54950,13 @@ function (_TextFieldComponent) {
   }, {
     key: "onChange",
     value: function onChange() {
-      _get(_getPrototypeOf(TextAreaComponent.prototype), "onChange", this).call(this);
+      var _get2;
+
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      (_get2 = _get(_getPrototypeOf(TextAreaComponent.prototype), "onChange", this)).call.apply(_get2, [this].concat(args));
 
       if (this.updateSize) {
         this.updateSize();
