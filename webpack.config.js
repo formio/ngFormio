@@ -20,6 +20,12 @@ module.exports = {
     new CopyWebpackPlugin([
       {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'}
     ]),
+    new CopyWebpackPlugin([
+      {from: 'node_modules/formio-tenant/dist', to: 'tenant', toType: 'dir'}
+    ]),
+    new CopyWebpackPlugin([
+      {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'}
+    ]),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery",
       "jQuery": "jquery",

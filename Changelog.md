@@ -36,6 +36,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - CKEditor configurations for TextArea components.
 
+## 6.5.0
+### Added
+ - Multi-tenant functionality.
+ 
+### Fixed
+ - FOR-2349: Fixed issues where form elements are added to end of form for pdf builder. 
+ 
+### Changed
+ - Upgraded formiojs@3.22.9, protractor-helpers@1.1.564, webdriverio@5.10.9, webpack-cli@3.3.5, webpack@4.35.0
+
 ## 6.4.10
 ### Fixed
  - The inline embed script when using deployed portal to set the base and project properties.

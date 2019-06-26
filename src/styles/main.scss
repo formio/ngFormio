@@ -661,6 +661,10 @@ ul.project-settings-menu {
 .project-section-inner-content {
   padding: 20px;
   position: relative;
+  #tenant-frame {
+    width: 100%;
+    height: 500px;
+  }
 }
 
 .project-resource-form-view-page .form-content, .project-form-form-view-page .form-content, .project-resource-form-api-page .form-content {

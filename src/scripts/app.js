@@ -465,6 +465,11 @@ angular
           controller: 'ProjectTeamController',
           templateUrl: 'views/project/teams/index.html'
         })
+        .state('project.tenants', {
+          url: '/tenants',
+          controller: 'ProjectTenantController',
+          templateUrl: 'views/project/tenants/index.html'
+        })
         .state('project.delete', {
           url: '/delete',
           templateUrl: 'views/project/delete.html',
@@ -561,6 +566,7 @@ angular
             project.settings.cors = '*';
           }
 
+          project.type = 'stage';
           formio.saveProject(project).then(function(project) {
             FormioAlerts.addAlert({
               type: 'success',

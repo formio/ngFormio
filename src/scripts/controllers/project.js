@@ -225,7 +225,7 @@ app.controller('ProjectCreateEnvironmentController', [
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.currentProject = {
         title: '',
-        //type: 'hosted',
+        type: 'stage',
         project: primaryProject._id
       };
       $scope.$watch('currentProject.title', function(newTitle) {
@@ -2760,6 +2760,65 @@ app.controller('ProjectTeamController', [
         $scope.primaryProject = project;
       });
     };
+  }
+]);
+
+app.controller('ProjectTenantController', [
+  '$scope',
+  '$http',
+  '$sce',
+  'AppConfig',
+  'Formio',
+  '$state',
+  function(
+    $scope,
+    $http,
+    $sce,
+    AppConfig,
+    Formio,
+    $state,
+  ) {
+    $scope.primaryProjectUrl = '';
+    $scope.tenantDisabled = false;
+    const tenantContainer = document.getElementById('tenant-app');
+    $scope.primaryProjectPromise.then(function(primaryProject) {
+      $scope.primaryProjectUrl = AppConfig.apiBase + '/' + $scope.primaryProject.name;
+      Formio.request(
+        'https://license.form.io/check/tenant?project=' + $scope.primaryProjectUrl
+      ).then(function(project) {
+        if (project && project.enabled) {
+          let url = `${AppConfig.appBase}/tenant/?iframe=true`;
+          url += `&project=${encodeURIComponent($scope.primaryProjectUrl)}`;
+          url += `&base=${encodeURIComponent($scope.baseUrl)}`;
+          url += `#/project/${primaryProject._id}/tenant/index`;
+          tenantContainer.innerHTML = '';
+          const tenantElement = document.createElement('iframe');
+          tenantElement.setAttribute('style', 'width: 100%');
+          tenantElement.setAttribute('id', 'tenant-frame');
+          tenantElement.setAttribute('src', $sce.trustAsResourceUrl(url));
+          tenantContainer.appendChild(tenantElement);
+          const tenantFrame = window.seamless(tenantElement);
+          tenantFrame.receive(function(data, event) {
+            if (data.event === 'gotoTenant') {
+              $state.go('project.overview', {projectId: data.tenant._id});
+            }
+          });
+        }
+        else {
+          $scope.tenantDisabled = true;
+          if(!$scope.$$phase) {
+            $scope.$apply();
+          }
+          console.warn('Multi-Tenant not enabled');
+        }
+      }).catch(() => {
+        $scope.tenantDisabled = true;
+        if(!$scope.$$phase) {
+          $scope.$apply();
+        }
+        console.warn('Multi-Tenant not enabled');
+      });
+    });
   }
 ]);
 
