@@ -38161,7 +38161,6 @@ var _default = [{
           utils = _ref.utils,
           instance = _ref.instance,
           form = _ref.form;
-      console.log('here');
       return _builder.default.getAvailableShortcuts(form, component);
     }
   }
