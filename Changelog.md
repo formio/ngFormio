@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.5.1
+### Fixed
+ - Only show the tenant button if plan is commercial or trial.
+ - Several bugs with tenant application.
+
 ## 6.5.0
 ### Added
  - Multi-tenant functionality.
