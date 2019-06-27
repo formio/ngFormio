@@ -23228,7 +23228,16 @@ function () {
 
       var requestArgs = Formio.getRequestArgs(formio, type, url, method, data, opts);
       requestArgs.opts = requestArgs.opts || {};
-      requestArgs.opts.formio = formio;
+      requestArgs.opts.formio = formio; //for Formio requests default Accept and Content-type headers
+
+      if (!requestArgs.opts.headers) {
+        requestArgs.opts.headers = {};
+      }
+
+      requestArgs.opts.headers = (0, _defaults2.default)(requestArgs.opts.headers, {
+        'Accept': 'application/json',
+        'Content-type': 'application/json;'
+      });
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
         return Formio.pluginGet('request', requestArgs).then(function (result) {
           if (isNil(result)) {
@@ -23268,10 +23277,10 @@ function () {
       } // Set up and fetch request
 
 
-      var headers = header || new Headers((0, _defaults2.default)(opts.headers, {
+      var headers = header || new Headers(opts.headers || {
         'Accept': 'application/json',
-        'Content-type': 'application/json; charset=UTF-8'
-      }));
+        'Content-type': 'application/json;'
+      });
       var token = Formio.getToken(opts);
 
       if (token && !opts.noToken) {
