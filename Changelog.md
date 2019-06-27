@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-beta.16
+### Fixed
+ - Issues with Tagpad and Sketchpad not working.
+
 ## 7.0.0-beta.14
 ### Changed
  - Upgrade core renderer with following changes. https://github.com/formio/formio.js/blob/master/Changelog.md#3229
@@ -35,6 +39,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - CKEditor configurations for TextArea components.
+
+## 6.5.1
+### Fixed
+ - Only show the tenant button if plan is commercial or trial.
+ - Several bugs with tenant application.
 
 ## 6.5.0
 ### Added
