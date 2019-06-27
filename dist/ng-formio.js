@@ -23236,7 +23236,7 @@ function () {
 
       requestArgs.opts.headers = (0, _defaults2.default)(requestArgs.opts.headers, {
         'Accept': 'application/json',
-        'Content-type': 'application/json;'
+        'Content-type': 'application/json'
       });
       var request = Formio.pluginWait('preRequest', requestArgs).then(function () {
         return Formio.pluginGet('request', requestArgs).then(function (result) {
@@ -23279,7 +23279,7 @@ function () {
 
       var headers = header || new Headers(opts.headers || {
         'Accept': 'application/json',
-        'Content-type': 'application/json;'
+        'Content-type': 'application/json'
       });
       var token = Formio.getToken(opts);
 
