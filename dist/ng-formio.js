@@ -43966,6 +43966,7 @@ function (_NestedComponent) {
 
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(EditGridComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
     _this.type = 'editgrid';
+    _this.editRows = [];
     return _this;
   }
 
@@ -44178,6 +44179,8 @@ function (_NestedComponent) {
   }, {
     key: "getComponents",
     value: function getComponents(rowIndex) {
+      // Ensure editrows is set.
+      this.editRows = this.editRows || [];
       return this.builderMode ? _get(_getPrototypeOf(EditGridComponent.prototype), "getComponents", this).call(this) : _lodash.default.isNumber(rowIndex) ? this.editRows[rowIndex].components || [] : this.editRows.reduce(function (result, row) {
         return result.concat(row.components || []);
       }, []);
