@@ -6,4 +6,7 @@
   <a class="btn btn-warning" ng-click="export(currentForm, 'json')">{...} Export JSON</a>
   <a class="btn btn-success" ng-click="export(currentForm, 'csv')"><i class="fa fa-file-text-o"></i> Export CSV</a>
 </div>
+<div class="alert alert-info">
+  To make a field show in this table, edit the component and select "Table View" from the Display tab.
+</div>
 <div kendo-grid="grid" k-options="gridOptions" k-ng-delay="gridOptions.columns" style="width:0"></div>
