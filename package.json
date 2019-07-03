@@ -44,7 +44,7 @@
   "dependencies": {
     "angular": "^1.7.8",
     "choices.js": "^7.0.0",
-    "formiojs": "^4.0.0-beta.54"
+    "formiojs": "^4.0.0-rc.2"
   },
   "browserify": {
     "transform": [
