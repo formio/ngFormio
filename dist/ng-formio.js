@@ -16399,9 +16399,9 @@ var freeze$2 = Object.freeze || function (x) {
   return x;
 };
 
-var html$1 = freeze$2(['accept', 'action', 'align', 'alt', 'autocomplete', 'background', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'clear', 'color', 'cols', 'colspan', 'coords', 'crossorigin', 'datetime', 'default', 'dir', 'disabled', 'download', 'enctype', 'face', 'for', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'id', 'integrity', 'ismap', 'label', 'lang', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'noshade', 'novalidate', 'nowrap', 'open', 'optimum', 'pattern', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'rev', 'reversed', 'role', 'rows', 'rowspan', 'spellcheck', 'scope', 'selected', 'shape', 'size', 'sizes', 'span', 'srclang', 'start', 'src', 'srcset', 'step', 'style', 'summary', 'tabindex', 'title', 'type', 'usemap', 'valign', 'value', 'width', 'xmlns']);
+var html$1 = freeze$2(['accept', 'action', 'align', 'alt', 'autocomplete', 'background', 'bgcolor', 'border', 'cellpadding', 'cellspacing', 'checked', 'cite', 'class', 'clear', 'color', 'cols', 'colspan', 'controls', 'coords', 'crossorigin', 'datetime', 'default', 'dir', 'disabled', 'download', 'enctype', 'face', 'for', 'headers', 'height', 'hidden', 'high', 'href', 'hreflang', 'id', 'integrity', 'ismap', 'label', 'lang', 'list', 'loop', 'low', 'max', 'maxlength', 'media', 'method', 'min', 'multiple', 'name', 'noshade', 'novalidate', 'nowrap', 'open', 'optimum', 'pattern', 'placeholder', 'poster', 'preload', 'pubdate', 'radiogroup', 'readonly', 'rel', 'required', 'rev', 'reversed', 'role', 'rows', 'rowspan', 'spellcheck', 'scope', 'selected', 'shape', 'size', 'sizes', 'span', 'srclang', 'start', 'src', 'srcset', 'step', 'style', 'summary', 'tabindex', 'title', 'type', 'usemap', 'valign', 'value', 'width', 'xmlns']);
 
-var svg$1 = freeze$2(['accent-height', 'accumulate', 'additive', 'alignment-baseline', 'ascent', 'attributename', 'attributetype', 'azimuth', 'basefrequency', 'baseline-shift', 'begin', 'bias', 'by', 'class', 'clip', 'clip-path', 'clip-rule', 'color', 'color-interpolation', 'color-interpolation-filters', 'color-profile', 'color-rendering', 'cx', 'cy', 'd', 'dx', 'dy', 'diffuseconstant', 'direction', 'display', 'divisor', 'dur', 'edgemode', 'elevation', 'end', 'fill', 'fill-opacity', 'fill-rule', 'filter', 'flood-color', 'flood-opacity', 'font-family', 'font-size', 'font-size-adjust', 'font-stretch', 'font-style', 'font-variant', 'font-weight', 'fx', 'fy', 'g1', 'g2', 'glyph-name', 'glyphref', 'gradientunits', 'gradienttransform', 'height', 'href', 'id', 'image-rendering', 'in', 'in2', 'k', 'k1', 'k2', 'k3', 'k4', 'kerning', 'keypoints', 'keysplines', 'keytimes', 'lang', 'lengthadjust', 'letter-spacing', 'kernelmatrix', 'kernelunitlength', 'lighting-color', 'local', 'marker-end', 'marker-mid', 'marker-start', 'markerheight', 'markerunits', 'markerwidth', 'maskcontentunits', 'maskunits', 'max', 'mask', 'media', 'method', 'mode', 'min', 'name', 'numoctaves', 'offset', 'operator', 'opacity', 'order', 'orient', 'orientation', 'origin', 'overflow', 'paint-order', 'path', 'pathlength', 'patterncontentunits', 'patterntransform', 'patternunits', 'points', 'preservealpha', 'preserveaspectratio', 'r', 'rx', 'ry', 'radius', 'refx', 'refy', 'repeatcount', 'repeatdur', 'restart', 'result', 'rotate', 'scale', 'seed', 'shape-rendering', 'specularconstant', 'specularexponent', 'spreadmethod', 'stddeviation', 'stitchtiles', 'stop-color', 'stop-opacity', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-opacity', 'stroke', 'stroke-width', 'style', 'surfacescale', 'tabindex', 'targetx', 'targety', 'transform', 'text-anchor', 'text-decoration', 'text-rendering', 'textlength', 'type', 'u1', 'u2', 'unicode', 'values', 'viewbox', 'visibility', 'version', 'vert-adv-y', 'vert-origin-x', 'vert-origin-y', 'width', 'word-spacing', 'wrap', 'writing-mode', 'xchannelselector', 'ychannelselector', 'x', 'x1', 'x2', 'xmlns', 'y', 'y1', 'y2', 'z', 'zoomandpan']);
+var svg$1 = freeze$2(['accent-height', 'accumulate', 'additive', 'alignment-baseline', 'ascent', 'attributename', 'attributetype', 'azimuth', 'basefrequency', 'baseline-shift', 'begin', 'bias', 'by', 'class', 'clip', 'clip-path', 'clip-rule', 'color', 'color-interpolation', 'color-interpolation-filters', 'color-profile', 'color-rendering', 'cx', 'cy', 'd', 'dx', 'dy', 'diffuseconstant', 'direction', 'display', 'divisor', 'dur', 'edgemode', 'elevation', 'end', 'fill', 'fill-opacity', 'fill-rule', 'filter', 'filterunits', 'flood-color', 'flood-opacity', 'font-family', 'font-size', 'font-size-adjust', 'font-stretch', 'font-style', 'font-variant', 'font-weight', 'fx', 'fy', 'g1', 'g2', 'glyph-name', 'glyphref', 'gradientunits', 'gradienttransform', 'height', 'href', 'id', 'image-rendering', 'in', 'in2', 'k', 'k1', 'k2', 'k3', 'k4', 'kerning', 'keypoints', 'keysplines', 'keytimes', 'lang', 'lengthadjust', 'letter-spacing', 'kernelmatrix', 'kernelunitlength', 'lighting-color', 'local', 'marker-end', 'marker-mid', 'marker-start', 'markerheight', 'markerunits', 'markerwidth', 'maskcontentunits', 'maskunits', 'max', 'mask', 'media', 'method', 'mode', 'min', 'name', 'numoctaves', 'offset', 'operator', 'opacity', 'order', 'orient', 'orientation', 'origin', 'overflow', 'paint-order', 'path', 'pathlength', 'patterncontentunits', 'patterntransform', 'patternunits', 'points', 'preservealpha', 'preserveaspectratio', 'primitiveunits', 'r', 'rx', 'ry', 'radius', 'refx', 'refy', 'repeatcount', 'repeatdur', 'restart', 'result', 'rotate', 'scale', 'seed', 'shape-rendering', 'specularconstant', 'specularexponent', 'spreadmethod', 'stddeviation', 'stitchtiles', 'stop-color', 'stop-opacity', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-opacity', 'stroke', 'stroke-width', 'style', 'surfacescale', 'tabindex', 'targetx', 'targety', 'transform', 'text-anchor', 'text-decoration', 'text-rendering', 'textlength', 'type', 'u1', 'u2', 'unicode', 'values', 'viewbox', 'visibility', 'version', 'vert-adv-y', 'vert-origin-x', 'vert-origin-y', 'width', 'word-spacing', 'wrap', 'writing-mode', 'xchannelselector', 'ychannelselector', 'x', 'x1', 'x2', 'xmlns', 'y', 'y1', 'y2', 'z', 'zoomandpan']);
 
 var mathMl$1 = freeze$2(['accent', 'accentunder', 'align', 'bevelled', 'close', 'columnsalign', 'columnlines', 'columnspan', 'denomalign', 'depth', 'dir', 'display', 'displaystyle', 'fence', 'frame', 'height', 'href', 'id', 'largeop', 'length', 'linethickness', 'lspace', 'lquote', 'mathbackground', 'mathcolor', 'mathsize', 'mathvariant', 'maxsize', 'minsize', 'movablelimits', 'notation', 'numalign', 'open', 'rowalign', 'rowlines', 'rowspacing', 'rowspan', 'rspace', 'rquote', 'scriptlevel', 'scriptminsize', 'scriptsizemultiplier', 'selection', 'separator', 'separators', 'stretchy', 'subscriptshift', 'supscriptshift', 'symmetric', 'voffset', 'width', 'xmlns']);
 
@@ -16547,7 +16547,7 @@ function createDOMPurify() {
    * Version label, exposed for easier checks
    * if DOMPurify is up to date or not
    */
-  DOMPurify.version = '1.0.10';
+  DOMPurify.version = '1.0.11';
 
   /**
    * Array of elements that DOMPurify removed during sanitation.
@@ -16701,7 +16701,8 @@ function createDOMPurify() {
   var DATA_URI_TAGS = addToSet({}, ['audio', 'video', 'img', 'source', 'image']);
 
   /* Attributes safe for values like "javascript:" */
-  var URI_SAFE_ATTRIBUTES = addToSet({}, ['alt', 'class', 'for', 'id', 'label', 'name', 'pattern', 'placeholder', 'summary', 'title', 'value', 'style', 'xmlns']);
+  var URI_SAFE_ATTRIBUTES = null;
+  var DEFAULT_URI_SAFE_ATTRIBUTES = addToSet({}, ['alt', 'class', 'for', 'id', 'label', 'name', 'pattern', 'placeholder', 'summary', 'title', 'value', 'style', 'xmlns']);
 
   /* Keep a reference to config to pass to hooks */
   var CONFIG = null;
@@ -16730,6 +16731,7 @@ function createDOMPurify() {
     /* Set configuration parameters */
     ALLOWED_TAGS = 'ALLOWED_TAGS' in cfg ? addToSet({}, cfg.ALLOWED_TAGS) : DEFAULT_ALLOWED_TAGS;
     ALLOWED_ATTR = 'ALLOWED_ATTR' in cfg ? addToSet({}, cfg.ALLOWED_ATTR) : DEFAULT_ALLOWED_ATTR;
+    URI_SAFE_ATTRIBUTES = 'ADD_URI_SAFE_ATTR' in cfg ? addToSet({}, cfg.ADD_URI_SAFE_ATTR) : DEFAULT_URI_SAFE_ATTRIBUTES;
     FORBID_TAGS = 'FORBID_TAGS' in cfg ? addToSet({}, cfg.FORBID_TAGS) : {};
     FORBID_ATTR = 'FORBID_ATTR' in cfg ? addToSet({}, cfg.FORBID_ATTR) : {};
     USE_PROFILES = 'USE_PROFILES' in cfg ? cfg.USE_PROFILES : false;
@@ -17213,7 +17215,7 @@ function createDOMPurify() {
       } else if (
       // This works around a bug in Safari, where input[type=file]
       // cannot be dynamically set after type has been removed
-      currentNode.nodeName === 'INPUT' && lcName === 'type' && value === 'file' && (ALLOWED_ATTR[lcName] || !FORBID_ATTR[lcName])) {
+      currentNode.nodeName === 'INPUT' && lcName === 'type' && value === 'file' && hookEvent.keepAttr && (ALLOWED_ATTR[lcName] || !FORBID_ATTR[lcName])) {
         continue;
       } else {
         // This avoids a crash in Safari v9.0 with double-ids.
@@ -17360,6 +17362,8 @@ function createDOMPurify() {
       importedNode = body.ownerDocument.importNode(dirty, true);
       if (importedNode.nodeType === 1 && importedNode.nodeName === 'BODY') {
         /* Node is already a body, use as is */
+        body = importedNode;
+      } else if (importedNode.nodeName === 'HTML') {
         body = importedNode;
       } else {
         // eslint-disable-next-line unicorn/prefer-node-append
@@ -23228,6 +23232,22 @@ function () {
       return this.events.on(type, cb);
     }
     /**
+     * Allow catching any event.
+     *
+     * @param cb
+     * @returns {this}
+     */
+
+  }, {
+    key: "onAny",
+    value: function onAny(cb) {
+      if (!this.events) {
+        return;
+      }
+
+      return this.events.onAny(cb);
+    }
+    /**
      * Removes all listeners for a certain event.
      *
      * @param event
@@ -26307,9 +26327,48 @@ function (_Webform) {
       });
     }
   }, {
+    key: "setSubmission",
+    value: function setSubmission(submission) {
+      var _this6 = this;
+
+      submission.readOnly = !!this.options.readOnly;
+      return _get(_getPrototypeOf(PDF.prototype), "setSubmission", this).call(this, submission).then(function () {
+        if (_this6.formio) {
+          _this6.formio.getDownloadUrl().then(function (url) {
+            // Add a download button if it has a download url.
+            if (!url) {
+              return;
+            }
+
+            if (!_this6.downloadButton) {
+              if (_this6.options.primaryProject) {
+                url += "&project=".concat(_this6.options.primaryProject);
+              }
+
+              _this6.downloadButton = _this6.ce('a', {
+                href: url,
+                target: '_blank',
+                style: 'position:absolute;right:10px;top:110px;cursor:pointer;'
+              }, _this6.ce('img', {
+                src: __webpack_require__(/*! ./pdf.image */ "./node_modules/formiojs/pdf.image.js"),
+                style: 'width:3em;'
+              }));
+
+              _this6.element.insertBefore(_this6.downloadButton, _this6.iframe);
+            }
+          });
+        }
+
+        _this6.postMessage({
+          name: 'submission',
+          data: submission
+        });
+      });
+    }
+  }, {
     key: "postMessage",
     value: function postMessage(message) {
-      var _this6 = this;
+      var _this7 = this;
 
       // If we get here before the iframeReady promise is set up, it's via the superclass constructor
       if (!this.iframeReady) {
@@ -26321,8 +26380,8 @@ function (_Webform) {
       }
 
       this.iframeReady = this.iframeReady.then(function () {
-        if (_this6.iframeElement && _this6.iframeElement.contentWindow) {
-          _this6.iframeElement.contentWindow.postMessage(JSON.stringify(message), '*');
+        if (_this7.iframeElement && _this7.iframeElement.contentWindow) {
+          _this7.iframeElement.contentWindow.postMessage(JSON.stringify(message), '*');
         }
       });
     } // Do not clear the iframe.
@@ -26330,44 +26389,6 @@ function (_Webform) {
   }, {
     key: "clear",
     value: function clear() {}
-  }, {
-    key: "setSubmission",
-    value: function setSubmission(submission) {
-      var _this7 = this;
-
-      submission.readOnly = !!this.options.readOnly;
-      this.postMessage({
-        name: 'submission',
-        data: submission
-      });
-      return _get(_getPrototypeOf(PDF.prototype), "setSubmission", this).call(this, submission).then(function () {
-        if (_this7.formio) {
-          _this7.formio.getDownloadUrl().then(function (url) {
-            // Add a download button if it has a download url.
-            if (!url) {
-              return;
-            }
-
-            if (!_this7.downloadButton) {
-              if (_this7.options.primaryProject) {
-                url += "&project=".concat(_this7.options.primaryProject);
-              }
-
-              _this7.downloadButton = _this7.ce('a', {
-                href: url,
-                target: '_blank',
-                style: 'position:absolute;right:10px;top:110px;cursor:pointer;'
-              }, _this7.ce('img', {
-                src: __webpack_require__(/*! ./pdf.image */ "./node_modules/formiojs/pdf.image.js"),
-                style: 'width:3em;'
-              }));
-
-              _this7.element.insertBefore(_this7.downloadButton, _this7.iframe);
-            }
-          });
-        }
-      });
-    }
   }]);
 
   return PDF;
@@ -26411,6 +26432,8 @@ __webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules
 
 __webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
 __webpack_require__(/*! core-js/modules/es.array.from */ "./node_modules/core-js/modules/es.array.from.js");
 
 __webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
@@ -26443,6 +26466,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
 
 var _WebformBuilder2 = _interopRequireDefault(__webpack_require__(/*! ./WebformBuilder */ "./node_modules/formiojs/WebformBuilder.js"));
 
@@ -26483,6 +26510,12 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var _fetchPonyfill = (0, _fetchPonyfill2.default)({
+  Promise: _nativePromiseOnly.default
+}),
+    fetch = _fetchPonyfill.fetch,
+    Headers = _fetchPonyfill.Headers;
 
 var PDFBuilder =
 /*#__PURE__*/
@@ -26560,7 +26593,7 @@ function (_WebformBuilder) {
             });
           })
         }),
-        form: this.webform.render()
+        form: _lodash.default.has(this.webform, 'form.settings.pdf') ? this.webform.render() : this.renderTemplate('pdfBuilderUpload', {})
       });
       return result;
     }
@@ -26568,6 +26601,67 @@ function (_WebformBuilder) {
     key: "attach",
     value: function attach(element) {
       var _this3 = this;
+
+      // PDF Upload
+      if (!this.hasPDF) {
+        this.loadRefs(element, {
+          'fileDrop': 'single',
+          'fileBrowse': 'single',
+          'hiddenFileInputElement': 'single',
+          'uploadError': 'single'
+        });
+        this.addEventListener(this.refs['pdf-upload-button'], 'click', function (event) {
+          event.preventDefault();
+        }); // Init the upload error.
+
+        if (!this.options.pdfServer) {
+          this.setUploadError('PDF Server not set. Please set the PDF Server in options.pdfServer so the upload can occur.');
+        } else {
+          this.setUploadError();
+        }
+
+        if (this.refs.fileDrop) {
+          var _element = this;
+
+          this.addEventListener(this.refs.fileDrop, 'dragover', function (event) {
+            this.className = 'fileSelector fileDragOver';
+            event.preventDefault();
+          });
+          this.addEventListener(this.refs.fileDrop, 'dragleave', function (event) {
+            this.className = 'fileSelector';
+            event.preventDefault();
+          });
+          this.addEventListener(this.refs.fileDrop, 'drop', function (event) {
+            this.className = 'fileSelector';
+            event.preventDefault();
+
+            _element.upload(event.dataTransfer.files[0]);
+
+            return false;
+          });
+        }
+
+        if (this.refs.fileBrowse && this.refs.hiddenFileInputElement) {
+          this.addEventListener(this.refs.fileBrowse, 'click', function (event) {
+            event.preventDefault(); // There is no direct way to trigger a file dialog. To work around this, create an input of type file and trigger
+            // a click event on it.
+
+            if (typeof _this3.refs.hiddenFileInputElement.trigger === 'function') {
+              _this3.refs.hiddenFileInputElement.trigger('click');
+            } else {
+              _this3.refs.hiddenFileInputElement.click();
+            }
+          });
+          this.addEventListener(this.refs.hiddenFileInputElement, 'change', function () {
+            _this3.upload(_this3.refs.hiddenFileInputElement.files[0]);
+
+            _this3.refs.hiddenFileInputElement.value = '';
+          });
+        }
+
+        return _nativePromiseOnly.default.resolve();
+      } // Normal PDF Builder
+
 
       return _get(_getPrototypeOf(PDFBuilder.prototype), "attach", this).call(this, element).then(function () {
         _this3.loadRefs(_this3.element, {
@@ -26591,6 +26685,47 @@ function (_WebformBuilder) {
       });
     }
   }, {
+    key: "upload",
+    value: function upload(file) {
+      var _this4 = this;
+
+      var headers = new Headers({
+        'Accept': 'application/json, text/plain, */*',
+        'Content-type': 'multipart/form-data' // 'x-file-token': tempToken,
+
+      });
+      fetch(this.options.pdfServer, {
+        method: 'POST',
+        headers: headers,
+        form: {
+          file: file
+        }
+      }).then(function (response) {
+        if (response.status !== 200) {
+          response.text().then(function (info) {
+            _this4.setUploadError("".concat(response.statusText, " - ").concat(info));
+          });
+        } else {
+          // TODO: Set settings.pdf here.
+          _this4.rebuild();
+        }
+      }).catch(function (response) {
+        _this4.setUploadError('Upload failed.');
+
+        console.log('fail', response);
+      });
+    }
+  }, {
+    key: "setUploadError",
+    value: function setUploadError(message) {
+      if (!this.refs.uploadError) {
+        return;
+      }
+
+      this.refs.uploadError.style.display = message ? '' : 'none';
+      this.refs.uploadError.innerHTML = message;
+    }
+  }, {
     key: "createForm",
     value: function createForm(options) {
       // Instantiate the webform from the PDF class instead of Webform
@@ -26602,17 +26737,17 @@ function (_WebformBuilder) {
   }, {
     key: "setForm",
     value: function setForm(form) {
-      var _this4 = this;
+      var _this5 = this;
 
       return _get(_getPrototypeOf(PDFBuilder.prototype), "setForm", this).call(this, form).then(function () {
-        return _this4.ready.then(function () {
-          if (_this4.webform) {
-            _this4.webform.postMessage({
+        return _this5.ready.then(function () {
+          if (_this5.webform) {
+            _this5.webform.postMessage({
               name: 'form',
               data: form
             });
 
-            return _this4.webform.setForm(form);
+            return _this5.webform.setForm(form);
           }
 
           return form;
@@ -26645,10 +26780,10 @@ function (_WebformBuilder) {
   }, {
     key: "initIframeEvents",
     value: function initIframeEvents() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.webform.on('iframe-elementUpdate', function (schema) {
-        var component = _this5.webform.getComponentById(schema.id);
+        var component = _this6.webform.getComponentById(schema.id);
 
         if (component && component.component) {
           component.component.overlay = {
@@ -26659,15 +26794,15 @@ function (_WebformBuilder) {
             width: schema.width
           };
 
-          _this5.editComponent(component.component, _this5.webform.iframeElement);
+          _this6.editComponent(component.component, _this6.webform.iframeElement);
 
-          _this5.emit('updateComponent', component);
+          _this6.emit('updateComponent', component);
         }
 
         return component;
       });
       this.webform.on('iframe-componentUpdate', function (schema) {
-        var component = _this5.webform.getComponentById(schema.id);
+        var component = _this6.webform.getComponentById(schema.id);
 
         if (component && component.component) {
           component.component.overlay = {
@@ -26678,18 +26813,18 @@ function (_WebformBuilder) {
             width: schema.overlay.width
           };
 
-          _this5.emit('updateComponent', component);
+          _this6.emit('updateComponent', component);
 
-          _this5.emit('change', _this5.form);
+          _this6.emit('change', _this6.form);
         }
 
         return component;
       });
       this.webform.on('iframe-componentClick', function (schema) {
-        var component = _this5.webform.getComponentById(schema.id);
+        var component = _this6.webform.getComponentById(schema.id);
 
         if (component) {
-          _this5.editComponent(component.component, _this5.webform.iframeElement);
+          _this6.editComponent(component.component, _this6.webform.iframeElement);
         }
       }, true);
     } // 8888888b.                                                                   888                   d8b
@@ -26717,15 +26852,15 @@ function (_WebformBuilder) {
   }, {
     key: "prepSidebarComponentsForDrag",
     value: function prepSidebarComponentsForDrag() {
-      var _this6 = this;
+      var _this7 = this;
 
       _toConsumableArray(this.refs['sidebar-container'].children).forEach(function (el) {
         el.draggable = true;
         el.setAttribute('draggable', true);
 
-        _this6.addEventListener(el, 'dragstart', _this6.onDragStart.bind(_this6), true);
+        _this7.addEventListener(el, 'dragstart', _this7.onDragStart.bind(_this7), true);
 
-        _this6.addEventListener(el, 'dragend', _this6.onDragEnd.bind(_this6), true);
+        _this7.addEventListener(el, 'dragend', _this7.onDragEnd.bind(_this7), true);
       });
     }
   }, {
@@ -26821,6 +26956,11 @@ function (_WebformBuilder) {
         premium: false,
         resource: false
       };
+    }
+  }, {
+    key: "hasPDF",
+    get: function get() {
+      return _lodash.default.has(this.webform, 'form.settings.pdf');
     }
   }]);
 
@@ -26930,6 +27070,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Initialize the available forms.
 _Formio.default.forms = {}; // Allow people to register components.
 
@@ -26999,6 +27141,38 @@ function (_NestedComponent) {
     }
 
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(Webform).call(this, null, getOptions(options)));
+
+    _defineProperty(_assertThisInitialized(_this2), "executeShortcuts", function (event) {
+      var target = event.target;
+
+      if (!_this2.keyboardCatchableElement(target)) {
+        return;
+      }
+
+      var ctrl = event.ctrlKey || event.metaKey;
+      var keyCode = event.keyCode;
+      var char = '';
+
+      if (65 <= keyCode && keyCode <= 90) {
+        char = String.fromCharCode(keyCode);
+      } else if (keyCode === 13) {
+        char = 'Enter';
+      } else if (keyCode === 27) {
+        char = 'Esc';
+      }
+
+      _lodash.default.each(_this2.shortcuts, function (shortcut) {
+        if (shortcut.ctrl && !ctrl) {
+          return;
+        }
+
+        if (shortcut.shortcut === char) {
+          shortcut.element.click();
+          event.preventDefault();
+        }
+      });
+    });
+
     _this2.element = element; // Keep track of all available forms globally.
 
     _Formio.default.forms[_this2.id] = _assertThisInitialized(_this2); // Set the base url.
@@ -27267,38 +27441,6 @@ function (_NestedComponent) {
       }
 
       return true;
-    }
-  }, {
-    key: "executeShortcuts",
-    value: function executeShortcuts(event) {
-      var target = event.target;
-
-      if (!this.keyboardCatchableElement(target)) {
-        return;
-      }
-
-      var ctrl = event.ctrlKey || event.metaKey;
-      var keyCode = event.keyCode;
-      var char = '';
-
-      if (65 <= keyCode && keyCode <= 90) {
-        char = String.fromCharCode(keyCode);
-      } else if (keyCode === 13) {
-        char = 'Enter';
-      } else if (keyCode === 27) {
-        char = 'Esc';
-      }
-
-      _lodash.default.each(this.shortcuts, function (shortcut) {
-        if (shortcut.ctrl && !ctrl) {
-          return;
-        }
-
-        if (shortcut.shortcut === char) {
-          shortcut.element.click();
-          event.preventDefault();
-        }
-      });
     }
   }, {
     key: "addShortcut",
@@ -27761,7 +27903,7 @@ function (_NestedComponent) {
         webform: 'single'
       });
       var childPromise = this.attachComponents(this.refs.webform);
-      this.element.addEventListener('keydown', this.executeShortcuts.bind(this));
+      this.element.addEventListener('keydown', this.executeShortcuts);
       this.currentForm = this;
       setTimeout(function () {
         return _this11.emit('render');
@@ -27772,7 +27914,7 @@ function (_NestedComponent) {
     key: "detach",
     value: function detach() {
       if (this.element) {
-        this.element.removeEventListener('keydown', this.executeShortcuts.bind(this));
+        this.element.removeEventListener('keydown', this.executeShortcuts);
       }
 
       return _get(_getPrototypeOf(Webform.prototype), "detach", this).call(this);
@@ -28606,7 +28748,7 @@ function (_Component) {
 
     _lodash.default.each(_this.defaultGroups, function (config, key) {
       if (config === false) {
-        _this.options.builder[key] = false;
+        _this.builder[key] = false;
       }
     }); // Add the groups.
 
@@ -28756,7 +28898,12 @@ function (_Component) {
     };
 
     _this.options.hooks.attachComponents = function (element, components, container, component) {
-      // Attach container and component to element for later reference.
+      // Don't attach if no element was found.
+      if (!element) {
+        return;
+      } // Attach container and component to element for later reference.
+
+
       var containerElement = element.querySelector("[ref=\"".concat(component.component.key, "-container\"]")) || element;
       containerElement.formioContainer = container;
       containerElement.formioComponent = component; // If this is an existing datagrid element, don't make it draggable.
@@ -28988,7 +29135,9 @@ function (_Component) {
           _this3.initDragula();
         }
 
-        return _this3.webform.attach(_this3.refs.form);
+        if (_this3.refs.form) {
+          return _this3.webform.attach(_this3.refs.form);
+        }
       });
     }
   }, {
@@ -29353,9 +29502,9 @@ function (_Component) {
         if (index !== -1) {
           var originalComponent = parentContainer[index];
           parentContainer[index] = _this6.editForm.submission.data;
-          parentComponent.rebuild();
+          parentComponent.rebuild(); // Should we be passing the instance or the definition here as the component? See WizardBuilder.
 
-          _this6.emit('saveComponent', component, originalComponent);
+          _this6.emit('saveComponent', parentContainer[index], originalComponent);
         }
       });
       this.addEventListener(this.dialog, 'close', function () {
@@ -30209,6 +30358,8 @@ __webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es.array.find-index */ "./node_modules/core-js/modules/es.array.find-index.js");
 
+__webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
+
 __webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
@@ -30222,6 +30373,8 @@ __webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_mo
 __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
+
+__webpack_require__(/*! core-js/modules/es.string.includes */ "./node_modules/core-js/modules/es.string.includes.js");
 
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
 
@@ -30329,7 +30482,16 @@ function (_WebformBuilder) {
       }
 
       return originalAttachComponentsHook(element, components, container, component);
-    };
+    }; // Wizard pages don't replace themselves in the right array. Do that here.
+
+
+    _this.on('saveComponent', function (component, originalComponent) {
+      if (_this._form.components.includes(originalComponent)) {
+        _this._form.components[_this._form.components.indexOf(originalComponent)] = component;
+
+        _this.rebuild();
+      }
+    }, true);
 
     return _this;
   }
@@ -31784,6 +31946,10 @@ function (_Element) {
      * @param {Object} params - The i18n parameters to use for translation.
      */
     value: function t(text, params) {
+      if (!text) {
+        return '';
+      }
+
       params = params || {};
       params.data = this.rootValue;
       params.row = this.data;
@@ -32087,7 +32253,7 @@ function (_Element) {
         tooltip: 'multiple'
       });
       this.refs.tooltip.forEach(function (tooltip, index) {
-        var title = _this4.interpolate(tooltip.getAttribute('data-title') || _this4.component.tooltip).replace(/(?:\r\n|\r|\n)/g, '<br />');
+        var title = _this4.interpolate(tooltip.getAttribute('data-title') || _this4.t(_this4.component.tooltip)).replace(/(?:\r\n|\r|\n)/g, '<br />');
 
         _this4.tooltips[index] = new _tooltip.default(tooltip, {
           trigger: 'hover click',
@@ -32115,6 +32281,34 @@ function (_Element) {
       }
 
       return Promise.resolve();
+    }
+  }, {
+    key: "addShortcut",
+    value: function addShortcut(element, shortcut) {
+      // Avoid infinite recursion.
+      if (this.root === this) {
+        return;
+      }
+
+      if (!shortcut) {
+        shortcut = this.component.shortcut;
+      }
+
+      this.root.addShortcut(element, shortcut);
+    }
+  }, {
+    key: "removeShortcut",
+    value: function removeShortcut(element, shortcut) {
+      // Avoid infinite recursion.
+      if (this.root === this) {
+        return;
+      }
+
+      if (!shortcut) {
+        shortcut = this.component.shortcut;
+      }
+
+      this.root.removeShortcut(element, shortcut);
     }
     /**
      * Remove all event handlers.
@@ -36335,6 +36529,19 @@ function (_Field) {
       });
     }
   }, {
+    key: "data",
+    get: function get() {
+      return this._data;
+    },
+    set: function set(value) {
+      var _this10 = this;
+
+      this._data = value;
+      this.eachComponent(function (component) {
+        component.data = _this10._data;
+      });
+    }
+  }, {
     key: "componentComponents",
     get: function get() {
       return this.component.components || [];
@@ -37484,6 +37691,7 @@ function (_Field) {
         return;
       }
 
+      this.addShortcut(this.refs.button);
       var onChange = null;
       var onError = null;
 
@@ -37599,6 +37807,13 @@ function (_Field) {
     }
     /* eslint-enable max-statements */
 
+  }, {
+    key: "detach",
+    value: function detach(element) {
+      if (element && this.refs.button) {
+        this.removeShortcut(this.refs.button);
+      }
+    }
   }, {
     key: "onClick",
     value: function onClick(event) {
@@ -37917,12 +38132,6 @@ exports.default = ButtonComponent;
 "use strict";
 
 
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -38154,14 +38363,13 @@ var _default = [{
   dataSrc: 'custom',
   data: {
     custom: function custom(_ref) {
-      var values = _ref.values,
-          component = _ref.component,
-          data = _ref.data,
-          row = _ref.row,
-          utils = _ref.utils,
-          instance = _ref.instance,
-          form = _ref.form;
-      return _builder.default.getAvailableShortcuts(form, component);
+      var _ref$instance = _ref.instance;
+      _ref$instance = _ref$instance === void 0 ? {} : _ref$instance;
+      var _ref$instance$root = _ref$instance.root;
+      _ref$instance$root = _ref$instance$root === void 0 ? {} : _ref$instance$root;
+      var editForm = _ref$instance$root.editForm,
+          editComponent = _ref$instance$root.editComponent;
+      return _builder.default.getAvailableShortcuts(editForm, editComponent);
     }
   }
 }, {
@@ -38325,7 +38533,7 @@ function (_Component) {
       return _get(_getPrototypeOf(CheckBoxComponent.prototype), "render", this).call(this, this.renderTemplate('checkbox', {
         input: this.inputInfo,
         checked: this.dataValue,
-        tooltip: this.interpolate(this.component.tooltip || '').replace(/(?:\r\n|\r|\n)/g, '<br />')
+        tooltip: this.interpolate(this.t(this.component.tooltip) || '').replace(/(?:\r\n|\r|\n)/g, '<br />')
       }));
     }
   }, {
@@ -38338,13 +38546,21 @@ function (_Component) {
       });
       this.input = this.refs.input[0];
 
-      if (this.refs.input.length) {
+      if (this.refs.input) {
         this.addEventListener(this.input, this.inputInfo.changeEvent, function () {
           return _this.updateValue();
         });
+        this.addShortcut(this.input);
       }
 
       _get(_getPrototypeOf(CheckBoxComponent.prototype), "attach", this).call(this, element);
+    }
+  }, {
+    key: "detach",
+    value: function detach(element) {
+      if (element && this.input) {
+        this.removeShortcut(this.input);
+      }
     }
   }, {
     key: "isEmpty",
@@ -38569,12 +38785,6 @@ exports.default = _default;
 "use strict";
 
 
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -38600,14 +38810,13 @@ var _default = [{
   dataSrc: 'custom',
   data: {
     custom: function custom(_ref) {
-      var values = _ref.values,
-          component = _ref.component,
-          data = _ref.data,
-          row = _ref.row,
-          utils = _ref.utils,
-          instance = _ref.instance,
-          form = _ref.form;
-      return _builder.default.getAvailableShortcuts(form, component);
+      var _ref$instance = _ref.instance;
+      _ref$instance = _ref$instance === void 0 ? {} : _ref$instance;
+      var _ref$instance$root = _ref$instance.root;
+      _ref$instance$root = _ref$instance$root === void 0 ? {} : _ref$instance$root;
+      var editForm = _ref$instance$root.editForm,
+          editComponent = _ref$instance$root.editComponent;
+      return _builder.default.getAvailableShortcuts(editForm, editComponent);
     }
   }
 }, {
@@ -40801,8 +41010,7 @@ function (_NestedComponent) {
   _createClass(DataGridComponent, [{
     key: "init",
     value: function init() {
-      this.components = this.components || [];
-      this.numColumns = 0; // Add new values based on minLength.
+      this.components = this.components || []; // Add new values based on minLength.
 
       this.rows = [];
       this.createRows();
@@ -41175,6 +41383,7 @@ function (_NestedComponent) {
 
         _lodash.default.each(row, function (col, key) {
           if (col.type === 'components') {
+            col.data = value[rowIndex];
             col.setValue(value[rowIndex], flags);
           } else if (value[rowIndex].hasOwnProperty(key)) {
             col.data = value[rowIndex];
@@ -42783,25 +42992,29 @@ function (_Field) {
       }
 
       var parts = value.split('/');
-      var day, month, year;
+      var day;
 
-      if (this.refs.day && this.component.dayFirst && this.showDay) {
+      if (this.component.dayFirst) {
         day = parts.shift();
+      }
+
+      var month = parts.shift();
+
+      if (!this.component.dayFirst) {
+        day = parts.shift();
+      }
+
+      var year = parts.shift();
+
+      if (this.refs.day && this.showDay) {
         this.refs.day.value = day === '00' ? undefined : parseInt(day, 10);
       }
 
       if (this.refs.month && this.showMonth) {
-        month = parts.shift();
         this.refs.month.value = month === '00' ? undefined : parseInt(month, 10);
       }
 
-      if (this.refs.day && !this.component.dayFirst && this.showDay) {
-        day = parts.shift();
-        this.refs.day.value = day === '00' ? undefined : parseInt(day, 10);
-      }
-
       if (this.refs.year && this.showYear) {
-        year = parts.shift();
         this.refs.year.value = year === '0000' ? undefined : parseInt(year, 10);
       }
     }
@@ -48620,6 +48833,8 @@ exports.default = void 0;
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
 
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -48658,7 +48873,7 @@ function (_TextFieldComponent) {
   _createClass(PasswordComponent, [{
     key: "defaultSchema",
     get: function get() {
-      return PasswordComponent.schema();
+      return _lodash.default.omit(PasswordComponent.schema(), ['protected', 'tableView']);
     }
   }, {
     key: "inputInfo",
@@ -49146,13 +49361,26 @@ function (_Field) {
         input: 'multiple',
         wrapper: 'multiple'
       });
-      this.refs.input.forEach(function (input) {
+      this.refs.input.forEach(function (input, index) {
         _this.addEventListener(input, _this.inputInfo.changeEvent, function () {
           return _this.updateValue();
         });
-      }); // this.addShortcut(label, value.shortcut);
+
+        _this.addShortcut(input, _this.component.values[index].shortcut);
+      });
 
       _get(_getPrototypeOf(RadioComponent.prototype), "attach", this).call(this, element);
+    }
+  }, {
+    key: "detach",
+    value: function detach(element) {
+      var _this2 = this;
+
+      if (element && this.refs.input) {
+        this.refs.input.forEach(function (input, index) {
+          _this2.removeShortcut(input, _this2.component.values[index].shortcut);
+        });
+      }
     }
   }, {
     key: "getValue",
@@ -49210,7 +49438,7 @@ function (_Field) {
   }, {
     key: "updateValue",
     value: function updateValue(flags, value) {
-      var _this2 = this;
+      var _this3 = this;
 
       var changed = _get(_getPrototypeOf(RadioComponent.prototype), "updateValue", this).call(this, flags, value);
 
@@ -49219,13 +49447,13 @@ function (_Field) {
         var _value = this.dataValue;
         var optionSelectedClass = 'radio-selected';
         this.refs.wrapper.forEach(function (wrapper, index) {
-          var input = _this2.refs.input[index];
+          var input = _this3.refs.input[index];
 
           if (input && input.value.toString() === _value.toString()) {
             //add class to container when selected
-            _this2.addClass(wrapper, optionSelectedClass);
+            _this3.addClass(wrapper, optionSelectedClass);
           } else {
-            _this2.removeClass(wrapper, optionSelectedClass);
+            _this3.removeClass(wrapper, optionSelectedClass);
           }
         });
       }
@@ -49303,12 +49531,6 @@ exports.default = RadioComponent;
 "use strict";
 
 
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -49359,14 +49581,13 @@ var _default = [{
     dataSrc: 'custom',
     data: {
       custom: function custom(_ref) {
-        var values = _ref.values,
-            component = _ref.component,
-            data = _ref.data,
-            row = _ref.row,
-            utils = _ref.utils,
-            instance = _ref.instance,
-            form = _ref.form;
-        return _builder.default.getAvailableShortcuts(form, component);
+        var _ref$instance = _ref.instance;
+        _ref$instance = _ref$instance === void 0 ? {} : _ref$instance;
+        var _ref$instance$root = _ref$instance.root;
+        _ref$instance$root = _ref$instance$root === void 0 ? {} : _ref$instance$root;
+        var editForm = _ref$instance$root.editForm,
+            editComponent = _ref$instance$root.editComponent;
+        return _builder.default.getAvailableShortcuts(editForm, editComponent);
       }
     }
   }]
@@ -50057,7 +50278,9 @@ var _Component = _interopRequireDefault(__webpack_require__(/*! ../_classes/comp
 
 var _SelectEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Select.edit.data */ "./node_modules/formiojs/components/select/editForm/Select.edit.data.js"));
 
-var _SelectEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Select.edit.validation */ "./node_modules/formiojs/components/select/editForm/Select.edit.validation.js"));
+var _SelectEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Select.edit.display */ "./node_modules/formiojs/components/select/editForm/Select.edit.display.js"));
+
+var _SelectEdit3 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Select.edit.validation */ "./node_modules/formiojs/components/select/editForm/Select.edit.validation.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -50067,11 +50290,14 @@ function _default() {
   }
 
   return _Component.default.apply(void 0, [[{
+    key: 'display',
+    components: _SelectEdit2.default
+  }, {
     key: 'data',
     components: _SelectEdit.default
   }, {
     key: 'validation',
-    components: _SelectEdit2.default
+    components: _SelectEdit3.default
   }]].concat(extend));
 }
 
@@ -50275,8 +50501,8 @@ function (_Field) {
       var forceUseValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
       if (_lodash.default.isObject(data)) {
-        if (this.component.valueProperty) {
-          return _lodash.default.get(data, this.component.valueProperty);
+        if (this.valueProperty) {
+          return _lodash.default.get(data, this.valueProperty);
         }
 
         if (forceUseValue) {
@@ -50563,7 +50789,6 @@ function (_Field) {
 
       switch (this.component.dataSrc) {
         case 'values':
-          this.component.valueProperty = 'value';
           this.setItems(this.component.data.values);
           break;
 
@@ -50915,7 +51140,7 @@ function (_Field) {
 
       var notFoundValuesToAdd = [];
       var added = values.reduce(function (defaultAdded, value) {
-        if (!value) {
+        if (!value || _lodash.default.isEmpty(value)) {
           return defaultAdded;
         }
 
@@ -50973,7 +51198,8 @@ function (_Field) {
   }, {
     key: "getValue",
     value: function getValue() {
-      if (this.viewOnly || this.loading || !this.selectOptions.length) {
+      // If the widget isn't active.
+      if (this.viewOnly || this.loading || !this.selectOptions.length || !this.element) {
         return this.dataValue;
       }
 
@@ -50985,21 +51211,15 @@ function (_Field) {
         if (!this.component.multiple && this.component.placeholder && value === this.t(this.component.placeholder)) {
           value = this.emptyValue;
         }
+      } else if (this.refs.selectContainer) {
+        value = this.refs.selectContainer.value;
       } else {
-        var values = [];
-
-        _lodash.default.each(this.selectOptions, function (selectOption) {
-          if (selectOption.element && selectOption.element.selected) {
-            values.push(selectOption.value);
-          }
-        });
-
-        value = this.component.multiple ? values : values.shift();
+        value = this.dataValue;
       } // Choices will return undefined if nothing is selected. We really want '' to be empty.
 
 
-      if (value === undefined || value === null || value === '') {
-        value = this.dataValue;
+      if (value === undefined || value === null) {
+        value = '';
       }
 
       return value;
@@ -51125,7 +51345,7 @@ function (_Field) {
           valueProperty: 'value'
         } : {
           items: this.getCustomItems(),
-          valueProperty: this.component.valueProperty
+          valueProperty: this.valueProperty
         },
             items = _ref.items,
             valueProperty = _ref.valueProperty;
@@ -51203,11 +51423,16 @@ function (_Field) {
   }, {
     key: "emptyValue",
     get: function get() {
-      if (this.component.valueProperty) {
+      if (this.valueProperty) {
         return '';
       }
 
       return {};
+    }
+  }, {
+    key: "valueProperty",
+    get: function get() {
+      return this.component.valueProperty || 'value';
     }
   }, {
     key: "inputInfo",
@@ -51521,6 +51746,21 @@ var _default = [{
     }
   }
 }, {
+  type: 'textfield',
+  input: true,
+  label: 'Data Path',
+  key: 'selectValues',
+  weight: 12,
+  description: 'The object path to the iterable items.',
+  tooltip: 'The property within the source data, where iterable items reside. For example: results.items or results[0].items',
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.dataSrc'
+      }, 'url']
+    }
+  }
+}, {
   type: 'select',
   input: true,
   label: 'Value Property',
@@ -51558,21 +51798,6 @@ var _default = [{
       }, {
         var: 'data.data.resource'
       }]
-    }
-  }
-}, {
-  type: 'textfield',
-  input: true,
-  label: 'Data Path',
-  key: 'selectValues',
-  weight: 12,
-  description: 'The object path to the iterable items.',
-  tooltip: 'The property within the source data, where iterable items reside. For example: results.items or results[0].items',
-  conditional: {
-    json: {
-      '===': [{
-        var: 'data.dataSrc'
-      }, 'url']
     }
   }
 }, {
@@ -51877,6 +52102,46 @@ var _default = [{
         var: 'data.dataSrc'
       }, ['url', 'resource']]
     }
+  }
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/select/editForm/Select.edit.display.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/formiojs/components/select/editForm/Select.edit.display.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _utils = __webpack_require__(/*! ../../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
+var _default = [{
+  type: 'select',
+  input: true,
+  weight: 20,
+  tooltip: 'Select the type of widget you\'d like to use',
+  key: 'widget',
+  defaultValue: 'choicesjs',
+  label: 'Widget Type',
+  dataSrc: 'values',
+  data: {
+    values: [{
+      label: 'ChoicesJS',
+      value: 'choicesjs'
+    }, {
+      label: 'HTML 5',
+      value: 'html5'
+    }]
   }
 }];
 exports.default = _default;
@@ -54484,7 +54749,9 @@ function (_TextFieldComponent) {
           break;
 
         case 'ckeditor':
-          this.editorReady = _Formio.default.requireLibrary('ckeditor', 'ClassicEditor', 'https://cdn.ckeditor.com/ckeditor5/11.2.0/classic/ckeditor.js', true).then(function (ClassicEditor) {
+          this.editorReady = _Formio.default.requireLibrary('ckeditor', 'ClassicEditor', 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/v12.2.0-formio.2/build/ckeditor.js', true).then(function (ClassicEditor) {
+            settings = settings || {};
+            settings.base64Upload = true;
             return ClassicEditor.create(element, settings).then(function (editor) {
               editor.model.document.on('change', function () {
                 return _this.updateValue(null, editor.data.get());
@@ -59053,6 +59320,8 @@ var _pdf = _interopRequireDefault(__webpack_require__(/*! ./pdf */ "./node_modul
 
 var _pdfBuilder = _interopRequireDefault(__webpack_require__(/*! ./pdfBuilder */ "./node_modules/formiojs/templates/bootstrap/pdfBuilder/index.js"));
 
+var _pdfBuilderUpload = _interopRequireDefault(__webpack_require__(/*! ./pdfBuilderUpload */ "./node_modules/formiojs/templates/bootstrap/pdfBuilderUpload/index.js"));
+
 var _radio = _interopRequireDefault(__webpack_require__(/*! ./radio */ "./node_modules/formiojs/templates/bootstrap/radio/index.js"));
 
 var _resourceAdd = _interopRequireDefault(__webpack_require__(/*! ./resourceAdd */ "./node_modules/formiojs/templates/bootstrap/resourceAdd/index.js"));
@@ -59136,6 +59405,7 @@ var _default = _objectSpread({
   panel: _panel.default,
   pdf: _pdf.default,
   pdfBuilder: _pdfBuilder.default,
+  pdfBuilderUpload: _pdfBuilderUpload.default,
   radio: _radio.default,
   resourceAdd: _resourceAdd.default,
   select: _select.default,
@@ -59392,6 +59662,30 @@ exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
 var form = "<div class=\"formio builder row formbuilder\">\n  <div class=\"col-xs-4 col-sm-3 col-md-2 formcomponents\">\n    {{sidebar}}\n  </div>\n  <div class=\"col-xs-8 col-sm-9 col-md-10 formarea\" ref=\"form\">\n\t  <div class=\"formio-drop-zone\" ref=\"iframeDropzone\"></div>\n    {{form}}\n  </div>\n</div>\n";
+var _default = {
+  form: form
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/templates/bootstrap/pdfBuilderUpload/index.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/formiojs/templates/bootstrap/pdfBuilderUpload/index.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+/* babel-plugin-inline-import './form.hbs' */
+var form = "<div class=\"pdf-upload formio-component-file\">\n  <h3 class=\"label\">Upload a PDF File</h3>\n  <input type=\"file\" style=\"opacity: 0; position: absolute;\" tabindex=\"-1\" accept=\".pdf\" ref=\"hiddenFileInputElement\">\n  <div class=\"fileSelector\" ref=\"fileDrop\">\n    <i class=\"{{iconClass('cloud-upload')}}\"></i> Drop pdf to start,\n    or <a href=\"#\" ref=\"fileBrowse\" class=\"browse\">browse</a>\n  </div>\n  <div class=\"alert alert-danger\" ref=\"uploadError\">\n\n  </div>\n</div>\n\n";
 var _default = {
   form: form
 };
@@ -62006,13 +62300,11 @@ var _default = {
     return result;
   },
   getAvailableShortcuts: function getAvailableShortcuts(form, component) {
-    // For some reason form and component are not passing in. Just send default list.
     if (!component) {
-      return this.getAlphaShortcuts();
+      return [];
     }
 
-    return [''].concat(_lodash.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), [] // this.getBindedShortcuts(form.components, component))
-    ));
+    return [''].concat(_lodash.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), this.getBindedShortcuts(form.components, component)));
   }
 };
 exports.default = _default;
