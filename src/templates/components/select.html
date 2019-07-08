@@ -20,6 +20,7 @@
   custom-validator="component.validate.custom"
   tabindex="{{ component.tabindex || 0 }}"
   ng-style="getInputGroupStyles(component)"
+  formio-custom-attributes="{{component.attributes}}"
 >
   <ui-select-match class="ui-select-match" placeholder="{{ component.placeholder | formioTranslate:null:options.building }}">
     <formio-select-item template="component.template" item="$item || $select.selected" select="$select"></formio-select-item>

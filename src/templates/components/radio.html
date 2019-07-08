@@ -20,6 +20,7 @@
           auto-focus="{{ $first }}"
           ng-disabled="readOnly"
           ng-style="getOptionInputStyles(component)"
+          formio-custom-attributes="{{component.attributes}}"
         >
         <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>
       </label>
@@ -42,6 +43,7 @@
         custom-validator="component.validate.custom"
         ng-disabled="readOnly"
         ng-style="getOptionInputStyles(component)"
+        formio-custom-attributes="{{component.attributes}}"
       >
       <span ng-if="!topOrLeftOptionLabel(component)">{{ v.label | formioTranslate:null:options.building | shortcut:v.shortcut }}</span>
     </label>

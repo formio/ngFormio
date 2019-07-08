@@ -19,6 +19,7 @@
       ng-model-options="{allowInvalid: true}"
       ng-required="component.validate.required"
       ng-style="getOptionInputStyles(component)"
+      formio-custom-attributes="{{component.attributes}}"
     >
     <input
       ng-if="!component.name"
@@ -35,6 +36,7 @@
       ng-required="isRequired(component)"
       custom-validator="component.validate.custom"
       ng-style="getOptionInputStyles(component)"
+      formio-custom-attributes="{{component.attributes}}"
     >
     <span ng-if="labelVisible() && !topOrLeftOptionLabel(component)">
       {{ component.label | formioTranslate:null:options.building | shortcut:component.shortcut }}
