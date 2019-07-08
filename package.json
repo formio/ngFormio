@@ -32,6 +32,7 @@
     "gulp-wrap": "^0.14.0",
     "karma": "^2.0.4",
     "main-bower-files": "^2.11.1",
+    "natives": "^1.1.6",
     "node-qunit-phantomjs": "^2.0.0",
     "run-sequence": "^2.2.0",
     "strictify": "^0.2.0",
