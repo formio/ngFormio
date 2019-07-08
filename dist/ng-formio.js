@@ -29454,7 +29454,7 @@ function (_Component) {
 
               if (_this6.form) {
                 // Set a unique key for this component.
-                _builder.default.uniquify(_this6.findNamespaceRoot(component.parent.component), event.data);
+                _builder.default.uniquify(_this6.findNamespaceRoot(parent.formioComponent.component), event.data);
               }
             }
           } // Update the component.
@@ -31886,7 +31886,8 @@ function (_Element) {
   _createClass(Component, [{
     key: "init",
     value: function init() {
-      // Attach the refresh on events.
+      this.disabled = this.options.readOnly || this.component.disabled || this.options.hasOwnProperty('disabled') && this.options.disabled[this.key]; // Attach the refresh on events.
+
       this.attachRefreshOn();
     }
   }, {
@@ -32096,6 +32097,7 @@ function (_Element) {
       data.id = data.id || this.id;
       data.key = data.key || this.key;
       data.value = data.value || this.dataValue;
+      data.disabled = this.disabled;
       data.builder = this.builderMode; // Allow more specific template names
 
       var names = ["".concat(name, "-").concat(this.component.type, "-").concat(this.key), "".concat(name, "-").concat(this.component.type), "".concat(name, "-").concat(this.key), "".concat(name)]; // Allow template alters.
@@ -32265,12 +32267,7 @@ function (_Element) {
 
       this.attachLogic(); // this.restoreValue();
 
-      this.autofocus(); // Disable if needed.
-
-      if (this.canDisable) {
-        this.disabled = this.options.readOnly || this.component.disabled;
-      } // Allow global attach.
-
+      this.autofocus(); // Allow global attach.
 
       this.hook('attachComponent', element, this); // Allow attach per component type.
 
@@ -34042,7 +34039,7 @@ var _default = [{
     type: 'textfield',
     key: 'value',
     label: 'Value',
-    defaultValue: 'Value',
+    placeholder: 'Value',
     input: true
   }
 }, {
@@ -35228,6 +35225,11 @@ function (_Multivalue) {
     key: "updateValue",
     value: function updateValue(flags, value, index) {
       flags = flags || {};
+
+      if (!value) {
+        value = this.getValue();
+      }
+
       value = value === undefined ? this.dataValue : value;
       index = index || 0;
       this.triggerUpdateValueAt(flags, value, index);
@@ -38484,7 +38486,7 @@ exports.default = void 0;
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
 
-var _Component2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/component/Component */ "./node_modules/formiojs/components/_classes/component/Component.js"));
+var _Field2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/field/Field */ "./node_modules/formiojs/components/_classes/field/Field.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38518,8 +38520,8 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var CheckBoxComponent =
 /*#__PURE__*/
-function (_Component) {
-  _inherits(CheckBoxComponent, _Component);
+function (_Field) {
+  _inherits(CheckBoxComponent, _Field);
 
   function CheckBoxComponent() {
     _classCallCheck(this, CheckBoxComponent);
@@ -38685,6 +38687,13 @@ function (_Component) {
       return info;
     }
   }, {
+    key: "labelInfo",
+    get: function get() {
+      return {
+        hidden: true
+      };
+    }
+  }, {
     key: "emptyValue",
     get: function get() {
       return false;
@@ -38721,7 +38730,7 @@ function (_Component) {
         extend[_key] = arguments[_key];
       }
 
-      return _Component2.default.schema.apply(_Component2.default, [{
+      return _Field2.default.schema.apply(_Field2.default, [{
         type: 'checkbox',
         inputType: 'checkbox',
         label: 'Checkbox',
@@ -38747,7 +38756,7 @@ function (_Component) {
   }]);
 
   return CheckBoxComponent;
-}(_Component2.default);
+}(_Field2.default);
 
 exports.default = CheckBoxComponent;
 
@@ -41524,6 +41533,22 @@ function (_NestedComponent) {
       return defaultValue;
     }
   }, {
+    key: "disabled",
+    set: function set(disabled) {
+      _set(_getPrototypeOf(DataGridComponent.prototype), "disabled", disabled, this, true);
+
+      _lodash.default.each(this.refs["".concat(this.datagridKey, "-addRow")], function (button) {
+        button.disabled = disabled;
+      });
+
+      _lodash.default.each(this.refs["".concat(this.datagridKey, "-removeRow")], function (button) {
+        button.disabled = disabled;
+      });
+    },
+    get: function get() {
+      return _get(_getPrototypeOf(DataGridComponent.prototype), "disabled", this);
+    }
+  }, {
     key: "datagridKey",
     get: function get() {
       return "datagrid-".concat(this.key);
@@ -41558,9 +41583,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _default = [{
   key: 'multiple',
-  ignore: true
-}, {
-  key: 'defaultValue',
   ignore: true
 }];
 exports.default = _default;
@@ -42961,7 +42983,7 @@ function (_Field) {
         return false;
       }
 
-      if (this.monthRequired && month < 0) {
+      if (this.monthRequired && !month) {
         return false;
       }
 
@@ -43007,15 +43029,15 @@ function (_Field) {
       var year = parts.shift();
 
       if (this.refs.day && this.showDay) {
-        this.refs.day.value = day === '00' ? undefined : parseInt(day, 10);
+        this.refs.day.value = day === '00' ? '' : parseInt(day, 10);
       }
 
       if (this.refs.month && this.showMonth) {
-        this.refs.month.value = month === '00' ? undefined : parseInt(month, 10);
+        this.refs.month.value = month === '00' ? '' : parseInt(month, 10);
       }
 
       if (this.refs.year && this.showYear) {
-        this.refs.year.value = year === '0000' ? undefined : parseInt(year, 10);
+        this.refs.year.value = year === '0000' ? '' : parseInt(year, 10);
       }
     }
   }, {
@@ -43123,7 +43145,7 @@ function (_Field) {
     value: function getValue() {
       var result = _get(_getPrototypeOf(DayComponent.prototype), "getValue", this).call(this);
 
-      return result === '' ? this.dataValue : result;
+      return !result ? this.dataValue : result;
     }
     /**
      * Get the value at a specific index.
@@ -43248,7 +43270,7 @@ function (_Field) {
       }
 
       this._days = [{
-        value: 0,
+        value: '',
         label: _lodash.default.get(this.component, 'fields.day.placeholder', '')
       }];
 
@@ -43269,7 +43291,7 @@ function (_Field) {
       }
 
       this._months = [{
-        value: undefined,
+        value: '',
         label: _lodash.default.get(this.component, 'fields.month.placeholder') || (this.hideInputLabels ? this.t('Month') : '')
       }, {
         value: 1,
@@ -43318,7 +43340,7 @@ function (_Field) {
       }
 
       this._years = [{
-        value: 0,
+        value: '',
         label: _lodash.default.get(this.component, 'fields.year.placeholder', '')
       }];
       var minYears = _lodash.default.get(this.component, 'fields.year.minYear', 1900) || 1900;
@@ -43669,20 +43691,20 @@ var _default = [{
   key: 'fields.year.required',
   input: true
 }, {
-  weight: 30,
-  type: 'textfield',
-  label: 'Maximum Day',
-  placeholder: 'yyyy-MM-dd',
-  tooltip: 'A maximum day that can be set. You can also use Moment.js functions. For example: \n \n moment().add(10, \'days\')',
-  key: 'maxDate',
-  input: true
-}, {
   weight: 40,
   type: 'textfield',
   label: 'Minimum Day',
   placeholder: 'yyyy-MM-dd',
   tooltip: 'A minimum date that can be set. You can also use Moment.js functions. For example: \n \n moment().subtract(10, \'days\')',
   key: 'minDate',
+  input: true
+}, {
+  weight: 30,
+  type: 'textfield',
+  label: 'Maximum Day',
+  placeholder: 'yyyy-MM-dd',
+  tooltip: 'A maximum day that can be set. You can also use Moment.js functions. For example: \n \n moment().add(10, \'days\')',
+  key: 'maxDate',
   input: true
 }];
 exports.default = _default;
@@ -44564,6 +44586,9 @@ var _default = [{
 }, {
   key: 'defaultValue',
   ignore: true
+}, {
+  key: 'multiple',
+  ignore: true
 }];
 exports.default = _default;
 
@@ -45122,11 +45147,13 @@ exports.default = _default;
 
 var _Component = _interopRequireDefault(__webpack_require__(/*! ../_classes/component/Component.form */ "./node_modules/formiojs/components/_classes/component/Component.form.js"));
 
-var _FileEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.display */ "./node_modules/formiojs/components/file/editForm/File.edit.display.js"));
+var _FileEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.data */ "./node_modules/formiojs/components/file/editForm/File.edit.data.js"));
 
-var _FileEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.file */ "./node_modules/formiojs/components/file/editForm/File.edit.file.js"));
+var _FileEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.display */ "./node_modules/formiojs/components/file/editForm/File.edit.display.js"));
 
-var _FileEdit3 = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.validation */ "./node_modules/formiojs/components/file/editForm/File.edit.validation.js"));
+var _FileEdit3 = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.file */ "./node_modules/formiojs/components/file/editForm/File.edit.file.js"));
+
+var _FileEdit4 = _interopRequireDefault(__webpack_require__(/*! ./editForm/File.edit.validation */ "./node_modules/formiojs/components/file/editForm/File.edit.validation.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -45137,15 +45164,18 @@ function _default() {
 
   return _Component.default.apply(void 0, [[{
     key: 'display',
+    components: _FileEdit2.default
+  }, {
+    key: 'data',
     components: _FileEdit.default
   }, {
     label: 'File',
     key: 'file',
     weight: 5,
-    components: _FileEdit2.default
+    components: _FileEdit3.default
   }, {
     key: 'validation',
-    components: _FileEdit3.default
+    components: _FileEdit4.default
   }]].concat(extend));
 }
 
@@ -45939,6 +45969,28 @@ function (_Field) {
 }(_Field2.default);
 
 exports.default = FileComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/file/editForm/File.edit.data.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/formiojs/components/file/editForm/File.edit.data.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  key: 'defaultValue',
+  ignore: true
+}];
+exports.default = _default;
 
 /***/ }),
 
@@ -48303,6 +48355,12 @@ var _default = [{
 }, {
   key: 'allowMultipleMasks',
   ignore: true
+}, {
+  key: 'showWordCount',
+  ignore: true
+}, {
+  key: 'showCharCount',
+  ignore: true
 }];
 exports.default = _default;
 
@@ -49621,6 +49679,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = [{
   key: 'placeholder',
   ignore: true
+}, {
+  type: 'select',
+  input: true,
+  label: 'Options Label Position',
+  key: 'optionsLabelPosition',
+  tooltip: 'Position for the label for options for this field.',
+  dataSrc: 'values',
+  weight: 32,
+  defaultValue: 'right',
+  data: {
+    values: [{
+      label: 'Top',
+      value: 'top'
+    }, {
+      label: 'Left',
+      value: 'left'
+    }, {
+      label: 'Right',
+      value: 'right'
+    }, {
+      label: 'Bottom',
+      value: 'bottom'
+    }]
+  }
 }, {
   type: 'checkbox',
   input: true,
@@ -51501,6 +51583,9 @@ function (_Field) {
         this.focusableElement.setAttribute('tabIndex', this.component.tabindex || 0);
         this.choices.enable();
       }
+    },
+    get: function get() {
+      return _get(_getPrototypeOf(SelectComponent.prototype), "disabled", this);
     }
   }, {
     key: "visible",
@@ -52192,6 +52277,8 @@ exports.default = _default;
 "use strict";
 
 
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -52199,10 +52286,19 @@ exports.default = _default;
 
 var _Radio = _interopRequireDefault(__webpack_require__(/*! ../radio/Radio.form */ "./node_modules/formiojs/components/radio/Radio.form.js"));
 
+var _SelectBoxesEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/SelectBoxes.edit.validation */ "./node_modules/formiojs/components/selectboxes/editForm/SelectBoxes.edit.validation.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
-  return _Radio.default.apply(void 0, arguments);
+  for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+    extend[_key] = arguments[_key];
+  }
+
+  return _Radio.default.apply(void 0, [[{
+    key: 'validation',
+    components: _SelectBoxesEdit.default
+  }]].concat(extend));
 }
 
 /***/ }),
@@ -52239,11 +52335,15 @@ __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */
 
 __webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
 
+__webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
+
 __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
 
 __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
 
@@ -52264,10 +52364,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
@@ -52278,6 +52374,10 @@ function _superPropBase(object, property) { while (!Object.prototype.hasOwnPrope
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -52287,10 +52387,48 @@ var SelectBoxesComponent =
 function (_RadioComponent) {
   _inherits(SelectBoxesComponent, _RadioComponent);
 
+  _createClass(SelectBoxesComponent, null, [{
+    key: "schema",
+    value: function schema() {
+      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
+        extend[_key] = arguments[_key];
+      }
+
+      return _Radio.default.schema.apply(_Radio.default, [{
+        type: 'selectboxes',
+        label: 'Select Boxes',
+        key: 'selectBoxes',
+        inline: false
+      }].concat(extend));
+    }
+  }, {
+    key: "builderInfo",
+    get: function get() {
+      return {
+        title: 'Select Boxes',
+        group: 'basic',
+        icon: 'plus-square',
+        weight: 60,
+        documentation: 'http://help.form.io/userguide/#selectboxes',
+        schema: SelectBoxesComponent.schema()
+      };
+    }
+  }]);
+
   function SelectBoxesComponent() {
+    var _getPrototypeOf2;
+
+    var _this;
+
     _classCallCheck(this, SelectBoxesComponent);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(SelectBoxesComponent).apply(this, arguments));
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(SelectBoxesComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this.validators = _this.validators.concat('minSelectedCount', 'maxSelectedCount');
+    return _this;
   }
 
   _createClass(SelectBoxesComponent, [{
@@ -52390,6 +52528,62 @@ function (_RadioComponent) {
       }).map('label').join(', ');
     }
   }, {
+    key: "checkValidity",
+    value: function checkValidity(data, dirty, rowData) {
+      var _this2 = this;
+
+      console.log('checkValidity', data, dirty, rowData);
+      var minCount = this.component.validate.minSelectedCount;
+      var maxCount = this.component.validate.maxSelectedCount;
+
+      if (maxCount || minCount) {
+        var count = Object.keys(this.validationValue).reduce(function (total, key) {
+          if (_this2.validationValue[key]) {
+            total++;
+          }
+
+          return total;
+        }, 0);
+
+        if (maxCount && count >= maxCount) {
+          console.log(this.refs);
+
+          if (this.refs.input) {
+            this.refs.input.forEach(function (item) {
+              if (!item.checked) {
+                item.disabled = true;
+              }
+            });
+          }
+
+          if (maxCount && count > maxCount) {
+            var message = this.component.maxSelectedCountMessage ? this.component.maxSelectedCountMessage : "You can only select up to ".concat(maxCount, " items.");
+            this.setCustomValidity(message, dirty);
+            return false;
+          }
+        } else if (minCount && count < minCount) {
+          if (this.refs.input) {
+            this.refs.input.forEach(function (item) {
+              item.disabled = false;
+            });
+          }
+
+          var _message = this.component.minSelectedCountMessage ? this.component.minSelectedCountMessage : "You must select at least ".concat(minCount, " items.");
+
+          this.setCustomValidity(_message, dirty);
+          return false;
+        } else {
+          if (this.refs.input) {
+            this.refs.input.forEach(function (item) {
+              item.disabled = false;
+            });
+          }
+        }
+      }
+
+      return _get(_getPrototypeOf(SelectBoxesComponent.prototype), "checkValidity", this).call(this, data, dirty, rowData);
+    }
+  }, {
     key: "defaultSchema",
     get: function get() {
       return SelectBoxesComponent.schema();
@@ -52412,38 +52606,59 @@ function (_RadioComponent) {
         return prev;
       }, {});
     }
-  }], [{
-    key: "schema",
-    value: function schema() {
-      for (var _len = arguments.length, extend = new Array(_len), _key = 0; _key < _len; _key++) {
-        extend[_key] = arguments[_key];
-      }
-
-      return _Radio.default.schema.apply(_Radio.default, [{
-        type: 'selectboxes',
-        label: 'Select Boxes',
-        key: 'selectBoxes',
-        inline: false
-      }].concat(extend));
-    }
-  }, {
-    key: "builderInfo",
-    get: function get() {
-      return {
-        title: 'Select Boxes',
-        group: 'basic',
-        icon: 'plus-square',
-        weight: 60,
-        documentation: 'http://help.form.io/userguide/#selectboxes',
-        schema: SelectBoxesComponent.schema()
-      };
-    }
   }]);
 
   return SelectBoxesComponent;
 }(_Radio.default);
 
 exports.default = SelectBoxesComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/selectboxes/editForm/SelectBoxes.edit.validation.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/formiojs/components/selectboxes/editForm/SelectBoxes.edit.validation.js ***!
+  \**********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  type: 'number',
+  input: true,
+  key: 'validate.minSelectedCount',
+  label: 'Minimum checked number',
+  tooltip: 'Minimum checkboxes required before form can be submitted.',
+  weight: 250
+}, {
+  type: 'number',
+  input: true,
+  key: 'validate.maxSelectedCount',
+  label: 'Maximum checked number',
+  tooltip: 'Maximum checkboxes possible before form can be submitted.',
+  weight: 250
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'minSelectedCountMessage',
+  label: 'Minimum checked error message',
+  tooltip: 'Error message displayed if minimum number of items not checked.',
+  weight: 250
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'maxSelectedCountMessage',
+  label: 'Maximum checked error message',
+  tooltip: 'Error message displayed if maximum number of items checked.',
+  weight: 250
+}];
+exports.default = _default;
 
 /***/ }),
 
@@ -52856,6 +53071,9 @@ var _default = [{
   key: 'multiple',
   ignore: true
 }, {
+  key: 'defaultValue',
+  ignore: true
+}, {
   key: 'dbIndex',
   ignore: true
 }];
@@ -52917,6 +53135,9 @@ var _default = [{
   tooltip: 'The ink color for the signature area.',
   placeholder: 'Pen Color',
   weight: 53
+}, {
+  key: 'placeholder',
+  ignore: true
 }];
 exports.default = _default;
 
@@ -53023,6 +53244,8 @@ __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/c
 
 __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es.reflect.set */ "./node_modules/core-js/modules/es.reflect.set.js");
+
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
@@ -53053,6 +53276,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function set(target, property, value, receiver) { if (typeof Reflect !== "undefined" && Reflect.set) { set = Reflect.set; } else { set = function set(target, property, value, receiver) { var base = _superPropBase(target, property); var desc; if (base) { desc = Object.getOwnPropertyDescriptor(base, property); if (desc.set) { desc.set.call(receiver, value); return true; } else if (!desc.writable) { return false; } } desc = Object.getOwnPropertyDescriptor(receiver, property); if (desc) { if (!desc.writable) { return false; } desc.value = value; Object.defineProperty(receiver, property, desc); } else { _defineProperty(receiver, property, value); } return true; }; } return set(target, property, value, receiver); }
+
+function _set(target, property, value, receiver, isStrict) { var s = set(target, property, value, receiver || target); if (!s && isStrict) { throw new Error('failed to set property'); } return value; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
@@ -53170,6 +53399,18 @@ function (_Field) {
     key: "emptyValue",
     get: function get() {
       return {};
+    }
+  }, {
+    key: "disabled",
+    set: function set(disabled) {
+      _set(_getPrototypeOf(SurveyComponent.prototype), "disabled", disabled, this, true);
+
+      _lodash.default.each(this.refs.input, function (input) {
+        input.disabled = true;
+      });
+    },
+    get: function get() {
+      return _get(_getPrototypeOf(SurveyComponent.prototype), "disabled", this);
     }
   }], [{
     key: "schema",
@@ -54354,6 +54595,9 @@ function (_Input) {
       } else {
         this.choices.enable();
       }
+    },
+    get: function get() {
+      return _get(_getPrototypeOf(TagsComponent.prototype), "disabled", this);
     }
   }], [{
     key: "schema",
@@ -54407,6 +54651,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _default = [{
+  key: 'multiple',
+  ignore: true
+}, {
   weight: 20,
   type: 'textfield',
   input: true,
@@ -55111,6 +55358,9 @@ var _default = [{
   ignore: true
 }, {
   key: 'allowMultipleMasks',
+  ignore: true
+}, {
+  key: 'mask',
   ignore: true
 }, {
   type: 'number',
@@ -58783,7 +59033,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<{{input.type}} \n  ref=\"button\" \n  {% for (var attr in input.attr) { %}\n  {{attr}}=\"{{input.attr[attr]}}\"\n  {% } %}\n>\n{% if (component.leftIcon) { %}<span class=\"{{component.leftIcon}}\"></span>&nbsp;{% } %}\n{{input.content}}\n{% if (component.rightIcon) { %}&nbsp;<span class=\"{{component.rightIcon}}\"></span>{% } %}\n</{{input.type}}>\n<div ref=\"buttonMessageContainer\">\n  <span class=\"help-block\" ref=\"buttonMessage\"></span>\n</div>\n";
+var form = "<{{input.type}}\n  ref=\"button\"\n  {% for (var attr in input.attr) { %}\n  {{attr}}=\"{{input.attr[attr]}}\"\n  {% } %}\n>\n{% if (component.leftIcon) { %}<span class=\"{{component.leftIcon}}\"></span>&nbsp;{% } %}\n{{input.content}}\n{% if (component.tooltip) { %}\n  <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\" data-title=\"{{component.tooltip}}\"></i>\n{% } %}\n{% if (component.rightIcon) { %}&nbsp;<span class=\"{{component.rightIcon}}\"></span>{% } %}\n</{{input.type}}>\n<div ref=\"buttonMessageContainer\">\n  <span class=\"help-block\" ref=\"buttonMessage\"></span>\n</div>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "\n";
@@ -58811,7 +59061,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"form-check\">\n  <label class=\"{{input.labelClass}} form-check-label\">\n    <{{input.type}} \n      ref=\"input\" \n      {% for (var attr in input.attr) { %}\n      {{attr}}=\"{{input.attr[attr]}}\"\n      {% } %}\n      {% if (checked) { %}checked=true{% } %}\n      >\n    {% if (!self.labelIsHidden()) { %}<span>{{input.label}}</span>{% } %}\n    {% if (component.tooltip) { %}\n      <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\"></i>\n    {% } %}\n    {{input.content}}\n    </{{input.type}}>\n  </label>\n</div>\n";
+var form = "<div class=\"form-check checkbox\">\n  <label class=\"{{input.labelClass}} form-check-label\">\n    <{{input.type}}\n      ref=\"input\"\n      {% for (var attr in input.attr) { %}\n      {{attr}}=\"{{input.attr[attr]}}\"\n      {% } %}\n      {% if (checked) { %}checked=true{% } %}\n      >\n    {% if (!self.labelIsHidden()) { %}<span>{{input.label}}</span>{% } %}\n    {% if (component.tooltip) { %}\n      <i ref=\"tooltip\" class=\"{{iconClass('question-sign')}} text-muted\"></i>\n    {% } %}\n    {{input.content}}\n    </{{input.type}}>\n  </label>\n</div>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<label class=\"{{input.labelClass}}\">\n    {{input.content}}\n    {% if (!self.labelIsHidden()) { %}<span>{{input.label}}</span>{% } %}\n</label>\n<div ref=\"value\">{% if (checked) { %}True{% } else { %}False{% } %}</div>\n";
@@ -58987,7 +59237,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"row\">\n  {% if (dayFirst && showDay) { %}\n  <div class=\"col col-xs-3\">\n    <label for=\"{{component.key}}-day\" class=\"{% if(component.fields.day.required) { %}field-required{% } %}\">{{t('Day')}}</label>\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showMonth) { %}\n  <div class=\"col col-xs-4\">\n    <label for=\"{{component.key}}-month\" class=\"{% if(component.fields.month.required) { %}field-required{% } %}\">{{t('Month')}}</label>\n    <div>{{month}}</div>\n  </div>\n  {% } %}\n  {% if (!dayFirst && showDay) { %}\n  <div class=\"col col-xs-3\">\n    <label for=\"{{component.key}}-day\" class=\"{% if(component.fields.day.required) { %}field-required{% } %}\">{{t('Day')}}</label>\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showYear) { %}\n  <div class=\"col col-xs-5\">\n    <label for=\"{{component.key}}-year\" class=\"{% if(component.fields.year.required) { %}field-required{% } %}\">{{t('Year')}}</label>\n    <div>{{year}}</div>\n  </div>\n  {% } %}\n</div>\n<input name=\"data[day]\" type=\"hidden\" class=\"form-control\" lang=\"en\" value=\"\" ref=\"input\">\n";
+var form = "<div class=\"row\">\n  {% if (dayFirst && showDay) { %}\n  <div class=\"col col-xs-3\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-day\" class=\"{% if(component.fields.day.required) { %}field-required{% } %}\">{{t('Day')}}</label>\n    {% } %}\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showMonth) { %}\n  <div class=\"col col-xs-4\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-month\" class=\"{% if(component.fields.month.required) { %}field-required{% } %}\">{{t('Month')}}</label>\n    {% } %}\n    <div>{{month}}</div>\n  </div>\n  {% } %}\n  {% if (!dayFirst && showDay) { %}\n  <div class=\"col col-xs-3\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-day\" class=\"{% if(component.fields.day.required) { %}field-required{% } %}\">{{t('Day')}}</label>\n    {% } %}\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showYear) { %}\n  <div class=\"col col-xs-5\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-year\" class=\"{% if(component.fields.year.required) { %}field-required{% } %}\">{{t('Year')}}</label>\n    {% } %}\n    <div>{{year}}</div>\n  </div>\n  {% } %}\n</div>\n<input name=\"data[day]\" type=\"hidden\" class=\"form-control\" lang=\"en\" value=\"\" ref=\"input\">\n";
 var _default = {
   form: form
 };
@@ -59712,7 +59962,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div>\n  {% values.forEach(function(item) { %}\n  <div class=\"form-check{{inline ? '-inline' : ''}}\" ref=\"wrapper\">\n    <label class=\"form-check-label\" for=\"{{id}}{{row}}-{{item.value}}\">\n      <{{input.type}} \n        ref=\"input\" \n        {% for (var attr in input.attr) { %}\n        {{attr}}=\"{{input.attr[attr]}}\"\n        {% } %}\n        value=\"{{item.value}}\"\n        {% if (value && (value === item.value || (typeof value === 'object' && value.hasOwnProperty(item.value) && value[item.value]))) { %}\n          checked=true\n        {% } %}\n        id=\"{{id}}{{row}}-{{item.value}}\" \n      >\n      <span>{{t(item.label)}}</span>\n    </label>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div class=\"form-radio radio\">\n  {% values.forEach(function(item) { %}\n  <div class=\"form-check{{inline ? '-inline' : ''}}\" ref=\"wrapper\">\n    <label class=\"form-check-label\" for=\"{{id}}{{row}}-{{item.value}}\">\n      {% if (component.optionsLabelPosition === 'left' || component.optionsLabelPosition === 'top') { %}\n      <span>{{t(item.label)}}</span>\n      {% } %}\n      <{{input.type}}\n        ref=\"input\"\n        {% for (var attr in input.attr) { %}\n        {{attr}}=\"{{input.attr[attr]}}\"\n        {% } %}\n        value=\"{{item.value}}\"\n        {% if (value && (value === item.value || (typeof value === 'object' && value.hasOwnProperty(item.value) && value[item.value]))) { %}\n          checked=true\n        {% } %}\n        id=\"{{id}}{{row}}-{{item.value}}\"\n      >\n      {% if (!component.optionsLabelPosition || component.optionsLabelPosition === 'right' || component.optionsLabelPosition === 'bottom') { %}\n      <span>{{t(item.label)}}</span>\n      {% } %}\n    </label>\n  </div>\n  {% }) %}\n</div>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<div ref=\"value\">\n  {% var values = values.filter(function(item) {return value === item.value || (typeof value === 'object' && value.hasOwnProperty(item.value) && value[item.value])}).map(function(item) { return t(item.label)}).join(', ') %}\n  {{values}}\n  </div>\n";
@@ -60307,7 +60557,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"row\">\n  {% if (dayFirst && showDay) { %}\n  <div class=\"form-group col col-xs-3\">\n    <label for=\"{{component.key}}-day\" class=\"\">{{t('Day')}}</label>\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showMonth) { %}\n  <div class=\"form-group col col-xs-4\">\n    <label for=\"{{component.key}}-month\" class=\"\">{{t('Month')}}</label>\n    <div>{{month}}</div>\n  </div>\n  {% } %}\n  {% if (!dayFirst && showDay) { %}\n  <div class=\"form-group col col-xs-3\">\n    <label for=\"{{component.key}}-day\" class=\"\">{{t('Day')}}</label>\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showYear) { %}\n  <div class=\"form-group col col-xs-5\">\n    <label for=\"{{component.key}}-year\" class=\"\">{{t('Year')}}</label>\n    <div>{{year}}</div>\n  </div>\n  {% } %}\n</div>\n<input name=\"data[day]\" type=\"hidden\" class=\"form-control\" lang=\"en\" value=\"\" ref=\"input\">\n";
+var form = "<div class=\"row\">\n  {% if (dayFirst && showDay) { %}\n  <div class=\"form-group col col-xs-3\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-day\" class=\"{% if(component.fields.day.required) { %}field-required{% } %}\">{{t('Day')}}</label>\n    {% } %}\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showMonth) { %}\n  <div class=\"form-group col col-xs-4\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-month\" class=\"{% if(component.fields.month.required) { %}field-required{% } %}\">{{t('Month')}}</label>\n    {% } %}\n    <div>{{month}}</div>\n  </div>\n  {% } %}\n  {% if (!dayFirst && showDay) { %}\n  <div class=\"form-group col col-xs-3\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-day\" class=\"{% if(component.fields.day.required) { %}field-required{% } %}\">{{t('Day')}}</label>\n    {% } %}\n    <div>{{day}}</div>\n  </div>\n  {% } %}\n  {% if (showYear) { %}\n  <div class=\"form-group col col-xs-5\">\n    {% if (!component.hideInputLabels) { %}\n    <label for=\"{{component.key}}-year\" class=\"{% if(component.fields.year.required) { %}field-required{% } %}\">{{t('Year')}}</label>\n    {% } %}\n    <div>{{year}}</div>\n  </div>\n  {% } %}\n</div>\n<input name=\"data[day]\" type=\"hidden\" class=\"form-control\" lang=\"en\" value=\"\" ref=\"input\">\n";
 var _default = {
   form: form
 };
@@ -60846,7 +61096,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"input-group\">\n  {% values.forEach(function(item) { %}\n  <div class=\"{{input.attr.type}}{{inline ? '-inline' : ''}}\" ref=\"wrapper\">\n    <label class=\"control-label form-check-label\" for=\"{{id}}{{row}}-{{item.value}}\">\n      <{{input.type}} \n        ref=\"input\" \n        {% for (var attr in input.attr) { %}\n        {{attr}}=\"{{input.attr[attr]}}\"\n        {% } %}\n        value=\"{{item.value}}\"\n        {% if (value === item.value || (typeof value === 'object' && value.hasOwnProperty(item.value) && value[item.value])) { %}\n          checked=true\n        {% } %}\n        id=\"{{id}}{{row}}-{{item.value}}\" \n      >\n      <span>{{t(item.label)}}</span>\n    </label>\n  </div>\n  {% }) %}\n</div>\n";
+var form = "<div class=\"input-group\">\n  {% values.forEach(function(item) { %}\n  <div class=\"{{input.attr.type}}{{inline ? '-inline' : ''}}\" ref=\"wrapper\">\n    <label class=\"control-label form-check-label\" for=\"{{id}}{{row}}-{{item.value}}\">\n      {% if (component.optionsLabelPosition === 'left' || component.optionsLabelPosition === 'top') { %}\n      <span>{{t(item.label)}}</span>\n      {% } %}\n      <{{input.type}}\n        ref=\"input\"\n        {% for (var attr in input.attr) { %}\n        {{attr}}=\"{{input.attr[attr]}}\"\n        {% } %}\n        value=\"{{item.value}}\"\n        {% if (value === item.value || (typeof value === 'object' && value.hasOwnProperty(item.value) && value[item.value])) { %}\n          checked=true\n        {% } %}\n        id=\"{{id}}{{row}}-{{item.value}}\"\n      >\n      {% if (!component.optionsLabelPosition || component.optionsLabelPosition === 'right' || component.optionsLabelPosition === 'bottom') { %}\n      <span>{{t(item.label)}}</span>\n      {% } %}\n    </label>\n  </div>\n  {% }) %}\n</div>\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<div ref=\"value\">\n  {% var values = values.filter(function(item) {return value === item.value || (typeof value === 'object' && value.hasOwnProperty(item.value) && value[item.value])}).map(function(item) { return t(item.label)}).join(', ') %}\n  {{values}}\n  </div>\n";
