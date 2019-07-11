@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "angular": "^1.7.2",
-    "angular-ckeditor": "lemonde/angular-ckeditor#v1.0.3",
+    "angular-ckeditor-legacy": "^1.0.3",
     "angular-file-saver": "^1.1.3",
     "angular-moment": "^1.2.0",
     "angular-sanitize": "^1.7.2",
