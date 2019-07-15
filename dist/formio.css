@@ -1,4 +1,4 @@
-/*! ng-formio v3.17.8 | https://unpkg.com/ngFormio@3.17.8/LICENSE.txt */
+/*! ng-formio v3.18.0 | https://unpkg.com/ngFormio@3.18.0/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3284,8 +3284,11 @@ dialog.fixed {
   border: none;
   display: none; }
 
-.formio-disabled-input.formio-component-ace > .well, .formio-disabled-input.formio-component-nativeTextArea > .well {
+.formio-disabled-input.formio-component-textarea > .well {
   white-space: pre-wrap; }
+
+.formio-disabled-input.formio-component-textarea > .well * {
+  white-space: initial; }
 
 .formio-disabled-input.formio-component-textarea .well {
   overflow-wrap: break-word; }
@@ -4012,7 +4015,8 @@ td .formio-component-modaledit .formio-modaledit-view-container {
   position: absolute; }
 
 .formio-edit-sketchpad-background svg {
-  background: #fff; }
+  background: #fff;
+  border: 1px dashed #999; }
 
 .formio-edit-sketchpad-canvas, .formio-view-sketchpad-canvas {
   position: relative;

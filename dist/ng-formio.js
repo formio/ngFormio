@@ -13226,6 +13226,41 @@ $({ target: 'Object', stat: true, forced: FORCED, sham: !DESCRIPTORS }, {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/modules/es.object.get-own-property-descriptors.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/core-js/modules/es.object.get-own-property-descriptors.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var DESCRIPTORS = __webpack_require__(/*! ../internals/descriptors */ "./node_modules/core-js/internals/descriptors.js");
+var ownKeys = __webpack_require__(/*! ../internals/own-keys */ "./node_modules/core-js/internals/own-keys.js");
+var toIndexedObject = __webpack_require__(/*! ../internals/to-indexed-object */ "./node_modules/core-js/internals/to-indexed-object.js");
+var getOwnPropertyDescriptorModule = __webpack_require__(/*! ../internals/object-get-own-property-descriptor */ "./node_modules/core-js/internals/object-get-own-property-descriptor.js");
+var createProperty = __webpack_require__(/*! ../internals/create-property */ "./node_modules/core-js/internals/create-property.js");
+
+// `Object.getOwnPropertyDescriptors` method
+// https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptors
+$({ target: 'Object', stat: true, sham: !DESCRIPTORS }, {
+  getOwnPropertyDescriptors: function getOwnPropertyDescriptors(object) {
+    var O = toIndexedObject(object);
+    var getOwnPropertyDescriptor = getOwnPropertyDescriptorModule.f;
+    var keys = ownKeys(O);
+    var result = {};
+    var index = 0;
+    var key, descriptor;
+    while (keys.length > index) {
+      descriptor = getOwnPropertyDescriptor(O, key = keys[index++]);
+      if (descriptor !== undefined) createProperty(result, key, descriptor);
+    }
+    return result;
+  }
+});
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/modules/es.object.get-prototype-of.js":
 /*!********************************************************************!*\
   !*** ./node_modules/core-js/modules/es.object.get-prototype-of.js ***!
@@ -18543,7 +18578,7 @@ exports.PatchError = PatchError;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.6.1, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.6.2, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
@@ -18634,6 +18669,7 @@ exports.PatchError = PatchError;
         locale: "default",
         minuteIncrement: 5,
         mode: "single",
+        monthSelectorType: "dropdown",
         nextArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z' /></svg>",
         noCalendar: false,
         now: new Date(),
@@ -18727,6 +18763,8 @@ exports.PatchError = PatchError;
         toggleTitle: "Click to toggle",
         amPM: ["AM", "PM"],
         yearAriaLabel: "Year",
+        hourAriaLabel: "Hour",
+        minuteAriaLabel: "Minute",
         time_24hr: false
     };
 
@@ -19689,7 +19727,8 @@ exports.PatchError = PatchError;
             }
         }
         function buildMonthSwitch() {
-            if (self.config.showMonths > 1)
+            if (self.config.showMonths > 1 ||
+                self.config.monthSelectorType !== "dropdown")
                 return;
             var shouldBuildMonth = function (month) {
                 if (self.config.minDate !== undefined &&
@@ -19708,7 +19747,7 @@ exports.PatchError = PatchError;
                     continue;
                 var month = createElement("option", "flatpickr-monthDropdown-month");
                 month.value = new Date(self.currentYear, i).getMonth().toString();
-                month.textContent = monthToStr(i, false, self.l10n);
+                month.textContent = monthToStr(i, self.config.shorthandCurrentMonth, self.l10n);
                 month.tabIndex = -1;
                 if (self.currentMonth === i) {
                     month.selected = true;
@@ -19720,7 +19759,8 @@ exports.PatchError = PatchError;
             var container = createElement("div", "flatpickr-month");
             var monthNavFragment = window.document.createDocumentFragment();
             var monthElement;
-            if (self.config.showMonths > 1) {
+            if (self.config.showMonths > 1 ||
+                self.config.monthSelectorType === "static") {
                 monthElement = createElement("span", "cur-month");
             }
             else {
@@ -19810,9 +19850,13 @@ exports.PatchError = PatchError;
             self.timeContainer = createElement("div", "flatpickr-time");
             self.timeContainer.tabIndex = -1;
             var separator = createElement("span", "flatpickr-time-separator", ":");
-            var hourInput = createNumberInput("flatpickr-hour");
+            var hourInput = createNumberInput("flatpickr-hour", {
+                "aria-label": self.l10n.hourAriaLabel
+            });
             self.hourElement = hourInput.getElementsByTagName("input")[0];
-            var minuteInput = createNumberInput("flatpickr-minute");
+            var minuteInput = createNumberInput("flatpickr-minute", {
+                "aria-label": self.l10n.minuteAriaLabel
+            });
             self.minuteElement = minuteInput.getElementsByTagName("input")[0];
             self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
             self.hourElement.value = pad(self.latestSelectedDateObj
@@ -20741,7 +20785,8 @@ exports.PatchError = PatchError;
                 return self.clear(triggerChange);
             setSelectedDate(date, format);
             self.showTimeInput = self.selectedDates.length > 0;
-            self.latestSelectedDateObj = self.selectedDates[self.selectedDates.length - 1];
+            self.latestSelectedDateObj =
+                self.selectedDates[self.selectedDates.length - 1];
             self.redraw();
             jumpToDate();
             setHoursFromDate();
@@ -20939,7 +20984,8 @@ exports.PatchError = PatchError;
             self.yearElements.forEach(function (yearElement, i) {
                 var d = new Date(self.currentYear, self.currentMonth, 1);
                 d.setMonth(self.currentMonth + i);
-                if (self.config.showMonths > 1) {
+                if (self.config.showMonths > 1 ||
+                    self.config.monthSelectorType === "static") {
                     self.monthElements[i].textContent =
                         monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) + " ";
                 }
@@ -21630,7 +21676,7 @@ function () {
           if (key.indexOf('on') === 0) {
             // If this is an event, add a listener.
             _this5.addEventListener(element, key.substr(2).toLowerCase(), value);
-          } else {
+          } else if (key) {
             // Otherwise it is just an attribute.
             element.setAttribute(key, value);
           }
@@ -24385,6 +24431,8 @@ __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
 
+__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
 
 Object.defineProperty(exports, "__esModule", {
@@ -24581,13 +24629,18 @@ function (_WebformBuilder) {
 
       if (!schema) {
         return false;
+      } // Special case for file components - default to image mode when added via PDF builder
+
+
+      if (schema.type === 'file') {
+        schema.image = true;
       }
 
       schema.overlay = {
         top: event.offsetY,
         left: event.offsetX,
-        width: 100,
-        height: 20
+        width: schema.defaultOverlayWidth || 100,
+        height: schema.defaultOverlayHeight || 20
       };
       this.addComponentTo(schema, this, this.getContainer());
       this.disableDropZone();
@@ -24703,7 +24756,7 @@ function (_WebformBuilder) {
       // If this is a brand new form, make sure it has a submit button component
       if (!form.created && !_lodash.default.find(form.components || [], {
         type: 'button',
-        action: 'submit'
+        key: 'submit'
       })) {
         form.components.push({
           type: 'button',
@@ -24719,15 +24772,15 @@ function (_WebformBuilder) {
 
       return _get(_getPrototypeOf(PDFBuilder.prototype), "setForm", this).call(this, form).then(function () {
         return _this6.ready.then(function () {
-          if (_this6.pdfForm) {
-            return _this6.pdfForm.setForm(form).then(function (newForm) {
-              _lodash.default.each(_this6.components, function (c, i) {
-                c.component = _lodash.default.cloneDeep(newForm.components[i]);
-                c.id = c.component.id;
-              });
+          // Ensure PDFBuilder component IDs are included in form schema to prevent desync with child PDF
+          var formCopy = _lodash.default.cloneDeep(form);
 
-              return newForm;
-            });
+          formCopy.components.forEach(function (c, i) {
+            return c.id = _this6.components[i].id;
+          });
+
+          if (_this6.pdfForm) {
+            return _this6.pdfForm.setForm(formCopy);
           }
 
           return form;
@@ -26473,6 +26526,8 @@ __webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
 
+__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptors */ "./node_modules/core-js/modules/es.object.get-own-property-descriptors.js");
+
 __webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
 
 __webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
@@ -26516,7 +26571,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { if (i % 2) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } else { Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i])); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -26844,7 +26899,7 @@ function (_Webform) {
 
 
       if (this.defaultValueComponent) {
-        _lodash.default.assign(this.defaultValueComponent, _lodash.default.omit(component.component, ['key', 'label', 'placeholder', 'tooltip', 'validate', 'disabled']));
+        _lodash.default.assign(this.defaultValueComponent, _lodash.default.omit(component.component, ['key', 'label', 'placeholder', 'tooltip', 'validate', 'disabled', 'fields.day.required', 'fields.month.required', 'fields.year.required']));
       } // Called when we update a component.
 
 
@@ -26947,7 +27002,7 @@ function (_Webform) {
 
       this.defaultValueComponent = (0, _utils.getComponent)(editForm.components, 'defaultValue');
 
-      _lodash.default.assign(this.defaultValueComponent, _lodash.default.omit(componentCopy.component, ['key', 'label', 'placeholder', 'tooltip', 'validate', 'disabled'])); // Create the form instance.
+      _lodash.default.assign(this.defaultValueComponent, _lodash.default.omit(componentCopy.component, ['key', 'label', 'placeholder', 'tooltip', 'validate', 'disabled', 'fields.day.required', 'fields.month.required', 'fields.year.required'])); // Create the form instance.
 
 
       var editFormOptions = _lodash.default.get(this, 'options.editForm', {});
@@ -30200,6 +30255,8 @@ var _BaseEdit5 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Base.
 
 var _BaseEdit6 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Base.edit.validation */ "./node_modules/formiojs/components/base/editForm/Base.edit.validation.js"));
 
+var _BaseEdit7 = _interopRequireDefault(__webpack_require__(/*! ./editForm/Base.edit.layout */ "./node_modules/formiojs/components/base/editForm/Base.edit.layout.js"));
+
 var _utils = _interopRequireDefault(__webpack_require__(/*! ./editForm/utils */ "./node_modules/formiojs/components/base/editForm/utils.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -30242,6 +30299,11 @@ function _default() {
       key: 'logic',
       weight: 50,
       components: _BaseEdit5.default
+    }, {
+      label: 'Layout',
+      key: 'layout',
+      weight: 60,
+      components: _BaseEdit7.default
     }]
   }]).concat(extend.map(function (items) {
     return {
@@ -30368,7 +30430,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var CKEDITOR = 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/v12.2.0-formio.1/build/ckeditor.js';
+var CKEDITOR = 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/v12.2.0-formio.2/build/ckeditor.js';
 /**
  * This is the BaseComponent class which all elements within the FormioForm derive from.
  */
@@ -32180,7 +32242,7 @@ function (_Component) {
     key: "clearOnHide",
     value: function clearOnHide(show) {
       // clearOnHide defaults to true for old forms (without the value set) so only trigger if the value is false.
-      if (this.component.clearOnHide !== false && !this.options.readOnly && !this.options.showHiddenFields) {
+      if (this.component.clearOnHide !== false && !this.options.readOnly) {
         if (!show) {
           this.deleteValue();
         } else if (!this.hasValue()) {
@@ -32330,6 +32392,7 @@ function (_Component) {
     key: "addCKE",
     value: function addCKE(element, settings, onChange) {
       settings = _lodash.default.isEmpty(settings) ? {} : settings;
+      settings.base64Upload = true;
       return _Formio.default.requireLibrary('ckeditor', 'ClassicEditor', CKEDITOR, true).then(function () {
         if (!element.parentNode) {
           return _nativePromiseOnly.default.reject();
@@ -33043,6 +33106,8 @@ function (_Component) {
         attributes.tabindex = this.component.tabindex;
       }
 
+      _lodash.default.defaults(attributes, this.component.attributes);
+
       return {
         type: 'input',
         component: this.component,
@@ -33386,7 +33451,7 @@ function (_Component) {
   }, {
     key: "dataValue",
     get: function get() {
-      if (!this.key || !this.visible && this.component.clearOnHide) {
+      if (!this.key) {
         return this.emptyValue;
       }
 
@@ -33403,7 +33468,7 @@ function (_Component) {
      */
     ,
     set: function set(value) {
-      if (!this.key || !this.visible && this.component.clearOnHide) {
+      if (!this.key) {
         return value;
       }
 
@@ -33958,6 +34023,39 @@ var _default = [{
 }];
 /* eslint-enable max-len */
 
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/base/editForm/Base.edit.layout.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/formiojs/components/base/editForm/Base.edit.layout.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  label: 'HTML Attributes',
+  type: 'datamap',
+  input: true,
+  key: 'attributes',
+  keyLabel: 'Attribute Name',
+  valueComponent: {
+    type: 'textfield',
+    key: 'value',
+    label: 'Attribute Value',
+    input: true
+  },
+  tooltip: 'Provide a map of HTML attributes for component\'s input element (attributes provided by other component settings or other attributes generated by form.io take precedence over attributes in this grid)',
+  addAnother: 'Add Attribute'
+}];
 exports.default = _default;
 
 /***/ }),
@@ -35990,6 +36088,10 @@ function (_BaseComponent) {
     key: "updateValue",
     value: function updateValue(flags, value) {
       var _this2 = this;
+
+      if (!this.hasInput) {
+        return false;
+      }
 
       if (this.isRadioCheckbox) {
         if (value === undefined && this.input.checked) {
@@ -38760,21 +38862,20 @@ function (_NestedComponent) {
         }
       }
 
-      this.dataValue = value;
-
       if (shouldBuildRows) {
+        this.dataValue = value;
         this.buildRows();
+        this.rows.forEach(function (row, index) {
+          if (value.length <= index) {
+            return;
+          }
+
+          _lodash.default.forIn(row, function (component) {
+            return _this9.setNestedValue(component, value[index], flags);
+          });
+        });
       }
 
-      this.rows.forEach(function (row, index) {
-        if (value.length <= index) {
-          return;
-        }
-
-        _lodash.default.forIn(row, function (component) {
-          return _this9.setNestedValue(component, value[index], flags);
-        });
-      });
       return changed;
     }
     /* eslint-enable max-statements */
@@ -39492,7 +39593,7 @@ function (_NestedComponent) {
 
       var keyHeader = this.ce('th', {
         'class': 'col-2 col-sm-3'
-      }, this.text('Key'));
+      }, this.text(this.component.keyLabel || 'Key'));
       this.createTooltip(keyHeader, {
         tooltip: this.t('Enter the map "key" for this value.')
       });
@@ -39626,7 +39727,11 @@ function (_NestedComponent) {
     value: function setValue(value) {
       var changed = this.hasChanged(value, this.dataValue);
       this.dataValue = value;
-      this.buildRows();
+
+      if (changed) {
+        this.buildRows();
+      }
+
       return changed;
     }
     /**
@@ -39685,6 +39790,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _default = [{
+  type: 'textfield',
+  label: 'Label for Key column',
+  key: 'keyLabel',
+  tooltip: 'Provide a label text for Key column (otherwise \'Key\' will be used)',
+  weight: 404,
+  input: true
+}, {
   type: 'checkbox',
   label: 'Disable Adding / Removing Rows',
   key: 'disableAddingRemovingRows',
@@ -40469,6 +40581,9 @@ function (_BaseComponent) {
         step: '1',
         min: '1',
         max: '31',
+        oninput: function oninput() {
+          this.value = parseInt(this.value, 10) || 0;
+        },
         placeholder: _lodash.default.get(this.component, 'fields.day.placeholder') || (this.hideInputLabels ? this.t('Day') : ''),
         id: id
       });
@@ -40569,6 +40684,9 @@ function (_BaseComponent) {
         type: 'number',
         step: '1',
         min: '1',
+        oninput: function oninput() {
+          this.value = parseInt(this.value, 10) || 0;
+        },
         placeholder: _lodash.default.get(this.component, 'fields.year.placeholder') || (this.hideInputLabels ? this.t('Year') : ''),
         id: id
       });
@@ -40682,28 +40800,33 @@ function (_BaseComponent) {
       // on invalid date.
       if (!value || value === 'Invalid date') {
         return null;
-      }
+      } // Calculate the value parts.
+
 
       var parts = value.split('/');
-      var day, month, year;
+      var day;
 
-      if (this.component.dayFirst && this.showDay) {
+      if (this.component.dayFirst) {
         day = parts.shift();
+      }
+
+      var month = parts.shift();
+
+      if (!this.component.dayFirst) {
+        day = parts.shift();
+      }
+
+      var year = parts.shift(); // Now set the values.
+
+      if (this.showDay) {
         this.dayInput.value = day === '00' ? undefined : parseInt(day, 10);
       }
 
       if (this.showMonth) {
-        month = parts.shift();
         this.monthInput.value = month === '00' ? undefined : parseInt(month, 10);
       }
 
-      if (!this.component.dayFirst && this.showDay) {
-        day = parts.shift();
-        this.dayInput.value = day === '00' ? undefined : parseInt(day, 10);
-      }
-
       if (this.showYear) {
-        year = parts.shift();
         this.yearInput.value = year === '0000' ? undefined : parseInt(year, 10);
       }
     }
@@ -43353,7 +43476,9 @@ function (_BaseComponent) {
         filePattern: '*',
         fileMinSize: '0KB',
         fileMaxSize: '1GB',
-        uploadOnly: false
+        uploadOnly: false,
+        defaultOverlayWidth: 200,
+        defaultOverlayHeight: 200
       }].concat(extend));
     }
   }, {
@@ -43395,6 +43520,11 @@ function (_BaseComponent) {
     key: "getValue",
     value: function getValue() {
       return this.dataValue;
+    }
+  }, {
+    key: "getView",
+    value: function getView(value) {
+      return value ? 'Yes' : 'No';
     }
   }, {
     key: "loadImage",
@@ -48428,6 +48558,8 @@ __webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
 
+__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptors */ "./node_modules/core-js/modules/es.object.get-own-property-descriptors.js");
+
 __webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
@@ -48441,7 +48573,7 @@ var _utils = _interopRequireDefault(__webpack_require__(/*! ../../base/editForm/
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { if (i % 2) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } else { Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i])); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -48701,6 +48833,8 @@ exports.default = void 0;
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
 
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -48747,7 +48881,7 @@ function (_TextFieldComponent) {
   }, {
     key: "defaultSchema",
     get: function get() {
-      return PasswordComponent.schema();
+      return _lodash.default.omit(PasswordComponent.schema(), ['protected', 'tableView']);
     }
   }], [{
     key: "schema",
@@ -48759,7 +48893,9 @@ function (_TextFieldComponent) {
       return _TextField.default.schema.apply(_TextField.default, [{
         type: 'password',
         label: 'Password',
-        key: 'password'
+        key: 'password',
+        protected: true,
+        tableView: false
       }].concat(extend));
     }
   }, {
@@ -49246,9 +49382,20 @@ function (_BaseComponent) {
       }
     }
   }, {
+    key: "deleteValue",
+    value: function deleteValue() {
+      var _this2 = this;
+
+      _lodash.default.each(this.inputs, function (__input, index) {
+        return _this2.setValueAt(index, false);
+      });
+
+      _get(_getPrototypeOf(RadioComponent.prototype), "deleteValue", this).call(this);
+    }
+  }, {
     key: "updateValue",
     value: function updateValue(flags, value) {
-      var _this2 = this;
+      var _this3 = this;
 
       var changed = _get(_getPrototypeOf(RadioComponent.prototype), "updateValue", this).call(this, flags, value);
 
@@ -49258,13 +49405,13 @@ function (_BaseComponent) {
         var optionSelectedClass = 'radio-selected';
 
         _lodash.default.each(this.wrappers, function (wrapper, index) {
-          var input = _this2.inputs[index];
+          var input = _this3.inputs[index];
 
           if (input.value.toString() === _value.toString()) {
             //add class to container when selected
-            _this2.addClass(wrapper, optionSelectedClass);
+            _this3.addClass(wrapper, optionSelectedClass);
           } else {
-            _this2.removeClass(wrapper, optionSelectedClass);
+            _this3.removeClass(wrapper, optionSelectedClass);
           }
         });
       }
@@ -50224,6 +50371,8 @@ __webpack_require__(/*! core-js/modules/es.object.assign */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
 
+__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptors */ "./node_modules/core-js/modules/es.object.get-own-property-descriptors.js");
+
 __webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
 
 __webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
@@ -50273,7 +50422,7 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { if (i % 2) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } else { Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i])); } } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -54499,7 +54648,10 @@ function (_TextFieldComponent) {
     _classCallCheck(this, TextAreaComponent);
 
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TextAreaComponent).call(this, component, options, data));
-    _this2.wysiwygRendered = false; // Never submit on enter for text areas.
+    _this2.wysiwygRendered = false;
+    _this2.editorReady = new _nativePromiseOnly.default(function (resolve) {
+      _this2.editorReadyResolve = resolve;
+    }); // Never submit on enter for text areas.
 
     _this2.options.submitOnEnter = false;
     return _this2;
@@ -54622,7 +54774,7 @@ function (_TextFieldComponent) {
       }
 
       if (this.component.editor === 'ace') {
-        this.editorReady = _Formio.default.requireLibrary('ace', 'ace', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js', true).then(function () {
+        _Formio.default.requireLibrary('ace', 'ace', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js', true).then(function () {
           var mode = _this3.component.as || 'javascript';
           _this3.editor = ace.edit(_this3.input);
 
@@ -54641,15 +54793,19 @@ function (_TextFieldComponent) {
           setTimeout(function () {
             return _this3.acePlaceholder();
           }, 100);
+
+          _this3.editorReadyResolve(_this3.editor);
+
           return _this3.editor;
         });
+
         return this.input;
       }
 
       if (this.component.editor === 'ckeditor') {
         var settings = this.component.wysiwyg || {};
         settings.rows = this.component.rows;
-        this.editorReady = this.addCKE(this.input, settings, function (newValue) {
+        this.addCKE(this.input, settings, function (newValue) {
           return _this3.updateEditorValue(newValue);
         }).then(function (editor) {
           _this3.editor = editor;
@@ -54657,6 +54813,8 @@ function (_TextFieldComponent) {
           if (_this3.options.readOnly || _this3.component.disabled) {
             _this3.editor.isReadOnly = true;
           }
+
+          _this3.editorReadyResolve(_this3.editor);
 
           return editor;
         });
@@ -54676,7 +54834,7 @@ function (_TextFieldComponent) {
       } // Add the quill editor.
 
 
-      this.editorReady = this.addQuill(this.input, this.component.wysiwyg, function () {
+      this.addQuill(this.input, this.component.wysiwyg, function () {
         return _this3.updateEditorValue(_this3.quill.root.innerHTML);
       }).then(function (quill) {
         if (_this3.component.isUploadEnabled) {
@@ -54694,6 +54852,8 @@ function (_TextFieldComponent) {
           quill.disable();
         }
 
+        _this3.editorReadyResolve(quill);
+
         return quill;
       }).catch(function (err) {
         return console.warn(err);
@@ -54702,14 +54862,19 @@ function (_TextFieldComponent) {
   }, {
     key: "destroyWysiwyg",
     value: function destroyWysiwyg() {
+      var _this4 = this;
+
       if (this.editor) {
+        this.editorReady = new _nativePromiseOnly.default(function (resolve) {
+          _this4.editorReadyResolve = resolve;
+        });
         this.editor.destroy();
       }
     }
   }, {
     key: "imageHandler",
     value: function imageHandler(quillInstance) {
-      var _this4 = this;
+      var _this5 = this;
 
       var fileInput = quillInstance.container.querySelector('input.ql-image[type=file]');
 
@@ -54728,17 +54893,17 @@ function (_TextFieldComponent) {
           }
 
           quillInstance.quill.enable(false);
-          var _this4$component = _this4.component,
-              uploadStorage = _this4$component.uploadStorage,
-              uploadUrl = _this4$component.uploadUrl,
-              uploadOptions = _this4$component.uploadOptions,
-              uploadDir = _this4$component.uploadDir;
+          var _this5$component = _this5.component,
+              uploadStorage = _this5$component.uploadStorage,
+              uploadUrl = _this5$component.uploadUrl,
+              uploadOptions = _this5$component.uploadOptions,
+              uploadDir = _this5$component.uploadDir;
           var requestData;
 
-          _this4.root.formio.uploadFile(uploadStorage, files[0], (0, _utils.uniqueName)(files[0].name), uploadDir || '', //should pass empty string if undefined
+          _this5.root.formio.uploadFile(uploadStorage, files[0], (0, _utils.uniqueName)(files[0].name), uploadDir || '', //should pass empty string if undefined
           null, uploadUrl, uploadOptions).then(function (result) {
             requestData = result;
-            return _this4.root.formio.downloadFile(result);
+            return _this5.root.formio.downloadFile(result);
           }).then(function (result) {
             quillInstance.quill.enable(true);
             var Delta = Quill.import('delta');
@@ -54762,7 +54927,7 @@ function (_TextFieldComponent) {
   }, {
     key: "setWysiwygValue",
     value: function setWysiwygValue(value, skipSetting) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (this.isPlain || this.options.readOnly || this.options.htmlView) {
         return;
@@ -54770,20 +54935,20 @@ function (_TextFieldComponent) {
 
       if (this.editorReady) {
         this.editorReady.then(function (editor) {
-          _this5.autoModified = true;
+          _this6.autoModified = true;
 
           if (!skipSetting) {
-            if (_this5.component.editor === 'ace') {
-              editor.setValue(_this5.setConvertedValue(value));
-            } else if (_this5.component.editor === 'ckeditor') {
-              editor.data.set(_this5.setConvertedValue(value));
+            if (_this6.component.editor === 'ace') {
+              editor.setValue(_this6.setConvertedValue(value));
+            } else if (_this6.component.editor === 'ckeditor') {
+              editor.data.set(_this6.setConvertedValue(value));
             } else {
-              if (_this5.component.isUploadEnabled) {
-                _this5.setAsyncConvertedValue(value).then(function (result) {
+              if (_this6.component.isUploadEnabled) {
+                _this6.setAsyncConvertedValue(value).then(function (result) {
                   editor.setContents(editor.clipboard.convert(result));
                 });
               } else {
-                editor.setContents(editor.clipboard.convert(_this5.setConvertedValue(value)));
+                editor.setContents(editor.clipboard.convert(_this6.setConvertedValue(value)));
               }
             }
           }
@@ -54837,7 +55002,7 @@ function (_TextFieldComponent) {
   }, {
     key: "setImagesUrl",
     value: function setImagesUrl(images) {
-      var _this6 = this;
+      var _this7 = this;
 
       return _nativePromiseOnly.default.all(_lodash.default.map(images, function (image) {
         var requestData;
@@ -54848,7 +55013,7 @@ function (_TextFieldComponent) {
           console.warn(error);
         }
 
-        return _this6.root.formio.downloadFile(requestData).then(function (result) {
+        return _this7.root.formio.downloadFile(requestData).then(function (result) {
           image.setAttribute('src', result.url);
         });
       }));
@@ -54984,7 +55149,7 @@ function (_TextFieldComponent) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var _this7 = this;
+      var _this8 = this;
 
       var skipSetting = _lodash.default.isEqual(value, this.getValue());
 
@@ -55004,7 +55169,7 @@ function (_TextFieldComponent) {
         return;
       } else if (this.isPlain) {
         value = Array.isArray(value) ? value.map(function (val) {
-          return _this7.setConvertedValue(val);
+          return _this8.setConvertedValue(val);
         }) : this.setConvertedValue(value);
         return _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, value, flags);
       } // Set the value when the editor is ready.
@@ -62150,7 +62315,7 @@ var sets = [{
   nr: [1],
   fc: 3
 }, {
-  lngs: ['be', 'bs', 'dz', 'hr', 'ru', 'sr', 'uk'],
+  lngs: ['be', 'bs', 'cnr', 'dz', 'hr', 'ru', 'sr', 'uk'],
   nr: [1, 2, 5],
   fc: 4
 }, {
@@ -66306,16 +66471,10 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
     value.forEach(function(subValue) {
       result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
     });
-
-    return result;
-  }
-
-  if (isMap(value)) {
+  } else if (isMap(value)) {
     value.forEach(function(subValue, key) {
       result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
     });
-
-    return result;
   }
 
   var keysFunc = isFull
@@ -68377,12 +68536,14 @@ module.exports = createPadding;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/lodash/toInteger.js"),
+var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js"),
+    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/lodash/toInteger.js"),
     toNumber = __webpack_require__(/*! ./toNumber */ "./node_modules/lodash/toNumber.js"),
     toString = __webpack_require__(/*! ./toString */ "./node_modules/lodash/toString.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMin = Math.min;
+var nativeIsFinite = root.isFinite,
+    nativeMin = Math.min;
 
 /**
  * Creates a function like `_.round`.
@@ -68396,7 +68557,7 @@ function createRound(methodName) {
   return function(number, precision) {
     number = toNumber(number);
     precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-    if (precision) {
+    if (precision && nativeIsFinite(number)) {
       // Shift with exponential notation to avoid floating-point issues.
       // See [MDN](https://mdn.io/round#Examples) for more details.
       var pair = (toString(number) + 'e').split('e'),
@@ -72577,7 +72738,7 @@ module.exports = keysIn;
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
- * Copyright JS Foundation and other contributors <https://js.foundation/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
  * Released under MIT license <https://lodash.com/license>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -72588,7 +72749,7 @@ module.exports = keysIn;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.11';
+  var VERSION = '4.17.14';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -75247,16 +75408,10 @@ module.exports = keysIn;
         value.forEach(function(subValue) {
           result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
         });
-
-        return result;
-      }
-
-      if (isMap(value)) {
+      } else if (isMap(value)) {
         value.forEach(function(subValue, key) {
           result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
         });
-
-        return result;
       }
 
       var keysFunc = isFull
@@ -76180,8 +76335,8 @@ module.exports = keysIn;
         return;
       }
       baseFor(source, function(srcValue, key) {
+        stack || (stack = new Stack);
         if (isObject(srcValue)) {
-          stack || (stack = new Stack);
           baseMergeDeep(object, source, key, srcIndex, baseMerge, customizer, stack);
         }
         else {
@@ -77998,7 +78153,7 @@ module.exports = keysIn;
       return function(number, precision) {
         number = toNumber(number);
         precision = precision == null ? 0 : nativeMin(toInteger(precision), 292);
-        if (precision) {
+        if (precision && nativeIsFinite(number)) {
           // Shift with exponential notation to avoid floating-point issues.
           // See [MDN](https://mdn.io/round#Examples) for more details.
           var pair = (toString(number) + 'e').split('e'),
@@ -79181,7 +79336,7 @@ module.exports = keysIn;
     }
 
     /**
-     * Gets the value at `key`, unless `key` is "__proto__".
+     * Gets the value at `key`, unless `key` is "__proto__" or "constructor".
      *
      * @private
      * @param {Object} object The object to query.
@@ -79189,6 +79344,10 @@ module.exports = keysIn;
      * @returns {*} Returns the property value.
      */
     function safeGet(object, key) {
+      if (key === 'constructor' && typeof object[key] === 'function') {
+        return;
+      }
+
       if (key == '__proto__') {
         return;
       }
@@ -82989,6 +83148,7 @@ module.exports = keysIn;
           }
           if (maxing) {
             // Handle invocations in a tight loop.
+            clearTimeout(timerId);
             timerId = setTimeout(timerExpired, wait);
             return invokeFunc(lastCallTime);
           }
@@ -87375,9 +87535,12 @@ module.exports = keysIn;
       , 'g');
 
       // Use a sourceURL for easier debugging.
+      // The sourceURL gets injected into the source that's eval-ed, so be careful
+      // with lookup (in case of e.g. prototype pollution), and strip newlines if any.
+      // A newline wouldn't be a valid sourceURL anyway, and it'd enable code injection.
       var sourceURL = '//# sourceURL=' +
-        ('sourceURL' in options
-          ? options.sourceURL
+        (hasOwnProperty.call(options, 'sourceURL')
+          ? (options.sourceURL + '').replace(/[\r\n]/g, ' ')
           : ('lodash.templateSources[' + (++templateCounter) + ']')
         ) + '\n';
 
@@ -87410,7 +87573,9 @@ module.exports = keysIn;
 
       // If `variable` is not specified wrap a with-statement around the generated
       // code to add the data object to the top of the scope chain.
-      var variable = options.variable;
+      // Like with sourceURL, we take care to not check the option's prototype,
+      // as this configuration is a code injection vector.
+      var variable = hasOwnProperty.call(options, 'variable') && options.variable;
       if (!variable) {
         source = 'with (obj) {\n' + source + '\n}\n';
       }
@@ -89615,10 +89780,11 @@ module.exports = keysIn;
     baseForOwn(LazyWrapper.prototype, function(func, methodName) {
       var lodashFunc = lodash[methodName];
       if (lodashFunc) {
-        var key = (lodashFunc.name + ''),
-            names = realNames[key] || (realNames[key] = []);
-
-        names.push({ 'name': methodName, 'func': lodashFunc });
+        var key = lodashFunc.name + '';
+        if (!hasOwnProperty.call(realNames, key)) {
+          realNames[key] = [];
+        }
+        realNames[key].push({ 'name': methodName, 'func': lodashFunc });
       }
     });
 
@@ -90295,7 +90461,7 @@ module.exports = trim;
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//! moment-timezone.js
-//! version : 0.5.25
+//! version : 0.5.26
 //! Copyright (c) JS Foundation and other contributors
 //! license : MIT
 //! github.com/moment/moment-timezone
@@ -90321,7 +90487,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	// 	return moment;
 	// }
 
-	var VERSION = "0.5.25",
+	var VERSION = "0.5.26",
 		zones = {},
 		links = {},
 		names = {},
@@ -90589,7 +90755,10 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 		if (a.abbrScore !== b.abbrScore) {
 			return a.abbrScore - b.abbrScore;
 		}
-		return b.zone.population - a.zone.population;
+		if (a.zone.population !== b.zone.population) {
+			return b.zone.population - a.zone.population;
+		}
+		return b.zone.name.localeCompare(a.zone.name);
 	}
 
 	function addToGuesses (name, offsets) {
@@ -90694,7 +90863,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	}
 
 	function getZone (name, caller) {
-		
+
 		name = normalizeName(name);
 
 		var zone = zones[name];
@@ -90895,7 +91064,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 	fn.utc       = resetZoneWrap(fn.utc);
 	fn.local     = resetZoneWrap(fn.local);
 	fn.utcOffset = resetZoneWrap2(fn.utcOffset);
-	
+
 	moment.tz.setDefault = function(name) {
 		if (major < 2 || (major === 2 && minor < 9)) {
 			logError('Moment Timezone setDefault() requires Moment.js >= 2.9.0. You are using Moment.js ' + moment.version + '.');
