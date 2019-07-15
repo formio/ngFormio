@@ -73,7 +73,7 @@
     "selenium-server-standalone-jar": "^3.14.0",
     "signature_pad": "^2.3.2",
     "style-loader": "^0.23.1",
-    "swagger-ui": "^3.23.0",
+    "swagger-ui": "^3.23.1",
     "ui-select": "^0.19.8",
     "webdriverio": "^5.10.9",
     "webdriverjs-angular": "^0.1.3",
