@@ -8,7 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - CSS classes for wizard buttons
  - Fixed Edit Grid's and Data Grid's tableView crashing on null values
+ - Added ability to provide HTML attributes for components inputs
 
+### Fixed
+ - Select autocomplete not working
+ 
 ## 2.25.4
 ### Fixed
  - Issue where Formio.fieldData is not defined and should use FormioUtils instead.

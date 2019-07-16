@@ -29,6 +29,13 @@
     <button ng-if="hasNextPage && ($index == $select.items.length-1)" class="btn btn-success btn-block" ng-click="loadMoreItems($select, $event)" ng-disabled="selectLoading">Load more...</button>
   </ui-select-choices>
 </ui-select>
+<input
+  type="text"
+  formio-custom-attributes="{{component.attributes}}"
+  class="formio-select-autocomplete-input"
+  ng-model="autocompleteValue"
+  ng-change="autocompleteValueChanged()"
+>
 <label ng-if="labelVisible() && (component.labelPosition === 'bottom')" for="{{ componentId }}" class="control-label control-label--bottom" ng-class="{'field-required': isRequired(component)}">
   {{ component.label | formioTranslate:null:options.building }}
   <formio-component-tooltip></formio-component-tooltip>

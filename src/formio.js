@@ -63,6 +63,8 @@ app.directive('formioMin', require('./directives/formioMin'));
 
 app.directive('formioMax', require('./directives/formioMax'));
 
+app.directive('formioCustomAttributes', require('./directives/formioCustomAttributes'));
+
 /**
  * Filter to flatten form components.
  */
