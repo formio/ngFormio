@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.37.4
+### Added
+ - FOR-2210: Added ability to provide HTML attributes for components inputs, enabled autocomplete for select
+
+### Fixed
+ - Replace unmantained dependency that uses bower
+
 ## 2.37.3
 ### Fixed
  - Pin angular version to 1.7.5 to get around ng-required issue that is affecting the renderer.
