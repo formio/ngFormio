@@ -10547,6 +10547,25 @@ module.exports = DESCRIPTORS ? function (object, key, value) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/internals/host-report-errors.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/core-js/internals/host-report-errors.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+
+module.exports = function (a, b) {
+  var console = global.console;
+  if (console && console.error) {
+    arguments.length === 1 ? console.error(a) : console.error(a, b);
+  }
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/internals/html.js":
 /*!************************************************!*\
   !*** ./node_modules/core-js/internals/html.js ***!
@@ -10826,6 +10845,59 @@ module.exports = function (it) {
 
 /***/ }),
 
+/***/ "./node_modules/core-js/internals/iterate.js":
+/*!***************************************************!*\
+  !*** ./node_modules/core-js/internals/iterate.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var isArrayIteratorMethod = __webpack_require__(/*! ../internals/is-array-iterator-method */ "./node_modules/core-js/internals/is-array-iterator-method.js");
+var toLength = __webpack_require__(/*! ../internals/to-length */ "./node_modules/core-js/internals/to-length.js");
+var bind = __webpack_require__(/*! ../internals/bind-context */ "./node_modules/core-js/internals/bind-context.js");
+var getIteratorMethod = __webpack_require__(/*! ../internals/get-iterator-method */ "./node_modules/core-js/internals/get-iterator-method.js");
+var callWithSafeIterationClosing = __webpack_require__(/*! ../internals/call-with-safe-iteration-closing */ "./node_modules/core-js/internals/call-with-safe-iteration-closing.js");
+
+var Result = function (stopped, result) {
+  this.stopped = stopped;
+  this.result = result;
+};
+
+var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
+  var boundFunction = bind(fn, that, AS_ENTRIES ? 2 : 1);
+  var iterator, iterFn, index, length, result, step;
+
+  if (IS_ITERATOR) {
+    iterator = iterable;
+  } else {
+    iterFn = getIteratorMethod(iterable);
+    if (typeof iterFn != 'function') throw TypeError('Target is not iterable');
+    // optimisation for array iterators
+    if (isArrayIteratorMethod(iterFn)) {
+      for (index = 0, length = toLength(iterable.length); length > index; index++) {
+        result = AS_ENTRIES
+          ? boundFunction(anObject(step = iterable[index])[0], step[1])
+          : boundFunction(iterable[index]);
+        if (result && result instanceof Result) return result;
+      } return new Result(false);
+    }
+    iterator = iterFn.call(iterable);
+  }
+
+  while (!(step = iterator.next()).done) {
+    result = callWithSafeIterationClosing(iterator, boundFunction, step.value, AS_ENTRIES);
+    if (result && result instanceof Result) return result;
+  } return new Result(false);
+};
+
+iterate.stop = function (result) {
+  return new Result(true, result);
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/internals/iterators-core.js":
 /*!**********************************************************!*\
   !*** ./node_modules/core-js/internals/iterators-core.js ***!
@@ -10885,6 +10957,94 @@ module.exports = {};
 
 /***/ }),
 
+/***/ "./node_modules/core-js/internals/microtask.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/core-js/internals/microtask.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+var getOwnPropertyDescriptor = __webpack_require__(/*! ../internals/object-get-own-property-descriptor */ "./node_modules/core-js/internals/object-get-own-property-descriptor.js").f;
+var classof = __webpack_require__(/*! ../internals/classof-raw */ "./node_modules/core-js/internals/classof-raw.js");
+var macrotask = __webpack_require__(/*! ../internals/task */ "./node_modules/core-js/internals/task.js").set;
+var userAgent = __webpack_require__(/*! ../internals/user-agent */ "./node_modules/core-js/internals/user-agent.js");
+
+var MutationObserver = global.MutationObserver || global.WebKitMutationObserver;
+var process = global.process;
+var Promise = global.Promise;
+var IS_NODE = classof(process) == 'process';
+// Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
+var queueMicrotaskDescriptor = getOwnPropertyDescriptor(global, 'queueMicrotask');
+var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
+
+var flush, head, last, notify, toggle, node, promise;
+
+// modern engines have queueMicrotask method
+if (!queueMicrotask) {
+  flush = function () {
+    var parent, fn;
+    if (IS_NODE && (parent = process.domain)) parent.exit();
+    while (head) {
+      fn = head.fn;
+      head = head.next;
+      try {
+        fn();
+      } catch (error) {
+        if (head) notify();
+        else last = undefined;
+        throw error;
+      }
+    } last = undefined;
+    if (parent) parent.enter();
+  };
+
+  // Node.js
+  if (IS_NODE) {
+    notify = function () {
+      process.nextTick(flush);
+    };
+  // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
+  } else if (MutationObserver && !/(iphone|ipod|ipad).*applewebkit/i.test(userAgent)) {
+    toggle = true;
+    node = document.createTextNode('');
+    new MutationObserver(flush).observe(node, { characterData: true }); // eslint-disable-line no-new
+    notify = function () {
+      node.data = toggle = !toggle;
+    };
+  // environments with maybe non-completely correct, but existent Promise
+  } else if (Promise && Promise.resolve) {
+    // Promise.resolve without an argument throws an error in LG WebOS 2
+    promise = Promise.resolve(undefined);
+    notify = function () {
+      promise.then(flush);
+    };
+  // for other environments - macrotask based on:
+  // - setImmediate
+  // - MessageChannel
+  // - window.postMessag
+  // - onreadystatechange
+  // - setTimeout
+  } else {
+    notify = function () {
+      // strange IE + webpack dev server bug - use .call(global)
+      macrotask.call(global, flush);
+    };
+  }
+}
+
+module.exports = queueMicrotask || function (fn) {
+  var task = { fn: fn, next: undefined };
+  if (last) last.next = task;
+  if (!head) {
+    head = task;
+    notify();
+  } last = task;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/core-js/internals/native-symbol.js":
 /*!*********************************************************!*\
   !*** ./node_modules/core-js/internals/native-symbol.js ***!
@@ -10916,6 +11076,36 @@ var nativeFunctionToString = __webpack_require__(/*! ../internals/function-to-st
 var WeakMap = global.WeakMap;
 
 module.exports = typeof WeakMap === 'function' && /native code/.test(nativeFunctionToString.call(WeakMap));
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/new-promise-capability.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/core-js/internals/new-promise-capability.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var aFunction = __webpack_require__(/*! ../internals/a-function */ "./node_modules/core-js/internals/a-function.js");
+
+var PromiseCapability = function (C) {
+  var resolve, reject;
+  this.promise = new C(function ($$resolve, $$reject) {
+    if (resolve !== undefined || reject !== undefined) throw TypeError('Bad Promise constructor');
+    resolve = $$resolve;
+    reject = $$reject;
+  });
+  this.resolve = aFunction(resolve);
+  this.reject = aFunction(reject);
+};
+
+// 25.4.1.5 NewPromiseCapability(C)
+module.exports.f = function (C) {
+  return new PromiseCapability(C);
+};
 
 
 /***/ }),
@@ -11397,6 +11587,47 @@ module.exports = getBuiltIn('Reflect', 'ownKeys') || function ownKeys(it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/perform.js":
+/*!***************************************************!*\
+  !*** ./node_modules/core-js/internals/perform.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function (exec) {
+  try {
+    return { error: false, value: exec() };
+  } catch (error) {
+    return { error: true, value: error };
+  }
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/promise-resolve.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/core-js/internals/promise-resolve.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject = __webpack_require__(/*! ../internals/an-object */ "./node_modules/core-js/internals/an-object.js");
+var isObject = __webpack_require__(/*! ../internals/is-object */ "./node_modules/core-js/internals/is-object.js");
+var newPromiseCapability = __webpack_require__(/*! ../internals/new-promise-capability */ "./node_modules/core-js/internals/new-promise-capability.js");
+
+module.exports = function (C, x) {
+  anObject(C);
+  if (isObject(x) && x.constructor === C) return x;
+  var promiseCapability = newPromiseCapability.f(C);
+  var resolve = promiseCapability.resolve;
+  resolve(x);
+  return promiseCapability.promise;
+};
 
 
 /***/ }),
@@ -11933,6 +12164,116 @@ module.exports = {
   // `String.prototype.trim` method
   // https://tc39.github.io/ecma262/#sec-string.prototype.trim
   trim: createMethod(3)
+};
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/internals/task.js":
+/*!************************************************!*\
+  !*** ./node_modules/core-js/internals/task.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+var fails = __webpack_require__(/*! ../internals/fails */ "./node_modules/core-js/internals/fails.js");
+var classof = __webpack_require__(/*! ../internals/classof-raw */ "./node_modules/core-js/internals/classof-raw.js");
+var bind = __webpack_require__(/*! ../internals/bind-context */ "./node_modules/core-js/internals/bind-context.js");
+var html = __webpack_require__(/*! ../internals/html */ "./node_modules/core-js/internals/html.js");
+var createElement = __webpack_require__(/*! ../internals/document-create-element */ "./node_modules/core-js/internals/document-create-element.js");
+
+var location = global.location;
+var set = global.setImmediate;
+var clear = global.clearImmediate;
+var process = global.process;
+var MessageChannel = global.MessageChannel;
+var Dispatch = global.Dispatch;
+var counter = 0;
+var queue = {};
+var ONREADYSTATECHANGE = 'onreadystatechange';
+var defer, channel, port;
+
+var run = function (id) {
+  // eslint-disable-next-line no-prototype-builtins
+  if (queue.hasOwnProperty(id)) {
+    var fn = queue[id];
+    delete queue[id];
+    fn();
+  }
+};
+
+var runner = function (id) {
+  return function () {
+    run(id);
+  };
+};
+
+var listener = function (event) {
+  run(event.data);
+};
+
+var post = function (id) {
+  // old engines have not location.origin
+  global.postMessage(id + '', location.protocol + '//' + location.host);
+};
+
+// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+if (!set || !clear) {
+  set = function setImmediate(fn) {
+    var args = [];
+    var i = 1;
+    while (arguments.length > i) args.push(arguments[i++]);
+    queue[++counter] = function () {
+      // eslint-disable-next-line no-new-func
+      (typeof fn == 'function' ? fn : Function(fn)).apply(undefined, args);
+    };
+    defer(counter);
+    return counter;
+  };
+  clear = function clearImmediate(id) {
+    delete queue[id];
+  };
+  // Node.js 0.8-
+  if (classof(process) == 'process') {
+    defer = function (id) {
+      process.nextTick(runner(id));
+    };
+  // Sphere (JS game engine) Dispatch API
+  } else if (Dispatch && Dispatch.now) {
+    defer = function (id) {
+      Dispatch.now(runner(id));
+    };
+  // Browsers with MessageChannel, includes WebWorkers
+  } else if (MessageChannel) {
+    channel = new MessageChannel();
+    port = channel.port2;
+    channel.port1.onmessage = listener;
+    defer = bind(port.postMessage, port, 1);
+  // Browsers with postMessage, skip WebWorkers
+  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
+  } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts && !fails(post)) {
+    defer = post;
+    global.addEventListener('message', listener, false);
+  // IE8-
+  } else if (ONREADYSTATECHANGE in createElement('script')) {
+    defer = function (id) {
+      html.appendChild(createElement('script'))[ONREADYSTATECHANGE] = function () {
+        html.removeChild(this);
+        run(id);
+      };
+    };
+  // Rest old browsers
+  } else {
+    defer = function (id) {
+      setTimeout(runner(id), 0);
+    };
+  }
+}
+
+module.exports = {
+  set: set,
+  clear: clear
 };
 
 
@@ -13449,6 +13790,375 @@ var ObjectPrototype = Object.prototype;
 if (toString !== ObjectPrototype.toString) {
   redefine(ObjectPrototype, 'toString', toString, { unsafe: true });
 }
+
+
+/***/ }),
+
+/***/ "./node_modules/core-js/modules/es.promise.js":
+/*!****************************************************!*\
+  !*** ./node_modules/core-js/modules/es.promise.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(/*! ../internals/export */ "./node_modules/core-js/internals/export.js");
+var IS_PURE = __webpack_require__(/*! ../internals/is-pure */ "./node_modules/core-js/internals/is-pure.js");
+var global = __webpack_require__(/*! ../internals/global */ "./node_modules/core-js/internals/global.js");
+var path = __webpack_require__(/*! ../internals/path */ "./node_modules/core-js/internals/path.js");
+var redefineAll = __webpack_require__(/*! ../internals/redefine-all */ "./node_modules/core-js/internals/redefine-all.js");
+var setToStringTag = __webpack_require__(/*! ../internals/set-to-string-tag */ "./node_modules/core-js/internals/set-to-string-tag.js");
+var setSpecies = __webpack_require__(/*! ../internals/set-species */ "./node_modules/core-js/internals/set-species.js");
+var isObject = __webpack_require__(/*! ../internals/is-object */ "./node_modules/core-js/internals/is-object.js");
+var aFunction = __webpack_require__(/*! ../internals/a-function */ "./node_modules/core-js/internals/a-function.js");
+var anInstance = __webpack_require__(/*! ../internals/an-instance */ "./node_modules/core-js/internals/an-instance.js");
+var classof = __webpack_require__(/*! ../internals/classof-raw */ "./node_modules/core-js/internals/classof-raw.js");
+var iterate = __webpack_require__(/*! ../internals/iterate */ "./node_modules/core-js/internals/iterate.js");
+var checkCorrectnessOfIteration = __webpack_require__(/*! ../internals/check-correctness-of-iteration */ "./node_modules/core-js/internals/check-correctness-of-iteration.js");
+var speciesConstructor = __webpack_require__(/*! ../internals/species-constructor */ "./node_modules/core-js/internals/species-constructor.js");
+var task = __webpack_require__(/*! ../internals/task */ "./node_modules/core-js/internals/task.js").set;
+var microtask = __webpack_require__(/*! ../internals/microtask */ "./node_modules/core-js/internals/microtask.js");
+var promiseResolve = __webpack_require__(/*! ../internals/promise-resolve */ "./node_modules/core-js/internals/promise-resolve.js");
+var hostReportErrors = __webpack_require__(/*! ../internals/host-report-errors */ "./node_modules/core-js/internals/host-report-errors.js");
+var newPromiseCapabilityModule = __webpack_require__(/*! ../internals/new-promise-capability */ "./node_modules/core-js/internals/new-promise-capability.js");
+var perform = __webpack_require__(/*! ../internals/perform */ "./node_modules/core-js/internals/perform.js");
+var userAgent = __webpack_require__(/*! ../internals/user-agent */ "./node_modules/core-js/internals/user-agent.js");
+var InternalStateModule = __webpack_require__(/*! ../internals/internal-state */ "./node_modules/core-js/internals/internal-state.js");
+var isForced = __webpack_require__(/*! ../internals/is-forced */ "./node_modules/core-js/internals/is-forced.js");
+var wellKnownSymbol = __webpack_require__(/*! ../internals/well-known-symbol */ "./node_modules/core-js/internals/well-known-symbol.js");
+
+var SPECIES = wellKnownSymbol('species');
+var PROMISE = 'Promise';
+var getInternalState = InternalStateModule.get;
+var setInternalState = InternalStateModule.set;
+var getInternalPromiseState = InternalStateModule.getterFor(PROMISE);
+var PromiseConstructor = global[PROMISE];
+var TypeError = global.TypeError;
+var document = global.document;
+var process = global.process;
+var $fetch = global.fetch;
+var versions = process && process.versions;
+var v8 = versions && versions.v8 || '';
+var newPromiseCapability = newPromiseCapabilityModule.f;
+var newGenericPromiseCapability = newPromiseCapability;
+var IS_NODE = classof(process) == 'process';
+var DISPATCH_EVENT = !!(document && document.createEvent && global.dispatchEvent);
+var UNHANDLED_REJECTION = 'unhandledrejection';
+var REJECTION_HANDLED = 'rejectionhandled';
+var PENDING = 0;
+var FULFILLED = 1;
+var REJECTED = 2;
+var HANDLED = 1;
+var UNHANDLED = 2;
+var Internal, OwnPromiseCapability, PromiseWrapper;
+
+var FORCED = isForced(PROMISE, function () {
+  // correct subclassing with @@species support
+  var promise = PromiseConstructor.resolve(1);
+  var empty = function () { /* empty */ };
+  var FakePromise = (promise.constructor = {})[SPECIES] = function (exec) {
+    exec(empty, empty);
+  };
+  // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+  return !((IS_NODE || typeof PromiseRejectionEvent == 'function')
+    && (!IS_PURE || promise['finally'])
+    && promise.then(empty) instanceof FakePromise
+    // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
+    // we can't detect it synchronously, so just check versions
+    && v8.indexOf('6.6') !== 0
+    && userAgent.indexOf('Chrome/66') === -1);
+});
+
+var INCORRECT_ITERATION = FORCED || !checkCorrectnessOfIteration(function (iterable) {
+  PromiseConstructor.all(iterable)['catch'](function () { /* empty */ });
+});
+
+// helpers
+var isThenable = function (it) {
+  var then;
+  return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
+};
+
+var notify = function (promise, state, isReject) {
+  if (state.notified) return;
+  state.notified = true;
+  var chain = state.reactions;
+  microtask(function () {
+    var value = state.value;
+    var ok = state.state == FULFILLED;
+    var index = 0;
+    // variable length - can't use forEach
+    while (chain.length > index) {
+      var reaction = chain[index++];
+      var handler = ok ? reaction.ok : reaction.fail;
+      var resolve = reaction.resolve;
+      var reject = reaction.reject;
+      var domain = reaction.domain;
+      var result, then, exited;
+      try {
+        if (handler) {
+          if (!ok) {
+            if (state.rejection === UNHANDLED) onHandleUnhandled(promise, state);
+            state.rejection = HANDLED;
+          }
+          if (handler === true) result = value;
+          else {
+            if (domain) domain.enter();
+            result = handler(value); // can throw
+            if (domain) {
+              domain.exit();
+              exited = true;
+            }
+          }
+          if (result === reaction.promise) {
+            reject(TypeError('Promise-chain cycle'));
+          } else if (then = isThenable(result)) {
+            then.call(result, resolve, reject);
+          } else resolve(result);
+        } else reject(value);
+      } catch (error) {
+        if (domain && !exited) domain.exit();
+        reject(error);
+      }
+    }
+    state.reactions = [];
+    state.notified = false;
+    if (isReject && !state.rejection) onUnhandled(promise, state);
+  });
+};
+
+var dispatchEvent = function (name, promise, reason) {
+  var event, handler;
+  if (DISPATCH_EVENT) {
+    event = document.createEvent('Event');
+    event.promise = promise;
+    event.reason = reason;
+    event.initEvent(name, false, true);
+    global.dispatchEvent(event);
+  } else event = { promise: promise, reason: reason };
+  if (handler = global['on' + name]) handler(event);
+  else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
+};
+
+var onUnhandled = function (promise, state) {
+  task.call(global, function () {
+    var value = state.value;
+    var IS_UNHANDLED = isUnhandled(state);
+    var result;
+    if (IS_UNHANDLED) {
+      result = perform(function () {
+        if (IS_NODE) {
+          process.emit('unhandledRejection', value, promise);
+        } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
+      });
+      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
+      state.rejection = IS_NODE || isUnhandled(state) ? UNHANDLED : HANDLED;
+      if (result.error) throw result.value;
+    }
+  });
+};
+
+var isUnhandled = function (state) {
+  return state.rejection !== HANDLED && !state.parent;
+};
+
+var onHandleUnhandled = function (promise, state) {
+  task.call(global, function () {
+    if (IS_NODE) {
+      process.emit('rejectionHandled', promise);
+    } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
+  });
+};
+
+var bind = function (fn, promise, state, unwrap) {
+  return function (value) {
+    fn(promise, state, value, unwrap);
+  };
+};
+
+var internalReject = function (promise, state, value, unwrap) {
+  if (state.done) return;
+  state.done = true;
+  if (unwrap) state = unwrap;
+  state.value = value;
+  state.state = REJECTED;
+  notify(promise, state, true);
+};
+
+var internalResolve = function (promise, state, value, unwrap) {
+  if (state.done) return;
+  state.done = true;
+  if (unwrap) state = unwrap;
+  try {
+    if (promise === value) throw TypeError("Promise can't be resolved itself");
+    var then = isThenable(value);
+    if (then) {
+      microtask(function () {
+        var wrapper = { done: false };
+        try {
+          then.call(value,
+            bind(internalResolve, promise, wrapper, state),
+            bind(internalReject, promise, wrapper, state)
+          );
+        } catch (error) {
+          internalReject(promise, wrapper, error, state);
+        }
+      });
+    } else {
+      state.value = value;
+      state.state = FULFILLED;
+      notify(promise, state, false);
+    }
+  } catch (error) {
+    internalReject(promise, { done: false }, error, state);
+  }
+};
+
+// constructor polyfill
+if (FORCED) {
+  // 25.4.3.1 Promise(executor)
+  PromiseConstructor = function Promise(executor) {
+    anInstance(this, PromiseConstructor, PROMISE);
+    aFunction(executor);
+    Internal.call(this);
+    var state = getInternalState(this);
+    try {
+      executor(bind(internalResolve, this, state), bind(internalReject, this, state));
+    } catch (error) {
+      internalReject(this, state, error);
+    }
+  };
+  // eslint-disable-next-line no-unused-vars
+  Internal = function Promise(executor) {
+    setInternalState(this, {
+      type: PROMISE,
+      done: false,
+      notified: false,
+      parent: false,
+      reactions: [],
+      rejection: false,
+      state: PENDING,
+      value: undefined
+    });
+  };
+  Internal.prototype = redefineAll(PromiseConstructor.prototype, {
+    // `Promise.prototype.then` method
+    // https://tc39.github.io/ecma262/#sec-promise.prototype.then
+    then: function then(onFulfilled, onRejected) {
+      var state = getInternalPromiseState(this);
+      var reaction = newPromiseCapability(speciesConstructor(this, PromiseConstructor));
+      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
+      reaction.fail = typeof onRejected == 'function' && onRejected;
+      reaction.domain = IS_NODE ? process.domain : undefined;
+      state.parent = true;
+      state.reactions.push(reaction);
+      if (state.state != PENDING) notify(this, state, false);
+      return reaction.promise;
+    },
+    // `Promise.prototype.catch` method
+    // https://tc39.github.io/ecma262/#sec-promise.prototype.catch
+    'catch': function (onRejected) {
+      return this.then(undefined, onRejected);
+    }
+  });
+  OwnPromiseCapability = function () {
+    var promise = new Internal();
+    var state = getInternalState(promise);
+    this.promise = promise;
+    this.resolve = bind(internalResolve, promise, state);
+    this.reject = bind(internalReject, promise, state);
+  };
+  newPromiseCapabilityModule.f = newPromiseCapability = function (C) {
+    return C === PromiseConstructor || C === PromiseWrapper
+      ? new OwnPromiseCapability(C)
+      : newGenericPromiseCapability(C);
+  };
+
+  // wrap fetch result
+  if (!IS_PURE && typeof $fetch == 'function') $({ global: true, enumerable: true, forced: true }, {
+    // eslint-disable-next-line no-unused-vars
+    fetch: function fetch(input) {
+      return promiseResolve(PromiseConstructor, $fetch.apply(global, arguments));
+    }
+  });
+}
+
+$({ global: true, wrap: true, forced: FORCED }, {
+  Promise: PromiseConstructor
+});
+
+setToStringTag(PromiseConstructor, PROMISE, false, true);
+setSpecies(PROMISE);
+
+PromiseWrapper = path[PROMISE];
+
+// statics
+$({ target: PROMISE, stat: true, forced: FORCED }, {
+  // `Promise.reject` method
+  // https://tc39.github.io/ecma262/#sec-promise.reject
+  reject: function reject(r) {
+    var capability = newPromiseCapability(this);
+    capability.reject.call(undefined, r);
+    return capability.promise;
+  }
+});
+
+$({ target: PROMISE, stat: true, forced: IS_PURE || FORCED }, {
+  // `Promise.resolve` method
+  // https://tc39.github.io/ecma262/#sec-promise.resolve
+  resolve: function resolve(x) {
+    return promiseResolve(IS_PURE && this === PromiseWrapper ? PromiseConstructor : this, x);
+  }
+});
+
+$({ target: PROMISE, stat: true, forced: INCORRECT_ITERATION }, {
+  // `Promise.all` method
+  // https://tc39.github.io/ecma262/#sec-promise.all
+  all: function all(iterable) {
+    var C = this;
+    var capability = newPromiseCapability(C);
+    var resolve = capability.resolve;
+    var reject = capability.reject;
+    var result = perform(function () {
+      var $promiseResolve = aFunction(C.resolve);
+      var values = [];
+      var counter = 0;
+      var remaining = 1;
+      iterate(iterable, function (promise) {
+        var index = counter++;
+        var alreadyCalled = false;
+        values.push(undefined);
+        remaining++;
+        $promiseResolve.call(C, promise).then(function (value) {
+          if (alreadyCalled) return;
+          alreadyCalled = true;
+          values[index] = value;
+          --remaining || resolve(values);
+        }, reject);
+      });
+      --remaining || resolve(values);
+    });
+    if (result.error) reject(result.value);
+    return capability.promise;
+  },
+  // `Promise.race` method
+  // https://tc39.github.io/ecma262/#sec-promise.race
+  race: function race(iterable) {
+    var C = this;
+    var capability = newPromiseCapability(C);
+    var reject = capability.reject;
+    var result = perform(function () {
+      var $promiseResolve = aFunction(C.resolve);
+      iterate(iterable, function (promise) {
+        $promiseResolve.call(C, promise).then(capability.resolve, reject);
+      });
+    });
+    if (result.error) reject(result.value);
+    return capability.promise;
+  }
+});
 
 
 /***/ }),
@@ -19863,7 +20573,7 @@ exports.PatchError = PatchError;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.6.1, @license MIT */
+/* WEBPACK VAR INJECTION */(function(jQuery) {/* flatpickr v4.6.2, @license MIT */
 (function (global, factory) {
      true ? module.exports = factory() :
     undefined;
@@ -19954,6 +20664,7 @@ exports.PatchError = PatchError;
         locale: "default",
         minuteIncrement: 5,
         mode: "single",
+        monthSelectorType: "dropdown",
         nextArrow: "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 17 17'><g></g><path d='M13.207 8.472l-7.854 7.854-0.707-0.707 7.146-7.146-7.146-7.148 0.707-0.707 7.854 7.854z' /></svg>",
         noCalendar: false,
         now: new Date(),
@@ -20047,6 +20758,8 @@ exports.PatchError = PatchError;
         toggleTitle: "Click to toggle",
         amPM: ["AM", "PM"],
         yearAriaLabel: "Year",
+        hourAriaLabel: "Hour",
+        minuteAriaLabel: "Minute",
         time_24hr: false
     };
 
@@ -21009,7 +21722,8 @@ exports.PatchError = PatchError;
             }
         }
         function buildMonthSwitch() {
-            if (self.config.showMonths > 1)
+            if (self.config.showMonths > 1 ||
+                self.config.monthSelectorType !== "dropdown")
                 return;
             var shouldBuildMonth = function (month) {
                 if (self.config.minDate !== undefined &&
@@ -21028,7 +21742,7 @@ exports.PatchError = PatchError;
                     continue;
                 var month = createElement("option", "flatpickr-monthDropdown-month");
                 month.value = new Date(self.currentYear, i).getMonth().toString();
-                month.textContent = monthToStr(i, false, self.l10n);
+                month.textContent = monthToStr(i, self.config.shorthandCurrentMonth, self.l10n);
                 month.tabIndex = -1;
                 if (self.currentMonth === i) {
                     month.selected = true;
@@ -21040,7 +21754,8 @@ exports.PatchError = PatchError;
             var container = createElement("div", "flatpickr-month");
             var monthNavFragment = window.document.createDocumentFragment();
             var monthElement;
-            if (self.config.showMonths > 1) {
+            if (self.config.showMonths > 1 ||
+                self.config.monthSelectorType === "static") {
                 monthElement = createElement("span", "cur-month");
             }
             else {
@@ -21130,9 +21845,13 @@ exports.PatchError = PatchError;
             self.timeContainer = createElement("div", "flatpickr-time");
             self.timeContainer.tabIndex = -1;
             var separator = createElement("span", "flatpickr-time-separator", ":");
-            var hourInput = createNumberInput("flatpickr-hour");
+            var hourInput = createNumberInput("flatpickr-hour", {
+                "aria-label": self.l10n.hourAriaLabel
+            });
             self.hourElement = hourInput.getElementsByTagName("input")[0];
-            var minuteInput = createNumberInput("flatpickr-minute");
+            var minuteInput = createNumberInput("flatpickr-minute", {
+                "aria-label": self.l10n.minuteAriaLabel
+            });
             self.minuteElement = minuteInput.getElementsByTagName("input")[0];
             self.hourElement.tabIndex = self.minuteElement.tabIndex = -1;
             self.hourElement.value = pad(self.latestSelectedDateObj
@@ -22061,7 +22780,8 @@ exports.PatchError = PatchError;
                 return self.clear(triggerChange);
             setSelectedDate(date, format);
             self.showTimeInput = self.selectedDates.length > 0;
-            self.latestSelectedDateObj = self.selectedDates[self.selectedDates.length - 1];
+            self.latestSelectedDateObj =
+                self.selectedDates[self.selectedDates.length - 1];
             self.redraw();
             jumpToDate();
             setHoursFromDate();
@@ -22259,7 +22979,8 @@ exports.PatchError = PatchError;
             self.yearElements.forEach(function (yearElement, i) {
                 var d = new Date(self.currentYear, self.currentMonth, 1);
                 d.setMonth(self.currentMonth + i);
-                if (self.config.showMonths > 1) {
+                if (self.config.showMonths > 1 ||
+                    self.config.monthSelectorType === "static") {
                     self.monthElements[i].textContent =
                         monthToStr(d.getMonth(), self.config.shorthandCurrentMonth, self.l10n) + " ";
                 }
@@ -23376,35 +24097,29 @@ function (_Element) {
    * form.build();
    */
   function Form() {
-    var _getPrototypeOf2;
-
     var _this;
 
     _classCallCheck(this, Form);
 
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(Form)).call.apply(_getPrototypeOf2, [this].concat(args)));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(Form).call(this, (arguments.length <= 0 ? undefined : arguments[0]) instanceof HTMLElement ? arguments.length <= 2 ? undefined : arguments[2] : arguments.length <= 1 ? undefined : arguments[1]));
     _this.ready = new _nativePromiseOnly.default(function (resolve, reject) {
       _this.readyResolve = resolve;
       _this.readyReject = reject;
     });
     _this.instance = null;
 
-    if (args[0] instanceof HTMLElement) {
-      _this.element = args[0];
-      _this.options = args[2];
+    if ((arguments.length <= 0 ? undefined : arguments[0]) instanceof HTMLElement) {
+      _this.element = arguments.length <= 0 ? undefined : arguments[0];
+      _this.options = arguments.length <= 2 ? undefined : arguments[2];
 
-      _this.setForm(args[1]).then(function () {
+      _this.setForm(arguments.length <= 1 ? undefined : arguments[1]).then(function () {
         return _this.readyResolve(_this.instance);
       }).catch(_this.readyReject);
-    } else if (args[0]) {
+    } else if (arguments.length <= 0 ? undefined : arguments[0]) {
       _this.element = null;
-      _this.options = args[1];
+      _this.options = arguments.length <= 1 ? undefined : arguments[1];
 
-      _this.setForm(args[0]).then(function () {
+      _this.setForm(arguments.length <= 0 ? undefined : arguments[0]).then(function () {
         return _this.readyResolve(_this.instance);
       }).catch(_this.readyReject);
     } else {
@@ -23671,8 +24386,8 @@ _Formio.default.embedForm = function (embed) {
 
 
 _Formio.default.createForm = function () {
-  for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    args[_key2] = arguments[_key2];
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
   }
 
   return _construct(Form, args).ready;
@@ -23869,8 +24584,6 @@ var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitte
 
 var _browserCookies = _interopRequireDefault(__webpack_require__(/*! browser-cookies */ "./node_modules/browser-cookies/src/browser-cookies.js"));
 
-var _shallowCopy = _interopRequireDefault(__webpack_require__(/*! shallow-copy */ "./node_modules/shallow-copy/index.js"));
-
 var _providers = _interopRequireDefault(__webpack_require__(/*! ./providers */ "./node_modules/formiojs/providers/index.js"));
 
 var _get2 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
@@ -23906,6 +24619,18 @@ var isNil = function isNil(val) {
 var isObject = function isObject(val) {
   return val && _typeof(val) === 'object';
 };
+
+function cloneResponse(response) {
+  var copy = (0, _cloneDeep2.default)(response);
+
+  if (Array.isArray(response)) {
+    copy.skip = response.skip;
+    copy.limit = response.limit;
+    copy.serverCount = response.serverCount;
+  }
+
+  return copy;
+}
 /**
  * The Formio interface class.
  *
@@ -24694,7 +25419,7 @@ function () {
       var cacheKey = btoa(url); // Get the cached promise to save multiple loads.
 
       if (!opts.ignoreCache && method === 'GET' && Formio.cache.hasOwnProperty(cacheKey)) {
-        return _nativePromiseOnly.default.resolve((0, _cloneDeep2.default)(Formio.cache[cacheKey]));
+        return _nativePromiseOnly.default.resolve(cloneResponse(Formio.cache[cacheKey]));
       } // Set up and fetch request
 
 
@@ -24812,18 +25537,7 @@ function () {
           Formio.cache[cacheKey] = result;
         }
 
-        var resultCopy = {}; // Shallow copy result so modifications don't end up in cache
-
-        if (Array.isArray(result)) {
-          resultCopy = result.map(_shallowCopy.default);
-          resultCopy.skip = result.skip;
-          resultCopy.limit = result.limit;
-          resultCopy.serverCount = result.serverCount;
-        } else {
-          resultCopy = (0, _shallowCopy.default)(result);
-        }
-
-        return resultCopy;
+        return cloneResponse(result);
       }).catch(function (err) {
         if (err === 'Bad Token') {
           Formio.setToken(null, opts);
@@ -27272,7 +27986,7 @@ function (_NestedComponent) {
 
       this.clear();
       this.setContent(this.element, this.render());
-      this.attach(this.element);
+      return this.attach(this.element);
     }
   }, {
     key: "attach",
@@ -28300,15 +29014,15 @@ function (_Component) {
 
       var containerElement = element.querySelector("[ref=\"".concat(component.component.key, "-container\"]")) || element;
       containerElement.formioContainer = container;
-      containerElement.formioComponent = component; // If this is an existing datagrid element, don't make it draggable.
-
-      if (component.type === 'datagrid' && components.length > 0) {
-        return element;
-      } // Add container to draggable list.
-
+      containerElement.formioComponent = component; // Add container to draggable list.
 
       if (_this.dragula) {
         _this.dragula.containers.push(containerElement);
+      } // If this is an existing datagrid element, don't make it draggable.
+
+
+      if (component.type === 'datagrid' && components.length > 0) {
+        return element;
       } // Since we added a wrapper, need to return the original element so that we can find the components inside it.
 
 
@@ -29235,6 +29949,7 @@ function (_Webform) {
     _this.globalComponents = [];
     _this.components = [];
     _this.page = 0;
+    _this.currentNextPage = 0;
     _this._seenPages = [0];
     return _this;
   }
@@ -29242,7 +29957,7 @@ function (_Webform) {
   _createClass(Wizard, [{
     key: "isLastPage",
     value: function isLastPage() {
-      var next = this.getNextPage(this.submission.data, this.page);
+      var next = this.getNextPage();
 
       if (_lodash.default.isNumber(next)) {
         return 0 < next && next >= this.pages.length;
@@ -29432,11 +30147,12 @@ function (_Webform) {
     }
   }, {
     key: "getNextPage",
-    value: function getNextPage(data, currentPage) {
-      var form = this.pages[currentPage]; // Check conditional nextPage
+    value: function getNextPage() {
+      var data = this.submission.data;
+      var form = this.panels[this.page]; // Check conditional nextPage
 
       if (form) {
-        var page = ++currentPage;
+        var page = this.page + 1;
 
         if (form.nextPage) {
           var next = this.evaluate(form.nextPage, {
@@ -29447,21 +30163,26 @@ function (_Webform) {
           }, 'next');
 
           if (next === null) {
+            this.currentNextPage = null;
             return null;
           }
 
           var pageNum = parseInt(next, 10);
 
           if (!isNaN(parseInt(pageNum, 10)) && isFinite(pageNum)) {
+            this.currentNextPage = pageNum;
             return pageNum;
           }
 
-          return this.getPageIndexByKey(next);
+          this.currentNextPage = this.getPageIndexByKey(next);
+          return this.currentNextPage;
         }
 
+        this.currentNextPage = page;
         return page;
       }
 
+      this.currentNextPage = null;
       return null;
     }
   }, {
@@ -29490,7 +30211,15 @@ function (_Webform) {
             reject(err);
           }
 
-          _get(_getPrototypeOf(Wizard.prototype), "beforeNext", _this5).call(_this5).then(resolve).catch(reject);
+          var form = _this5.currentPage;
+
+          if (form) {
+            _nativePromiseOnly.default.all(form.map(function (comp) {
+              return comp.beforeNext();
+            })).then(resolve).catch(reject);
+          } else {
+            resolve();
+          }
         });
       });
     }
@@ -29501,7 +30230,7 @@ function (_Webform) {
 
       // Read-only forms should not worry about validation before going to next page, nor should they submit.
       if (this.options.readOnly) {
-        return this.setPage(this.getNextPage(this.submission.data, this.page)).then(function () {
+        return this.setPage(this.getNextPage()).then(function () {
           _this6.emit('nextPage', {
             page: _this6.page,
             submission: _this6.submission
@@ -29513,7 +30242,7 @@ function (_Webform) {
       if (this.checkCurrentPageValidity(this.submission.data, true)) {
         this.checkData(this.submission.data);
         return this.beforeNext().then(function () {
-          return _this6.setPage(_this6.getNextPage(_this6.submission.data, _this6.page)).then(function () {
+          return _this6.setPage(_this6.getNextPage()).then(function () {
             _this6.emit('nextPage', {
               page: _this6.page,
               submission: _this6.submission
@@ -29549,8 +30278,8 @@ function (_Webform) {
   }, {
     key: "getPageIndexByKey",
     value: function getPageIndexByKey(key) {
-      var pageIndex = 0;
-      this.pages.forEach(function (page, index) {
+      var pageIndex = this.page;
+      this.panels.forEach(function (page, index) {
         if (page.key === key) {
           pageIndex = index;
           return false;
@@ -29607,7 +30336,7 @@ function (_Webform) {
         return this.page > 0 && show;
       }
 
-      nextPage = nextPage === undefined ? this.getNextPage(this.submission.data, this.page) : nextPage;
+      nextPage = nextPage === undefined ? this.getNextPage() : nextPage;
 
       if (name === 'next') {
         var _show = (0, _utils.firstNonNil)([_lodash.default.get(currentPage, 'buttonSettings.next'), this.options.buttonSettings.showNext]);
@@ -29661,14 +30390,16 @@ function (_Webform) {
       _get(_getPrototypeOf(Wizard.prototype), "onChange", this).call(this, flags, changed); // Only rebuild if there is a page visibility change.
 
 
+      var currentNextPage = this.currentNextPage;
+      var nextPage = this.getNextPage();
       var panels = this.calculateVisiblePanels();
 
-      if (!_lodash.default.isEqual(panels.map(function (panel) {
+      if (nextPage !== currentNextPage || !_lodash.default.isEqual(panels.map(function (panel) {
         return panel.key;
       }), this.panels.map(function (panel) {
         return panel.key;
       }))) {
-        // If visible panels changes we need to completely rebuild to add new pages.
+        // If visible panels changes we need to build this template again.
         this.rebuild();
       }
     }
@@ -31669,6 +32400,7 @@ function (_Element) {
   }, {
     key: "build",
     value: function build(element) {
+      element = element || this.element;
       this.empty(element);
       this.setContent(element, this.render());
       this.attach(element);
@@ -31715,8 +32447,7 @@ function (_Element) {
         });
       }); // Attach logic.
 
-      this.attachLogic(); // this.restoreValue();
-
+      this.attachLogic();
       this.autofocus(); // Allow global attach.
 
       this.hook('attachComponent', element, this); // Allow attach per component type.
@@ -32040,7 +32771,7 @@ function (_Element) {
       var index = Array.prototype.indexOf.call(parent.children, this.element);
       this.element.outerHTML = this.sanitize(this.render());
       this.element = parent.children[index];
-      this.attach(this.element);
+      return this.attach(this.element);
     }
   }, {
     key: "rebuild",
@@ -32291,12 +33022,8 @@ function (_Element) {
     value: function onChange(flags, fromRoot) {
       flags = flags || {};
 
-      if (!flags.noValidate) {
-        this.pristine = false;
-      }
-
       if (flags.modified) {
-        // Add a modified class if this element was manually modified.
+        this.pristine = false;
         this.addClass(this.getElement(), 'formio-modified');
       } // If we are supposed to validate on blur, then don't trigger validation yet.
 
@@ -32520,20 +33247,11 @@ function (_Element) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      this.dataValue = value; // If we aren't connected to the dom yet, skip updating values.
-
-      if (!this.attached) {
-        return;
-      }
-
-      flags = this.getFlags.apply(this, arguments);
+      var changed = this.updateValue(value, flags);
+      value = this.dataValue;
 
       if (!this.hasInput) {
-        return false;
-      }
-
-      if (this.component.multiple && !Array.isArray(value)) {
-        value = value ? [value] : [];
+        return changed;
       }
 
       var isArray = Array.isArray(value);
@@ -32548,7 +33266,7 @@ function (_Element) {
         }
       }
 
-      return this.updateValue(flags);
+      return changed;
     }
     /**
      * Set the value at a specific index.
@@ -32596,6 +33314,22 @@ function (_Element) {
       }
     }
     /**
+     * Normalize values coming into updateValue.
+     *
+     * @param value
+     * @return {*}
+     */
+
+  }, {
+    key: "normalizeValue",
+    value: function normalizeValue(value) {
+      if (this.component.multiple && !Array.isArray(value)) {
+        value = value ? [value] : [];
+      }
+
+      return value;
+    }
+    /**
      * Update a value of this component.
      *
      * @param flags
@@ -32603,20 +33337,12 @@ function (_Element) {
 
   }, {
     key: "updateValue",
-    value: function updateValue(flags, value) {
-      if (!this.hasInput) {
-        return false;
-      }
-
+    value: function updateValue(value, flags) {
       flags = flags || {};
       var newValue = value === undefined || value === null ? this.getValue() : value;
+      newValue = this.normalizeValue(newValue);
       var changed = newValue !== undefined ? this.hasChanged(newValue, this.dataValue) : false;
       this.dataValue = newValue;
-
-      if (this.viewOnly) {
-        this.updateViewOnlyValue(newValue);
-      }
-
       this.updateOnChange(flags, changed);
       return changed;
     }
@@ -32648,19 +33374,19 @@ function (_Element) {
     /**
      * Determine if the value of this component has changed.
      *
-     * @param before
-     * @param after
+     * @param newValue
+     * @param oldValue
      * @return {boolean}
      */
 
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      if ((before === undefined || before === null) && (after === undefined || after === null)) {
+    value: function hasChanged(newValue, oldValue) {
+      if ((newValue === undefined || newValue === null) && (oldValue === undefined || oldValue === null || this.isEmpty(oldValue))) {
         return false;
       }
 
-      return !_lodash.default.isEqual(before, after);
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
     /**
      * Update the value on change.
@@ -32833,24 +33559,30 @@ function (_Element) {
         this.empty(this.refs.messageContainer);
       }
 
-      if (!this.refs.input) {
-        return;
-      }
-
       if (message) {
         this.error = {
           component: this.component,
           message: message
         };
         this.emit('componentError', this.error);
-        this.addInputError(message, dirty, this.refs.input);
+
+        if (this.refs.input) {
+          this.addInputError(message, dirty, this.refs.input);
+        }
       } else {
-        this.refs.input.forEach(function (input) {
-          return _this12.removeClass(_this12.performInputMapping(input), 'is-invalid');
-        });
+        if (this.refs.input) {
+          this.refs.input.forEach(function (input) {
+            return _this12.removeClass(_this12.performInputMapping(input), 'is-invalid');
+          });
+        }
+
         this.removeClass(this.element, 'alert alert-danger');
         this.removeClass(this.element, 'has-error');
         this.error = null;
+      }
+
+      if (!this.refs.input) {
+        return;
       }
 
       this.refs.input.forEach(function (input) {
@@ -32876,14 +33608,6 @@ function (_Element) {
       return rules.some(function (pred) {
         return pred();
       });
-    }
-  }, {
-    key: "getFlags",
-    value: function getFlags() {
-      return typeof arguments[1] === 'boolean' ? {
-        noUpdateEvent: arguments[1],
-        noValidate: arguments[2]
-      } : arguments[1] || {};
     } // Maintain reverse compatibility.
 
   }, {
@@ -34805,7 +35529,7 @@ function (_Multivalue) {
     }
   }, {
     key: "updateValueAt",
-    value: function updateValueAt(flags, value, index) {
+    value: function updateValueAt(value, flags, index) {
       if (_lodash.default.get(this.component, 'showWordCount', false)) {
         if (this.refs.wordcount && this.refs.wordcount[index]) {
           var maxWords = _lodash.default.parseInt(_lodash.default.get(this.component, 'validate.maxWords', 0), 10);
@@ -34824,12 +35548,12 @@ function (_Multivalue) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags, value, index) {
+    value: function updateValue(value, flags, index) {
       flags = flags || {};
       value = value === undefined ? this.dataValue : value;
       index = index || 0;
-      this.triggerUpdateValueAt(flags, value, index);
-      return _get(_getPrototypeOf(Input.prototype), "updateValue", this).call(this, flags, value);
+      this.triggerUpdateValueAt(value, flags, index);
+      return _get(_getPrototypeOf(Input.prototype), "updateValue", this).call(this, value, flags);
     }
   }, {
     key: "attach",
@@ -34850,7 +35574,9 @@ function (_Multivalue) {
       this.addEventListener(element, this.inputInfo.changeEvent, function () {
         // Delay update slightly to give input mask a chance to run.
         setTimeout(function () {
-          return _this2.updateValue(null, null, index);
+          return _this2.updateValue(null, {
+            modified: true
+          }, index);
         }, 1);
       }); // Attach the widget.
 
@@ -34920,7 +35646,9 @@ function (_Multivalue) {
 
       var widget = new _widgets.default[settings.type](settings, this.component);
       widget.on('update', function () {
-        return _this3.updateValue(null, widget.getValue(), index);
+        return _this3.updateValue(widget.getValue(), {
+          modified: true
+        }, index);
       }, true);
       widget.on('redraw', function () {
         return _this3.redraw();
@@ -35809,14 +36537,14 @@ function (_Field) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags, source) {
+    value: function updateValue(value, flags, source) {
       return this.components.reduce(function (changed, comp) {
         // Skip over the source if it is provided.
         if (source && source.id === comp.id) {
           return changed;
         }
 
-        return comp.updateValue(flags) || changed;
+        return comp.updateValue(null, flags) || changed;
       }, false);
     }
   }, {
@@ -35843,7 +36571,7 @@ function (_Field) {
       } // Update the value.
 
 
-      var changed = this.updateValue({
+      var changed = this.updateValue(null, {
         noUpdateEvent: true
       }, source); // Iterate through all components and check conditions, and calculate values.
 
@@ -36044,7 +36772,7 @@ function (_Field) {
         return false;
       }
 
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
       return this.getComponents().reduce(function (changed, component) {
         return _this8.setNestedValue(component, value, flags, changed);
       }, false);
@@ -38167,7 +38895,9 @@ function (_Field) {
 
       if (this.refs.input) {
         this.addEventListener(this.input, this.inputInfo.changeEvent, function () {
-          return _this.updateValue();
+          return _this.updateValue(null, {
+            modified: true
+          });
         });
         this.addShortcut(this.input);
       }
@@ -38247,10 +38977,10 @@ function (_Field) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
 
       if (this.setCheckedState(value) !== undefined) {
-        return this.updateValue(flags);
+        return this.updateValue(value, flags);
       }
     }
   }, {
@@ -39132,8 +39862,8 @@ function (_NestedComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return !_lodash.default.isEqual(before, after);
+    value: function hasChanged(newValue, oldValue) {
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
   }, {
     key: "getValue",
@@ -39142,14 +39872,14 @@ function (_NestedComponent) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags, value) {
+    value: function updateValue(value, flags) {
       // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
-      return _Component.default.prototype.updateValue.call(this, flags, value);
+      return _Component.default.prototype.updateValue.call(this, value, flags);
     }
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
 
       if (!value || !_lodash.default.isObject(value)) {
         return;
@@ -40767,8 +41497,8 @@ function (_NestedComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return !_lodash.default.isEqual(before, after);
+    value: function hasChanged(newValue, oldValue) {
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
   }, {
     key: "render",
@@ -40997,14 +41727,14 @@ function (_NestedComponent) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags, value) {
+    value: function updateValue(value, flags) {
       // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
-      return _Component.default.prototype.updateValue.call(this, flags, value);
+      return _Component.default.prototype.updateValue.call(this, value, flags);
     }
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
 
       if (!value) {
         this.dataValue = this.defaultValue;
@@ -42591,10 +43321,9 @@ function (_Field) {
       _get(_getPrototypeOf(DayComponent.prototype), "attach", this).call(this, element);
 
       this.addEventListener(this.refs.day, 'change', function () {
-        return _this2.updateValue();
-      });
-      this.addEventListener(this.refs.month, 'change', function () {
-        return _this2.updateValue();
+        return _this2.updateValue(null, {
+          modified: true
+        });
       }); // TODO: Need to rework this to work with day select as well.
       // Change day max input when month changes.
 
@@ -42608,12 +43337,20 @@ function (_Field) {
         if (day > maxDay) {
           _this2.refs.day.value = _this2.refs.day.max;
         }
+
+        _this2.updateValue(null, {
+          modified: true
+        });
       });
       this.addEventListener(this.refs.year, 'change', function () {
-        return _this2.updateValue();
+        return _this2.updateValue(null, {
+          modified: true
+        });
       });
       this.addEventListener(this.refs.input, this.info.changeEvent, function () {
-        return _this2.updateValue();
+        return _this2.updateValue(null, {
+          modified: true
+        });
       });
       this.setValue(this.dataValue);
     }
@@ -43787,7 +44524,7 @@ function (_NestedComponent) {
       } // Update the value.
 
 
-      var changed = this.updateValue({
+      var changed = this.updateValue(null, {
         noUpdateEvent: true
       }); // Iterate through all components and check conditions, and calculate values.
 
@@ -45983,6 +46720,8 @@ __webpack_require__(/*! core-js/modules/es.reflect.set */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
+
 __webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
@@ -45997,6 +46736,8 @@ exports.default = void 0;
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Component2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/component/Component */ "./node_modules/formiojs/components/_classes/component/Component.js"));
+
+var _eventemitter = _interopRequireDefault(__webpack_require__(/*! eventemitter2 */ "./node_modules/eventemitter2/lib/eventemitter2.js"));
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
@@ -46049,26 +46790,11 @@ function (_Component) {
 
   _createClass(FormComponent, [{
     key: "init",
-
-    /* eslint-disable max-statements */
     value: function init() {
-      var _this = this;
-
       _get(_getPrototypeOf(FormComponent.prototype), "init", this).call(this);
 
       this.subForm = null;
       this.formSrc = '';
-      this.subFormReady = new _nativePromiseOnly.default(function (resolve, reject) {
-        _this.subFormReadyResolve = resolve;
-        _this.subFormReadyReject = reject;
-      });
-      this.subFormLoaded = false;
-      this.subscribe();
-      var srcOptions = this.getSubOptions(); // Make sure that if reference is provided, the form must submit.
-
-      if (this.component.reference) {
-        this.component.submit = true;
-      }
 
       if (this.component.src) {
         this.formSrc = this.component.src;
@@ -46083,10 +46809,10 @@ function (_Component) {
           }
 
           this.formSrc += "/".concat(this.component.project);
-          srcOptions.project = this.formSrc;
+          this.options.project = this.formSrc;
         } else {
           this.formSrc = _Formio.default.getProjectUrl();
-          srcOptions.project = this.formSrc;
+          this.options.project = this.formSrc;
         }
 
         if (this.component.form) {
@@ -46109,26 +46835,13 @@ function (_Component) {
         if (this.component.form) {
           this.formSrc = "".concat(rootSrc, "/").concat(this.component.form);
         }
-      } // Ensure components is set.
+      } // Add revision version if set.
 
 
-      this.component.components = this.component.components || [];
-      this.subForm = new _Form.default(this.component, srcOptions).instance;
-      this.subForm.root = this.root;
-      this.subForm.currentForm = this;
-      this.subForm.on('change', function () {
-        _this.dataValue = _this.subForm.getValue();
-
-        _this.triggerChange();
-      });
-      this.loadSubForm().then(this.redraw.bind(this));
-      this.subForm.url = this.formSrc;
-      this.subForm.nosubmit = this.nosubmit;
-      this.subForm.nosubmit = false;
-      this.restoreValue();
+      if (this.component.formRevision || this.component.formRevision === 0) {
+        this.formSrc += "/v/".concat(this.component.formRevision);
+      }
     }
-    /* eslint-enable max-statements */
-
   }, {
     key: "getSubOptions",
     value: function getSubOptions() {
@@ -46186,6 +46899,7 @@ function (_Component) {
         options.iconset = this.options.iconset;
       }
 
+      options.events = this.createEmitter();
       return options;
     }
   }, {
@@ -46201,6 +46915,8 @@ function (_Component) {
   }, {
     key: "attach",
     value: function attach(element) {
+      var _this = this;
+
       _get(_getPrototypeOf(FormComponent.prototype), "attach", this).call(this, element); // Don't attach in builder.
 
 
@@ -46208,9 +46924,9 @@ function (_Component) {
         return _nativePromiseOnly.default.resolve();
       }
 
-      if (this.subForm) {
-        return this.subForm.attach(element);
-      }
+      return this.loadSubForm().then(function () {
+        return _this.subForm.attach(element);
+      });
     }
   }, {
     key: "detach",
@@ -46222,19 +46938,12 @@ function (_Component) {
       _get(_getPrototypeOf(FormComponent.prototype), "detach", this).call(this);
     }
   }, {
-    key: "subscribe",
-    value: function subscribe() {
-      var _this2 = this;
-
-      this.on('nosubmit', function (value) {
-        _this2.nosubmit = value;
-      }, true);
-    }
-  }, {
     key: "destroy",
     value: function destroy() {
       if (this.subForm) {
         this.subForm.destroy();
+        this.subForm = null;
+        this.subFormReady = null;
       }
 
       _get(_getPrototypeOf(FormComponent.prototype), "destroy", this).call(this);
@@ -46246,7 +46955,7 @@ function (_Component) {
         this.subForm.form = this.component;
       }
 
-      _get(_getPrototypeOf(FormComponent.prototype), "redraw", this).call(this);
+      return _get(_getPrototypeOf(FormComponent.prototype), "redraw", this).call(this);
     }
     /**
      * Pass everyComponent to subform.
@@ -46257,94 +46966,98 @@ function (_Component) {
   }, {
     key: "everyComponent",
     value: function everyComponent() {
-      var _this$subForm;
+      if (this.subForm) {
+        var _this$subForm;
 
-      return (_this$subForm = this.subForm).everyComponent.apply(_this$subForm, arguments);
+        (_this$subForm = this.subForm).everyComponent.apply(_this$subForm, arguments);
+      }
     }
     /**
-     * Filter a subform to ensure all submit button components are hidden.
+     * Render a subform.
      *
      * @param form
      * @param options
      */
 
   }, {
-    key: "filterSubForm",
-    value: function filterSubForm() {
-      // Iterate through every component and hide the submit button.
-      (0, _utils.eachComponent)(this.component.components, function (component) {
+    key: "renderSubForm",
+    value: function renderSubForm(form) {
+      var _this2 = this;
+
+      if (this.options.builder) {
+        this.element.appendChild(this.ce('div', {
+          class: 'text-muted text-center p-2'
+        }, this.text(form.title)));
+        return;
+      } // Iterate through every component and hide the submit button.
+
+
+      (0, _utils.eachComponent)(form.components, function (component) {
         if (component.type === 'button' && (component.action === 'submit' || !component.action)) {
           component.hidden = true;
         }
+      }); // Render the form.
+
+      return new _Form.default(form, this.getSubOptions()).ready.then(function (instance) {
+        _this2.subForm = instance;
+        _this2.subForm.currentForm = _this2;
+        _this2.subForm.parent = _this2;
+        _this2.subForm.parentVisible = _this2.visible;
+
+        _this2.subForm.on('change', function () {
+          if (_this2.subForm) {
+            _this2.dataValue = _this2.subForm.getValue();
+
+            _this2.triggerChange({
+              noEmit: true
+            });
+          }
+        });
+
+        _this2.subForm.url = _this2.formSrc;
+        _this2.subForm.nosubmit = _this2.nosubmit;
+
+        _this2.redraw();
+
+        _this2.restoreValue();
+
+        _this2.subForm.root = _this2.root;
+        return _this2.subForm;
       });
-    }
-  }, {
-    key: "show",
-    value: function show() {
-      var _get2;
-
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      var state = (_get2 = _get(_getPrototypeOf(FormComponent.prototype), "show", this)).call.apply(_get2, [this].concat(args));
-
-      if (state && !this.subFormLoaded) {
-        this.loadSubForm();
-      }
-
-      return state;
     }
     /**
      * Load the subform.
      */
-
-    /* eslint-disable max-statements */
 
   }, {
     key: "loadSubForm",
     value: function loadSubForm() {
       var _this3 = this;
 
-      // Don't load form in builder mode.
-      if (this.builderMode) {
-        return this.subFormReady;
+      if (this.builderMode || this.isHidden()) {
+        return _nativePromiseOnly.default.resolve();
       }
 
-      if (this.subFormLoaded) {
+      if (this.subFormReady) {
         return this.subFormReady;
-      } // Add revision version if set.
-
-
-      if (this.component.formRevision || this.component.formRevision === 0) {
-        this.formSrc += "/v/".concat(this.component.formRevision);
       } // Determine if we already have a loaded form object.
 
 
       if (this.component && this.component.components && Array.isArray(this.component.components) && this.component.components.length) {
-        this.filterSubForm();
-        this.subFormReadyResolve(this.subForm);
-        return this.subFormReady;
+        this.subFormReady = this.renderSubForm(this.component);
       } else if (this.formSrc) {
-        new _Formio.default(this.formSrc).loadForm({
+        this.subFormReady = new _Formio.default(this.formSrc).loadForm({
           params: {
             live: 1
           }
         }).then(function (formObj) {
           _this3.component.components = formObj.components;
-
-          _this3.filterSubForm();
-
-          return _this3.subFormReadyResolve(_this3.subForm);
-        }).catch(function (err) {
-          return _this3.subFormReadyReject(err);
+          return _this3.renderSubForm(formObj);
         });
       }
 
       return this.subFormReady;
     }
-    /* eslint-enable max-statements */
-
   }, {
     key: "checkValidity",
     value: function checkValidity(data, dirty) {
@@ -46357,15 +47070,14 @@ function (_Component) {
   }, {
     key: "checkConditions",
     value: function checkConditions(data) {
-      var visible = _get(_getPrototypeOf(FormComponent.prototype), "checkConditions", this).call(this, data);
+      var visible = _get(_getPrototypeOf(FormComponent.prototype), "checkConditions", this).call(this, data); // Return if already hidden
 
-      var subForm = this.subForm; // Return if already hidden
 
       if (!visible) {
         return visible;
       }
 
-      if (subForm && subForm.hasCondition()) {
+      if (this.subForm && this.subForm.hasCondition()) {
         return this.subForm.checkConditions(this.dataValue.data);
       }
 
@@ -46389,18 +47101,18 @@ function (_Component) {
         this.subForm.setPristine(pristine);
       }
     }
+  }, {
+    key: "beforeNext",
+
     /**
      * Submit the form before the next page is triggered.
      */
-
-  }, {
-    key: "beforeNext",
     value: function beforeNext() {
       var _this4 = this;
 
       // If we wish to submit the form on next page, then do that here.
-      if (this.component.submit) {
-        return this.loadSubForm().then(function () {
+      if (this.shouldSubmit) {
+        return this.subFormReady.then(function () {
           return _this4.subForm.submitForm().then(function (result) {
             _this4.dataValue = result.submission;
             return _this4.dataValue;
@@ -46426,7 +47138,7 @@ function (_Component) {
       var submission = this.dataValue; // This submission has already been submitted, so just return the reference data.
 
       if (submission && submission._id && submission.form) {
-        this.dataValue = this.component.reference ? {
+        this.dataValue = this.shouldSubmit ? {
           _id: submission._id,
           form: submission.form
         } : submission;
@@ -46434,14 +47146,14 @@ function (_Component) {
       } // This submission has not been submitted yet.
 
 
-      if (this.component.submit) {
-        return this.loadSubForm().then(function () {
+      if (this.shouldSubmit) {
+        return this.subFormReady.then(function () {
           return _this5.subForm.submitForm().then(function (result) {
             _this5.subForm.loading = false;
-            _this5.dataValue = _this5.component.reference ? {
+            _this5.dataValue = {
               _id: result.submission._id,
               form: result.submission.form
-            } : result.submission;
+            };
             return _this5.dataValue;
           }).catch(function () {});
         });
@@ -46465,25 +47177,19 @@ function (_Component) {
 
       var changed = _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, submission, flags);
 
-      var hidden = this.isHidden();
-      var subForm;
-
-      if (hidden) {
-        subForm = this.subFormReady;
-      } else {
-        subForm = this.loadSubForm();
+      if (this.subFormReady) {
+        this.subFormReady.then(function (form) {
+          if (submission && submission._id && form.formio && !flags.noload && (_lodash.default.isEmpty(submission.data) || _this6.shouldSubmit)) {
+            var submissionUrl = "".concat(form.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
+            form.setUrl(submissionUrl, _this6.options);
+            form.nosubmit = false;
+            form.loadSubmission();
+          } else {
+            form.setValue(submission, flags);
+          }
+        });
       }
 
-      subForm.then(function (form) {
-        if (submission && submission._id && form.formio && !flags.noload && _lodash.default.isEmpty(submission.data)) {
-          var submissionUrl = "".concat(form.formio.formsUrl, "/").concat(submission.form, "/submission/").concat(submission._id);
-          form.setUrl(submissionUrl, _this6.options);
-          form.nosubmit = false;
-          form.loadSubmission();
-        } else {
-          form.setValue(submission, flags);
-        }
-      });
       return changed;
     }
   }, {
@@ -46512,6 +47218,66 @@ function (_Component) {
       }
     }
   }, {
+    key: "isInternalEvent",
+    value: function isInternalEvent(event) {
+      switch (event) {
+        case 'focus':
+        case 'blur':
+        case 'componentChange':
+        case 'componentError':
+        case 'error':
+        case 'formLoad':
+        case 'languageChanged':
+        case 'render':
+        case 'checkValidity':
+        case 'initialized':
+        case 'submit':
+        case 'submitButton':
+        case 'nosubmit':
+        case 'updateComponent':
+        case 'submitDone':
+        case 'submissionDeleted':
+        case 'requestDone':
+        case 'nextPage':
+        case 'prevPage':
+        case 'wizardNavigationClicked':
+        case 'updateWizardNav':
+        case 'restoreDraft':
+        case 'saveDraft':
+        case 'saveComponent':
+          return true;
+
+        default:
+          return false;
+      }
+    }
+  }, {
+    key: "createEmitter",
+    value: function createEmitter() {
+      var emitter = new _eventemitter.default({
+        wildcard: false,
+        maxListeners: 0
+      });
+      var nativeEmit = emitter.emit;
+      var that = this;
+
+      emitter.emit = function (event) {
+        var eventType = event.replace("".concat(that.options.namespace, "."), '');
+
+        for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          args[_key - 1] = arguments[_key];
+        }
+
+        nativeEmit.call.apply(nativeEmit, [this, event].concat(args));
+
+        if (!that.isInternalEvent(eventType)) {
+          that.emit.apply(that, [eventType].concat(args));
+        }
+      };
+
+      return emitter;
+    }
+  }, {
     key: "deleteValue",
     value: function deleteValue() {
       _get(_getPrototypeOf(FormComponent.prototype), "setValue", this).call(this, null, {
@@ -46524,7 +47290,7 @@ function (_Component) {
   }, {
     key: "dataReady",
     get: function get() {
-      return this.subFormReady;
+      return this.subFormReady || _nativePromiseOnly.default.resolve();
     }
   }, {
     key: "defaultSchema",
@@ -46541,7 +47307,7 @@ function (_Component) {
   }, {
     key: "ready",
     get: function get() {
-      return this.subFormReady;
+      return this.subFormReady || _nativePromiseOnly.default.resolve();
     }
   }, {
     key: "root",
@@ -46585,6 +47351,11 @@ function (_Component) {
       this.subForm.getComponents().forEach(function (component) {
         component.currentForm = _this7;
       });
+    }
+  }, {
+    key: "shouldSubmit",
+    get: function get() {
+      return this.subFormReady && (!this.component.hasOwnProperty('reference') || this.component.reference);
     }
   }, {
     key: "visible",
@@ -46890,9 +47661,7 @@ function (_Input) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      flags = this.getFlags.apply(this, arguments);
-      this.dataValue = value;
-      return this.updateValue(flags);
+      return this.updateValue(value, flags);
     }
   }, {
     key: "getValue",
@@ -49074,7 +49843,9 @@ function (_Field) {
       });
       this.refs.input.forEach(function (input, index) {
         _this.addEventListener(input, _this.inputInfo.changeEvent, function () {
-          return _this.updateValue();
+          return _this.updateValue(null, {
+            modified: true
+          });
         });
 
         _this.addShortcut(input, _this.component.values[index].shortcut);
@@ -49148,10 +49919,10 @@ function (_Field) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags, value) {
+    value: function updateValue(value, flags) {
       var _this3 = this;
 
-      var changed = _get(_getPrototypeOf(RadioComponent.prototype), "updateValue", this).call(this, flags, value);
+      var changed = _get(_getPrototypeOf(RadioComponent.prototype), "updateValue", this).call(this, value, flags);
 
       if (changed && this.refs.wrapper) {
         //add/remove selected option class
@@ -50085,6 +50856,8 @@ __webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
 
+__webpack_require__(/*! core-js/modules/es.promise */ "./node_modules/core-js/modules/es.promise.js");
+
 __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
 
 __webpack_require__(/*! core-js/modules/es.reflect.set */ "./node_modules/core-js/modules/es.reflect.set.js");
@@ -50513,6 +51286,8 @@ function (_Field) {
 
     /* eslint-disable max-statements */
     value: function updateItems(searchInput, forceUpdate) {
+      var _this4 = this;
+
       if (!this.component.data) {
         console.warn("Select component ".concat(this.key, " does not have data configuration."));
         this.itemsLoadedResolve();
@@ -50596,6 +51371,61 @@ function (_Field) {
             this.loadItems(url, searchInput, this.requestHeaders, options, method, body);
             break;
           }
+
+        case 'indexeddb':
+          {
+            if (!window.indexedDB) {
+              window.alert("Your browser doesn't support current version of indexedDB");
+            }
+
+            if (this.component.indexeddb && this.component.indexeddb.database && this.component.indexeddb.table) {
+              var request = window.indexedDB.open(this.component.indexeddb.database, 1);
+
+              request.onupgradeneeded = function (event) {
+                if (_this4.component.customOptions) {
+                  var db = event.target.result;
+                  var objectStore = db.createObjectStore(_this4.component.indexeddb.table, {
+                    keyPath: 'myKey',
+                    autoIncrement: true
+                  });
+
+                  objectStore.transaction.oncomplete = function () {
+                    var transaction = db.transaction(_this4.component.indexeddb.table, 'readwrite');
+
+                    _this4.component.customOptions.forEach(function (item) {
+                      transaction.objectStore(_this4.component.indexeddb.table).put(item);
+                    });
+                  };
+                }
+              };
+
+              request.onerror = function () {
+                window.alert(request.errorCode);
+              };
+
+              request.onsuccess = function (event) {
+                var db = event.target.result;
+                var transaction = db.transaction(_this4.component.indexeddb.table, 'readwrite');
+                var objectStore = transaction.objectStore(_this4.component.indexeddb.table);
+                new Promise(function (resolve) {
+                  var responseItems = [];
+
+                  objectStore.getAll().onsuccess = function (event) {
+                    event.target.result.forEach(function (item) {
+                      responseItems.push(item);
+                    });
+                    resolve(responseItems);
+                  };
+                }).then(function (items) {
+                  if (!_lodash.default.isEmpty(_this4.component.indexeddb.filter)) {
+                    items = _lodash.default.filter(items, _this4.component.indexeddb.filter);
+                  }
+
+                  _this4.setItems(items);
+                });
+              };
+            }
+          }
       }
     }
     /* eslint-enable max-statements */
@@ -50659,7 +51489,7 @@ function (_Field) {
   }, {
     key: "attach",
     value: function attach(element) {
-      var _this4 = this;
+      var _this5 = this;
 
       _get(_getPrototypeOf(SelectComponent.prototype), "attach", this).call(this, element);
 
@@ -50673,7 +51503,7 @@ function (_Field) {
 
       if (autocompleteInput) {
         this.addEventListener(autocompleteInput, 'change', function (event) {
-          _this4.setValue(event.target.value);
+          _this5.setValue(event.target.value);
         });
       }
 
@@ -50684,20 +51514,22 @@ function (_Field) {
       }
 
       this.addEventListener(input, this.inputInfo.changeEvent, function () {
-        return _this4.updateValue();
+        return _this5.updateValue(null, {
+          modified: true
+        });
       });
 
       if (this.component.widget === 'html5') {
         this.triggerUpdate();
         this.focusableElement = input;
         this.addEventListener(input, 'focus', function () {
-          return _this4.update();
+          return _this5.update();
         });
         this.addEventListener(input, 'keydown', function (event) {
           var key = event.key;
 
           if (['Backspace', 'Delete'].includes(key)) {
-            _this4.setValue(null);
+            _this5.setValue(null);
           }
         });
         return;
@@ -50755,7 +51587,7 @@ function (_Field) {
 
         if (useSearch) {
           this.addEventListener(this.choices.containerOuter.element, 'focus', function () {
-            return _this4.focusableElement.focus();
+            return _this5.focusableElement.focus();
           });
         }
       }
@@ -50764,16 +51596,16 @@ function (_Field) {
         this.scrollList = this.choices.choiceList.element;
 
         this.onScroll = function () {
-          if (!_this4.isScrollLoading && _this4.additionalResourcesAvailable && _this4.scrollList.scrollTop + _this4.scrollList.clientHeight >= _this4.scrollList.scrollHeight) {
-            _this4.isScrollLoading = true;
+          if (!_this5.isScrollLoading && _this5.additionalResourcesAvailable && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight) {
+            _this5.isScrollLoading = true;
 
-            _this4.choices.setChoices([{
-              value: "".concat(_this4.id, "-loading"),
+            _this5.choices.setChoices([{
+              value: "".concat(_this5.id, "-loading"),
               label: 'Loading...',
               disabled: true
             }], 'value', 'label');
 
-            _this4.triggerUpdate(_this4.choices.input.element.value);
+            _this5.triggerUpdate(_this5.choices.input.element.value);
           }
         };
 
@@ -50787,33 +51619,33 @@ function (_Field) {
         if (this.choices && this.choices.input && this.choices.input.element) {
           this.addEventListener(this.choices.input.element, 'input', function (event) {
             if (!event.target.value) {
-              _this4.triggerUpdate();
+              _this5.triggerUpdate();
             }
           });
         }
 
         this.addEventListener(input, 'search', function (event) {
-          return _this4.triggerUpdate(event.detail.value);
+          return _this5.triggerUpdate(event.detail.value);
         });
         this.addEventListener(input, 'stopSearch', function () {
-          return _this4.triggerUpdate();
+          return _this5.triggerUpdate();
         });
       }
 
       this.addEventListener(input, 'showDropdown', function () {
-        if (_this4.dataValue) {
-          _this4.triggerUpdate();
+        if (_this5.dataValue) {
+          _this5.triggerUpdate();
         }
 
-        _this4.update();
+        _this5.update();
       });
 
       if (placeholderValue && this.choices._isSelectOneElement) {
         this.addEventListener(input, 'removeItem', function () {
-          var items = _this4.choices._store.activeItems;
+          var items = _this5.choices._store.activeItems;
 
           if (!items.length) {
-            _this4.choices._addItem({
+            _this5.choices._addItem({
               value: placeholderValue,
               label: placeholderValue,
               choiceId: 0,
@@ -50835,20 +51667,20 @@ function (_Field) {
         this.addEventListener(this.refs.addResource, 'click', function (event) {
           event.preventDefault();
 
-          var formioForm = _this4.ce('div');
+          var formioForm = _this5.ce('div');
 
-          var dialog = _this4.createModal(formioForm);
+          var dialog = _this5.createModal(formioForm);
 
-          var projectUrl = _lodash.default.get(_this4.root, 'formio.projectUrl', _Formio.default.getBaseUrl());
+          var projectUrl = _lodash.default.get(_this5.root, 'formio.projectUrl', _Formio.default.getBaseUrl());
 
-          var formUrl = "".concat(projectUrl, "/form/").concat(_this4.component.data.resource);
+          var formUrl = "".concat(projectUrl, "/form/").concat(_this5.component.data.resource);
           new _Form.default(formioForm, formUrl, {}).ready.then(function (form) {
             form.on('submit', function (submission) {
-              if (_this4.component.multiple) {
-                submission = [].concat(_toConsumableArray(_this4.dataValue), [submission]);
+              if (_this5.component.multiple) {
+                submission = [].concat(_toConsumableArray(_this5.dataValue), [submission]);
               }
 
-              _this4.setValue(submission);
+              _this5.setValue(submission);
 
               dialog.close();
             });
@@ -50880,7 +51712,7 @@ function (_Field) {
      * @param {Array} items
      */
     value: function addCurrentChoices(values, items, keyValue) {
-      var _this5 = this;
+      var _this6 = this;
 
       if (!values) {
         return false;
@@ -50899,7 +51731,7 @@ function (_Field) {
         // 'label' and 'value' properties. This assumption allows
         // us to read correct value from the item.
 
-        var isSelectOptions = items === _this5.selectOptions;
+        var isSelectOptions = items === _this6.selectOptions;
 
         if (items && items.length) {
           _lodash.default.each(items, function (choice) {
@@ -50908,7 +51740,7 @@ function (_Field) {
               return false;
             }
 
-            var itemValue = keyValue ? choice.value : _this5.itemValue(choice, isSelectOptions);
+            var itemValue = keyValue ? choice.value : _this6.itemValue(choice, isSelectOptions);
             found |= _lodash.default.isEqual(itemValue, value);
             return found ? false : true;
           });
@@ -50917,8 +51749,8 @@ function (_Field) {
 
         if (!found) {
           notFoundValuesToAdd.push({
-            value: _this5.itemValue(value),
-            label: _this5.itemTemplate(value)
+            value: _this6.itemValue(value),
+            label: _this6.itemTemplate(value)
           });
           return true;
         }
@@ -50931,7 +51763,7 @@ function (_Field) {
           this.choices.setChoices(notFoundValuesToAdd, 'value', 'label');
         } else {
           notFoundValuesToAdd.map(function (notFoundValue) {
-            _this5.addOption(notFoundValue.value, notFoundValue.label);
+            _this6.addOption(notFoundValue.value, notFoundValue.label);
           });
         }
       }
@@ -50975,32 +51807,36 @@ function (_Field) {
   }, {
     key: "redraw",
     value: function redraw() {
-      _get(_getPrototypeOf(SelectComponent.prototype), "redraw", this).call(this);
+      var done = _get(_getPrototypeOf(SelectComponent.prototype), "redraw", this).call(this);
 
       this.triggerUpdate();
+      return done;
+    }
+    /**
+     * Normalize values coming into updateValue.
+     *
+     * @param value
+     * @return {*}
+     */
+
+  }, {
+    key: "normalizeValue",
+    value: function normalizeValue(value) {
+      if (!isNaN(parseFloat(value)) && isFinite(value)) {
+        value = +value;
+      }
+
+      return _get(_getPrototypeOf(SelectComponent.prototype), "normalizeValue", this).call(this, value);
     }
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      var isNumeric = function isNumeric(val) {
-        return !isNaN(parseFloat(val)) && isFinite(val);
-      };
-
-      if (isNumeric(value)) {
-        value = +value;
-      }
-
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
       var previousValue = this.dataValue;
-
-      if (this.component.multiple && !Array.isArray(value)) {
-        value = value ? [value] : [];
-      }
-
+      var changed = this.updateValue(value, flags);
+      value = this.dataValue;
       var hasPreviousValue = Array.isArray(previousValue) ? previousValue.length : previousValue;
-      var hasValue = Array.isArray(value) ? value.length : value;
-      var changed = this.hasChanged(value, previousValue);
-      this.dataValue = value; // Do not set the value if we are loading... that will happen after it is done.
+      var hasValue = Array.isArray(value) ? value.length : value; // Do not set the value if we are loading... that will happen after it is done.
 
       if (this.loading) {
         return changed;
@@ -51010,7 +51846,7 @@ function (_Field) {
       if (this.component.searchField && this.component.lazyLoad && !this.lazyLoadInit && !this.active && !this.selectOptions.length && hasValue) {
         this.loading = true;
         this.lazyLoadInit = true;
-        this.triggerUpdate(this.dataValue, true);
+        this.triggerUpdate(value, true);
         return changed;
       } // Add the value options.
 
@@ -51022,7 +51858,7 @@ function (_Field) {
         if (hasValue) {
           this.choices.removeActiveItems(); // Add the currently selected choices if they don't already exist.
 
-          var currentChoices = Array.isArray(this.dataValue) ? this.dataValue : [this.dataValue];
+          var currentChoices = Array.isArray(value) ? value : [value];
 
           if (!this.addCurrentChoices(currentChoices, this.selectOptions, true)) {
             this.choices.setChoices(this.selectOptions, 'value', 'label', true);
@@ -51055,7 +51891,6 @@ function (_Field) {
         }
       }
 
-      this.updateOnChange(flags, changed);
       return changed;
     }
     /**
@@ -51091,7 +51926,7 @@ function (_Field) {
   }, {
     key: "asString",
     value: function asString(value) {
-      var _this6 = this;
+      var _this7 = this;
 
       value = value || this.getValue();
 
@@ -51118,7 +51953,7 @@ function (_Field) {
       if (Array.isArray(value)) {
         var _items = [];
         value.forEach(function (item) {
-          return _items.push(_this6.itemTemplate(item));
+          return _items.push(_this7.itemTemplate(item));
         });
         return _items.length > 0 ? _items.join('<br />') : '-';
       }
@@ -51207,7 +52042,7 @@ function (_Field) {
   }, {
     key: "requestHeaders",
     get: function get() {
-      var _this7 = this;
+      var _this8 = this;
 
       // Create the headers object.
       var headers = new _Formio.default.Headers(); // Add custom headers to the url.
@@ -51216,7 +52051,7 @@ function (_Field) {
         try {
           _lodash.default.each(this.component.data.headers, function (header) {
             if (header.key) {
-              headers.set(header.key, _this7.interpolate(header.value));
+              headers.set(header.key, _this8.interpolate(header.value));
             }
           });
         } catch (err) {
@@ -51363,9 +52198,6 @@ var _default = [{
       label: 'Values',
       value: 'values'
     }, {
-      label: 'Raw JSON',
-      value: 'json'
-    }, {
       label: 'URL',
       value: 'url'
     }, {
@@ -51374,7 +52206,58 @@ var _default = [{
     }, {
       label: 'Custom',
       value: 'custom'
+    }, {
+      label: 'Raw JSON',
+      value: 'json'
+    }, {
+      label: 'IndexedDB',
+      value: 'indexeddb'
     }]
+  }
+}, {
+  type: 'textfield',
+  weight: 10,
+  input: true,
+  key: 'indexeddb.database',
+  label: 'Database name',
+  tooltip: 'The name of the indexeddb database.',
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.dataSrc'
+      }, 'indexeddb']
+    }
+  }
+}, {
+  type: 'textfield',
+  input: true,
+  key: 'indexeddb.table',
+  label: 'Table name',
+  weight: 16,
+  tooltip: 'The name of table in the indexeddb database.',
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.dataSrc'
+      }, 'indexeddb']
+    }
+  }
+}, {
+  type: 'textarea',
+  as: 'json',
+  editor: 'ace',
+  weight: 18,
+  input: true,
+  key: 'indexeddb.filter',
+  label: 'Row Filter',
+  tooltip: 'Filter table items that match the object.',
+  defaultValue: {},
+  conditional: {
+    json: {
+      '===': [{
+        var: 'data.dataSrc'
+      }, 'indexeddb']
+    }
   }
 }, {
   type: 'textarea',
@@ -52147,15 +53030,15 @@ function (_RadioComponent) {
       return value;
     }
     /**
-     * Set the value of this component.
+     * Normalize values coming into updateValue.
      *
      * @param value
-     * @param flags
+     * @return {*}
      */
 
   }, {
-    key: "setValue",
-    value: function setValue(value, flags) {
+    key: "normalizeValue",
+    value: function normalizeValue(value) {
       value = value || {};
 
       if (_typeof(value) !== 'object') {
@@ -52166,13 +53049,26 @@ function (_RadioComponent) {
         }
       }
 
-      flags = this.getFlags.apply(this, arguments);
-
       if (Array.isArray(value)) {
         _lodash.default.each(value, function (val) {
           value[val] = true;
         });
       }
+
+      return value;
+    }
+    /**
+     * Set the value of this component.
+     *
+     * @param value
+     * @param flags
+     */
+
+  }, {
+    key: "setValue",
+    value: function setValue(value, flags) {
+      var changed = this.updateValue(value, flags);
+      value = this.dataValue;
 
       _lodash.default.each(this.refs.input, function (input) {
         if (_lodash.default.isUndefined(value[input.value])) {
@@ -52182,7 +53078,7 @@ function (_RadioComponent) {
         input.checked = !!value[input.value];
       });
 
-      this.updateValue(flags);
+      return changed;
     }
   }, {
     key: "getView",
@@ -52486,7 +53382,7 @@ function (_Input) {
   }, {
     key: "setValue",
     value: function setValue(value, flags) {
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
 
       _get(_getPrototypeOf(SignatureComponent.prototype), "setValue", this).call(this, value, flags);
 
@@ -54384,7 +55280,9 @@ function (_Field) {
 
       this.refs.input.forEach(function (input) {
         _this.addEventListener(input, 'change', function () {
-          return _this.updateValue();
+          return _this.updateValue(null, {
+            modified: true
+          });
         });
       });
       this.setValue(this.dataValue);
@@ -54394,7 +55292,7 @@ function (_Field) {
     value: function setValue(value, flags) {
       var _this2 = this;
 
-      flags = this.getFlags.apply(this, arguments);
+      flags = flags || {};
 
       if (!value) {
         return;
@@ -54408,7 +55306,7 @@ function (_Field) {
         });
       });
 
-      this.updateValue(flags);
+      this.updateValue(value, flags);
     }
   }, {
     key: "getValue",
@@ -56062,9 +56960,9 @@ function (_NestedComponent) {
     }
   }, {
     key: "updateValue",
-    value: function updateValue(flags, value) {
+    value: function updateValue(value, flags) {
       // Intentionally skip over nested component updateValue method to keep recursive update from occurring with sub components.
-      return _NestedComponent2.default.prototype.updateValue.call(this, flags, value);
+      return _NestedComponent2.default.prototype.updateValue.call(this, value, flags);
     }
   }, {
     key: "getValue",
@@ -56672,6 +57570,8 @@ __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
 
+__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
+
 __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
@@ -56812,9 +57712,9 @@ function (_TextFieldComponent) {
       newValue = this.getConvertedValue(this.removeBlanks(newValue));
 
       if (newValue !== this.dataValue && (!_lodash.default.isEmpty(newValue) || !_lodash.default.isEmpty(this.dataValue))) {
-        this.updateValue({
+        this.updateValue(newValue, {
           modified: !this.autoModified
-        }, newValue);
+        });
       }
 
       this.autoModified = false;
@@ -56946,7 +57846,9 @@ function (_TextFieldComponent) {
 
         default:
           this.addEventListener(element, this.inputInfo.changeEvent, function () {
-            _this3.updateValue(null, null, index);
+            _this3.updateValue(null, {
+              modified: true
+            }, index);
           });
       }
 
@@ -57201,7 +58103,7 @@ function (_TextFieldComponent) {
           return input;
         }
 
-        return input.replace(/<p>&nbsp;<\/p>|<p><br><\/p>|<p><br>&nbsp;<\/p>/g, '');
+        return input.replace(/<p>&nbsp;<\/p>|<p><br><\/p>|<p><br>&nbsp;<\/p>/g, '').trim();
       };
 
       if (Array.isArray(value)) {
@@ -57227,8 +58129,8 @@ function (_TextFieldComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return _get(_getPrototypeOf(TextAreaComponent.prototype), "hasChanged", this).call(this, this.removeBlanks(before), this.removeBlanks(after));
+    value: function hasChanged(newValue, oldValue) {
+      return _get(_getPrototypeOf(TextAreaComponent.prototype), "hasChanged", this).call(this, this.removeBlanks(newValue), this.removeBlanks(oldValue));
     }
   }, {
     key: "isEmpty",
@@ -57728,6 +58630,8 @@ __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
+
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
 
 Object.defineProperty(exports, "__esModule", {
@@ -57842,7 +58746,7 @@ function (_Input) {
     key: "isEmpty",
     value: function isEmpty(value) {
       if (!this.isMultipleMasksField) {
-        return _get(_getPrototypeOf(TextFieldComponent.prototype), "isEmpty", this).call(this, value);
+        return _get(_getPrototypeOf(TextFieldComponent.prototype), "isEmpty", this).call(this, (value || '').trim());
       }
 
       return _get(_getPrototypeOf(TextFieldComponent.prototype), "isEmpty", this).call(this, value) || (this.component.multiple ? value.length === 0 : !value.maskName || !value.value);
@@ -59085,7 +59989,7 @@ function (_NestedComponent) {
   }, {
     key: "setValue",
     value: function setValue(value) {
-      this.updateValue({}, value);
+      this.updateValue(value);
       this.setRoot();
     }
   }, {
@@ -59266,7 +60170,7 @@ function (_NestedComponent) {
   }, {
     key: "updateTree",
     value: function updateTree() {
-      this.updateValue({}, this.tree.value);
+      this.updateValue(this.tree.value);
       this.redraw();
     }
   }, {
@@ -59288,7 +60192,7 @@ function (_NestedComponent) {
       } // Update the value.
 
 
-      var changed = this.updateValue({
+      var changed = this.updateValue(null, {
         noUpdateEvent: true
       }); // Iterate through all components and check conditions, and calculate values.
 
@@ -104554,52 +105458,6 @@ var index = (function () {
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../process/browser.js */ "./node_modules/process/browser.js")))
-
-/***/ }),
-
-/***/ "./node_modules/shallow-copy/index.js":
-/*!********************************************!*\
-  !*** ./node_modules/shallow-copy/index.js ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = function (obj) {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    var copy;
-    
-    if (isArray(obj)) {
-        var len = obj.length;
-        copy = Array(len);
-        for (var i = 0; i < len; i++) {
-            copy[i] = obj[i];
-        }
-    }
-    else {
-        var keys = objectKeys(obj);
-        copy = {};
-        
-        for (var i = 0, l = keys.length; i < l; i++) {
-            var key = keys[i];
-            copy[key] = obj[key];
-        }
-    }
-    return copy;
-};
-
-var objectKeys = Object.keys || function (obj) {
-    var keys = [];
-    for (var key in obj) {
-        if ({}.hasOwnProperty.call(obj, key)) keys.push(key);
-    }
-    return keys;
-};
-
-var isArray = Array.isArray || function (xs) {
-    return {}.toString.call(xs) === '[object Array]';
-};
-
 
 /***/ }),
 
