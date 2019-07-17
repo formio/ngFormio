@@ -1,0 +1,93 @@
+<div class="project-section-content">
+  <div class="project-section-inner-content">
+    <h2>Actions Log</h2>
+    <div class="description">This page shows a list of actions that have been triggered.</div>
+    <table class="table">
+      <thead>
+      <tr>
+        <td>Date/Time</td>
+        <td>FormId</td>
+        <td>SubmissionId</td>
+        <td>Action</td>
+        <td>Handler</td>
+        <td>Method</td>
+        <td>Status</td>
+      </tr>
+      <tr>
+        <th></th>
+        <th><input type="text" ng-model="formId"></th>
+        <th><input type="text" ng-model="submissionId"></th>
+        <th><input type="text" ng-model="title"></th>
+        <th>
+          <select ng-model="handler">
+            <option value=""></option>
+            <option value="before">Before</option>
+            <option value="after">After</option>
+          </select>
+        </th>
+        <th>
+          <select ng-model="method">
+            <option value=""></option>
+            <option value="index">Index</option>
+            <option value="create">Create</option>
+            <option value="read">Read</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+          </select>
+        </th>
+        <th>
+          <select ng-model="actionState">
+            <option value=""></option>
+            <option value="new">New</option>
+            <option value="inprogress">In Progress</option>
+            <option value="complete">Complete</option>
+            <option value="error">Error</option>
+          </select>
+        </th>
+      </tr>
+      </thead>
+      <tbody ng-repeat="action in actions track by $index">
+        <tr class="formio-submission" ng-click="open = !open">
+          <td>{{ action.created | amDateFormat:'l, h:mm:ss a' }}</td>
+          <td>{{action.form}}</td>
+          <td>{{action.submission}}</td>
+          <td>{{action.title}}</td>
+          <td>{{action.handler}}</td>
+          <td>{{action.method}}</td>
+          <td>{{action.state}}</td>
+        </tr>
+        <tr ng-if="open">
+          <td colspan="7">
+            <table class="table">
+              <thead>
+                <th>Date/Time</th>
+                <th>Message</th>
+                <td>Data</td>
+              </thead>
+              <tbody>
+                <tr ng-repeat="message in action.messages">
+                  <td>{{message.datetime | amDateFormat:'l, h:mm:ss a'}}</td>
+                  <td>{{message.info}}</td>
+                  <td>{{message.data}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div ng-if="!actions.length">
+      <div class="alert alert-warning">
+        No action logs were found.
+      </div>
+    </div>
+
+    <bgf-pagination
+      collection="actions"
+      url="actionsUrl"
+      url-params="actionsQuery"
+      per-page="25"
+      template-url="views/partials/pager.html"
+    />
+  </div>
+</div>
