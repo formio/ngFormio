@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "6.7.0",
+  "version": "7.0.0-rc.1",
   "dependencies": {
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
@@ -42,9 +42,9 @@
     "ckeditor": "^4.12.1",
     "copy-webpack-plugin": "^5.0.3",
     "core-js": "^3.1.4",
-    "css-loader": "^2.1.1",
+    "css-loader": "^3.0.0",
     "dompurify": "^1.0.11",
-    "dotenv": "^6.2.0",
+    "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "fast-json-patch": "^2.0.7",
     "file-loader": "^3.0.1",

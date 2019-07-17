@@ -29,6 +29,7 @@ import 'angular-ui-ace';
 import 'ui-select';
 import 'angular-ckeditor/angular-ckeditor';
 import 'formiojs';
+import 'formiojs/contrib';
 import 'ng-formio/lib/module';
 import 'ng-formio/lib/filters';
 import 'ng-formio/lib/providers';

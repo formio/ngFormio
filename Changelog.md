@@ -17,6 +17,42 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Form Manager and Form View pro to use latest renderer.
  - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
 
+## 7.0.0-beta.16
+### Fixed
+ - Issues with Tagpad and Sketchpad not working.
+
+## 7.0.0-beta.14
+### Changed
+ - Upgrade core renderer with following changes. https://github.com/formio/formio.js/blob/master/Changelog.md#3229
+
+## 7.0.0-beta.13
+### Fixed
+ - The inline embed script when using deployed portal to set the base and project properties.
+
+### Changed
+ - Upgraded protractor-helpers@1.1.560, webpack@4.35.0
+
+## 7.0.0-beta.12
+### Fixed
+ - Issue with the Form Manager button so that it will not show up unless the project is enabled.
+
+## 7.0.0-beta.11
+### Changed
+ - Upgrade core renderer to 3.22.8
+ - Upgrade form-manager to 1.34.0 with following changes to formview pro.  https://github.com/formio/pro.formview.io/blob/master/Changlog.md#1340
+
+## 7.0.0-beta.10
+### Changed
+ - Upgraded @progress/kendo-ui@2019.2.619, core-js@3.1.4, dompurify@1.0.11, formiojs@3.22.7, ng-formio@3.17.4, protractor-helpers@1.1.558, webdriverio@5.10.7, webpack-dev-server@3.7.2
+ - Upgraded core renderer to 3.22.7 https://github.com/formio/formio.js/blob/master/Changelog.md#3227
+
+## 7.0.0-beta.8
+### Fixed
+ - Renderer to fix CKEditor rows property.
+
+### Added
+ - CKEditor configurations for TextArea components.
+
 ## 6.5.1
 ### Fixed
  - Only show the tenant button if plan is commercial or trial.
@@ -82,6 +118,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  
 ### Changed
  - Upgraded @babel/core@7.4.4, @babel/preset-env@7.4.4, @progress/kendo-ui@2019.1.424, copy-webpack-plugin@5.0.3, mocha@6.1.4, protractor-helpers@1.1.509, swagger-ui@3.22.1, webpack-cli@3.3.1, formiojs@3.20.4, jquery@3.4.0, node-sass@4.12.0, webdriverio@5.8.0, webpack@4.30.0
+>>>>>>> 5730f9b498b1a554c5fc06992cd0cab6f4957538
 
 ## 6.3.6
 ### Changed
