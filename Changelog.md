@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - ActionItem views.
 
+### Added 
+ - ActionItem log view added to portal.
+
+## 6.5.2
+### Changed
+ - Fixed issues regarding the tenant manager with pagination and also introduced searching.
+ - Form Manager and Form View pro to use latest renderer.
+ - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
+
+## 6.5.1
+### Fixed
+ - Only show the tenant button if plan is commercial or trial.
+ - Several bugs with tenant application.
+
+## 6.5.0
+### Added
+ - Multi-tenant functionality.
+ 
+### Fixed
+ - FOR-2349: Fixed issues where form elements are added to end of form for pdf builder. 
+ 
+### Changed
+ - Upgraded formiojs@3.22.9, protractor-helpers@1.1.564, webdriverio@5.10.9, webpack-cli@3.3.5, webpack@4.35.0
+
 ## 6.4.10
 ### Fixed
  - The inline embed script when using deployed portal to set the base and project properties.
