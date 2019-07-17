@@ -26571,7 +26571,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { if (i % 2) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } else { Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i])); } } return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -32575,19 +32577,19 @@ function (_Component) {
     /**
      * Determine if the value of this component has changed.
      *
-     * @param before
-     * @param after
+     * @param newValue
+     * @param oldValue
      * @return {boolean}
      */
 
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      if ((before === undefined || before === null) && (after === undefined || after === null)) {
+    value: function hasChanged(newValue, oldValue) {
+      if ((newValue === undefined || newValue === null) && (oldValue === undefined || oldValue === null || this.isEmpty(oldValue))) {
         return false;
       }
 
-      return !_lodash.default.isEqual(before, after);
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
     /**
      * Update the value on change.
@@ -37028,8 +37030,8 @@ function (_NestedComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return !_lodash.default.isEqual(before, after);
+    value: function hasChanged(newValue, oldValue) {
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
   }, {
     key: "getValue",
@@ -38481,8 +38483,8 @@ function (_NestedComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return !_lodash.default.isEqual(before, after);
+    value: function hasChanged(newValue, oldValue) {
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
   }, {
     key: "build",
@@ -39504,8 +39506,8 @@ function (_NestedComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return !_lodash.default.isEqual(before, after);
+    value: function hasChanged(newValue, oldValue) {
+      return !_lodash.default.isEqual(newValue, oldValue);
     }
   }, {
     key: "build",
@@ -48552,8 +48554,6 @@ exports.default = PanelComponent;
 
 __webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
 
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
 __webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-js/modules/es.array.filter.js");
 
 __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
@@ -48573,7 +48573,9 @@ var _utils = _interopRequireDefault(__webpack_require__(/*! ../../base/editForm/
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { if (i % 2) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } else { Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i])); } } return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -50422,7 +50424,9 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { if (i % 2) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } else { Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i])); } } return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -50608,7 +50612,7 @@ function (_BaseComponent) {
         style: 'display: none'
       });
       input.addEventListener('change', function (event) {
-        autofillInput.value = JSON.stringify(event.detail.value);
+        autofillInput.value = JSON.stringify(event.detail ? event.detail.value : event.target.value);
       });
       autofillInput.addEventListener('change', function (event) {
         _this2.updateValue({}, JSON.parse(event.target.value));
@@ -50620,7 +50624,10 @@ function (_BaseComponent) {
     value: function createInput(container) {
       this.selectContainer = container;
       this.selectInput = _get(_getPrototypeOf(SelectComponent.prototype), "createInput", this).call(this, container);
-      this.addAutofillHoneyInput(this.selectContainer, this.selectInput);
+
+      if (this.component.widget !== 'html5') {
+        this.addAutofillHoneyInput(this.selectContainer, this.selectInput);
+      }
     }
     /**
      * Adds an option to the select dropdown.
@@ -54564,6 +54571,8 @@ __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/co
 
 __webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
 
+__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
+
 __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
@@ -55108,7 +55117,7 @@ function (_TextFieldComponent) {
           return input;
         }
 
-        return input.replace(/<p>&nbsp;<\/p>|<p><br><\/p>|<p><br>&nbsp;<\/p>/g, '');
+        return input.replace(/<p>&nbsp;<\/p>|<p><br><\/p>|<p><br>&nbsp;<\/p>/g, '').trim();
       };
 
       if (Array.isArray(value)) {
@@ -55138,8 +55147,8 @@ function (_TextFieldComponent) {
     }
   }, {
     key: "hasChanged",
-    value: function hasChanged(before, after) {
-      return _get(_getPrototypeOf(TextAreaComponent.prototype), "hasChanged", this).call(this, this.removeBlanks(before), this.removeBlanks(after));
+    value: function hasChanged(newValue, oldValue) {
+      return _get(_getPrototypeOf(TextAreaComponent.prototype), "hasChanged", this).call(this, this.removeBlanks(newValue), this.removeBlanks(oldValue));
     }
   }, {
     key: "isEmpty",
@@ -55588,6 +55597,8 @@ __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/c
 
 __webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
 
+__webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
+
 __webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
 
 __webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
@@ -55851,7 +55862,7 @@ function (_BaseComponent) {
     key: "isEmpty",
     value: function isEmpty(value) {
       if (!this.isMultipleMasksField) {
-        return _get(_getPrototypeOf(TextFieldComponent.prototype), "isEmpty", this).call(this, value);
+        return _get(_getPrototypeOf(TextFieldComponent.prototype), "isEmpty", this).call(this, (value || '').toString().trim());
       }
 
       return _get(_getPrototypeOf(TextFieldComponent.prototype), "isEmpty", this).call(this, value) || (this.component.multiple ? value.length === 0 : !value.maskName || !value.value);

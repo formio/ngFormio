@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.19.0
+### Changed
+ - Upgraded formiojs@3.23.2, webpack@4.36.1
+
 ## 3.16.0
 ### Changed
  - Updated autoprefixer@9.6.1, webpack@4.35.3, webpack-cli@3.3.6, @babel/cli@7.5.0, @babel/core@7.5.4, @babel/plugin-proposal-export-default-from@7.5.2, @babel/preset-env@7.5.4, eslint-loader@2.2.1, formiojs
