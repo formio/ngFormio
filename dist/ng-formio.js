@@ -21225,7 +21225,7 @@ var FormioUtils = _interopRequireWildcard(__webpack_require__(/*! ./utils/utils 
 
 var _i18next = _interopRequireDefault(__webpack_require__(/*! i18next */ "./node_modules/i18next/dist/esm/i18next.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 
@@ -21829,7 +21829,8 @@ function () {
         util: FormioUtils,
         user: _Formio.default.getUser(),
         moment: _moment.default,
-        instance: this
+        instance: this,
+        config: this.root && this.root.form && this.root.form.config ? this.root.form.config : {}
       }, additional);
     }
     /**
@@ -22419,6 +22420,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
 var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
@@ -22433,13 +22436,13 @@ var _shallowCopy = _interopRequireDefault(__webpack_require__(/*! shallow-copy *
 
 var providers = _interopRequireWildcard(__webpack_require__(/*! ./providers */ "./node_modules/formiojs/providers/index.js"));
 
-var _intersection2 = _interopRequireDefault(__webpack_require__(/*! lodash/intersection */ "./node_modules/lodash/intersection.js"));
+var _intersection2 = _interopRequireDefault(__webpack_require__(/*! lodash/intersection */ "./node_modules/formiojs/node_modules/lodash/intersection.js"));
 
-var _get2 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js"));
+var _get2 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
 
-var _cloneDeep2 = _interopRequireDefault(__webpack_require__(/*! lodash/cloneDeep */ "./node_modules/lodash/cloneDeep.js"));
+var _cloneDeep2 = _interopRequireDefault(__webpack_require__(/*! lodash/cloneDeep */ "./node_modules/formiojs/node_modules/lodash/cloneDeep.js"));
 
-var _defaults2 = _interopRequireDefault(__webpack_require__(/*! lodash/defaults */ "./node_modules/lodash/defaults.js"));
+var _defaults2 = _interopRequireDefault(__webpack_require__(/*! lodash/defaults */ "./node_modules/formiojs/node_modules/lodash/defaults.js"));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -22460,6 +22463,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+_lodash.default.noConflict(); // Intentionally use native-promise-only here... Other promise libraries (es6-promise)
+// duck-punch the global Promise definition which messes up Angular 2 since it
+// also duck-punches the global Promise definition. For now, keep native-promise-only.
+
 
 var _fetchPonyfill = (0, _fetchPonyfill2.default)({
   Promise: _nativePromiseOnly.default
@@ -24121,7 +24129,7 @@ exports.default = void 0;
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -24440,7 +24448,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _WebformBuilder2 = _interopRequireDefault(__webpack_require__(/*! ./WebformBuilder */ "./node_modules/formiojs/WebformBuilder.js"));
 
@@ -24857,7 +24865,11 @@ __webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core
 
 __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
 
+__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptors */ "./node_modules/core-js/modules/es.object.get-own-property-descriptors.js");
+
 __webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
+
+__webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
 
 __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
 
@@ -24876,7 +24888,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
 
@@ -24897,6 +24909,12 @@ var _utils = __webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/u
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -25595,7 +25613,7 @@ function (_NestedComponent) {
       return this.onSubmission = this.formReady.then(function () {
         _this8.submissionSet = true;
 
-        if (submission._fvid && _this8._form.revisions === 'original' && submission._fvid !== _this8._form._vid) {
+        if (submission._fvid && _this8._form.revisions === 'original' && submission._fvid !== _this8._form._vid && _this8.formio) {
           return _this8.formio.loadFormRevision(submission._fvid).then(function (revision) {
             _this8._form._vid = submission._fvid;
             _this8._form.components = revision.components;
@@ -26137,7 +26155,9 @@ function (_NestedComponent) {
         submission.state = options.state || 'submitted';
         var isDraft = submission.state === 'draft';
 
-        _this16.hook('beforeSubmit', submission, function (err) {
+        _this16.hook('beforeSubmit', _objectSpread({}, submission, {
+          component: options.component
+        }), function (err) {
           if (err) {
             return reject(err);
           }
@@ -26160,7 +26180,9 @@ function (_NestedComponent) {
             }
           });
 
-          _this16.hook('customValidation', submission, function (err) {
+          _this16.hook('customValidation', _objectSpread({}, submission, {
+            component: options.component
+          }), function (err) {
             if (err) {
               // If string is returned, cast to object.
               if (typeof err === 'string') {
@@ -26565,13 +26587,13 @@ var _EventEmitter = _interopRequireDefault(__webpack_require__(/*! ./EventEmitte
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
@@ -27751,7 +27773,7 @@ exports.default = void 0;
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Webform2 = _interopRequireDefault(__webpack_require__(/*! ./Webform */ "./node_modules/formiojs/Webform.js"));
 
@@ -28119,6 +28141,7 @@ function (_Webform) {
       this.options.buttonSettings = _lodash.default.defaults(this.options.buttonSettings, {
         showPrevious: true,
         showNext: true,
+        showSubmit: true,
         showCancel: !this.options.readOnly
       });
 
@@ -28140,7 +28163,9 @@ function (_Webform) {
       }
 
       if (name === 'submit') {
-        return !this.options.readOnly && (nextPage === null || this.page === this.pages.length - 1);
+        var _show2 = (0, _utils.firstNonNil)([_lodash.default.get(currentPage, 'buttonSettings.submit'), this.options.buttonSettings.showSubmit]);
+
+        return _show2 && !this.options.readOnly && (nextPage === null || this.page === this.pages.length - 1);
       }
 
       return true;
@@ -28470,7 +28495,7 @@ exports.default = void 0;
 
 var _WebformBuilder2 = _interopRequireDefault(__webpack_require__(/*! ./WebformBuilder */ "./node_modules/formiojs/WebformBuilder.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28703,7 +28728,7 @@ exports.default = void 0;
 
 var _Unknown = _interopRequireDefault(__webpack_require__(/*! ./unknown/Unknown */ "./node_modules/formiojs/components/unknown/Unknown.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28889,7 +28914,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _utils = __webpack_require__(/*! ../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
@@ -29520,7 +29545,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
 
@@ -30243,7 +30268,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = _default;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _BaseEdit = _interopRequireDefault(__webpack_require__(/*! ./editForm/Base.edit.conditional */ "./node_modules/formiojs/components/base/editForm/Base.edit.conditional.js"));
 
@@ -30390,7 +30415,7 @@ var _vanillaTextMask = __webpack_require__(/*! vanilla-text-mask */ "./node_modu
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _tooltip = _interopRequireDefault(__webpack_require__(/*! tooltip.js */ "./node_modules/tooltip.js/dist/esm/tooltip.js"));
 
@@ -34492,7 +34517,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34859,7 +34884,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -35092,7 +35117,8 @@ function (_BaseComponent) {
             event.stopPropagation();
 
             _this.emit('submitButton', {
-              state: _this.component.state || 'submitted'
+              state: _this.component.state || 'submitted',
+              component: _this.component
             });
 
             break;
@@ -35763,7 +35789,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -36357,7 +36383,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -36533,7 +36559,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -36930,7 +36956,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -37514,7 +37540,7 @@ var _vanillaTextMask = _interopRequireDefault(__webpack_require__(/*! vanilla-te
 
 var _textMaskAddons = __webpack_require__(/*! text-mask-addons */ "./node_modules/text-mask-addons/dist/textMaskAddons.js");
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
@@ -38329,7 +38355,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -39397,7 +39423,7 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./no
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
@@ -39922,7 +39948,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -40398,7 +40424,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -41399,7 +41425,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -41647,6 +41673,7 @@ function (_NestedComponent) {
       row.components = [];
 
       if (wrapper.rowOpen) {
+        var dialog = this.component.modal ? this.createModal(this.component.addAnother || 'Add Another') : undefined;
         var editForm = this.component.components.map(function (comp) {
           var component = _lodash.default.cloneDeep(comp);
 
@@ -41667,18 +41694,27 @@ function (_NestedComponent) {
             class: 'editgrid-actions'
           }, [this.ce('button', {
             class: 'btn btn-primary',
-            onClick: this.saveRow.bind(this, rowIndex)
+            onClick: this.saveRow.bind(this, rowIndex, dialog)
           }, this.component.saveRow || 'Save'), ' ', this.component.removeRow ? this.ce('button', {
             class: 'btn btn-danger',
             onClick: this.cancelRow.bind(this, rowIndex)
           }, this.component.removeRow || 'Cancel') : null]));
         }
 
-        wrapper.appendChild(this.ce('div', {
-          class: 'editgrid-edit'
-        }, this.ce('div', {
-          class: 'editgrid-body'
-        }, editForm)));
+        if (!this.component.modal) {
+          wrapper.appendChild(this.ce('div', {
+            class: 'editgrid-edit'
+          }, this.ce('div', {
+            class: 'editgrid-body'
+          }, editForm)));
+        } else {
+          var formComponents = this.ce('div', {
+            class: 'editgrid-edit'
+          }, this.ce('div', {
+            class: 'editgrid-body'
+          }, editForm));
+          dialog.body.appendChild(formComponents);
+        }
       } else {
         var rowMarkup = this.renderTemplate(rowTemplate, {
           row: row.data,
@@ -41902,7 +41938,7 @@ function (_NestedComponent) {
     }
   }, {
     key: "saveRow",
-    value: function saveRow(rowIndex) {
+    value: function saveRow(rowIndex, modal) {
       var editRow = this.editRows[rowIndex];
 
       if (this.options.readOnly) {
@@ -41934,6 +41970,10 @@ function (_NestedComponent) {
       }
 
       this.updateGrid();
+
+      if (this.component.modal) {
+        modal.close();
+      }
     }
   }, {
     key: "removeRow",
@@ -42249,6 +42289,12 @@ var _default = [{
   placeholder: 'Add Another',
   tooltip: 'Set the text of the Add Another button.'
 }, {
+  type: 'checkbox',
+  label: 'Display as Modal',
+  tooltip: 'Display a modal to add or edit entries in the table',
+  key: 'modal',
+  input: true
+}, {
   type: 'textfield',
   input: true,
   key: 'saveRow',
@@ -42418,7 +42464,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _DataGrid = _interopRequireDefault(__webpack_require__(/*! ../datagrid/DataGrid */ "./node_modules/formiojs/components/datagrid/DataGrid.js"));
 
@@ -43404,7 +43450,7 @@ var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formio
 
 var _downloadjs = _interopRequireDefault(__webpack_require__(/*! downloadjs */ "./node_modules/downloadjs/download.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -44439,7 +44485,7 @@ exports.default = void 0;
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../../Formio */ "./node_modules/formiojs/Formio.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44707,7 +44753,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -44888,8 +44934,14 @@ function (_BaseComponent) {
 
       var state = (_get2 = _get(_getPrototypeOf(FormComponent.prototype), "show", this)).call.apply(_get2, [this].concat(args));
 
-      if (state && !this.subFormLoaded) {
-        this.loadSubForm();
+      if (!this.subFormLoaded) {
+        if (state) {
+          this.loadSubForm();
+        } // If our parent is read-only and is done loading, and we were never asked
+        // to load a subform, consider our subform loading promise resolved
+        else if (this.parent.options.readOnly && !this.parent.loading) {
+            this.subFormReadyResolve(this.subForm);
+          }
       }
 
       return state;
@@ -45334,7 +45386,7 @@ function (_BaseComponent) {
   }, {
     key: "shouldSubmit",
     get: function get() {
-      return !this.component.hasOwnProperty('reference') || this.component.reference;
+      return !this.isHidden() && (!this.component.hasOwnProperty('reference') || this.component.reference);
     }
   }, {
     key: "visible",
@@ -45691,7 +45743,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -46571,7 +46623,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -46987,7 +47039,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
@@ -47909,7 +47961,7 @@ exports.default = void 0;
 
 var _vanillaTextMask = __webpack_require__(/*! vanilla-text-mask */ "./node_modules/vanilla-text-mask/dist/vanillaTextMask.js");
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _textMaskAddons = __webpack_require__(/*! text-mask-addons */ "./node_modules/text-mask-addons/dist/textMaskAddons.js");
 
@@ -48573,7 +48625,7 @@ var _utils = _interopRequireDefault(__webpack_require__(/*! ../../base/editForm/
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
@@ -48835,7 +48887,7 @@ exports.default = void 0;
 
 var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/TextField */ "./node_modules/formiojs/components/textfield/TextField.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -49163,7 +49215,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -49659,7 +49711,7 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./no
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
-var _get3 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js"));
+var _get3 = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
@@ -49988,7 +50040,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Select = _interopRequireDefault(__webpack_require__(/*! ../select/Select */ "./node_modules/formiojs/components/select/Select.js"));
 
@@ -50404,7 +50456,7 @@ exports.default = void 0;
 
 var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/public/assets/scripts/choices.js */ "./node_modules/choices.js/public/assets/scripts/choices.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -50424,7 +50476,7 @@ function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
@@ -52212,7 +52264,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Radio = _interopRequireDefault(__webpack_require__(/*! ../radio/Radio */ "./node_modules/formiojs/components/radio/Radio.js"));
 
@@ -52568,7 +52620,7 @@ var _signature_pad = _interopRequireDefault(__webpack_require__(/*! signature_pa
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53012,7 +53064,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -53425,7 +53477,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
@@ -53809,7 +53861,7 @@ var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53999,11 +54051,6 @@ function (_NestedComponent) {
         return comp.destroy();
       });
       this.components = [];
-      var components = this.hook('addComponents', tab.components, this);
-      components.forEach(function (component) {
-        return _this4.addComponent(component, _this4.tabs[index], _this4.data, null, null, state);
-      });
-      this.restoreValue();
 
       if (this.tabLinks.length <= index) {
         return;
@@ -54016,6 +54063,11 @@ function (_NestedComponent) {
         return _this4.removeClass(tab, 'active');
       });
       this.addClass(this.tabLinks[index], 'active').addClass(this.tabLinks[index].tabLink, 'active').addClass(this.tabs[index], 'active');
+      var components = this.hook('addComponents', tab.components, this);
+      components.forEach(function (component) {
+        return _this4.addComponent(component, _this4.tabs[index], _this4.data, null, null, state);
+      });
+      this.restoreValue();
       this.triggerChange();
     }
     /**
@@ -54273,7 +54325,7 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./no
 
 var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/public/assets/scripts/choices.js */ "./node_modules/choices.js/public/assets/scripts/choices.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -54586,7 +54638,7 @@ var _TextField = _interopRequireDefault(__webpack_require__(/*! ../textfield/Tex
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
@@ -55102,6 +55154,7 @@ function (_TextFieldComponent) {
       }
 
       this.addEventListener(textarea, 'input', update);
+      this.on('initialized', update);
       this.updateSize = update;
       update();
     }
@@ -55299,7 +55352,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../../Formio */ "./node_modules/formiojs/Formio.js"));
 
@@ -55616,7 +55669,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -56058,7 +56111,7 @@ exports.default = void 0;
 
 var _widgets = _interopRequireDefault(__webpack_require__(/*! ../../../widgets */ "./node_modules/formiojs/widgets/index.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56529,7 +56582,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./node_modules/formiojs/components/base/Base.js"));
 
@@ -57784,6 +57837,8 @@ Object.defineProperty(exports, "Utils", {
   }
 });
 
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
 var _components = _interopRequireDefault(__webpack_require__(/*! ./components */ "./node_modules/formiojs/components/index.js"));
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! ./components/Components */ "./node_modules/formiojs/components/Components.js"));
@@ -57795,6 +57850,9 @@ var _Form2 = _interopRequireDefault(__webpack_require__(/*! ./Form */ "./node_mo
 var _utils = _interopRequireDefault(__webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/index.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Keep lodash off the global scope.
+_lodash.default.noConflict();
 
 _Components.default.setComponents(_components.default);
 
@@ -57920,7571 +57978,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /***/ }),
 
-/***/ "./node_modules/formiojs/pdf.image.js":
-/*!********************************************!*\
-  !*** ./node_modules/formiojs/pdf.image.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_DataView.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_DataView.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-module.exports = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAAAA3NCSVQICAjb4U/gAAAC9FBMVEX' + '///+HiYuGhomCg4aCgIF6eX12eHokJCQkICAgICAjHSOOj5KJi46DhYd1dnltb3EkICAgICAjHSOVl5qTlZeOj5KHiYt6eX0kICAjH' + 'SOZmp2Vl5qGhokkICDOz9G+vsCztbapq66cnqGbnZ6ZmZmTlZckICCbnZ6Zmp2Vl5qTlZeOj5KMioqGhomCg4aCgIGZmp2TlZeCgIG' + 'mqauho6aen6KcnqGmqaucnqGbnZ66u76cnqGZmp2Vl5rKISjS0dLR0NHOz9HMzMzHycrHxsfFxMXCwsPCw8W+vsCen6KbnZ7GISjCw' + 'sO+v8K+vsCpq66kpqmeoaObnZ7////7+/v5+vr39/j09fXz8/P88PHx8fL37+/u7+/r7O3r6+zp6uvn5+jj5+fz4+P44eLw4eHj5OX' + 'i4+Th4uPf4OLf3+Dc3t/b3N7a29z109TY2tvv1NXv0tPX2NrW19jU1tfS09XP0dLOz9Hrx8jxxMbnxsfMzMzkxMXHycrGx8nDxcfqu' + 'bvCw8XCwsPkuLrutbe/wcO+v8Lftre+vsC7vb+6u763ubu1t7riqqzeqquztbbqpqmxs7bZqKmvsbOtr7Kqra+pq67bnJ7gm56mqav' + 'XnJ3nl5ulp6qkpqmjpaeho6aeoaPbj5Gen6KcnqHXjpGbnZ7jiYzfio7SjpDdiYyZmp3LjI6ZmZnahoqVl5rXgoaTlZeSk5bSgIOPk' + 'ZPOf4Lgen6Oj5LLf4KLjY+Ji46HiYvVcnaGhonNcnWDhYfKcXSCg4bca3DFcXTBcHJ+gIJ9foHRZWl6fH7MZmbOZWnGZGd6eX12eHr' + 'BY2bZXGF1dnlydHa4YWNwcXTOV1vKVlvIVlrCVlnPUFW+VVnOTlS3VFe1VFbKS1HGSE3BR0y/R0y7R0zEREq2R0rSP0WzRkmtRUjBO' + 'kC4OT6zOD3OMDaqNzrBLTO2KzCzKzCuKi/KISiqKi6lKS2+ICa6HyW7Hya2HySuHiOyHiSrHiKnHSGiHCCeHB+aGx/MBOLyAAAA/HR' + 'STlMAERERERERERERESIiIiIiIiIiMzMzMzMzM0RERERVVVVVVVVVVVVmZmZmZmZmZmZ3d3eIiIiImZmZqqqqqrvMzMzMzMzMzMzMz' + 'MzM3d3d3e7u7v/////////////////////////////////////////////////////////////////////////////////////////' + '//////////////////////////////////////////////////////////////////////////////////////////////////////' + '/////////////////////////////////8PeNL3AAAACXBIWXMAAC37AAAt+wH8h0rnAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJ' + 'ld29ya3MgQ1M26LyyjAAAFydJREFUeJzt3Xl8FNd9AHD31K56LfSIaOumTY80aeK06R23TXq5xXV8ZIRhzWEkgkAHKICQZCwpQpZsS' + 'SsWRQdeR2hlCWEsXFkHyELmtMEkGBvnMKZ2iV1jW2COGAOSwPzT33tv5s2bY3fn+O2slg8//DFikeT97u94b2Zn5FtuuRk342bcjJt' + 'xM8zCl5nhaWRm+lJNJuHP8Psy/H6/z7uA/1oG/CvVfL+P/vJS7qP/uQx4wVOJh9f/93q6u6LRzs0dHZH29ra21taWluZwOBRqbGxsq' + 'K+vr6urra2trq6qqqqsrKyoqFhHo5TEWiFKtKE8TD6NfgF8ZUUlfJNq+G519Q2NoVA4/Lek2lJI931algO8HeCqvKGBwOsIvFqBV+j' + 'hJXHCFF+9Huj1hN7Scs/vQvZTJ/f9Ppe3mcjVlGsyrsv1mpI1mtDo6QtVyvHV1WBvDIWbW1pb2//G58tMjRwaLvAHXE7hIA9RuVzsc' + 'sqNGedsHquFf6t+rqd2kndOb2ttn/2p1OQ9w58ZCHxWlbeYyUnKNXAh4cxqEuwFMLVXVpFmh3pvbYP/Zvu9n/Olot+h3AOBzwtyqHX' + 'tgNOmXN/ignuVJmQ/56s9D98J0v5YQ2O4pa090gH2jtt/LQV2WNUCgT8Tqp3KhT7n802bcrXSGXqlPrif4tfwzFM7tHsdo3ds7oR+7' + '5j9W97LM3wzA1lfUOXNOvn6anFJ0zY5r3UTucznuVfLXrbXQrO3tEU6o13RFrDf9zmv6Zl+fyCQ9cWIblGLKdc2uVLnDFoEUUj/YcH' + '0K9XUq3hS8nUNlN7V0xMh9ujtHtMzCH3WbcqEExY1bbWLcqHS1XxTbKE2OF/Wi3aa9ua2SLS7t6+vmdpn/4rHdGj1rNuM8jrDhGO1b' + 'tbiWnUBDc4vLOJ6mnm54ysqIe3h1ki0p69/IBoi9s77ftNTuo/0+pc0s12zkREHnJpxNeGCusAYYvJXqZmneYe0h1ragT4wOBwO07x' + '3ednwQJ8RyPpyG5/tYpvHk2vhGm8+/DLo2cwX7CTtUPGbu58ZHB7tbpTt/+ApHQr+yyabVy6vUOVrqZzPNgM8XwiNvUi2r+ajvpSkv' + 'SHUGunqGxzZNdbYGGomNd915y84lPyT7fgvGv9H4qQY/2sS/6OLN+wE+5JtHE/skPb2aN/A6NjuzfXMHu2685ed0X863WMHdPwaJe+' + 'V1fWh1s6egZGx/WNkT89q/hvOhl2qZQljiEw71vAs7S2Rrn6gHwrV1Ss1/40/vkHprOPXMPv6hlBbtG8Y6J3Vtbzmez9/Q9KL2DIn2' + '6tqG1s6egZ37T88CgOf13zvX9yI9MJChqf2dRXV9c3tXf2j+w8fq2B2VvO9/3gD0gvYIs+mHaS9DgbdMyN7Dx8LgV2oedv2VMsSxhB' + 'd6Cke8r62tKIaBl3v8NihY22lFZqat2tPtSxhDOWzTQ7YSd4h7fXh9u6BXQePRdfK9rBi/7mk0rc+Ur5CglhS/t0D6oPl5UHyYPkjO' + '8+onyqJ8apT+rPL8xme2km314Zao/2jB48Okz9o7Hfastt9JiJnyQHjg8Gt6PTly/OVoqdpr25o6ewb2f/y6MrVJbrE3/mzHtElaaf' + 'JgyvOmH2qc/qy5QwPRb+SYKHimzt6h/ceHi2kf3Rsd0eXDpg8qNix6Iq9AGp+1Zq16yrrQpGewd2HDy8vFPKuHMz8TJLpK1hvQ30LD' + '5YrD34XlZ6Xl8cTDyVfUgrN3tY1MHbotWVGO+Tdcr87o8MHW4WSVx48s5F9dEr41FdZnIn3TePSly4V7atK1lasb4Q5N3bw2NJl+WL' + 'Nh2wewDum/5QxH9E+WE4/2qj7VDcBdNUOaYeKr25o7ezfdfDo4qUmee/s+vuk019lpa998JShDTDoon11Ccw5GPGj+4/maezqxs6i3' + 'Tld+FB4cIXa2Yh0Yif4goKiVWtKK+ubN5PVrfTBxeY1b82OTWcjYCsiPScnh9pJ4iHtK9eUVtSFI72wiy9d+GCMmv9zL+hB3YMHzCa' + 'AK/rixYtzeNHnFxStXltRG470wMK+doHOXsvtf5pUOmvrch3yVdNHXcR/E7pqLyhcvXZdbai9G+glDzB7vibv9AR91+8kk75VHeYik' + 'n64BJcuJ57Y8wtXlayrhoUd9jRr5j2gz7tc85HO+34jefQzS+hHB0zp+gnghv6gal8K9oKVQG8E+tih1XONdl7z9yXc2jilH1gRYxn' + 'T0yW1AxzSH2R4Nu2WFxSVlFbBnga2c6vu5/Z846ybncjujM5jpyd0NfF5y/OLYHVrIPSDRXPuN8k7r/lEb8S6o2/Uc5NAX7RokWAHI' + '4z4hpYobOeKskV7gaHm/y6J9I2aB4WPg/pPdUFfuJDYmT6HVPyqtRWwnesf3V8gZcfLe0fnZ5NFL39V+yD98A1VikN/eiGxL2J2kva' + 'CVSUVcMTeN7J3sRTDLuc9cu+v49PLyzdufUP/IP2QreuIW5qnFywkwe15+TDiyXZueDf59vFr/r6fR6fHfhB9I/v0Ao0d6EUl6+gR+' + '6hksBtqfraH9Efoh4bV3hWd4VnD5yyFOVdaRU7PbZYW5+eva2wMhRvAG2N9/2vv6OxEzRlk+gI179DsMOKh4rueGd61e//BQ4cOv/z' + 'y0WPHXvvhyGCkapVhT/uHXtF3qq2OSudFvzgnj+3nWjq6+gaGR3eN7d67d//Bg/ACHAX+D/f3hrQ1f+8veUM/w5Ju3Oi4pjM7r/iKO' + 'nJVTXdf/8DA4PDICH0FCJ/ojw2ExZqP2e6o9FNsd7skzqfapz+wYIGqJ/ZlkPbSitqGMNmyRbu6unt64SUYhAqgfEj+a0ej1WrN/1X' + 'y6extGYmffcWii/ZFpNthVwP26rpGcrlwa1s7bF6iXeAfGByh3Q/6Y0f7annN/3bS6UrsjPepTug6e07ecjhyJVeX0Fsj6A0C8ALAQ' + 'XpPX/+wrIfoq5Nr/p5f9Ii+M+6nOqKrerKpJfaCIjLMyDWUleT2EHJzCHv/hehHx0APsT9ay/JufiCDTd94Kv6nOqVzO6zfMOrgKLV' + 'oNb3OQrmAtpZcON3cGuns6u0nF5fthdg90sLsn0kanb37GoTd7alEn2o7np6no9PjOHL0St+Iki80KSV8qm9t3xzt6YehNwaxa6T7M' + 'Wr/VQS65/HUPAgBv5DNupyl7CxlAXkDFl4A+bq6Wnb1NL2YdGR0dHRksC9M7Leb3DiQalnCoHSG16xx9KxNHjs5Xyjr5WuIQ80UD6k' + 'fHhzo72sl9s8Y7amWJQwjfYG8r5NPWcnn54meXGvD8C1tHWzD09/f19MKQ7DFeMNIqmUJQ6aLNS93/IPCiVpa+iq+Xu75Poje7q52s' + 'H/FcGNgqmUJ46m584x5V+0MT96Vkt9/ZxdV1taHwjDto909PT3d0U5S83+kt6daljCemivaxYbX4vkb8DKetDzJfLQrGt0caWlovMe' + 'ns6daljCArtrnae2LBDt5eyJfGHhV6x8jN0hFNnd2bu5ob2tuaPxLnT3VsoRB6IqdpT5G3hV7kTLs6ayHHW4kEmlvaw3VN37Kn5mZd' + 'nSrdrnoKZ50/GNkO9NG77RuDtXf7ctwdVOkfBcEvZMhn7zfvywvj7wnlJNDT5WTs0iLFpFjaz6SaIvypz6Xxf3GmKP5TQ1b9uVC0bN' + '1Ltwi33raWP8VPwodXz5njvCbni7oE9g1Oxx6X2A4zG7Sabgr4PO7uAdapVM50OllD0y+2JWcoOXfyAcGvB27fFUpuTGQ3vNPb9G5I' + '+DLdJF2mZ4UOQ/2Z9GuKXtrNc8anh3VN9B7EO+YGYB2d01n1e5ezsucRHa27hWI0fFx1neh5ql9HT2gZfH1QMDnottlukmfO5SDcA6' + 'Xy3blJTD0vL1+Vw5pyA89gFh/dyCQmeGajjThNEnOzpbt/CVwmvd8rZ2cy6mqrqq6Owsq3nXBY8p5qmU7fwlwap7/5IPKu7MCM100u' + '0h3PeHEMs/WB1rNK7fAVwA94He+vHE6ptw85siDwHnNF9E7ghX8uq/j0DFmu1H+rW83NZXlavPu0L5csJew+8AJ3efPcElfhjLbtfL' + '5z5/9mMbz87md+W3bNXsbbr+L9LrPLR1twgkZl+EQJ+cLjzvOO5vz8m1ixA70Ge7p+PL5H3ysxrP6nndR8yv5DcF3kYLHoFuUz7Umz' + '37yYzFyXduFmlfseHTU2T7/rIb+uGHWm9vjnbPS13wJFh15tjdp5B+fzM6WYust4tWDGXo3dMl/4tCR5dkvaekfZ0tSHLudzU0+a3i' + 'w49BRJxwJeVlrkuv+cpmU2G48iNWfpVbshdR+BwodW17GxJLECv/y5SYJ345Hx5rtEBKb7z8C7VlGf1JKYI/Z74tinKxciUtH2rdLA' + 'v1HVK7QDXYLg97EzmYdGh1TLrEp9zyjg/zyjyXn9lhzHouO1+eSnGtzehy73TmPRMeVy3RS8Cep/JJKT2S3Puv+A4WOLBfoTC7SJR3' + 'dsR2LjjXb9XQm19Dj2G3N+X/HoVP5grhykwEXSy6POVjXy8zoSHYcOt5sZyEftwWlJibX0Z3YjTWPREfsc4FeJj3P5JeelKzarc95H' + 'DqyXHpcPlaVzsagY8y6f8OiY8oltoe//FITg5vQEexYdKzZzqKY0c+eVeiPG+juZx0SHW22y8F27pcV+aUyI921HYeON9vlOGmB7nb' + 'O49Ix+pzGS1r5paAZ3eWcR6WjyaUntfJLpnKXsw6TjieXvq2VfxCD7sr+r3h0lNkuxxKNXL+ZM6fbnXV4dKTZLscHovzS92PR3djR6' + 'BblengMufSShm7c0biys5rHoiP2OY3HRfmVptj0ePb4cx6Jji2XikX5FdNl3ao91qzDoaPLodkF+RXzZd2lHY+ONNuVeFakx5Vr6dZ' + 'nHRodbbbLUSzIX49Pdzjn/wWJjjfblTjJ5Vdir21u7Eh03D6n0cTlV+KsbRbsseY8Dj0Jcil4VpHHXdus2o2zDpeOKJek5znd5EQFg' + 'h2TjjTblchV5FfOxV/cTOhW+h2RjjXbeZy8ooSFZtfjE9vx6HizXYkfc7qltNu99ACNji+XrlyxmXbrcx6TngR5riqfPJeLY58rpB2' + 'JngS5VCbQJ/dY/CIbdhy6dblluCQ9KcgnJ52kPWa/00mHSceVS98X5ZNHrH6ZZTsi3Qh3JZc+EOWTk3GP2a3b1SmPR0ftc4igVj553' + 'PJXxu93bkejY8uVKafIJydq3Ns1qzsWHV0uTzlVPjFu/Wtj2eeKdiQ68oQj8bpOPjFh5QDOhG6wo9KTIJf0SZ+YsLidNeLN845PR5j' + 'tJMoM8omJLTa+PrH9n5NDd9nnEmt1qn6dyycmLO5rTO336+3odCQ5bXVKD57j8gmr21kTu7i+MTs2HUsuKfKfSFsm1LC8r9HbDXv5u' + 'dh0nD6XaKuzLh+SpHGVbn1fo6WbHcfg0tHk0OrygIMVrUmlT1lf4ET8HLNjOEw60myn8bpCJ5PtbS6fOm9jgVPtc8zsiHRMuaTI6Ra' + 'uTKVP2Vng4tu/hkzHmHAEqyzobKYfV+AQdha4uHY8OqZcGlLom+gfcwX6CZvfKma/o9Exq12SfqLs4orZn7dw+dSUrQVOHfOGvGPRc' + 'eVBJennlAfGuXzqtCO50Y5Ex5VLNUrS+WmpGpU+tc2R3GDHoSPLpT3KQYu6jB9X6RcsTzrdM9La8ehYE47EuHK4piJzz6t2i5PO8Iy' + '0djQ6pjxXkYsnZjap9Clr56qMdM2cx6IjwkGpHKJrjtTUkr962tKeLiZ9DiYdVS59T6Frspt7gdOvWpx0ce04dFy5xM/LaJO7icuvX' + 'i12b08K3aW8RpHrD1FPcPnVdy1+rzj2ZNBdyukultI36f4ieEGRWy75WPYkZd0tfVw5GWeo6jIuv3r1Ief27CT1ulu4VKzITd5z2KH' + 'SP3L03msy6a7lZGlj9CGTvzzB6Zbb3YhPzoR3L1fPyZgdogUvqPbnHNqT0+sI8lzl3PN5078uVunXNjiyJ2fCI8jVk5AxTrpv4PJrH' + '1lc3Y23BxH79KMfUeixNuo7OP3aR2TPU1yz7YU333zz4idvvvXWi9sffXi+RftXEekYcCk4EbfeSbygyK9de++F966x+ESN97/jNR1' + 'FnrDeIYLvcroaAv2T6++bZN6Ax6PjyNV6j3MKDuzX4smvX3/f5Kv0djQ6kpzXe+xrKHI3vPJR3JyT2J7YjkVHkqv1brafgVemZsdpk' + '2q/ppdf/zABPRuNjiVX691km5r7xAl1uMdP+vXr34ovB/s0o+cq8nf0fxPc8K66l9HLL8K69pYIv3794QRyLDqWXNqk0LXvqAY3vHJ' + 'VCGPOn4ORPv/FeHS9PDt7mtGV/bvmDdWyfReumskvCtV+8Qn4xPdV+XXd8maUT7OsFyvvqO7jD+VuOz111Sh/77maYPAVsdE/3P7N7' + 'ar8rYTyaUYfUujK5nzDiakpg/yjFzbIQ3Cb+YiDeDShfJrRz8vvqLKTcrk7Lqgn4/hR+nPiMctDF83lLyaWTy96k3IBARlyNSeEE7C' + 'K+wn9mhd8xUz+lqbTzeXTi65cQTAuBbecntLLX9lg+sbDQx8a6NqtnFE+/ej8AoIj+4Q3mZj7hLmbxnc+1MB/8M1E8ulX8EMKXQ831' + 'rkuHn3xokL/gW5BN5VPuzF33igH+ukdlk69PvzEdohH9UerMeTTbHFrMpPvs34DgFnElE+vLc3bBvnpTfaukrMjn070Mr18n73rhWz' + 'Kp88ePnePttxdJzyhfJpkncFV+RHXCU8snxZ0Ga7IL1gb6W7l04AeVK53x6v0xPLpQA9uOTch0neguK3IU01v4nAmv4CTcivy1NLLh' + 'PsbWLnrr6NIihz13RdHzy/3+IRebuvyV5fy1NGDQ5MGuc2Lnt3JU0ZvEm7hOr9Hplu+R92FPNX04uPqbXvntwT3yAu6B+u58D8BxXl' + '/3d6TCw6p92oCXMqVy93mbS0u5UiXFth6cmXjXE7gkrQHccZZhaNdUGLjuQW/p96fS+FSGeKMsyH3nF5zjsuPs9YOjk+h7ePsyD2my' + 'ymnl7orp1+G5HJH2MdZ73PP6XLKQX6Oj7QavHK3J/eUzm9emzjClzHlvo4dnsu9pO/hd3AJpxrfYXLD2+nY8jkGuXf0oHLX3uTbws5' + 'Ffq/hguVr//Dk3tFf53Jhnm2RG93yFZ+Ics/oe8zkTcq51yTLjX3uIb2J97lQ7Yr8HdfrmhO5R/TgOYUu7NOVu3jcN7ojuUd0Xu7qN' + 'WHK4drUVJLlpn3uGV1N+oTyUNn4FNaIcyj3hl7D5TKdnHlPtdwb+hYuJzftBWuOTHglj9XnXtPJ4drbx8eFk3EXkvyOYjy5pwUvnIZ' + 'k9HfcTrgE8Lhyjyb8uE4un4VM8noep8+9oxefM+b8fEp2r2og/YSShE+yeFwv35f0988TyL2ii28rkh+ntA/hvLObPveSDtF0hF0HO' + 'r6vCeNNRbdyL+kkysrcH5lbgVuQe01HC1d9zn7oWprSXcnlH+6N80PX0lGennT3fZ6udBx5GtITwC3L049uGZ5IfqPRLU44xB+mmo7' + 'ydKNj9Tnez4xOR3la0RPAbcrTiW4Zbk1+49BtTTgk+gyP6NhyQp/hjj4zkPWllMvt9rlMn+mG7icFf1s6ylnB+13Q/YHArKTTE8Ady' + 'ed9bVYg4HdOzyT0rC+mVm57tsv0LELPdEr3ZZBe/0JK6Q4mHP0fHX2V9HqGzyn9Fh9t9ltvvfVP0ivgGdNWdy6/xU8W9lnEnk548nS' + 'zZpFl3e+cnuHPDEDaqT2tIguSHsh0PuVI1jMg7ZD3tNLDs4WcB+C5u8j6LX5a8iTxhJ8eMYumnJS7G7lqT7twLQe6PyOT7GcDgZkzU' + 's2xEDPoM/X5MmE75pJO+p3+guynSfjlZ+wWTuywlSevYapJFoPUKWzeMeQ0oIDSJzI1O5n/B5/xAXbXPcU5AAAAAElFTkSuQmCC';
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/index.js":
-/*!**************************************************!*\
-  !*** ./node_modules/formiojs/providers/index.js ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-Object.defineProperty(exports, "storage", {
-  enumerable: true,
-  get: function get() {
-    return _storage2.default;
-  }
-});
-
-var _storage2 = _interopRequireDefault(__webpack_require__(/*! ./storage */ "./node_modules/formiojs/providers/storage/index.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/azure.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/azure.js ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core-js/modules/es.function.name.js");
-
-__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _xhr = _interopRequireDefault(__webpack_require__(/*! ./xhr */ "./node_modules/formiojs/providers/storage/xhr.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var azure = function azure(formio) {
-  return {
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return _xhr.default.upload(formio, 'azure', function (xhr, response) {
-        xhr.open('PUT', response.url);
-        xhr.setRequestHeader('Content-Type', file.type);
-        xhr.setRequestHeader('x-ms-blob-type', 'BlockBlob');
-        return file;
-      }, file, fileName, dir, progressCallback).then(function () {
-        return {
-          storage: 'azure',
-          name: _xhr.default.path([dir, fileName]),
-          size: file.size,
-          type: file.type
-        };
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/azure?name=").concat(_xhr.default.trim(file.name)), 'GET');
-    }
-  };
-};
-
-azure.title = 'Azure File Services';
-var _default = azure;
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/base64.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/base64.js ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var base64 = function base64() {
-  return {
-    title: 'Base64',
-    name: 'base64',
-    uploadFile: function uploadFile(file, fileName) {
-      var _this = this;
-
-      var reader = new FileReader();
-      return new _nativePromiseOnly.default(function (resolve, reject) {
-        reader.onload = function (event) {
-          var url = event.target.result;
-          resolve({
-            storage: 'base64',
-            name: fileName,
-            url: url,
-            size: file.size,
-            type: file.type
-          });
-        };
-
-        reader.onerror = function () {
-          return reject(_this);
-        };
-
-        reader.readAsDataURL(file);
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      // Return the original as there is nothing to do.
-      return _nativePromiseOnly.default.resolve(file);
-    }
-  };
-};
-
-base64.title = 'Base64';
-var _default = base64;
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/dropbox.js":
-/*!************************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/dropbox.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var dropbox = function dropbox(formio) {
-  return {
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return new _nativePromiseOnly.default(function (resolve, reject) {
-        // Send the file with data.
-        var xhr = new XMLHttpRequest();
-
-        if (typeof progressCallback === 'function') {
-          xhr.upload.onprogress = progressCallback;
-        }
-
-        var fd = new FormData();
-        fd.append('name', fileName);
-        fd.append('dir', dir);
-        fd.append('file', file); // Fire on network error.
-
-        xhr.onerror = function (err) {
-          err.networkError = true;
-          reject(err);
-        };
-
-        xhr.onload = function () {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            var response = JSON.parse(xhr.response);
-            response.storage = 'dropbox';
-            response.size = file.size;
-            response.type = file.type;
-            response.url = response.path_lower;
-            resolve(response);
-          } else {
-            reject(xhr.response || 'Unable to upload file');
-          }
-        };
-
-        xhr.onabort = reject;
-        xhr.open('POST', "".concat(formio.formUrl, "/storage/dropbox"));
-        var token = formio.getToken();
-
-        if (token) {
-          xhr.setRequestHeader('x-jwt-token', token);
-        }
-
-        xhr.send(fd);
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      var token = formio.getToken();
-      file.url = "".concat(formio.formUrl, "/storage/dropbox?path_lower=").concat(file.path_lower).concat(token ? "&x-jwt-token=".concat(token) : '');
-      return _nativePromiseOnly.default.resolve(file);
-    }
-  };
-};
-
-dropbox.title = 'Dropbox';
-var _default = dropbox;
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/index.js ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _base = _interopRequireDefault(__webpack_require__(/*! ./base64 */ "./node_modules/formiojs/providers/storage/base64.js"));
-
-var _dropbox = _interopRequireDefault(__webpack_require__(/*! ./dropbox */ "./node_modules/formiojs/providers/storage/dropbox.js"));
-
-var _s = _interopRequireDefault(__webpack_require__(/*! ./s3 */ "./node_modules/formiojs/providers/storage/s3.js"));
-
-var _azure = _interopRequireDefault(__webpack_require__(/*! ./azure */ "./node_modules/formiojs/providers/storage/azure.js"));
-
-var _url = _interopRequireDefault(__webpack_require__(/*! ./url */ "./node_modules/formiojs/providers/storage/url.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = {
-  base64: _base.default,
-  dropbox: _dropbox.default,
-  s3: _s.default,
-  url: _url.default,
-  azure: _azure.default
-};
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/s3.js":
-/*!*******************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/s3.js ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
-
-var _xhr = _interopRequireDefault(__webpack_require__(/*! ./xhr */ "./node_modules/formiojs/providers/storage/xhr.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var s3 = function s3(formio) {
-  return {
-    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
-      return _xhr.default.upload(formio, 's3', function (xhr, response) {
-        response.data.fileName = fileName;
-        response.data.key = _xhr.default.path([response.data.key, dir, fileName]);
-
-        if (response.signed) {
-          xhr.open('PUT', response.signed);
-          xhr.setRequestHeader('Content-Type', file.type);
-          return file;
-        } else {
-          var fd = new FormData();
-
-          for (var key in response.data) {
-            fd.append(key, response.data[key]);
-          }
-
-          fd.append('file', file);
-          xhr.open('POST', response.url);
-          return fd;
-        }
-      }, file, fileName, dir, progressCallback).then(function (response) {
-        return {
-          storage: 's3',
-          name: fileName,
-          bucket: response.bucket,
-          key: response.data.key,
-          url: _xhr.default.path([response.url, response.data.key]),
-          acl: response.data.acl,
-          size: file.size,
-          type: file.type
-        };
-      });
-    },
-    downloadFile: function downloadFile(file) {
-      if (file.acl !== 'public-read') {
-        return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/s3?bucket=").concat(_xhr.default.trim(file.bucket), "&key=").concat(_xhr.default.trim(file.key)), 'GET');
-      } else {
-        return _nativePromiseOnly.default.resolve(file);
-      }
-    }
-  };
-};
-
-s3.title = 'S3';
-var _default = s3;
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/url.js":
-/*!********************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/url.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core-js/modules/es.function.name.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var url = function url(formio) {
-  var xhrRequest = function xhrRequest(url, name, query, data, options, onprogress) {
-    return new _nativePromiseOnly.default(function (resolve, reject) {
-      var xhr = new XMLHttpRequest();
-      var json = typeof data === 'string';
-      var fd = new FormData();
-
-      if (typeof onprogress === 'function') {
-        xhr.upload.onprogress = onprogress;
-      }
-
-      if (!json) {
-        for (var key in data) {
-          fd.append(key, data[key]);
-        }
-      }
-
-      xhr.onload = function () {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          // Need to test if xhr.response is decoded or not.
-          var respData = {};
-
-          try {
-            respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
-            respData = respData && respData.data ? respData.data : respData;
-          } catch (err) {
-            respData = {};
-          } // Get the url of the file.
-
-
-          var respUrl = respData.hasOwnProperty('url') ? respData.url : "".concat(xhr.responseURL, "/").concat(name); // If they provide relative url, then prepend the url.
-
-          if (respUrl && respUrl[0] === '/') {
-            respUrl = "".concat(url).concat(respUrl);
-          }
-
-          resolve({
-            url: respUrl,
-            data: respData
-          });
-        } else {
-          reject(xhr.response || 'Unable to upload file');
-        }
-      };
-
-      xhr.onerror = function () {
-        return reject(xhr);
-      };
-
-      xhr.onabort = function () {
-        return reject(xhr);
-      };
-
-      var requestUrl = url + (url.indexOf('?') > -1 ? '&' : '?');
-
-      for (var _key in query) {
-        requestUrl += "".concat(_key, "=").concat(query[_key], "&");
-      }
-
-      if (requestUrl[requestUrl.length - 1] === '&') {
-        requestUrl = requestUrl.substr(0, requestUrl.length - 1);
-      }
-
-      xhr.open('POST', requestUrl);
-
-      if (json) {
-        xhr.setRequestHeader('Content-Type', 'application/json');
-      }
-
-      var token = formio.getToken();
-
-      if (token) {
-        xhr.setRequestHeader('x-jwt-token', token);
-      } //Overrides previous request props
-
-
-      if (options) {
-        var parsedOptions = JSON.parse(options);
-
-        for (var prop in parsedOptions) {
-          xhr[prop] = parsedOptions[prop];
-        }
-      }
-
-      xhr.send(json ? data : fd);
-    });
-  };
-
-  return {
-    title: 'Url',
-    name: 'url',
-    uploadFile: function uploadFile(file, name, dir, progressCallback, url, options) {
-      var uploadRequest = function uploadRequest(form) {
-        return xhrRequest(url, name, {
-          baseUrl: encodeURIComponent(formio.projectUrl),
-          project: form ? form.project : '',
-          form: form ? form._id : ''
-        }, {
-          file: file,
-          name: name,
-          dir: dir
-        }, options, progressCallback).then(function (response) {
-          // Store the project and form url along with the metadata.
-          response.data = response.data || {};
-          response.data.baseUrl = formio.projectUrl;
-          response.data.project = form ? form.project : '';
-          response.data.form = form ? form._id : '';
-          return {
-            storage: 'url',
-            name: name,
-            url: response.url,
-            size: file.size,
-            type: file.type,
-            data: response.data
-          };
-        });
-      };
-
-      if (file.private && formio.formId) {
-        return formio.loadForm().then(function (form) {
-          return uploadRequest(form);
-        });
-      } else {
-        return uploadRequest();
-      }
-    },
-    downloadFile: function downloadFile(file) {
-      if (file.private) {
-        if (formio.submissionId && file.data) {
-          file.data.submission = formio.submissionId;
-        }
-
-        return xhrRequest(file.url, file.name, {}, JSON.stringify(file)).then(function (response) {
-          return response.data;
-        });
-      } // Return the original as there is nothing to do.
-
-
-      return _nativePromiseOnly.default.resolve(file);
-    }
-  };
-};
-
-url.title = 'Url';
-var _default = url;
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/providers/storage/xhr.js":
-/*!********************************************************!*\
-  !*** ./node_modules/formiojs/providers/storage/xhr.js ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-js/modules/es.array.filter.js");
-
-__webpack_require__(/*! core-js/modules/es.array.join */ "./node_modules/core-js/modules/es.array.join.js");
-
-__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
-
-__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
-
-var _trim2 = _interopRequireDefault(__webpack_require__(/*! lodash/trim */ "./node_modules/lodash/trim.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var XHR = {
-  trim: function trim(text) {
-    return (0, _trim2.default)(text, '/');
-  },
-  path: function path(items) {
-    return items.filter(function (item) {
-      return !!item;
-    }).map(XHR.trim).join('/');
-  },
-  upload: function upload(formio, type, xhrCb, file, fileName, dir, progressCallback) {
-    return new _nativePromiseOnly.default(function (resolve, reject) {
-      // Send the pre response to sign the upload.
-      var pre = new XMLHttpRequest(); // This only fires on a network error.
-
-      pre.onerror = function (err) {
-        err.networkError = true;
-        reject(err);
-      };
-
-      pre.onabort = reject;
-
-      pre.onload = function () {
-        if (pre.status >= 200 && pre.status < 300) {
-          var response = JSON.parse(pre.response); // Send the file with data.
-
-          var xhr = new XMLHttpRequest();
-
-          if (typeof progressCallback === 'function') {
-            xhr.upload.onprogress = progressCallback;
-          } // Fire on network error.
-
-
-          xhr.onerror = function (err) {
-            err.networkError = true;
-            reject(err);
-          }; // Fire on network abort.
-
-
-          xhr.onabort = function (err) {
-            err.networkError = true;
-            reject(err);
-          }; // Fired when the response has made it back from the server.
-
-
-          xhr.onload = function () {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve(response);
-            } else {
-              reject(xhr.response || 'Unable to upload file');
-            }
-          }; // Set the onabort error callback.
-
-
-          xhr.onabort = reject; // Get the request and send it to the server.
-
-          xhr.send(xhrCb(xhr, response));
-        } else {
-          reject(pre.response || 'Unable to sign file');
-        }
-      };
-
-      pre.open('POST', "".concat(formio.formUrl, "/storage/").concat(type));
-      pre.setRequestHeader('Accept', 'application/json');
-      pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-      var token = formio.getToken();
-
-      if (token) {
-        pre.setRequestHeader('x-jwt-token', token);
-      }
-
-      pre.send(JSON.stringify({
-        name: XHR.path([dir, fileName]),
-        size: file.size,
-        type: file.type
-      }));
-    });
-  }
-};
-var _default = XHR;
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/utils/builder.js":
-/*!************************************************!*\
-  !*** ./node_modules/formiojs/utils/builder.js ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
-
-var _utils = __webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/utils.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = {
-  /**
-   * Appends a number to a component.key to keep it unique
-   *
-   * @param {Object} form
-   *   The components parent form.
-   * @param {Object} component
-   *   The component to uniquify
-   */
-  uniquify: function uniquify(form, component) {
-    var changed = false;
-    var formKeys = {};
-    (0, _utils.eachComponent)(form.components, function (comp) {
-      formKeys[comp.key] = true;
-    }, true); // Recurse into all child components.
-
-    (0, _utils.eachComponent)([component], function (component) {
-      // Skip key uniquification if this component doesn't have a key.
-      if (!component.key) {
-        return;
-      }
-
-      var newKey = (0, _utils.uniqueKey)(formKeys, component.key);
-
-      if (newKey !== component.key) {
-        component.key = newKey;
-        changed = true;
-      }
-    }, true);
-    return changed;
-  },
-  additionalShortcuts: {
-    button: ['Enter', 'Esc']
-  },
-  getAlphaShortcuts: function getAlphaShortcuts() {
-    return _lodash.default.range('A'.charCodeAt(), 'Z'.charCodeAt() + 1).map(function (charCode) {
-      return String.fromCharCode(charCode);
-    });
-  },
-  getAdditionalShortcuts: function getAdditionalShortcuts(type) {
-    return this.additionalShortcuts[type] || [];
-  },
-  getBindedShortcuts: function getBindedShortcuts(components, input) {
-    var result = [];
-    (0, _utils.eachComponent)(components, function (component) {
-      if (component === input) {
-        return;
-      }
-
-      if (component.shortcut) {
-        result.push(component.shortcut);
-      }
-
-      if (component.values) {
-        component.values.forEach(function (value) {
-          if (value.shortcut) {
-            result.push(value.shortcut);
-          }
-        });
-      }
-    }, true);
-    return result;
-  },
-  getAvailableShortcuts: function getAvailableShortcuts(form, component) {
-    if (!component) {
-      return [];
-    }
-
-    return [''].concat(_lodash.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), this.getBindedShortcuts(form.components, component)));
-  }
-};
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/utils/formUtils.js":
-/*!**************************************************!*\
-  !*** ./node_modules/formiojs/utils/formUtils.js ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.array.from */ "./node_modules/core-js/modules/es.array.from.js");
-
-__webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
-
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.join */ "./node_modules/core-js/modules/es.array.join.js");
-
-__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
-
-__webpack_require__(/*! core-js/modules/es.array.slice */ "./node_modules/core-js/modules/es.array.slice.js");
-
-__webpack_require__(/*! core-js/modules/es.array.splice */ "./node_modules/core-js/modules/es.array.splice.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.string.match */ "./node_modules/core-js/modules/es.string.match.js");
-
-__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
-
-__webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.isLayoutComponent = isLayoutComponent;
-exports.eachComponent = eachComponent;
-exports.matchComponent = matchComponent;
-exports.getComponent = getComponent;
-exports.searchComponents = searchComponents;
-exports.findComponents = findComponents;
-exports.findComponent = findComponent;
-exports.removeComponent = removeComponent;
-exports.generateFormChange = generateFormChange;
-exports.applyFormChanges = applyFormChanges;
-exports.flattenComponents = flattenComponents;
-exports.hasCondition = hasCondition;
-exports.parseFloatExt = parseFloatExt;
-exports.formatAsCurrency = formatAsCurrency;
-exports.escapeRegExCharacters = escapeRegExCharacters;
-exports.getValue = getValue;
-exports.getStrings = getStrings;
-
-var _get = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/lodash/get.js"));
-
-var _set = _interopRequireDefault(__webpack_require__(/*! lodash/set */ "./node_modules/lodash/set.js"));
-
-var _has = _interopRequireDefault(__webpack_require__(/*! lodash/has */ "./node_modules/lodash/has.js"));
-
-var _clone = _interopRequireDefault(__webpack_require__(/*! lodash/clone */ "./node_modules/lodash/clone.js"));
-
-var _forOwn = _interopRequireDefault(__webpack_require__(/*! lodash/forOwn */ "./node_modules/lodash/forOwn.js"));
-
-var _isString = _interopRequireDefault(__webpack_require__(/*! lodash/isString */ "./node_modules/lodash/isString.js"));
-
-var _isNaN = _interopRequireDefault(__webpack_require__(/*! lodash/isNaN */ "./node_modules/lodash/isNaN.js"));
-
-var _isNil = _interopRequireDefault(__webpack_require__(/*! lodash/isNil */ "./node_modules/lodash/isNil.js"));
-
-var _isPlainObject = _interopRequireDefault(__webpack_require__(/*! lodash/isPlainObject */ "./node_modules/lodash/isPlainObject.js"));
-
-var _round = _interopRequireDefault(__webpack_require__(/*! lodash/round */ "./node_modules/lodash/round.js"));
-
-var _chunk = _interopRequireDefault(__webpack_require__(/*! lodash/chunk */ "./node_modules/lodash/chunk.js"));
-
-var _pad = _interopRequireDefault(__webpack_require__(/*! lodash/pad */ "./node_modules/lodash/pad.js"));
-
-var _findIndex = _interopRequireDefault(__webpack_require__(/*! lodash/findIndex */ "./node_modules/lodash/findIndex.js"));
-
-var _fastJsonPatch = _interopRequireDefault(__webpack_require__(/*! fast-json-patch */ "./node_modules/fast-json-patch/lib/duplex.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Determine if a component is a layout component or not.
- *
- * @param {Object} component
- *   The component to check.
- *
- * @returns {Boolean}
- *   Whether or not the component is a layout component.
- */
-function isLayoutComponent(component) {
-  return Boolean(component.columns && Array.isArray(component.columns) || component.rows && Array.isArray(component.rows) || component.components && Array.isArray(component.components));
-}
-/**
- * Iterate through each component within a form.
- *
- * @param {Object} components
- *   The components to iterate.
- * @param {Function} fn
- *   The iteration function to invoke for each component.
- * @param {Boolean} includeAll
- *   Whether or not to include layout components.
- * @param {String} path
- *   The current data path of the element. Example: data.user.firstName
- * @param {Object} parent
- *   The parent object.
- */
-
-
-function eachComponent(components, fn, includeAll, path, parent) {
-  if (!components) return;
-  path = path || '';
-  components.forEach(function (component) {
-    if (!component) {
-      return;
-    }
-
-    var hasColumns = component.columns && Array.isArray(component.columns);
-    var hasRows = component.rows && Array.isArray(component.rows);
-    var hasComps = component.components && Array.isArray(component.components);
-    var noRecurse = false;
-    var newPath = component.key ? path ? "".concat(path, ".").concat(component.key) : component.key : ''; // Keep track of parent references.
-
-    if (parent) {
-      // Ensure we don't create infinite JSON structures.
-      component.parent = (0, _clone.default)(parent);
-      delete component.parent.components;
-      delete component.parent.componentMap;
-      delete component.parent.columns;
-      delete component.parent.rows;
-    }
-
-    if (includeAll || component.tree || !hasColumns && !hasRows && !hasComps) {
-      noRecurse = fn(component, newPath);
-    }
-
-    var subPath = function subPath() {
-      if (component.key && !['panel', 'table', 'well', 'columns', 'fieldset', 'tabs', 'form'].includes(component.type) && (['datagrid', 'container', 'editgrid'].includes(component.type) || component.tree)) {
-        return newPath;
-      } else if (component.key && component.type === 'form') {
-        return "".concat(newPath, ".data");
-      }
-
-      return path;
-    };
-
-    if (!noRecurse) {
-      if (hasColumns) {
-        component.columns.forEach(function (column) {
-          return eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
-        });
-      } else if (hasRows) {
-        component.rows.forEach(function (row) {
-          if (Array.isArray(row)) {
-            row.forEach(function (column) {
-              return eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
-            });
-          }
-        });
-      } else if (hasComps) {
-        eachComponent(component.components, fn, includeAll, subPath(), parent ? component : null);
-      }
-    }
-  });
-}
-/**
- * Matches if a component matches the query.
- *
- * @param component
- * @param query
- * @return {boolean}
- */
-
-
-function matchComponent(component, query) {
-  if ((0, _isString.default)(query)) {
-    return component.key === query;
-  } else {
-    var matches = false;
-    (0, _forOwn.default)(query, function (value, key) {
-      matches = (0, _get.default)(component, key) === value;
-
-      if (!matches) {
-        return false;
-      }
-    });
-    return matches;
-  }
-}
-/**
- * Get a component by its key
- *
- * @param {Object} components
- *   The components to iterate.
- * @param {String|Object} key
- *   The key of the component to get, or a query of the component to search.
- *
- * @returns {Object}
- *   The component that matches the given key, or undefined if not found.
- */
-
-
-function getComponent(components, key, includeAll) {
-  var result;
-  eachComponent(components, function (component, path) {
-    if (path === key) {
-      component.path = path;
-      result = component;
-      return true;
-    }
-  }, includeAll);
-  return result;
-}
-/**
- * Finds a component provided a query of properties of that component.
- *
- * @param components
- * @param query
- * @return {*}
- */
-
-
-function searchComponents(components, query) {
-  var results = [];
-  eachComponent(components, function (component, path) {
-    if (matchComponent(component, query)) {
-      component.path = path;
-      results.push(component);
-    }
-  }, true);
-  return results;
-}
-/**
- * Deprecated version of findComponents. Renamed to searchComponents.
- *
- * @param components
- * @param query
- * @returns {*}
- */
-
-
-function findComponents(components, query) {
-  console.warn('formio.js/utils findComponents is deprecated. Use searchComponents instead.');
-  return searchComponents(components, query);
-}
-
-var possibleFind = null;
-var possiblePath = [];
-var unknownCounter = {};
-
-var checkComponent = function checkComponent(component, key, path) {
-  // Search for components without a key as well.
-  if (!component.key) {
-    if (!unknownCounter.hasOwnProperty(component.type)) {
-      unknownCounter[component.type] = 0;
-    }
-
-    unknownCounter[component.type]++;
-
-    if (key === component.type + unknownCounter[component.type]) {
-      possibleFind = component;
-      possiblePath = (0, _clone.default)(path);
-    }
-  } else if (possibleFind && component.key === possibleFind.key) {
-    var nextCount = component.key.match(/([0-9]+)$/g);
-
-    if (nextCount) {
-      unknownCounter[component.type] = parseInt(nextCount.pop(), 10);
-      possibleFind = null;
-      possiblePath = [];
-    }
-  }
-
-  if (component.key === key) {
-    return true;
-  }
-
-  return false;
-};
-/**
- * This function will find a component in a form and return the component AND THE PATH to the component in the form.
- *
- * @param components
- * @param key
- * @param fn
- * @param path
- * @returns boolean - If the component was found.
- */
-
-
-function findComponent(components, key, path, fn) {
-  if (!components || !key) {
-    return false;
-  }
-
-  if (typeof path === 'function') {
-    fn = path;
-    path = [];
-  }
-
-  path = path || [];
-
-  if (!path.length) {
-    // Reset search params.
-    possibleFind = null;
-    possiblePath = [];
-    unknownCounter = {};
-  }
-
-  var found = false;
-  components.forEach(function (component, index) {
-    var newPath = path.slice();
-    newPath.push(index);
-    if (!component) return;
-
-    if (component.hasOwnProperty('columns') && Array.isArray(component.columns)) {
-      newPath.push('columns');
-      component.columns.forEach(function (column, index) {
-        var colPath = newPath.slice();
-        colPath.push(index);
-        column.type = 'column';
-
-        if (checkComponent(column, key, colPath)) {
-          found = true;
-          fn(column, colPath);
-        } else if (findComponent(column.components, key, colPath.concat(['components']), fn)) {
-          found = true;
-        }
-      });
-    }
-
-    if (component.hasOwnProperty('rows') && Array.isArray(component.rows)) {
-      newPath.push('rows');
-      component.rows.forEach(function (row, index) {
-        var rowPath = newPath.slice();
-        rowPath.push(index);
-        row.forEach(function (column, index) {
-          var colPath = rowPath.slice();
-          colPath.push(index);
-          column.type = 'cell';
-
-          if (checkComponent(column, key, colPath)) {
-            found = true;
-            fn(column, colPath);
-          } else if (findComponent(column.components, key, colPath.concat(['components']), fn)) {
-            found = true;
-          }
-        });
-      });
-    }
-
-    if (component.hasOwnProperty('components') && Array.isArray(component.components) && findComponent(component.components, key, newPath.concat(['components']), fn)) {
-      found = true;
-    } // Check this component.
-
-
-    if (checkComponent(component, key, newPath)) {
-      found = true;
-      fn(component, newPath);
-    }
-  }); // If the component was not found BUT there was a possibility then return it.
-
-  if (!path.length && !found && possibleFind) {
-    found = true;
-    fn(possibleFind, possiblePath);
-  } // Return if this if found.
-
-
-  return found;
-}
-/**
- * Remove a component by path.
- *
- * @param components
- * @param path
- */
-
-
-function removeComponent(components, path) {
-  // Using _.unset() leave a null value. Use Array splice instead.
-  var index = path.pop();
-
-  if (path.length !== 0) {
-    components = (0, _get.default)(components, path);
-  }
-
-  components.splice(index, 1);
-}
-
-function generateFormChange(type, data) {
-  var change = null;
-  var schema = data.schema;
-
-  switch (type) {
-    case 'add':
-      change = {
-        op: 'add',
-        key: schema.key,
-        container: data.parent.key,
-        index: (0, _findIndex.default)(data.parent.components, {
-          id: data.id
-        }),
-        component: schema
-      };
-      break;
-
-    case 'edit':
-      change = {
-        op: 'edit',
-        key: schema.key,
-        patches: _fastJsonPatch.default.compare(data.originalComponent, schema)
-      }; // Don't save if nothing changed.
-
-      if (!change.patches.length) {
-        change = null;
-      }
-
-      break;
-
-    case 'remove':
-      change = {
-        op: 'remove',
-        key: schema.key
-      };
-      break;
-  }
-
-  return change;
-} // Get the parent component provided a component key.
-
-
-var getParent = function getParent(form, key, fn) {
-  if (!findComponent(form.components, key, null, fn)) {
-    // Return the root form if no parent is found so it will add the component to the root form.
-    fn(form);
-  }
-};
-
-function applyFormChanges(form, changes) {
-  var failed = [];
-  changes.forEach(function (change) {
-    var found = false;
-
-    switch (change.op) {
-      case 'add':
-        var newComponent = change.component;
-        getParent(form, change.container, function (parent) {
-          // A move will first run an add so remove any existing components with matching key before inserting.
-          findComponent(form.components, change.key, null, function (component, path) {
-            // If found, use the existing component. (If someone else edited it, the changes would be here)
-            newComponent = component;
-            removeComponent(form.components, path);
-          });
-          found = true;
-          parent.components.splice(change.index, 0, newComponent);
-        });
-        break;
-
-      case 'remove':
-        findComponent(form.components, change.key, null, function (component, path) {
-          found = true;
-          removeComponent(form.components, path);
-        });
-        break;
-
-      case 'edit':
-        findComponent(form.components, change.key, null, function (component, path) {
-          found = true;
-
-          try {
-            (0, _set.default)(form.components, path, _fastJsonPatch.default.applyPatch(component, change.patches).newDocument);
-          } catch (err) {
-            failed.push(change);
-          }
-        });
-        break;
-
-      case 'move':
-        break;
-    }
-
-    if (!found) {
-      failed.push(change);
-    }
-  });
-  return {
-    form: form,
-    failed: failed
-  };
-}
-/**
- * Flatten the form components for data manipulation.
- *
- * @param {Object} components
- *   The components to iterate.
- * @param {Boolean} includeAll
- *   Whether or not to include layout components.
- *
- * @returns {Object}
- *   The flattened components map.
- */
-
-
-function flattenComponents(components, includeAll) {
-  var flattened = {};
-  eachComponent(components, function (component, path) {
-    flattened[path] = component;
-  }, includeAll);
-  return flattened;
-}
-/**
- * Returns if this component has a conditional statement.
- *
- * @param component - The component JSON schema.
- *
- * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
- */
-
-
-function hasCondition(component) {
-  return Boolean(component.customConditional || component.conditional && component.conditional.when || component.conditional && component.conditional.json);
-}
-/**
- * Extension of standard #parseFloat(value) function, that also clears input string.
- *
- * @param {any} value
- *   The value to parse.
- *
- * @returns {Number}
- *   Parsed value.
- */
-
-
-function parseFloatExt(value) {
-  return parseFloat((0, _isString.default)(value) ? value.replace(/[^\de.+-]/gi, '') : value);
-}
-/**
- * Formats provided value in way how Currency component uses it.
- *
- * @param {any} value
- *   The value to format.
- *
- * @returns {String}
- *   Value formatted for Currency component.
- */
-
-
-function formatAsCurrency(value) {
-  var parsedValue = parseFloatExt(value);
-
-  if ((0, _isNaN.default)(parsedValue)) {
-    return '';
-  }
-
-  var parts = (0, _round.default)(parsedValue, 2).toString().split('.');
-  parts[0] = (0, _chunk.default)(Array.from(parts[0]).reverse(), 3).reverse().map(function (part) {
-    return part.reverse().join('');
-  }).join(',');
-  parts[1] = (0, _pad.default)(parts[1], 2, '0');
-  return parts.join('.');
-}
-/**
- * Escapes RegEx characters in provided String value.
- *
- * @param {String} value
- *   String for escaping RegEx characters.
- * @returns {string}
- *   String with escaped RegEx characters.
- */
-
-
-function escapeRegExCharacters(value) {
-  return value.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
-}
-/**
- * Get the value for a component key, in the given submission.
- *
- * @param {Object} submission
- *   A submission object to search.
- * @param {String} key
- *   A for components API key to search for.
- */
-
-
-function getValue(submission, key) {
-  var search = function search(data) {
-    if ((0, _isPlainObject.default)(data)) {
-      if ((0, _has.default)(data, key)) {
-        return data[key];
-      }
-
-      var value = null;
-      (0, _forOwn.default)(data, function (prop) {
-        var result = search(prop);
-
-        if (!(0, _isNil.default)(result)) {
-          value = result;
-          return false;
-        }
-      });
-      return value;
-    } else {
-      return null;
-    }
-  };
-
-  return search(submission.data);
-}
-/**
- * Iterate over all components in a form and get string values for translation.
- * @param form
- */
-
-
-function getStrings(form) {
-  var _this = this;
-
-  var properties = ['label', 'title', 'legend', 'tooltip', 'description', 'placeholder', 'prefix', 'suffix', 'errorLabel', 'content', 'html'];
-  var strings = [];
-  eachComponent(form.components, function (component) {
-    properties.forEach(function (property) {
-      if (component.hasOwnProperty(property) && component[property]) {
-        strings.push({
-          key: component.key,
-          type: component.type,
-          property: property,
-          string: component[property]
-        });
-      }
-    });
-
-    if ((!component.dataSrc || component.dataSrc === 'values') && component.hasOwnProperty('values') && Array.isArray(component.values) && component.values.length) {
-      component.values.forEach(function (value, index) {
-        strings.push({
-          key: component.key,
-          property: "value[".concat(index, "].label"),
-          string: component.values[index].label
-        });
-      });
-    } // Hard coded values from Day component
-
-
-    if (component.type === 'day') {
-      ['day', 'month', 'year', 'Day', 'Month', 'Year', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].forEach(function (string) {
-        strings.push({
-          key: component.key,
-          property: 'day',
-          string: string
-        });
-      });
-
-      if (component.fields.day.placeholder) {
-        strings.push({
-          key: component.key,
-          property: 'fields.day.placeholder',
-          string: component.fields.day.placeholder
-        });
-      }
-
-      if (component.fields.month.placeholder) {
-        strings.push({
-          key: component.key,
-          property: 'fields.month.placeholder',
-          string: component.fields.month.placeholder
-        });
-      }
-
-      if (component.fields.year.placeholder) {
-        strings.push({
-          key: component.key,
-          property: 'fields.year.placeholder',
-          string: component.fields.year.placeholder
-        });
-      }
-    }
-
-    if (component.type === 'editgrid') {
-      var string = _this.component.addAnother || 'Add Another';
-
-      if (component.addAnother) {
-        strings.push({
-          key: component.key,
-          property: 'addAnother',
-          string: string
-        });
-      }
-    }
-
-    if (component.type === 'select') {
-      ['loading...', 'Type to search'].forEach(function (string) {
-        strings.push({
-          key: component.key,
-          property: 'select',
-          string: string
-        });
-      });
-    }
-  }, true);
-  return strings;
-}
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/utils/index.js":
-/*!**********************************************!*\
-  !*** ./node_modules/formiojs/utils/index.js ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var FormioUtils = _interopRequireWildcard(__webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/utils.js"));
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-if ((typeof global === "undefined" ? "undefined" : _typeof(global)) === 'object') {
-  global.FormioUtils = FormioUtils;
-}
-
-var _default = FormioUtils;
-exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/utils/jsonlogic/operators.js":
-/*!************************************************************!*\
-  !*** ./node_modules/formiojs/utils/jsonlogic/operators.js ***!
-  \************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.lodashOperators = void 0;
-// Use only immutable useful functions from Lodash.
-// Visit https://lodash.com/docs for more info.
-var lodashOperators = [// Array
-'chunk', 'compact', 'concat', 'difference', 'differenceBy', 'differenceWith', 'drop', 'dropRight', 'dropRightWhile', 'dropWhile', 'findIndex', 'findLastIndex', 'first', 'flatten', 'flattenDeep', 'flattenDepth', 'fromPairs', 'head', 'indexOf', 'initial', 'intersection', 'intersectionBy', 'intersectionWith', 'join', 'last', 'lastIndexOf', 'nth', 'slice', 'sortedIndex', 'sortedIndexBy', 'sortedIndexOf', 'sortedLastIndex', 'sortedLastIndexBy', 'sortedLastIndexOf', 'sortedUniq', 'sortedUniqBy', 'tail', 'take', 'takeRight', 'takeRightWhile', 'takeWhile', 'union', 'unionBy', 'unionWith', 'uniq', 'uniqBy', 'uniqWith', 'unzip', 'unzipWith', 'without', 'xor', 'xorBy', 'xorWith', 'zip', 'zipObject', 'zipObjectDeep', 'zipWith', // Collection
-'countBy', 'every', 'filter', 'find', 'findLast', 'flatMap', 'flatMapDeep', 'flatMapDepth', 'groupBy', 'includes', 'invokeMap', 'keyBy', 'map', 'orderBy', 'partition', 'reduce', 'reduceRight', 'reject', 'sample', 'sampleSize', 'shuffle', 'size', 'some', 'sortBy', // Date
-'now', // Function
-'flip', 'negate', 'overArgs', 'partial', 'partialRight', 'rearg', 'rest', 'spread', // Lang
-'castArray', 'clone', 'cloneDeep', 'cloneDeepWith', 'cloneDeep', 'conformsTo', 'eq', 'gt', 'gte', 'isArguments', 'isArray', 'isArrayBuffer', 'isArrayLike', 'isArrayLikeObject', 'isBoolean', 'isBuffer', 'isDate', 'isElement', 'isEmpty', 'isEqual', 'isEqualWith', 'isError', 'isFinite', 'isFunction', 'isInteger', 'isLength', 'isMap', 'isMatch', 'isMatchWith', 'isNaN', 'isNative', 'isNil', 'isNull', 'isNumber', 'isObject', 'isObjectLike', 'isPlainObject', 'isRegExp', 'isSafeInteger', 'isSet', 'isString', 'isSymbol', 'isTypedArray', 'isUndefined', 'isWeakMap', 'isWeakSet', 'lt', 'lte', 'toArray', 'toFinite', 'toInteger', 'toLength', 'toNumber', 'toPlainObject', 'toSafeInteger', 'toString', // Math
-'add', 'ceil', 'divide', 'floor', 'max', 'maxBy', 'mean', 'meanBy', 'min', 'minBy', 'multiply', 'round', 'subtract', 'sum', 'sumBy', // Number
-'clamp', 'inRange', 'random', // Object
-'at', 'entries', 'entriesIn', 'findKey', 'findLastKey', 'functions', 'functionsIn', 'get', 'has', 'hasIn', 'invert', 'invertBy', 'invoke', 'keys', 'keysIn', 'mapKeys', 'mapValues', 'omit', 'omitBy', 'pick', 'pickBy', 'result', 'toPairs', 'toPairsIn', 'transform', 'values', 'valuesIn', // String
-'camelCase', 'capitalize', 'deburr', 'endsWith', 'escape', 'escapeRegExp', 'kebabCase', 'lowerCase', 'lowerFirst', 'pad', 'padEnd', 'padStart', 'parseInt', 'repeat', 'replace', 'snakeCase', 'split', 'startCase', 'startsWith', 'toLower', 'toUpper', 'trim', 'trimEnd', 'trimStart', 'truncate', 'unescape', 'upperCase', 'upperFirst', 'words', // Util
-'cond', 'conforms', 'constant', 'defaultTo', 'flow', 'flowRight', 'identity', 'iteratee', 'matches', 'matchesProperty', 'method', 'methodOf', 'nthArg', 'over', 'overEvery', 'overSome', 'property', 'propertyOf', 'range', 'rangeRight', 'stubArray', 'stubFalse', 'stubObject', 'stubString', 'stubTrue', 'times', 'toPath', 'uniqueId'];
-exports.lodashOperators = lodashOperators;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/utils/utils.js":
-/*!**********************************************!*\
-  !*** ./node_modules/formiojs/utils/utils.js ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {
-
-__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
-
-__webpack_require__(/*! core-js/modules/es.array.find */ "./node_modules/core-js/modules/es.array.find.js");
-
-__webpack_require__(/*! core-js/modules/es.array.from */ "./node_modules/core-js/modules/es.array.from.js");
-
-__webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
-
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.join */ "./node_modules/core-js/modules/es.array.join.js");
-
-__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
-
-__webpack_require__(/*! core-js/modules/es.array.slice */ "./node_modules/core-js/modules/es.array.slice.js");
-
-__webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core-js/modules/es.function.name.js");
-
-__webpack_require__(/*! core-js/modules/es.number.constructor */ "./node_modules/core-js/modules/es.number.constructor.js");
-
-__webpack_require__(/*! core-js/modules/es.object.assign */ "./node_modules/core-js/modules/es.object.assign.js");
-
-__webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.reflect.construct */ "./node_modules/core-js/modules/es.reflect.construct.js");
-
-__webpack_require__(/*! core-js/modules/es.regexp.constructor */ "./node_modules/core-js/modules/es.regexp.constructor.js");
-
-__webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.string.includes */ "./node_modules/core-js/modules/es.string.includes.js");
-
-__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.string.match */ "./node_modules/core-js/modules/es.string.match.js");
-
-__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
-
-__webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var _exportNames = {
-  evaluate: true,
-  getRandomComponentId: true,
-  getPropertyValue: true,
-  getElementRect: true,
-  boolValue: true,
-  isMongoId: true,
-  checkCalculated: true,
-  checkSimpleConditional: true,
-  checkCustomConditional: true,
-  checkJsonConditional: true,
-  checkCondition: true,
-  checkTrigger: true,
-  setActionProperty: true,
-  addTemplateHash: true,
-  interpolate: true,
-  uniqueName: true,
-  guid: true,
-  getDateSetting: true,
-  isValidDate: true,
-  currentTimezone: true,
-  offsetDate: true,
-  zonesLoaded: true,
-  shouldLoadZones: true,
-  loadZones: true,
-  momentDate: true,
-  formatDate: true,
-  formatOffset: true,
-  getLocaleDateFormatInfo: true,
-  convertFormatToFlatpickr: true,
-  convertFormatToMoment: true,
-  convertFormatToMask: true,
-  getInputMask: true,
-  matchInputMask: true,
-  getNumberSeparators: true,
-  getNumberDecimalLimit: true,
-  getCurrencyAffixes: true,
-  fieldData: true,
-  delay: true,
-  iterateKey: true,
-  uniqueKey: true,
-  bootstrapVersion: true,
-  unfold: true,
-  firstNonNil: true,
-  withSwitch: true,
-  observeOverload: true,
-  jsonLogic: true,
-  moment: true
-};
-exports.evaluate = evaluate;
-exports.getRandomComponentId = getRandomComponentId;
-exports.getPropertyValue = getPropertyValue;
-exports.getElementRect = getElementRect;
-exports.boolValue = boolValue;
-exports.isMongoId = isMongoId;
-exports.checkCalculated = checkCalculated;
-exports.checkSimpleConditional = checkSimpleConditional;
-exports.checkCustomConditional = checkCustomConditional;
-exports.checkJsonConditional = checkJsonConditional;
-exports.checkCondition = checkCondition;
-exports.checkTrigger = checkTrigger;
-exports.setActionProperty = setActionProperty;
-exports.addTemplateHash = addTemplateHash;
-exports.interpolate = interpolate;
-exports.uniqueName = uniqueName;
-exports.guid = guid;
-exports.getDateSetting = getDateSetting;
-exports.isValidDate = isValidDate;
-exports.currentTimezone = currentTimezone;
-exports.offsetDate = offsetDate;
-exports.zonesLoaded = zonesLoaded;
-exports.shouldLoadZones = shouldLoadZones;
-exports.loadZones = loadZones;
-exports.momentDate = momentDate;
-exports.formatDate = formatDate;
-exports.formatOffset = formatOffset;
-exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
-exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
-exports.convertFormatToMoment = convertFormatToMoment;
-exports.convertFormatToMask = convertFormatToMask;
-exports.getInputMask = getInputMask;
-exports.matchInputMask = matchInputMask;
-exports.getNumberSeparators = getNumberSeparators;
-exports.getNumberDecimalLimit = getNumberDecimalLimit;
-exports.getCurrencyAffixes = getCurrencyAffixes;
-exports.fieldData = fieldData;
-exports.delay = delay;
-exports.iterateKey = iterateKey;
-exports.uniqueKey = uniqueKey;
-exports.bootstrapVersion = bootstrapVersion;
-exports.unfold = unfold;
-exports.withSwitch = withSwitch;
-exports.observeOverload = observeOverload;
-Object.defineProperty(exports, "jsonLogic", {
-  enumerable: true,
-  get: function get() {
-    return _jsonLogicJs.default;
-  }
-});
-Object.defineProperty(exports, "moment", {
-  enumerable: true,
-  get: function get() {
-    return _momentTimezone.default;
-  }
-});
-exports.firstNonNil = void 0;
-
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
-
-var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
-
-var _jsonLogicJs = _interopRequireDefault(__webpack_require__(/*! json-logic-js */ "./node_modules/json-logic-js/logic.js"));
-
-var _momentTimezone = _interopRequireDefault(__webpack_require__(/*! moment-timezone/moment-timezone */ "./node_modules/moment-timezone/moment-timezone.js"));
-
-var _jstimezonedetect = _interopRequireDefault(__webpack_require__(/*! jstimezonedetect */ "./node_modules/jstimezonedetect/dist/jstz.js"));
-
-var _operators = __webpack_require__(/*! ./jsonlogic/operators */ "./node_modules/formiojs/utils/jsonlogic/operators.js");
-
-var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
-
-var _formUtils = __webpack_require__(/*! ./formUtils */ "./node_modules/formiojs/utils/formUtils.js");
-
-Object.keys(_formUtils).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _formUtils[key];
-    }
-  });
-});
-
-var _stringHash = _interopRequireDefault(__webpack_require__(/*! string-hash */ "./node_modules/string-hash/index.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-var _fetchPonyfill = (0, _fetchPonyfill2.default)({
-  Promise: _nativePromiseOnly.default
-}),
-    fetch = _fetchPonyfill.fetch;
-
-// Configure JsonLogic
-_operators.lodashOperators.forEach(function (name) {
-  return _jsonLogicJs.default.add_operation("_".concat(name), _lodash.default[name]);
-}); // Retrieve Any Date
-
-
-_jsonLogicJs.default.add_operation('getDate', function (date) {
-  return (0, _momentTimezone.default)(date).toISOString();
-}); // Set Relative Minimum Date
-
-
-_jsonLogicJs.default.add_operation('relativeMinDate', function (relativeMinDate) {
-  return (0, _momentTimezone.default)().subtract(relativeMinDate, 'days').toISOString();
-}); // Set Relative Maximum Date
-
-
-_jsonLogicJs.default.add_operation('relativeMaxDate', function (relativeMaxDate) {
-  return (0, _momentTimezone.default)().add(relativeMaxDate, 'days').toISOString();
-});
-
-/**
- * Evaluate a method.
- *
- * @param func
- * @param args
- * @return {*}
- */
-
-/* eslint-disable max-statements */
-function evaluate(func, args, ret, tokenize) {
-  var returnVal = null;
-  args.component = args.component ? _lodash.default.cloneDeep(args.component) : {
-    key: 'unknown'
-  };
-
-  if (!args.form && args.instance) {
-    args.form = _lodash.default.get(args.instance, 'root._form', {});
-  } // Deeply cloning the form is expensive - only do it if it looks like the function needs it
-
-
-  if (func.toString().includes('form')) {
-    args.form = _lodash.default.cloneDeep(args.form);
-  } else {
-    delete args.form;
-  }
-
-  var componentKey = args.component.key;
-
-  if (typeof func === 'string') {
-    if (ret) {
-      func += ";return ".concat(ret);
-    }
-
-    var params = _lodash.default.keys(args);
-
-    if (tokenize) {
-      // Replace all {{ }} references with actual data.
-      func = func.replace(/({{\s+(.*)\s+}})/, function (match, $1, $2) {
-        if ($2.indexOf('data.') === 0) {
-          return _lodash.default.get(args.data, $2.replace('data.', ''));
-        } else if ($2.indexOf('row.') === 0) {
-          return _lodash.default.get(args.row, $2.replace('row.', ''));
-        } // Support legacy...
-
-
-        return _lodash.default.get(args.data, $2);
-      });
-    }
-
-    try {
-      func = _construct(Function, _toConsumableArray(params).concat([func]));
-      args = _lodash.default.values(args);
-    } catch (err) {
-      console.warn("An error occured within the custom function for ".concat(componentKey), err);
-      returnVal = null;
-      func = false;
-    }
-  }
-
-  if (typeof func === 'function') {
-    try {
-      returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
-    } catch (err) {
-      returnVal = null;
-      console.warn("An error occured within custom function for ".concat(componentKey), err);
-    }
-  } else if (_typeof(func) === 'object') {
-    try {
-      returnVal = _jsonLogicJs.default.apply(func, args);
-    } catch (err) {
-      returnVal = null;
-      console.warn("An error occured within custom function for ".concat(componentKey), err);
-    }
-  } else if (func) {
-    console.warn("Unknown function type for ".concat(componentKey));
-  }
-
-  return returnVal;
-}
-/* eslint-enable max-statements */
-
-
-function getRandomComponentId() {
-  return "e".concat(Math.random().toString(36).substring(7));
-}
-/**
- * Get a property value of an element.
- *
- * @param style
- * @param prop
- * @return {number}
- */
-
-
-function getPropertyValue(style, prop) {
-  var value = style.getPropertyValue(prop);
-  value = value ? value.replace(/[^0-9.]/g, '') : '0';
-  return parseFloat(value);
-}
-/**
- * Get an elements bounding rectagle.
- *
- * @param element
- * @return {{x: string, y: string, width: string, height: string}}
- */
-
-
-function getElementRect(element) {
-  var style = window.getComputedStyle(element, null);
-  return {
-    x: getPropertyValue(style, 'left'),
-    y: getPropertyValue(style, 'top'),
-    width: getPropertyValue(style, 'width'),
-    height: getPropertyValue(style, 'height')
-  };
-}
-/**
- * Determines the boolean value of a setting.
- *
- * @param value
- * @return {boolean}
- */
-
-
-function boolValue(value) {
-  if (_lodash.default.isBoolean(value)) {
-    return value;
-  } else if (_lodash.default.isString(value)) {
-    return value.toLowerCase() === 'true';
-  } else {
-    return !!value;
-  }
-}
-/**
- * Check to see if an ID is a mongoID.
- * @param text
- * @return {Array|{index: number, input: string}|Boolean|*}
- */
-
-
-function isMongoId(text) {
-  return text.toString().match(/^[0-9a-fA-F]{24}$/);
-}
-/**
- * Checks the calculated value for a provided component and data.
- *
- * @param {Object} component
- *   The component to check for the calculated value.
- * @param {Object} submission
- *   A submission object.
- * @param data
- *   The full submission data.
- */
-
-
-function checkCalculated(component, submission, rowData) {
-  // Process calculated value stuff if present.
-  if (component.calculateValue) {
-    _lodash.default.set(rowData, component.key, evaluate(component.calculateValue, {
-      value: undefined,
-      data: submission ? submission.data : rowData,
-      row: rowData,
-      util: this,
-      component: component
-    }, 'value'));
-  }
-}
-/**
- * Check if a simple conditional evaluates to true.
- *
- * @param condition
- * @param condition
- * @param row
- * @param data
- * @returns {boolean}
- */
-
-
-function checkSimpleConditional(component, condition, row, data) {
-  var value = null;
-
-  if (row) {
-    value = (0, _formUtils.getValue)({
-      data: row
-    }, condition.when);
-  }
-
-  if (data && _lodash.default.isNil(value)) {
-    value = (0, _formUtils.getValue)({
-      data: data
-    }, condition.when);
-  } // FOR-400 - Fix issue where falsey values were being evaluated as show=true
-
-
-  if (_lodash.default.isNil(value)) {
-    value = '';
-  }
-
-  var eq = String(condition.eq);
-  var show = String(condition.show); // Special check for selectboxes component.
-
-  if (_lodash.default.isObject(value) && _lodash.default.has(value, condition.eq)) {
-    return String(value[condition.eq]) === show;
-  } // FOR-179 - Check for multiple values.
-
-
-  if (Array.isArray(value) && value.map(String).includes(eq)) {
-    return show === 'true';
-  }
-
-  return String(value) === eq === (show === 'true');
-}
-/**
- * Check custom javascript conditional.
- *
- * @param component
- * @param custom
- * @param row
- * @param data
- * @returns {*}
- */
-
-
-function checkCustomConditional(component, custom, row, data, form, variable, onError, instance) {
-  if (typeof custom === 'string') {
-    custom = "var ".concat(variable, " = true; ").concat(custom, "; return ").concat(variable, ";");
-  }
-
-  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, {
-    row: row,
-    data: data,
-    form: form
-  });
-
-  if (value === null) {
-    return onError;
-  }
-
-  return value;
-}
-
-function checkJsonConditional(component, json, row, data, form, onError) {
-  try {
-    return _jsonLogicJs.default.apply(json, {
-      data: data,
-      row: row,
-      form: form,
-      _: _lodash.default
-    });
-  } catch (err) {
-    console.warn("An error occurred in jsonLogic advanced condition for ".concat(component.key), err);
-    return onError;
-  }
-}
-/**
- * Checks the conditions for a provided component and data.
- *
- * @param component
- *   The component to check for the condition.
- * @param row
- *   The data within a row
- * @param data
- *   The full submission data.
- *
- * @returns {boolean}
- */
-
-
-function checkCondition(component, row, data, form, instance) {
-  if (component.customConditional) {
-    return checkCustomConditional(component, component.customConditional, row, data, form, 'show', true, instance);
-  } else if (component.conditional && component.conditional.when) {
-    return checkSimpleConditional(component, component.conditional, row, data, true);
-  } else if (component.conditional && component.conditional.json) {
-    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
-  } // Default to show.
-
-
-  return true;
-}
-/**
- * Test a trigger on a component.
- *
- * @param component
- * @param action
- * @param data
- * @param row
- * @returns {mixed}
- */
-
-
-function checkTrigger(component, trigger, row, data, form, instance) {
-  switch (trigger.type) {
-    case 'simple':
-      return checkSimpleConditional(component, trigger.simple, row, data);
-
-    case 'javascript':
-      return checkCustomConditional(component, trigger.javascript, row, data, form, 'result', false, instance);
-
-    case 'json':
-      return checkJsonConditional(component, trigger.json, row, data, form, false);
-  } // If none of the types matched, don't fire the trigger.
-
-
-  return false;
-}
-
-function setActionProperty(component, action, row, data, result, instance) {
-  switch (action.property.type) {
-    case 'boolean':
-      if (_lodash.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
-        _lodash.default.set(component, action.property.value, action.state.toString() === 'true');
-      }
-
-      break;
-
-    case 'string':
-      {
-        var evalData = {
-          data: data,
-          row: row,
-          component: component,
-          result: result
-        };
-        var textValue = action.property.component ? action[action.property.component] : action.text;
-        var newValue = instance && instance.interpolate ? instance.interpolate(textValue, evalData) : interpolate(textValue, evalData);
-
-        if (newValue !== _lodash.default.get(component, action.property.value, '')) {
-          _lodash.default.set(component, action.property.value, newValue);
-        }
-
-        break;
-      }
-  }
-
-  return component;
-}
-
-var templateCache = {};
-var templateHashCache = {};
-
-function interpolateTemplate(template) {
-  var templateSettings = {
-    evaluate: /\{%([\s\S]+?)%\}/g,
-    interpolate: /\{\{([\s\S]+?)\}\}/g,
-    escape: /\{\{\{([\s\S]+?)\}\}\}/g
-  };
-
-  try {
-    return _lodash.default.template(template, templateSettings);
-  } catch (err) {
-    console.warn('Error while processing template', err, template);
-  }
-}
-
-function addTemplateHash(template) {
-  var hash = (0, _stringHash.default)(template);
-  templateHashCache[hash] = interpolateTemplate(template);
-  return hash;
-}
-/**
- * Interpolate a string and add data replacements.
- *
- * @param string
- * @param data
- * @returns {XML|string|*|void}
- */
-
-
-function interpolate(rawTemplate, data) {
-  var template = _lodash.default.isNumber(rawTemplate) && templateHashCache.hasOwnProperty(rawTemplate) ? templateHashCache[rawTemplate] : templateCache[rawTemplate] = templateCache[rawTemplate] || interpolateTemplate(rawTemplate);
-
-  if (typeof template === 'function') {
-    try {
-      return template(data);
-    } catch (err) {
-      console.warn('Error interpolating template', err, rawTemplate, data);
-    }
-  }
-
-  return template;
-}
-/**
- * Make a filename guaranteed to be unique.
- * @param name
- * @param template
- * @param evalContext
- * @returns {string}
- */
-
-
-function uniqueName(name, template, evalContext) {
-  template = template || '{{fileName}}-{{guid}}'; //include guid in template anyway, to prevent overwriting issue if filename matches existing file
-
-  if (!template.includes('{{guid}}')) {
-    template = "".concat(template, "-{{guid}}");
-  }
-
-  var parts = name.split('.');
-  var fileName = parts.slice(0, parts.length - 1).join('.');
-  var extension = parts.length > 1 ? ".".concat(_lodash.default.last(parts)) : ''; //allow only 100 characters from original name to avoid issues with filename length restrictions
-
-  fileName = fileName.substr(0, 100);
-  evalContext = Object.assign(evalContext || {}, {
-    fileName: fileName,
-    guid: guid()
-  }); //only letters, numbers, dots, dashes, underscores and spaces are allowed. Anything else will be replaced with dash
-
-  var uniqueName = "".concat(interpolate(template, evalContext)).concat(extension).replace(/[^0-9a-zA-Z.\-_ ]/g, '-');
-  return uniqueName;
-}
-
-function guid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0;
-    var v = c === 'x' ? r : r & 0x3 | 0x8;
-    return v.toString(16);
-  });
-}
-/**
- * Return a translated date setting.
- *
- * @param date
- * @return {(null|Date)}
- */
-
-
-function getDateSetting(date) {
-  if (_lodash.default.isNil(date) || _lodash.default.isNaN(date) || date === '') {
-    return null;
-  }
-
-  if (date instanceof Date) {
-    return date;
-  } else if (typeof date.toDate === 'function') {
-    return date.isValid() ? date.toDate() : null;
-  }
-
-  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _momentTimezone.default)(date) : null;
-
-  if (dateSetting && dateSetting.isValid()) {
-    return dateSetting.toDate();
-  }
-
-  dateSetting = null;
-
-  try {
-    var value = new Function('moment', "return ".concat(date, ";"))(_momentTimezone.default);
-
-    if (typeof value === 'string') {
-      dateSetting = (0, _momentTimezone.default)(value);
-    } else if (typeof value.toDate === 'function') {
-      dateSetting = (0, _momentTimezone.default)(value.toDate().toUTCString());
-    } else if (value instanceof Date) {
-      dateSetting = (0, _momentTimezone.default)(value);
-    }
-  } catch (e) {
-    return null;
-  }
-
-  if (!dateSetting) {
-    return null;
-  } // Ensure this is a date.
-
-
-  if (!dateSetting.isValid()) {
-    return null;
-  }
-
-  return dateSetting.toDate();
-}
-
-function isValidDate(date) {
-  return _lodash.default.isDate(date) && !_lodash.default.isNaN(date.getDate());
-}
-/**
- * Get the current timezone string.
- *
- * @return {string}
- */
-
-
-function currentTimezone() {
-  if (_momentTimezone.default.currentTimezone) {
-    return _momentTimezone.default.currentTimezone;
-  }
-
-  _momentTimezone.default.currentTimezone = _jstimezonedetect.default.determine().name();
-  return _momentTimezone.default.currentTimezone;
-}
-/**
- * Get an offset date provided a date object and timezone object.
- *
- * @param date
- * @param timezone
- * @return {Date}
- */
-
-
-function offsetDate(date, timezone) {
-  if (timezone === 'UTC') {
-    return {
-      date: new Date(date.getTime() + date.getTimezoneOffset() * 60000),
-      abbr: 'UTC'
-    };
-  }
-
-  var dateMoment = (0, _momentTimezone.default)(date).tz(timezone);
-  return {
-    date: new Date(date.getTime() + (dateMoment.utcOffset() + date.getTimezoneOffset()) * 60000),
-    abbr: dateMoment.format('z')
-  };
-}
-/**
- * Returns if the zones are loaded.
- *
- * @return {boolean}
- */
-
-
-function zonesLoaded() {
-  return _momentTimezone.default.zonesLoaded;
-}
-/**
- * Returns if we should load the zones.
- *
- * @param timezone
- * @return {boolean}
- */
-
-
-function shouldLoadZones(timezone) {
-  if (timezone === currentTimezone() || timezone === 'UTC') {
-    return false;
-  }
-
-  return true;
-}
-/**
- * Externally load the timezone data.
- *
- * @return {Promise<any> | *}
- */
-
-
-function loadZones(timezone) {
-  if (timezone && !shouldLoadZones(timezone)) {
-    // Return non-resolving promise.
-    return new _nativePromiseOnly.default(_lodash.default.noop);
-  }
-
-  if (_momentTimezone.default.zonesPromise) {
-    return _momentTimezone.default.zonesPromise;
-  }
-
-  return _momentTimezone.default.zonesPromise = fetch('https://formio.github.io/formio.js/resources/latest.json').then(function (resp) {
-    return resp.json().then(function (zones) {
-      _momentTimezone.default.tz.load(zones);
-
-      _momentTimezone.default.zonesLoaded = true; // Trigger a global event that the timezones have finished loading.
-
-      if (document && document.createEvent && document.body && document.body.dispatchEvent) {
-        var event = document.createEvent('Event');
-        event.initEvent('zonesLoaded', true, true);
-        document.body.dispatchEvent(event);
-      }
-    });
-  });
-}
-/**
- * Get the moment date object for translating dates with timezones.
- *
- * @param value
- * @param format
- * @param timezone
- * @return {*}
- */
-
-
-function momentDate(value, format, timezone) {
-  var momentDate = (0, _momentTimezone.default)(value);
-
-  if (timezone === 'UTC') {
-    timezone = 'Etc/UTC';
-  }
-
-  if ((timezone !== currentTimezone() || format && format.match(/\s(z$|z\s)/)) && _momentTimezone.default.zonesLoaded) {
-    return momentDate.tz(timezone);
-  }
-
-  return momentDate;
-}
-/**
- * Format a date provided a value, format, and timezone object.
- *
- * @param value
- * @param format
- * @param timezone
- * @return {string}
- */
-
-
-function formatDate(value, format, timezone) {
-  var momentDate = (0, _momentTimezone.default)(value);
-
-  if (timezone === currentTimezone()) {
-    // See if our format contains a "z" timezone character.
-    if (format.match(/\s(z$|z\s)/)) {
-      loadZones();
-
-      if (_momentTimezone.default.zonesLoaded) {
-        return momentDate.tz(timezone).format(convertFormatToMoment(format));
-      } else {
-        return momentDate.format(convertFormatToMoment(format.replace(/\s(z$|z\s)/, '')));
-      }
-    } // Return the standard format.
-
-
-    return momentDate.format(convertFormatToMoment(format));
-  }
-
-  if (timezone === 'UTC') {
-    var offset = offsetDate(momentDate.toDate(), 'UTC');
-    return "".concat((0, _momentTimezone.default)(offset.date).format(convertFormatToMoment(format)), " UTC");
-  } // Load the zones since we need timezone information.
-
-
-  loadZones();
-
-  if (_momentTimezone.default.zonesLoaded) {
-    return momentDate.tz(timezone).format("".concat(convertFormatToMoment(format), " z"));
-  } else {
-    return momentDate.format(convertFormatToMoment(format));
-  }
-}
-/**
- * Pass a format function to format within a timezone.
- *
- * @param formatFn
- * @param date
- * @param format
- * @param timezone
- * @return {string}
- */
-
-
-function formatOffset(formatFn, date, format, timezone) {
-  if (timezone === currentTimezone()) {
-    return formatFn(date, format);
-  }
-
-  if (timezone === 'UTC') {
-    return "".concat(formatFn(offsetDate(date, 'UTC').date, format), " UTC");
-  } // Load the zones since we need timezone information.
-
-
-  loadZones();
-
-  if (_momentTimezone.default.zonesLoaded) {
-    var offset = offsetDate(date, timezone);
-    return "".concat(formatFn(offset.date, format), " ").concat(offset.abbr);
-  } else {
-    return formatFn(date, format);
-  }
-}
-
-function getLocaleDateFormatInfo(locale) {
-  var formatInfo = {};
-  var day = 21;
-  var exampleDate = new Date(2017, 11, day);
-  var localDateString = exampleDate.toLocaleDateString(locale);
-  formatInfo.dayFirst = localDateString.slice(0, 2) === day.toString();
-  return formatInfo;
-}
-/**
- * Convert the format from the angular-datepicker module to flatpickr format.
- * @param format
- * @return {string}
- */
-
-
-function convertFormatToFlatpickr(format) {
-  return format // Remove the Z timezone offset, not supported by flatpickr.
-  .replace(/Z/g, '') // Year conversion.
-  .replace(/y/g, 'Y').replace('YYYY', 'Y').replace('YY', 'y') // Month conversion.
-  .replace('MMMM', 'F').replace(/M/g, 'n').replace('nnn', 'M').replace('nn', 'm') // Day in month.
-  .replace(/d/g, 'j').replace(/jj/g, 'd') // Day in week.
-  .replace('EEEE', 'l').replace('EEE', 'D') // Hours, minutes, seconds
-  .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
-}
-/**
- * Convert the format from the angular-datepicker module to moment format.
- * @param format
- * @return {string}
- */
-
-
-function convertFormatToMoment(format) {
-  return format // Year conversion.
-  .replace(/y/g, 'Y') // Day in month.
-  .replace(/d/g, 'D') // Day in week.
-  .replace(/E/g, 'd') // AM/PM marker
-  .replace(/a/g, 'A');
-}
-
-function convertFormatToMask(format) {
-  return format // Short and long month replacement.
-  .replace(/(MMM|MMMM)/g, 'MM') // Year conversion
-  .replace(/[ydhmsHM]/g, '9') // AM/PM conversion
-  .replace(/a/g, 'AA');
-}
-/**
- * Returns an input mask that is compatible with the input mask library.
- * @param {string} mask - The Form.io input mask.
- * @returns {Array} - The input mask for the mask library.
- */
-
-
-function getInputMask(mask) {
-  if (mask instanceof Array) {
-    return mask;
-  }
-
-  var maskArray = [];
-  maskArray.numeric = true;
-
-  for (var i = 0; i < mask.length; i++) {
-    switch (mask[i]) {
-      case '9':
-        maskArray.push(/\d/);
-        break;
-
-      case 'A':
-        maskArray.numeric = false;
-        maskArray.push(/[a-zA-Z]/);
-        break;
-
-      case 'a':
-        maskArray.numeric = false;
-        maskArray.push(/[a-z]/);
-        break;
-
-      case '*':
-        maskArray.numeric = false;
-        maskArray.push(/[a-zA-Z0-9]/);
-        break;
-
-      default:
-        maskArray.push(mask[i]);
-        break;
-    }
-  }
-
-  return maskArray;
-}
-
-function matchInputMask(value, inputMask) {
-  if (!inputMask) {
-    return true;
-  }
-
-  for (var i = 0; i < inputMask.length; i++) {
-    var char = value[i];
-    var charPart = inputMask[i];
-
-    if (!(_lodash.default.isRegExp(charPart) && charPart.test(char) || charPart === char)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-function getNumberSeparators() {
-  var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
-  var formattedNumberString = 12345.6789.toLocaleString(lang);
-  var delimeters = formattedNumberString.match(/..(.)...(.)../);
-
-  if (!delimeters) {
-    return {
-      delimiter: ',',
-      decimalSeparator: '.'
-    };
-  }
-
-  return {
-    delimiter: delimeters.length > 1 ? delimeters[1] : ',',
-    decimalSeparator: delimeters.length > 2 ? delimeters[2] : '.'
-  };
-}
-
-function getNumberDecimalLimit(component) {
-  // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
-  var decimalLimit = 20;
-
-  var step = _lodash.default.get(component, 'validate.step', 'any');
-
-  if (step !== 'any') {
-    var parts = step.toString().split('.');
-
-    if (parts.length > 1) {
-      decimalLimit = parts[1].length;
-    }
-  }
-
-  return decimalLimit;
-}
-
-function getCurrencyAffixes(_ref) {
-  var _ref$currency = _ref.currency,
-      currency = _ref$currency === void 0 ? 'USD' : _ref$currency,
-      decimalLimit = _ref.decimalLimit,
-      decimalSeparator = _ref.decimalSeparator,
-      lang = _ref.lang;
-  // Get the prefix and suffix from the localized string.
-  var regex = '(.*)?100';
-
-  if (decimalLimit) {
-    regex += "".concat(decimalSeparator === '.' ? '\\.' : decimalSeparator, "0{").concat(decimalLimit, "}");
-  }
-
-  regex += '(.*)?';
-  var parts = 100 .toLocaleString(lang, {
-    style: 'currency',
-    currency: currency,
-    useGrouping: true,
-    maximumFractionDigits: decimalLimit,
-    minimumFractionDigits: decimalLimit
-  }).replace('.', decimalSeparator).match(new RegExp(regex));
-  return {
-    prefix: parts[1] || '',
-    suffix: parts[2] || ''
-  };
-}
-/**
- * Fetch the field data provided a component.
- *
- * @param data
- * @param component
- * @return {*}
- */
-
-
-function fieldData(data, component) {
-  if (!data) {
-    return '';
-  }
-
-  if (!component || !component.key) {
-    return data;
-  }
-
-  if (component.key.includes('.')) {
-    var value = data;
-    var parts = component.key.split('.');
-    var key = '';
-
-    for (var i = 0; i < parts.length; i++) {
-      key = parts[i]; // Handle nested resources
-
-      if (value.hasOwnProperty('_id')) {
-        value = value.data;
-      } // Return if the key is not found on the value.
-
-
-      if (!value.hasOwnProperty(key)) {
-        return;
-      } // Convert old single field data in submissions to multiple
-
-
-      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
-        value[key] = [value[key]];
-      } // Set the value of this key.
-
-
-      value = value[key];
-    }
-
-    return value;
-  } else {
-    // Convert old single field data in submissions to multiple
-    if (component.multiple && !Array.isArray(data[component.key])) {
-      data[component.key] = [data[component.key]];
-    }
-
-    return data[component.key];
-  }
-}
-/**
- * Delays function execution with possibility to execute function synchronously or cancel it.
- *
- * @param fn Function to delay
- * @param delay Delay time
- * @return {*}
- */
-
-
-function delay(fn) {
-  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-    args[_key - 2] = arguments[_key];
-  }
-
-  var timer = setTimeout.apply(void 0, [fn, delay].concat(args));
-
-  function cancel() {
-    clearTimeout(timer);
-  }
-
-  function earlyCall() {
-    cancel();
-    return fn.apply(void 0, args);
-  }
-
-  earlyCall.timer = timer;
-  earlyCall.cancel = cancel;
-  return earlyCall;
-}
-/**
- * Iterate the given key to make it unique.
- *
- * @param {String} key
- *   Modify the component key to be unique.
- *
- * @returns {String}
- *   The new component key.
- */
-
-
-function iterateKey(key) {
-  if (!key.match(/(\d+)$/)) {
-    return "".concat(key, "2");
-  }
-
-  return key.replace(/(\d+)$/, function (suffix) {
-    return Number(suffix) + 1;
-  });
-}
-/**
- * Determines a unique key within a map provided the base key.
- *
- * @param map
- * @param base
- * @return {*}
- */
-
-
-function uniqueKey(map, base) {
-  var newKey = base;
-
-  while (map.hasOwnProperty(newKey)) {
-    newKey = iterateKey(newKey);
-  }
-
-  return newKey;
-}
-/**
- * Determines the major version number of bootstrap.
- *
- * @return {number}
- */
-
-
-function bootstrapVersion(options) {
-  if (options.bootstrap) {
-    return options.bootstrap;
-  }
-
-  if (typeof $ === 'function' && typeof $().collapse === 'function') {
-    return parseInt($.fn.collapse.Constructor.VERSION.split('.')[0], 10);
-  }
-
-  return 0;
-}
-/**
- * Retrun provided argument.
- * If argument is a function, returns the result of a function call.
- * @param {*} e;
- *
- * @return {*}
- */
-
-
-function unfold(e) {
-  if (typeof e === 'function') {
-    return e();
-  }
-
-  return e;
-}
-/**
- * Map values through unfold and return first non-nil value.
- * @param {Array<T>} collection;
- *
- * @return {T}
- */
-
-
-var firstNonNil = _lodash.default.flow([_lodash.default.partialRight(_lodash.default.map, unfold), _lodash.default.partialRight(_lodash.default.find, function (v) {
-  return !_lodash.default.isUndefined(v);
-})]);
-/*
- * Create enclosed state.
- * Returns functions to getting and cycling between states.
- * @param {*} a - initial state.
- * @param {*} b - next state.
- * @return {Functions[]} -- [get, toggle];
- */
-
-
-exports.firstNonNil = firstNonNil;
-
-function withSwitch(a, b) {
-  var state = a;
-  var next = b;
-
-  function get() {
-    return state;
-  }
-
-  function toggle() {
-    var prev = state;
-    state = next;
-    next = prev;
-  }
-
-  return [get, toggle];
-}
-
-function observeOverload(callback) {
-  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var _options$limit = options.limit,
-      limit = _options$limit === void 0 ? 50 : _options$limit,
-      _options$delay = options.delay,
-      delay = _options$delay === void 0 ? 500 : _options$delay;
-  var callCount = 0;
-  var timeoutID = 0;
-
-  var reset = function reset() {
-    return callCount = 0;
-  };
-
-  return function () {
-    if (timeoutID !== 0) {
-      clearTimeout(timeoutID);
-      timeoutID = 0;
-    }
-
-    timeoutID = setTimeout(reset, delay);
-    callCount += 1;
-
-    if (callCount >= limit) {
-      clearTimeout(timeoutID);
-      reset();
-      return callback();
-    }
-  };
-}
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/widgets/CalendarWidget.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/formiojs/widgets/CalendarWidget.js ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
-
-__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
-
-__webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
-
-__webpack_require__(/*! core-js/modules/es.reflect.set */ "./node_modules/core-js/modules/es.reflect.set.js");
-
-__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _flatpickr = _interopRequireDefault(__webpack_require__(/*! flatpickr */ "./node_modules/flatpickr/dist/flatpickr.js"));
-
-var _InputWidget2 = _interopRequireDefault(__webpack_require__(/*! ./InputWidget */ "./node_modules/formiojs/widgets/InputWidget.js"));
-
-var _utils = __webpack_require__(/*! ../utils/utils */ "./node_modules/formiojs/utils/utils.js");
-
-var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
-
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function set(target, property, value, receiver) { if (typeof Reflect !== "undefined" && Reflect.set) { set = Reflect.set; } else { set = function set(target, property, value, receiver) { var base = _superPropBase(target, property); var desc; if (base) { desc = Object.getOwnPropertyDescriptor(base, property); if (desc.set) { desc.set.call(receiver, value); return true; } else if (!desc.writable) { return false; } } desc = Object.getOwnPropertyDescriptor(receiver, property); if (desc) { if (!desc.writable) { return false; } desc.value = value; Object.defineProperty(receiver, property, desc); } else { _defineProperty(receiver, property, value); } return true; }; } return set(target, property, value, receiver); }
-
-function _set(target, property, value, receiver, isStrict) { var s = set(target, property, value, receiver || target); if (!s && isStrict) { throw new Error('failed to set property'); } return value; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var DEFAULT_FORMAT = 'yyyy-MM-dd hh:mm a';
-var ISO_8601_FORMAT = 'yyyy-MM-ddTHH:mm:ssZ';
-
-var CalendarWidget =
-/*#__PURE__*/
-function (_InputWidget) {
-  _inherits(CalendarWidget, _InputWidget);
-
-  _createClass(CalendarWidget, null, [{
-    key: "defaultSettings",
-
-    /* eslint-disable camelcase */
-    get: function get() {
-      return {
-        type: 'calendar',
-        altInput: true,
-        allowInput: true,
-        clickOpens: true,
-        enableDate: true,
-        enableTime: true,
-        mode: 'single',
-        noCalendar: false,
-        format: DEFAULT_FORMAT,
-        dateFormat: ISO_8601_FORMAT,
-        useLocaleSettings: false,
-        language: 'us-en',
-        defaultDate: null,
-        hourIncrement: 1,
-        minuteIncrement: 5,
-        time_24hr: false,
-        saveAs: 'date',
-        displayInTimezone: '',
-        timezone: '',
-        minDate: '',
-        maxDate: ''
-      };
-    }
-    /* eslint-enable camelcase */
-
-  }]);
-
-  function CalendarWidget(settings, component) {
-    var _this;
-
-    _classCallCheck(this, CalendarWidget);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(CalendarWidget).call(this, settings, component)); // Change the format to map to the settings.
-
-    if (_this.settings.noCalendar) {
-      _this.settings.format = _this.settings.format.replace(/yyyy-MM-dd /g, '');
-    }
-
-    if (!_this.settings.enableTime) {
-      _this.settings.format = _this.settings.format.replace(/ hh:mm a$/g, '');
-    } else if (_this.settings.time_24hr) {
-      _this.settings.format = _this.settings.format.replace(/hh:mm a$/g, 'HH:mm');
-    }
-
-    _this.component.suffix = true;
-    return _this;
-  }
-  /**
-   * Load the timezones.
-   *
-   * @return {boolean} TRUE if the zones are loading, FALSE otherwise.
-   */
-
-
-  _createClass(CalendarWidget, [{
-    key: "loadZones",
-    value: function loadZones() {
-      var _this2 = this;
-
-      var timezone = this.timezone;
-
-      if (!(0, _utils.zonesLoaded)() && (0, _utils.shouldLoadZones)(timezone)) {
-        (0, _utils.loadZones)(timezone).then(function () {
-          return _this2.emit('redraw');
-        }); // Return zones are loading.
-
-        return true;
-      } // Zones are already loaded.
-
-
-      return false;
-    }
-  }, {
-    key: "attach",
-    value: function attach(input) {
-      var _this3 = this;
-
-      _get(_getPrototypeOf(CalendarWidget.prototype), "attach", this).call(this, input);
-
-      if (input && !input.getAttribute('placeholder')) {
-        input.setAttribute('placeholder', this.settings.format);
-      }
-
-      var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(this.settings.language);
-      this.defaultFormat = {
-        date: dateFormatInfo.dayFirst ? 'd/m/Y ' : 'm/d/Y ',
-        time: 'h:i K'
-      };
-      this.closedOn = 0;
-      this.valueFormat = this.settings.dateFormat || ISO_8601_FORMAT;
-      this.valueMomentFormat = (0, _utils.convertFormatToMoment)(this.valueFormat);
-      this.settings.minDate = (0, _utils.getDateSetting)(this.settings.minDate);
-      this.settings.maxDate = (0, _utils.getDateSetting)(this.settings.maxDate);
-      this.settings.defaultDate = (0, _utils.getDateSetting)(this.settings.defaultDate);
-      this.settings.altFormat = (0, _utils.convertFormatToFlatpickr)(this.settings.format);
-      this.settings.dateFormat = (0, _utils.convertFormatToFlatpickr)(this.settings.dateFormat);
-
-      this.settings.onChange = function () {
-        return _this3.emit('update');
-      };
-
-      this.settings.onClose = function () {
-        return _this3.closedOn = Date.now();
-      };
-
-      this.settings.formatDate = function (date, format) {
-        // Only format this if this is the altFormat and the form is readOnly.
-        if (_this3.settings.readOnly && format === _this3.settings.altFormat) {
-          if (_this3.settings.saveAs === 'text' || _this3.loadZones()) {
-            return _flatpickr.default.formatDate(date, format);
-          }
-
-          return (0, _utils.formatOffset)(_flatpickr.default.formatDate.bind(_flatpickr.default), date, format, _this3.timezone);
-        }
-
-        return _flatpickr.default.formatDate(date, format);
-      };
-
-      if (this._input) {
-        // Create a new flatpickr.
-        this.calendar = new _flatpickr.default(this._input, this.settings); // Enforce the input mask of the format.
-
-        this.setInputMask(this.calendar._input, (0, _utils.convertFormatToMask)(this.settings.format)); // Make sure we commit the value after a blur event occurs.
-
-        this.addEventListener(this.calendar._input, 'blur', function () {
-          return _this3.calendar.setDate(_this3.calendar._input.value, true, _this3.settings.altFormat);
-        });
-      }
-    }
-  }, {
-    key: "addSuffix",
-    value: function addSuffix(container) {
-      var _this4 = this;
-
-      var suffix = this.ce('span', {
-        class: 'input-group-addon input-group-append',
-        style: 'cursor: pointer'
-      });
-      suffix.appendChild(this.ce('span', {
-        class: 'input-group-text'
-      }, this.getIcon(this.settings.enableDate ? 'calendar' : 'time')));
-      this.addEventListener(suffix, 'click', function () {
-        if (_this4.calendar && !_this4.calendar.isOpen && Date.now() - _this4.closedOn > 200) {
-          _this4.calendar.open();
-        }
-      });
-      container.appendChild(suffix);
-      return suffix;
-    }
-  }, {
-    key: "getDateValue",
-
-    /**
-     * Return the date value.
-     *
-     * @param date
-     * @param format
-     * @return {string}
-     */
-    value: function getDateValue(date, format) {
-      return (0, _moment.default)(date).format((0, _utils.convertFormatToMoment)(format));
-    }
-    /**
-     * Return the value of the selected date.
-     *
-     * @return {*}
-     */
-
-  }, {
-    key: "getValue",
-    value: function getValue() {
-      // Standard output format.
-      if (!this.calendar) {
-        return _get(_getPrototypeOf(CalendarWidget.prototype), "getValue", this).call(this);
-      } // Get the selected dates from the calendar widget.
-
-
-      var dates = this.calendar.selectedDates;
-
-      if (!dates || !dates.length) {
-        return _get(_getPrototypeOf(CalendarWidget.prototype), "getValue", this).call(this);
-      }
-
-      if (!(dates[0] instanceof Date)) {
-        return 'Invalid Date';
-      }
-
-      return this.getDateValue(dates[0], this.valueFormat);
-    }
-    /**
-     * Set the selected date value.
-     *
-     * @param value
-     */
-
-  }, {
-    key: "setValue",
-    value: function setValue(value) {
-      if (!this.calendar) {
-        return _get(_getPrototypeOf(CalendarWidget.prototype), "setValue", this).call(this, value);
-      }
-
-      if (value) {
-        if (this.settings.saveAs !== 'text' && this.settings.readOnly && !this.loadZones()) {
-          this.calendar.setDate((0, _utils.momentDate)(value, this.valueFormat, this.timezone).toDate(), false);
-        } else {
-          this.calendar.setDate((0, _moment.default)(value, this.valueMomentFormat).toDate(), false);
-        }
-      } else {
-        this.calendar.clear(false);
-      }
-    }
-  }, {
-    key: "getView",
-    value: function getView(value, format) {
-      format = format || this.dateFormat;
-
-      if (this.settings.saveAs === 'text') {
-        return this.getDateValue(value, format);
-      }
-
-      return (0, _utils.formatDate)(value, format, this.timezone);
-    }
-  }, {
-    key: "validationValue",
-    value: function validationValue(value) {
-      if (typeof value === 'string') {
-        return new Date(value);
-      }
-
-      return value.map(function (val) {
-        return new Date(val);
-      });
-    }
-  }, {
-    key: "destroy",
-    value: function destroy() {
-      _get(_getPrototypeOf(CalendarWidget.prototype), "destroy", this).call(this);
-
-      this.calendar.destroy();
-    }
-  }, {
-    key: "timezone",
-    get: function get() {
-      if (this.settings.timezone) {
-        return this.settings.timezone;
-      }
-
-      if (this.settings.displayInTimezone === 'submission' && this.settings.submissionTimezone) {
-        return this.settings.submissionTimezone;
-      }
-
-      if (this.settings.displayInTimezone === 'utc') {
-        return 'UTC';
-      } // Return current timezone if none are provided.
-
-
-      return (0, _utils.currentTimezone)();
-    }
-  }, {
-    key: "defaultSettings",
-    get: function get() {
-      return CalendarWidget.defaultSettings;
-    }
-  }, {
-    key: "disabled",
-    set: function set(disabled) {
-      _set(_getPrototypeOf(CalendarWidget.prototype), "disabled", disabled, this, true);
-
-      if (this.calendar) {
-        if (disabled) {
-          this.calendar._input.setAttribute('disabled', 'disabled');
-        } else {
-          this.calendar._input.removeAttribute('disabled');
-        }
-
-        this.calendar.close();
-        this.calendar.redraw();
-      }
-    }
-  }, {
-    key: "input",
-    get: function get() {
-      return this.calendar ? this.calendar.altInput : null;
-    }
-  }, {
-    key: "localeFormat",
-    get: function get() {
-      var format = '';
-
-      if (this.settings.enableDate) {
-        format += this.defaultFormat.date;
-      }
-
-      if (this.settings.enableTime) {
-        format += this.defaultFormat.time;
-      }
-
-      return format;
-    }
-  }, {
-    key: "dateTimeFormat",
-    get: function get() {
-      return this.settings.useLocaleSettings ? this.localeFormat : (0, _utils.convertFormatToFlatpickr)(this.dateFormat);
-    }
-  }, {
-    key: "dateFormat",
-    get: function get() {
-      return _lodash.default.get(this.settings, 'format', DEFAULT_FORMAT);
-    }
-    /**
-     * Get the default date for the calendar.
-     * @return {*}
-     */
-
-  }, {
-    key: "defaultDate",
-    get: function get() {
-      return (0, _utils.getDateSetting)(this.settings.defaultDate);
-    }
-  }, {
-    key: "defaultValue",
-    get: function get() {
-      var defaultDate = this.defaultDate;
-      return defaultDate ? defaultDate.toISOString() : '';
-    }
-  }]);
-
-  return CalendarWidget;
-}(_InputWidget2.default);
-
-exports.default = CalendarWidget;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/widgets/InputWidget.js":
-/*!******************************************************!*\
-  !*** ./node_modules/formiojs/widgets/InputWidget.js ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
-
-__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
-
-__webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
-
-__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
-
-__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
-
-__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
-
-var _Component2 = _interopRequireDefault(__webpack_require__(/*! ../Component */ "./node_modules/formiojs/Component.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var InputWidget =
-/*#__PURE__*/
-function (_Component) {
-  _inherits(InputWidget, _Component);
-
-  function InputWidget(settings, component) {
-    var _this;
-
-    _classCallCheck(this, InputWidget);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(InputWidget).call(this, settings));
-    _this.namespace = 'formio.widget';
-    _this.component = component || {};
-    _this.settings = _lodash.default.merge({}, _this.defaultSettings, settings || {});
-    return _this;
-  }
-
-  _createClass(InputWidget, [{
-    key: "attach",
-    value: function attach(input) {
-      this._input = input;
-    }
-  }, {
-    key: "getValue",
-    value: function getValue() {
-      return this._input.value;
-    }
-  }, {
-    key: "getView",
-    value: function getView(value) {
-      return value;
-    }
-  }, {
-    key: "validationValue",
-    value: function validationValue(value) {
-      return value;
-    }
-  }, {
-    key: "addPrefix",
-    value: function addPrefix() {
-      return null;
-    }
-  }, {
-    key: "addSuffix",
-    value: function addSuffix() {
-      return null;
-    }
-  }, {
-    key: "setValue",
-    value: function setValue(value) {
-      this._input.value = value;
-    }
-  }, {
-    key: "defaultSettings",
-    get: function get() {
-      return {};
-    }
-  }, {
-    key: "disabled",
-    set: function set(disabled) {
-      if (disabled) {
-        this._input.setAttribute('disabled', 'disabled');
-      } else {
-        this._input.removeAttribute('disabled');
-      }
-    }
-  }, {
-    key: "input",
-    get: function get() {
-      return this._input;
-    }
-  }, {
-    key: "defaultValue",
-    get: function get() {
-      return '';
-    }
-  }]);
-
-  return InputWidget;
-}(_Component2.default);
-
-exports.default = InputWidget;
-
-/***/ }),
-
-/***/ "./node_modules/formiojs/widgets/index.js":
-/*!************************************************!*\
-  !*** ./node_modules/formiojs/widgets/index.js ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-
-var _InputWidget = _interopRequireDefault(__webpack_require__(/*! ./InputWidget */ "./node_modules/formiojs/widgets/InputWidget.js"));
-
-var _CalendarWidget = _interopRequireDefault(__webpack_require__(/*! ./CalendarWidget */ "./node_modules/formiojs/widgets/CalendarWidget.js"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var _default = {
-  input: _InputWidget.default,
-  calendar: _CalendarWidget.default
-};
-exports.default = _default;
-
-/***/ }),
-
-/***/ "./node_modules/i18next/dist/esm/i18next.js":
-/*!**************************************************!*\
-  !*** ./node_modules/i18next/dist/esm/i18next.js ***!
-  \**************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/typeof */ "./node_modules/@babel/runtime/helpers/esm/typeof.js");
-/* harmony import */ var _babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectSpread */ "./node_modules/@babel/runtime/helpers/esm/objectSpread.js");
-/* harmony import */ var _babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/esm/classCallCheck */ "./node_modules/@babel/runtime/helpers/esm/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/esm/createClass */ "./node_modules/@babel/runtime/helpers/esm/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/esm/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/esm/possibleConstructorReturn.js");
-/* harmony import */ var _babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/esm/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/esm/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/esm/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js");
-/* harmony import */ var _babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inherits */ "./node_modules/@babel/runtime/helpers/esm/inherits.js");
-/* harmony import */ var _babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @babel/runtime/helpers/esm/toConsumableArray */ "./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js");
-/* harmony import */ var _babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @babel/runtime/helpers/esm/slicedToArray */ "./node_modules/@babel/runtime/helpers/esm/slicedToArray.js");
-
-
-
-
-
-
-
-
-
-
-
-var consoleLogger = {
-  type: 'logger',
-  log: function log(args) {
-    this.output('log', args);
-  },
-  warn: function warn(args) {
-    this.output('warn', args);
-  },
-  error: function error(args) {
-    this.output('error', args);
-  },
-  output: function output(type, args) {
-    var _console;
-
-    /* eslint no-console: 0 */
-    if (console && console[type]) (_console = console)[type].apply(_console, Object(_babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_8__["default"])(args));
-  }
-};
-
-var Logger =
-/*#__PURE__*/
-function () {
-  function Logger(concreteLogger) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Logger);
-
-    this.init(concreteLogger, options);
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Logger, [{
-    key: "init",
-    value: function init(concreteLogger) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      this.prefix = options.prefix || 'i18next:';
-      this.logger = concreteLogger || consoleLogger;
-      this.options = options;
-      this.debug = options.debug;
-    }
-  }, {
-    key: "setDebug",
-    value: function setDebug(bool) {
-      this.debug = bool;
-    }
-  }, {
-    key: "log",
-    value: function log() {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      return this.forward(args, 'log', '', true);
-    }
-  }, {
-    key: "warn",
-    value: function warn() {
-      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
-
-      return this.forward(args, 'warn', '', true);
-    }
-  }, {
-    key: "error",
-    value: function error() {
-      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-        args[_key3] = arguments[_key3];
-      }
-
-      return this.forward(args, 'error', '');
-    }
-  }, {
-    key: "deprecate",
-    value: function deprecate() {
-      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-        args[_key4] = arguments[_key4];
-      }
-
-      return this.forward(args, 'warn', 'WARNING DEPRECATED: ', true);
-    }
-  }, {
-    key: "forward",
-    value: function forward(args, lvl, prefix, debugOnly) {
-      if (debugOnly && !this.debug) return null;
-      if (typeof args[0] === 'string') args[0] = "".concat(prefix).concat(this.prefix, " ").concat(args[0]);
-      return this.logger[lvl](args);
-    }
-  }, {
-    key: "create",
-    value: function create(moduleName) {
-      return new Logger(this.logger, Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, {
-        prefix: "".concat(this.prefix, ":").concat(moduleName, ":")
-      }, this.options));
-    }
-  }]);
-
-  return Logger;
-}();
-
-var baseLogger = new Logger();
-
-var EventEmitter =
-/*#__PURE__*/
-function () {
-  function EventEmitter() {
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, EventEmitter);
-
-    this.observers = {};
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(EventEmitter, [{
-    key: "on",
-    value: function on(events, listener) {
-      var _this = this;
-
-      events.split(' ').forEach(function (event) {
-        _this.observers[event] = _this.observers[event] || [];
-
-        _this.observers[event].push(listener);
-      });
-      return this;
-    }
-  }, {
-    key: "off",
-    value: function off(event, listener) {
-      var _this2 = this;
-
-      if (!this.observers[event]) {
-        return;
-      }
-
-      this.observers[event].forEach(function () {
-        if (!listener) {
-          delete _this2.observers[event];
-        } else {
-          var index = _this2.observers[event].indexOf(listener);
-
-          if (index > -1) {
-            _this2.observers[event].splice(index, 1);
-          }
-        }
-      });
-    }
-  }, {
-    key: "emit",
-    value: function emit(event) {
-      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
-
-      if (this.observers[event]) {
-        var cloned = [].concat(this.observers[event]);
-        cloned.forEach(function (observer) {
-          observer.apply(void 0, args);
-        });
-      }
-
-      if (this.observers['*']) {
-        var _cloned = [].concat(this.observers['*']);
-
-        _cloned.forEach(function (observer) {
-          observer.apply(observer, [event].concat(args));
-        });
-      }
-    }
-  }]);
-
-  return EventEmitter;
-}();
-
-// http://lea.verou.me/2016/12/resolve-promises-externally-with-this-one-weird-trick/
-function defer() {
-  var res;
-  var rej;
-  var promise = new Promise(function (resolve, reject) {
-    res = resolve;
-    rej = reject;
-  });
-  promise.resolve = res;
-  promise.reject = rej;
-  return promise;
-}
-function makeString(object) {
-  if (object == null) return '';
-  /* eslint prefer-template: 0 */
-
-  return '' + object;
-}
-function copy(a, s, t) {
-  a.forEach(function (m) {
-    if (s[m]) t[m] = s[m];
-  });
-}
-
-function getLastOfPath(object, path, Empty) {
-  function cleanKey(key) {
-    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
-  }
-
-  function canNotTraverseDeeper() {
-    return !object || typeof object === 'string';
-  }
-
-  var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
-
-  while (stack.length > 1) {
-    if (canNotTraverseDeeper()) return {};
-    var key = cleanKey(stack.shift());
-    if (!object[key] && Empty) object[key] = new Empty();
-    object = object[key];
-  }
-
-  if (canNotTraverseDeeper()) return {};
-  return {
-    obj: object,
-    k: cleanKey(stack.shift())
-  };
-}
-
-function setPath(object, path, newValue) {
-  var _getLastOfPath = getLastOfPath(object, path, Object),
-      obj = _getLastOfPath.obj,
-      k = _getLastOfPath.k;
-
-  obj[k] = newValue;
-}
-function pushPath(object, path, newValue, concat) {
-  var _getLastOfPath2 = getLastOfPath(object, path, Object),
-      obj = _getLastOfPath2.obj,
-      k = _getLastOfPath2.k;
-
-  obj[k] = obj[k] || [];
-  if (concat) obj[k] = obj[k].concat(newValue);
-  if (!concat) obj[k].push(newValue);
-}
-function getPath(object, path) {
-  var _getLastOfPath3 = getLastOfPath(object, path),
-      obj = _getLastOfPath3.obj,
-      k = _getLastOfPath3.k;
-
-  if (!obj) return undefined;
-  return obj[k];
-}
-function deepExtend(target, source, overwrite) {
-  /* eslint no-restricted-syntax: 0 */
-  for (var prop in source) {
-    if (prop in target) {
-      // If we reached a leaf string in target or source then replace with source or skip depending on the 'overwrite' switch
-      if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
-        if (overwrite) target[prop] = source[prop];
-      } else {
-        deepExtend(target[prop], source[prop], overwrite);
-      }
-    } else {
-      target[prop] = source[prop];
-    }
-  }
-
-  return target;
-}
-function regexEscape(str) {
-  /* eslint no-useless-escape: 0 */
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-}
-/* eslint-disable */
-
-var _entityMap = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-  '/': '&#x2F;'
-};
-/* eslint-enable */
-
-function escape(data) {
-  if (typeof data === 'string') {
-    return data.replace(/[&<>"'\/]/g, function (s) {
-      return _entityMap[s];
-    });
-  }
-
-  return data;
-}
-
-var ResourceStore =
-/*#__PURE__*/
-function (_EventEmitter) {
-  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(ResourceStore, _EventEmitter);
-
-  function ResourceStore(data) {
-    var _this;
-
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-      ns: ['translation'],
-      defaultNS: 'translation'
-    };
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, ResourceStore);
-
-    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(ResourceStore).call(this));
-    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
-
-    _this.data = data || {};
-    _this.options = options;
-
-    if (_this.options.keySeparator === undefined) {
-      _this.options.keySeparator = '.';
-    }
-
-    return _this;
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(ResourceStore, [{
-    key: "addNamespaces",
-    value: function addNamespaces(ns) {
-      if (this.options.ns.indexOf(ns) < 0) {
-        this.options.ns.push(ns);
-      }
-    }
-  }, {
-    key: "removeNamespaces",
-    value: function removeNamespaces(ns) {
-      var index = this.options.ns.indexOf(ns);
-
-      if (index > -1) {
-        this.options.ns.splice(index, 1);
-      }
-    }
-  }, {
-    key: "getResource",
-    value: function getResource(lng, ns, key) {
-      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-      var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
-      var path = [lng, ns];
-      if (key && typeof key !== 'string') path = path.concat(key);
-      if (key && typeof key === 'string') path = path.concat(keySeparator ? key.split(keySeparator) : key);
-
-      if (lng.indexOf('.') > -1) {
-        path = lng.split('.');
-      }
-
-      return getPath(this.data, path);
-    }
-  }, {
-    key: "addResource",
-    value: function addResource(lng, ns, key, value) {
-      var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
-        silent: false
-      };
-      var keySeparator = this.options.keySeparator;
-      if (keySeparator === undefined) keySeparator = '.';
-      var path = [lng, ns];
-      if (key) path = path.concat(keySeparator ? key.split(keySeparator) : key);
-
-      if (lng.indexOf('.') > -1) {
-        path = lng.split('.');
-        value = ns;
-        ns = path[1];
-      }
-
-      this.addNamespaces(ns);
-      setPath(this.data, path, value);
-      if (!options.silent) this.emit('added', lng, ns, key, value);
-    }
-  }, {
-    key: "addResources",
-    value: function addResources(lng, ns, resources) {
-      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
-        silent: false
-      };
-
-      /* eslint no-restricted-syntax: 0 */
-      for (var m in resources) {
-        if (typeof resources[m] === 'string' || Object.prototype.toString.apply(resources[m]) === '[object Array]') this.addResource(lng, ns, m, resources[m], {
-          silent: true
-        });
-      }
-
-      if (!options.silent) this.emit('added', lng, ns, resources);
-    }
-  }, {
-    key: "addResourceBundle",
-    value: function addResourceBundle(lng, ns, resources, deep, overwrite) {
-      var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {
-        silent: false
-      };
-      var path = [lng, ns];
-
-      if (lng.indexOf('.') > -1) {
-        path = lng.split('.');
-        deep = resources;
-        resources = ns;
-        ns = path[1];
-      }
-
-      this.addNamespaces(ns);
-      var pack = getPath(this.data, path) || {};
-
-      if (deep) {
-        deepExtend(pack, resources, overwrite);
-      } else {
-        pack = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, pack, resources);
-      }
-
-      setPath(this.data, path, pack);
-      if (!options.silent) this.emit('added', lng, ns, resources);
-    }
-  }, {
-    key: "removeResourceBundle",
-    value: function removeResourceBundle(lng, ns) {
-      if (this.hasResourceBundle(lng, ns)) {
-        delete this.data[lng][ns];
-      }
-
-      this.removeNamespaces(ns);
-      this.emit('removed', lng, ns);
-    }
-  }, {
-    key: "hasResourceBundle",
-    value: function hasResourceBundle(lng, ns) {
-      return this.getResource(lng, ns) !== undefined;
-    }
-  }, {
-    key: "getResourceBundle",
-    value: function getResourceBundle(lng, ns) {
-      if (!ns) ns = this.options.defaultNS; // COMPATIBILITY: remove extend in v2.1.0
-
-      if (this.options.compatibilityAPI === 'v1') return Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, {}, this.getResource(lng, ns));
-      return this.getResource(lng, ns);
-    }
-  }, {
-    key: "getDataByLanguage",
-    value: function getDataByLanguage(lng) {
-      return this.data[lng];
-    }
-  }, {
-    key: "toJSON",
-    value: function toJSON() {
-      return this.data;
-    }
-  }]);
-
-  return ResourceStore;
-}(EventEmitter);
-
-var postProcessor = {
-  processors: {},
-  addPostProcessor: function addPostProcessor(module) {
-    this.processors[module.name] = module;
-  },
-  handle: function handle(processors, value, key, options, translator) {
-    var _this = this;
-
-    processors.forEach(function (processor) {
-      if (_this.processors[processor]) value = _this.processors[processor].process(value, key, options, translator);
-    });
-    return value;
-  }
-};
-
-var Translator =
-/*#__PURE__*/
-function (_EventEmitter) {
-  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(Translator, _EventEmitter);
-
-  function Translator(services) {
-    var _this;
-
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Translator);
-
-    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(Translator).call(this));
-    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
-
-    copy(['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector', 'i18nFormat'], services, Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this));
-    _this.options = options;
-
-    if (_this.options.keySeparator === undefined) {
-      _this.options.keySeparator = '.';
-    }
-
-    _this.logger = baseLogger.create('translator');
-    return _this;
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Translator, [{
-    key: "changeLanguage",
-    value: function changeLanguage(lng) {
-      if (lng) this.language = lng;
-    }
-  }, {
-    key: "exists",
-    value: function exists(key) {
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
-        interpolation: {}
-      };
-      var resolved = this.resolve(key, options);
-      return resolved && resolved.res !== undefined;
-    }
-  }, {
-    key: "extractFromKey",
-    value: function extractFromKey(key, options) {
-      var nsSeparator = options.nsSeparator || this.options.nsSeparator;
-      if (nsSeparator === undefined) nsSeparator = ':';
-      var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
-      var namespaces = options.ns || this.options.defaultNS;
-
-      if (nsSeparator && key.indexOf(nsSeparator) > -1) {
-        var parts = key.split(nsSeparator);
-        if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1) namespaces = parts.shift();
-        key = parts.join(keySeparator);
-      }
-
-      if (typeof namespaces === 'string') namespaces = [namespaces];
-      return {
-        key: key,
-        namespaces: namespaces
-      };
-    }
-  }, {
-    key: "translate",
-    value: function translate(keys, options) {
-      var _this2 = this;
-
-      if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(options) !== 'object' && this.options.overloadTranslationOptionHandler) {
-        /* eslint prefer-rest-params: 0 */
-        options = this.options.overloadTranslationOptionHandler(arguments);
-      }
-
-      if (!options) options = {}; // non valid keys handling
-
-      if (keys === undefined || keys === null) return '';
-      if (!Array.isArray(keys)) keys = [String(keys)]; // separators
-
-      var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator; // get namespace(s)
-
-      var _this$extractFromKey = this.extractFromKey(keys[keys.length - 1], options),
-          key = _this$extractFromKey.key,
-          namespaces = _this$extractFromKey.namespaces;
-
-      var namespace = namespaces[namespaces.length - 1]; // return key on CIMode
-
-      var lng = options.lng || this.language;
-      var appendNamespaceToCIMode = options.appendNamespaceToCIMode || this.options.appendNamespaceToCIMode;
-
-      if (lng && lng.toLowerCase() === 'cimode') {
-        if (appendNamespaceToCIMode) {
-          var nsSeparator = options.nsSeparator || this.options.nsSeparator;
-          return namespace + nsSeparator + key;
-        }
-
-        return key;
-      } // resolve from store
-
-
-      var resolved = this.resolve(keys, options);
-      var res = resolved && resolved.res;
-      var resUsedKey = resolved && resolved.usedKey || key;
-      var resExactUsedKey = resolved && resolved.exactUsedKey || key;
-      var resType = Object.prototype.toString.apply(res);
-      var noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
-      var joinArrays = options.joinArrays !== undefined ? options.joinArrays : this.options.joinArrays; // object
-
-      var handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
-      var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
-
-      if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0 && !(typeof joinArrays === 'string' && resType === '[object Array]')) {
-        if (!options.returnObjects && !this.options.returnObjects) {
-          this.logger.warn('accessing an object - but returnObjects options is not enabled!');
-          return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, options) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
-        } // if we got a separator we loop over children - else we just return object as is
-        // as having it set to false means no hierarchy so no lookup for nested values
-
-
-        if (keySeparator) {
-          var resTypeIsArray = resType === '[object Array]';
-          var copy$$1 = resTypeIsArray ? [] : {}; // apply child translation on a copy
-
-          /* eslint no-restricted-syntax: 0 */
-
-          var newKeyToUse = resTypeIsArray ? resExactUsedKey : resUsedKey;
-
-          for (var m in res) {
-            if (Object.prototype.hasOwnProperty.call(res, m)) {
-              var deepKey = "".concat(newKeyToUse).concat(keySeparator).concat(m);
-              copy$$1[m] = this.translate(deepKey, Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options, {
-                joinArrays: false,
-                ns: namespaces
-              }));
-              if (copy$$1[m] === deepKey) copy$$1[m] = res[m]; // if nothing found use orginal value as fallback
-            }
-          }
-
-          res = copy$$1;
-        }
-      } else if (handleAsObjectInI18nFormat && typeof joinArrays === 'string' && resType === '[object Array]') {
-        // array special treatment
-        res = res.join(joinArrays);
-        if (res) res = this.extendTranslation(res, keys, options);
-      } else {
-        // string, empty or null
-        var usedDefault = false;
-        var usedKey = false; // fallback value
-
-        if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
-          usedDefault = true;
-
-          if (options.count !== undefined) {
-            var suffix = this.pluralResolver.getSuffix(lng, options.count);
-            res = options["defaultValue".concat(suffix)];
-          }
-
-          if (!res) res = options.defaultValue;
-        }
-
-        if (!this.isValidLookup(res)) {
-          usedKey = true;
-          res = key;
-        } // save missing
-
-
-        var updateMissing = options.defaultValue && options.defaultValue !== res && this.options.updateMissing;
-
-        if (usedKey || usedDefault || updateMissing) {
-          this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, key, updateMissing ? options.defaultValue : res);
-          var lngs = [];
-          var fallbackLngs = this.languageUtils.getFallbackCodes(this.options.fallbackLng, options.lng || this.language);
-
-          if (this.options.saveMissingTo === 'fallback' && fallbackLngs && fallbackLngs[0]) {
-            for (var i = 0; i < fallbackLngs.length; i++) {
-              lngs.push(fallbackLngs[i]);
-            }
-          } else if (this.options.saveMissingTo === 'all') {
-            lngs = this.languageUtils.toResolveHierarchy(options.lng || this.language);
-          } else {
-            lngs.push(options.lng || this.language);
-          }
-
-          var send = function send(l, k) {
-            if (_this2.options.missingKeyHandler) {
-              _this2.options.missingKeyHandler(l, namespace, k, updateMissing ? options.defaultValue : res, updateMissing, options);
-            } else if (_this2.backendConnector && _this2.backendConnector.saveMissing) {
-              _this2.backendConnector.saveMissing(l, namespace, k, updateMissing ? options.defaultValue : res, updateMissing, options);
-            }
-
-            _this2.emit('missingKey', l, namespace, k, res);
-          };
-
-          if (this.options.saveMissing) {
-            var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-
-            if (this.options.saveMissingPlurals && needsPluralHandling) {
-              lngs.forEach(function (l) {
-                var plurals = _this2.pluralResolver.getPluralFormsOfKey(l, key);
-
-                plurals.forEach(function (p) {
-                  return send([l], p);
-                });
-              });
-            } else {
-              send(lngs, key);
-            }
-          }
-        } // extend
-
-
-        res = this.extendTranslation(res, keys, options, resolved); // append namespace if still key
-
-        if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = "".concat(namespace, ":").concat(key); // parseMissingKeyHandler
-
-        if (usedKey && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
-      } // return
-
-
-      return res;
-    }
-  }, {
-    key: "extendTranslation",
-    value: function extendTranslation(res, key, options, resolved) {
-      var _this3 = this;
-
-      if (this.i18nFormat && this.i18nFormat.parse) {
-        res = this.i18nFormat.parse(res, options, resolved.usedLng, resolved.usedNS, resolved.usedKey, {
-          resolved: resolved
-        });
-      } else if (!options.skipInterpolation) {
-        // i18next.parsing
-        if (options.interpolation) this.interpolator.init(Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options, {
-          interpolation: Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.options.interpolation, options.interpolation)
-        })); // interpolate
-
-        var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
-        if (this.options.interpolation.defaultVariables) data = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.options.interpolation.defaultVariables, data);
-        res = this.interpolator.interpolate(res, data, options.lng || this.language, options); // nesting
-
-        if (options.nest !== false) res = this.interpolator.nest(res, function () {
-          return _this3.translate.apply(_this3, arguments);
-        }, options);
-        if (options.interpolation) this.interpolator.reset();
-      } // post process
-
-
-      var postProcess = options.postProcess || this.options.postProcess;
-      var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
-
-      if (res !== undefined && res !== null && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
-        res = postProcessor.handle(postProcessorNames, res, key, options, this);
-      }
-
-      return res;
-    }
-  }, {
-    key: "resolve",
-    value: function resolve(keys) {
-      var _this4 = this;
-
-      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var found;
-      var usedKey; // plain key
-
-      var exactUsedKey; // key with context / plural
-
-      var usedLng;
-      var usedNS;
-      if (typeof keys === 'string') keys = [keys]; // forEach possible key
-
-      keys.forEach(function (k) {
-        if (_this4.isValidLookup(found)) return;
-
-        var extracted = _this4.extractFromKey(k, options);
-
-        var key = extracted.key;
-        usedKey = key;
-        var namespaces = extracted.namespaces;
-        if (_this4.options.fallbackNS) namespaces = namespaces.concat(_this4.options.fallbackNS);
-        var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
-        var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
-        var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language, options.fallbackLng);
-        namespaces.forEach(function (ns) {
-          if (_this4.isValidLookup(found)) return;
-          usedNS = ns;
-          codes.forEach(function (code) {
-            if (_this4.isValidLookup(found)) return;
-            usedLng = code;
-            var finalKey = key;
-            var finalKeys = [finalKey];
-
-            if (_this4.i18nFormat && _this4.i18nFormat.addLookupKeys) {
-              _this4.i18nFormat.addLookupKeys(finalKeys, key, code, ns, options);
-            } else {
-              var pluralSuffix;
-              if (needsPluralHandling) pluralSuffix = _this4.pluralResolver.getSuffix(code, options.count); // fallback for plural if context not found
-
-              if (needsPluralHandling && needsContextHandling) finalKeys.push(finalKey + pluralSuffix); // get key for context if needed
-
-              if (needsContextHandling) finalKeys.push(finalKey += "".concat(_this4.options.contextSeparator).concat(options.context)); // get key for plural if needed
-
-              if (needsPluralHandling) finalKeys.push(finalKey += pluralSuffix);
-            } // iterate over finalKeys starting with most specific pluralkey (-> contextkey only) -> singularkey only
-
-
-            var possibleKey;
-            /* eslint no-cond-assign: 0 */
-
-            while (possibleKey = finalKeys.pop()) {
-              if (!_this4.isValidLookup(found)) {
-                exactUsedKey = possibleKey;
-                found = _this4.getResource(code, ns, possibleKey, options);
-              }
-            }
-          });
-        });
-      });
-      return {
-        res: found,
-        usedKey: usedKey,
-        exactUsedKey: exactUsedKey,
-        usedLng: usedLng,
-        usedNS: usedNS
-      };
-    }
-  }, {
-    key: "isValidLookup",
-    value: function isValidLookup(res) {
-      return res !== undefined && !(!this.options.returnNull && res === null) && !(!this.options.returnEmptyString && res === '');
-    }
-  }, {
-    key: "getResource",
-    value: function getResource(code, ns, key) {
-      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-      if (this.i18nFormat && this.i18nFormat.getResource) return this.i18nFormat.getResource(code, ns, key, options);
-      return this.resourceStore.getResource(code, ns, key, options);
-    }
-  }]);
-
-  return Translator;
-}(EventEmitter);
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-var LanguageUtil =
-/*#__PURE__*/
-function () {
-  function LanguageUtil(options) {
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, LanguageUtil);
-
-    this.options = options;
-    this.whitelist = this.options.whitelist || false;
-    this.logger = baseLogger.create('languageUtils');
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(LanguageUtil, [{
-    key: "getScriptPartFromCode",
-    value: function getScriptPartFromCode(code) {
-      if (!code || code.indexOf('-') < 0) return null;
-      var p = code.split('-');
-      if (p.length === 2) return null;
-      p.pop();
-      return this.formatLanguageCode(p.join('-'));
-    }
-  }, {
-    key: "getLanguagePartFromCode",
-    value: function getLanguagePartFromCode(code) {
-      if (!code || code.indexOf('-') < 0) return code;
-      var p = code.split('-');
-      return this.formatLanguageCode(p[0]);
-    }
-  }, {
-    key: "formatLanguageCode",
-    value: function formatLanguageCode(code) {
-      // http://www.iana.org/assignments/language-tags/language-tags.xhtml
-      if (typeof code === 'string' && code.indexOf('-') > -1) {
-        var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
-        var p = code.split('-');
-
-        if (this.options.lowerCaseLng) {
-          p = p.map(function (part) {
-            return part.toLowerCase();
-          });
-        } else if (p.length === 2) {
-          p[0] = p[0].toLowerCase();
-          p[1] = p[1].toUpperCase();
-          if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
-        } else if (p.length === 3) {
-          p[0] = p[0].toLowerCase(); // if lenght 2 guess it's a country
-
-          if (p[1].length === 2) p[1] = p[1].toUpperCase();
-          if (p[0] !== 'sgn' && p[2].length === 2) p[2] = p[2].toUpperCase();
-          if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
-          if (specialCases.indexOf(p[2].toLowerCase()) > -1) p[2] = capitalize(p[2].toLowerCase());
-        }
-
-        return p.join('-');
-      }
-
-      return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
-    }
-  }, {
-    key: "isWhitelisted",
-    value: function isWhitelisted(code) {
-      if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist) {
-        code = this.getLanguagePartFromCode(code);
-      }
-
-      return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1;
-    }
-  }, {
-    key: "getFallbackCodes",
-    value: function getFallbackCodes(fallbacks, code) {
-      if (!fallbacks) return [];
-      if (typeof fallbacks === 'string') fallbacks = [fallbacks];
-      if (Object.prototype.toString.apply(fallbacks) === '[object Array]') return fallbacks;
-      if (!code) return fallbacks["default"] || []; // asume we have an object defining fallbacks
-
-      var found = fallbacks[code];
-      if (!found) found = fallbacks[this.getScriptPartFromCode(code)];
-      if (!found) found = fallbacks[this.formatLanguageCode(code)];
-      if (!found) found = fallbacks["default"];
-      return found || [];
-    }
-  }, {
-    key: "toResolveHierarchy",
-    value: function toResolveHierarchy(code, fallbackCode) {
-      var _this = this;
-
-      var fallbackCodes = this.getFallbackCodes(fallbackCode || this.options.fallbackLng || [], code);
-      var codes = [];
-
-      var addCode = function addCode(c) {
-        if (!c) return;
-
-        if (_this.isWhitelisted(c)) {
-          codes.push(c);
-        } else {
-          _this.logger.warn("rejecting non-whitelisted language code: ".concat(c));
-        }
-      };
-
-      if (typeof code === 'string' && code.indexOf('-') > -1) {
-        if (this.options.load !== 'languageOnly') addCode(this.formatLanguageCode(code));
-        if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') addCode(this.getScriptPartFromCode(code));
-        if (this.options.load !== 'currentOnly') addCode(this.getLanguagePartFromCode(code));
-      } else if (typeof code === 'string') {
-        addCode(this.formatLanguageCode(code));
-      }
-
-      fallbackCodes.forEach(function (fc) {
-        if (codes.indexOf(fc) < 0) addCode(_this.formatLanguageCode(fc));
-      });
-      return codes;
-    }
-  }]);
-
-  return LanguageUtil;
-}();
-
-/* eslint-disable */
-
-var sets = [{
-  lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'],
-  nr: [1, 2],
-  fc: 1
-}, {
-  lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'],
-  nr: [1, 2],
-  fc: 2
-}, {
-  lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
-  nr: [1],
-  fc: 3
-}, {
-  lngs: ['be', 'bs', 'cnr', 'dz', 'hr', 'ru', 'sr', 'uk'],
-  nr: [1, 2, 5],
-  fc: 4
-}, {
-  lngs: ['ar'],
-  nr: [0, 1, 2, 3, 11, 100],
-  fc: 5
-}, {
-  lngs: ['cs', 'sk'],
-  nr: [1, 2, 5],
-  fc: 6
-}, {
-  lngs: ['csb', 'pl'],
-  nr: [1, 2, 5],
-  fc: 7
-}, {
-  lngs: ['cy'],
-  nr: [1, 2, 3, 8],
-  fc: 8
-}, {
-  lngs: ['fr'],
-  nr: [1, 2],
-  fc: 9
-}, {
-  lngs: ['ga'],
-  nr: [1, 2, 3, 7, 11],
-  fc: 10
-}, {
-  lngs: ['gd'],
-  nr: [1, 2, 3, 20],
-  fc: 11
-}, {
-  lngs: ['is'],
-  nr: [1, 2],
-  fc: 12
-}, {
-  lngs: ['jv'],
-  nr: [0, 1],
-  fc: 13
-}, {
-  lngs: ['kw'],
-  nr: [1, 2, 3, 4],
-  fc: 14
-}, {
-  lngs: ['lt'],
-  nr: [1, 2, 10],
-  fc: 15
-}, {
-  lngs: ['lv'],
-  nr: [1, 2, 0],
-  fc: 16
-}, {
-  lngs: ['mk'],
-  nr: [1, 2],
-  fc: 17
-}, {
-  lngs: ['mnk'],
-  nr: [0, 1, 2],
-  fc: 18
-}, {
-  lngs: ['mt'],
-  nr: [1, 2, 11, 20],
-  fc: 19
-}, {
-  lngs: ['or'],
-  nr: [2, 1],
-  fc: 2
-}, {
-  lngs: ['ro'],
-  nr: [1, 2, 20],
-  fc: 20
-}, {
-  lngs: ['sl'],
-  nr: [5, 1, 2, 3],
-  fc: 21
-}, {
-  lngs: ['he'],
-  nr: [1, 2, 20, 21],
-  fc: 22
-}];
-var _rulesPluralsTypes = {
-  1: function _(n) {
-    return Number(n > 1);
-  },
-  2: function _(n) {
-    return Number(n != 1);
-  },
-  3: function _(n) {
-    return 0;
-  },
-  4: function _(n) {
-    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
-  },
-  5: function _(n) {
-    return Number(n === 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 ? 4 : 5);
-  },
-  6: function _(n) {
-    return Number(n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2);
-  },
-  7: function _(n) {
-    return Number(n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
-  },
-  8: function _(n) {
-    return Number(n == 1 ? 0 : n == 2 ? 1 : n != 8 && n != 11 ? 2 : 3);
-  },
-  9: function _(n) {
-    return Number(n >= 2);
-  },
-  10: function _(n) {
-    return Number(n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4);
-  },
-  11: function _(n) {
-    return Number(n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 2 && n < 20 ? 2 : 3);
-  },
-  12: function _(n) {
-    return Number(n % 10 != 1 || n % 100 == 11);
-  },
-  13: function _(n) {
-    return Number(n !== 0);
-  },
-  14: function _(n) {
-    return Number(n == 1 ? 0 : n == 2 ? 1 : n == 3 ? 2 : 3);
-  },
-  15: function _(n) {
-    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
-  },
-  16: function _(n) {
-    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n !== 0 ? 1 : 2);
-  },
-  17: function _(n) {
-    return Number(n == 1 || n % 10 == 1 ? 0 : 1);
-  },
-  18: function _(n) {
-    return Number(n == 0 ? 0 : n == 1 ? 1 : 2);
-  },
-  19: function _(n) {
-    return Number(n == 1 ? 0 : n === 0 || n % 100 > 1 && n % 100 < 11 ? 1 : n % 100 > 10 && n % 100 < 20 ? 2 : 3);
-  },
-  20: function _(n) {
-    return Number(n == 1 ? 0 : n === 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2);
-  },
-  21: function _(n) {
-    return Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0);
-  },
-  22: function _(n) {
-    return Number(n === 1 ? 0 : n === 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3);
-  }
-};
-/* eslint-enable */
-
-function createRules() {
-  var rules = {};
-  sets.forEach(function (set) {
-    set.lngs.forEach(function (l) {
-      rules[l] = {
-        numbers: set.nr,
-        plurals: _rulesPluralsTypes[set.fc]
-      };
-    });
-  });
-  return rules;
-}
-
-var PluralResolver =
-/*#__PURE__*/
-function () {
-  function PluralResolver(languageUtils) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, PluralResolver);
-
-    this.languageUtils = languageUtils;
-    this.options = options;
-    this.logger = baseLogger.create('pluralResolver');
-    this.rules = createRules();
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(PluralResolver, [{
-    key: "addRule",
-    value: function addRule(lng, obj) {
-      this.rules[lng] = obj;
-    }
-  }, {
-    key: "getRule",
-    value: function getRule(code) {
-      return this.rules[code] || this.rules[this.languageUtils.getLanguagePartFromCode(code)];
-    }
-  }, {
-    key: "needsPlural",
-    value: function needsPlural(code) {
-      var rule = this.getRule(code);
-      return rule && rule.numbers.length > 1;
-    }
-  }, {
-    key: "getPluralFormsOfKey",
-    value: function getPluralFormsOfKey(code, key) {
-      var _this = this;
-
-      var ret = [];
-      var rule = this.getRule(code);
-      if (!rule) return ret;
-      rule.numbers.forEach(function (n) {
-        var suffix = _this.getSuffix(code, n);
-
-        ret.push("".concat(key).concat(suffix));
-      });
-      return ret;
-    }
-  }, {
-    key: "getSuffix",
-    value: function getSuffix(code, count) {
-      var _this2 = this;
-
-      var rule = this.getRule(code);
-
-      if (rule) {
-        // if (rule.numbers.length === 1) return ''; // only singular
-        var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
-        var suffix = rule.numbers[idx]; // special treatment for lngs only having singular and plural
-
-        if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
-          if (suffix === 2) {
-            suffix = 'plural';
-          } else if (suffix === 1) {
-            suffix = '';
-          }
-        }
-
-        var returnSuffix = function returnSuffix() {
-          return _this2.options.prepend && suffix.toString() ? _this2.options.prepend + suffix.toString() : suffix.toString();
-        }; // COMPATIBILITY JSON
-        // v1
-
-
-        if (this.options.compatibilityJSON === 'v1') {
-          if (suffix === 1) return '';
-          if (typeof suffix === 'number') return "_plural_".concat(suffix.toString());
-          return returnSuffix();
-        } else if (
-        /* v2 */
-        this.options.compatibilityJSON === 'v2') {
-          return returnSuffix();
-        } else if (
-        /* v3 - gettext index */
-        this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
-          return returnSuffix();
-        }
-
-        return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
-      }
-
-      this.logger.warn("no plural rule found for: ".concat(code));
-      return '';
-    }
-  }]);
-
-  return PluralResolver;
-}();
-
-var Interpolator =
-/*#__PURE__*/
-function () {
-  function Interpolator() {
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Interpolator);
-
-    this.logger = baseLogger.create('interpolator');
-    this.init(options, true);
-  }
-  /* eslint no-param-reassign: 0 */
-
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Interpolator, [{
-    key: "init",
-    value: function init() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var reset = arguments.length > 1 ? arguments[1] : undefined;
-
-      if (reset) {
-        this.options = options;
-
-        this.format = options.interpolation && options.interpolation.format || function (value) {
-          return value;
-        };
-      }
-
-      if (!options.interpolation) options.interpolation = {
-        escapeValue: true
-      };
-      var iOpts = options.interpolation;
-      this.escape = iOpts.escape !== undefined ? iOpts.escape : escape;
-      this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
-      this.useRawValueToEscape = iOpts.useRawValueToEscape !== undefined ? iOpts.useRawValueToEscape : false;
-      this.prefix = iOpts.prefix ? regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
-      this.suffix = iOpts.suffix ? regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
-      this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
-      this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
-      this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
-      this.nestingPrefix = iOpts.nestingPrefix ? regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || regexEscape('$t(');
-      this.nestingSuffix = iOpts.nestingSuffix ? regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || regexEscape(')');
-      this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000; // the regexp
-
-      this.resetRegExp();
-    }
-  }, {
-    key: "reset",
-    value: function reset() {
-      if (this.options) this.init(this.options);
-    }
-  }, {
-    key: "resetRegExp",
-    value: function resetRegExp() {
-      // the regexp
-      var regexpStr = "".concat(this.prefix, "(.+?)").concat(this.suffix);
-      this.regexp = new RegExp(regexpStr, 'g');
-      var regexpUnescapeStr = "".concat(this.prefix).concat(this.unescapePrefix, "(.+?)").concat(this.unescapeSuffix).concat(this.suffix);
-      this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
-      var nestingRegexpStr = "".concat(this.nestingPrefix, "(.+?)").concat(this.nestingSuffix);
-      this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
-    }
-  }, {
-    key: "interpolate",
-    value: function interpolate(str, data, lng, options) {
-      var _this = this;
-
-      var match;
-      var value;
-      var replaces;
-
-      function regexSafe(val) {
-        return val.replace(/\$/g, '$$$$');
-      }
-
-      var handleFormat = function handleFormat(key) {
-        if (key.indexOf(_this.formatSeparator) < 0) return getPath(data, key);
-        var p = key.split(_this.formatSeparator);
-        var k = p.shift().trim();
-        var f = p.join(_this.formatSeparator).trim();
-        return _this.format(getPath(data, k), f, lng);
-      };
-
-      this.resetRegExp();
-      var missingInterpolationHandler = options && options.missingInterpolationHandler || this.options.missingInterpolationHandler;
-      replaces = 0; // unescape if has unescapePrefix/Suffix
-
-      /* eslint no-cond-assign: 0 */
-
-      while (match = this.regexpUnescape.exec(str)) {
-        value = handleFormat(match[1].trim());
-        str = str.replace(match[0], value);
-        this.regexpUnescape.lastIndex = 0;
-        replaces++;
-
-        if (replaces >= this.maxReplaces) {
-          break;
-        }
-      }
-
-      replaces = 0; // regular escape on demand
-
-      while (match = this.regexp.exec(str)) {
-        value = handleFormat(match[1].trim());
-
-        if (value === undefined) {
-          if (typeof missingInterpolationHandler === 'function') {
-            var temp = missingInterpolationHandler(str, match, options);
-            value = typeof temp === 'string' ? temp : '';
-          } else {
-            this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
-            value = '';
-          }
-        } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
-          value = makeString(value);
-        }
-
-        value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
-        str = str.replace(match[0], value);
-        this.regexp.lastIndex = 0;
-        replaces++;
-
-        if (replaces >= this.maxReplaces) {
-          break;
-        }
-      }
-
-      return str;
-    }
-  }, {
-    key: "nest",
-    value: function nest(str, fc) {
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-      var match;
-      var value;
-
-      var clonedOptions = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options);
-
-      clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
-      // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
-
-      function handleHasOptions(key, inheritedOptions) {
-        if (key.indexOf(',') < 0) return key;
-        var p = key.split(',');
-        key = p.shift();
-        var optionsString = p.join(',');
-        optionsString = this.interpolate(optionsString, clonedOptions);
-        optionsString = optionsString.replace(/'/g, '"');
-
-        try {
-          clonedOptions = JSON.parse(optionsString);
-          if (inheritedOptions) clonedOptions = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, inheritedOptions, clonedOptions);
-        } catch (e) {
-          this.logger.error("failed parsing options string in nesting for key ".concat(key), e);
-        }
-
-        return key;
-      } // regular escape on demand
-
-
-      while (match = this.nestingRegexp.exec(str)) {
-        value = fc(handleHasOptions.call(this, match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
-
-        if (value && match[0] === str && typeof value !== 'string') return value; // no string to include or empty
-
-        if (typeof value !== 'string') value = makeString(value);
-
-        if (!value) {
-          this.logger.warn("missed to resolve ".concat(match[1], " for nesting ").concat(str));
-          value = '';
-        } // Nested keys should not be escaped by default #854
-        // value = this.escapeValue ? regexSafe(utils.escape(value)) : regexSafe(value);
-
-
-        str = str.replace(match[0], value);
-        this.regexp.lastIndex = 0;
-      }
-
-      return str;
-    }
-  }]);
-
-  return Interpolator;
-}();
-
-function remove(arr, what) {
-  var found = arr.indexOf(what);
-
-  while (found !== -1) {
-    arr.splice(found, 1);
-    found = arr.indexOf(what);
-  }
-}
-
-var Connector =
-/*#__PURE__*/
-function (_EventEmitter) {
-  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(Connector, _EventEmitter);
-
-  function Connector(backend, store, services) {
-    var _this;
-
-    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Connector);
-
-    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(Connector).call(this));
-    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
-
-    _this.backend = backend;
-    _this.store = store;
-    _this.languageUtils = services.languageUtils;
-    _this.options = options;
-    _this.logger = baseLogger.create('backendConnector');
-    _this.state = {};
-    _this.queue = [];
-
-    if (_this.backend && _this.backend.init) {
-      _this.backend.init(services, options.backend, options);
-    }
-
-    return _this;
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Connector, [{
-    key: "queueLoad",
-    value: function queueLoad(languages, namespaces, options, callback) {
-      var _this2 = this;
-
-      // find what needs to be loaded
-      var toLoad = [];
-      var pending = [];
-      var toLoadLanguages = [];
-      var toLoadNamespaces = [];
-      languages.forEach(function (lng) {
-        var hasAllNamespaces = true;
-        namespaces.forEach(function (ns) {
-          var name = "".concat(lng, "|").concat(ns);
-
-          if (!options.reload && _this2.store.hasResourceBundle(lng, ns)) {
-            _this2.state[name] = 2; // loaded
-          } else if (_this2.state[name] < 0) ; else if (_this2.state[name] === 1) {
-            if (pending.indexOf(name) < 0) pending.push(name);
-          } else {
-            _this2.state[name] = 1; // pending
-
-            hasAllNamespaces = false;
-            if (pending.indexOf(name) < 0) pending.push(name);
-            if (toLoad.indexOf(name) < 0) toLoad.push(name);
-            if (toLoadNamespaces.indexOf(ns) < 0) toLoadNamespaces.push(ns);
-          }
-        });
-        if (!hasAllNamespaces) toLoadLanguages.push(lng);
-      });
-
-      if (toLoad.length || pending.length) {
-        this.queue.push({
-          pending: pending,
-          loaded: {},
-          errors: [],
-          callback: callback
-        });
-      }
-
-      return {
-        toLoad: toLoad,
-        pending: pending,
-        toLoadLanguages: toLoadLanguages,
-        toLoadNamespaces: toLoadNamespaces
-      };
-    }
-  }, {
-    key: "loaded",
-    value: function loaded(name, err, data) {
-      var _name$split = name.split('|'),
-          _name$split2 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_9__["default"])(_name$split, 2),
-          lng = _name$split2[0],
-          ns = _name$split2[1];
-
-      if (err) this.emit('failedLoading', lng, ns, err);
-
-      if (data) {
-        this.store.addResourceBundle(lng, ns, data);
-      } // set loaded
-
-
-      this.state[name] = err ? -1 : 2; // consolidated loading done in this run - only emit once for a loaded namespace
-
-      var loaded = {}; // callback if ready
-
-      this.queue.forEach(function (q) {
-        pushPath(q.loaded, [lng], ns);
-        remove(q.pending, name);
-        if (err) q.errors.push(err);
-
-        if (q.pending.length === 0 && !q.done) {
-          // only do once per loaded -> this.emit('loaded', q.loaded);
-          Object.keys(q.loaded).forEach(function (l) {
-            if (!loaded[l]) loaded[l] = [];
-
-            if (q.loaded[l].length) {
-              q.loaded[l].forEach(function (ns) {
-                if (loaded[l].indexOf(ns) < 0) loaded[l].push(ns);
-              });
-            }
-          });
-          /* eslint no-param-reassign: 0 */
-
-          q.done = true;
-
-          if (q.errors.length) {
-            q.callback(q.errors);
-          } else {
-            q.callback();
-          }
-        }
-      }); // emit consolidated loaded event
-
-      this.emit('loaded', loaded); // remove done load requests
-
-      this.queue = this.queue.filter(function (q) {
-        return !q.done;
-      });
-    }
-  }, {
-    key: "read",
-    value: function read(lng, ns, fcName) {
-      var _this3 = this;
-
-      var tried = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-      var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
-      var callback = arguments.length > 5 ? arguments[5] : undefined;
-      if (!lng.length) return callback(null, {}); // noting to load
-
-      return this.backend[fcName](lng, ns, function (err, data) {
-        if (err && data
-        /* = retryFlag */
-        && tried < 5) {
-          setTimeout(function () {
-            _this3.read.call(_this3, lng, ns, fcName, tried + 1, wait * 2, callback);
-          }, wait);
-          return;
-        }
-
-        callback(err, data);
-      });
-    }
-    /* eslint consistent-return: 0 */
-
-  }, {
-    key: "prepareLoading",
-    value: function prepareLoading(languages, namespaces) {
-      var _this4 = this;
-
-      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-      var callback = arguments.length > 3 ? arguments[3] : undefined;
-
-      if (!this.backend) {
-        this.logger.warn('No backend was added via i18next.use. Will not load resources.');
-        return callback && callback();
-      }
-
-      if (typeof languages === 'string') languages = this.languageUtils.toResolveHierarchy(languages);
-      if (typeof namespaces === 'string') namespaces = [namespaces];
-      var toLoad = this.queueLoad(languages, namespaces, options, callback);
-
-      if (!toLoad.toLoad.length) {
-        if (!toLoad.pending.length) callback(); // nothing to load and no pendings...callback now
-
-        return null; // pendings will trigger callback
-      }
-
-      toLoad.toLoad.forEach(function (name) {
-        _this4.loadOne(name);
-      });
-    }
-  }, {
-    key: "load",
-    value: function load(languages, namespaces, callback) {
-      this.prepareLoading(languages, namespaces, {}, callback);
-    }
-  }, {
-    key: "reload",
-    value: function reload(languages, namespaces, callback) {
-      this.prepareLoading(languages, namespaces, {
-        reload: true
-      }, callback);
-    }
-  }, {
-    key: "loadOne",
-    value: function loadOne(name) {
-      var _this5 = this;
-
-      var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-      var _name$split3 = name.split('|'),
-          _name$split4 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_9__["default"])(_name$split3, 2),
-          lng = _name$split4[0],
-          ns = _name$split4[1];
-
-      this.read(lng, ns, 'read', null, null, function (err, data) {
-        if (err) _this5.logger.warn("".concat(prefix, "loading namespace ").concat(ns, " for language ").concat(lng, " failed"), err);
-        if (!err && data) _this5.logger.log("".concat(prefix, "loaded namespace ").concat(ns, " for language ").concat(lng), data);
-
-        _this5.loaded(name, err, data);
-      });
-    }
-  }, {
-    key: "saveMissing",
-    value: function saveMissing(languages, namespace, key, fallbackValue, isUpdate) {
-      var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
-
-      if (this.backend && this.backend.create) {
-        this.backend.create(languages, namespace, key, fallbackValue, null
-        /* unused callback */
-        , Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options, {
-          isUpdate: isUpdate
-        }));
-      } // write to store to avoid resending
-
-
-      if (!languages || !languages[0]) return;
-      this.store.addResource(languages[0], namespace, key, fallbackValue);
-    }
-  }]);
-
-  return Connector;
-}(EventEmitter);
-
-function get() {
-  return {
-    debug: false,
-    initImmediate: true,
-    ns: ['translation'],
-    defaultNS: ['translation'],
-    fallbackLng: ['dev'],
-    fallbackNS: false,
-    // string or array of namespaces
-    whitelist: false,
-    // array with whitelisted languages
-    nonExplicitWhitelist: false,
-    load: 'all',
-    // | currentOnly | languageOnly
-    preload: false,
-    // array with preload languages
-    simplifyPluralSuffix: true,
-    keySeparator: '.',
-    nsSeparator: ':',
-    pluralSeparator: '_',
-    contextSeparator: '_',
-    partialBundledLanguages: false,
-    // allow bundling certain languages that are not remotely fetched
-    saveMissing: false,
-    // enable to send missing values
-    updateMissing: false,
-    // enable to update default values if different from translated value (only useful on initial development, or when keeping code as source of truth)
-    saveMissingTo: 'fallback',
-    // 'current' || 'all'
-    saveMissingPlurals: true,
-    // will save all forms not only singular key
-    missingKeyHandler: false,
-    // function(lng, ns, key, fallbackValue) -> override if prefer on handling
-    missingInterpolationHandler: false,
-    // function(str, match)
-    postProcess: false,
-    // string or array of postProcessor names
-    returnNull: true,
-    // allows null value as valid translation
-    returnEmptyString: true,
-    // allows empty string value as valid translation
-    returnObjects: false,
-    joinArrays: false,
-    // or string to join array
-    returnedObjectHandler: function returnedObjectHandler() {},
-    // function(key, value, options) triggered if key returns object but returnObjects is set to false
-    parseMissingKeyHandler: false,
-    // function(key) parsed a key that was not found in t() before returning
-    appendNamespaceToMissingKey: false,
-    appendNamespaceToCIMode: false,
-    overloadTranslationOptionHandler: function handle(args) {
-      var ret = {};
-      if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(args[1]) === 'object') ret = args[1];
-      if (typeof args[1] === 'string') ret.defaultValue = args[1];
-      if (typeof args[2] === 'string') ret.tDescription = args[2];
-
-      if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(args[2]) === 'object' || Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(args[3]) === 'object') {
-        var options = args[3] || args[2];
-        Object.keys(options).forEach(function (key) {
-          ret[key] = options[key];
-        });
-      }
-
-      return ret;
-    },
-    interpolation: {
-      escapeValue: true,
-      format: function format(value, _format, lng) {
-        return value;
-      },
-      prefix: '{{',
-      suffix: '}}',
-      formatSeparator: ',',
-      // prefixEscaped: '{{',
-      // suffixEscaped: '}}',
-      // unescapeSuffix: '',
-      unescapePrefix: '-',
-      nestingPrefix: '$t(',
-      nestingSuffix: ')',
-      // nestingPrefixEscaped: '$t(',
-      // nestingSuffixEscaped: ')',
-      // defaultVariables: undefined // object that can have values to interpolate on - extends passed in interpolation data
-      maxReplaces: 1000 // max replaces to prevent endless loop
-
-    }
-  };
-}
-/* eslint no-param-reassign: 0 */
-
-function transformOptions(options) {
-  // create namespace object if namespace is passed in as string
-  if (typeof options.ns === 'string') options.ns = [options.ns];
-  if (typeof options.fallbackLng === 'string') options.fallbackLng = [options.fallbackLng];
-  if (typeof options.fallbackNS === 'string') options.fallbackNS = [options.fallbackNS]; // extend whitelist with cimode
-
-  if (options.whitelist && options.whitelist.indexOf('cimode') < 0) {
-    options.whitelist = options.whitelist.concat(['cimode']);
-  }
-
-  return options;
-}
-
-function noop() {}
-
-var I18n =
-/*#__PURE__*/
-function (_EventEmitter) {
-  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(I18n, _EventEmitter);
-
-  function I18n() {
-    var _this;
-
-    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var callback = arguments.length > 1 ? arguments[1] : undefined;
-
-    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, I18n);
-
-    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(I18n).call(this));
-    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
-
-    _this.options = transformOptions(options);
-    _this.services = {};
-    _this.logger = baseLogger;
-    _this.modules = {
-      external: []
-    };
-
-    if (callback && !_this.isInitialized && !options.isClone) {
-      // https://github.com/i18next/i18next/issues/879
-      if (!_this.options.initImmediate) {
-        _this.init(options, callback);
-
-        return Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(_this, Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this));
-      }
-
-      setTimeout(function () {
-        _this.init(options, callback);
-      }, 0);
-    }
-
-    return _this;
-  }
-
-  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(I18n, [{
-    key: "init",
-    value: function init() {
-      var _this2 = this;
-
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var callback = arguments.length > 1 ? arguments[1] : undefined;
-
-      if (typeof options === 'function') {
-        callback = options;
-        options = {};
-      }
-
-      this.options = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, get(), this.options, transformOptions(options));
-      this.format = this.options.interpolation.format;
-      if (!callback) callback = noop;
-
-      function createClassOnDemand(ClassOrObject) {
-        if (!ClassOrObject) return null;
-        if (typeof ClassOrObject === 'function') return new ClassOrObject();
-        return ClassOrObject;
-      } // init services
-
-
-      if (!this.options.isClone) {
-        if (this.modules.logger) {
-          baseLogger.init(createClassOnDemand(this.modules.logger), this.options);
-        } else {
-          baseLogger.init(null, this.options);
-        }
-
-        var lu = new LanguageUtil(this.options);
-        this.store = new ResourceStore(this.options.resources, this.options);
-        var s = this.services;
-        s.logger = baseLogger;
-        s.resourceStore = this.store;
-        s.languageUtils = lu;
-        s.pluralResolver = new PluralResolver(lu, {
-          prepend: this.options.pluralSeparator,
-          compatibilityJSON: this.options.compatibilityJSON,
-          simplifyPluralSuffix: this.options.simplifyPluralSuffix
-        });
-        s.interpolator = new Interpolator(this.options);
-        s.backendConnector = new Connector(createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options); // pipe events from backendConnector
-
-        s.backendConnector.on('*', function (event) {
-          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            args[_key - 1] = arguments[_key];
-          }
-
-          _this2.emit.apply(_this2, [event].concat(args));
-        });
-
-        if (this.modules.languageDetector) {
-          s.languageDetector = createClassOnDemand(this.modules.languageDetector);
-          s.languageDetector.init(s, this.options.detection, this.options);
-        }
-
-        if (this.modules.i18nFormat) {
-          s.i18nFormat = createClassOnDemand(this.modules.i18nFormat);
-          if (s.i18nFormat.init) s.i18nFormat.init(this);
-        }
-
-        this.translator = new Translator(this.services, this.options); // pipe events from translator
-
-        this.translator.on('*', function (event) {
-          for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-            args[_key2 - 1] = arguments[_key2];
-          }
-
-          _this2.emit.apply(_this2, [event].concat(args));
-        });
-        this.modules.external.forEach(function (m) {
-          if (m.init) m.init(_this2);
-        });
-      } // append api
-
-
-      var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle', 'getDataByLanguage'];
-      storeApi.forEach(function (fcName) {
-        _this2[fcName] = function () {
-          var _this2$store;
-
-          return (_this2$store = _this2.store)[fcName].apply(_this2$store, arguments);
-        };
-      });
-      var deferred = defer();
-
-      var load = function load() {
-        _this2.changeLanguage(_this2.options.lng, function (err, t) {
-          _this2.isInitialized = true;
-
-          _this2.logger.log('initialized', _this2.options);
-
-          _this2.emit('initialized', _this2.options);
-
-          deferred.resolve(t); // not rejecting on err (as err is only a loading translation failed warning)
-
-          callback(err, t);
-        });
-      };
-
-      if (this.options.resources || !this.options.initImmediate) {
-        load();
-      } else {
-        setTimeout(load, 0);
-      }
-
-      return deferred;
-    }
-    /* eslint consistent-return: 0 */
-
-  }, {
-    key: "loadResources",
-    value: function loadResources() {
-      var _this3 = this;
-
-      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
-
-      if (!this.options.resources || this.options.partialBundledLanguages) {
-        if (this.language && this.language.toLowerCase() === 'cimode') return callback(); // avoid loading resources for cimode
-
-        var toLoad = [];
-
-        var append = function append(lng) {
-          if (!lng) return;
-
-          var lngs = _this3.services.languageUtils.toResolveHierarchy(lng);
-
-          lngs.forEach(function (l) {
-            if (toLoad.indexOf(l) < 0) toLoad.push(l);
-          });
-        };
-
-        if (!this.language) {
-          // at least load fallbacks in this case
-          var fallbacks = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
-          fallbacks.forEach(function (l) {
-            return append(l);
-          });
-        } else {
-          append(this.language);
-        }
-
-        if (this.options.preload) {
-          this.options.preload.forEach(function (l) {
-            return append(l);
-          });
-        }
-
-        this.services.backendConnector.load(toLoad, this.options.ns, callback);
-      } else {
-        callback(null);
-      }
-    }
-  }, {
-    key: "reloadResources",
-    value: function reloadResources(lngs, ns, callback) {
-      var deferred = defer();
-      if (!lngs) lngs = this.languages;
-      if (!ns) ns = this.options.ns;
-      if (!callback) callback = noop;
-      this.services.backendConnector.reload(lngs, ns, function (err) {
-        deferred.resolve(); // not rejecting on err (as err is only a loading translation failed warning)
-
-        callback(err);
-      });
-      return deferred;
-    }
-  }, {
-    key: "use",
-    value: function use(module) {
-      if (module.type === 'backend') {
-        this.modules.backend = module;
-      }
-
-      if (module.type === 'logger' || module.log && module.warn && module.error) {
-        this.modules.logger = module;
-      }
-
-      if (module.type === 'languageDetector') {
-        this.modules.languageDetector = module;
-      }
-
-      if (module.type === 'i18nFormat') {
-        this.modules.i18nFormat = module;
-      }
-
-      if (module.type === 'postProcessor') {
-        postProcessor.addPostProcessor(module);
-      }
-
-      if (module.type === '3rdParty') {
-        this.modules.external.push(module);
-      }
-
-      return this;
-    }
-  }, {
-    key: "changeLanguage",
-    value: function changeLanguage(lng, callback) {
-      var _this4 = this;
-
-      var deferred = defer();
-      this.emit('languageChanging', lng);
-
-      var done = function done(err, l) {
-        _this4.translator.changeLanguage(l);
-
-        if (l) {
-          _this4.emit('languageChanged', l);
-
-          _this4.logger.log('languageChanged', l);
-        }
-
-        deferred.resolve(function () {
-          return _this4.t.apply(_this4, arguments);
-        });
-        if (callback) callback(err, function () {
-          return _this4.t.apply(_this4, arguments);
-        });
-      };
-
-      var setLng = function setLng(l) {
-        if (l) {
-          _this4.language = l;
-          _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
-          if (!_this4.translator.language) _this4.translator.changeLanguage(l);
-          if (_this4.services.languageDetector) _this4.services.languageDetector.cacheUserLanguage(l);
-        }
-
-        _this4.loadResources(function (err) {
-          done(err, l);
-        });
-      };
-
-      if (!lng && this.services.languageDetector && !this.services.languageDetector.async) {
-        setLng(this.services.languageDetector.detect());
-      } else if (!lng && this.services.languageDetector && this.services.languageDetector.async) {
-        this.services.languageDetector.detect(setLng);
-      } else {
-        setLng(lng);
-      }
-
-      return deferred;
-    }
-  }, {
-    key: "getFixedT",
-    value: function getFixedT(lng, ns) {
-      var _this5 = this;
-
-      var fixedT = function fixedT(key, opts) {
-        var options = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, opts);
-
-        if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(opts) !== 'object') {
-          for (var _len3 = arguments.length, rest = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-            rest[_key3 - 2] = arguments[_key3];
-          }
-
-          options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
-        }
-
-        options.lng = options.lng || fixedT.lng;
-        options.lngs = options.lngs || fixedT.lngs;
-        options.ns = options.ns || fixedT.ns;
-        return _this5.t(key, options);
-      };
-
-      if (typeof lng === 'string') {
-        fixedT.lng = lng;
-      } else {
-        fixedT.lngs = lng;
-      }
-
-      fixedT.ns = ns;
-      return fixedT;
-    }
-  }, {
-    key: "t",
-    value: function t() {
-      var _this$translator;
-
-      return this.translator && (_this$translator = this.translator).translate.apply(_this$translator, arguments);
-    }
-  }, {
-    key: "exists",
-    value: function exists() {
-      var _this$translator2;
-
-      return this.translator && (_this$translator2 = this.translator).exists.apply(_this$translator2, arguments);
-    }
-  }, {
-    key: "setDefaultNamespace",
-    value: function setDefaultNamespace(ns) {
-      this.options.defaultNS = ns;
-    }
-  }, {
-    key: "loadNamespaces",
-    value: function loadNamespaces(ns, callback) {
-      var _this6 = this;
-
-      var deferred = defer();
-
-      if (!this.options.ns) {
-        callback && callback();
-        return Promise.resolve();
-      }
-
-      if (typeof ns === 'string') ns = [ns];
-      ns.forEach(function (n) {
-        if (_this6.options.ns.indexOf(n) < 0) _this6.options.ns.push(n);
-      });
-      this.loadResources(function (err) {
-        deferred.resolve();
-        if (callback) callback(err);
-      });
-      return deferred;
-    }
-  }, {
-    key: "loadLanguages",
-    value: function loadLanguages(lngs, callback) {
-      var deferred = defer();
-      if (typeof lngs === 'string') lngs = [lngs];
-      var preloaded = this.options.preload || [];
-      var newLngs = lngs.filter(function (lng) {
-        return preloaded.indexOf(lng) < 0;
-      }); // Exit early if all given languages are already preloaded
-
-      if (!newLngs.length) {
-        if (callback) callback();
-        return Promise.resolve();
-      }
-
-      this.options.preload = preloaded.concat(newLngs);
-      this.loadResources(function (err) {
-        deferred.resolve();
-        if (callback) callback(err);
-      });
-      return deferred;
-    }
-  }, {
-    key: "dir",
-    value: function dir(lng) {
-      if (!lng) lng = this.languages && this.languages.length > 0 ? this.languages[0] : this.language;
-      if (!lng) return 'rtl';
-      var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
-      return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
-    }
-    /* eslint class-methods-use-this: 0 */
-
-  }, {
-    key: "createInstance",
-    value: function createInstance() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var callback = arguments.length > 1 ? arguments[1] : undefined;
-      return new I18n(options, callback);
-    }
-  }, {
-    key: "cloneInstance",
-    value: function cloneInstance() {
-      var _this7 = this;
-
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
-
-      var mergedOptions = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.options, options, {
-        isClone: true
-      });
-
-      var clone = new I18n(mergedOptions);
-      var membersToCopy = ['store', 'services', 'language'];
-      membersToCopy.forEach(function (m) {
-        clone[m] = _this7[m];
-      });
-      clone.translator = new Translator(clone.services, clone.options);
-      clone.translator.on('*', function (event) {
-        for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-          args[_key4 - 1] = arguments[_key4];
-        }
-
-        clone.emit.apply(clone, [event].concat(args));
-      });
-      clone.init(mergedOptions, callback);
-      clone.translator.options = clone.options; // sync options
-
-      return clone;
-    }
-  }]);
-
-  return I18n;
-}(EventEmitter);
-
-var i18next = new I18n();
-
-/* harmony default export */ __webpack_exports__["default"] = (i18next);
-
-
-/***/ }),
-
-/***/ "./node_modules/json-logic-js/logic.js":
-/*!*********************************************!*\
-  !*** ./node_modules/json-logic-js/logic.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/* globals define,module */
-/*
-Using a Universal Module Loader that should be browser, require, and AMD friendly
-http://ricostacruz.com/cheatsheets/umdjs.html
-*/
-;(function(root, factory) {
-  if (true) {
-    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
-				__WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  } else {}
-}(this, function() {
-  "use strict";
-  /* globals console:false */
-
-  if ( ! Array.isArray) {
-    Array.isArray = function(arg) {
-      return Object.prototype.toString.call(arg) === "[object Array]";
-    };
-  }
-
-  /**
-   * Return an array that contains no duplicates (original not modified)
-   * @param  {array} array   Original reference array
-   * @return {array}         New array with no duplicates
-   */
-  function arrayUnique(array) {
-    var a = [];
-    for (var i=0, l=array.length; i<l; i++) {
-      if (a.indexOf(array[i]) === -1) {
-        a.push(array[i]);
-      }
-    }
-    return a;
-  }
-
-  var jsonLogic = {};
-  var operations = {
-    "==": function(a, b) {
-      return a == b;
-    },
-    "===": function(a, b) {
-      return a === b;
-    },
-    "!=": function(a, b) {
-      return a != b;
-    },
-    "!==": function(a, b) {
-      return a !== b;
-    },
-    ">": function(a, b) {
-      return a > b;
-    },
-    ">=": function(a, b) {
-      return a >= b;
-    },
-    "<": function(a, b, c) {
-      return (c === undefined) ? a < b : (a < b) && (b < c);
-    },
-    "<=": function(a, b, c) {
-      return (c === undefined) ? a <= b : (a <= b) && (b <= c);
-    },
-    "!!": function(a) {
-      return jsonLogic.truthy(a);
-    },
-    "!": function(a) {
-      return !jsonLogic.truthy(a);
-    },
-    "%": function(a, b) {
-      return a % b;
-    },
-    "log": function(a) {
-      console.log(a); return a;
-    },
-    "in": function(a, b) {
-      if(!b || typeof b.indexOf === "undefined") return false;
-      return (b.indexOf(a) !== -1);
-    },
-    "cat": function() {
-      return Array.prototype.join.call(arguments, "");
-    },
-    "substr":function(source, start, end) {
-      if(end < 0){
-        // JavaScript doesn't support negative end, this emulates PHP behavior
-        var temp = String(source).substr(start);
-        return temp.substr(0, temp.length + end);
-      }
-      return String(source).substr(start, end);
-    },
-    "+": function() {
-      return Array.prototype.reduce.call(arguments, function(a, b) {
-        return parseFloat(a, 10) + parseFloat(b, 10);
-      }, 0);
-    },
-    "*": function() {
-      return Array.prototype.reduce.call(arguments, function(a, b) {
-        return parseFloat(a, 10) * parseFloat(b, 10);
-      });
-    },
-    "-": function(a, b) {
-      if(b === undefined) {
-        return -a;
-      }else{
-        return a - b;
-      }
-    },
-    "/": function(a, b) {
-      return a / b;
-    },
-    "min": function() {
-      return Math.min.apply(this, arguments);
-    },
-    "max": function() {
-      return Math.max.apply(this, arguments);
-    },
-    "merge": function() {
-      return Array.prototype.reduce.call(arguments, function(a, b) {
-        return a.concat(b);
-      }, []);
-    },
-    "var": function(a, b) {
-      var not_found = (b === undefined) ? null : b;
-      var data = this;
-      if(typeof a === "undefined" || a==="" || a===null) {
-        return data;
-      }
-      var sub_props = String(a).split(".");
-      for(var i = 0; i < sub_props.length; i++) {
-        if(data === null) {
-          return not_found;
-        }
-        // Descending into data
-        data = data[sub_props[i]];
-        if(data === undefined) {
-          return not_found;
-        }
-      }
-      return data;
-    },
-    "missing": function() {
-      /*
-      Missing can receive many keys as many arguments, like {"missing:[1,2]}
-      Missing can also receive *one* argument that is an array of keys,
-      which typically happens if it's actually acting on the output of another command
-      (like 'if' or 'merge')
-      */
-
-      var missing = [];
-      var keys = Array.isArray(arguments[0]) ? arguments[0] : arguments;
-
-      for(var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        var value = jsonLogic.apply({"var": key}, this);
-        if(value === null || value === "") {
-          missing.push(key);
-        }
-      }
-
-      return missing;
-    },
-    "missing_some": function(need_count, options) {
-      // missing_some takes two arguments, how many (minimum) items must be present, and an array of keys (just like 'missing') to check for presence.
-      var are_missing = jsonLogic.apply({"missing": options}, this);
-
-      if(options.length - are_missing.length >= need_count) {
-        return [];
-      }else{
-        return are_missing;
-      }
-    },
-    "method": function(obj, method, args) {
-      return obj[method].apply(obj, args);
-    },
-
-  };
-
-  jsonLogic.is_logic = function(logic) {
-    return (
-      typeof logic === "object" && // An object
-      logic !== null && // but not null
-      ! Array.isArray(logic) && // and not an array
-      Object.keys(logic).length === 1 // with exactly one key
-    );
-  };
-
-  /*
-  This helper will defer to the JsonLogic spec as a tie-breaker when different language interpreters define different behavior for the truthiness of primitives.  E.g., PHP considers empty arrays to be falsy, but Javascript considers them to be truthy. JsonLogic, as an ecosystem, needs one consistent answer.
-
-  Spec and rationale here: http://jsonlogic.com/truthy
-  */
-  jsonLogic.truthy = function(value) {
-    if(Array.isArray(value) && value.length === 0) {
-      return false;
-    }
-    return !! value;
-  };
-
-
-  jsonLogic.get_operator = function(logic) {
-    return Object.keys(logic)[0];
-  };
-
-  jsonLogic.get_values = function(logic) {
-    return logic[jsonLogic.get_operator(logic)];
-  };
-
-  jsonLogic.apply = function(logic, data) {
-    // Does this array contain logic? Only one way to find out.
-    if(Array.isArray(logic)) {
-      return logic.map(function(l) {
-        return jsonLogic.apply(l, data);
-      });
-    }
-    // You've recursed to a primitive, stop!
-    if( ! jsonLogic.is_logic(logic) ) {
-      return logic;
-    }
-
-    data = data || {};
-
-    var op = jsonLogic.get_operator(logic);
-    var values = logic[op];
-    var i;
-    var current;
-    var scopedLogic, scopedData, filtered, initial;
-
-    // easy syntax for unary operators, like {"var" : "x"} instead of strict {"var" : ["x"]}
-    if( ! Array.isArray(values)) {
-      values = [values];
-    }
-
-    // 'if', 'and', and 'or' violate the normal rule of depth-first calculating consequents, let each manage recursion as needed.
-    if(op === "if" || op == "?:") {
-      /* 'if' should be called with a odd number of parameters, 3 or greater
-      This works on the pattern:
-      if( 0 ){ 1 }else{ 2 };
-      if( 0 ){ 1 }else if( 2 ){ 3 }else{ 4 };
-      if( 0 ){ 1 }else if( 2 ){ 3 }else if( 4 ){ 5 }else{ 6 };
-
-      The implementation is:
-      For pairs of values (0,1 then 2,3 then 4,5 etc)
-      If the first evaluates truthy, evaluate and return the second
-      If the first evaluates falsy, jump to the next pair (e.g, 0,1 to 2,3)
-      given one parameter, evaluate and return it. (it's an Else and all the If/ElseIf were false)
-      given 0 parameters, return NULL (not great practice, but there was no Else)
-      */
-      for(i = 0; i < values.length - 1; i += 2) {
-        if( jsonLogic.truthy( jsonLogic.apply(values[i], data) ) ) {
-          return jsonLogic.apply(values[i+1], data);
-        }
-      }
-      if(values.length === i+1) return jsonLogic.apply(values[i], data);
-      return null;
-    }else if(op === "and") { // Return first falsy, or last
-      for(i=0; i < values.length; i+=1) {
-        current = jsonLogic.apply(values[i], data);
-        if( ! jsonLogic.truthy(current)) {
-          return current;
-        }
-      }
-      return current; // Last
-    }else if(op === "or") {// Return first truthy, or last
-      for(i=0; i < values.length; i+=1) {
-        current = jsonLogic.apply(values[i], data);
-        if( jsonLogic.truthy(current) ) {
-          return current;
-        }
-      }
-      return current; // Last
-
-
-
-
-    }else if(op === 'filter'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-
-      if ( ! Array.isArray(scopedData)) {
-          return [];
-      }
-      // Return only the elements from the array in the first argument,
-      // that return truthy when passed to the logic in the second argument.
-      // For parity with JavaScript, reindex the returned array
-      return scopedData.filter(function(datum){
-          return jsonLogic.truthy( jsonLogic.apply(scopedLogic, datum));
-      });
-  }else if(op === 'map'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-
-      if ( ! Array.isArray(scopedData)) {
-          return [];
-      }
-
-      return scopedData.map(function(datum){
-          return jsonLogic.apply(scopedLogic, datum);
-      });
-
-  }else if(op === 'reduce'){
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-      initial = typeof values[2] !== 'undefined' ? values[2] : null;
-
-      if ( ! Array.isArray(scopedData)) {
-          return initial;
-      }
-
-      return scopedData.reduce(
-          function(accumulator, current){
-              return jsonLogic.apply(
-                  scopedLogic,
-                  {'current':current, 'accumulator':accumulator}
-              );
-          },
-          initial
-      );
-
-    }else if(op === "all") {
-      scopedData = jsonLogic.apply(values[0], data);
-      scopedLogic = values[1];
-      // All of an empty set is false. Note, some and none have correct fallback after the for loop
-      if( ! scopedData.length) {
-        return false;
-      }
-      for(i=0; i < scopedData.length; i+=1) {
-        if( ! jsonLogic.truthy( jsonLogic.apply(scopedLogic, scopedData[i]) )) {
-          return false; // First falsy, short circuit
-        }
-      }
-      return true; // All were truthy
-    }else if(op === "none") {
-      filtered = jsonLogic.apply({'filter' : values}, data);
-      return filtered.length === 0;
-
-    }else if(op === "some") {
-      filtered = jsonLogic.apply({'filter' : values}, data);
-      return filtered.length > 0;
-    }
-
-    // Everyone else gets immediate depth-first recursion
-    values = values.map(function(val) {
-      return jsonLogic.apply(val, data);
-    });
-
-
-    // The operation is called with "data" bound to its "this" and "values" passed as arguments.
-    // Structured commands like % or > can name formal arguments while flexible commands (like missing or merge) can operate on the pseudo-array arguments
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
-    if(typeof operations[op] === "function") {
-      return operations[op].apply(data, values);
-    }else if(op.indexOf(".") > 0) { // Contains a dot, and not in the 0th position
-      var sub_ops = String(op).split(".");
-      var operation = operations;
-      for(i = 0; i < sub_ops.length; i++) {
-        // Descending into operations
-        operation = operation[sub_ops[i]];
-        if(operation === undefined) {
-          throw new Error("Unrecognized operation " + op +
-          " (failed at " + sub_ops.slice(0, i+1).join(".") + ")");
-        }
-      }
-
-      return operation.apply(data, values);
-    }
-
-    throw new Error("Unrecognized operation " + op );
-  };
-
-  jsonLogic.uses_data = function(logic) {
-    var collection = [];
-
-    if( jsonLogic.is_logic(logic) ) {
-      var op = jsonLogic.get_operator(logic);
-      var values = logic[op];
-
-      if( ! Array.isArray(values)) {
-        values = [values];
-      }
-
-      if(op === "var") {
-        // This doesn't cover the case where the arg to var is itself a rule.
-        collection.push(values[0]);
-      }else{
-        // Recursion!
-        values.map(function(val) {
-          collection.push.apply(collection, jsonLogic.uses_data(val) );
-        });
-      }
-    }
-
-    return arrayUnique(collection);
-  };
-
-  jsonLogic.add_operation = function(name, code) {
-    operations[name] = code;
-  };
-
-  jsonLogic.rm_operation = function(name) {
-    delete operations[name];
-  };
-
-  jsonLogic.rule_like = function(rule, pattern) {
-    // console.log("Is ". JSON.stringify(rule) . " like " . JSON.stringify(pattern) . "?");
-    if(pattern === rule) {
-      return true;
-    } // TODO : Deep object equivalency?
-    if(pattern === "@") {
-      return true;
-    } // Wildcard!
-    if(pattern === "number") {
-      return (typeof rule === "number");
-    }
-    if(pattern === "string") {
-      return (typeof rule === "string");
-    }
-    if(pattern === "array") {
-      // !logic test might be superfluous in JavaScript
-      return Array.isArray(rule) && ! jsonLogic.is_logic(rule);
-    }
-
-    if(jsonLogic.is_logic(pattern)) {
-      if(jsonLogic.is_logic(rule)) {
-        var pattern_op = jsonLogic.get_operator(pattern);
-        var rule_op = jsonLogic.get_operator(rule);
-
-        if(pattern_op === "@" || pattern_op === rule_op) {
-        // echo "\nOperators match, go deeper\n";
-          return jsonLogic.rule_like(
-            jsonLogic.get_values(rule, false),
-            jsonLogic.get_values(pattern, false)
-          );
-        }
-      }
-      return false; // pattern is logic, rule isn't, can't be eq
-    }
-
-    if(Array.isArray(pattern)) {
-      if(Array.isArray(rule)) {
-        if(pattern.length !== rule.length) {
-          return false;
-        }
-        /*
-          Note, array order MATTERS, because we're using this array test logic to consider arguments, where order can matter. (e.g., + is commutative, but '-' or 'if' or 'var' are NOT)
-        */
-        for(var i = 0; i < pattern.length; i += 1) {
-          // If any fail, we fail
-          if( ! jsonLogic.rule_like(rule[i], pattern[i])) {
-            return false;
-          }
-        }
-        return true; // If they *all* passed, we pass
-      }else{
-        return false; // Pattern is array, rule isn't
-      }
-    }
-
-    // Not logic, not array, not a === match for rule.
-    return false;
-  };
-
-  return jsonLogic;
-}));
-
-
-/***/ }),
-
-/***/ "./node_modules/jstimezonedetect/dist/jstz.js":
-/*!****************************************************!*\
-  !*** ./node_modules/jstimezonedetect/dist/jstz.js ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root) {/*global exports, Intl*/
-/**
- * This script gives you the zone info key representing your device's time zone setting.
- *
- * @name jsTimezoneDetect
- * @version 1.0.6
- * @author Jon Nylander
- * @license MIT License - https://bitbucket.org/pellepim/jstimezonedetect/src/default/LICENCE.txt
- *
- * For usage and examples, visit:
- * http://pellepim.bitbucket.org/jstz/
- *
- * Copyright (c) Jon Nylander
- */
-
-
-/**
- * Namespace to hold all the code for timezone detection.
- */
-var jstz = (function () {
-    'use strict';
-    var HEMISPHERE_SOUTH = 's',
-
-        consts = {
-            DAY: 86400000,
-            HOUR: 3600000,
-            MINUTE: 60000,
-            SECOND: 1000,
-            BASELINE_YEAR: 2014,
-            MAX_SCORE: 864000000, // 10 days
-            AMBIGUITIES: {
-                'America/Denver':       ['America/Mazatlan'],
-                'Europe/London':        ['Africa/Casablanca'],
-                'America/Chicago':      ['America/Mexico_City'],
-                'America/Asuncion':     ['America/Campo_Grande', 'America/Santiago'],
-                'America/Montevideo':   ['America/Sao_Paulo', 'America/Santiago'],
-                // Europe/Minsk should not be in this list... but Windows.
-                'Asia/Beirut':          ['Asia/Amman', 'Asia/Jerusalem', 'Europe/Helsinki', 'Asia/Damascus', 'Africa/Cairo', 'Asia/Gaza', 'Europe/Minsk'],
-                'Pacific/Auckland':     ['Pacific/Fiji'],
-                'America/Los_Angeles':  ['America/Santa_Isabel'],
-                'America/New_York':     ['America/Havana'],
-                'America/Halifax':      ['America/Goose_Bay'],
-                'America/Godthab':      ['America/Miquelon'],
-                'Asia/Dubai':           ['Asia/Yerevan'],
-                'Asia/Jakarta':         ['Asia/Krasnoyarsk'],
-                'Asia/Shanghai':        ['Asia/Irkutsk', 'Australia/Perth'],
-                'Australia/Sydney':     ['Australia/Lord_Howe'],
-                'Asia/Tokyo':           ['Asia/Yakutsk'],
-                'Asia/Dhaka':           ['Asia/Omsk'],
-                // In the real world Yerevan is not ambigous for Baku... but Windows.
-                'Asia/Baku':            ['Asia/Yerevan'],
-                'Australia/Brisbane':   ['Asia/Vladivostok'],
-                'Pacific/Noumea':       ['Asia/Vladivostok'],
-                'Pacific/Majuro':       ['Asia/Kamchatka', 'Pacific/Fiji'],
-                'Pacific/Tongatapu':    ['Pacific/Apia'],
-                'Asia/Baghdad':         ['Europe/Minsk', 'Europe/Moscow'],
-                'Asia/Karachi':         ['Asia/Yekaterinburg'],
-                'Africa/Johannesburg':  ['Asia/Gaza', 'Africa/Cairo']
-            }
-        },
-
-        /**
-         * Gets the offset in minutes from UTC for a certain date.
-         * @param {Date} date
-         * @returns {Number}
-         */
-        get_date_offset = function get_date_offset(date) {
-            var offset = -date.getTimezoneOffset();
-            return (offset !== null ? offset : 0);
-        },
-
-        /**
-         * This function does some basic calculations to create information about
-         * the user's timezone. It uses REFERENCE_YEAR as a solid year for which
-         * the script has been tested rather than depend on the year set by the
-         * client device.
-         *
-         * Returns a key that can be used to do lookups in jstz.olson.timezones.
-         * eg: "720,1,2".
-         *
-         * @returns {String}
-         */
-        lookup_key = function lookup_key() {
-            var january_offset = get_date_offset(new Date(consts.BASELINE_YEAR, 0, 2)),
-                june_offset = get_date_offset(new Date(consts.BASELINE_YEAR, 5, 2)),
-                diff = january_offset - june_offset;
-
-            if (diff < 0) {
-                return january_offset + ",1";
-            } else if (diff > 0) {
-                return june_offset + ",1," + HEMISPHERE_SOUTH;
-            }
-
-            return january_offset + ",0";
-        },
-
-
-        /**
-         * Tries to get the time zone key directly from the operating system for those
-         * environments that support the ECMAScript Internationalization API.
-         */
-        get_from_internationalization_api = function get_from_internationalization_api() {
-            var format, timezone;
-            if (typeof Intl === "undefined" || typeof Intl.DateTimeFormat === "undefined") {
-                return;
-            }
-
-            format = Intl.DateTimeFormat();
-
-            if (typeof format === "undefined" || typeof format.resolvedOptions === "undefined") {
-                return;
-            }
-
-            timezone = format.resolvedOptions().timeZone;
-
-            if (timezone && (timezone.indexOf("/") > -1 || timezone === 'UTC')) {
-                return timezone;
-            }
-
-        },
-
-        /**
-         * Starting point for getting all the DST rules for a specific year
-         * for the current timezone (as described by the client system).
-         *
-         * Returns an object with start and end attributes, or false if no
-         * DST rules were found for the year.
-         *
-         * @param year
-         * @returns {Object} || {Boolean}
-         */
-        dst_dates = function dst_dates(year) {
-            var yearstart = new Date(year, 0, 1, 0, 0, 1, 0).getTime();
-            var yearend = new Date(year, 12, 31, 23, 59, 59).getTime();
-            var current = yearstart;
-            var offset = (new Date(current)).getTimezoneOffset();
-            var dst_start = null;
-            var dst_end = null;
-
-            while (current < yearend - 86400000) {
-                var dateToCheck = new Date(current);
-                var dateToCheckOffset = dateToCheck.getTimezoneOffset();
-
-                if (dateToCheckOffset !== offset) {
-                    if (dateToCheckOffset < offset) {
-                        dst_start = dateToCheck;
-                    }
-                    if (dateToCheckOffset > offset) {
-                        dst_end = dateToCheck;
-                    }
-                    offset = dateToCheckOffset;
-                }
-
-                current += 86400000;
-            }
-
-            if (dst_start && dst_end) {
-                return {
-                    s: find_dst_fold(dst_start).getTime(),
-                    e: find_dst_fold(dst_end).getTime()
-                };
-            }
-
-            return false;
-        },
-
-        /**
-         * Probably completely unnecessary function that recursively finds the
-         * exact (to the second) time when a DST rule was changed.
-         *
-         * @param a_date - The candidate Date.
-         * @param padding - integer specifying the padding to allow around the candidate
-         *                  date for finding the fold.
-         * @param iterator - integer specifying how many milliseconds to iterate while
-         *                   searching for the fold.
-         *
-         * @returns {Date}
-         */
-        find_dst_fold = function find_dst_fold(a_date, padding, iterator) {
-            if (typeof padding === 'undefined') {
-                padding = consts.DAY;
-                iterator = consts.HOUR;
-            }
-
-            var date_start = new Date(a_date.getTime() - padding).getTime();
-            var date_end = a_date.getTime() + padding;
-            var offset = new Date(date_start).getTimezoneOffset();
-
-            var current = date_start;
-
-            var dst_change = null;
-            while (current < date_end - iterator) {
-                var dateToCheck = new Date(current);
-                var dateToCheckOffset = dateToCheck.getTimezoneOffset();
-
-                if (dateToCheckOffset !== offset) {
-                    dst_change = dateToCheck;
-                    break;
-                }
-                current += iterator;
-            }
-
-            if (padding === consts.DAY) {
-                return find_dst_fold(dst_change, consts.HOUR, consts.MINUTE);
-            }
-
-            if (padding === consts.HOUR) {
-                return find_dst_fold(dst_change, consts.MINUTE, consts.SECOND);
-            }
-
-            return dst_change;
-        },
-
-        windows7_adaptations = function windows7_adaptions(rule_list, preliminary_timezone, score, sample) {
-            if (score !== 'N/A') {
-                return score;
-            }
-            if (preliminary_timezone === 'Asia/Beirut') {
-                if (sample.name === 'Africa/Cairo') {
-                    if (rule_list[6].s === 1398376800000 && rule_list[6].e === 1411678800000) {
-                        return 0;
-                    }
-                }
-                if (sample.name === 'Asia/Jerusalem') {
-                    if (rule_list[6].s === 1395964800000 && rule_list[6].e === 1411858800000) {
-                        return 0;
-                }
-            }
-            } else if (preliminary_timezone === 'America/Santiago') {
-                if (sample.name === 'America/Asuncion') {
-                    if (rule_list[6].s === 1412481600000 && rule_list[6].e === 1397358000000) {
-                        return 0;
-                    }
-                }
-                if (sample.name === 'America/Campo_Grande') {
-                    if (rule_list[6].s === 1413691200000 && rule_list[6].e === 1392519600000) {
-                        return 0;
-                    }
-                }
-            } else if (preliminary_timezone === 'America/Montevideo') {
-                if (sample.name === 'America/Sao_Paulo') {
-                    if (rule_list[6].s === 1413687600000 && rule_list[6].e === 1392516000000) {
-                        return 0;
-                    }
-                }
-            } else if (preliminary_timezone === 'Pacific/Auckland') {
-                if (sample.name === 'Pacific/Fiji') {
-                    if (rule_list[6].s === 1414245600000 && rule_list[6].e === 1396101600000) {
-                        return 0;
-                    }
-                }
-            }
-
-            return score;
-        },
-
-        /**
-         * Takes the DST rules for the current timezone, and proceeds to find matches
-         * in the jstz.olson.dst_rules.zones array.
-         *
-         * Compares samples to the current timezone on a scoring basis.
-         *
-         * Candidates are ruled immediately if either the candidate or the current zone
-         * has a DST rule where the other does not.
-         *
-         * Candidates are ruled out immediately if the current zone has a rule that is
-         * outside the DST scope of the candidate.
-         *
-         * Candidates are included for scoring if the current zones rules fall within the
-         * span of the samples rules.
-         *
-         * Low score is best, the score is calculated by summing up the differences in DST
-         * rules and if the consts.MAX_SCORE is overreached the candidate is ruled out.
-         *
-         * Yah follow? :)
-         *
-         * @param rule_list
-         * @param preliminary_timezone
-         * @returns {*}
-         */
-        best_dst_match = function best_dst_match(rule_list, preliminary_timezone) {
-            var score_sample = function score_sample(sample) {
-                var score = 0;
-
-                for (var j = 0; j < rule_list.length; j++) {
-
-                    // Both sample and current time zone report DST during the year.
-                    if (!!sample.rules[j] && !!rule_list[j]) {
-
-                        // The current time zone's DST rules are inside the sample's. Include.
-                        if (rule_list[j].s >= sample.rules[j].s && rule_list[j].e <= sample.rules[j].e) {
-                            score = 0;
-                            score += Math.abs(rule_list[j].s - sample.rules[j].s);
-                            score += Math.abs(sample.rules[j].e - rule_list[j].e);
-
-                        // The current time zone's DST rules are outside the sample's. Discard.
-                        } else {
-                            score = 'N/A';
-                            break;
-                        }
-
-                        // The max score has been reached. Discard.
-                        if (score > consts.MAX_SCORE) {
-                            score = 'N/A';
-                            break;
-                        }
-                    }
-                }
-
-                score = windows7_adaptations(rule_list, preliminary_timezone, score, sample);
-
-                return score;
-            };
-            var scoreboard = {};
-            var dst_zones = jstz.olson.dst_rules.zones;
-            var dst_zones_length = dst_zones.length;
-            var ambiguities = consts.AMBIGUITIES[preliminary_timezone];
-
-            for (var i = 0; i < dst_zones_length; i++) {
-                var sample = dst_zones[i];
-                var score = score_sample(dst_zones[i]);
-
-                if (score !== 'N/A') {
-                    scoreboard[sample.name] = score;
-                }
-            }
-
-            for (var tz in scoreboard) {
-                if (scoreboard.hasOwnProperty(tz)) {
-                    for (var j = 0; j < ambiguities.length; j++) {
-                        if (ambiguities[j] === tz) {
-                            return tz;
-                        }
-                    }
-                }
-            }
-
-            return preliminary_timezone;
-        },
-
-        /**
-         * Takes the preliminary_timezone as detected by lookup_key().
-         *
-         * Builds up the current timezones DST rules for the years defined
-         * in the jstz.olson.dst_rules.years array.
-         *
-         * If there are no DST occurences for those years, immediately returns
-         * the preliminary timezone. Otherwise proceeds and tries to solve
-         * ambiguities.
-         *
-         * @param preliminary_timezone
-         * @returns {String} timezone_name
-         */
-        get_by_dst = function get_by_dst(preliminary_timezone) {
-            var get_rules = function get_rules() {
-                var rule_list = [];
-                for (var i = 0; i < jstz.olson.dst_rules.years.length; i++) {
-                    var year_rules = dst_dates(jstz.olson.dst_rules.years[i]);
-                    rule_list.push(year_rules);
-                }
-                return rule_list;
-            };
-            var check_has_dst = function check_has_dst(rules) {
-                for (var i = 0; i < rules.length; i++) {
-                    if (rules[i] !== false) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-            var rules = get_rules();
-            var has_dst = check_has_dst(rules);
-
-            if (has_dst) {
-                return best_dst_match(rules, preliminary_timezone);
-            }
-
-            return preliminary_timezone;
-        },
-
-        /**
-         * Uses get_timezone_info() to formulate a key to use in the olson.timezones dictionary.
-         *
-         * Returns an object with one function ".name()"
-         *
-         * @returns Object
-         */
-        determine = function determine() {
-            var preliminary_tz = get_from_internationalization_api();
-
-            if (!preliminary_tz) {
-                preliminary_tz = jstz.olson.timezones[lookup_key()];
-
-                if (typeof consts.AMBIGUITIES[preliminary_tz] !== 'undefined') {
-                    preliminary_tz = get_by_dst(preliminary_tz);
-                }
-            }
-
-            return {
-                name: function () {
-                    return preliminary_tz;
-                }
-            };
-        };
-
-    return {
-        determine: determine
-    };
-}());
-
-
-jstz.olson = jstz.olson || {};
-
-/**
- * The keys in this dictionary are comma separated as such:
- *
- * First the offset compared to UTC time in minutes.
- *
- * Then a flag which is 0 if the timezone does not take daylight savings into account and 1 if it
- * does.
- *
- * Thirdly an optional 's' signifies that the timezone is in the southern hemisphere,
- * only interesting for timezones with DST.
- *
- * The mapped arrays is used for constructing the jstz.TimeZone object from within
- * jstz.determine();
- */
-jstz.olson.timezones = {
-    '-720,0': 'Etc/GMT+12',
-    '-660,0': 'Pacific/Pago_Pago',
-    '-660,1,s': 'Pacific/Apia', // Why? Because windows... cry!
-    '-600,1': 'America/Adak',
-    '-600,0': 'Pacific/Honolulu',
-    '-570,0': 'Pacific/Marquesas',
-    '-540,0': 'Pacific/Gambier',
-    '-540,1': 'America/Anchorage',
-    '-480,1': 'America/Los_Angeles',
-    '-480,0': 'Pacific/Pitcairn',
-    '-420,0': 'America/Phoenix',
-    '-420,1': 'America/Denver',
-    '-360,0': 'America/Guatemala',
-    '-360,1': 'America/Chicago',
-    '-360,1,s': 'Pacific/Easter',
-    '-300,0': 'America/Bogota',
-    '-300,1': 'America/New_York',
-    '-270,0': 'America/Caracas',
-    '-240,1': 'America/Halifax',
-    '-240,0': 'America/Santo_Domingo',
-    '-240,1,s': 'America/Asuncion',
-    '-210,1': 'America/St_Johns',
-    '-180,1': 'America/Godthab',
-    '-180,0': 'America/Argentina/Buenos_Aires',
-    '-180,1,s': 'America/Montevideo',
-    '-120,0': 'America/Noronha',
-    '-120,1': 'America/Noronha',
-    '-60,1': 'Atlantic/Azores',
-    '-60,0': 'Atlantic/Cape_Verde',
-    '0,0': 'UTC',
-    '0,1': 'Europe/London',
-    '60,1': 'Europe/Berlin',
-    '60,0': 'Africa/Lagos',
-    '60,1,s': 'Africa/Windhoek',
-    '120,1': 'Asia/Beirut',
-    '120,0': 'Africa/Johannesburg',
-    '180,0': 'Asia/Baghdad',
-    '180,1': 'Europe/Moscow',
-    '210,1': 'Asia/Tehran',
-    '240,0': 'Asia/Dubai',
-    '240,1': 'Asia/Baku',
-    '270,0': 'Asia/Kabul',
-    '300,1': 'Asia/Yekaterinburg',
-    '300,0': 'Asia/Karachi',
-    '330,0': 'Asia/Kolkata',
-    '345,0': 'Asia/Kathmandu',
-    '360,0': 'Asia/Dhaka',
-    '360,1': 'Asia/Omsk',
-    '390,0': 'Asia/Rangoon',
-    '420,1': 'Asia/Krasnoyarsk',
-    '420,0': 'Asia/Jakarta',
-    '480,0': 'Asia/Shanghai',
-    '480,1': 'Asia/Irkutsk',
-    '525,0': 'Australia/Eucla',
-    '525,1,s': 'Australia/Eucla',
-    '540,1': 'Asia/Yakutsk',
-    '540,0': 'Asia/Tokyo',
-    '570,0': 'Australia/Darwin',
-    '570,1,s': 'Australia/Adelaide',
-    '600,0': 'Australia/Brisbane',
-    '600,1': 'Asia/Vladivostok',
-    '600,1,s': 'Australia/Sydney',
-    '630,1,s': 'Australia/Lord_Howe',
-    '660,1': 'Asia/Kamchatka',
-    '660,0': 'Pacific/Noumea',
-    '690,0': 'Pacific/Norfolk',
-    '720,1,s': 'Pacific/Auckland',
-    '720,0': 'Pacific/Majuro',
-    '765,1,s': 'Pacific/Chatham',
-    '780,0': 'Pacific/Tongatapu',
-    '780,1,s': 'Pacific/Apia',
-    '840,0': 'Pacific/Kiritimati'
-};
-
-/* Build time: 2015-11-02 13:01:00Z Build by invoking python utilities/dst.py generate */
-jstz.olson.dst_rules = {
-    "years": [
-        2008,
-        2009,
-        2010,
-        2011,
-        2012,
-        2013,
-        2014
-    ],
-    "zones": [
-        {
-            "name": "Africa/Cairo",
-            "rules": [
-                {
-                    "e": 1219957200000,
-                    "s": 1209074400000
-                },
-                {
-                    "e": 1250802000000,
-                    "s": 1240524000000
-                },
-                {
-                    "e": 1285880400000,
-                    "s": 1284069600000
-                },
-                false,
-                false,
-                false,
-                {
-                    "e": 1411678800000,
-                    "s": 1406844000000
-                }
-            ]
-        },
-        {
-            "name": "Africa/Casablanca",
-            "rules": [
-                {
-                    "e": 1220223600000,
-                    "s": 1212278400000
-                },
-                {
-                    "e": 1250809200000,
-                    "s": 1243814400000
-                },
-                {
-                    "e": 1281222000000,
-                    "s": 1272758400000
-                },
-                {
-                    "e": 1312066800000,
-                    "s": 1301788800000
-                },
-                {
-                    "e": 1348970400000,
-                    "s": 1345428000000
-                },
-                {
-                    "e": 1382839200000,
-                    "s": 1376100000000
-                },
-                {
-                    "e": 1414288800000,
-                    "s": 1406944800000
-                }
-            ]
-        },
-        {
-            "name": "America/Asuncion",
-            "rules": [
-                {
-                    "e": 1205031600000,
-                    "s": 1224388800000
-                },
-                {
-                    "e": 1236481200000,
-                    "s": 1255838400000
-                },
-                {
-                    "e": 1270954800000,
-                    "s": 1286078400000
-                },
-                {
-                    "e": 1302404400000,
-                    "s": 1317528000000
-                },
-                {
-                    "e": 1333854000000,
-                    "s": 1349582400000
-                },
-                {
-                    "e": 1364094000000,
-                    "s": 1381032000000
-                },
-                {
-                    "e": 1395543600000,
-                    "s": 1412481600000
-                }
-            ]
-        },
-        {
-            "name": "America/Campo_Grande",
-            "rules": [
-                {
-                    "e": 1203217200000,
-                    "s": 1224388800000
-                },
-                {
-                    "e": 1234666800000,
-                    "s": 1255838400000
-                },
-                {
-                    "e": 1266721200000,
-                    "s": 1287288000000
-                },
-                {
-                    "e": 1298170800000,
-                    "s": 1318737600000
-                },
-                {
-                    "e": 1330225200000,
-                    "s": 1350792000000
-                },
-                {
-                    "e": 1361070000000,
-                    "s": 1382241600000
-                },
-                {
-                    "e": 1392519600000,
-                    "s": 1413691200000
-                }
-            ]
-        },
-        {
-            "name": "America/Goose_Bay",
-            "rules": [
-                {
-                    "e": 1225594860000,
-                    "s": 1205035260000
-                },
-                {
-                    "e": 1257044460000,
-                    "s": 1236484860000
-                },
-                {
-                    "e": 1289098860000,
-                    "s": 1268539260000
-                },
-                {
-                    "e": 1320555600000,
-                    "s": 1299988860000
-                },
-                {
-                    "e": 1352005200000,
-                    "s": 1331445600000
-                },
-                {
-                    "e": 1383454800000,
-                    "s": 1362895200000
-                },
-                {
-                    "e": 1414904400000,
-                    "s": 1394344800000
-                }
-            ]
-        },
-        {
-            "name": "America/Havana",
-            "rules": [
-                {
-                    "e": 1224997200000,
-                    "s": 1205643600000
-                },
-                {
-                    "e": 1256446800000,
-                    "s": 1236488400000
-                },
-                {
-                    "e": 1288501200000,
-                    "s": 1268542800000
-                },
-                {
-                    "e": 1321160400000,
-                    "s": 1300597200000
-                },
-                {
-                    "e": 1352005200000,
-                    "s": 1333256400000
-                },
-                {
-                    "e": 1383454800000,
-                    "s": 1362891600000
-                },
-                {
-                    "e": 1414904400000,
-                    "s": 1394341200000
-                }
-            ]
-        },
-        {
-            "name": "America/Mazatlan",
-            "rules": [
-                {
-                    "e": 1225008000000,
-                    "s": 1207472400000
-                },
-                {
-                    "e": 1256457600000,
-                    "s": 1238922000000
-                },
-                {
-                    "e": 1288512000000,
-                    "s": 1270371600000
-                },
-                {
-                    "e": 1319961600000,
-                    "s": 1301821200000
-                },
-                {
-                    "e": 1351411200000,
-                    "s": 1333270800000
-                },
-                {
-                    "e": 1382860800000,
-                    "s": 1365325200000
-                },
-                {
-                    "e": 1414310400000,
-                    "s": 1396774800000
-                }
-            ]
-        },
-        {
-            "name": "America/Mexico_City",
-            "rules": [
-                {
-                    "e": 1225004400000,
-                    "s": 1207468800000
-                },
-                {
-                    "e": 1256454000000,
-                    "s": 1238918400000
-                },
-                {
-                    "e": 1288508400000,
-                    "s": 1270368000000
-                },
-                {
-                    "e": 1319958000000,
-                    "s": 1301817600000
-                },
-                {
-                    "e": 1351407600000,
-                    "s": 1333267200000
-                },
-                {
-                    "e": 1382857200000,
-                    "s": 1365321600000
-                },
-                {
-                    "e": 1414306800000,
-                    "s": 1396771200000
-                }
-            ]
-        },
-        {
-            "name": "America/Miquelon",
-            "rules": [
-                {
-                    "e": 1225598400000,
-                    "s": 1205038800000
-                },
-                {
-                    "e": 1257048000000,
-                    "s": 1236488400000
-                },
-                {
-                    "e": 1289102400000,
-                    "s": 1268542800000
-                },
-                {
-                    "e": 1320552000000,
-                    "s": 1299992400000
-                },
-                {
-                    "e": 1352001600000,
-                    "s": 1331442000000
-                },
-                {
-                    "e": 1383451200000,
-                    "s": 1362891600000
-                },
-                {
-                    "e": 1414900800000,
-                    "s": 1394341200000
-                }
-            ]
-        },
-        {
-            "name": "America/Santa_Isabel",
-            "rules": [
-                {
-                    "e": 1225011600000,
-                    "s": 1207476000000
-                },
-                {
-                    "e": 1256461200000,
-                    "s": 1238925600000
-                },
-                {
-                    "e": 1288515600000,
-                    "s": 1270375200000
-                },
-                {
-                    "e": 1319965200000,
-                    "s": 1301824800000
-                },
-                {
-                    "e": 1351414800000,
-                    "s": 1333274400000
-                },
-                {
-                    "e": 1382864400000,
-                    "s": 1365328800000
-                },
-                {
-                    "e": 1414314000000,
-                    "s": 1396778400000
-                }
-            ]
-        },
-        {
-            "name": "America/Santiago",
-            "rules": [
-                {
-                    "e": 1206846000000,
-                    "s": 1223784000000
-                },
-                {
-                    "e": 1237086000000,
-                    "s": 1255233600000
-                },
-                {
-                    "e": 1270350000000,
-                    "s": 1286683200000
-                },
-                {
-                    "e": 1304823600000,
-                    "s": 1313899200000
-                },
-                {
-                    "e": 1335668400000,
-                    "s": 1346558400000
-                },
-                {
-                    "e": 1367118000000,
-                    "s": 1378612800000
-                },
-                {
-                    "e": 1398567600000,
-                    "s": 1410062400000
-                }
-            ]
-        },
-        {
-            "name": "America/Sao_Paulo",
-            "rules": [
-                {
-                    "e": 1203213600000,
-                    "s": 1224385200000
-                },
-                {
-                    "e": 1234663200000,
-                    "s": 1255834800000
-                },
-                {
-                    "e": 1266717600000,
-                    "s": 1287284400000
-                },
-                {
-                    "e": 1298167200000,
-                    "s": 1318734000000
-                },
-                {
-                    "e": 1330221600000,
-                    "s": 1350788400000
-                },
-                {
-                    "e": 1361066400000,
-                    "s": 1382238000000
-                },
-                {
-                    "e": 1392516000000,
-                    "s": 1413687600000
-                }
-            ]
-        },
-        {
-            "name": "Asia/Amman",
-            "rules": [
-                {
-                    "e": 1225404000000,
-                    "s": 1206655200000
-                },
-                {
-                    "e": 1256853600000,
-                    "s": 1238104800000
-                },
-                {
-                    "e": 1288303200000,
-                    "s": 1269554400000
-                },
-                {
-                    "e": 1319752800000,
-                    "s": 1301608800000
-                },
-                false,
-                false,
-                {
-                    "e": 1414706400000,
-                    "s": 1395957600000
-                }
-            ]
-        },
-        {
-            "name": "Asia/Damascus",
-            "rules": [
-                {
-                    "e": 1225486800000,
-                    "s": 1207260000000
-                },
-                {
-                    "e": 1256850000000,
-                    "s": 1238104800000
-                },
-                {
-                    "e": 1288299600000,
-                    "s": 1270159200000
-                },
-                {
-                    "e": 1319749200000,
-                    "s": 1301608800000
-                },
-                {
-                    "e": 1351198800000,
-                    "s": 1333058400000
-                },
-                {
-                    "e": 1382648400000,
-                    "s": 1364508000000
-                },
-                {
-                    "e": 1414702800000,
-                    "s": 1395957600000
-                }
-            ]
-        },
-        {
-            "name": "Asia/Dubai",
-            "rules": [
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Gaza",
-            "rules": [
-                {
-                    "e": 1219957200000,
-                    "s": 1206655200000
-                },
-                {
-                    "e": 1252015200000,
-                    "s": 1238104800000
-                },
-                {
-                    "e": 1281474000000,
-                    "s": 1269640860000
-                },
-                {
-                    "e": 1312146000000,
-                    "s": 1301608860000
-                },
-                {
-                    "e": 1348178400000,
-                    "s": 1333058400000
-                },
-                {
-                    "e": 1380229200000,
-                    "s": 1364508000000
-                },
-                {
-                    "e": 1414098000000,
-                    "s": 1395957600000
-                }
-            ]
-        },
-        {
-            "name": "Asia/Irkutsk",
-            "rules": [
-                {
-                    "e": 1224957600000,
-                    "s": 1206813600000
-                },
-                {
-                    "e": 1256407200000,
-                    "s": 1238263200000
-                },
-                {
-                    "e": 1288461600000,
-                    "s": 1269712800000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Jerusalem",
-            "rules": [
-                {
-                    "e": 1223161200000,
-                    "s": 1206662400000
-                },
-                {
-                    "e": 1254006000000,
-                    "s": 1238112000000
-                },
-                {
-                    "e": 1284246000000,
-                    "s": 1269561600000
-                },
-                {
-                    "e": 1317510000000,
-                    "s": 1301616000000
-                },
-                {
-                    "e": 1348354800000,
-                    "s": 1333065600000
-                },
-                {
-                    "e": 1382828400000,
-                    "s": 1364515200000
-                },
-                {
-                    "e": 1414278000000,
-                    "s": 1395964800000
-                }
-            ]
-        },
-        {
-            "name": "Asia/Kamchatka",
-            "rules": [
-                {
-                    "e": 1224943200000,
-                    "s": 1206799200000
-                },
-                {
-                    "e": 1256392800000,
-                    "s": 1238248800000
-                },
-                {
-                    "e": 1288450800000,
-                    "s": 1269698400000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Krasnoyarsk",
-            "rules": [
-                {
-                    "e": 1224961200000,
-                    "s": 1206817200000
-                },
-                {
-                    "e": 1256410800000,
-                    "s": 1238266800000
-                },
-                {
-                    "e": 1288465200000,
-                    "s": 1269716400000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Omsk",
-            "rules": [
-                {
-                    "e": 1224964800000,
-                    "s": 1206820800000
-                },
-                {
-                    "e": 1256414400000,
-                    "s": 1238270400000
-                },
-                {
-                    "e": 1288468800000,
-                    "s": 1269720000000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Vladivostok",
-            "rules": [
-                {
-                    "e": 1224950400000,
-                    "s": 1206806400000
-                },
-                {
-                    "e": 1256400000000,
-                    "s": 1238256000000
-                },
-                {
-                    "e": 1288454400000,
-                    "s": 1269705600000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Yakutsk",
-            "rules": [
-                {
-                    "e": 1224954000000,
-                    "s": 1206810000000
-                },
-                {
-                    "e": 1256403600000,
-                    "s": 1238259600000
-                },
-                {
-                    "e": 1288458000000,
-                    "s": 1269709200000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Yekaterinburg",
-            "rules": [
-                {
-                    "e": 1224968400000,
-                    "s": 1206824400000
-                },
-                {
-                    "e": 1256418000000,
-                    "s": 1238274000000
-                },
-                {
-                    "e": 1288472400000,
-                    "s": 1269723600000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Asia/Yerevan",
-            "rules": [
-                {
-                    "e": 1224972000000,
-                    "s": 1206828000000
-                },
-                {
-                    "e": 1256421600000,
-                    "s": 1238277600000
-                },
-                {
-                    "e": 1288476000000,
-                    "s": 1269727200000
-                },
-                {
-                    "e": 1319925600000,
-                    "s": 1301176800000
-                },
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Australia/Lord_Howe",
-            "rules": [
-                {
-                    "e": 1207407600000,
-                    "s": 1223134200000
-                },
-                {
-                    "e": 1238857200000,
-                    "s": 1254583800000
-                },
-                {
-                    "e": 1270306800000,
-                    "s": 1286033400000
-                },
-                {
-                    "e": 1301756400000,
-                    "s": 1317483000000
-                },
-                {
-                    "e": 1333206000000,
-                    "s": 1349537400000
-                },
-                {
-                    "e": 1365260400000,
-                    "s": 1380987000000
-                },
-                {
-                    "e": 1396710000000,
-                    "s": 1412436600000
-                }
-            ]
-        },
-        {
-            "name": "Australia/Perth",
-            "rules": [
-                {
-                    "e": 1206813600000,
-                    "s": 1224957600000
-                },
-                false,
-                false,
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Europe/Helsinki",
-            "rules": [
-                {
-                    "e": 1224982800000,
-                    "s": 1206838800000
-                },
-                {
-                    "e": 1256432400000,
-                    "s": 1238288400000
-                },
-                {
-                    "e": 1288486800000,
-                    "s": 1269738000000
-                },
-                {
-                    "e": 1319936400000,
-                    "s": 1301187600000
-                },
-                {
-                    "e": 1351386000000,
-                    "s": 1332637200000
-                },
-                {
-                    "e": 1382835600000,
-                    "s": 1364691600000
-                },
-                {
-                    "e": 1414285200000,
-                    "s": 1396141200000
-                }
-            ]
-        },
-        {
-            "name": "Europe/Minsk",
-            "rules": [
-                {
-                    "e": 1224979200000,
-                    "s": 1206835200000
-                },
-                {
-                    "e": 1256428800000,
-                    "s": 1238284800000
-                },
-                {
-                    "e": 1288483200000,
-                    "s": 1269734400000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Europe/Moscow",
-            "rules": [
-                {
-                    "e": 1224975600000,
-                    "s": 1206831600000
-                },
-                {
-                    "e": 1256425200000,
-                    "s": 1238281200000
-                },
-                {
-                    "e": 1288479600000,
-                    "s": 1269730800000
-                },
-                false,
-                false,
-                false,
-                false
-            ]
-        },
-        {
-            "name": "Pacific/Apia",
-            "rules": [
-                false,
-                false,
-                false,
-                {
-                    "e": 1301752800000,
-                    "s": 1316872800000
-                },
-                {
-                    "e": 1333202400000,
-                    "s": 1348927200000
-                },
-                {
-                    "e": 1365256800000,
-                    "s": 1380376800000
-                },
-                {
-                    "e": 1396706400000,
-                    "s": 1411826400000
-                }
-            ]
-        },
-        {
-            "name": "Pacific/Fiji",
-            "rules": [
-                false,
-                false,
-                {
-                    "e": 1269698400000,
-                    "s": 1287842400000
-                },
-                {
-                    "e": 1327154400000,
-                    "s": 1319292000000
-                },
-                {
-                    "e": 1358604000000,
-                    "s": 1350741600000
-                },
-                {
-                    "e": 1390050000000,
-                    "s": 1382796000000
-                },
-                {
-                    "e": 1421503200000,
-                    "s": 1414850400000
-                }
-            ]
-        },
-        {
-            "name": "Europe/London",
-            "rules": [
-                {
-                    "e": 1224982800000,
-                    "s": 1206838800000
-                },
-                {
-                    "e": 1256432400000,
-                    "s": 1238288400000
-                },
-                {
-                    "e": 1288486800000,
-                    "s": 1269738000000
-                },
-                {
-                    "e": 1319936400000,
-                    "s": 1301187600000
-                },
-                {
-                    "e": 1351386000000,
-                    "s": 1332637200000
-                },
-                {
-                    "e": 1382835600000,
-                    "s": 1364691600000
-                },
-                {
-                    "e": 1414285200000,
-                    "s": 1396141200000
-                }
-            ]
-        }
-    ]
-};
-if ( true && typeof module.exports !== 'undefined') {
-    module.exports = jstz;
-} else if (( true && __webpack_require__(/*! !webpack amd define */ "./node_modules/webpack/buildin/amd-define.js") !== null) && (__webpack_require__(/*! !webpack amd options */ "./node_modules/webpack/buildin/amd-options.js") != null)) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
-        return jstz;
-    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-} else {
-    if (typeof root === 'undefined') {
-        window.jstz = jstz;
-    } else {
-        root.jstz = jstz;
-    }
-}
-}());
-
-
-/***/ }),
-
-/***/ "./node_modules/lodash/_DataView.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_DataView.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js"),
-    root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js"),
+    root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /* Built-in method references that are verified to be native. */
 var DataView = getNative(root, 'DataView');
@@ -65494,18 +57996,18 @@ module.exports = DataView;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Hash.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/_Hash.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Hash.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Hash.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var hashClear = __webpack_require__(/*! ./_hashClear */ "./node_modules/lodash/_hashClear.js"),
-    hashDelete = __webpack_require__(/*! ./_hashDelete */ "./node_modules/lodash/_hashDelete.js"),
-    hashGet = __webpack_require__(/*! ./_hashGet */ "./node_modules/lodash/_hashGet.js"),
-    hashHas = __webpack_require__(/*! ./_hashHas */ "./node_modules/lodash/_hashHas.js"),
-    hashSet = __webpack_require__(/*! ./_hashSet */ "./node_modules/lodash/_hashSet.js");
+var hashClear = __webpack_require__(/*! ./_hashClear */ "./node_modules/formiojs/node_modules/lodash/_hashClear.js"),
+    hashDelete = __webpack_require__(/*! ./_hashDelete */ "./node_modules/formiojs/node_modules/lodash/_hashDelete.js"),
+    hashGet = __webpack_require__(/*! ./_hashGet */ "./node_modules/formiojs/node_modules/lodash/_hashGet.js"),
+    hashHas = __webpack_require__(/*! ./_hashHas */ "./node_modules/formiojs/node_modules/lodash/_hashHas.js"),
+    hashSet = __webpack_require__(/*! ./_hashSet */ "./node_modules/formiojs/node_modules/lodash/_hashSet.js");
 
 /**
  * Creates a hash object.
@@ -65537,18 +58039,18 @@ module.exports = Hash;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_ListCache.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_ListCache.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_ListCache.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_ListCache.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var listCacheClear = __webpack_require__(/*! ./_listCacheClear */ "./node_modules/lodash/_listCacheClear.js"),
-    listCacheDelete = __webpack_require__(/*! ./_listCacheDelete */ "./node_modules/lodash/_listCacheDelete.js"),
-    listCacheGet = __webpack_require__(/*! ./_listCacheGet */ "./node_modules/lodash/_listCacheGet.js"),
-    listCacheHas = __webpack_require__(/*! ./_listCacheHas */ "./node_modules/lodash/_listCacheHas.js"),
-    listCacheSet = __webpack_require__(/*! ./_listCacheSet */ "./node_modules/lodash/_listCacheSet.js");
+var listCacheClear = __webpack_require__(/*! ./_listCacheClear */ "./node_modules/formiojs/node_modules/lodash/_listCacheClear.js"),
+    listCacheDelete = __webpack_require__(/*! ./_listCacheDelete */ "./node_modules/formiojs/node_modules/lodash/_listCacheDelete.js"),
+    listCacheGet = __webpack_require__(/*! ./_listCacheGet */ "./node_modules/formiojs/node_modules/lodash/_listCacheGet.js"),
+    listCacheHas = __webpack_require__(/*! ./_listCacheHas */ "./node_modules/formiojs/node_modules/lodash/_listCacheHas.js"),
+    listCacheSet = __webpack_require__(/*! ./_listCacheSet */ "./node_modules/formiojs/node_modules/lodash/_listCacheSet.js");
 
 /**
  * Creates an list cache object.
@@ -65580,15 +58082,15 @@ module.exports = ListCache;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Map.js":
-/*!*************************************!*\
-  !*** ./node_modules/lodash/_Map.js ***!
-  \*************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Map.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Map.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js"),
-    root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js"),
+    root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /* Built-in method references that are verified to be native. */
 var Map = getNative(root, 'Map');
@@ -65598,18 +58100,18 @@ module.exports = Map;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_MapCache.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_MapCache.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_MapCache.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_MapCache.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var mapCacheClear = __webpack_require__(/*! ./_mapCacheClear */ "./node_modules/lodash/_mapCacheClear.js"),
-    mapCacheDelete = __webpack_require__(/*! ./_mapCacheDelete */ "./node_modules/lodash/_mapCacheDelete.js"),
-    mapCacheGet = __webpack_require__(/*! ./_mapCacheGet */ "./node_modules/lodash/_mapCacheGet.js"),
-    mapCacheHas = __webpack_require__(/*! ./_mapCacheHas */ "./node_modules/lodash/_mapCacheHas.js"),
-    mapCacheSet = __webpack_require__(/*! ./_mapCacheSet */ "./node_modules/lodash/_mapCacheSet.js");
+var mapCacheClear = __webpack_require__(/*! ./_mapCacheClear */ "./node_modules/formiojs/node_modules/lodash/_mapCacheClear.js"),
+    mapCacheDelete = __webpack_require__(/*! ./_mapCacheDelete */ "./node_modules/formiojs/node_modules/lodash/_mapCacheDelete.js"),
+    mapCacheGet = __webpack_require__(/*! ./_mapCacheGet */ "./node_modules/formiojs/node_modules/lodash/_mapCacheGet.js"),
+    mapCacheHas = __webpack_require__(/*! ./_mapCacheHas */ "./node_modules/formiojs/node_modules/lodash/_mapCacheHas.js"),
+    mapCacheSet = __webpack_require__(/*! ./_mapCacheSet */ "./node_modules/formiojs/node_modules/lodash/_mapCacheSet.js");
 
 /**
  * Creates a map cache object to store key-value pairs.
@@ -65641,15 +58143,15 @@ module.exports = MapCache;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Promise.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_Promise.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Promise.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Promise.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js"),
-    root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js"),
+    root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /* Built-in method references that are verified to be native. */
 var Promise = getNative(root, 'Promise');
@@ -65659,15 +58161,15 @@ module.exports = Promise;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Set.js":
-/*!*************************************!*\
-  !*** ./node_modules/lodash/_Set.js ***!
-  \*************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Set.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Set.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js"),
-    root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js"),
+    root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /* Built-in method references that are verified to be native. */
 var Set = getNative(root, 'Set');
@@ -65677,16 +58179,16 @@ module.exports = Set;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_SetCache.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_SetCache.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_SetCache.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_SetCache.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var MapCache = __webpack_require__(/*! ./_MapCache */ "./node_modules/lodash/_MapCache.js"),
-    setCacheAdd = __webpack_require__(/*! ./_setCacheAdd */ "./node_modules/lodash/_setCacheAdd.js"),
-    setCacheHas = __webpack_require__(/*! ./_setCacheHas */ "./node_modules/lodash/_setCacheHas.js");
+var MapCache = __webpack_require__(/*! ./_MapCache */ "./node_modules/formiojs/node_modules/lodash/_MapCache.js"),
+    setCacheAdd = __webpack_require__(/*! ./_setCacheAdd */ "./node_modules/formiojs/node_modules/lodash/_setCacheAdd.js"),
+    setCacheHas = __webpack_require__(/*! ./_setCacheHas */ "./node_modules/formiojs/node_modules/lodash/_setCacheHas.js");
 
 /**
  *
@@ -65715,19 +58217,19 @@ module.exports = SetCache;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Stack.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/_Stack.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Stack.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Stack.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/lodash/_ListCache.js"),
-    stackClear = __webpack_require__(/*! ./_stackClear */ "./node_modules/lodash/_stackClear.js"),
-    stackDelete = __webpack_require__(/*! ./_stackDelete */ "./node_modules/lodash/_stackDelete.js"),
-    stackGet = __webpack_require__(/*! ./_stackGet */ "./node_modules/lodash/_stackGet.js"),
-    stackHas = __webpack_require__(/*! ./_stackHas */ "./node_modules/lodash/_stackHas.js"),
-    stackSet = __webpack_require__(/*! ./_stackSet */ "./node_modules/lodash/_stackSet.js");
+var ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/formiojs/node_modules/lodash/_ListCache.js"),
+    stackClear = __webpack_require__(/*! ./_stackClear */ "./node_modules/formiojs/node_modules/lodash/_stackClear.js"),
+    stackDelete = __webpack_require__(/*! ./_stackDelete */ "./node_modules/formiojs/node_modules/lodash/_stackDelete.js"),
+    stackGet = __webpack_require__(/*! ./_stackGet */ "./node_modules/formiojs/node_modules/lodash/_stackGet.js"),
+    stackHas = __webpack_require__(/*! ./_stackHas */ "./node_modules/formiojs/node_modules/lodash/_stackHas.js"),
+    stackSet = __webpack_require__(/*! ./_stackSet */ "./node_modules/formiojs/node_modules/lodash/_stackSet.js");
 
 /**
  * Creates a stack cache object to store key-value pairs.
@@ -65753,14 +58255,14 @@ module.exports = Stack;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Symbol.js":
-/*!****************************************!*\
-  !*** ./node_modules/lodash/_Symbol.js ***!
-  \****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Symbol.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Symbol.js ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /** Built-in value references. */
 var Symbol = root.Symbol;
@@ -65770,14 +58272,14 @@ module.exports = Symbol;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_Uint8Array.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_Uint8Array.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_Uint8Array.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_Uint8Array.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /** Built-in value references. */
 var Uint8Array = root.Uint8Array;
@@ -65787,15 +58289,15 @@ module.exports = Uint8Array;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_WeakMap.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_WeakMap.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_WeakMap.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_WeakMap.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js"),
-    root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js"),
+    root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /* Built-in method references that are verified to be native. */
 var WeakMap = getNative(root, 'WeakMap');
@@ -65805,10 +58307,10 @@ module.exports = WeakMap;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_apply.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/_apply.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_apply.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_apply.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -65837,10 +58339,10 @@ module.exports = apply;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayEach.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_arrayEach.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayEach.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayEach.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -65870,10 +58372,10 @@ module.exports = arrayEach;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayFilter.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_arrayFilter.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayFilter.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayFilter.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -65906,14 +58408,14 @@ module.exports = arrayFilter;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayIncludes.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_arrayIncludes.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayIncludes.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayIncludes.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/lodash/_baseIndexOf.js");
+var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/formiojs/node_modules/lodash/_baseIndexOf.js");
 
 /**
  * A specialized version of `_.includes` for arrays without support for
@@ -65934,10 +58436,10 @@ module.exports = arrayIncludes;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayIncludesWith.js":
-/*!***************************************************!*\
-  !*** ./node_modules/lodash/_arrayIncludesWith.js ***!
-  \***************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayIncludesWith.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayIncludesWith.js ***!
+  \*************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -65967,19 +58469,19 @@ module.exports = arrayIncludesWith;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayLikeKeys.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_arrayLikeKeys.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayLikeKeys.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayLikeKeys.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseTimes = __webpack_require__(/*! ./_baseTimes */ "./node_modules/lodash/_baseTimes.js"),
-    isArguments = __webpack_require__(/*! ./isArguments */ "./node_modules/lodash/isArguments.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isBuffer = __webpack_require__(/*! ./isBuffer */ "./node_modules/lodash/isBuffer.js"),
-    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/lodash/_isIndex.js"),
-    isTypedArray = __webpack_require__(/*! ./isTypedArray */ "./node_modules/lodash/isTypedArray.js");
+var baseTimes = __webpack_require__(/*! ./_baseTimes */ "./node_modules/formiojs/node_modules/lodash/_baseTimes.js"),
+    isArguments = __webpack_require__(/*! ./isArguments */ "./node_modules/formiojs/node_modules/lodash/isArguments.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isBuffer = __webpack_require__(/*! ./isBuffer */ "./node_modules/formiojs/node_modules/lodash/isBuffer.js"),
+    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/formiojs/node_modules/lodash/_isIndex.js"),
+    isTypedArray = __webpack_require__(/*! ./isTypedArray */ "./node_modules/formiojs/node_modules/lodash/isTypedArray.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -66027,10 +58529,10 @@ module.exports = arrayLikeKeys;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayMap.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_arrayMap.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayMap.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayMap.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66059,10 +58561,10 @@ module.exports = arrayMap;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arrayPush.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_arrayPush.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arrayPush.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arrayPush.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66090,10 +58592,10 @@ module.exports = arrayPush;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_arraySome.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_arraySome.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_arraySome.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_arraySome.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66124,14 +58626,14 @@ module.exports = arraySome;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_asciiSize.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_asciiSize.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_asciiSize.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_asciiSize.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseProperty = __webpack_require__(/*! ./_baseProperty */ "./node_modules/lodash/_baseProperty.js");
+var baseProperty = __webpack_require__(/*! ./_baseProperty */ "./node_modules/formiojs/node_modules/lodash/_baseProperty.js");
 
 /**
  * Gets the size of an ASCII `string`.
@@ -66147,10 +58649,10 @@ module.exports = asciiSize;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_asciiToArray.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_asciiToArray.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_asciiToArray.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_asciiToArray.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66170,15 +58672,15 @@ module.exports = asciiToArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_assignValue.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_assignValue.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_assignValue.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_assignValue.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseAssignValue = __webpack_require__(/*! ./_baseAssignValue */ "./node_modules/lodash/_baseAssignValue.js"),
-    eq = __webpack_require__(/*! ./eq */ "./node_modules/lodash/eq.js");
+var baseAssignValue = __webpack_require__(/*! ./_baseAssignValue */ "./node_modules/formiojs/node_modules/lodash/_baseAssignValue.js"),
+    eq = __webpack_require__(/*! ./eq */ "./node_modules/formiojs/node_modules/lodash/eq.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -66209,14 +58711,14 @@ module.exports = assignValue;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_assocIndexOf.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_assocIndexOf.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_assocIndexOf.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_assocIndexOf.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(/*! ./eq */ "./node_modules/lodash/eq.js");
+var eq = __webpack_require__(/*! ./eq */ "./node_modules/formiojs/node_modules/lodash/eq.js");
 
 /**
  * Gets the index at which the `key` is found in `array` of key-value pairs.
@@ -66241,15 +58743,15 @@ module.exports = assocIndexOf;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseAssign.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseAssign.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseAssign.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseAssign.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/lodash/_copyObject.js"),
-    keys = __webpack_require__(/*! ./keys */ "./node_modules/lodash/keys.js");
+var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/formiojs/node_modules/lodash/_copyObject.js"),
+    keys = __webpack_require__(/*! ./keys */ "./node_modules/formiojs/node_modules/lodash/keys.js");
 
 /**
  * The base implementation of `_.assign` without support for multiple sources
@@ -66269,15 +58771,15 @@ module.exports = baseAssign;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseAssignIn.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_baseAssignIn.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseAssignIn.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseAssignIn.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/lodash/_copyObject.js"),
-    keysIn = __webpack_require__(/*! ./keysIn */ "./node_modules/lodash/keysIn.js");
+var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/formiojs/node_modules/lodash/_copyObject.js"),
+    keysIn = __webpack_require__(/*! ./keysIn */ "./node_modules/formiojs/node_modules/lodash/keysIn.js");
 
 /**
  * The base implementation of `_.assignIn` without support for multiple sources
@@ -66297,14 +58799,14 @@ module.exports = baseAssignIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseAssignValue.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_baseAssignValue.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseAssignValue.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseAssignValue.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var defineProperty = __webpack_require__(/*! ./_defineProperty */ "./node_modules/lodash/_defineProperty.js");
+var defineProperty = __webpack_require__(/*! ./_defineProperty */ "./node_modules/formiojs/node_modules/lodash/_defineProperty.js");
 
 /**
  * The base implementation of `assignValue` and `assignMergeValue` without
@@ -66333,34 +58835,34 @@ module.exports = baseAssignValue;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseClone.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseClone.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseClone.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseClone.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Stack = __webpack_require__(/*! ./_Stack */ "./node_modules/lodash/_Stack.js"),
-    arrayEach = __webpack_require__(/*! ./_arrayEach */ "./node_modules/lodash/_arrayEach.js"),
-    assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/lodash/_assignValue.js"),
-    baseAssign = __webpack_require__(/*! ./_baseAssign */ "./node_modules/lodash/_baseAssign.js"),
-    baseAssignIn = __webpack_require__(/*! ./_baseAssignIn */ "./node_modules/lodash/_baseAssignIn.js"),
-    cloneBuffer = __webpack_require__(/*! ./_cloneBuffer */ "./node_modules/lodash/_cloneBuffer.js"),
-    copyArray = __webpack_require__(/*! ./_copyArray */ "./node_modules/lodash/_copyArray.js"),
-    copySymbols = __webpack_require__(/*! ./_copySymbols */ "./node_modules/lodash/_copySymbols.js"),
-    copySymbolsIn = __webpack_require__(/*! ./_copySymbolsIn */ "./node_modules/lodash/_copySymbolsIn.js"),
-    getAllKeys = __webpack_require__(/*! ./_getAllKeys */ "./node_modules/lodash/_getAllKeys.js"),
-    getAllKeysIn = __webpack_require__(/*! ./_getAllKeysIn */ "./node_modules/lodash/_getAllKeysIn.js"),
-    getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/lodash/_getTag.js"),
-    initCloneArray = __webpack_require__(/*! ./_initCloneArray */ "./node_modules/lodash/_initCloneArray.js"),
-    initCloneByTag = __webpack_require__(/*! ./_initCloneByTag */ "./node_modules/lodash/_initCloneByTag.js"),
-    initCloneObject = __webpack_require__(/*! ./_initCloneObject */ "./node_modules/lodash/_initCloneObject.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isBuffer = __webpack_require__(/*! ./isBuffer */ "./node_modules/lodash/isBuffer.js"),
-    isMap = __webpack_require__(/*! ./isMap */ "./node_modules/lodash/isMap.js"),
-    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
-    isSet = __webpack_require__(/*! ./isSet */ "./node_modules/lodash/isSet.js"),
-    keys = __webpack_require__(/*! ./keys */ "./node_modules/lodash/keys.js");
+var Stack = __webpack_require__(/*! ./_Stack */ "./node_modules/formiojs/node_modules/lodash/_Stack.js"),
+    arrayEach = __webpack_require__(/*! ./_arrayEach */ "./node_modules/formiojs/node_modules/lodash/_arrayEach.js"),
+    assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/formiojs/node_modules/lodash/_assignValue.js"),
+    baseAssign = __webpack_require__(/*! ./_baseAssign */ "./node_modules/formiojs/node_modules/lodash/_baseAssign.js"),
+    baseAssignIn = __webpack_require__(/*! ./_baseAssignIn */ "./node_modules/formiojs/node_modules/lodash/_baseAssignIn.js"),
+    cloneBuffer = __webpack_require__(/*! ./_cloneBuffer */ "./node_modules/formiojs/node_modules/lodash/_cloneBuffer.js"),
+    copyArray = __webpack_require__(/*! ./_copyArray */ "./node_modules/formiojs/node_modules/lodash/_copyArray.js"),
+    copySymbols = __webpack_require__(/*! ./_copySymbols */ "./node_modules/formiojs/node_modules/lodash/_copySymbols.js"),
+    copySymbolsIn = __webpack_require__(/*! ./_copySymbolsIn */ "./node_modules/formiojs/node_modules/lodash/_copySymbolsIn.js"),
+    getAllKeys = __webpack_require__(/*! ./_getAllKeys */ "./node_modules/formiojs/node_modules/lodash/_getAllKeys.js"),
+    getAllKeysIn = __webpack_require__(/*! ./_getAllKeysIn */ "./node_modules/formiojs/node_modules/lodash/_getAllKeysIn.js"),
+    getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/formiojs/node_modules/lodash/_getTag.js"),
+    initCloneArray = __webpack_require__(/*! ./_initCloneArray */ "./node_modules/formiojs/node_modules/lodash/_initCloneArray.js"),
+    initCloneByTag = __webpack_require__(/*! ./_initCloneByTag */ "./node_modules/formiojs/node_modules/lodash/_initCloneByTag.js"),
+    initCloneObject = __webpack_require__(/*! ./_initCloneObject */ "./node_modules/formiojs/node_modules/lodash/_initCloneObject.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isBuffer = __webpack_require__(/*! ./isBuffer */ "./node_modules/formiojs/node_modules/lodash/isBuffer.js"),
+    isMap = __webpack_require__(/*! ./isMap */ "./node_modules/formiojs/node_modules/lodash/isMap.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js"),
+    isSet = __webpack_require__(/*! ./isSet */ "./node_modules/formiojs/node_modules/lodash/isSet.js"),
+    keys = __webpack_require__(/*! ./keys */ "./node_modules/formiojs/node_modules/lodash/keys.js");
 
 /** Used to compose bitmasks for cloning. */
 var CLONE_DEEP_FLAG = 1,
@@ -66509,14 +59011,14 @@ module.exports = baseClone;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseCreate.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseCreate.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseCreate.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseCreate.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js");
+var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js");
 
 /** Built-in value references. */
 var objectCreate = Object.create;
@@ -66550,10 +59052,10 @@ module.exports = baseCreate;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseFindIndex.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_baseFindIndex.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseFindIndex.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseFindIndex.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66585,14 +59087,14 @@ module.exports = baseFindIndex;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseFor.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_baseFor.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseFor.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseFor.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var createBaseFor = __webpack_require__(/*! ./_createBaseFor */ "./node_modules/lodash/_createBaseFor.js");
+var createBaseFor = __webpack_require__(/*! ./_createBaseFor */ "./node_modules/formiojs/node_modules/lodash/_createBaseFor.js");
 
 /**
  * The base implementation of `baseForOwn` which iterates over `object`
@@ -66612,15 +59114,15 @@ module.exports = baseFor;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseForOwn.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseForOwn.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseForOwn.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseForOwn.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseFor = __webpack_require__(/*! ./_baseFor */ "./node_modules/lodash/_baseFor.js"),
-    keys = __webpack_require__(/*! ./keys */ "./node_modules/lodash/keys.js");
+var baseFor = __webpack_require__(/*! ./_baseFor */ "./node_modules/formiojs/node_modules/lodash/_baseFor.js"),
+    keys = __webpack_require__(/*! ./keys */ "./node_modules/formiojs/node_modules/lodash/keys.js");
 
 /**
  * The base implementation of `_.forOwn` without support for iteratee shorthands.
@@ -66639,15 +59141,15 @@ module.exports = baseForOwn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseGet.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_baseGet.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseGet.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseGet.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js"),
-    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
+var castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/formiojs/node_modules/lodash/_castPath.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/formiojs/node_modules/lodash/_toKey.js");
 
 /**
  * The base implementation of `_.get` without support for default values.
@@ -66674,15 +59176,15 @@ module.exports = baseGet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseGetAllKeys.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_baseGetAllKeys.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseGetAllKeys.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseGetAllKeys.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayPush = __webpack_require__(/*! ./_arrayPush */ "./node_modules/lodash/_arrayPush.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js");
+var arrayPush = __webpack_require__(/*! ./_arrayPush */ "./node_modules/formiojs/node_modules/lodash/_arrayPush.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js");
 
 /**
  * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
@@ -66705,16 +59207,16 @@ module.exports = baseGetAllKeys;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseGetTag.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseGetTag.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseGetTag.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/lodash/_Symbol.js"),
-    getRawTag = __webpack_require__(/*! ./_getRawTag */ "./node_modules/lodash/_getRawTag.js"),
-    objectToString = __webpack_require__(/*! ./_objectToString */ "./node_modules/lodash/_objectToString.js");
+var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/formiojs/node_modules/lodash/_Symbol.js"),
+    getRawTag = __webpack_require__(/*! ./_getRawTag */ "./node_modules/formiojs/node_modules/lodash/_getRawTag.js"),
+    objectToString = __webpack_require__(/*! ./_objectToString */ "./node_modules/formiojs/node_modules/lodash/_objectToString.js");
 
 /** `Object#toString` result references. */
 var nullTag = '[object Null]',
@@ -66744,10 +59246,10 @@ module.exports = baseGetTag;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseHas.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_baseHas.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseHas.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseHas.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66774,10 +59276,10 @@ module.exports = baseHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseHasIn.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseHasIn.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseHasIn.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseHasIn.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -66798,16 +59300,16 @@ module.exports = baseHasIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIndexOf.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_baseIndexOf.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIndexOf.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIndexOf.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseFindIndex = __webpack_require__(/*! ./_baseFindIndex */ "./node_modules/lodash/_baseFindIndex.js"),
-    baseIsNaN = __webpack_require__(/*! ./_baseIsNaN */ "./node_modules/lodash/_baseIsNaN.js"),
-    strictIndexOf = __webpack_require__(/*! ./_strictIndexOf */ "./node_modules/lodash/_strictIndexOf.js");
+var baseFindIndex = __webpack_require__(/*! ./_baseFindIndex */ "./node_modules/formiojs/node_modules/lodash/_baseFindIndex.js"),
+    baseIsNaN = __webpack_require__(/*! ./_baseIsNaN */ "./node_modules/formiojs/node_modules/lodash/_baseIsNaN.js"),
+    strictIndexOf = __webpack_require__(/*! ./_strictIndexOf */ "./node_modules/formiojs/node_modules/lodash/_strictIndexOf.js");
 
 /**
  * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
@@ -66829,19 +59331,19 @@ module.exports = baseIndexOf;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIntersection.js":
-/*!**************************************************!*\
-  !*** ./node_modules/lodash/_baseIntersection.js ***!
-  \**************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIntersection.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIntersection.js ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var SetCache = __webpack_require__(/*! ./_SetCache */ "./node_modules/lodash/_SetCache.js"),
-    arrayIncludes = __webpack_require__(/*! ./_arrayIncludes */ "./node_modules/lodash/_arrayIncludes.js"),
-    arrayIncludesWith = __webpack_require__(/*! ./_arrayIncludesWith */ "./node_modules/lodash/_arrayIncludesWith.js"),
-    arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/lodash/_arrayMap.js"),
-    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/lodash/_baseUnary.js"),
-    cacheHas = __webpack_require__(/*! ./_cacheHas */ "./node_modules/lodash/_cacheHas.js");
+var SetCache = __webpack_require__(/*! ./_SetCache */ "./node_modules/formiojs/node_modules/lodash/_SetCache.js"),
+    arrayIncludes = __webpack_require__(/*! ./_arrayIncludes */ "./node_modules/formiojs/node_modules/lodash/_arrayIncludes.js"),
+    arrayIncludesWith = __webpack_require__(/*! ./_arrayIncludesWith */ "./node_modules/formiojs/node_modules/lodash/_arrayIncludesWith.js"),
+    arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/formiojs/node_modules/lodash/_arrayMap.js"),
+    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/formiojs/node_modules/lodash/_baseUnary.js"),
+    cacheHas = __webpack_require__(/*! ./_cacheHas */ "./node_modules/formiojs/node_modules/lodash/_cacheHas.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeMin = Math.min;
@@ -66914,15 +59416,15 @@ module.exports = baseIntersection;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsArguments.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_baseIsArguments.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsArguments.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsArguments.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
@@ -66943,15 +59445,15 @@ module.exports = baseIsArguments;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsEqual.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_baseIsEqual.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsEqual.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsEqual.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsEqualDeep = __webpack_require__(/*! ./_baseIsEqualDeep */ "./node_modules/lodash/_baseIsEqualDeep.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseIsEqualDeep = __webpack_require__(/*! ./_baseIsEqualDeep */ "./node_modules/formiojs/node_modules/lodash/_baseIsEqualDeep.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /**
  * The base implementation of `_.isEqual` which supports partial comparisons
@@ -66982,21 +59484,21 @@ module.exports = baseIsEqual;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsEqualDeep.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_baseIsEqualDeep.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsEqualDeep.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsEqualDeep.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Stack = __webpack_require__(/*! ./_Stack */ "./node_modules/lodash/_Stack.js"),
-    equalArrays = __webpack_require__(/*! ./_equalArrays */ "./node_modules/lodash/_equalArrays.js"),
-    equalByTag = __webpack_require__(/*! ./_equalByTag */ "./node_modules/lodash/_equalByTag.js"),
-    equalObjects = __webpack_require__(/*! ./_equalObjects */ "./node_modules/lodash/_equalObjects.js"),
-    getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/lodash/_getTag.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isBuffer = __webpack_require__(/*! ./isBuffer */ "./node_modules/lodash/isBuffer.js"),
-    isTypedArray = __webpack_require__(/*! ./isTypedArray */ "./node_modules/lodash/isTypedArray.js");
+var Stack = __webpack_require__(/*! ./_Stack */ "./node_modules/formiojs/node_modules/lodash/_Stack.js"),
+    equalArrays = __webpack_require__(/*! ./_equalArrays */ "./node_modules/formiojs/node_modules/lodash/_equalArrays.js"),
+    equalByTag = __webpack_require__(/*! ./_equalByTag */ "./node_modules/formiojs/node_modules/lodash/_equalByTag.js"),
+    equalObjects = __webpack_require__(/*! ./_equalObjects */ "./node_modules/formiojs/node_modules/lodash/_equalObjects.js"),
+    getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/formiojs/node_modules/lodash/_getTag.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isBuffer = __webpack_require__(/*! ./isBuffer */ "./node_modules/formiojs/node_modules/lodash/isBuffer.js"),
+    isTypedArray = __webpack_require__(/*! ./isTypedArray */ "./node_modules/formiojs/node_modules/lodash/isTypedArray.js");
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1;
@@ -67076,15 +59578,15 @@ module.exports = baseIsEqualDeep;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsMap.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseIsMap.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsMap.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsMap.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/lodash/_getTag.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/formiojs/node_modules/lodash/_getTag.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var mapTag = '[object Map]';
@@ -67105,15 +59607,15 @@ module.exports = baseIsMap;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsMatch.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_baseIsMatch.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsMatch.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsMatch.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Stack = __webpack_require__(/*! ./_Stack */ "./node_modules/lodash/_Stack.js"),
-    baseIsEqual = __webpack_require__(/*! ./_baseIsEqual */ "./node_modules/lodash/_baseIsEqual.js");
+var Stack = __webpack_require__(/*! ./_Stack */ "./node_modules/formiojs/node_modules/lodash/_Stack.js"),
+    baseIsEqual = __webpack_require__(/*! ./_baseIsEqual */ "./node_modules/formiojs/node_modules/lodash/_baseIsEqual.js");
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -67178,10 +59680,10 @@ module.exports = baseIsMatch;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsNaN.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseIsNaN.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsNaN.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsNaN.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67201,17 +59703,17 @@ module.exports = baseIsNaN;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsNative.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_baseIsNative.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsNative.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsNative.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isFunction = __webpack_require__(/*! ./isFunction */ "./node_modules/lodash/isFunction.js"),
-    isMasked = __webpack_require__(/*! ./_isMasked */ "./node_modules/lodash/_isMasked.js"),
-    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
-    toSource = __webpack_require__(/*! ./_toSource */ "./node_modules/lodash/_toSource.js");
+var isFunction = __webpack_require__(/*! ./isFunction */ "./node_modules/formiojs/node_modules/lodash/isFunction.js"),
+    isMasked = __webpack_require__(/*! ./_isMasked */ "./node_modules/formiojs/node_modules/lodash/_isMasked.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js"),
+    toSource = __webpack_require__(/*! ./_toSource */ "./node_modules/formiojs/node_modules/lodash/_toSource.js");
 
 /**
  * Used to match `RegExp`
@@ -67259,15 +59761,15 @@ module.exports = baseIsNative;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsSet.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseIsSet.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsSet.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsSet.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/lodash/_getTag.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var getTag = __webpack_require__(/*! ./_getTag */ "./node_modules/formiojs/node_modules/lodash/_getTag.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var setTag = '[object Set]';
@@ -67288,16 +59790,16 @@ module.exports = baseIsSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIsTypedArray.js":
-/*!**************************************************!*\
-  !*** ./node_modules/lodash/_baseIsTypedArray.js ***!
-  \**************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIsTypedArray.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIsTypedArray.js ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    isLength = __webpack_require__(/*! ./isLength */ "./node_modules/lodash/isLength.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    isLength = __webpack_require__(/*! ./isLength */ "./node_modules/formiojs/node_modules/lodash/isLength.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var argsTag = '[object Arguments]',
@@ -67359,18 +59861,18 @@ module.exports = baseIsTypedArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseIteratee.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_baseIteratee.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseIteratee.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseIteratee.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseMatches = __webpack_require__(/*! ./_baseMatches */ "./node_modules/lodash/_baseMatches.js"),
-    baseMatchesProperty = __webpack_require__(/*! ./_baseMatchesProperty */ "./node_modules/lodash/_baseMatchesProperty.js"),
-    identity = __webpack_require__(/*! ./identity */ "./node_modules/lodash/identity.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    property = __webpack_require__(/*! ./property */ "./node_modules/lodash/property.js");
+var baseMatches = __webpack_require__(/*! ./_baseMatches */ "./node_modules/formiojs/node_modules/lodash/_baseMatches.js"),
+    baseMatchesProperty = __webpack_require__(/*! ./_baseMatchesProperty */ "./node_modules/formiojs/node_modules/lodash/_baseMatchesProperty.js"),
+    identity = __webpack_require__(/*! ./identity */ "./node_modules/formiojs/node_modules/lodash/identity.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    property = __webpack_require__(/*! ./property */ "./node_modules/formiojs/node_modules/lodash/property.js");
 
 /**
  * The base implementation of `_.iteratee`.
@@ -67401,15 +59903,15 @@ module.exports = baseIteratee;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseKeys.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_baseKeys.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseKeys.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseKeys.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isPrototype = __webpack_require__(/*! ./_isPrototype */ "./node_modules/lodash/_isPrototype.js"),
-    nativeKeys = __webpack_require__(/*! ./_nativeKeys */ "./node_modules/lodash/_nativeKeys.js");
+var isPrototype = __webpack_require__(/*! ./_isPrototype */ "./node_modules/formiojs/node_modules/lodash/_isPrototype.js"),
+    nativeKeys = __webpack_require__(/*! ./_nativeKeys */ "./node_modules/formiojs/node_modules/lodash/_nativeKeys.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -67442,16 +59944,16 @@ module.exports = baseKeys;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseKeysIn.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseKeysIn.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseKeysIn.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseKeysIn.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
-    isPrototype = __webpack_require__(/*! ./_isPrototype */ "./node_modules/lodash/_isPrototype.js"),
-    nativeKeysIn = __webpack_require__(/*! ./_nativeKeysIn */ "./node_modules/lodash/_nativeKeysIn.js");
+var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js"),
+    isPrototype = __webpack_require__(/*! ./_isPrototype */ "./node_modules/formiojs/node_modules/lodash/_isPrototype.js"),
+    nativeKeysIn = __webpack_require__(/*! ./_nativeKeysIn */ "./node_modules/formiojs/node_modules/lodash/_nativeKeysIn.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -67486,16 +59988,16 @@ module.exports = baseKeysIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseMatches.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_baseMatches.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseMatches.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseMatches.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsMatch = __webpack_require__(/*! ./_baseIsMatch */ "./node_modules/lodash/_baseIsMatch.js"),
-    getMatchData = __webpack_require__(/*! ./_getMatchData */ "./node_modules/lodash/_getMatchData.js"),
-    matchesStrictComparable = __webpack_require__(/*! ./_matchesStrictComparable */ "./node_modules/lodash/_matchesStrictComparable.js");
+var baseIsMatch = __webpack_require__(/*! ./_baseIsMatch */ "./node_modules/formiojs/node_modules/lodash/_baseIsMatch.js"),
+    getMatchData = __webpack_require__(/*! ./_getMatchData */ "./node_modules/formiojs/node_modules/lodash/_getMatchData.js"),
+    matchesStrictComparable = __webpack_require__(/*! ./_matchesStrictComparable */ "./node_modules/formiojs/node_modules/lodash/_matchesStrictComparable.js");
 
 /**
  * The base implementation of `_.matches` which doesn't clone `source`.
@@ -67519,20 +60021,20 @@ module.exports = baseMatches;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseMatchesProperty.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/lodash/_baseMatchesProperty.js ***!
-  \*****************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseMatchesProperty.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseMatchesProperty.js ***!
+  \***************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsEqual = __webpack_require__(/*! ./_baseIsEqual */ "./node_modules/lodash/_baseIsEqual.js"),
-    get = __webpack_require__(/*! ./get */ "./node_modules/lodash/get.js"),
-    hasIn = __webpack_require__(/*! ./hasIn */ "./node_modules/lodash/hasIn.js"),
-    isKey = __webpack_require__(/*! ./_isKey */ "./node_modules/lodash/_isKey.js"),
-    isStrictComparable = __webpack_require__(/*! ./_isStrictComparable */ "./node_modules/lodash/_isStrictComparable.js"),
-    matchesStrictComparable = __webpack_require__(/*! ./_matchesStrictComparable */ "./node_modules/lodash/_matchesStrictComparable.js"),
-    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
+var baseIsEqual = __webpack_require__(/*! ./_baseIsEqual */ "./node_modules/formiojs/node_modules/lodash/_baseIsEqual.js"),
+    get = __webpack_require__(/*! ./get */ "./node_modules/formiojs/node_modules/lodash/get.js"),
+    hasIn = __webpack_require__(/*! ./hasIn */ "./node_modules/formiojs/node_modules/lodash/hasIn.js"),
+    isKey = __webpack_require__(/*! ./_isKey */ "./node_modules/formiojs/node_modules/lodash/_isKey.js"),
+    isStrictComparable = __webpack_require__(/*! ./_isStrictComparable */ "./node_modules/formiojs/node_modules/lodash/_isStrictComparable.js"),
+    matchesStrictComparable = __webpack_require__(/*! ./_matchesStrictComparable */ "./node_modules/formiojs/node_modules/lodash/_matchesStrictComparable.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/formiojs/node_modules/lodash/_toKey.js");
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -67563,10 +60065,10 @@ module.exports = baseMatchesProperty;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseProperty.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_baseProperty.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseProperty.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseProperty.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67588,14 +60090,14 @@ module.exports = baseProperty;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_basePropertyDeep.js":
-/*!**************************************************!*\
-  !*** ./node_modules/lodash/_basePropertyDeep.js ***!
-  \**************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_basePropertyDeep.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_basePropertyDeep.js ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGet = __webpack_require__(/*! ./_baseGet */ "./node_modules/lodash/_baseGet.js");
+var baseGet = __webpack_require__(/*! ./_baseGet */ "./node_modules/formiojs/node_modules/lodash/_baseGet.js");
 
 /**
  * A specialized version of `baseProperty` which supports deep paths.
@@ -67615,10 +60117,10 @@ module.exports = basePropertyDeep;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseRepeat.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_baseRepeat.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseRepeat.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseRepeat.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67661,16 +60163,16 @@ module.exports = baseRepeat;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseRest.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_baseRest.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseRest.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseRest.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var identity = __webpack_require__(/*! ./identity */ "./node_modules/lodash/identity.js"),
-    overRest = __webpack_require__(/*! ./_overRest */ "./node_modules/lodash/_overRest.js"),
-    setToString = __webpack_require__(/*! ./_setToString */ "./node_modules/lodash/_setToString.js");
+var identity = __webpack_require__(/*! ./identity */ "./node_modules/formiojs/node_modules/lodash/identity.js"),
+    overRest = __webpack_require__(/*! ./_overRest */ "./node_modules/formiojs/node_modules/lodash/_overRest.js"),
+    setToString = __webpack_require__(/*! ./_setToString */ "./node_modules/formiojs/node_modules/lodash/_setToString.js");
 
 /**
  * The base implementation of `_.rest` which doesn't validate or coerce arguments.
@@ -67689,18 +60191,18 @@ module.exports = baseRest;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseSet.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_baseSet.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseSet.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseSet.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/lodash/_assignValue.js"),
-    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js"),
-    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/lodash/_isIndex.js"),
-    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
-    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
+var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/formiojs/node_modules/lodash/_assignValue.js"),
+    castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/formiojs/node_modules/lodash/_castPath.js"),
+    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/formiojs/node_modules/lodash/_isIndex.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/formiojs/node_modules/lodash/_toKey.js");
 
 /**
  * The base implementation of `_.set`.
@@ -67747,16 +60249,16 @@ module.exports = baseSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseSetToString.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_baseSetToString.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseSetToString.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseSetToString.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var constant = __webpack_require__(/*! ./constant */ "./node_modules/lodash/constant.js"),
-    defineProperty = __webpack_require__(/*! ./_defineProperty */ "./node_modules/lodash/_defineProperty.js"),
-    identity = __webpack_require__(/*! ./identity */ "./node_modules/lodash/identity.js");
+var constant = __webpack_require__(/*! ./constant */ "./node_modules/formiojs/node_modules/lodash/constant.js"),
+    defineProperty = __webpack_require__(/*! ./_defineProperty */ "./node_modules/formiojs/node_modules/lodash/_defineProperty.js"),
+    identity = __webpack_require__(/*! ./identity */ "./node_modules/formiojs/node_modules/lodash/identity.js");
 
 /**
  * The base implementation of `setToString` without support for hot loop shorting.
@@ -67780,10 +60282,10 @@ module.exports = baseSetToString;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseSlice.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseSlice.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseSlice.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseSlice.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67822,10 +60324,10 @@ module.exports = baseSlice;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseTimes.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseTimes.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseTimes.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseTimes.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67853,17 +60355,17 @@ module.exports = baseTimes;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseToString.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_baseToString.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseToString.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseToString.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/lodash/_Symbol.js"),
-    arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/lodash/_arrayMap.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/lodash/isSymbol.js");
+var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/formiojs/node_modules/lodash/_Symbol.js"),
+    arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/formiojs/node_modules/lodash/_arrayMap.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/formiojs/node_modules/lodash/isSymbol.js");
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0;
@@ -67901,10 +60403,10 @@ module.exports = baseToString;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_baseUnary.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_baseUnary.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_baseUnary.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_baseUnary.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67926,10 +60428,10 @@ module.exports = baseUnary;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cacheHas.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_cacheHas.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cacheHas.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cacheHas.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -67950,14 +60452,14 @@ module.exports = cacheHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_castArrayLikeObject.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/lodash/_castArrayLikeObject.js ***!
-  \*****************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_castArrayLikeObject.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_castArrayLikeObject.js ***!
+  \***************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isArrayLikeObject = __webpack_require__(/*! ./isArrayLikeObject */ "./node_modules/lodash/isArrayLikeObject.js");
+var isArrayLikeObject = __webpack_require__(/*! ./isArrayLikeObject */ "./node_modules/formiojs/node_modules/lodash/isArrayLikeObject.js");
 
 /**
  * Casts `value` to an empty array if it's not an array like object.
@@ -67975,14 +60477,14 @@ module.exports = castArrayLikeObject;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_castFunction.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_castFunction.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_castFunction.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_castFunction.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var identity = __webpack_require__(/*! ./identity */ "./node_modules/lodash/identity.js");
+var identity = __webpack_require__(/*! ./identity */ "./node_modules/formiojs/node_modules/lodash/identity.js");
 
 /**
  * Casts `value` to `identity` if it's not a function.
@@ -68000,17 +60502,17 @@ module.exports = castFunction;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_castPath.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_castPath.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_castPath.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_castPath.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isKey = __webpack_require__(/*! ./_isKey */ "./node_modules/lodash/_isKey.js"),
-    stringToPath = __webpack_require__(/*! ./_stringToPath */ "./node_modules/lodash/_stringToPath.js"),
-    toString = __webpack_require__(/*! ./toString */ "./node_modules/lodash/toString.js");
+var isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isKey = __webpack_require__(/*! ./_isKey */ "./node_modules/formiojs/node_modules/lodash/_isKey.js"),
+    stringToPath = __webpack_require__(/*! ./_stringToPath */ "./node_modules/formiojs/node_modules/lodash/_stringToPath.js"),
+    toString = __webpack_require__(/*! ./toString */ "./node_modules/formiojs/node_modules/lodash/toString.js");
 
 /**
  * Casts `value` to a path array if it's not one.
@@ -68032,14 +60534,14 @@ module.exports = castPath;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_castSlice.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_castSlice.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_castSlice.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_castSlice.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseSlice = __webpack_require__(/*! ./_baseSlice */ "./node_modules/lodash/_baseSlice.js");
+var baseSlice = __webpack_require__(/*! ./_baseSlice */ "./node_modules/formiojs/node_modules/lodash/_baseSlice.js");
 
 /**
  * Casts `array` to a slice if it's needed.
@@ -68061,14 +60563,14 @@ module.exports = castSlice;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_charsEndIndex.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_charsEndIndex.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_charsEndIndex.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_charsEndIndex.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/lodash/_baseIndexOf.js");
+var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/formiojs/node_modules/lodash/_baseIndexOf.js");
 
 /**
  * Used by `_.trim` and `_.trimEnd` to get the index of the last string symbol
@@ -68091,14 +60593,14 @@ module.exports = charsEndIndex;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_charsStartIndex.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_charsStartIndex.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_charsStartIndex.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_charsStartIndex.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/lodash/_baseIndexOf.js");
+var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ "./node_modules/formiojs/node_modules/lodash/_baseIndexOf.js");
 
 /**
  * Used by `_.trim` and `_.trimStart` to get the index of the first string symbol
@@ -68122,14 +60624,14 @@ module.exports = charsStartIndex;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cloneArrayBuffer.js":
-/*!**************************************************!*\
-  !*** ./node_modules/lodash/_cloneArrayBuffer.js ***!
-  \**************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cloneArrayBuffer.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cloneArrayBuffer.js ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Uint8Array = __webpack_require__(/*! ./_Uint8Array */ "./node_modules/lodash/_Uint8Array.js");
+var Uint8Array = __webpack_require__(/*! ./_Uint8Array */ "./node_modules/formiojs/node_modules/lodash/_Uint8Array.js");
 
 /**
  * Creates a clone of `arrayBuffer`.
@@ -68149,14 +60651,14 @@ module.exports = cloneArrayBuffer;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cloneBuffer.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_cloneBuffer.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cloneBuffer.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cloneBuffer.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /** Detect free variable `exports`. */
 var freeExports =  true && exports && !exports.nodeType && exports;
@@ -68192,18 +60694,18 @@ function cloneBuffer(buffer, isDeep) {
 
 module.exports = cloneBuffer;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cloneDataView.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_cloneDataView.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cloneDataView.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cloneDataView.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var cloneArrayBuffer = __webpack_require__(/*! ./_cloneArrayBuffer */ "./node_modules/lodash/_cloneArrayBuffer.js");
+var cloneArrayBuffer = __webpack_require__(/*! ./_cloneArrayBuffer */ "./node_modules/formiojs/node_modules/lodash/_cloneArrayBuffer.js");
 
 /**
  * Creates a clone of `dataView`.
@@ -68223,10 +60725,10 @@ module.exports = cloneDataView;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cloneRegExp.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_cloneRegExp.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cloneRegExp.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cloneRegExp.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -68251,14 +60753,14 @@ module.exports = cloneRegExp;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cloneSymbol.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_cloneSymbol.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cloneSymbol.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cloneSymbol.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/lodash/_Symbol.js");
+var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/formiojs/node_modules/lodash/_Symbol.js");
 
 /** Used to convert symbols to primitives and strings. */
 var symbolProto = Symbol ? Symbol.prototype : undefined,
@@ -68280,14 +60782,14 @@ module.exports = cloneSymbol;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_cloneTypedArray.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_cloneTypedArray.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_cloneTypedArray.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_cloneTypedArray.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var cloneArrayBuffer = __webpack_require__(/*! ./_cloneArrayBuffer */ "./node_modules/lodash/_cloneArrayBuffer.js");
+var cloneArrayBuffer = __webpack_require__(/*! ./_cloneArrayBuffer */ "./node_modules/formiojs/node_modules/lodash/_cloneArrayBuffer.js");
 
 /**
  * Creates a clone of `typedArray`.
@@ -68307,10 +60809,10 @@ module.exports = cloneTypedArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_copyArray.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_copyArray.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_copyArray.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_copyArray.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -68338,15 +60840,15 @@ module.exports = copyArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_copyObject.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_copyObject.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_copyObject.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_copyObject.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/lodash/_assignValue.js"),
-    baseAssignValue = __webpack_require__(/*! ./_baseAssignValue */ "./node_modules/lodash/_baseAssignValue.js");
+var assignValue = __webpack_require__(/*! ./_assignValue */ "./node_modules/formiojs/node_modules/lodash/_assignValue.js"),
+    baseAssignValue = __webpack_require__(/*! ./_baseAssignValue */ "./node_modules/formiojs/node_modules/lodash/_baseAssignValue.js");
 
 /**
  * Copies properties of `source` to `object`.
@@ -68389,15 +60891,15 @@ module.exports = copyObject;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_copySymbols.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_copySymbols.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_copySymbols.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_copySymbols.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/lodash/_copyObject.js"),
-    getSymbols = __webpack_require__(/*! ./_getSymbols */ "./node_modules/lodash/_getSymbols.js");
+var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/formiojs/node_modules/lodash/_copyObject.js"),
+    getSymbols = __webpack_require__(/*! ./_getSymbols */ "./node_modules/formiojs/node_modules/lodash/_getSymbols.js");
 
 /**
  * Copies own symbols of `source` to `object`.
@@ -68416,15 +60918,15 @@ module.exports = copySymbols;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_copySymbolsIn.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_copySymbolsIn.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_copySymbolsIn.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_copySymbolsIn.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/lodash/_copyObject.js"),
-    getSymbolsIn = __webpack_require__(/*! ./_getSymbolsIn */ "./node_modules/lodash/_getSymbolsIn.js");
+var copyObject = __webpack_require__(/*! ./_copyObject */ "./node_modules/formiojs/node_modules/lodash/_copyObject.js"),
+    getSymbolsIn = __webpack_require__(/*! ./_getSymbolsIn */ "./node_modules/formiojs/node_modules/lodash/_getSymbolsIn.js");
 
 /**
  * Copies own and inherited symbols of `source` to `object`.
@@ -68443,14 +60945,14 @@ module.exports = copySymbolsIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_coreJsData.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_coreJsData.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_coreJsData.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_coreJsData.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js");
+var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js");
 
 /** Used to detect overreaching core-js shims. */
 var coreJsData = root['__core-js_shared__'];
@@ -68460,10 +60962,10 @@ module.exports = coreJsData;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_createBaseFor.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_createBaseFor.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_createBaseFor.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_createBaseFor.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -68496,19 +60998,19 @@ module.exports = createBaseFor;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_createPadding.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_createPadding.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_createPadding.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_createPadding.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseRepeat = __webpack_require__(/*! ./_baseRepeat */ "./node_modules/lodash/_baseRepeat.js"),
-    baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/lodash/_baseToString.js"),
-    castSlice = __webpack_require__(/*! ./_castSlice */ "./node_modules/lodash/_castSlice.js"),
-    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/lodash/_hasUnicode.js"),
-    stringSize = __webpack_require__(/*! ./_stringSize */ "./node_modules/lodash/_stringSize.js"),
-    stringToArray = __webpack_require__(/*! ./_stringToArray */ "./node_modules/lodash/_stringToArray.js");
+var baseRepeat = __webpack_require__(/*! ./_baseRepeat */ "./node_modules/formiojs/node_modules/lodash/_baseRepeat.js"),
+    baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/formiojs/node_modules/lodash/_baseToString.js"),
+    castSlice = __webpack_require__(/*! ./_castSlice */ "./node_modules/formiojs/node_modules/lodash/_castSlice.js"),
+    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/formiojs/node_modules/lodash/_hasUnicode.js"),
+    stringSize = __webpack_require__(/*! ./_stringSize */ "./node_modules/formiojs/node_modules/lodash/_stringSize.js"),
+    stringToArray = __webpack_require__(/*! ./_stringToArray */ "./node_modules/formiojs/node_modules/lodash/_stringToArray.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeCeil = Math.ceil;
@@ -68540,17 +61042,17 @@ module.exports = createPadding;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_createRound.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_createRound.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_createRound.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_createRound.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js"),
-    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/lodash/toInteger.js"),
-    toNumber = __webpack_require__(/*! ./toNumber */ "./node_modules/lodash/toNumber.js"),
-    toString = __webpack_require__(/*! ./toString */ "./node_modules/lodash/toString.js");
+var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js"),
+    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/formiojs/node_modules/lodash/toInteger.js"),
+    toNumber = __webpack_require__(/*! ./toNumber */ "./node_modules/formiojs/node_modules/lodash/toNumber.js"),
+    toString = __webpack_require__(/*! ./toString */ "./node_modules/formiojs/node_modules/lodash/toString.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeIsFinite = root.isFinite,
@@ -68586,14 +61088,14 @@ module.exports = createRound;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_defineProperty.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_defineProperty.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_defineProperty.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_defineProperty.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js");
 
 var defineProperty = (function() {
   try {
@@ -68608,16 +61110,16 @@ module.exports = defineProperty;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_equalArrays.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_equalArrays.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_equalArrays.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_equalArrays.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var SetCache = __webpack_require__(/*! ./_SetCache */ "./node_modules/lodash/_SetCache.js"),
-    arraySome = __webpack_require__(/*! ./_arraySome */ "./node_modules/lodash/_arraySome.js"),
-    cacheHas = __webpack_require__(/*! ./_cacheHas */ "./node_modules/lodash/_cacheHas.js");
+var SetCache = __webpack_require__(/*! ./_SetCache */ "./node_modules/formiojs/node_modules/lodash/_SetCache.js"),
+    arraySome = __webpack_require__(/*! ./_arraySome */ "./node_modules/formiojs/node_modules/lodash/_arraySome.js"),
+    cacheHas = __webpack_require__(/*! ./_cacheHas */ "./node_modules/formiojs/node_modules/lodash/_cacheHas.js");
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -68702,19 +61204,19 @@ module.exports = equalArrays;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_equalByTag.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_equalByTag.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_equalByTag.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_equalByTag.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/lodash/_Symbol.js"),
-    Uint8Array = __webpack_require__(/*! ./_Uint8Array */ "./node_modules/lodash/_Uint8Array.js"),
-    eq = __webpack_require__(/*! ./eq */ "./node_modules/lodash/eq.js"),
-    equalArrays = __webpack_require__(/*! ./_equalArrays */ "./node_modules/lodash/_equalArrays.js"),
-    mapToArray = __webpack_require__(/*! ./_mapToArray */ "./node_modules/lodash/_mapToArray.js"),
-    setToArray = __webpack_require__(/*! ./_setToArray */ "./node_modules/lodash/_setToArray.js");
+var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/formiojs/node_modules/lodash/_Symbol.js"),
+    Uint8Array = __webpack_require__(/*! ./_Uint8Array */ "./node_modules/formiojs/node_modules/lodash/_Uint8Array.js"),
+    eq = __webpack_require__(/*! ./eq */ "./node_modules/formiojs/node_modules/lodash/eq.js"),
+    equalArrays = __webpack_require__(/*! ./_equalArrays */ "./node_modules/formiojs/node_modules/lodash/_equalArrays.js"),
+    mapToArray = __webpack_require__(/*! ./_mapToArray */ "./node_modules/formiojs/node_modules/lodash/_mapToArray.js"),
+    setToArray = __webpack_require__(/*! ./_setToArray */ "./node_modules/formiojs/node_modules/lodash/_setToArray.js");
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1,
@@ -68825,14 +61327,14 @@ module.exports = equalByTag;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_equalObjects.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_equalObjects.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_equalObjects.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_equalObjects.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getAllKeys = __webpack_require__(/*! ./_getAllKeys */ "./node_modules/lodash/_getAllKeys.js");
+var getAllKeys = __webpack_require__(/*! ./_getAllKeys */ "./node_modules/formiojs/node_modules/lodash/_getAllKeys.js");
 
 /** Used to compose bitmasks for value comparisons. */
 var COMPARE_PARTIAL_FLAG = 1;
@@ -68925,10 +61427,10 @@ module.exports = equalObjects;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_freeGlobal.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_freeGlobal.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_freeGlobal.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_freeGlobal.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -68937,20 +61439,20 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 
 module.exports = freeGlobal;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getAllKeys.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_getAllKeys.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getAllKeys.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getAllKeys.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetAllKeys = __webpack_require__(/*! ./_baseGetAllKeys */ "./node_modules/lodash/_baseGetAllKeys.js"),
-    getSymbols = __webpack_require__(/*! ./_getSymbols */ "./node_modules/lodash/_getSymbols.js"),
-    keys = __webpack_require__(/*! ./keys */ "./node_modules/lodash/keys.js");
+var baseGetAllKeys = __webpack_require__(/*! ./_baseGetAllKeys */ "./node_modules/formiojs/node_modules/lodash/_baseGetAllKeys.js"),
+    getSymbols = __webpack_require__(/*! ./_getSymbols */ "./node_modules/formiojs/node_modules/lodash/_getSymbols.js"),
+    keys = __webpack_require__(/*! ./keys */ "./node_modules/formiojs/node_modules/lodash/keys.js");
 
 /**
  * Creates an array of own enumerable property names and symbols of `object`.
@@ -68968,16 +61470,16 @@ module.exports = getAllKeys;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getAllKeysIn.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_getAllKeysIn.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getAllKeysIn.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getAllKeysIn.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetAllKeys = __webpack_require__(/*! ./_baseGetAllKeys */ "./node_modules/lodash/_baseGetAllKeys.js"),
-    getSymbolsIn = __webpack_require__(/*! ./_getSymbolsIn */ "./node_modules/lodash/_getSymbolsIn.js"),
-    keysIn = __webpack_require__(/*! ./keysIn */ "./node_modules/lodash/keysIn.js");
+var baseGetAllKeys = __webpack_require__(/*! ./_baseGetAllKeys */ "./node_modules/formiojs/node_modules/lodash/_baseGetAllKeys.js"),
+    getSymbolsIn = __webpack_require__(/*! ./_getSymbolsIn */ "./node_modules/formiojs/node_modules/lodash/_getSymbolsIn.js"),
+    keysIn = __webpack_require__(/*! ./keysIn */ "./node_modules/formiojs/node_modules/lodash/keysIn.js");
 
 /**
  * Creates an array of own and inherited enumerable property names and
@@ -68996,14 +61498,14 @@ module.exports = getAllKeysIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getMapData.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_getMapData.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getMapData.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getMapData.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isKeyable = __webpack_require__(/*! ./_isKeyable */ "./node_modules/lodash/_isKeyable.js");
+var isKeyable = __webpack_require__(/*! ./_isKeyable */ "./node_modules/formiojs/node_modules/lodash/_isKeyable.js");
 
 /**
  * Gets the data for `map`.
@@ -69025,15 +61527,15 @@ module.exports = getMapData;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getMatchData.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_getMatchData.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getMatchData.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getMatchData.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isStrictComparable = __webpack_require__(/*! ./_isStrictComparable */ "./node_modules/lodash/_isStrictComparable.js"),
-    keys = __webpack_require__(/*! ./keys */ "./node_modules/lodash/keys.js");
+var isStrictComparable = __webpack_require__(/*! ./_isStrictComparable */ "./node_modules/formiojs/node_modules/lodash/_isStrictComparable.js"),
+    keys = __webpack_require__(/*! ./keys */ "./node_modules/formiojs/node_modules/lodash/keys.js");
 
 /**
  * Gets the property names, values, and compare flags of `object`.
@@ -69060,15 +61562,15 @@ module.exports = getMatchData;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getNative.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_getNative.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getNative.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getNative.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsNative = __webpack_require__(/*! ./_baseIsNative */ "./node_modules/lodash/_baseIsNative.js"),
-    getValue = __webpack_require__(/*! ./_getValue */ "./node_modules/lodash/_getValue.js");
+var baseIsNative = __webpack_require__(/*! ./_baseIsNative */ "./node_modules/formiojs/node_modules/lodash/_baseIsNative.js"),
+    getValue = __webpack_require__(/*! ./_getValue */ "./node_modules/formiojs/node_modules/lodash/_getValue.js");
 
 /**
  * Gets the native function at `key` of `object`.
@@ -69088,14 +61590,14 @@ module.exports = getNative;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getPrototype.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_getPrototype.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getPrototype.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getPrototype.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var overArg = __webpack_require__(/*! ./_overArg */ "./node_modules/lodash/_overArg.js");
+var overArg = __webpack_require__(/*! ./_overArg */ "./node_modules/formiojs/node_modules/lodash/_overArg.js");
 
 /** Built-in value references. */
 var getPrototype = overArg(Object.getPrototypeOf, Object);
@@ -69105,14 +61607,14 @@ module.exports = getPrototype;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getRawTag.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_getRawTag.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getRawTag.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getRawTag.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/lodash/_Symbol.js");
+var Symbol = __webpack_require__(/*! ./_Symbol */ "./node_modules/formiojs/node_modules/lodash/_Symbol.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -69162,15 +61664,15 @@ module.exports = getRawTag;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getSymbols.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_getSymbols.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getSymbols.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getSymbols.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayFilter = __webpack_require__(/*! ./_arrayFilter */ "./node_modules/lodash/_arrayFilter.js"),
-    stubArray = __webpack_require__(/*! ./stubArray */ "./node_modules/lodash/stubArray.js");
+var arrayFilter = __webpack_require__(/*! ./_arrayFilter */ "./node_modules/formiojs/node_modules/lodash/_arrayFilter.js"),
+    stubArray = __webpack_require__(/*! ./stubArray */ "./node_modules/formiojs/node_modules/lodash/stubArray.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -69203,17 +61705,17 @@ module.exports = getSymbols;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getSymbolsIn.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_getSymbolsIn.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getSymbolsIn.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getSymbolsIn.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayPush = __webpack_require__(/*! ./_arrayPush */ "./node_modules/lodash/_arrayPush.js"),
-    getPrototype = __webpack_require__(/*! ./_getPrototype */ "./node_modules/lodash/_getPrototype.js"),
-    getSymbols = __webpack_require__(/*! ./_getSymbols */ "./node_modules/lodash/_getSymbols.js"),
-    stubArray = __webpack_require__(/*! ./stubArray */ "./node_modules/lodash/stubArray.js");
+var arrayPush = __webpack_require__(/*! ./_arrayPush */ "./node_modules/formiojs/node_modules/lodash/_arrayPush.js"),
+    getPrototype = __webpack_require__(/*! ./_getPrototype */ "./node_modules/formiojs/node_modules/lodash/_getPrototype.js"),
+    getSymbols = __webpack_require__(/*! ./_getSymbols */ "./node_modules/formiojs/node_modules/lodash/_getSymbols.js"),
+    stubArray = __webpack_require__(/*! ./stubArray */ "./node_modules/formiojs/node_modules/lodash/stubArray.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeGetSymbols = Object.getOwnPropertySymbols;
@@ -69239,20 +61741,20 @@ module.exports = getSymbolsIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getTag.js":
-/*!****************************************!*\
-  !*** ./node_modules/lodash/_getTag.js ***!
-  \****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getTag.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getTag.js ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var DataView = __webpack_require__(/*! ./_DataView */ "./node_modules/lodash/_DataView.js"),
-    Map = __webpack_require__(/*! ./_Map */ "./node_modules/lodash/_Map.js"),
-    Promise = __webpack_require__(/*! ./_Promise */ "./node_modules/lodash/_Promise.js"),
-    Set = __webpack_require__(/*! ./_Set */ "./node_modules/lodash/_Set.js"),
-    WeakMap = __webpack_require__(/*! ./_WeakMap */ "./node_modules/lodash/_WeakMap.js"),
-    baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    toSource = __webpack_require__(/*! ./_toSource */ "./node_modules/lodash/_toSource.js");
+var DataView = __webpack_require__(/*! ./_DataView */ "./node_modules/formiojs/node_modules/lodash/_DataView.js"),
+    Map = __webpack_require__(/*! ./_Map */ "./node_modules/formiojs/node_modules/lodash/_Map.js"),
+    Promise = __webpack_require__(/*! ./_Promise */ "./node_modules/formiojs/node_modules/lodash/_Promise.js"),
+    Set = __webpack_require__(/*! ./_Set */ "./node_modules/formiojs/node_modules/lodash/_Set.js"),
+    WeakMap = __webpack_require__(/*! ./_WeakMap */ "./node_modules/formiojs/node_modules/lodash/_WeakMap.js"),
+    baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    toSource = __webpack_require__(/*! ./_toSource */ "./node_modules/formiojs/node_modules/lodash/_toSource.js");
 
 /** `Object#toString` result references. */
 var mapTag = '[object Map]',
@@ -69308,10 +61810,10 @@ module.exports = getTag;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_getValue.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_getValue.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_getValue.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_getValue.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69332,19 +61834,19 @@ module.exports = getValue;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hasPath.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_hasPath.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hasPath.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hasPath.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/lodash/_castPath.js"),
-    isArguments = __webpack_require__(/*! ./isArguments */ "./node_modules/lodash/isArguments.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/lodash/_isIndex.js"),
-    isLength = __webpack_require__(/*! ./isLength */ "./node_modules/lodash/isLength.js"),
-    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
+var castPath = __webpack_require__(/*! ./_castPath */ "./node_modules/formiojs/node_modules/lodash/_castPath.js"),
+    isArguments = __webpack_require__(/*! ./isArguments */ "./node_modules/formiojs/node_modules/lodash/isArguments.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/formiojs/node_modules/lodash/_isIndex.js"),
+    isLength = __webpack_require__(/*! ./isLength */ "./node_modules/formiojs/node_modules/lodash/isLength.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/formiojs/node_modules/lodash/_toKey.js");
 
 /**
  * Checks if `path` exists on `object`.
@@ -69382,10 +61884,10 @@ module.exports = hasPath;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hasUnicode.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_hasUnicode.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hasUnicode.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hasUnicode.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69419,14 +61921,14 @@ module.exports = hasUnicode;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hashClear.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_hashClear.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hashClear.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hashClear.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/lodash/_nativeCreate.js");
+var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/formiojs/node_modules/lodash/_nativeCreate.js");
 
 /**
  * Removes all key-value entries from the hash.
@@ -69445,10 +61947,10 @@ module.exports = hashClear;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hashDelete.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_hashDelete.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hashDelete.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hashDelete.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69473,14 +61975,14 @@ module.exports = hashDelete;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hashGet.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_hashGet.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hashGet.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hashGet.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/lodash/_nativeCreate.js");
+var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/formiojs/node_modules/lodash/_nativeCreate.js");
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -69514,14 +62016,14 @@ module.exports = hashGet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hashHas.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_hashHas.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hashHas.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hashHas.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/lodash/_nativeCreate.js");
+var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/formiojs/node_modules/lodash/_nativeCreate.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -69548,14 +62050,14 @@ module.exports = hashHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_hashSet.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_hashSet.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_hashSet.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_hashSet.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/lodash/_nativeCreate.js");
+var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ "./node_modules/formiojs/node_modules/lodash/_nativeCreate.js");
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -69582,10 +62084,10 @@ module.exports = hashSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_initCloneArray.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_initCloneArray.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_initCloneArray.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_initCloneArray.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69619,18 +62121,18 @@ module.exports = initCloneArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_initCloneByTag.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_initCloneByTag.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_initCloneByTag.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_initCloneByTag.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var cloneArrayBuffer = __webpack_require__(/*! ./_cloneArrayBuffer */ "./node_modules/lodash/_cloneArrayBuffer.js"),
-    cloneDataView = __webpack_require__(/*! ./_cloneDataView */ "./node_modules/lodash/_cloneDataView.js"),
-    cloneRegExp = __webpack_require__(/*! ./_cloneRegExp */ "./node_modules/lodash/_cloneRegExp.js"),
-    cloneSymbol = __webpack_require__(/*! ./_cloneSymbol */ "./node_modules/lodash/_cloneSymbol.js"),
-    cloneTypedArray = __webpack_require__(/*! ./_cloneTypedArray */ "./node_modules/lodash/_cloneTypedArray.js");
+var cloneArrayBuffer = __webpack_require__(/*! ./_cloneArrayBuffer */ "./node_modules/formiojs/node_modules/lodash/_cloneArrayBuffer.js"),
+    cloneDataView = __webpack_require__(/*! ./_cloneDataView */ "./node_modules/formiojs/node_modules/lodash/_cloneDataView.js"),
+    cloneRegExp = __webpack_require__(/*! ./_cloneRegExp */ "./node_modules/formiojs/node_modules/lodash/_cloneRegExp.js"),
+    cloneSymbol = __webpack_require__(/*! ./_cloneSymbol */ "./node_modules/formiojs/node_modules/lodash/_cloneSymbol.js"),
+    cloneTypedArray = __webpack_require__(/*! ./_cloneTypedArray */ "./node_modules/formiojs/node_modules/lodash/_cloneTypedArray.js");
 
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
@@ -69707,16 +62209,16 @@ module.exports = initCloneByTag;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_initCloneObject.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_initCloneObject.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_initCloneObject.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_initCloneObject.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseCreate = __webpack_require__(/*! ./_baseCreate */ "./node_modules/lodash/_baseCreate.js"),
-    getPrototype = __webpack_require__(/*! ./_getPrototype */ "./node_modules/lodash/_getPrototype.js"),
-    isPrototype = __webpack_require__(/*! ./_isPrototype */ "./node_modules/lodash/_isPrototype.js");
+var baseCreate = __webpack_require__(/*! ./_baseCreate */ "./node_modules/formiojs/node_modules/lodash/_baseCreate.js"),
+    getPrototype = __webpack_require__(/*! ./_getPrototype */ "./node_modules/formiojs/node_modules/lodash/_getPrototype.js"),
+    isPrototype = __webpack_require__(/*! ./_isPrototype */ "./node_modules/formiojs/node_modules/lodash/_isPrototype.js");
 
 /**
  * Initializes an object clone.
@@ -69736,10 +62238,10 @@ module.exports = initCloneObject;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isIndex.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_isIndex.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isIndex.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isIndex.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69772,17 +62274,17 @@ module.exports = isIndex;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isIterateeCall.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_isIterateeCall.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isIterateeCall.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isIterateeCall.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var eq = __webpack_require__(/*! ./eq */ "./node_modules/lodash/eq.js"),
-    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js"),
-    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/lodash/_isIndex.js"),
-    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js");
+var eq = __webpack_require__(/*! ./eq */ "./node_modules/formiojs/node_modules/lodash/eq.js"),
+    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/formiojs/node_modules/lodash/isArrayLike.js"),
+    isIndex = __webpack_require__(/*! ./_isIndex */ "./node_modules/formiojs/node_modules/lodash/_isIndex.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js");
 
 /**
  * Checks if the given arguments are from an iteratee call.
@@ -69813,15 +62315,15 @@ module.exports = isIterateeCall;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isKey.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/_isKey.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isKey.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isKey.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/lodash/isSymbol.js");
+var isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/formiojs/node_modules/lodash/isSymbol.js");
 
 /** Used to match property names within property paths. */
 var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
@@ -69853,10 +62355,10 @@ module.exports = isKey;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isKeyable.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/_isKeyable.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isKeyable.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isKeyable.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69879,14 +62381,14 @@ module.exports = isKeyable;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isMasked.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_isMasked.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isMasked.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isMasked.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var coreJsData = __webpack_require__(/*! ./_coreJsData */ "./node_modules/lodash/_coreJsData.js");
+var coreJsData = __webpack_require__(/*! ./_coreJsData */ "./node_modules/formiojs/node_modules/lodash/_coreJsData.js");
 
 /** Used to detect methods masquerading as native. */
 var maskSrcKey = (function() {
@@ -69910,10 +62412,10 @@ module.exports = isMasked;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isPrototype.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_isPrototype.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isPrototype.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isPrototype.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69939,14 +62441,14 @@ module.exports = isPrototype;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_isStrictComparable.js":
-/*!****************************************************!*\
-  !*** ./node_modules/lodash/_isStrictComparable.js ***!
-  \****************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_isStrictComparable.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_isStrictComparable.js ***!
+  \**************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js");
+var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js");
 
 /**
  * Checks if `value` is suitable for strict equality comparisons, i.e. `===`.
@@ -69965,10 +62467,10 @@ module.exports = isStrictComparable;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_listCacheClear.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_listCacheClear.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_listCacheClear.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_listCacheClear.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -69989,14 +62491,14 @@ module.exports = listCacheClear;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_listCacheDelete.js":
-/*!*************************************************!*\
-  !*** ./node_modules/lodash/_listCacheDelete.js ***!
-  \*************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_listCacheDelete.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_listCacheDelete.js ***!
+  \***********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/lodash/_assocIndexOf.js");
+var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/formiojs/node_modules/lodash/_assocIndexOf.js");
 
 /** Used for built-in method references. */
 var arrayProto = Array.prototype;
@@ -70035,14 +62537,14 @@ module.exports = listCacheDelete;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_listCacheGet.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_listCacheGet.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_listCacheGet.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_listCacheGet.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/lodash/_assocIndexOf.js");
+var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/formiojs/node_modules/lodash/_assocIndexOf.js");
 
 /**
  * Gets the list cache value for `key`.
@@ -70065,14 +62567,14 @@ module.exports = listCacheGet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_listCacheHas.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_listCacheHas.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_listCacheHas.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_listCacheHas.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/lodash/_assocIndexOf.js");
+var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/formiojs/node_modules/lodash/_assocIndexOf.js");
 
 /**
  * Checks if a list cache value for `key` exists.
@@ -70092,14 +62594,14 @@ module.exports = listCacheHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_listCacheSet.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_listCacheSet.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_listCacheSet.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_listCacheSet.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/lodash/_assocIndexOf.js");
+var assocIndexOf = __webpack_require__(/*! ./_assocIndexOf */ "./node_modules/formiojs/node_modules/lodash/_assocIndexOf.js");
 
 /**
  * Sets the list cache `key` to `value`.
@@ -70129,16 +62631,16 @@ module.exports = listCacheSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_mapCacheClear.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_mapCacheClear.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_mapCacheClear.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_mapCacheClear.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Hash = __webpack_require__(/*! ./_Hash */ "./node_modules/lodash/_Hash.js"),
-    ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/lodash/_ListCache.js"),
-    Map = __webpack_require__(/*! ./_Map */ "./node_modules/lodash/_Map.js");
+var Hash = __webpack_require__(/*! ./_Hash */ "./node_modules/formiojs/node_modules/lodash/_Hash.js"),
+    ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/formiojs/node_modules/lodash/_ListCache.js"),
+    Map = __webpack_require__(/*! ./_Map */ "./node_modules/formiojs/node_modules/lodash/_Map.js");
 
 /**
  * Removes all key-value entries from the map.
@@ -70161,14 +62663,14 @@ module.exports = mapCacheClear;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_mapCacheDelete.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_mapCacheDelete.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_mapCacheDelete.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_mapCacheDelete.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/lodash/_getMapData.js");
+var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/formiojs/node_modules/lodash/_getMapData.js");
 
 /**
  * Removes `key` and its value from the map.
@@ -70190,14 +62692,14 @@ module.exports = mapCacheDelete;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_mapCacheGet.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_mapCacheGet.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_mapCacheGet.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_mapCacheGet.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/lodash/_getMapData.js");
+var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/formiojs/node_modules/lodash/_getMapData.js");
 
 /**
  * Gets the map value for `key`.
@@ -70217,14 +62719,14 @@ module.exports = mapCacheGet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_mapCacheHas.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_mapCacheHas.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_mapCacheHas.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_mapCacheHas.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/lodash/_getMapData.js");
+var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/formiojs/node_modules/lodash/_getMapData.js");
 
 /**
  * Checks if a map value for `key` exists.
@@ -70244,14 +62746,14 @@ module.exports = mapCacheHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_mapCacheSet.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_mapCacheSet.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_mapCacheSet.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_mapCacheSet.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/lodash/_getMapData.js");
+var getMapData = __webpack_require__(/*! ./_getMapData */ "./node_modules/formiojs/node_modules/lodash/_getMapData.js");
 
 /**
  * Sets the map `key` to `value`.
@@ -70277,10 +62779,10 @@ module.exports = mapCacheSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_mapToArray.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_mapToArray.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_mapToArray.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_mapToArray.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70306,10 +62808,10 @@ module.exports = mapToArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_matchesStrictComparable.js":
-/*!*********************************************************!*\
-  !*** ./node_modules/lodash/_matchesStrictComparable.js ***!
-  \*********************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_matchesStrictComparable.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_matchesStrictComparable.js ***!
+  \*******************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70337,14 +62839,14 @@ module.exports = matchesStrictComparable;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_memoizeCapped.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_memoizeCapped.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_memoizeCapped.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_memoizeCapped.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var memoize = __webpack_require__(/*! ./memoize */ "./node_modules/lodash/memoize.js");
+var memoize = __webpack_require__(/*! ./memoize */ "./node_modules/formiojs/node_modules/lodash/memoize.js");
 
 /** Used as the maximum memoize cache size. */
 var MAX_MEMOIZE_SIZE = 500;
@@ -70374,14 +62876,14 @@ module.exports = memoizeCapped;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_nativeCreate.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_nativeCreate.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_nativeCreate.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_nativeCreate.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/lodash/_getNative.js");
+var getNative = __webpack_require__(/*! ./_getNative */ "./node_modules/formiojs/node_modules/lodash/_getNative.js");
 
 /* Built-in method references that are verified to be native. */
 var nativeCreate = getNative(Object, 'create');
@@ -70391,14 +62893,14 @@ module.exports = nativeCreate;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_nativeKeys.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_nativeKeys.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_nativeKeys.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_nativeKeys.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var overArg = __webpack_require__(/*! ./_overArg */ "./node_modules/lodash/_overArg.js");
+var overArg = __webpack_require__(/*! ./_overArg */ "./node_modules/formiojs/node_modules/lodash/_overArg.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeKeys = overArg(Object.keys, Object);
@@ -70408,10 +62910,10 @@ module.exports = nativeKeys;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_nativeKeysIn.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_nativeKeysIn.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_nativeKeysIn.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_nativeKeysIn.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70439,14 +62941,14 @@ module.exports = nativeKeysIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_nodeUtil.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_nodeUtil.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_nodeUtil.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_nodeUtil.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(module) {var freeGlobal = __webpack_require__(/*! ./_freeGlobal */ "./node_modules/lodash/_freeGlobal.js");
+/* WEBPACK VAR INJECTION */(function(module) {var freeGlobal = __webpack_require__(/*! ./_freeGlobal */ "./node_modules/formiojs/node_modules/lodash/_freeGlobal.js");
 
 /** Detect free variable `exports`. */
 var freeExports =  true && exports && !exports.nodeType && exports;
@@ -70477,14 +62979,14 @@ var nodeUtil = (function() {
 
 module.exports = nodeUtil;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_objectToString.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_objectToString.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_objectToString.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_objectToString.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70514,10 +63016,10 @@ module.exports = objectToString;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_overArg.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/_overArg.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_overArg.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_overArg.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70540,14 +63042,14 @@ module.exports = overArg;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_overRest.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_overRest.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_overRest.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_overRest.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var apply = __webpack_require__(/*! ./_apply */ "./node_modules/lodash/_apply.js");
+var apply = __webpack_require__(/*! ./_apply */ "./node_modules/formiojs/node_modules/lodash/_apply.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeMax = Math.max;
@@ -70587,14 +63089,14 @@ module.exports = overRest;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_root.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/_root.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_root.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_root.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var freeGlobal = __webpack_require__(/*! ./_freeGlobal */ "./node_modules/lodash/_freeGlobal.js");
+var freeGlobal = __webpack_require__(/*! ./_freeGlobal */ "./node_modules/formiojs/node_modules/lodash/_freeGlobal.js");
 
 /** Detect free variable `self`. */
 var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
@@ -70607,10 +63109,10 @@ module.exports = root;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_setCacheAdd.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_setCacheAdd.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_setCacheAdd.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_setCacheAdd.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70637,10 +63139,10 @@ module.exports = setCacheAdd;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_setCacheHas.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_setCacheHas.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_setCacheHas.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_setCacheHas.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70662,10 +63164,10 @@ module.exports = setCacheHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_setToArray.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_setToArray.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_setToArray.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_setToArray.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70691,15 +63193,15 @@ module.exports = setToArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_setToString.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_setToString.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_setToString.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_setToString.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseSetToString = __webpack_require__(/*! ./_baseSetToString */ "./node_modules/lodash/_baseSetToString.js"),
-    shortOut = __webpack_require__(/*! ./_shortOut */ "./node_modules/lodash/_shortOut.js");
+var baseSetToString = __webpack_require__(/*! ./_baseSetToString */ "./node_modules/formiojs/node_modules/lodash/_baseSetToString.js"),
+    shortOut = __webpack_require__(/*! ./_shortOut */ "./node_modules/formiojs/node_modules/lodash/_shortOut.js");
 
 /**
  * Sets the `toString` method of `func` to return `string`.
@@ -70716,10 +63218,10 @@ module.exports = setToString;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_shortOut.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_shortOut.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_shortOut.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_shortOut.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70764,14 +63266,14 @@ module.exports = shortOut;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stackClear.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_stackClear.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stackClear.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stackClear.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/lodash/_ListCache.js");
+var ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/formiojs/node_modules/lodash/_ListCache.js");
 
 /**
  * Removes all key-value entries from the stack.
@@ -70790,10 +63292,10 @@ module.exports = stackClear;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stackDelete.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_stackDelete.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stackDelete.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stackDelete.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70819,10 +63321,10 @@ module.exports = stackDelete;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stackGet.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_stackGet.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stackGet.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stackGet.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70844,10 +63346,10 @@ module.exports = stackGet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stackHas.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_stackHas.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stackHas.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stackHas.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70869,16 +63371,16 @@ module.exports = stackHas;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stackSet.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_stackSet.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stackSet.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stackSet.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/lodash/_ListCache.js"),
-    Map = __webpack_require__(/*! ./_Map */ "./node_modules/lodash/_Map.js"),
-    MapCache = __webpack_require__(/*! ./_MapCache */ "./node_modules/lodash/_MapCache.js");
+var ListCache = __webpack_require__(/*! ./_ListCache */ "./node_modules/formiojs/node_modules/lodash/_ListCache.js"),
+    Map = __webpack_require__(/*! ./_Map */ "./node_modules/formiojs/node_modules/lodash/_Map.js"),
+    MapCache = __webpack_require__(/*! ./_MapCache */ "./node_modules/formiojs/node_modules/lodash/_MapCache.js");
 
 /** Used as the size to enable large array optimizations. */
 var LARGE_ARRAY_SIZE = 200;
@@ -70914,10 +63416,10 @@ module.exports = stackSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_strictIndexOf.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_strictIndexOf.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_strictIndexOf.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_strictIndexOf.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -70948,16 +63450,16 @@ module.exports = strictIndexOf;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stringSize.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/_stringSize.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stringSize.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stringSize.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var asciiSize = __webpack_require__(/*! ./_asciiSize */ "./node_modules/lodash/_asciiSize.js"),
-    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/lodash/_hasUnicode.js"),
-    unicodeSize = __webpack_require__(/*! ./_unicodeSize */ "./node_modules/lodash/_unicodeSize.js");
+var asciiSize = __webpack_require__(/*! ./_asciiSize */ "./node_modules/formiojs/node_modules/lodash/_asciiSize.js"),
+    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/formiojs/node_modules/lodash/_hasUnicode.js"),
+    unicodeSize = __webpack_require__(/*! ./_unicodeSize */ "./node_modules/formiojs/node_modules/lodash/_unicodeSize.js");
 
 /**
  * Gets the number of symbols in `string`.
@@ -70977,16 +63479,16 @@ module.exports = stringSize;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stringToArray.js":
-/*!***********************************************!*\
-  !*** ./node_modules/lodash/_stringToArray.js ***!
-  \***********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stringToArray.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stringToArray.js ***!
+  \*********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var asciiToArray = __webpack_require__(/*! ./_asciiToArray */ "./node_modules/lodash/_asciiToArray.js"),
-    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/lodash/_hasUnicode.js"),
-    unicodeToArray = __webpack_require__(/*! ./_unicodeToArray */ "./node_modules/lodash/_unicodeToArray.js");
+var asciiToArray = __webpack_require__(/*! ./_asciiToArray */ "./node_modules/formiojs/node_modules/lodash/_asciiToArray.js"),
+    hasUnicode = __webpack_require__(/*! ./_hasUnicode */ "./node_modules/formiojs/node_modules/lodash/_hasUnicode.js"),
+    unicodeToArray = __webpack_require__(/*! ./_unicodeToArray */ "./node_modules/formiojs/node_modules/lodash/_unicodeToArray.js");
 
 /**
  * Converts `string` to an array.
@@ -71006,14 +63508,14 @@ module.exports = stringToArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_stringToPath.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/_stringToPath.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_stringToPath.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_stringToPath.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var memoizeCapped = __webpack_require__(/*! ./_memoizeCapped */ "./node_modules/lodash/_memoizeCapped.js");
+var memoizeCapped = __webpack_require__(/*! ./_memoizeCapped */ "./node_modules/formiojs/node_modules/lodash/_memoizeCapped.js");
 
 /** Used to match property names within property paths. */
 var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
@@ -71044,14 +63546,14 @@ module.exports = stringToPath;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_toKey.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/_toKey.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_toKey.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_toKey.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/lodash/isSymbol.js");
+var isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/formiojs/node_modules/lodash/isSymbol.js");
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0;
@@ -71076,10 +63578,10 @@ module.exports = toKey;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_toSource.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/_toSource.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_toSource.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_toSource.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71113,10 +63615,10 @@ module.exports = toSource;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_unicodeSize.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/_unicodeSize.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_unicodeSize.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_unicodeSize.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71168,10 +63670,10 @@ module.exports = unicodeSize;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/_unicodeToArray.js":
-/*!************************************************!*\
-  !*** ./node_modules/lodash/_unicodeToArray.js ***!
-  \************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/_unicodeToArray.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/_unicodeToArray.js ***!
+  \**********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71219,16 +63721,16 @@ module.exports = unicodeToArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/chunk.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/chunk.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/chunk.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/chunk.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseSlice = __webpack_require__(/*! ./_baseSlice */ "./node_modules/lodash/_baseSlice.js"),
-    isIterateeCall = __webpack_require__(/*! ./_isIterateeCall */ "./node_modules/lodash/_isIterateeCall.js"),
-    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/lodash/toInteger.js");
+var baseSlice = __webpack_require__(/*! ./_baseSlice */ "./node_modules/formiojs/node_modules/lodash/_baseSlice.js"),
+    isIterateeCall = __webpack_require__(/*! ./_isIterateeCall */ "./node_modules/formiojs/node_modules/lodash/_isIterateeCall.js"),
+    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/formiojs/node_modules/lodash/toInteger.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeCeil = Math.ceil,
@@ -71280,14 +63782,14 @@ module.exports = chunk;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/clone.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/clone.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/clone.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/clone.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseClone = __webpack_require__(/*! ./_baseClone */ "./node_modules/lodash/_baseClone.js");
+var baseClone = __webpack_require__(/*! ./_baseClone */ "./node_modules/formiojs/node_modules/lodash/_baseClone.js");
 
 /** Used to compose bitmasks for cloning. */
 var CLONE_SYMBOLS_FLAG = 4;
@@ -71327,14 +63829,14 @@ module.exports = clone;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/cloneDeep.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/cloneDeep.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/cloneDeep.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/cloneDeep.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseClone = __webpack_require__(/*! ./_baseClone */ "./node_modules/lodash/_baseClone.js");
+var baseClone = __webpack_require__(/*! ./_baseClone */ "./node_modules/formiojs/node_modules/lodash/_baseClone.js");
 
 /** Used to compose bitmasks for cloning. */
 var CLONE_DEEP_FLAG = 1,
@@ -71367,10 +63869,10 @@ module.exports = cloneDeep;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/constant.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/constant.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/constant.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/constant.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71404,17 +63906,17 @@ module.exports = constant;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/defaults.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/defaults.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/defaults.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/defaults.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseRest = __webpack_require__(/*! ./_baseRest */ "./node_modules/lodash/_baseRest.js"),
-    eq = __webpack_require__(/*! ./eq */ "./node_modules/lodash/eq.js"),
-    isIterateeCall = __webpack_require__(/*! ./_isIterateeCall */ "./node_modules/lodash/_isIterateeCall.js"),
-    keysIn = __webpack_require__(/*! ./keysIn */ "./node_modules/lodash/keysIn.js");
+var baseRest = __webpack_require__(/*! ./_baseRest */ "./node_modules/formiojs/node_modules/lodash/_baseRest.js"),
+    eq = __webpack_require__(/*! ./eq */ "./node_modules/formiojs/node_modules/lodash/eq.js"),
+    isIterateeCall = __webpack_require__(/*! ./_isIterateeCall */ "./node_modules/formiojs/node_modules/lodash/_isIterateeCall.js"),
+    keysIn = __webpack_require__(/*! ./keysIn */ "./node_modules/formiojs/node_modules/lodash/keysIn.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -71479,10 +63981,10 @@ module.exports = defaults;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/eq.js":
-/*!***********************************!*\
-  !*** ./node_modules/lodash/eq.js ***!
-  \***********************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/eq.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/eq.js ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71527,16 +64029,16 @@ module.exports = eq;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/findIndex.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/findIndex.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/findIndex.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/findIndex.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseFindIndex = __webpack_require__(/*! ./_baseFindIndex */ "./node_modules/lodash/_baseFindIndex.js"),
-    baseIteratee = __webpack_require__(/*! ./_baseIteratee */ "./node_modules/lodash/_baseIteratee.js"),
-    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/lodash/toInteger.js");
+var baseFindIndex = __webpack_require__(/*! ./_baseFindIndex */ "./node_modules/formiojs/node_modules/lodash/_baseFindIndex.js"),
+    baseIteratee = __webpack_require__(/*! ./_baseIteratee */ "./node_modules/formiojs/node_modules/lodash/_baseIteratee.js"),
+    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/formiojs/node_modules/lodash/toInteger.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeMax = Math.max;
@@ -71593,15 +64095,15 @@ module.exports = findIndex;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/forOwn.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/forOwn.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/forOwn.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/forOwn.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseForOwn = __webpack_require__(/*! ./_baseForOwn */ "./node_modules/lodash/_baseForOwn.js"),
-    castFunction = __webpack_require__(/*! ./_castFunction */ "./node_modules/lodash/_castFunction.js");
+var baseForOwn = __webpack_require__(/*! ./_baseForOwn */ "./node_modules/formiojs/node_modules/lodash/_baseForOwn.js"),
+    castFunction = __webpack_require__(/*! ./_castFunction */ "./node_modules/formiojs/node_modules/lodash/_castFunction.js");
 
 /**
  * Iterates over own enumerable string keyed properties of an object and
@@ -71640,14 +64142,14 @@ module.exports = forOwn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/get.js":
-/*!************************************!*\
-  !*** ./node_modules/lodash/get.js ***!
-  \************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/get.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/get.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGet = __webpack_require__(/*! ./_baseGet */ "./node_modules/lodash/_baseGet.js");
+var baseGet = __webpack_require__(/*! ./_baseGet */ "./node_modules/formiojs/node_modules/lodash/_baseGet.js");
 
 /**
  * Gets the value at `path` of `object`. If the resolved value is
@@ -71684,15 +64186,15 @@ module.exports = get;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/has.js":
-/*!************************************!*\
-  !*** ./node_modules/lodash/has.js ***!
-  \************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/has.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/has.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseHas = __webpack_require__(/*! ./_baseHas */ "./node_modules/lodash/_baseHas.js"),
-    hasPath = __webpack_require__(/*! ./_hasPath */ "./node_modules/lodash/_hasPath.js");
+var baseHas = __webpack_require__(/*! ./_baseHas */ "./node_modules/formiojs/node_modules/lodash/_baseHas.js"),
+    hasPath = __webpack_require__(/*! ./_hasPath */ "./node_modules/formiojs/node_modules/lodash/_hasPath.js");
 
 /**
  * Checks if `path` is a direct property of `object`.
@@ -71730,15 +64232,15 @@ module.exports = has;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/hasIn.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/hasIn.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/hasIn.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/hasIn.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseHasIn = __webpack_require__(/*! ./_baseHasIn */ "./node_modules/lodash/_baseHasIn.js"),
-    hasPath = __webpack_require__(/*! ./_hasPath */ "./node_modules/lodash/_hasPath.js");
+var baseHasIn = __webpack_require__(/*! ./_baseHasIn */ "./node_modules/formiojs/node_modules/lodash/_baseHasIn.js"),
+    hasPath = __webpack_require__(/*! ./_hasPath */ "./node_modules/formiojs/node_modules/lodash/_hasPath.js");
 
 /**
  * Checks if `path` is a direct or inherited property of `object`.
@@ -71775,10 +64277,10 @@ module.exports = hasIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/identity.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/identity.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/identity.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/identity.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71807,17 +64309,17 @@ module.exports = identity;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/intersection.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/intersection.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/intersection.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/intersection.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/lodash/_arrayMap.js"),
-    baseIntersection = __webpack_require__(/*! ./_baseIntersection */ "./node_modules/lodash/_baseIntersection.js"),
-    baseRest = __webpack_require__(/*! ./_baseRest */ "./node_modules/lodash/_baseRest.js"),
-    castArrayLikeObject = __webpack_require__(/*! ./_castArrayLikeObject */ "./node_modules/lodash/_castArrayLikeObject.js");
+var arrayMap = __webpack_require__(/*! ./_arrayMap */ "./node_modules/formiojs/node_modules/lodash/_arrayMap.js"),
+    baseIntersection = __webpack_require__(/*! ./_baseIntersection */ "./node_modules/formiojs/node_modules/lodash/_baseIntersection.js"),
+    baseRest = __webpack_require__(/*! ./_baseRest */ "./node_modules/formiojs/node_modules/lodash/_baseRest.js"),
+    castArrayLikeObject = __webpack_require__(/*! ./_castArrayLikeObject */ "./node_modules/formiojs/node_modules/lodash/_castArrayLikeObject.js");
 
 /**
  * Creates an array of unique values that are included in all given arrays
@@ -71848,15 +64350,15 @@ module.exports = intersection;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isArguments.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/isArguments.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isArguments.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isArguments.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsArguments = __webpack_require__(/*! ./_baseIsArguments */ "./node_modules/lodash/_baseIsArguments.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseIsArguments = __webpack_require__(/*! ./_baseIsArguments */ "./node_modules/formiojs/node_modules/lodash/_baseIsArguments.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** Used for built-in method references. */
 var objectProto = Object.prototype;
@@ -71895,10 +64397,10 @@ module.exports = isArguments;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isArray.js":
-/*!****************************************!*\
-  !*** ./node_modules/lodash/isArray.js ***!
-  \****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isArray.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isArray.js ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -71932,15 +64434,15 @@ module.exports = isArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isArrayLike.js":
-/*!********************************************!*\
-  !*** ./node_modules/lodash/isArrayLike.js ***!
-  \********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isArrayLike.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isArrayLike.js ***!
+  \******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isFunction = __webpack_require__(/*! ./isFunction */ "./node_modules/lodash/isFunction.js"),
-    isLength = __webpack_require__(/*! ./isLength */ "./node_modules/lodash/isLength.js");
+var isFunction = __webpack_require__(/*! ./isFunction */ "./node_modules/formiojs/node_modules/lodash/isFunction.js"),
+    isLength = __webpack_require__(/*! ./isLength */ "./node_modules/formiojs/node_modules/lodash/isLength.js");
 
 /**
  * Checks if `value` is array-like. A value is considered array-like if it's
@@ -71976,15 +64478,15 @@ module.exports = isArrayLike;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isArrayLikeObject.js":
-/*!**************************************************!*\
-  !*** ./node_modules/lodash/isArrayLikeObject.js ***!
-  \**************************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isArrayLikeObject.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isArrayLikeObject.js ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/formiojs/node_modules/lodash/isArrayLike.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /**
  * This method is like `_.isArrayLike` except that it also checks if `value`
@@ -72020,15 +64522,15 @@ module.exports = isArrayLikeObject;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isBuffer.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/isBuffer.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isBuffer.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isBuffer.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(/*! ./_root */ "./node_modules/lodash/_root.js"),
-    stubFalse = __webpack_require__(/*! ./stubFalse */ "./node_modules/lodash/stubFalse.js");
+/* WEBPACK VAR INJECTION */(function(module) {var root = __webpack_require__(/*! ./_root */ "./node_modules/formiojs/node_modules/lodash/_root.js"),
+    stubFalse = __webpack_require__(/*! ./stubFalse */ "./node_modules/formiojs/node_modules/lodash/stubFalse.js");
 
 /** Detect free variable `exports`. */
 var freeExports =  true && exports && !exports.nodeType && exports;
@@ -72066,19 +64568,19 @@ var isBuffer = nativeIsBuffer || stubFalse;
 
 module.exports = isBuffer;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isFunction.js":
-/*!*******************************************!*\
-  !*** ./node_modules/lodash/isFunction.js ***!
-  \*******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isFunction.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isFunction.js ***!
+  \*****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js");
 
 /** `Object#toString` result references. */
 var asyncTag = '[object AsyncFunction]',
@@ -72118,10 +64620,10 @@ module.exports = isFunction;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isLength.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/isLength.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isLength.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isLength.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -72164,16 +64666,16 @@ module.exports = isLength;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isMap.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/isMap.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isMap.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isMap.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsMap = __webpack_require__(/*! ./_baseIsMap */ "./node_modules/lodash/_baseIsMap.js"),
-    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/lodash/_baseUnary.js"),
-    nodeUtil = __webpack_require__(/*! ./_nodeUtil */ "./node_modules/lodash/_nodeUtil.js");
+var baseIsMap = __webpack_require__(/*! ./_baseIsMap */ "./node_modules/formiojs/node_modules/lodash/_baseIsMap.js"),
+    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/formiojs/node_modules/lodash/_baseUnary.js"),
+    nodeUtil = __webpack_require__(/*! ./_nodeUtil */ "./node_modules/formiojs/node_modules/lodash/_nodeUtil.js");
 
 /* Node.js helper references. */
 var nodeIsMap = nodeUtil && nodeUtil.isMap;
@@ -72202,14 +64704,14 @@ module.exports = isMap;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isNaN.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/isNaN.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isNaN.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isNaN.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isNumber = __webpack_require__(/*! ./isNumber */ "./node_modules/lodash/isNumber.js");
+var isNumber = __webpack_require__(/*! ./isNumber */ "./node_modules/formiojs/node_modules/lodash/isNumber.js");
 
 /**
  * Checks if `value` is `NaN`.
@@ -72251,10 +64753,10 @@ module.exports = isNaN;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isNil.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/isNil.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isNil.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isNil.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -72287,15 +64789,15 @@ module.exports = isNil;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isNumber.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/isNumber.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isNumber.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isNumber.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var numberTag = '[object Number]';
@@ -72336,10 +64838,10 @@ module.exports = isNumber;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isObject.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/isObject.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isObject.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isObject.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -72378,10 +64880,10 @@ module.exports = isObject;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isObjectLike.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/isObjectLike.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isObjectLike.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -72418,16 +64920,16 @@ module.exports = isObjectLike;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isPlainObject.js":
-/*!**********************************************!*\
-  !*** ./node_modules/lodash/isPlainObject.js ***!
-  \**********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isPlainObject.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isPlainObject.js ***!
+  \********************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    getPrototype = __webpack_require__(/*! ./_getPrototype */ "./node_modules/lodash/_getPrototype.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    getPrototype = __webpack_require__(/*! ./_getPrototype */ "./node_modules/formiojs/node_modules/lodash/_getPrototype.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var objectTag = '[object Object]';
@@ -72491,16 +64993,16 @@ module.exports = isPlainObject;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isSet.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/isSet.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isSet.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isSet.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsSet = __webpack_require__(/*! ./_baseIsSet */ "./node_modules/lodash/_baseIsSet.js"),
-    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/lodash/_baseUnary.js"),
-    nodeUtil = __webpack_require__(/*! ./_nodeUtil */ "./node_modules/lodash/_nodeUtil.js");
+var baseIsSet = __webpack_require__(/*! ./_baseIsSet */ "./node_modules/formiojs/node_modules/lodash/_baseIsSet.js"),
+    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/formiojs/node_modules/lodash/_baseUnary.js"),
+    nodeUtil = __webpack_require__(/*! ./_nodeUtil */ "./node_modules/formiojs/node_modules/lodash/_nodeUtil.js");
 
 /* Node.js helper references. */
 var nodeIsSet = nodeUtil && nodeUtil.isSet;
@@ -72529,16 +65031,16 @@ module.exports = isSet;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isString.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/isString.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isString.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isString.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/lodash/isArray.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    isArray = __webpack_require__(/*! ./isArray */ "./node_modules/formiojs/node_modules/lodash/isArray.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var stringTag = '[object String]';
@@ -72570,15 +65072,15 @@ module.exports = isString;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isSymbol.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/isSymbol.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isSymbol.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isSymbol.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/lodash/_baseGetTag.js"),
-    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/lodash/isObjectLike.js");
+var baseGetTag = __webpack_require__(/*! ./_baseGetTag */ "./node_modules/formiojs/node_modules/lodash/_baseGetTag.js"),
+    isObjectLike = __webpack_require__(/*! ./isObjectLike */ "./node_modules/formiojs/node_modules/lodash/isObjectLike.js");
 
 /** `Object#toString` result references. */
 var symbolTag = '[object Symbol]';
@@ -72610,16 +65112,16 @@ module.exports = isSymbol;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/isTypedArray.js":
-/*!*********************************************!*\
-  !*** ./node_modules/lodash/isTypedArray.js ***!
-  \*********************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/isTypedArray.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/isTypedArray.js ***!
+  \*******************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseIsTypedArray = __webpack_require__(/*! ./_baseIsTypedArray */ "./node_modules/lodash/_baseIsTypedArray.js"),
-    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/lodash/_baseUnary.js"),
-    nodeUtil = __webpack_require__(/*! ./_nodeUtil */ "./node_modules/lodash/_nodeUtil.js");
+var baseIsTypedArray = __webpack_require__(/*! ./_baseIsTypedArray */ "./node_modules/formiojs/node_modules/lodash/_baseIsTypedArray.js"),
+    baseUnary = __webpack_require__(/*! ./_baseUnary */ "./node_modules/formiojs/node_modules/lodash/_baseUnary.js"),
+    nodeUtil = __webpack_require__(/*! ./_nodeUtil */ "./node_modules/formiojs/node_modules/lodash/_nodeUtil.js");
 
 /* Node.js helper references. */
 var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
@@ -72648,16 +65150,16 @@ module.exports = isTypedArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/keys.js":
-/*!*************************************!*\
-  !*** ./node_modules/lodash/keys.js ***!
-  \*************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/keys.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/keys.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayLikeKeys = __webpack_require__(/*! ./_arrayLikeKeys */ "./node_modules/lodash/_arrayLikeKeys.js"),
-    baseKeys = __webpack_require__(/*! ./_baseKeys */ "./node_modules/lodash/_baseKeys.js"),
-    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js");
+var arrayLikeKeys = __webpack_require__(/*! ./_arrayLikeKeys */ "./node_modules/formiojs/node_modules/lodash/_arrayLikeKeys.js"),
+    baseKeys = __webpack_require__(/*! ./_baseKeys */ "./node_modules/formiojs/node_modules/lodash/_baseKeys.js"),
+    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/formiojs/node_modules/lodash/isArrayLike.js");
 
 /**
  * Creates an array of the own enumerable property names of `object`.
@@ -72696,16 +65198,16 @@ module.exports = keys;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/keysIn.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/keysIn.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/keysIn.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/keysIn.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var arrayLikeKeys = __webpack_require__(/*! ./_arrayLikeKeys */ "./node_modules/lodash/_arrayLikeKeys.js"),
-    baseKeysIn = __webpack_require__(/*! ./_baseKeysIn */ "./node_modules/lodash/_baseKeysIn.js"),
-    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/lodash/isArrayLike.js");
+var arrayLikeKeys = __webpack_require__(/*! ./_arrayLikeKeys */ "./node_modules/formiojs/node_modules/lodash/_arrayLikeKeys.js"),
+    baseKeysIn = __webpack_require__(/*! ./_baseKeysIn */ "./node_modules/formiojs/node_modules/lodash/_baseKeysIn.js"),
+    isArrayLike = __webpack_require__(/*! ./isArrayLike */ "./node_modules/formiojs/node_modules/lodash/isArrayLike.js");
 
 /**
  * Creates an array of the own and inherited enumerable property names of `object`.
@@ -72739,10 +65241,10 @@ module.exports = keysIn;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/lodash.js":
-/*!***************************************!*\
-  !*** ./node_modules/lodash/lodash.js ***!
-  \***************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/lodash.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/lodash.js ***!
+  \*************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -72760,7 +65262,7 @@ module.exports = keysIn;
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.14';
+  var VERSION = '4.17.15';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -89851,18 +82353,18 @@ module.exports = keysIn;
   else {}
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../../../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
 
 /***/ }),
 
-/***/ "./node_modules/lodash/memoize.js":
-/*!****************************************!*\
-  !*** ./node_modules/lodash/memoize.js ***!
-  \****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/memoize.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/memoize.js ***!
+  \**************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var MapCache = __webpack_require__(/*! ./_MapCache */ "./node_modules/lodash/_MapCache.js");
+var MapCache = __webpack_require__(/*! ./_MapCache */ "./node_modules/formiojs/node_modules/lodash/_MapCache.js");
 
 /** Error message constants. */
 var FUNC_ERROR_TEXT = 'Expected a function';
@@ -89939,17 +82441,17 @@ module.exports = memoize;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/pad.js":
-/*!************************************!*\
-  !*** ./node_modules/lodash/pad.js ***!
-  \************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/pad.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/pad.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var createPadding = __webpack_require__(/*! ./_createPadding */ "./node_modules/lodash/_createPadding.js"),
-    stringSize = __webpack_require__(/*! ./_stringSize */ "./node_modules/lodash/_stringSize.js"),
-    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/lodash/toInteger.js"),
-    toString = __webpack_require__(/*! ./toString */ "./node_modules/lodash/toString.js");
+var createPadding = __webpack_require__(/*! ./_createPadding */ "./node_modules/formiojs/node_modules/lodash/_createPadding.js"),
+    stringSize = __webpack_require__(/*! ./_stringSize */ "./node_modules/formiojs/node_modules/lodash/_stringSize.js"),
+    toInteger = __webpack_require__(/*! ./toInteger */ "./node_modules/formiojs/node_modules/lodash/toInteger.js"),
+    toString = __webpack_require__(/*! ./toString */ "./node_modules/formiojs/node_modules/lodash/toString.js");
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeCeil = Math.ceil,
@@ -89999,17 +82501,17 @@ module.exports = pad;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/property.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/property.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/property.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/property.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseProperty = __webpack_require__(/*! ./_baseProperty */ "./node_modules/lodash/_baseProperty.js"),
-    basePropertyDeep = __webpack_require__(/*! ./_basePropertyDeep */ "./node_modules/lodash/_basePropertyDeep.js"),
-    isKey = __webpack_require__(/*! ./_isKey */ "./node_modules/lodash/_isKey.js"),
-    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/lodash/_toKey.js");
+var baseProperty = __webpack_require__(/*! ./_baseProperty */ "./node_modules/formiojs/node_modules/lodash/_baseProperty.js"),
+    basePropertyDeep = __webpack_require__(/*! ./_basePropertyDeep */ "./node_modules/formiojs/node_modules/lodash/_basePropertyDeep.js"),
+    isKey = __webpack_require__(/*! ./_isKey */ "./node_modules/formiojs/node_modules/lodash/_isKey.js"),
+    toKey = __webpack_require__(/*! ./_toKey */ "./node_modules/formiojs/node_modules/lodash/_toKey.js");
 
 /**
  * Creates a function that returns the value at `path` of a given object.
@@ -90042,14 +82544,14 @@ module.exports = property;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/round.js":
-/*!**************************************!*\
-  !*** ./node_modules/lodash/round.js ***!
-  \**************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/round.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/round.js ***!
+  \************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var createRound = __webpack_require__(/*! ./_createRound */ "./node_modules/lodash/_createRound.js");
+var createRound = __webpack_require__(/*! ./_createRound */ "./node_modules/formiojs/node_modules/lodash/_createRound.js");
 
 /**
  * Computes `number` rounded to `precision`.
@@ -90079,14 +82581,14 @@ module.exports = round;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/set.js":
-/*!************************************!*\
-  !*** ./node_modules/lodash/set.js ***!
-  \************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/set.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/set.js ***!
+  \**********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseSet = __webpack_require__(/*! ./_baseSet */ "./node_modules/lodash/_baseSet.js");
+var baseSet = __webpack_require__(/*! ./_baseSet */ "./node_modules/formiojs/node_modules/lodash/_baseSet.js");
 
 /**
  * Sets the value at `path` of `object`. If a portion of `path` doesn't exist,
@@ -90125,10 +82627,10 @@ module.exports = set;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/stubArray.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/stubArray.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/stubArray.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/stubArray.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -90159,10 +82661,10 @@ module.exports = stubArray;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/stubFalse.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/stubFalse.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/stubFalse.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/stubFalse.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -90188,14 +82690,14 @@ module.exports = stubFalse;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/toFinite.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/toFinite.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/toFinite.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/toFinite.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toNumber = __webpack_require__(/*! ./toNumber */ "./node_modules/lodash/toNumber.js");
+var toNumber = __webpack_require__(/*! ./toNumber */ "./node_modules/formiojs/node_modules/lodash/toNumber.js");
 
 /** Used as references for various `Number` constants. */
 var INFINITY = 1 / 0,
@@ -90241,14 +82743,14 @@ module.exports = toFinite;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/toInteger.js":
-/*!******************************************!*\
-  !*** ./node_modules/lodash/toInteger.js ***!
-  \******************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/toInteger.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/toInteger.js ***!
+  \****************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toFinite = __webpack_require__(/*! ./toFinite */ "./node_modules/lodash/toFinite.js");
+var toFinite = __webpack_require__(/*! ./toFinite */ "./node_modules/formiojs/node_modules/lodash/toFinite.js");
 
 /**
  * Converts `value` to an integer.
@@ -90288,15 +82790,15 @@ module.exports = toInteger;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/toNumber.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/toNumber.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/toNumber.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/toNumber.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/lodash/isObject.js"),
-    isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/lodash/isSymbol.js");
+var isObject = __webpack_require__(/*! ./isObject */ "./node_modules/formiojs/node_modules/lodash/isObject.js"),
+    isSymbol = __webpack_require__(/*! ./isSymbol */ "./node_modules/formiojs/node_modules/lodash/isSymbol.js");
 
 /** Used as references for various `Number` constants. */
 var NAN = 0 / 0;
@@ -90365,14 +82867,14 @@ module.exports = toNumber;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/toString.js":
-/*!*****************************************!*\
-  !*** ./node_modules/lodash/toString.js ***!
-  \*****************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/toString.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/toString.js ***!
+  \***************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/lodash/_baseToString.js");
+var baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/formiojs/node_modules/lodash/_baseToString.js");
 
 /**
  * Converts `value` to a string. An empty string is returned for `null`
@@ -90404,19 +82906,19 @@ module.exports = toString;
 
 /***/ }),
 
-/***/ "./node_modules/lodash/trim.js":
-/*!*************************************!*\
-  !*** ./node_modules/lodash/trim.js ***!
-  \*************************************/
+/***/ "./node_modules/formiojs/node_modules/lodash/trim.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/lodash/trim.js ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/lodash/_baseToString.js"),
-    castSlice = __webpack_require__(/*! ./_castSlice */ "./node_modules/lodash/_castSlice.js"),
-    charsEndIndex = __webpack_require__(/*! ./_charsEndIndex */ "./node_modules/lodash/_charsEndIndex.js"),
-    charsStartIndex = __webpack_require__(/*! ./_charsStartIndex */ "./node_modules/lodash/_charsStartIndex.js"),
-    stringToArray = __webpack_require__(/*! ./_stringToArray */ "./node_modules/lodash/_stringToArray.js"),
-    toString = __webpack_require__(/*! ./toString */ "./node_modules/lodash/toString.js");
+var baseToString = __webpack_require__(/*! ./_baseToString */ "./node_modules/formiojs/node_modules/lodash/_baseToString.js"),
+    castSlice = __webpack_require__(/*! ./_castSlice */ "./node_modules/formiojs/node_modules/lodash/_castSlice.js"),
+    charsEndIndex = __webpack_require__(/*! ./_charsEndIndex */ "./node_modules/formiojs/node_modules/lodash/_charsEndIndex.js"),
+    charsStartIndex = __webpack_require__(/*! ./_charsStartIndex */ "./node_modules/formiojs/node_modules/lodash/_charsStartIndex.js"),
+    stringToArray = __webpack_require__(/*! ./_stringToArray */ "./node_modules/formiojs/node_modules/lodash/_stringToArray.js"),
+    toString = __webpack_require__(/*! ./toString */ "./node_modules/formiojs/node_modules/lodash/toString.js");
 
 /** Used to match leading and trailing whitespace. */
 var reTrim = /^\s+|\s+$/g;
@@ -90460,6 +82962,7562 @@ function trim(string, chars, guard) {
 }
 
 module.exports = trim;
+
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/pdf.image.js":
+/*!********************************************!*\
+  !*** ./node_modules/formiojs/pdf.image.js ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6CAMAAAC/MqoPAAAAA3NCSVQICAjb4U/gAAAC9FBMVEX' + '///+HiYuGhomCg4aCgIF6eX12eHokJCQkICAgICAjHSOOj5KJi46DhYd1dnltb3EkICAgICAjHSOVl5qTlZeOj5KHiYt6eX0kICAjH' + 'SOZmp2Vl5qGhokkICDOz9G+vsCztbapq66cnqGbnZ6ZmZmTlZckICCbnZ6Zmp2Vl5qTlZeOj5KMioqGhomCg4aCgIGZmp2TlZeCgIG' + 'mqauho6aen6KcnqGmqaucnqGbnZ66u76cnqGZmp2Vl5rKISjS0dLR0NHOz9HMzMzHycrHxsfFxMXCwsPCw8W+vsCen6KbnZ7GISjCw' + 'sO+v8K+vsCpq66kpqmeoaObnZ7////7+/v5+vr39/j09fXz8/P88PHx8fL37+/u7+/r7O3r6+zp6uvn5+jj5+fz4+P44eLw4eHj5OX' + 'i4+Th4uPf4OLf3+Dc3t/b3N7a29z109TY2tvv1NXv0tPX2NrW19jU1tfS09XP0dLOz9Hrx8jxxMbnxsfMzMzkxMXHycrGx8nDxcfqu' + 'bvCw8XCwsPkuLrutbe/wcO+v8Lftre+vsC7vb+6u763ubu1t7riqqzeqquztbbqpqmxs7bZqKmvsbOtr7Kqra+pq67bnJ7gm56mqav' + 'XnJ3nl5ulp6qkpqmjpaeho6aeoaPbj5Gen6KcnqHXjpGbnZ7jiYzfio7SjpDdiYyZmp3LjI6ZmZnahoqVl5rXgoaTlZeSk5bSgIOPk' + 'ZPOf4Lgen6Oj5LLf4KLjY+Ji46HiYvVcnaGhonNcnWDhYfKcXSCg4bca3DFcXTBcHJ+gIJ9foHRZWl6fH7MZmbOZWnGZGd6eX12eHr' + 'BY2bZXGF1dnlydHa4YWNwcXTOV1vKVlvIVlrCVlnPUFW+VVnOTlS3VFe1VFbKS1HGSE3BR0y/R0y7R0zEREq2R0rSP0WzRkmtRUjBO' + 'kC4OT6zOD3OMDaqNzrBLTO2KzCzKzCuKi/KISiqKi6lKS2+ICa6HyW7Hya2HySuHiOyHiSrHiKnHSGiHCCeHB+aGx/MBOLyAAAA/HR' + 'STlMAERERERERERERESIiIiIiIiIiMzMzMzMzM0RERERVVVVVVVVVVVVmZmZmZmZmZmZ3d3eIiIiImZmZqqqqqrvMzMzMzMzMzMzMz' + 'MzM3d3d3e7u7v/////////////////////////////////////////////////////////////////////////////////////////' + '//////////////////////////////////////////////////////////////////////////////////////////////////////' + '/////////////////////////////////8PeNL3AAAACXBIWXMAAC37AAAt+wH8h0rnAAAAHHRFWHRTb2Z0d2FyZQBBZG9iZSBGaXJ' + 'ld29ya3MgQ1M26LyyjAAAFydJREFUeJzt3Xl8FNd9AHD31K56LfSIaOumTY80aeK06R23TXq5xXV8ZIRhzWEkgkAHKICQZCwpQpZsS' + 'SsWRQdeR2hlCWEsXFkHyELmtMEkGBvnMKZ2iV1jW2COGAOSwPzT33tv5s2bY3fn+O2slg8//DFikeT97u94b2Zn5FtuuRk342bcjJt' + 'xM8zCl5nhaWRm+lJNJuHP8Psy/H6/z7uA/1oG/CvVfL+P/vJS7qP/uQx4wVOJh9f/93q6u6LRzs0dHZH29ra21taWluZwOBRqbGxsq' + 'K+vr6urra2trq6qqqqsrKyoqFhHo5TEWiFKtKE8TD6NfgF8ZUUlfJNq+G519Q2NoVA4/Lek2lJI931algO8HeCqvKGBwOsIvFqBV+j' + 'hJXHCFF+9Huj1hN7Scs/vQvZTJ/f9Ppe3mcjVlGsyrsv1mpI1mtDo6QtVyvHV1WBvDIWbW1pb2//G58tMjRwaLvAHXE7hIA9RuVzsc' + 'sqNGedsHquFf6t+rqd2kndOb2ttn/2p1OQ9w58ZCHxWlbeYyUnKNXAh4cxqEuwFMLVXVpFmh3pvbYP/Zvu9n/Olot+h3AOBzwtyqHX' + 'tgNOmXN/ignuVJmQ/56s9D98J0v5YQ2O4pa090gH2jtt/LQV2WNUCgT8Tqp3KhT7n802bcrXSGXqlPrif4tfwzFM7tHsdo3ds7oR+7' + '5j9W97LM3wzA1lfUOXNOvn6anFJ0zY5r3UTucznuVfLXrbXQrO3tEU6o13RFrDf9zmv6Zl+fyCQ9cWIblGLKdc2uVLnDFoEUUj/YcH' + '0K9XUq3hS8nUNlN7V0xMh9ujtHtMzCH3WbcqEExY1bbWLcqHS1XxTbKE2OF/Wi3aa9ua2SLS7t6+vmdpn/4rHdGj1rNuM8jrDhGO1b' + 'tbiWnUBDc4vLOJ6mnm54ysqIe3h1ki0p69/IBoi9s77ftNTuo/0+pc0s12zkREHnJpxNeGCusAYYvJXqZmneYe0h1ragT4wOBwO07x' + '3ednwQJ8RyPpyG5/tYpvHk2vhGm8+/DLo2cwX7CTtUPGbu58ZHB7tbpTt/+ApHQr+yyabVy6vUOVrqZzPNgM8XwiNvUi2r+ajvpSkv' + 'SHUGunqGxzZNdbYGGomNd915y84lPyT7fgvGv9H4qQY/2sS/6OLN+wE+5JtHE/skPb2aN/A6NjuzfXMHu2685ed0X863WMHdPwaJe+' + 'V1fWh1s6egZGx/WNkT89q/hvOhl2qZQljiEw71vAs7S2Rrn6gHwrV1Ss1/40/vkHprOPXMPv6hlBbtG8Y6J3Vtbzmez9/Q9KL2DIn2' + '6tqG1s6egZ37T88CgOf13zvX9yI9MJChqf2dRXV9c3tXf2j+w8fq2B2VvO9/3gD0gvYIs+mHaS9DgbdMyN7Dx8LgV2oedv2VMsSxhB' + 'd6Cke8r62tKIaBl3v8NihY22lFZqat2tPtSxhDOWzTQ7YSd4h7fXh9u6BXQePRdfK9rBi/7mk0rc+Ur5CglhS/t0D6oPl5UHyYPkjO' + '8+onyqJ8apT+rPL8xme2km314Zao/2jB48Okz9o7Hfastt9JiJnyQHjg8Gt6PTly/OVoqdpr25o6ewb2f/y6MrVJbrE3/mzHtElaaf' + 'JgyvOmH2qc/qy5QwPRb+SYKHimzt6h/ceHi2kf3Rsd0eXDpg8qNix6Iq9AGp+1Zq16yrrQpGewd2HDy8vFPKuHMz8TJLpK1hvQ30LD' + '5YrD34XlZ6Xl8cTDyVfUgrN3tY1MHbotWVGO+Tdcr87o8MHW4WSVx48s5F9dEr41FdZnIn3TePSly4V7atK1lasb4Q5N3bw2NJl+WL' + 'Nh2wewDum/5QxH9E+WE4/2qj7VDcBdNUOaYeKr25o7ezfdfDo4qUmee/s+vuk019lpa998JShDTDoon11Ccw5GPGj+4/maezqxs6i3' + 'Tld+FB4cIXa2Yh0Yif4goKiVWtKK+ubN5PVrfTBxeY1b82OTWcjYCsiPScnh9pJ4iHtK9eUVtSFI72wiy9d+GCMmv9zL+hB3YMHzCa' + 'AK/rixYtzeNHnFxStXltRG470wMK+doHOXsvtf5pUOmvrch3yVdNHXcR/E7pqLyhcvXZdbai9G+glDzB7vibv9AR91+8kk75VHeYik' + 'n64BJcuJ57Y8wtXlayrhoUd9jRr5j2gz7tc85HO+34jefQzS+hHB0zp+gnghv6gal8K9oKVQG8E+tih1XONdl7z9yXc2jilH1gRYxn' + 'T0yW1AxzSH2R4Nu2WFxSVlFbBnga2c6vu5/Z846ybncjujM5jpyd0NfF5y/OLYHVrIPSDRXPuN8k7r/lEb8S6o2/Uc5NAX7RokWAHI' + '4z4hpYobOeKskV7gaHm/y6J9I2aB4WPg/pPdUFfuJDYmT6HVPyqtRWwnesf3V8gZcfLe0fnZ5NFL39V+yD98A1VikN/eiGxL2J2kva' + 'CVSUVcMTeN7J3sRTDLuc9cu+v49PLyzdufUP/IP2QreuIW5qnFywkwe15+TDiyXZueDf59vFr/r6fR6fHfhB9I/v0Ao0d6EUl6+gR+' + '6hksBtqfraH9Efoh4bV3hWd4VnD5yyFOVdaRU7PbZYW5+eva2wMhRvAG2N9/2vv6OxEzRlk+gI179DsMOKh4rueGd61e//BQ4cOv/z' + 'y0WPHXvvhyGCkapVhT/uHXtF3qq2OSudFvzgnj+3nWjq6+gaGR3eN7d67d//Bg/ACHAX+D/f3hrQ1f+8veUM/w5Ju3Oi4pjM7r/iKO' + 'nJVTXdf/8DA4PDICH0FCJ/ojw2ExZqP2e6o9FNsd7skzqfapz+wYIGqJ/ZlkPbSitqGMNmyRbu6unt64SUYhAqgfEj+a0ej1WrN/1X' + 'y6extGYmffcWii/ZFpNthVwP26rpGcrlwa1s7bF6iXeAfGByh3Q/6Y0f7annN/3bS6UrsjPepTug6e07ecjhyJVeX0Fsj6A0C8ALAQ' + 'XpPX/+wrIfoq5Nr/p5f9Ii+M+6nOqKrerKpJfaCIjLMyDWUleT2EHJzCHv/hehHx0APsT9ay/JufiCDTd94Kv6nOqVzO6zfMOrgKLV' + 'oNb3OQrmAtpZcON3cGuns6u0nF5fthdg90sLsn0kanb37GoTd7alEn2o7np6no9PjOHL0St+Iki80KSV8qm9t3xzt6YehNwaxa6T7M' + 'Wr/VQS65/HUPAgBv5DNupyl7CxlAXkDFl4A+bq6Wnb1NL2YdGR0dHRksC9M7Leb3DiQalnCoHSG16xx9KxNHjs5Xyjr5WuIQ80UD6k' + 'fHhzo72sl9s8Y7amWJQwjfYG8r5NPWcnn54meXGvD8C1tHWzD09/f19MKQ7DFeMNIqmUJQ6aLNS93/IPCiVpa+iq+Xu75Poje7q52s' + 'H/FcGNgqmUJ46m584x5V+0MT96Vkt9/ZxdV1taHwjDto909PT3d0U5S83+kt6daljCemivaxYbX4vkb8DKetDzJfLQrGt0caWlovMe' + 'ns6daljCArtrnae2LBDt5eyJfGHhV6x8jN0hFNnd2bu5ob2tuaPxLnT3VsoRB6IqdpT5G3hV7kTLs6ayHHW4kEmlvaw3VN37Kn5mZd' + 'nSrdrnoKZ50/GNkO9NG77RuDtXf7ctwdVOkfBcEvZMhn7zfvywvj7wnlJNDT5WTs0iLFpFjaz6SaIvypz6Xxf3GmKP5TQ1b9uVC0bN' + '1Ltwi33raWP8VPwodXz5njvCbni7oE9g1Oxx6X2A4zG7Sabgr4PO7uAdapVM50OllD0y+2JWcoOXfyAcGvB27fFUpuTGQ3vNPb9G5I' + '+DLdJF2mZ4UOQ/2Z9GuKXtrNc8anh3VN9B7EO+YGYB2d01n1e5ezsucRHa27hWI0fFx1neh5ql9HT2gZfH1QMDnottlukmfO5SDcA6' + 'Xy3blJTD0vL1+Vw5pyA89gFh/dyCQmeGajjThNEnOzpbt/CVwmvd8rZ2cy6mqrqq6Owsq3nXBY8p5qmU7fwlwap7/5IPKu7MCM100u' + '0h3PeHEMs/WB1rNK7fAVwA94He+vHE6ptw85siDwHnNF9E7ghX8uq/j0DFmu1H+rW83NZXlavPu0L5csJew+8AJ3efPcElfhjLbtfL' + '5z5/9mMbz87md+W3bNXsbbr+L9LrPLR1twgkZl+EQJ+cLjzvOO5vz8m1ixA70Ge7p+PL5H3ysxrP6nndR8yv5DcF3kYLHoFuUz7Umz' + '37yYzFyXduFmlfseHTU2T7/rIb+uGHWm9vjnbPS13wJFh15tjdp5B+fzM6WYust4tWDGXo3dMl/4tCR5dkvaekfZ0tSHLudzU0+a3i' + 'w49BRJxwJeVlrkuv+cpmU2G48iNWfpVbshdR+BwodW17GxJLECv/y5SYJ345Hx5rtEBKb7z8C7VlGf1JKYI/Z74tinKxciUtH2rdLA' + 'v1HVK7QDXYLg97EzmYdGh1TLrEp9zyjg/zyjyXn9lhzHouO1+eSnGtzehy73TmPRMeVy3RS8Cep/JJKT2S3Puv+A4WOLBfoTC7SJR3' + 'dsR2LjjXb9XQm19Dj2G3N+X/HoVP5grhykwEXSy6POVjXy8zoSHYcOt5sZyEftwWlJibX0Z3YjTWPREfsc4FeJj3P5JeelKzarc95H' + 'DqyXHpcPlaVzsagY8y6f8OiY8oltoe//FITg5vQEexYdKzZzqKY0c+eVeiPG+juZx0SHW22y8F27pcV+aUyI921HYeON9vlOGmB7nb' + 'O49Ix+pzGS1r5paAZ3eWcR6WjyaUntfJLpnKXsw6TjieXvq2VfxCD7sr+r3h0lNkuxxKNXL+ZM6fbnXV4dKTZLscHovzS92PR3djR6' + 'BblengMufSShm7c0biys5rHoiP2OY3HRfmVptj0ePb4cx6Jji2XikX5FdNl3ao91qzDoaPLodkF+RXzZd2lHY+ONNuVeFakx5Vr6dZ' + 'nHRodbbbLUSzIX49Pdzjn/wWJjjfblTjJ5Vdir21u7Eh03D6n0cTlV+KsbRbsseY8Dj0Jcil4VpHHXdus2o2zDpeOKJek5znd5EQFg' + 'h2TjjTblchV5FfOxV/cTOhW+h2RjjXbeZy8ooSFZtfjE9vx6HizXYkfc7qltNu99ACNji+XrlyxmXbrcx6TngR5riqfPJeLY58rpB2' + 'JngS5VCbQJ/dY/CIbdhy6dblluCQ9KcgnJ52kPWa/00mHSceVS98X5ZNHrH6ZZTsi3Qh3JZc+EOWTk3GP2a3b1SmPR0ftc4igVj553' + 'PJXxu93bkejY8uVKafIJydq3Ns1qzsWHV0uTzlVPjFu/Wtj2eeKdiQ68oQj8bpOPjFh5QDOhG6wo9KTIJf0SZ+YsLidNeLN845PR5j' + 'tJMoM8omJLTa+PrH9n5NDd9nnEmt1qn6dyycmLO5rTO336+3odCQ5bXVKD57j8gmr21kTu7i+MTs2HUsuKfKfSFsm1LC8r9HbDXv5u' + 'dh0nD6XaKuzLh+SpHGVbn1fo6WbHcfg0tHk0OrygIMVrUmlT1lf4ET8HLNjOEw60myn8bpCJ5PtbS6fOm9jgVPtc8zsiHRMuaTI6Ra' + 'uTKVP2Vng4tu/hkzHmHAEqyzobKYfV+AQdha4uHY8OqZcGlLom+gfcwX6CZvfKma/o9Exq12SfqLs4orZn7dw+dSUrQVOHfOGvGPRc' + 'eVBJennlAfGuXzqtCO50Y5Ex5VLNUrS+WmpGpU+tc2R3GDHoSPLpT3KQYu6jB9X6RcsTzrdM9La8ehYE47EuHK4piJzz6t2i5PO8Iy' + '0djQ6pjxXkYsnZjap9Clr56qMdM2cx6IjwkGpHKJrjtTUkr962tKeLiZ9DiYdVS59T6Frspt7gdOvWpx0ce04dFy5xM/LaJO7icuvX' + 'i12b08K3aW8RpHrD1FPcPnVdy1+rzj2ZNBdyukultI36f4ieEGRWy75WPYkZd0tfVw5GWeo6jIuv3r1Ief27CT1ulu4VKzITd5z2KH' + 'SP3L03msy6a7lZGlj9CGTvzzB6Zbb3YhPzoR3L1fPyZgdogUvqPbnHNqT0+sI8lzl3PN5078uVunXNjiyJ2fCI8jVk5AxTrpv4PJrH' + '1lc3Y23BxH79KMfUeixNuo7OP3aR2TPU1yz7YU333zz4idvvvXWi9sffXi+RftXEekYcCk4EbfeSbygyK9de++F966x+ESN97/jNR1' + 'FnrDeIYLvcroaAv2T6++bZN6Ax6PjyNV6j3MKDuzX4smvX3/f5Kv0djQ6kpzXe+xrKHI3vPJR3JyT2J7YjkVHkqv1brafgVemZsdpk' + '2q/ppdf/zABPRuNjiVX691km5r7xAl1uMdP+vXr34ovB/s0o+cq8nf0fxPc8K66l9HLL8K69pYIv3794QRyLDqWXNqk0LXvqAY3vHJ' + 'VCGPOn4ORPv/FeHS9PDt7mtGV/bvmDdWyfReumskvCtV+8Qn4xPdV+XXd8maUT7OsFyvvqO7jD+VuOz111Sh/77maYPAVsdE/3P7N7' + 'ar8rYTyaUYfUujK5nzDiakpg/yjFzbIQ3Cb+YiDeDShfJrRz8vvqLKTcrk7Lqgn4/hR+nPiMctDF83lLyaWTy96k3IBARlyNSeEE7C' + 'K+wn9mhd8xUz+lqbTzeXTi65cQTAuBbecntLLX9lg+sbDQx8a6NqtnFE+/ej8AoIj+4Q3mZj7hLmbxnc+1MB/8M1E8ulX8EMKXQ831' + 'rkuHn3xokL/gW5BN5VPuzF33igH+ukdlk69PvzEdohH9UerMeTTbHFrMpPvs34DgFnElE+vLc3bBvnpTfaukrMjn070Mr18n73rhWz' + 'Kp88ePnePttxdJzyhfJpkncFV+RHXCU8snxZ0Ga7IL1gb6W7l04AeVK53x6v0xPLpQA9uOTch0neguK3IU01v4nAmv4CTcivy1NLLh' + 'PsbWLnrr6NIihz13RdHzy/3+IRebuvyV5fy1NGDQ5MGuc2Lnt3JU0ZvEm7hOr9Hplu+R92FPNX04uPqbXvntwT3yAu6B+u58D8BxXl' + '/3d6TCw6p92oCXMqVy93mbS0u5UiXFth6cmXjXE7gkrQHccZZhaNdUGLjuQW/p96fS+FSGeKMsyH3nF5zjsuPs9YOjk+h7ePsyD2my' + 'ymnl7orp1+G5HJH2MdZ73PP6XLKQX6Oj7QavHK3J/eUzm9emzjClzHlvo4dnsu9pO/hd3AJpxrfYXLD2+nY8jkGuXf0oHLX3uTbws5' + 'Ffq/hguVr//Dk3tFf53Jhnm2RG93yFZ+Ics/oe8zkTcq51yTLjX3uIb2J97lQ7Yr8HdfrmhO5R/TgOYUu7NOVu3jcN7ojuUd0Xu7qN' + 'WHK4drUVJLlpn3uGV1N+oTyUNn4FNaIcyj3hl7D5TKdnHlPtdwb+hYuJzftBWuOTHglj9XnXtPJ4drbx8eFk3EXkvyOYjy5pwUvnIZ' + 'k9HfcTrgE8Lhyjyb8uE4un4VM8noep8+9oxefM+b8fEp2r2og/YSShE+yeFwv35f0988TyL2ii28rkh+ntA/hvLObPveSDtF0hF0HO' + 'r6vCeNNRbdyL+kkysrcH5lbgVuQe01HC1d9zn7oWprSXcnlH+6N80PX0lGennT3fZ6udBx5GtITwC3L049uGZ5IfqPRLU44xB+mmo7' + 'ydKNj9Tnez4xOR3la0RPAbcrTiW4Zbk1+49BtTTgk+gyP6NhyQp/hjj4zkPWllMvt9rlMn+mG7icFf1s6ylnB+13Q/YHArKTTE8Ady' + 'ed9bVYg4HdOzyT0rC+mVm57tsv0LELPdEr3ZZBe/0JK6Q4mHP0fHX2V9HqGzyn9Fh9t9ltvvfVP0ivgGdNWdy6/xU8W9lnEnk548nS' + 'zZpFl3e+cnuHPDEDaqT2tIguSHsh0PuVI1jMg7ZD3tNLDs4WcB+C5u8j6LX5a8iTxhJ8eMYumnJS7G7lqT7twLQe6PyOT7GcDgZkzU' + 's2xEDPoM/X5MmE75pJO+p3+guynSfjlZ+wWTuywlSevYapJFoPUKWzeMeQ0oIDSJzI1O5n/B5/xAXbXPcU5AAAAAElFTkSuQmCC';
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/index.js":
+/*!**************************************************!*\
+  !*** ./node_modules/formiojs/providers/index.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "storage", {
+  enumerable: true,
+  get: function get() {
+    return _storage2.default;
+  }
+});
+
+var _storage2 = _interopRequireDefault(__webpack_require__(/*! ./storage */ "./node_modules/formiojs/providers/storage/index.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/azure.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/azure.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core-js/modules/es.function.name.js");
+
+__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _xhr = _interopRequireDefault(__webpack_require__(/*! ./xhr */ "./node_modules/formiojs/providers/storage/xhr.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var azure = function azure(formio) {
+  return {
+    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
+      return _xhr.default.upload(formio, 'azure', function (xhr, response) {
+        xhr.open('PUT', response.url);
+        xhr.setRequestHeader('Content-Type', file.type);
+        xhr.setRequestHeader('x-ms-blob-type', 'BlockBlob');
+        return file;
+      }, file, fileName, dir, progressCallback).then(function () {
+        return {
+          storage: 'azure',
+          name: _xhr.default.path([dir, fileName]),
+          size: file.size,
+          type: file.type
+        };
+      });
+    },
+    downloadFile: function downloadFile(file) {
+      return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/azure?name=").concat(_xhr.default.trim(file.name)), 'GET');
+    }
+  };
+};
+
+azure.title = 'Azure File Services';
+var _default = azure;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/base64.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/base64.js ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var base64 = function base64() {
+  return {
+    title: 'Base64',
+    name: 'base64',
+    uploadFile: function uploadFile(file, fileName) {
+      var _this = this;
+
+      var reader = new FileReader();
+      return new _nativePromiseOnly.default(function (resolve, reject) {
+        reader.onload = function (event) {
+          var url = event.target.result;
+          resolve({
+            storage: 'base64',
+            name: fileName,
+            url: url,
+            size: file.size,
+            type: file.type
+          });
+        };
+
+        reader.onerror = function () {
+          return reject(_this);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    },
+    downloadFile: function downloadFile(file) {
+      // Return the original as there is nothing to do.
+      return _nativePromiseOnly.default.resolve(file);
+    }
+  };
+};
+
+base64.title = 'Base64';
+var _default = base64;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/dropbox.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/dropbox.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var dropbox = function dropbox(formio) {
+  return {
+    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
+      return new _nativePromiseOnly.default(function (resolve, reject) {
+        // Send the file with data.
+        var xhr = new XMLHttpRequest();
+
+        if (typeof progressCallback === 'function') {
+          xhr.upload.onprogress = progressCallback;
+        }
+
+        var fd = new FormData();
+        fd.append('name', fileName);
+        fd.append('dir', dir);
+        fd.append('file', file); // Fire on network error.
+
+        xhr.onerror = function (err) {
+          err.networkError = true;
+          reject(err);
+        };
+
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            var response = JSON.parse(xhr.response);
+            response.storage = 'dropbox';
+            response.size = file.size;
+            response.type = file.type;
+            response.url = response.path_lower;
+            resolve(response);
+          } else {
+            reject(xhr.response || 'Unable to upload file');
+          }
+        };
+
+        xhr.onabort = reject;
+        xhr.open('POST', "".concat(formio.formUrl, "/storage/dropbox"));
+        var token = formio.getToken();
+
+        if (token) {
+          xhr.setRequestHeader('x-jwt-token', token);
+        }
+
+        xhr.send(fd);
+      });
+    },
+    downloadFile: function downloadFile(file) {
+      var token = formio.getToken();
+      file.url = "".concat(formio.formUrl, "/storage/dropbox?path_lower=").concat(file.path_lower).concat(token ? "&x-jwt-token=".concat(token) : '');
+      return _nativePromiseOnly.default.resolve(file);
+    }
+  };
+};
+
+dropbox.title = 'Dropbox';
+var _default = dropbox;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/index.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/index.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _base = _interopRequireDefault(__webpack_require__(/*! ./base64 */ "./node_modules/formiojs/providers/storage/base64.js"));
+
+var _dropbox = _interopRequireDefault(__webpack_require__(/*! ./dropbox */ "./node_modules/formiojs/providers/storage/dropbox.js"));
+
+var _s = _interopRequireDefault(__webpack_require__(/*! ./s3 */ "./node_modules/formiojs/providers/storage/s3.js"));
+
+var _azure = _interopRequireDefault(__webpack_require__(/*! ./azure */ "./node_modules/formiojs/providers/storage/azure.js"));
+
+var _url = _interopRequireDefault(__webpack_require__(/*! ./url */ "./node_modules/formiojs/providers/storage/url.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = {
+  base64: _base.default,
+  dropbox: _dropbox.default,
+  s3: _s.default,
+  url: _url.default,
+  azure: _azure.default
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/s3.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/s3.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+var _xhr = _interopRequireDefault(__webpack_require__(/*! ./xhr */ "./node_modules/formiojs/providers/storage/xhr.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var s3 = function s3(formio) {
+  return {
+    uploadFile: function uploadFile(file, fileName, dir, progressCallback) {
+      return _xhr.default.upload(formio, 's3', function (xhr, response) {
+        response.data.fileName = fileName;
+        response.data.key = _xhr.default.path([response.data.key, dir, fileName]);
+
+        if (response.signed) {
+          xhr.open('PUT', response.signed);
+          xhr.setRequestHeader('Content-Type', file.type);
+          return file;
+        } else {
+          var fd = new FormData();
+
+          for (var key in response.data) {
+            fd.append(key, response.data[key]);
+          }
+
+          fd.append('file', file);
+          xhr.open('POST', response.url);
+          return fd;
+        }
+      }, file, fileName, dir, progressCallback).then(function (response) {
+        return {
+          storage: 's3',
+          name: fileName,
+          bucket: response.bucket,
+          key: response.data.key,
+          url: _xhr.default.path([response.url, response.data.key]),
+          acl: response.data.acl,
+          size: file.size,
+          type: file.type
+        };
+      });
+    },
+    downloadFile: function downloadFile(file) {
+      if (file.acl !== 'public-read') {
+        return formio.makeRequest('file', "".concat(formio.formUrl, "/storage/s3?bucket=").concat(_xhr.default.trim(file.bucket), "&key=").concat(_xhr.default.trim(file.key)), 'GET');
+      } else {
+        return _nativePromiseOnly.default.resolve(file);
+      }
+    }
+  };
+};
+
+s3.title = 'S3';
+var _default = s3;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/url.js":
+/*!********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/url.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core-js/modules/es.function.name.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var url = function url(formio) {
+  var xhrRequest = function xhrRequest(url, name, query, data, options, onprogress) {
+    return new _nativePromiseOnly.default(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      var json = typeof data === 'string';
+      var fd = new FormData();
+
+      if (typeof onprogress === 'function') {
+        xhr.upload.onprogress = onprogress;
+      }
+
+      if (!json) {
+        for (var key in data) {
+          fd.append(key, data[key]);
+        }
+      }
+
+      xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Need to test if xhr.response is decoded or not.
+          var respData = {};
+
+          try {
+            respData = typeof xhr.response === 'string' ? JSON.parse(xhr.response) : {};
+            respData = respData && respData.data ? respData.data : respData;
+          } catch (err) {
+            respData = {};
+          } // Get the url of the file.
+
+
+          var respUrl = respData.hasOwnProperty('url') ? respData.url : "".concat(xhr.responseURL, "/").concat(name); // If they provide relative url, then prepend the url.
+
+          if (respUrl && respUrl[0] === '/') {
+            respUrl = "".concat(url).concat(respUrl);
+          }
+
+          resolve({
+            url: respUrl,
+            data: respData
+          });
+        } else {
+          reject(xhr.response || 'Unable to upload file');
+        }
+      };
+
+      xhr.onerror = function () {
+        return reject(xhr);
+      };
+
+      xhr.onabort = function () {
+        return reject(xhr);
+      };
+
+      var requestUrl = url + (url.indexOf('?') > -1 ? '&' : '?');
+
+      for (var _key in query) {
+        requestUrl += "".concat(_key, "=").concat(query[_key], "&");
+      }
+
+      if (requestUrl[requestUrl.length - 1] === '&') {
+        requestUrl = requestUrl.substr(0, requestUrl.length - 1);
+      }
+
+      xhr.open('POST', requestUrl);
+
+      if (json) {
+        xhr.setRequestHeader('Content-Type', 'application/json');
+      }
+
+      var token = formio.getToken();
+
+      if (token) {
+        xhr.setRequestHeader('x-jwt-token', token);
+      } //Overrides previous request props
+
+
+      if (options) {
+        var parsedOptions = JSON.parse(options);
+
+        for (var prop in parsedOptions) {
+          xhr[prop] = parsedOptions[prop];
+        }
+      }
+
+      xhr.send(json ? data : fd);
+    });
+  };
+
+  return {
+    title: 'Url',
+    name: 'url',
+    uploadFile: function uploadFile(file, name, dir, progressCallback, url, options) {
+      var uploadRequest = function uploadRequest(form) {
+        return xhrRequest(url, name, {
+          baseUrl: encodeURIComponent(formio.projectUrl),
+          project: form ? form.project : '',
+          form: form ? form._id : ''
+        }, {
+          file: file,
+          name: name,
+          dir: dir
+        }, options, progressCallback).then(function (response) {
+          // Store the project and form url along with the metadata.
+          response.data = response.data || {};
+          response.data.baseUrl = formio.projectUrl;
+          response.data.project = form ? form.project : '';
+          response.data.form = form ? form._id : '';
+          return {
+            storage: 'url',
+            name: name,
+            url: response.url,
+            size: file.size,
+            type: file.type,
+            data: response.data
+          };
+        });
+      };
+
+      if (file.private && formio.formId) {
+        return formio.loadForm().then(function (form) {
+          return uploadRequest(form);
+        });
+      } else {
+        return uploadRequest();
+      }
+    },
+    downloadFile: function downloadFile(file) {
+      if (file.private) {
+        if (formio.submissionId && file.data) {
+          file.data.submission = formio.submissionId;
+        }
+
+        return xhrRequest(file.url, file.name, {}, JSON.stringify(file)).then(function (response) {
+          return response.data;
+        });
+      } // Return the original as there is nothing to do.
+
+
+      return _nativePromiseOnly.default.resolve(file);
+    }
+  };
+};
+
+url.title = 'Url';
+var _default = url;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/providers/storage/xhr.js":
+/*!********************************************************!*\
+  !*** ./node_modules/formiojs/providers/storage/xhr.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-js/modules/es.array.filter.js");
+
+__webpack_require__(/*! core-js/modules/es.array.join */ "./node_modules/core-js/modules/es.array.join.js");
+
+__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+
+__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+var _trim2 = _interopRequireDefault(__webpack_require__(/*! lodash/trim */ "./node_modules/formiojs/node_modules/lodash/trim.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var XHR = {
+  trim: function trim(text) {
+    return (0, _trim2.default)(text, '/');
+  },
+  path: function path(items) {
+    return items.filter(function (item) {
+      return !!item;
+    }).map(XHR.trim).join('/');
+  },
+  upload: function upload(formio, type, xhrCb, file, fileName, dir, progressCallback) {
+    return new _nativePromiseOnly.default(function (resolve, reject) {
+      // Send the pre response to sign the upload.
+      var pre = new XMLHttpRequest(); // This only fires on a network error.
+
+      pre.onerror = function (err) {
+        err.networkError = true;
+        reject(err);
+      };
+
+      pre.onabort = reject;
+
+      pre.onload = function () {
+        if (pre.status >= 200 && pre.status < 300) {
+          var response = JSON.parse(pre.response); // Send the file with data.
+
+          var xhr = new XMLHttpRequest();
+
+          if (typeof progressCallback === 'function') {
+            xhr.upload.onprogress = progressCallback;
+          } // Fire on network error.
+
+
+          xhr.onerror = function (err) {
+            err.networkError = true;
+            reject(err);
+          }; // Fire on network abort.
+
+
+          xhr.onabort = function (err) {
+            err.networkError = true;
+            reject(err);
+          }; // Fired when the response has made it back from the server.
+
+
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(response);
+            } else {
+              reject(xhr.response || 'Unable to upload file');
+            }
+          }; // Set the onabort error callback.
+
+
+          xhr.onabort = reject; // Get the request and send it to the server.
+
+          xhr.send(xhrCb(xhr, response));
+        } else {
+          reject(pre.response || 'Unable to sign file');
+        }
+      };
+
+      pre.open('POST', "".concat(formio.formUrl, "/storage/").concat(type));
+      pre.setRequestHeader('Accept', 'application/json');
+      pre.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+      var token = formio.getToken();
+
+      if (token) {
+        pre.setRequestHeader('x-jwt-token', token);
+      }
+
+      pre.send(JSON.stringify({
+        name: XHR.path([dir, fileName]),
+        size: file.size,
+        type: file.type
+      }));
+    });
+  }
+};
+var _default = XHR;
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/utils/builder.js":
+/*!************************************************!*\
+  !*** ./node_modules/formiojs/utils/builder.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _utils = __webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/utils.js");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = {
+  /**
+   * Appends a number to a component.key to keep it unique
+   *
+   * @param {Object} form
+   *   The components parent form.
+   * @param {Object} component
+   *   The component to uniquify
+   */
+  uniquify: function uniquify(form, component) {
+    var changed = false;
+    var formKeys = {};
+    (0, _utils.eachComponent)(form.components, function (comp) {
+      formKeys[comp.key] = true;
+    }, true); // Recurse into all child components.
+
+    (0, _utils.eachComponent)([component], function (component) {
+      // Skip key uniquification if this component doesn't have a key.
+      if (!component.key) {
+        return;
+      }
+
+      var newKey = (0, _utils.uniqueKey)(formKeys, component.key);
+
+      if (newKey !== component.key) {
+        component.key = newKey;
+        changed = true;
+      }
+    }, true);
+    return changed;
+  },
+  additionalShortcuts: {
+    button: ['Enter', 'Esc']
+  },
+  getAlphaShortcuts: function getAlphaShortcuts() {
+    return _lodash.default.range('A'.charCodeAt(), 'Z'.charCodeAt() + 1).map(function (charCode) {
+      return String.fromCharCode(charCode);
+    });
+  },
+  getAdditionalShortcuts: function getAdditionalShortcuts(type) {
+    return this.additionalShortcuts[type] || [];
+  },
+  getBindedShortcuts: function getBindedShortcuts(components, input) {
+    var result = [];
+    (0, _utils.eachComponent)(components, function (component) {
+      if (component === input) {
+        return;
+      }
+
+      if (component.shortcut) {
+        result.push(component.shortcut);
+      }
+
+      if (component.values) {
+        component.values.forEach(function (value) {
+          if (value.shortcut) {
+            result.push(value.shortcut);
+          }
+        });
+      }
+    }, true);
+    return result;
+  },
+  getAvailableShortcuts: function getAvailableShortcuts(form, component) {
+    if (!component) {
+      return [];
+    }
+
+    return [''].concat(_lodash.default.difference(this.getAlphaShortcuts().concat(this.getAdditionalShortcuts(component.type)), this.getBindedShortcuts(form.components, component)));
+  }
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/utils/formUtils.js":
+/*!**************************************************!*\
+  !*** ./node_modules/formiojs/utils/formUtils.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.array.from */ "./node_modules/core-js/modules/es.array.from.js");
+
+__webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
+
+__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.join */ "./node_modules/core-js/modules/es.array.join.js");
+
+__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+
+__webpack_require__(/*! core-js/modules/es.array.slice */ "./node_modules/core-js/modules/es.array.slice.js");
+
+__webpack_require__(/*! core-js/modules/es.array.splice */ "./node_modules/core-js/modules/es.array.splice.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.string.match */ "./node_modules/core-js/modules/es.string.match.js");
+
+__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
+
+__webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isLayoutComponent = isLayoutComponent;
+exports.eachComponent = eachComponent;
+exports.matchComponent = matchComponent;
+exports.getComponent = getComponent;
+exports.searchComponents = searchComponents;
+exports.findComponents = findComponents;
+exports.findComponent = findComponent;
+exports.removeComponent = removeComponent;
+exports.generateFormChange = generateFormChange;
+exports.applyFormChanges = applyFormChanges;
+exports.flattenComponents = flattenComponents;
+exports.hasCondition = hasCondition;
+exports.parseFloatExt = parseFloatExt;
+exports.formatAsCurrency = formatAsCurrency;
+exports.escapeRegExCharacters = escapeRegExCharacters;
+exports.getValue = getValue;
+exports.getStrings = getStrings;
+
+var _get = _interopRequireDefault(__webpack_require__(/*! lodash/get */ "./node_modules/formiojs/node_modules/lodash/get.js"));
+
+var _set = _interopRequireDefault(__webpack_require__(/*! lodash/set */ "./node_modules/formiojs/node_modules/lodash/set.js"));
+
+var _has = _interopRequireDefault(__webpack_require__(/*! lodash/has */ "./node_modules/formiojs/node_modules/lodash/has.js"));
+
+var _clone = _interopRequireDefault(__webpack_require__(/*! lodash/clone */ "./node_modules/formiojs/node_modules/lodash/clone.js"));
+
+var _forOwn = _interopRequireDefault(__webpack_require__(/*! lodash/forOwn */ "./node_modules/formiojs/node_modules/lodash/forOwn.js"));
+
+var _isString = _interopRequireDefault(__webpack_require__(/*! lodash/isString */ "./node_modules/formiojs/node_modules/lodash/isString.js"));
+
+var _isNaN = _interopRequireDefault(__webpack_require__(/*! lodash/isNaN */ "./node_modules/formiojs/node_modules/lodash/isNaN.js"));
+
+var _isNil = _interopRequireDefault(__webpack_require__(/*! lodash/isNil */ "./node_modules/formiojs/node_modules/lodash/isNil.js"));
+
+var _isPlainObject = _interopRequireDefault(__webpack_require__(/*! lodash/isPlainObject */ "./node_modules/formiojs/node_modules/lodash/isPlainObject.js"));
+
+var _round = _interopRequireDefault(__webpack_require__(/*! lodash/round */ "./node_modules/formiojs/node_modules/lodash/round.js"));
+
+var _chunk = _interopRequireDefault(__webpack_require__(/*! lodash/chunk */ "./node_modules/formiojs/node_modules/lodash/chunk.js"));
+
+var _pad = _interopRequireDefault(__webpack_require__(/*! lodash/pad */ "./node_modules/formiojs/node_modules/lodash/pad.js"));
+
+var _findIndex = _interopRequireDefault(__webpack_require__(/*! lodash/findIndex */ "./node_modules/formiojs/node_modules/lodash/findIndex.js"));
+
+var _fastJsonPatch = _interopRequireDefault(__webpack_require__(/*! fast-json-patch */ "./node_modules/fast-json-patch/lib/duplex.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Determine if a component is a layout component or not.
+ *
+ * @param {Object} component
+ *   The component to check.
+ *
+ * @returns {Boolean}
+ *   Whether or not the component is a layout component.
+ */
+function isLayoutComponent(component) {
+  return Boolean(component.columns && Array.isArray(component.columns) || component.rows && Array.isArray(component.rows) || component.components && Array.isArray(component.components));
+}
+/**
+ * Iterate through each component within a form.
+ *
+ * @param {Object} components
+ *   The components to iterate.
+ * @param {Function} fn
+ *   The iteration function to invoke for each component.
+ * @param {Boolean} includeAll
+ *   Whether or not to include layout components.
+ * @param {String} path
+ *   The current data path of the element. Example: data.user.firstName
+ * @param {Object} parent
+ *   The parent object.
+ */
+
+
+function eachComponent(components, fn, includeAll, path, parent) {
+  if (!components) return;
+  path = path || '';
+  components.forEach(function (component) {
+    if (!component) {
+      return;
+    }
+
+    var hasColumns = component.columns && Array.isArray(component.columns);
+    var hasRows = component.rows && Array.isArray(component.rows);
+    var hasComps = component.components && Array.isArray(component.components);
+    var noRecurse = false;
+    var newPath = component.key ? path ? "".concat(path, ".").concat(component.key) : component.key : ''; // Keep track of parent references.
+
+    if (parent) {
+      // Ensure we don't create infinite JSON structures.
+      component.parent = (0, _clone.default)(parent);
+      delete component.parent.components;
+      delete component.parent.componentMap;
+      delete component.parent.columns;
+      delete component.parent.rows;
+    }
+
+    if (includeAll || component.tree || !hasColumns && !hasRows && !hasComps) {
+      noRecurse = fn(component, newPath);
+    }
+
+    var subPath = function subPath() {
+      if (component.key && !['panel', 'table', 'well', 'columns', 'fieldset', 'tabs', 'form'].includes(component.type) && (['datagrid', 'container', 'editgrid'].includes(component.type) || component.tree)) {
+        return newPath;
+      } else if (component.key && component.type === 'form') {
+        return "".concat(newPath, ".data");
+      }
+
+      return path;
+    };
+
+    if (!noRecurse) {
+      if (hasColumns) {
+        component.columns.forEach(function (column) {
+          return eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
+        });
+      } else if (hasRows) {
+        component.rows.forEach(function (row) {
+          if (Array.isArray(row)) {
+            row.forEach(function (column) {
+              return eachComponent(column.components, fn, includeAll, subPath(), parent ? component : null);
+            });
+          }
+        });
+      } else if (hasComps) {
+        eachComponent(component.components, fn, includeAll, subPath(), parent ? component : null);
+      }
+    }
+  });
+}
+/**
+ * Matches if a component matches the query.
+ *
+ * @param component
+ * @param query
+ * @return {boolean}
+ */
+
+
+function matchComponent(component, query) {
+  if ((0, _isString.default)(query)) {
+    return component.key === query;
+  } else {
+    var matches = false;
+    (0, _forOwn.default)(query, function (value, key) {
+      matches = (0, _get.default)(component, key) === value;
+
+      if (!matches) {
+        return false;
+      }
+    });
+    return matches;
+  }
+}
+/**
+ * Get a component by its key
+ *
+ * @param {Object} components
+ *   The components to iterate.
+ * @param {String|Object} key
+ *   The key of the component to get, or a query of the component to search.
+ *
+ * @returns {Object}
+ *   The component that matches the given key, or undefined if not found.
+ */
+
+
+function getComponent(components, key, includeAll) {
+  var result;
+  eachComponent(components, function (component, path) {
+    if (path === key) {
+      component.path = path;
+      result = component;
+      return true;
+    }
+  }, includeAll);
+  return result;
+}
+/**
+ * Finds a component provided a query of properties of that component.
+ *
+ * @param components
+ * @param query
+ * @return {*}
+ */
+
+
+function searchComponents(components, query) {
+  var results = [];
+  eachComponent(components, function (component, path) {
+    if (matchComponent(component, query)) {
+      component.path = path;
+      results.push(component);
+    }
+  }, true);
+  return results;
+}
+/**
+ * Deprecated version of findComponents. Renamed to searchComponents.
+ *
+ * @param components
+ * @param query
+ * @returns {*}
+ */
+
+
+function findComponents(components, query) {
+  console.warn('formio.js/utils findComponents is deprecated. Use searchComponents instead.');
+  return searchComponents(components, query);
+}
+
+var possibleFind = null;
+var possiblePath = [];
+var unknownCounter = {};
+
+var checkComponent = function checkComponent(component, key, path) {
+  // Search for components without a key as well.
+  if (!component.key) {
+    if (!unknownCounter.hasOwnProperty(component.type)) {
+      unknownCounter[component.type] = 0;
+    }
+
+    unknownCounter[component.type]++;
+
+    if (key === component.type + unknownCounter[component.type]) {
+      possibleFind = component;
+      possiblePath = (0, _clone.default)(path);
+    }
+  } else if (possibleFind && component.key === possibleFind.key) {
+    var nextCount = component.key.match(/([0-9]+)$/g);
+
+    if (nextCount) {
+      unknownCounter[component.type] = parseInt(nextCount.pop(), 10);
+      possibleFind = null;
+      possiblePath = [];
+    }
+  }
+
+  if (component.key === key) {
+    return true;
+  }
+
+  return false;
+};
+/**
+ * This function will find a component in a form and return the component AND THE PATH to the component in the form.
+ *
+ * @param components
+ * @param key
+ * @param fn
+ * @param path
+ * @returns boolean - If the component was found.
+ */
+
+
+function findComponent(components, key, path, fn) {
+  if (!components || !key) {
+    return false;
+  }
+
+  if (typeof path === 'function') {
+    fn = path;
+    path = [];
+  }
+
+  path = path || [];
+
+  if (!path.length) {
+    // Reset search params.
+    possibleFind = null;
+    possiblePath = [];
+    unknownCounter = {};
+  }
+
+  var found = false;
+  components.forEach(function (component, index) {
+    var newPath = path.slice();
+    newPath.push(index);
+    if (!component) return;
+
+    if (component.hasOwnProperty('columns') && Array.isArray(component.columns)) {
+      newPath.push('columns');
+      component.columns.forEach(function (column, index) {
+        var colPath = newPath.slice();
+        colPath.push(index);
+        column.type = 'column';
+
+        if (checkComponent(column, key, colPath)) {
+          found = true;
+          fn(column, colPath);
+        } else if (findComponent(column.components, key, colPath.concat(['components']), fn)) {
+          found = true;
+        }
+      });
+    }
+
+    if (component.hasOwnProperty('rows') && Array.isArray(component.rows)) {
+      newPath.push('rows');
+      component.rows.forEach(function (row, index) {
+        var rowPath = newPath.slice();
+        rowPath.push(index);
+        row.forEach(function (column, index) {
+          var colPath = rowPath.slice();
+          colPath.push(index);
+          column.type = 'cell';
+
+          if (checkComponent(column, key, colPath)) {
+            found = true;
+            fn(column, colPath);
+          } else if (findComponent(column.components, key, colPath.concat(['components']), fn)) {
+            found = true;
+          }
+        });
+      });
+    }
+
+    if (component.hasOwnProperty('components') && Array.isArray(component.components) && findComponent(component.components, key, newPath.concat(['components']), fn)) {
+      found = true;
+    } // Check this component.
+
+
+    if (checkComponent(component, key, newPath)) {
+      found = true;
+      fn(component, newPath);
+    }
+  }); // If the component was not found BUT there was a possibility then return it.
+
+  if (!path.length && !found && possibleFind) {
+    found = true;
+    fn(possibleFind, possiblePath);
+  } // Return if this if found.
+
+
+  return found;
+}
+/**
+ * Remove a component by path.
+ *
+ * @param components
+ * @param path
+ */
+
+
+function removeComponent(components, path) {
+  // Using _.unset() leave a null value. Use Array splice instead.
+  var index = path.pop();
+
+  if (path.length !== 0) {
+    components = (0, _get.default)(components, path);
+  }
+
+  components.splice(index, 1);
+}
+
+function generateFormChange(type, data) {
+  var change = null;
+  var schema = data.schema;
+
+  switch (type) {
+    case 'add':
+      change = {
+        op: 'add',
+        key: schema.key,
+        container: data.parent.key,
+        index: (0, _findIndex.default)(data.parent.components, {
+          id: data.id
+        }),
+        component: schema
+      };
+      break;
+
+    case 'edit':
+      change = {
+        op: 'edit',
+        key: schema.key,
+        patches: _fastJsonPatch.default.compare(data.originalComponent, schema)
+      }; // Don't save if nothing changed.
+
+      if (!change.patches.length) {
+        change = null;
+      }
+
+      break;
+
+    case 'remove':
+      change = {
+        op: 'remove',
+        key: schema.key
+      };
+      break;
+  }
+
+  return change;
+} // Get the parent component provided a component key.
+
+
+var getParent = function getParent(form, key, fn) {
+  if (!findComponent(form.components, key, null, fn)) {
+    // Return the root form if no parent is found so it will add the component to the root form.
+    fn(form);
+  }
+};
+
+function applyFormChanges(form, changes) {
+  var failed = [];
+  changes.forEach(function (change) {
+    var found = false;
+
+    switch (change.op) {
+      case 'add':
+        var newComponent = change.component;
+        getParent(form, change.container, function (parent) {
+          // A move will first run an add so remove any existing components with matching key before inserting.
+          findComponent(form.components, change.key, null, function (component, path) {
+            // If found, use the existing component. (If someone else edited it, the changes would be here)
+            newComponent = component;
+            removeComponent(form.components, path);
+          });
+          found = true;
+          parent.components.splice(change.index, 0, newComponent);
+        });
+        break;
+
+      case 'remove':
+        findComponent(form.components, change.key, null, function (component, path) {
+          found = true;
+          removeComponent(form.components, path);
+        });
+        break;
+
+      case 'edit':
+        findComponent(form.components, change.key, null, function (component, path) {
+          found = true;
+
+          try {
+            (0, _set.default)(form.components, path, _fastJsonPatch.default.applyPatch(component, change.patches).newDocument);
+          } catch (err) {
+            failed.push(change);
+          }
+        });
+        break;
+
+      case 'move':
+        break;
+    }
+
+    if (!found) {
+      failed.push(change);
+    }
+  });
+  return {
+    form: form,
+    failed: failed
+  };
+}
+/**
+ * Flatten the form components for data manipulation.
+ *
+ * @param {Object} components
+ *   The components to iterate.
+ * @param {Boolean} includeAll
+ *   Whether or not to include layout components.
+ *
+ * @returns {Object}
+ *   The flattened components map.
+ */
+
+
+function flattenComponents(components, includeAll) {
+  var flattened = {};
+  eachComponent(components, function (component, path) {
+    flattened[path] = component;
+  }, includeAll);
+  return flattened;
+}
+/**
+ * Returns if this component has a conditional statement.
+ *
+ * @param component - The component JSON schema.
+ *
+ * @returns {boolean} - TRUE - This component has a conditional, FALSE - No conditional provided.
+ */
+
+
+function hasCondition(component) {
+  return Boolean(component.customConditional || component.conditional && component.conditional.when || component.conditional && component.conditional.json);
+}
+/**
+ * Extension of standard #parseFloat(value) function, that also clears input string.
+ *
+ * @param {any} value
+ *   The value to parse.
+ *
+ * @returns {Number}
+ *   Parsed value.
+ */
+
+
+function parseFloatExt(value) {
+  return parseFloat((0, _isString.default)(value) ? value.replace(/[^\de.+-]/gi, '') : value);
+}
+/**
+ * Formats provided value in way how Currency component uses it.
+ *
+ * @param {any} value
+ *   The value to format.
+ *
+ * @returns {String}
+ *   Value formatted for Currency component.
+ */
+
+
+function formatAsCurrency(value) {
+  var parsedValue = parseFloatExt(value);
+
+  if ((0, _isNaN.default)(parsedValue)) {
+    return '';
+  }
+
+  var parts = (0, _round.default)(parsedValue, 2).toString().split('.');
+  parts[0] = (0, _chunk.default)(Array.from(parts[0]).reverse(), 3).reverse().map(function (part) {
+    return part.reverse().join('');
+  }).join(',');
+  parts[1] = (0, _pad.default)(parts[1], 2, '0');
+  return parts.join('.');
+}
+/**
+ * Escapes RegEx characters in provided String value.
+ *
+ * @param {String} value
+ *   String for escaping RegEx characters.
+ * @returns {string}
+ *   String with escaped RegEx characters.
+ */
+
+
+function escapeRegExCharacters(value) {
+  return value.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
+}
+/**
+ * Get the value for a component key, in the given submission.
+ *
+ * @param {Object} submission
+ *   A submission object to search.
+ * @param {String} key
+ *   A for components API key to search for.
+ */
+
+
+function getValue(submission, key) {
+  var search = function search(data) {
+    if ((0, _isPlainObject.default)(data)) {
+      if ((0, _has.default)(data, key)) {
+        return data[key];
+      }
+
+      var value = null;
+      (0, _forOwn.default)(data, function (prop) {
+        var result = search(prop);
+
+        if (!(0, _isNil.default)(result)) {
+          value = result;
+          return false;
+        }
+      });
+      return value;
+    } else {
+      return null;
+    }
+  };
+
+  return search(submission.data);
+}
+/**
+ * Iterate over all components in a form and get string values for translation.
+ * @param form
+ */
+
+
+function getStrings(form) {
+  var _this = this;
+
+  var properties = ['label', 'title', 'legend', 'tooltip', 'description', 'placeholder', 'prefix', 'suffix', 'errorLabel', 'content', 'html'];
+  var strings = [];
+  eachComponent(form.components, function (component) {
+    properties.forEach(function (property) {
+      if (component.hasOwnProperty(property) && component[property]) {
+        strings.push({
+          key: component.key,
+          type: component.type,
+          property: property,
+          string: component[property]
+        });
+      }
+    });
+
+    if ((!component.dataSrc || component.dataSrc === 'values') && component.hasOwnProperty('values') && Array.isArray(component.values) && component.values.length) {
+      component.values.forEach(function (value, index) {
+        strings.push({
+          key: component.key,
+          property: "value[".concat(index, "].label"),
+          string: component.values[index].label
+        });
+      });
+    } // Hard coded values from Day component
+
+
+    if (component.type === 'day') {
+      ['day', 'month', 'year', 'Day', 'Month', 'Year', 'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'].forEach(function (string) {
+        strings.push({
+          key: component.key,
+          property: 'day',
+          string: string
+        });
+      });
+
+      if (component.fields.day.placeholder) {
+        strings.push({
+          key: component.key,
+          property: 'fields.day.placeholder',
+          string: component.fields.day.placeholder
+        });
+      }
+
+      if (component.fields.month.placeholder) {
+        strings.push({
+          key: component.key,
+          property: 'fields.month.placeholder',
+          string: component.fields.month.placeholder
+        });
+      }
+
+      if (component.fields.year.placeholder) {
+        strings.push({
+          key: component.key,
+          property: 'fields.year.placeholder',
+          string: component.fields.year.placeholder
+        });
+      }
+    }
+
+    if (component.type === 'editgrid') {
+      var string = _this.component.addAnother || 'Add Another';
+
+      if (component.addAnother) {
+        strings.push({
+          key: component.key,
+          property: 'addAnother',
+          string: string
+        });
+      }
+    }
+
+    if (component.type === 'select') {
+      ['loading...', 'Type to search'].forEach(function (string) {
+        strings.push({
+          key: component.key,
+          property: 'select',
+          string: string
+        });
+      });
+    }
+  }, true);
+  return strings;
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/utils/index.js":
+/*!**********************************************!*\
+  !*** ./node_modules/formiojs/utils/index.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var FormioUtils = _interopRequireWildcard(__webpack_require__(/*! ./utils */ "./node_modules/formiojs/utils/utils.js"));
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+if ((typeof global === "undefined" ? "undefined" : _typeof(global)) === 'object') {
+  global.FormioUtils = FormioUtils;
+}
+
+var _default = FormioUtils;
+exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/utils/jsonlogic/operators.js":
+/*!************************************************************!*\
+  !*** ./node_modules/formiojs/utils/jsonlogic/operators.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.lodashOperators = void 0;
+// Use only immutable useful functions from Lodash.
+// Visit https://lodash.com/docs for more info.
+var lodashOperators = [// Array
+'chunk', 'compact', 'concat', 'difference', 'differenceBy', 'differenceWith', 'drop', 'dropRight', 'dropRightWhile', 'dropWhile', 'findIndex', 'findLastIndex', 'first', 'flatten', 'flattenDeep', 'flattenDepth', 'fromPairs', 'head', 'indexOf', 'initial', 'intersection', 'intersectionBy', 'intersectionWith', 'join', 'last', 'lastIndexOf', 'nth', 'slice', 'sortedIndex', 'sortedIndexBy', 'sortedIndexOf', 'sortedLastIndex', 'sortedLastIndexBy', 'sortedLastIndexOf', 'sortedUniq', 'sortedUniqBy', 'tail', 'take', 'takeRight', 'takeRightWhile', 'takeWhile', 'union', 'unionBy', 'unionWith', 'uniq', 'uniqBy', 'uniqWith', 'unzip', 'unzipWith', 'without', 'xor', 'xorBy', 'xorWith', 'zip', 'zipObject', 'zipObjectDeep', 'zipWith', // Collection
+'countBy', 'every', 'filter', 'find', 'findLast', 'flatMap', 'flatMapDeep', 'flatMapDepth', 'groupBy', 'includes', 'invokeMap', 'keyBy', 'map', 'orderBy', 'partition', 'reduce', 'reduceRight', 'reject', 'sample', 'sampleSize', 'shuffle', 'size', 'some', 'sortBy', // Date
+'now', // Function
+'flip', 'negate', 'overArgs', 'partial', 'partialRight', 'rearg', 'rest', 'spread', // Lang
+'castArray', 'clone', 'cloneDeep', 'cloneDeepWith', 'cloneDeep', 'conformsTo', 'eq', 'gt', 'gte', 'isArguments', 'isArray', 'isArrayBuffer', 'isArrayLike', 'isArrayLikeObject', 'isBoolean', 'isBuffer', 'isDate', 'isElement', 'isEmpty', 'isEqual', 'isEqualWith', 'isError', 'isFinite', 'isFunction', 'isInteger', 'isLength', 'isMap', 'isMatch', 'isMatchWith', 'isNaN', 'isNative', 'isNil', 'isNull', 'isNumber', 'isObject', 'isObjectLike', 'isPlainObject', 'isRegExp', 'isSafeInteger', 'isSet', 'isString', 'isSymbol', 'isTypedArray', 'isUndefined', 'isWeakMap', 'isWeakSet', 'lt', 'lte', 'toArray', 'toFinite', 'toInteger', 'toLength', 'toNumber', 'toPlainObject', 'toSafeInteger', 'toString', // Math
+'add', 'ceil', 'divide', 'floor', 'max', 'maxBy', 'mean', 'meanBy', 'min', 'minBy', 'multiply', 'round', 'subtract', 'sum', 'sumBy', // Number
+'clamp', 'inRange', 'random', // Object
+'at', 'entries', 'entriesIn', 'findKey', 'findLastKey', 'functions', 'functionsIn', 'get', 'has', 'hasIn', 'invert', 'invertBy', 'invoke', 'keys', 'keysIn', 'mapKeys', 'mapValues', 'omit', 'omitBy', 'pick', 'pickBy', 'result', 'toPairs', 'toPairsIn', 'transform', 'values', 'valuesIn', // String
+'camelCase', 'capitalize', 'deburr', 'endsWith', 'escape', 'escapeRegExp', 'kebabCase', 'lowerCase', 'lowerFirst', 'pad', 'padEnd', 'padStart', 'parseInt', 'repeat', 'replace', 'snakeCase', 'split', 'startCase', 'startsWith', 'toLower', 'toUpper', 'trim', 'trimEnd', 'trimStart', 'truncate', 'unescape', 'upperCase', 'upperFirst', 'words', // Util
+'cond', 'conforms', 'constant', 'defaultTo', 'flow', 'flowRight', 'identity', 'iteratee', 'matches', 'matchesProperty', 'method', 'methodOf', 'nthArg', 'over', 'overEvery', 'overSome', 'property', 'propertyOf', 'range', 'rangeRight', 'stubArray', 'stubFalse', 'stubObject', 'stubString', 'stubTrue', 'times', 'toPath', 'uniqueId'];
+exports.lodashOperators = lodashOperators;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/utils/utils.js":
+/*!**********************************************!*\
+  !*** ./node_modules/formiojs/utils/utils.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {
+
+__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.array.find */ "./node_modules/core-js/modules/es.array.find.js");
+
+__webpack_require__(/*! core-js/modules/es.array.from */ "./node_modules/core-js/modules/es.array.from.js");
+
+__webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
+
+__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.join */ "./node_modules/core-js/modules/es.array.join.js");
+
+__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+
+__webpack_require__(/*! core-js/modules/es.array.slice */ "./node_modules/core-js/modules/es.array.slice.js");
+
+__webpack_require__(/*! core-js/modules/es.function.name */ "./node_modules/core-js/modules/es.function.name.js");
+
+__webpack_require__(/*! core-js/modules/es.number.constructor */ "./node_modules/core-js/modules/es.number.constructor.js");
+
+__webpack_require__(/*! core-js/modules/es.object.assign */ "./node_modules/core-js/modules/es.object.assign.js");
+
+__webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-js/modules/es.object.keys.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.reflect.construct */ "./node_modules/core-js/modules/es.reflect.construct.js");
+
+__webpack_require__(/*! core-js/modules/es.regexp.constructor */ "./node_modules/core-js/modules/es.regexp.constructor.js");
+
+__webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.string.includes */ "./node_modules/core-js/modules/es.string.includes.js");
+
+__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.string.match */ "./node_modules/core-js/modules/es.string.match.js");
+
+__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
+
+__webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var _exportNames = {
+  evaluate: true,
+  getRandomComponentId: true,
+  getPropertyValue: true,
+  getElementRect: true,
+  boolValue: true,
+  isMongoId: true,
+  checkCalculated: true,
+  checkSimpleConditional: true,
+  checkCustomConditional: true,
+  checkJsonConditional: true,
+  checkCondition: true,
+  checkTrigger: true,
+  setActionProperty: true,
+  addTemplateHash: true,
+  interpolate: true,
+  uniqueName: true,
+  guid: true,
+  getDateSetting: true,
+  isValidDate: true,
+  currentTimezone: true,
+  offsetDate: true,
+  zonesLoaded: true,
+  shouldLoadZones: true,
+  loadZones: true,
+  momentDate: true,
+  formatDate: true,
+  formatOffset: true,
+  getLocaleDateFormatInfo: true,
+  convertFormatToFlatpickr: true,
+  convertFormatToMoment: true,
+  convertFormatToMask: true,
+  getInputMask: true,
+  matchInputMask: true,
+  getNumberSeparators: true,
+  getNumberDecimalLimit: true,
+  getCurrencyAffixes: true,
+  fieldData: true,
+  delay: true,
+  iterateKey: true,
+  uniqueKey: true,
+  bootstrapVersion: true,
+  unfold: true,
+  firstNonNil: true,
+  withSwitch: true,
+  observeOverload: true,
+  jsonLogic: true,
+  moment: true
+};
+exports.evaluate = evaluate;
+exports.getRandomComponentId = getRandomComponentId;
+exports.getPropertyValue = getPropertyValue;
+exports.getElementRect = getElementRect;
+exports.boolValue = boolValue;
+exports.isMongoId = isMongoId;
+exports.checkCalculated = checkCalculated;
+exports.checkSimpleConditional = checkSimpleConditional;
+exports.checkCustomConditional = checkCustomConditional;
+exports.checkJsonConditional = checkJsonConditional;
+exports.checkCondition = checkCondition;
+exports.checkTrigger = checkTrigger;
+exports.setActionProperty = setActionProperty;
+exports.addTemplateHash = addTemplateHash;
+exports.interpolate = interpolate;
+exports.uniqueName = uniqueName;
+exports.guid = guid;
+exports.getDateSetting = getDateSetting;
+exports.isValidDate = isValidDate;
+exports.currentTimezone = currentTimezone;
+exports.offsetDate = offsetDate;
+exports.zonesLoaded = zonesLoaded;
+exports.shouldLoadZones = shouldLoadZones;
+exports.loadZones = loadZones;
+exports.momentDate = momentDate;
+exports.formatDate = formatDate;
+exports.formatOffset = formatOffset;
+exports.getLocaleDateFormatInfo = getLocaleDateFormatInfo;
+exports.convertFormatToFlatpickr = convertFormatToFlatpickr;
+exports.convertFormatToMoment = convertFormatToMoment;
+exports.convertFormatToMask = convertFormatToMask;
+exports.getInputMask = getInputMask;
+exports.matchInputMask = matchInputMask;
+exports.getNumberSeparators = getNumberSeparators;
+exports.getNumberDecimalLimit = getNumberDecimalLimit;
+exports.getCurrencyAffixes = getCurrencyAffixes;
+exports.fieldData = fieldData;
+exports.delay = delay;
+exports.iterateKey = iterateKey;
+exports.uniqueKey = uniqueKey;
+exports.bootstrapVersion = bootstrapVersion;
+exports.unfold = unfold;
+exports.withSwitch = withSwitch;
+exports.observeOverload = observeOverload;
+Object.defineProperty(exports, "jsonLogic", {
+  enumerable: true,
+  get: function get() {
+    return _jsonLogicJs.default;
+  }
+});
+Object.defineProperty(exports, "moment", {
+  enumerable: true,
+  get: function get() {
+    return _momentTimezone.default;
+  }
+});
+exports.firstNonNil = void 0;
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _fetchPonyfill2 = _interopRequireDefault(__webpack_require__(/*! fetch-ponyfill */ "./node_modules/fetch-ponyfill/build/fetch-browser.js"));
+
+var _jsonLogicJs = _interopRequireDefault(__webpack_require__(/*! json-logic-js */ "./node_modules/json-logic-js/logic.js"));
+
+var _momentTimezone = _interopRequireDefault(__webpack_require__(/*! moment-timezone/moment-timezone */ "./node_modules/moment-timezone/moment-timezone.js"));
+
+var _jstimezonedetect = _interopRequireDefault(__webpack_require__(/*! jstimezonedetect */ "./node_modules/jstimezonedetect/dist/jstz.js"));
+
+var _operators = __webpack_require__(/*! ./jsonlogic/operators */ "./node_modules/formiojs/utils/jsonlogic/operators.js");
+
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
+var _formUtils = __webpack_require__(/*! ./formUtils */ "./node_modules/formiojs/utils/formUtils.js");
+
+Object.keys(_formUtils).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (Object.prototype.hasOwnProperty.call(_exportNames, key)) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _formUtils[key];
+    }
+  });
+});
+
+var _stringHash = _interopRequireDefault(__webpack_require__(/*! string-hash */ "./node_modules/string-hash/index.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+var _fetchPonyfill = (0, _fetchPonyfill2.default)({
+  Promise: _nativePromiseOnly.default
+}),
+    fetch = _fetchPonyfill.fetch;
+
+// Configure JsonLogic
+_operators.lodashOperators.forEach(function (name) {
+  return _jsonLogicJs.default.add_operation("_".concat(name), _lodash.default[name]);
+}); // Retrieve Any Date
+
+
+_jsonLogicJs.default.add_operation('getDate', function (date) {
+  return (0, _momentTimezone.default)(date).toISOString();
+}); // Set Relative Minimum Date
+
+
+_jsonLogicJs.default.add_operation('relativeMinDate', function (relativeMinDate) {
+  return (0, _momentTimezone.default)().subtract(relativeMinDate, 'days').toISOString();
+}); // Set Relative Maximum Date
+
+
+_jsonLogicJs.default.add_operation('relativeMaxDate', function (relativeMaxDate) {
+  return (0, _momentTimezone.default)().add(relativeMaxDate, 'days').toISOString();
+});
+
+/**
+ * Evaluate a method.
+ *
+ * @param func
+ * @param args
+ * @return {*}
+ */
+
+/* eslint-disable max-statements */
+function evaluate(func, args, ret, tokenize) {
+  var returnVal = null;
+  args.component = args.component ? _lodash.default.cloneDeep(args.component) : {
+    key: 'unknown'
+  };
+
+  if (!args.form && args.instance) {
+    args.form = _lodash.default.get(args.instance, 'root._form', {});
+  } // Deeply cloning the form is expensive - only do it if it looks like the function needs it
+
+
+  if (func.toString().includes('form')) {
+    args.form = _lodash.default.cloneDeep(args.form);
+  } else {
+    delete args.form;
+  }
+
+  var componentKey = args.component.key;
+
+  if (typeof func === 'string') {
+    if (ret) {
+      func += ";return ".concat(ret);
+    }
+
+    var params = _lodash.default.keys(args);
+
+    if (tokenize) {
+      // Replace all {{ }} references with actual data.
+      func = func.replace(/({{\s+(.*)\s+}})/, function (match, $1, $2) {
+        if ($2.indexOf('data.') === 0) {
+          return _lodash.default.get(args.data, $2.replace('data.', ''));
+        } else if ($2.indexOf('row.') === 0) {
+          return _lodash.default.get(args.row, $2.replace('row.', ''));
+        } // Support legacy...
+
+
+        return _lodash.default.get(args.data, $2);
+      });
+    }
+
+    try {
+      func = _construct(Function, _toConsumableArray(params).concat([func]));
+      args = _lodash.default.values(args);
+    } catch (err) {
+      console.warn("An error occured within the custom function for ".concat(componentKey), err);
+      returnVal = null;
+      func = false;
+    }
+  }
+
+  if (typeof func === 'function') {
+    try {
+      returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
+    } catch (err) {
+      returnVal = null;
+      console.warn("An error occured within custom function for ".concat(componentKey), err);
+    }
+  } else if (_typeof(func) === 'object') {
+    try {
+      returnVal = _jsonLogicJs.default.apply(func, args);
+    } catch (err) {
+      returnVal = null;
+      console.warn("An error occured within custom function for ".concat(componentKey), err);
+    }
+  } else if (func) {
+    console.warn("Unknown function type for ".concat(componentKey));
+  }
+
+  return returnVal;
+}
+/* eslint-enable max-statements */
+
+
+function getRandomComponentId() {
+  return "e".concat(Math.random().toString(36).substring(7));
+}
+/**
+ * Get a property value of an element.
+ *
+ * @param style
+ * @param prop
+ * @return {number}
+ */
+
+
+function getPropertyValue(style, prop) {
+  var value = style.getPropertyValue(prop);
+  value = value ? value.replace(/[^0-9.]/g, '') : '0';
+  return parseFloat(value);
+}
+/**
+ * Get an elements bounding rectagle.
+ *
+ * @param element
+ * @return {{x: string, y: string, width: string, height: string}}
+ */
+
+
+function getElementRect(element) {
+  var style = window.getComputedStyle(element, null);
+  return {
+    x: getPropertyValue(style, 'left'),
+    y: getPropertyValue(style, 'top'),
+    width: getPropertyValue(style, 'width'),
+    height: getPropertyValue(style, 'height')
+  };
+}
+/**
+ * Determines the boolean value of a setting.
+ *
+ * @param value
+ * @return {boolean}
+ */
+
+
+function boolValue(value) {
+  if (_lodash.default.isBoolean(value)) {
+    return value;
+  } else if (_lodash.default.isString(value)) {
+    return value.toLowerCase() === 'true';
+  } else {
+    return !!value;
+  }
+}
+/**
+ * Check to see if an ID is a mongoID.
+ * @param text
+ * @return {Array|{index: number, input: string}|Boolean|*}
+ */
+
+
+function isMongoId(text) {
+  return text.toString().match(/^[0-9a-fA-F]{24}$/);
+}
+/**
+ * Checks the calculated value for a provided component and data.
+ *
+ * @param {Object} component
+ *   The component to check for the calculated value.
+ * @param {Object} submission
+ *   A submission object.
+ * @param data
+ *   The full submission data.
+ */
+
+
+function checkCalculated(component, submission, rowData) {
+  // Process calculated value stuff if present.
+  if (component.calculateValue) {
+    _lodash.default.set(rowData, component.key, evaluate(component.calculateValue, {
+      value: undefined,
+      data: submission ? submission.data : rowData,
+      row: rowData,
+      util: this,
+      component: component
+    }, 'value'));
+  }
+}
+/**
+ * Check if a simple conditional evaluates to true.
+ *
+ * @param condition
+ * @param condition
+ * @param row
+ * @param data
+ * @returns {boolean}
+ */
+
+
+function checkSimpleConditional(component, condition, row, data) {
+  var value = null;
+
+  if (row) {
+    value = (0, _formUtils.getValue)({
+      data: row
+    }, condition.when);
+  }
+
+  if (data && _lodash.default.isNil(value)) {
+    value = (0, _formUtils.getValue)({
+      data: data
+    }, condition.when);
+  } // FOR-400 - Fix issue where falsey values were being evaluated as show=true
+
+
+  if (_lodash.default.isNil(value)) {
+    value = '';
+  }
+
+  var eq = String(condition.eq);
+  var show = String(condition.show); // Special check for selectboxes component.
+
+  if (_lodash.default.isObject(value) && _lodash.default.has(value, condition.eq)) {
+    return String(value[condition.eq]) === show;
+  } // FOR-179 - Check for multiple values.
+
+
+  if (Array.isArray(value) && value.map(String).includes(eq)) {
+    return show === 'true';
+  }
+
+  return String(value) === eq === (show === 'true');
+}
+/**
+ * Check custom javascript conditional.
+ *
+ * @param component
+ * @param custom
+ * @param row
+ * @param data
+ * @returns {*}
+ */
+
+
+function checkCustomConditional(component, custom, row, data, form, variable, onError, instance) {
+  if (typeof custom === 'string') {
+    custom = "var ".concat(variable, " = true; ").concat(custom, "; return ").concat(variable, ";");
+  }
+
+  var value = instance && instance.evaluate ? instance.evaluate(custom) : evaluate(custom, {
+    row: row,
+    data: data,
+    form: form
+  });
+
+  if (value === null) {
+    return onError;
+  }
+
+  return value;
+}
+
+function checkJsonConditional(component, json, row, data, form, onError) {
+  try {
+    return _jsonLogicJs.default.apply(json, {
+      data: data,
+      row: row,
+      form: form,
+      _: _lodash.default
+    });
+  } catch (err) {
+    console.warn("An error occurred in jsonLogic advanced condition for ".concat(component.key), err);
+    return onError;
+  }
+}
+/**
+ * Checks the conditions for a provided component and data.
+ *
+ * @param component
+ *   The component to check for the condition.
+ * @param row
+ *   The data within a row
+ * @param data
+ *   The full submission data.
+ *
+ * @returns {boolean}
+ */
+
+
+function checkCondition(component, row, data, form, instance) {
+  if (component.customConditional) {
+    return checkCustomConditional(component, component.customConditional, row, data, form, 'show', true, instance);
+  } else if (component.conditional && component.conditional.when) {
+    return checkSimpleConditional(component, component.conditional, row, data, true);
+  } else if (component.conditional && component.conditional.json) {
+    return checkJsonConditional(component, component.conditional.json, row, data, form, instance);
+  } // Default to show.
+
+
+  return true;
+}
+/**
+ * Test a trigger on a component.
+ *
+ * @param component
+ * @param action
+ * @param data
+ * @param row
+ * @returns {mixed}
+ */
+
+
+function checkTrigger(component, trigger, row, data, form, instance) {
+  switch (trigger.type) {
+    case 'simple':
+      return checkSimpleConditional(component, trigger.simple, row, data);
+
+    case 'javascript':
+      return checkCustomConditional(component, trigger.javascript, row, data, form, 'result', false, instance);
+
+    case 'json':
+      return checkJsonConditional(component, trigger.json, row, data, form, false);
+  } // If none of the types matched, don't fire the trigger.
+
+
+  return false;
+}
+
+function setActionProperty(component, action, row, data, result, instance) {
+  switch (action.property.type) {
+    case 'boolean':
+      if (_lodash.default.get(component, action.property.value, false).toString() !== action.state.toString()) {
+        _lodash.default.set(component, action.property.value, action.state.toString() === 'true');
+      }
+
+      break;
+
+    case 'string':
+      {
+        var evalData = {
+          data: data,
+          row: row,
+          component: component,
+          result: result
+        };
+        var textValue = action.property.component ? action[action.property.component] : action.text;
+        var newValue = instance && instance.interpolate ? instance.interpolate(textValue, evalData) : interpolate(textValue, evalData);
+
+        if (newValue !== _lodash.default.get(component, action.property.value, '')) {
+          _lodash.default.set(component, action.property.value, newValue);
+        }
+
+        break;
+      }
+  }
+
+  return component;
+}
+
+var templateCache = {};
+var templateHashCache = {};
+
+function interpolateTemplate(template) {
+  var templateSettings = {
+    evaluate: /\{%([\s\S]+?)%\}/g,
+    interpolate: /\{\{([\s\S]+?)\}\}/g,
+    escape: /\{\{\{([\s\S]+?)\}\}\}/g
+  };
+
+  try {
+    return _lodash.default.template(template, templateSettings);
+  } catch (err) {
+    console.warn('Error while processing template', err, template);
+  }
+}
+
+function addTemplateHash(template) {
+  var hash = (0, _stringHash.default)(template);
+  templateHashCache[hash] = interpolateTemplate(template);
+  return hash;
+}
+/**
+ * Interpolate a string and add data replacements.
+ *
+ * @param string
+ * @param data
+ * @returns {XML|string|*|void}
+ */
+
+
+function interpolate(rawTemplate, data) {
+  var template = _lodash.default.isNumber(rawTemplate) && templateHashCache.hasOwnProperty(rawTemplate) ? templateHashCache[rawTemplate] : templateCache[rawTemplate] = templateCache[rawTemplate] || interpolateTemplate(rawTemplate);
+
+  if (typeof template === 'function') {
+    try {
+      return template(data);
+    } catch (err) {
+      console.warn('Error interpolating template', err, rawTemplate, data);
+    }
+  }
+
+  return template;
+}
+/**
+ * Make a filename guaranteed to be unique.
+ * @param name
+ * @param template
+ * @param evalContext
+ * @returns {string}
+ */
+
+
+function uniqueName(name, template, evalContext) {
+  template = template || '{{fileName}}-{{guid}}'; //include guid in template anyway, to prevent overwriting issue if filename matches existing file
+
+  if (!template.includes('{{guid}}')) {
+    template = "".concat(template, "-{{guid}}");
+  }
+
+  var parts = name.split('.');
+  var fileName = parts.slice(0, parts.length - 1).join('.');
+  var extension = parts.length > 1 ? ".".concat(_lodash.default.last(parts)) : ''; //allow only 100 characters from original name to avoid issues with filename length restrictions
+
+  fileName = fileName.substr(0, 100);
+  evalContext = Object.assign(evalContext || {}, {
+    fileName: fileName,
+    guid: guid()
+  }); //only letters, numbers, dots, dashes, underscores and spaces are allowed. Anything else will be replaced with dash
+
+  var uniqueName = "".concat(interpolate(template, evalContext)).concat(extension).replace(/[^0-9a-zA-Z.\-_ ]/g, '-');
+  return uniqueName;
+}
+
+function guid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0;
+    var v = c === 'x' ? r : r & 0x3 | 0x8;
+    return v.toString(16);
+  });
+}
+/**
+ * Return a translated date setting.
+ *
+ * @param date
+ * @return {(null|Date)}
+ */
+
+
+function getDateSetting(date) {
+  if (_lodash.default.isNil(date) || _lodash.default.isNaN(date) || date === '') {
+    return null;
+  }
+
+  if (date instanceof Date) {
+    return date;
+  } else if (typeof date.toDate === 'function') {
+    return date.isValid() ? date.toDate() : null;
+  }
+
+  var dateSetting = typeof date !== 'string' || date.indexOf('moment(') === -1 ? (0, _momentTimezone.default)(date) : null;
+
+  if (dateSetting && dateSetting.isValid()) {
+    return dateSetting.toDate();
+  }
+
+  dateSetting = null;
+
+  try {
+    var value = new Function('moment', "return ".concat(date, ";"))(_momentTimezone.default);
+
+    if (typeof value === 'string') {
+      dateSetting = (0, _momentTimezone.default)(value);
+    } else if (typeof value.toDate === 'function') {
+      dateSetting = (0, _momentTimezone.default)(value.toDate().toUTCString());
+    } else if (value instanceof Date) {
+      dateSetting = (0, _momentTimezone.default)(value);
+    }
+  } catch (e) {
+    return null;
+  }
+
+  if (!dateSetting) {
+    return null;
+  } // Ensure this is a date.
+
+
+  if (!dateSetting.isValid()) {
+    return null;
+  }
+
+  return dateSetting.toDate();
+}
+
+function isValidDate(date) {
+  return _lodash.default.isDate(date) && !_lodash.default.isNaN(date.getDate());
+}
+/**
+ * Get the current timezone string.
+ *
+ * @return {string}
+ */
+
+
+function currentTimezone() {
+  if (_momentTimezone.default.currentTimezone) {
+    return _momentTimezone.default.currentTimezone;
+  }
+
+  _momentTimezone.default.currentTimezone = _jstimezonedetect.default.determine().name();
+  return _momentTimezone.default.currentTimezone;
+}
+/**
+ * Get an offset date provided a date object and timezone object.
+ *
+ * @param date
+ * @param timezone
+ * @return {Date}
+ */
+
+
+function offsetDate(date, timezone) {
+  if (timezone === 'UTC') {
+    return {
+      date: new Date(date.getTime() + date.getTimezoneOffset() * 60000),
+      abbr: 'UTC'
+    };
+  }
+
+  var dateMoment = (0, _momentTimezone.default)(date).tz(timezone);
+  return {
+    date: new Date(date.getTime() + (dateMoment.utcOffset() + date.getTimezoneOffset()) * 60000),
+    abbr: dateMoment.format('z')
+  };
+}
+/**
+ * Returns if the zones are loaded.
+ *
+ * @return {boolean}
+ */
+
+
+function zonesLoaded() {
+  return _momentTimezone.default.zonesLoaded;
+}
+/**
+ * Returns if we should load the zones.
+ *
+ * @param timezone
+ * @return {boolean}
+ */
+
+
+function shouldLoadZones(timezone) {
+  if (timezone === currentTimezone() || timezone === 'UTC') {
+    return false;
+  }
+
+  return true;
+}
+/**
+ * Externally load the timezone data.
+ *
+ * @return {Promise<any> | *}
+ */
+
+
+function loadZones(timezone) {
+  if (timezone && !shouldLoadZones(timezone)) {
+    // Return non-resolving promise.
+    return new _nativePromiseOnly.default(_lodash.default.noop);
+  }
+
+  if (_momentTimezone.default.zonesPromise) {
+    return _momentTimezone.default.zonesPromise;
+  }
+
+  return _momentTimezone.default.zonesPromise = fetch('https://formio.github.io/formio.js/resources/latest.json').then(function (resp) {
+    return resp.json().then(function (zones) {
+      _momentTimezone.default.tz.load(zones);
+
+      _momentTimezone.default.zonesLoaded = true; // Trigger a global event that the timezones have finished loading.
+
+      if (document && document.createEvent && document.body && document.body.dispatchEvent) {
+        var event = document.createEvent('Event');
+        event.initEvent('zonesLoaded', true, true);
+        document.body.dispatchEvent(event);
+      }
+    });
+  });
+}
+/**
+ * Get the moment date object for translating dates with timezones.
+ *
+ * @param value
+ * @param format
+ * @param timezone
+ * @return {*}
+ */
+
+
+function momentDate(value, format, timezone) {
+  var momentDate = (0, _momentTimezone.default)(value);
+
+  if (timezone === 'UTC') {
+    timezone = 'Etc/UTC';
+  }
+
+  if ((timezone !== currentTimezone() || format && format.match(/\s(z$|z\s)/)) && _momentTimezone.default.zonesLoaded) {
+    return momentDate.tz(timezone);
+  }
+
+  return momentDate;
+}
+/**
+ * Format a date provided a value, format, and timezone object.
+ *
+ * @param value
+ * @param format
+ * @param timezone
+ * @return {string}
+ */
+
+
+function formatDate(value, format, timezone) {
+  var momentDate = (0, _momentTimezone.default)(value);
+
+  if (timezone === currentTimezone()) {
+    // See if our format contains a "z" timezone character.
+    if (format.match(/\s(z$|z\s)/)) {
+      loadZones();
+
+      if (_momentTimezone.default.zonesLoaded) {
+        return momentDate.tz(timezone).format(convertFormatToMoment(format));
+      } else {
+        return momentDate.format(convertFormatToMoment(format.replace(/\s(z$|z\s)/, '')));
+      }
+    } // Return the standard format.
+
+
+    return momentDate.format(convertFormatToMoment(format));
+  }
+
+  if (timezone === 'UTC') {
+    var offset = offsetDate(momentDate.toDate(), 'UTC');
+    return "".concat((0, _momentTimezone.default)(offset.date).format(convertFormatToMoment(format)), " UTC");
+  } // Load the zones since we need timezone information.
+
+
+  loadZones();
+
+  if (_momentTimezone.default.zonesLoaded) {
+    return momentDate.tz(timezone).format("".concat(convertFormatToMoment(format), " z"));
+  } else {
+    return momentDate.format(convertFormatToMoment(format));
+  }
+}
+/**
+ * Pass a format function to format within a timezone.
+ *
+ * @param formatFn
+ * @param date
+ * @param format
+ * @param timezone
+ * @return {string}
+ */
+
+
+function formatOffset(formatFn, date, format, timezone) {
+  if (timezone === currentTimezone()) {
+    return formatFn(date, format);
+  }
+
+  if (timezone === 'UTC') {
+    return "".concat(formatFn(offsetDate(date, 'UTC').date, format), " UTC");
+  } // Load the zones since we need timezone information.
+
+
+  loadZones();
+
+  if (_momentTimezone.default.zonesLoaded) {
+    var offset = offsetDate(date, timezone);
+    return "".concat(formatFn(offset.date, format), " ").concat(offset.abbr);
+  } else {
+    return formatFn(date, format);
+  }
+}
+
+function getLocaleDateFormatInfo(locale) {
+  var formatInfo = {};
+  var day = 21;
+  var exampleDate = new Date(2017, 11, day);
+  var localDateString = exampleDate.toLocaleDateString(locale);
+  formatInfo.dayFirst = localDateString.slice(0, 2) === day.toString();
+  return formatInfo;
+}
+/**
+ * Convert the format from the angular-datepicker module to flatpickr format.
+ * @param format
+ * @return {string}
+ */
+
+
+function convertFormatToFlatpickr(format) {
+  return format // Remove the Z timezone offset, not supported by flatpickr.
+  .replace(/Z/g, '') // Year conversion.
+  .replace(/y/g, 'Y').replace('YYYY', 'Y').replace('YY', 'y') // Month conversion.
+  .replace('MMMM', 'F').replace(/M/g, 'n').replace('nnn', 'M').replace('nn', 'm') // Day in month.
+  .replace(/d/g, 'j').replace(/jj/g, 'd') // Day in week.
+  .replace('EEEE', 'l').replace('EEE', 'D') // Hours, minutes, seconds
+  .replace('HH', 'H').replace('hh', 'h').replace('mm', 'i').replace('ss', 'S').replace(/a/g, 'K');
+}
+/**
+ * Convert the format from the angular-datepicker module to moment format.
+ * @param format
+ * @return {string}
+ */
+
+
+function convertFormatToMoment(format) {
+  return format // Year conversion.
+  .replace(/y/g, 'Y') // Day in month.
+  .replace(/d/g, 'D') // Day in week.
+  .replace(/E/g, 'd') // AM/PM marker
+  .replace(/a/g, 'A');
+}
+
+function convertFormatToMask(format) {
+  return format // Short and long month replacement.
+  .replace(/(MMM|MMMM)/g, 'MM') // Year conversion
+  .replace(/[ydhmsHM]/g, '9') // AM/PM conversion
+  .replace(/a/g, 'AA');
+}
+/**
+ * Returns an input mask that is compatible with the input mask library.
+ * @param {string} mask - The Form.io input mask.
+ * @returns {Array} - The input mask for the mask library.
+ */
+
+
+function getInputMask(mask) {
+  if (mask instanceof Array) {
+    return mask;
+  }
+
+  var maskArray = [];
+  maskArray.numeric = true;
+
+  for (var i = 0; i < mask.length; i++) {
+    switch (mask[i]) {
+      case '9':
+        maskArray.push(/\d/);
+        break;
+
+      case 'A':
+        maskArray.numeric = false;
+        maskArray.push(/[a-zA-Z]/);
+        break;
+
+      case 'a':
+        maskArray.numeric = false;
+        maskArray.push(/[a-z]/);
+        break;
+
+      case '*':
+        maskArray.numeric = false;
+        maskArray.push(/[a-zA-Z0-9]/);
+        break;
+
+      default:
+        maskArray.push(mask[i]);
+        break;
+    }
+  }
+
+  return maskArray;
+}
+
+function matchInputMask(value, inputMask) {
+  if (!inputMask) {
+    return true;
+  }
+
+  for (var i = 0; i < inputMask.length; i++) {
+    var char = value[i];
+    var charPart = inputMask[i];
+
+    if (!(_lodash.default.isRegExp(charPart) && charPart.test(char) || charPart === char)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function getNumberSeparators() {
+  var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'en';
+  var formattedNumberString = 12345.6789.toLocaleString(lang);
+  var delimeters = formattedNumberString.match(/..(.)...(.)../);
+
+  if (!delimeters) {
+    return {
+      delimiter: ',',
+      decimalSeparator: '.'
+    };
+  }
+
+  return {
+    delimiter: delimeters.length > 1 ? delimeters[1] : ',',
+    decimalSeparator: delimeters.length > 2 ? delimeters[2] : '.'
+  };
+}
+
+function getNumberDecimalLimit(component) {
+  // Determine the decimal limit. Defaults to 20 but can be overridden by validate.step or decimalLimit settings.
+  var decimalLimit = 20;
+
+  var step = _lodash.default.get(component, 'validate.step', 'any');
+
+  if (step !== 'any') {
+    var parts = step.toString().split('.');
+
+    if (parts.length > 1) {
+      decimalLimit = parts[1].length;
+    }
+  }
+
+  return decimalLimit;
+}
+
+function getCurrencyAffixes(_ref) {
+  var _ref$currency = _ref.currency,
+      currency = _ref$currency === void 0 ? 'USD' : _ref$currency,
+      decimalLimit = _ref.decimalLimit,
+      decimalSeparator = _ref.decimalSeparator,
+      lang = _ref.lang;
+  // Get the prefix and suffix from the localized string.
+  var regex = '(.*)?100';
+
+  if (decimalLimit) {
+    regex += "".concat(decimalSeparator === '.' ? '\\.' : decimalSeparator, "0{").concat(decimalLimit, "}");
+  }
+
+  regex += '(.*)?';
+  var parts = 100 .toLocaleString(lang, {
+    style: 'currency',
+    currency: currency,
+    useGrouping: true,
+    maximumFractionDigits: decimalLimit,
+    minimumFractionDigits: decimalLimit
+  }).replace('.', decimalSeparator).match(new RegExp(regex));
+  return {
+    prefix: parts[1] || '',
+    suffix: parts[2] || ''
+  };
+}
+/**
+ * Fetch the field data provided a component.
+ *
+ * @param data
+ * @param component
+ * @return {*}
+ */
+
+
+function fieldData(data, component) {
+  if (!data) {
+    return '';
+  }
+
+  if (!component || !component.key) {
+    return data;
+  }
+
+  if (component.key.includes('.')) {
+    var value = data;
+    var parts = component.key.split('.');
+    var key = '';
+
+    for (var i = 0; i < parts.length; i++) {
+      key = parts[i]; // Handle nested resources
+
+      if (value.hasOwnProperty('_id')) {
+        value = value.data;
+      } // Return if the key is not found on the value.
+
+
+      if (!value.hasOwnProperty(key)) {
+        return;
+      } // Convert old single field data in submissions to multiple
+
+
+      if (key === parts[parts.length - 1] && component.multiple && !Array.isArray(value[key])) {
+        value[key] = [value[key]];
+      } // Set the value of this key.
+
+
+      value = value[key];
+    }
+
+    return value;
+  } else {
+    // Convert old single field data in submissions to multiple
+    if (component.multiple && !Array.isArray(data[component.key])) {
+      data[component.key] = [data[component.key]];
+    }
+
+    return data[component.key];
+  }
+}
+/**
+ * Delays function execution with possibility to execute function synchronously or cancel it.
+ *
+ * @param fn Function to delay
+ * @param delay Delay time
+ * @return {*}
+ */
+
+
+function delay(fn) {
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  for (var _len = arguments.length, args = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+    args[_key - 2] = arguments[_key];
+  }
+
+  var timer = setTimeout.apply(void 0, [fn, delay].concat(args));
+
+  function cancel() {
+    clearTimeout(timer);
+  }
+
+  function earlyCall() {
+    cancel();
+    return fn.apply(void 0, args);
+  }
+
+  earlyCall.timer = timer;
+  earlyCall.cancel = cancel;
+  return earlyCall;
+}
+/**
+ * Iterate the given key to make it unique.
+ *
+ * @param {String} key
+ *   Modify the component key to be unique.
+ *
+ * @returns {String}
+ *   The new component key.
+ */
+
+
+function iterateKey(key) {
+  if (!key.match(/(\d+)$/)) {
+    return "".concat(key, "2");
+  }
+
+  return key.replace(/(\d+)$/, function (suffix) {
+    return Number(suffix) + 1;
+  });
+}
+/**
+ * Determines a unique key within a map provided the base key.
+ *
+ * @param map
+ * @param base
+ * @return {*}
+ */
+
+
+function uniqueKey(map, base) {
+  var newKey = base;
+
+  while (map.hasOwnProperty(newKey)) {
+    newKey = iterateKey(newKey);
+  }
+
+  return newKey;
+}
+/**
+ * Determines the major version number of bootstrap.
+ *
+ * @return {number}
+ */
+
+
+function bootstrapVersion(options) {
+  if (options.bootstrap) {
+    return options.bootstrap;
+  }
+
+  if (typeof $ === 'function' && typeof $().collapse === 'function') {
+    return parseInt($.fn.collapse.Constructor.VERSION.split('.')[0], 10);
+  }
+
+  return 0;
+}
+/**
+ * Retrun provided argument.
+ * If argument is a function, returns the result of a function call.
+ * @param {*} e;
+ *
+ * @return {*}
+ */
+
+
+function unfold(e) {
+  if (typeof e === 'function') {
+    return e();
+  }
+
+  return e;
+}
+/**
+ * Map values through unfold and return first non-nil value.
+ * @param {Array<T>} collection;
+ *
+ * @return {T}
+ */
+
+
+var firstNonNil = _lodash.default.flow([_lodash.default.partialRight(_lodash.default.map, unfold), _lodash.default.partialRight(_lodash.default.find, function (v) {
+  return !_lodash.default.isUndefined(v);
+})]);
+/*
+ * Create enclosed state.
+ * Returns functions to getting and cycling between states.
+ * @param {*} a - initial state.
+ * @param {*} b - next state.
+ * @return {Functions[]} -- [get, toggle];
+ */
+
+
+exports.firstNonNil = firstNonNil;
+
+function withSwitch(a, b) {
+  var state = a;
+  var next = b;
+
+  function get() {
+    return state;
+  }
+
+  function toggle() {
+    var prev = state;
+    state = next;
+    next = prev;
+  }
+
+  return [get, toggle];
+}
+
+function observeOverload(callback) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _options$limit = options.limit,
+      limit = _options$limit === void 0 ? 50 : _options$limit,
+      _options$delay = options.delay,
+      delay = _options$delay === void 0 ? 500 : _options$delay;
+  var callCount = 0;
+  var timeoutID = 0;
+
+  var reset = function reset() {
+    return callCount = 0;
+  };
+
+  return function () {
+    if (timeoutID !== 0) {
+      clearTimeout(timeoutID);
+      timeoutID = 0;
+    }
+
+    timeoutID = setTimeout(reset, delay);
+    callCount += 1;
+
+    if (callCount >= limit) {
+      clearTimeout(timeoutID);
+      reset();
+      return callback();
+    }
+  };
+}
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! jquery */ "jquery")))
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/widgets/CalendarWidget.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/formiojs/widgets/CalendarWidget.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+
+__webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
+
+__webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.reflect.get */ "./node_modules/core-js/modules/es.reflect.get.js");
+
+__webpack_require__(/*! core-js/modules/es.reflect.set */ "./node_modules/core-js/modules/es.reflect.set.js");
+
+__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _flatpickr = _interopRequireDefault(__webpack_require__(/*! flatpickr */ "./node_modules/flatpickr/dist/flatpickr.js"));
+
+var _InputWidget2 = _interopRequireDefault(__webpack_require__(/*! ./InputWidget */ "./node_modules/formiojs/widgets/InputWidget.js"));
+
+var _utils = __webpack_require__(/*! ../utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
+var _moment = _interopRequireDefault(__webpack_require__(/*! moment */ "./node_modules/moment/moment.js"));
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function set(target, property, value, receiver) { if (typeof Reflect !== "undefined" && Reflect.set) { set = Reflect.set; } else { set = function set(target, property, value, receiver) { var base = _superPropBase(target, property); var desc; if (base) { desc = Object.getOwnPropertyDescriptor(base, property); if (desc.set) { desc.set.call(receiver, value); return true; } else if (!desc.writable) { return false; } } desc = Object.getOwnPropertyDescriptor(receiver, property); if (desc) { if (!desc.writable) { return false; } desc.value = value; Object.defineProperty(receiver, property, desc); } else { _defineProperty(receiver, property, value); } return true; }; } return set(target, property, value, receiver); }
+
+function _set(target, property, value, receiver, isStrict) { var s = set(target, property, value, receiver || target); if (!s && isStrict) { throw new Error('failed to set property'); } return value; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var DEFAULT_FORMAT = 'yyyy-MM-dd hh:mm a';
+var ISO_8601_FORMAT = 'yyyy-MM-ddTHH:mm:ssZ';
+
+var CalendarWidget =
+/*#__PURE__*/
+function (_InputWidget) {
+  _inherits(CalendarWidget, _InputWidget);
+
+  _createClass(CalendarWidget, null, [{
+    key: "defaultSettings",
+
+    /* eslint-disable camelcase */
+    get: function get() {
+      return {
+        type: 'calendar',
+        altInput: true,
+        allowInput: true,
+        clickOpens: true,
+        enableDate: true,
+        enableTime: true,
+        mode: 'single',
+        noCalendar: false,
+        format: DEFAULT_FORMAT,
+        dateFormat: ISO_8601_FORMAT,
+        useLocaleSettings: false,
+        language: 'us-en',
+        defaultDate: null,
+        hourIncrement: 1,
+        minuteIncrement: 5,
+        time_24hr: false,
+        saveAs: 'date',
+        displayInTimezone: '',
+        timezone: '',
+        minDate: '',
+        maxDate: ''
+      };
+    }
+    /* eslint-enable camelcase */
+
+  }]);
+
+  function CalendarWidget(settings, component) {
+    var _this;
+
+    _classCallCheck(this, CalendarWidget);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(CalendarWidget).call(this, settings, component)); // Change the format to map to the settings.
+
+    if (_this.settings.noCalendar) {
+      _this.settings.format = _this.settings.format.replace(/yyyy-MM-dd /g, '');
+    }
+
+    if (!_this.settings.enableTime) {
+      _this.settings.format = _this.settings.format.replace(/ hh:mm a$/g, '');
+    } else if (_this.settings.time_24hr) {
+      _this.settings.format = _this.settings.format.replace(/hh:mm a$/g, 'HH:mm');
+    }
+
+    _this.component.suffix = true;
+    return _this;
+  }
+  /**
+   * Load the timezones.
+   *
+   * @return {boolean} TRUE if the zones are loading, FALSE otherwise.
+   */
+
+
+  _createClass(CalendarWidget, [{
+    key: "loadZones",
+    value: function loadZones() {
+      var _this2 = this;
+
+      var timezone = this.timezone;
+
+      if (!(0, _utils.zonesLoaded)() && (0, _utils.shouldLoadZones)(timezone)) {
+        (0, _utils.loadZones)(timezone).then(function () {
+          return _this2.emit('redraw');
+        }); // Return zones are loading.
+
+        return true;
+      } // Zones are already loaded.
+
+
+      return false;
+    }
+  }, {
+    key: "attach",
+    value: function attach(input) {
+      var _this3 = this;
+
+      _get(_getPrototypeOf(CalendarWidget.prototype), "attach", this).call(this, input);
+
+      if (input && !input.getAttribute('placeholder')) {
+        input.setAttribute('placeholder', this.settings.format);
+      }
+
+      var dateFormatInfo = (0, _utils.getLocaleDateFormatInfo)(this.settings.language);
+      this.defaultFormat = {
+        date: dateFormatInfo.dayFirst ? 'd/m/Y ' : 'm/d/Y ',
+        time: 'h:i K'
+      };
+      this.closedOn = 0;
+      this.valueFormat = this.settings.dateFormat || ISO_8601_FORMAT;
+      this.valueMomentFormat = (0, _utils.convertFormatToMoment)(this.valueFormat);
+      this.settings.minDate = (0, _utils.getDateSetting)(this.settings.minDate);
+      this.settings.maxDate = (0, _utils.getDateSetting)(this.settings.maxDate);
+      this.settings.defaultDate = (0, _utils.getDateSetting)(this.settings.defaultDate);
+      this.settings.altFormat = (0, _utils.convertFormatToFlatpickr)(this.settings.format);
+      this.settings.dateFormat = (0, _utils.convertFormatToFlatpickr)(this.settings.dateFormat);
+
+      this.settings.onChange = function () {
+        return _this3.emit('update');
+      };
+
+      this.settings.onClose = function () {
+        return _this3.closedOn = Date.now();
+      };
+
+      this.settings.formatDate = function (date, format) {
+        // Only format this if this is the altFormat and the form is readOnly.
+        if (_this3.settings.readOnly && format === _this3.settings.altFormat) {
+          if (_this3.settings.saveAs === 'text' || _this3.loadZones()) {
+            return _flatpickr.default.formatDate(date, format);
+          }
+
+          return (0, _utils.formatOffset)(_flatpickr.default.formatDate.bind(_flatpickr.default), date, format, _this3.timezone);
+        }
+
+        return _flatpickr.default.formatDate(date, format);
+      };
+
+      if (this._input) {
+        // Create a new flatpickr.
+        this.calendar = new _flatpickr.default(this._input, this.settings); // Enforce the input mask of the format.
+
+        this.setInputMask(this.calendar._input, (0, _utils.convertFormatToMask)(this.settings.format)); // Make sure we commit the value after a blur event occurs.
+
+        this.addEventListener(this.calendar._input, 'blur', function () {
+          return _this3.calendar.setDate(_this3.calendar._input.value, true, _this3.settings.altFormat);
+        });
+      }
+    }
+  }, {
+    key: "addSuffix",
+    value: function addSuffix(container) {
+      var _this4 = this;
+
+      var suffix = this.ce('span', {
+        class: 'input-group-addon input-group-append',
+        style: 'cursor: pointer'
+      });
+      suffix.appendChild(this.ce('span', {
+        class: 'input-group-text'
+      }, this.getIcon(this.settings.enableDate ? 'calendar' : 'time')));
+      this.addEventListener(suffix, 'click', function () {
+        if (_this4.calendar && !_this4.calendar.isOpen && Date.now() - _this4.closedOn > 200) {
+          _this4.calendar.open();
+        }
+      });
+      container.appendChild(suffix);
+      return suffix;
+    }
+  }, {
+    key: "getDateValue",
+
+    /**
+     * Return the date value.
+     *
+     * @param date
+     * @param format
+     * @return {string}
+     */
+    value: function getDateValue(date, format) {
+      return (0, _moment.default)(date).format((0, _utils.convertFormatToMoment)(format));
+    }
+    /**
+     * Return the value of the selected date.
+     *
+     * @return {*}
+     */
+
+  }, {
+    key: "getValue",
+    value: function getValue() {
+      // Standard output format.
+      if (!this.calendar) {
+        return _get(_getPrototypeOf(CalendarWidget.prototype), "getValue", this).call(this);
+      } // Get the selected dates from the calendar widget.
+
+
+      var dates = this.calendar.selectedDates;
+
+      if (!dates || !dates.length) {
+        return _get(_getPrototypeOf(CalendarWidget.prototype), "getValue", this).call(this);
+      }
+
+      if (!(dates[0] instanceof Date)) {
+        return 'Invalid Date';
+      }
+
+      return this.getDateValue(dates[0], this.valueFormat);
+    }
+    /**
+     * Set the selected date value.
+     *
+     * @param value
+     */
+
+  }, {
+    key: "setValue",
+    value: function setValue(value) {
+      if (!this.calendar) {
+        return _get(_getPrototypeOf(CalendarWidget.prototype), "setValue", this).call(this, value);
+      }
+
+      if (value) {
+        if (this.settings.saveAs !== 'text' && this.settings.readOnly && !this.loadZones()) {
+          this.calendar.setDate((0, _utils.momentDate)(value, this.valueFormat, this.timezone).toDate(), false);
+        } else {
+          this.calendar.setDate((0, _moment.default)(value, this.valueMomentFormat).toDate(), false);
+        }
+      } else {
+        this.calendar.clear(false);
+      }
+    }
+  }, {
+    key: "getView",
+    value: function getView(value, format) {
+      format = format || this.dateFormat;
+
+      if (this.settings.saveAs === 'text') {
+        return this.getDateValue(value, format);
+      }
+
+      return (0, _utils.formatDate)(value, format, this.timezone);
+    }
+  }, {
+    key: "validationValue",
+    value: function validationValue(value) {
+      if (typeof value === 'string') {
+        return new Date(value);
+      }
+
+      return value.map(function (val) {
+        return new Date(val);
+      });
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      _get(_getPrototypeOf(CalendarWidget.prototype), "destroy", this).call(this);
+
+      this.calendar.destroy();
+    }
+  }, {
+    key: "timezone",
+    get: function get() {
+      if (this.settings.timezone) {
+        return this.settings.timezone;
+      }
+
+      if (this.settings.displayInTimezone === 'submission' && this.settings.submissionTimezone) {
+        return this.settings.submissionTimezone;
+      }
+
+      if (this.settings.displayInTimezone === 'utc') {
+        return 'UTC';
+      } // Return current timezone if none are provided.
+
+
+      return (0, _utils.currentTimezone)();
+    }
+  }, {
+    key: "defaultSettings",
+    get: function get() {
+      return CalendarWidget.defaultSettings;
+    }
+  }, {
+    key: "disabled",
+    set: function set(disabled) {
+      _set(_getPrototypeOf(CalendarWidget.prototype), "disabled", disabled, this, true);
+
+      if (this.calendar) {
+        if (disabled) {
+          this.calendar._input.setAttribute('disabled', 'disabled');
+        } else {
+          this.calendar._input.removeAttribute('disabled');
+        }
+
+        this.calendar.close();
+        this.calendar.redraw();
+      }
+    }
+  }, {
+    key: "input",
+    get: function get() {
+      return this.calendar ? this.calendar.altInput : null;
+    }
+  }, {
+    key: "localeFormat",
+    get: function get() {
+      var format = '';
+
+      if (this.settings.enableDate) {
+        format += this.defaultFormat.date;
+      }
+
+      if (this.settings.enableTime) {
+        format += this.defaultFormat.time;
+      }
+
+      return format;
+    }
+  }, {
+    key: "dateTimeFormat",
+    get: function get() {
+      return this.settings.useLocaleSettings ? this.localeFormat : (0, _utils.convertFormatToFlatpickr)(this.dateFormat);
+    }
+  }, {
+    key: "dateFormat",
+    get: function get() {
+      return _lodash.default.get(this.settings, 'format', DEFAULT_FORMAT);
+    }
+    /**
+     * Get the default date for the calendar.
+     * @return {*}
+     */
+
+  }, {
+    key: "defaultDate",
+    get: function get() {
+      return (0, _utils.getDateSetting)(this.settings.defaultDate);
+    }
+  }, {
+    key: "defaultValue",
+    get: function get() {
+      var defaultDate = this.defaultDate;
+      return defaultDate ? defaultDate.toISOString() : '';
+    }
+  }]);
+
+  return CalendarWidget;
+}(_InputWidget2.default);
+
+exports.default = CalendarWidget;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/widgets/InputWidget.js":
+/*!******************************************************!*\
+  !*** ./node_modules/formiojs/widgets/InputWidget.js ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.symbol */ "./node_modules/core-js/modules/es.symbol.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.description */ "./node_modules/core-js/modules/es.symbol.description.js");
+
+__webpack_require__(/*! core-js/modules/es.symbol.iterator */ "./node_modules/core-js/modules/es.symbol.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
+
+__webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.string.iterator */ "./node_modules/core-js/modules/es.string.iterator.js");
+
+__webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _Component2 = _interopRequireDefault(__webpack_require__(/*! ../Component */ "./node_modules/formiojs/Component.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var InputWidget =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(InputWidget, _Component);
+
+  function InputWidget(settings, component) {
+    var _this;
+
+    _classCallCheck(this, InputWidget);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(InputWidget).call(this, settings));
+    _this.namespace = 'formio.widget';
+    _this.component = component || {};
+    _this.settings = _lodash.default.merge({}, _this.defaultSettings, settings || {});
+    return _this;
+  }
+
+  _createClass(InputWidget, [{
+    key: "attach",
+    value: function attach(input) {
+      this._input = input;
+    }
+  }, {
+    key: "getValue",
+    value: function getValue() {
+      return this._input.value;
+    }
+  }, {
+    key: "getView",
+    value: function getView(value) {
+      return value;
+    }
+  }, {
+    key: "validationValue",
+    value: function validationValue(value) {
+      return value;
+    }
+  }, {
+    key: "addPrefix",
+    value: function addPrefix() {
+      return null;
+    }
+  }, {
+    key: "addSuffix",
+    value: function addSuffix() {
+      return null;
+    }
+  }, {
+    key: "setValue",
+    value: function setValue(value) {
+      this._input.value = value;
+    }
+  }, {
+    key: "defaultSettings",
+    get: function get() {
+      return {};
+    }
+  }, {
+    key: "disabled",
+    set: function set(disabled) {
+      if (disabled) {
+        this._input.setAttribute('disabled', 'disabled');
+      } else {
+        this._input.removeAttribute('disabled');
+      }
+    }
+  }, {
+    key: "input",
+    get: function get() {
+      return this._input;
+    }
+  }, {
+    key: "defaultValue",
+    get: function get() {
+      return '';
+    }
+  }]);
+
+  return InputWidget;
+}(_Component2.default);
+
+exports.default = InputWidget;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/widgets/index.js":
+/*!************************************************!*\
+  !*** ./node_modules/formiojs/widgets/index.js ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _InputWidget = _interopRequireDefault(__webpack_require__(/*! ./InputWidget */ "./node_modules/formiojs/widgets/InputWidget.js"));
+
+var _CalendarWidget = _interopRequireDefault(__webpack_require__(/*! ./CalendarWidget */ "./node_modules/formiojs/widgets/CalendarWidget.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = {
+  input: _InputWidget.default,
+  calendar: _CalendarWidget.default
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/i18next/dist/esm/i18next.js":
+/*!**************************************************!*\
+  !*** ./node_modules/i18next/dist/esm/i18next.js ***!
+  \**************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/typeof */ "./node_modules/@babel/runtime/helpers/esm/typeof.js");
+/* harmony import */ var _babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectSpread */ "./node_modules/@babel/runtime/helpers/esm/objectSpread.js");
+/* harmony import */ var _babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/esm/classCallCheck */ "./node_modules/@babel/runtime/helpers/esm/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/esm/createClass */ "./node_modules/@babel/runtime/helpers/esm/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/esm/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/esm/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/esm/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/esm/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/esm/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/esm/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @babel/runtime/helpers/esm/inherits */ "./node_modules/@babel/runtime/helpers/esm/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @babel/runtime/helpers/esm/toConsumableArray */ "./node_modules/@babel/runtime/helpers/esm/toConsumableArray.js");
+/* harmony import */ var _babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @babel/runtime/helpers/esm/slicedToArray */ "./node_modules/@babel/runtime/helpers/esm/slicedToArray.js");
+
+
+
+
+
+
+
+
+
+
+
+var consoleLogger = {
+  type: 'logger',
+  log: function log(args) {
+    this.output('log', args);
+  },
+  warn: function warn(args) {
+    this.output('warn', args);
+  },
+  error: function error(args) {
+    this.output('error', args);
+  },
+  output: function output(type, args) {
+    var _console;
+
+    /* eslint no-console: 0 */
+    if (console && console[type]) (_console = console)[type].apply(_console, Object(_babel_runtime_helpers_esm_toConsumableArray__WEBPACK_IMPORTED_MODULE_8__["default"])(args));
+  }
+};
+
+var Logger =
+/*#__PURE__*/
+function () {
+  function Logger(concreteLogger) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Logger);
+
+    this.init(concreteLogger, options);
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Logger, [{
+    key: "init",
+    value: function init(concreteLogger) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      this.prefix = options.prefix || 'i18next:';
+      this.logger = concreteLogger || consoleLogger;
+      this.options = options;
+      this.debug = options.debug;
+    }
+  }, {
+    key: "setDebug",
+    value: function setDebug(bool) {
+      this.debug = bool;
+    }
+  }, {
+    key: "log",
+    value: function log() {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      return this.forward(args, 'log', '', true);
+    }
+  }, {
+    key: "warn",
+    value: function warn() {
+      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+        args[_key2] = arguments[_key2];
+      }
+
+      return this.forward(args, 'warn', '', true);
+    }
+  }, {
+    key: "error",
+    value: function error() {
+      for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+        args[_key3] = arguments[_key3];
+      }
+
+      return this.forward(args, 'error', '');
+    }
+  }, {
+    key: "deprecate",
+    value: function deprecate() {
+      for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      return this.forward(args, 'warn', 'WARNING DEPRECATED: ', true);
+    }
+  }, {
+    key: "forward",
+    value: function forward(args, lvl, prefix, debugOnly) {
+      if (debugOnly && !this.debug) return null;
+      if (typeof args[0] === 'string') args[0] = "".concat(prefix).concat(this.prefix, " ").concat(args[0]);
+      return this.logger[lvl](args);
+    }
+  }, {
+    key: "create",
+    value: function create(moduleName) {
+      return new Logger(this.logger, Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, {
+        prefix: "".concat(this.prefix, ":").concat(moduleName, ":")
+      }, this.options));
+    }
+  }]);
+
+  return Logger;
+}();
+
+var baseLogger = new Logger();
+
+var EventEmitter =
+/*#__PURE__*/
+function () {
+  function EventEmitter() {
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, EventEmitter);
+
+    this.observers = {};
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(EventEmitter, [{
+    key: "on",
+    value: function on(events, listener) {
+      var _this = this;
+
+      events.split(' ').forEach(function (event) {
+        _this.observers[event] = _this.observers[event] || [];
+
+        _this.observers[event].push(listener);
+      });
+      return this;
+    }
+  }, {
+    key: "off",
+    value: function off(event, listener) {
+      var _this2 = this;
+
+      if (!this.observers[event]) {
+        return;
+      }
+
+      this.observers[event].forEach(function () {
+        if (!listener) {
+          delete _this2.observers[event];
+        } else {
+          var index = _this2.observers[event].indexOf(listener);
+
+          if (index > -1) {
+            _this2.observers[event].splice(index, 1);
+          }
+        }
+      });
+    }
+  }, {
+    key: "emit",
+    value: function emit(event) {
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+
+      if (this.observers[event]) {
+        var cloned = [].concat(this.observers[event]);
+        cloned.forEach(function (observer) {
+          observer.apply(void 0, args);
+        });
+      }
+
+      if (this.observers['*']) {
+        var _cloned = [].concat(this.observers['*']);
+
+        _cloned.forEach(function (observer) {
+          observer.apply(observer, [event].concat(args));
+        });
+      }
+    }
+  }]);
+
+  return EventEmitter;
+}();
+
+// http://lea.verou.me/2016/12/resolve-promises-externally-with-this-one-weird-trick/
+function defer() {
+  var res;
+  var rej;
+  var promise = new Promise(function (resolve, reject) {
+    res = resolve;
+    rej = reject;
+  });
+  promise.resolve = res;
+  promise.reject = rej;
+  return promise;
+}
+function makeString(object) {
+  if (object == null) return '';
+  /* eslint prefer-template: 0 */
+
+  return '' + object;
+}
+function copy(a, s, t) {
+  a.forEach(function (m) {
+    if (s[m]) t[m] = s[m];
+  });
+}
+
+function getLastOfPath(object, path, Empty) {
+  function cleanKey(key) {
+    return key && key.indexOf('###') > -1 ? key.replace(/###/g, '.') : key;
+  }
+
+  function canNotTraverseDeeper() {
+    return !object || typeof object === 'string';
+  }
+
+  var stack = typeof path !== 'string' ? [].concat(path) : path.split('.');
+
+  while (stack.length > 1) {
+    if (canNotTraverseDeeper()) return {};
+    var key = cleanKey(stack.shift());
+    if (!object[key] && Empty) object[key] = new Empty();
+    object = object[key];
+  }
+
+  if (canNotTraverseDeeper()) return {};
+  return {
+    obj: object,
+    k: cleanKey(stack.shift())
+  };
+}
+
+function setPath(object, path, newValue) {
+  var _getLastOfPath = getLastOfPath(object, path, Object),
+      obj = _getLastOfPath.obj,
+      k = _getLastOfPath.k;
+
+  obj[k] = newValue;
+}
+function pushPath(object, path, newValue, concat) {
+  var _getLastOfPath2 = getLastOfPath(object, path, Object),
+      obj = _getLastOfPath2.obj,
+      k = _getLastOfPath2.k;
+
+  obj[k] = obj[k] || [];
+  if (concat) obj[k] = obj[k].concat(newValue);
+  if (!concat) obj[k].push(newValue);
+}
+function getPath(object, path) {
+  var _getLastOfPath3 = getLastOfPath(object, path),
+      obj = _getLastOfPath3.obj,
+      k = _getLastOfPath3.k;
+
+  if (!obj) return undefined;
+  return obj[k];
+}
+function deepExtend(target, source, overwrite) {
+  /* eslint no-restricted-syntax: 0 */
+  for (var prop in source) {
+    if (prop in target) {
+      // If we reached a leaf string in target or source then replace with source or skip depending on the 'overwrite' switch
+      if (typeof target[prop] === 'string' || target[prop] instanceof String || typeof source[prop] === 'string' || source[prop] instanceof String) {
+        if (overwrite) target[prop] = source[prop];
+      } else {
+        deepExtend(target[prop], source[prop], overwrite);
+      }
+    } else {
+      target[prop] = source[prop];
+    }
+  }
+
+  return target;
+}
+function regexEscape(str) {
+  /* eslint no-useless-escape: 0 */
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+}
+/* eslint-disable */
+
+var _entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;'
+};
+/* eslint-enable */
+
+function escape(data) {
+  if (typeof data === 'string') {
+    return data.replace(/[&<>"'\/]/g, function (s) {
+      return _entityMap[s];
+    });
+  }
+
+  return data;
+}
+
+var ResourceStore =
+/*#__PURE__*/
+function (_EventEmitter) {
+  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(ResourceStore, _EventEmitter);
+
+  function ResourceStore(data) {
+    var _this;
+
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+      ns: ['translation'],
+      defaultNS: 'translation'
+    };
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, ResourceStore);
+
+    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(ResourceStore).call(this));
+    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
+
+    _this.data = data || {};
+    _this.options = options;
+
+    if (_this.options.keySeparator === undefined) {
+      _this.options.keySeparator = '.';
+    }
+
+    return _this;
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(ResourceStore, [{
+    key: "addNamespaces",
+    value: function addNamespaces(ns) {
+      if (this.options.ns.indexOf(ns) < 0) {
+        this.options.ns.push(ns);
+      }
+    }
+  }, {
+    key: "removeNamespaces",
+    value: function removeNamespaces(ns) {
+      var index = this.options.ns.indexOf(ns);
+
+      if (index > -1) {
+        this.options.ns.splice(index, 1);
+      }
+    }
+  }, {
+    key: "getResource",
+    value: function getResource(lng, ns, key) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
+      var path = [lng, ns];
+      if (key && typeof key !== 'string') path = path.concat(key);
+      if (key && typeof key === 'string') path = path.concat(keySeparator ? key.split(keySeparator) : key);
+
+      if (lng.indexOf('.') > -1) {
+        path = lng.split('.');
+      }
+
+      return getPath(this.data, path);
+    }
+  }, {
+    key: "addResource",
+    value: function addResource(lng, ns, key, value) {
+      var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {
+        silent: false
+      };
+      var keySeparator = this.options.keySeparator;
+      if (keySeparator === undefined) keySeparator = '.';
+      var path = [lng, ns];
+      if (key) path = path.concat(keySeparator ? key.split(keySeparator) : key);
+
+      if (lng.indexOf('.') > -1) {
+        path = lng.split('.');
+        value = ns;
+        ns = path[1];
+      }
+
+      this.addNamespaces(ns);
+      setPath(this.data, path, value);
+      if (!options.silent) this.emit('added', lng, ns, key, value);
+    }
+  }, {
+    key: "addResources",
+    value: function addResources(lng, ns, resources) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {
+        silent: false
+      };
+
+      /* eslint no-restricted-syntax: 0 */
+      for (var m in resources) {
+        if (typeof resources[m] === 'string' || Object.prototype.toString.apply(resources[m]) === '[object Array]') this.addResource(lng, ns, m, resources[m], {
+          silent: true
+        });
+      }
+
+      if (!options.silent) this.emit('added', lng, ns, resources);
+    }
+  }, {
+    key: "addResourceBundle",
+    value: function addResourceBundle(lng, ns, resources, deep, overwrite) {
+      var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {
+        silent: false
+      };
+      var path = [lng, ns];
+
+      if (lng.indexOf('.') > -1) {
+        path = lng.split('.');
+        deep = resources;
+        resources = ns;
+        ns = path[1];
+      }
+
+      this.addNamespaces(ns);
+      var pack = getPath(this.data, path) || {};
+
+      if (deep) {
+        deepExtend(pack, resources, overwrite);
+      } else {
+        pack = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, pack, resources);
+      }
+
+      setPath(this.data, path, pack);
+      if (!options.silent) this.emit('added', lng, ns, resources);
+    }
+  }, {
+    key: "removeResourceBundle",
+    value: function removeResourceBundle(lng, ns) {
+      if (this.hasResourceBundle(lng, ns)) {
+        delete this.data[lng][ns];
+      }
+
+      this.removeNamespaces(ns);
+      this.emit('removed', lng, ns);
+    }
+  }, {
+    key: "hasResourceBundle",
+    value: function hasResourceBundle(lng, ns) {
+      return this.getResource(lng, ns) !== undefined;
+    }
+  }, {
+    key: "getResourceBundle",
+    value: function getResourceBundle(lng, ns) {
+      if (!ns) ns = this.options.defaultNS; // COMPATIBILITY: remove extend in v2.1.0
+
+      if (this.options.compatibilityAPI === 'v1') return Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, {}, this.getResource(lng, ns));
+      return this.getResource(lng, ns);
+    }
+  }, {
+    key: "getDataByLanguage",
+    value: function getDataByLanguage(lng) {
+      return this.data[lng];
+    }
+  }, {
+    key: "toJSON",
+    value: function toJSON() {
+      return this.data;
+    }
+  }]);
+
+  return ResourceStore;
+}(EventEmitter);
+
+var postProcessor = {
+  processors: {},
+  addPostProcessor: function addPostProcessor(module) {
+    this.processors[module.name] = module;
+  },
+  handle: function handle(processors, value, key, options, translator) {
+    var _this = this;
+
+    processors.forEach(function (processor) {
+      if (_this.processors[processor]) value = _this.processors[processor].process(value, key, options, translator);
+    });
+    return value;
+  }
+};
+
+var Translator =
+/*#__PURE__*/
+function (_EventEmitter) {
+  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(Translator, _EventEmitter);
+
+  function Translator(services) {
+    var _this;
+
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Translator);
+
+    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(Translator).call(this));
+    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
+
+    copy(['resourceStore', 'languageUtils', 'pluralResolver', 'interpolator', 'backendConnector', 'i18nFormat'], services, Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this));
+    _this.options = options;
+
+    if (_this.options.keySeparator === undefined) {
+      _this.options.keySeparator = '.';
+    }
+
+    _this.logger = baseLogger.create('translator');
+    return _this;
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Translator, [{
+    key: "changeLanguage",
+    value: function changeLanguage(lng) {
+      if (lng) this.language = lng;
+    }
+  }, {
+    key: "exists",
+    value: function exists(key) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        interpolation: {}
+      };
+      var resolved = this.resolve(key, options);
+      return resolved && resolved.res !== undefined;
+    }
+  }, {
+    key: "extractFromKey",
+    value: function extractFromKey(key, options) {
+      var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+      if (nsSeparator === undefined) nsSeparator = ':';
+      var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator;
+      var namespaces = options.ns || this.options.defaultNS;
+
+      if (nsSeparator && key.indexOf(nsSeparator) > -1) {
+        var parts = key.split(nsSeparator);
+        if (nsSeparator !== keySeparator || nsSeparator === keySeparator && this.options.ns.indexOf(parts[0]) > -1) namespaces = parts.shift();
+        key = parts.join(keySeparator);
+      }
+
+      if (typeof namespaces === 'string') namespaces = [namespaces];
+      return {
+        key: key,
+        namespaces: namespaces
+      };
+    }
+  }, {
+    key: "translate",
+    value: function translate(keys, options) {
+      var _this2 = this;
+
+      if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(options) !== 'object' && this.options.overloadTranslationOptionHandler) {
+        /* eslint prefer-rest-params: 0 */
+        options = this.options.overloadTranslationOptionHandler(arguments);
+      }
+
+      if (!options) options = {}; // non valid keys handling
+
+      if (keys === undefined || keys === null) return '';
+      if (!Array.isArray(keys)) keys = [String(keys)]; // separators
+
+      var keySeparator = options.keySeparator !== undefined ? options.keySeparator : this.options.keySeparator; // get namespace(s)
+
+      var _this$extractFromKey = this.extractFromKey(keys[keys.length - 1], options),
+          key = _this$extractFromKey.key,
+          namespaces = _this$extractFromKey.namespaces;
+
+      var namespace = namespaces[namespaces.length - 1]; // return key on CIMode
+
+      var lng = options.lng || this.language;
+      var appendNamespaceToCIMode = options.appendNamespaceToCIMode || this.options.appendNamespaceToCIMode;
+
+      if (lng && lng.toLowerCase() === 'cimode') {
+        if (appendNamespaceToCIMode) {
+          var nsSeparator = options.nsSeparator || this.options.nsSeparator;
+          return namespace + nsSeparator + key;
+        }
+
+        return key;
+      } // resolve from store
+
+
+      var resolved = this.resolve(keys, options);
+      var res = resolved && resolved.res;
+      var resUsedKey = resolved && resolved.usedKey || key;
+      var resExactUsedKey = resolved && resolved.exactUsedKey || key;
+      var resType = Object.prototype.toString.apply(res);
+      var noObject = ['[object Number]', '[object Function]', '[object RegExp]'];
+      var joinArrays = options.joinArrays !== undefined ? options.joinArrays : this.options.joinArrays; // object
+
+      var handleAsObjectInI18nFormat = !this.i18nFormat || this.i18nFormat.handleAsObject;
+      var handleAsObject = typeof res !== 'string' && typeof res !== 'boolean' && typeof res !== 'number';
+
+      if (handleAsObjectInI18nFormat && res && handleAsObject && noObject.indexOf(resType) < 0 && !(typeof joinArrays === 'string' && resType === '[object Array]')) {
+        if (!options.returnObjects && !this.options.returnObjects) {
+          this.logger.warn('accessing an object - but returnObjects options is not enabled!');
+          return this.options.returnedObjectHandler ? this.options.returnedObjectHandler(resUsedKey, res, options) : "key '".concat(key, " (").concat(this.language, ")' returned an object instead of string.");
+        } // if we got a separator we loop over children - else we just return object as is
+        // as having it set to false means no hierarchy so no lookup for nested values
+
+
+        if (keySeparator) {
+          var resTypeIsArray = resType === '[object Array]';
+          var copy$$1 = resTypeIsArray ? [] : {}; // apply child translation on a copy
+
+          /* eslint no-restricted-syntax: 0 */
+
+          var newKeyToUse = resTypeIsArray ? resExactUsedKey : resUsedKey;
+
+          for (var m in res) {
+            if (Object.prototype.hasOwnProperty.call(res, m)) {
+              var deepKey = "".concat(newKeyToUse).concat(keySeparator).concat(m);
+              copy$$1[m] = this.translate(deepKey, Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options, {
+                joinArrays: false,
+                ns: namespaces
+              }));
+              if (copy$$1[m] === deepKey) copy$$1[m] = res[m]; // if nothing found use orginal value as fallback
+            }
+          }
+
+          res = copy$$1;
+        }
+      } else if (handleAsObjectInI18nFormat && typeof joinArrays === 'string' && resType === '[object Array]') {
+        // array special treatment
+        res = res.join(joinArrays);
+        if (res) res = this.extendTranslation(res, keys, options);
+      } else {
+        // string, empty or null
+        var usedDefault = false;
+        var usedKey = false; // fallback value
+
+        if (!this.isValidLookup(res) && options.defaultValue !== undefined) {
+          usedDefault = true;
+
+          if (options.count !== undefined) {
+            var suffix = this.pluralResolver.getSuffix(lng, options.count);
+            res = options["defaultValue".concat(suffix)];
+          }
+
+          if (!res) res = options.defaultValue;
+        }
+
+        if (!this.isValidLookup(res)) {
+          usedKey = true;
+          res = key;
+        } // save missing
+
+
+        var updateMissing = options.defaultValue && options.defaultValue !== res && this.options.updateMissing;
+
+        if (usedKey || usedDefault || updateMissing) {
+          this.logger.log(updateMissing ? 'updateKey' : 'missingKey', lng, namespace, key, updateMissing ? options.defaultValue : res);
+          var lngs = [];
+          var fallbackLngs = this.languageUtils.getFallbackCodes(this.options.fallbackLng, options.lng || this.language);
+
+          if (this.options.saveMissingTo === 'fallback' && fallbackLngs && fallbackLngs[0]) {
+            for (var i = 0; i < fallbackLngs.length; i++) {
+              lngs.push(fallbackLngs[i]);
+            }
+          } else if (this.options.saveMissingTo === 'all') {
+            lngs = this.languageUtils.toResolveHierarchy(options.lng || this.language);
+          } else {
+            lngs.push(options.lng || this.language);
+          }
+
+          var send = function send(l, k) {
+            if (_this2.options.missingKeyHandler) {
+              _this2.options.missingKeyHandler(l, namespace, k, updateMissing ? options.defaultValue : res, updateMissing, options);
+            } else if (_this2.backendConnector && _this2.backendConnector.saveMissing) {
+              _this2.backendConnector.saveMissing(l, namespace, k, updateMissing ? options.defaultValue : res, updateMissing, options);
+            }
+
+            _this2.emit('missingKey', l, namespace, k, res);
+          };
+
+          if (this.options.saveMissing) {
+            var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+
+            if (this.options.saveMissingPlurals && needsPluralHandling) {
+              lngs.forEach(function (l) {
+                var plurals = _this2.pluralResolver.getPluralFormsOfKey(l, key);
+
+                plurals.forEach(function (p) {
+                  return send([l], p);
+                });
+              });
+            } else {
+              send(lngs, key);
+            }
+          }
+        } // extend
+
+
+        res = this.extendTranslation(res, keys, options, resolved); // append namespace if still key
+
+        if (usedKey && res === key && this.options.appendNamespaceToMissingKey) res = "".concat(namespace, ":").concat(key); // parseMissingKeyHandler
+
+        if (usedKey && this.options.parseMissingKeyHandler) res = this.options.parseMissingKeyHandler(res);
+      } // return
+
+
+      return res;
+    }
+  }, {
+    key: "extendTranslation",
+    value: function extendTranslation(res, key, options, resolved) {
+      var _this3 = this;
+
+      if (this.i18nFormat && this.i18nFormat.parse) {
+        res = this.i18nFormat.parse(res, options, resolved.usedLng, resolved.usedNS, resolved.usedKey, {
+          resolved: resolved
+        });
+      } else if (!options.skipInterpolation) {
+        // i18next.parsing
+        if (options.interpolation) this.interpolator.init(Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options, {
+          interpolation: Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.options.interpolation, options.interpolation)
+        })); // interpolate
+
+        var data = options.replace && typeof options.replace !== 'string' ? options.replace : options;
+        if (this.options.interpolation.defaultVariables) data = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.options.interpolation.defaultVariables, data);
+        res = this.interpolator.interpolate(res, data, options.lng || this.language, options); // nesting
+
+        if (options.nest !== false) res = this.interpolator.nest(res, function () {
+          return _this3.translate.apply(_this3, arguments);
+        }, options);
+        if (options.interpolation) this.interpolator.reset();
+      } // post process
+
+
+      var postProcess = options.postProcess || this.options.postProcess;
+      var postProcessorNames = typeof postProcess === 'string' ? [postProcess] : postProcess;
+
+      if (res !== undefined && res !== null && postProcessorNames && postProcessorNames.length && options.applyPostProcessor !== false) {
+        res = postProcessor.handle(postProcessorNames, res, key, options, this);
+      }
+
+      return res;
+    }
+  }, {
+    key: "resolve",
+    value: function resolve(keys) {
+      var _this4 = this;
+
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var found;
+      var usedKey; // plain key
+
+      var exactUsedKey; // key with context / plural
+
+      var usedLng;
+      var usedNS;
+      if (typeof keys === 'string') keys = [keys]; // forEach possible key
+
+      keys.forEach(function (k) {
+        if (_this4.isValidLookup(found)) return;
+
+        var extracted = _this4.extractFromKey(k, options);
+
+        var key = extracted.key;
+        usedKey = key;
+        var namespaces = extracted.namespaces;
+        if (_this4.options.fallbackNS) namespaces = namespaces.concat(_this4.options.fallbackNS);
+        var needsPluralHandling = options.count !== undefined && typeof options.count !== 'string';
+        var needsContextHandling = options.context !== undefined && typeof options.context === 'string' && options.context !== '';
+        var codes = options.lngs ? options.lngs : _this4.languageUtils.toResolveHierarchy(options.lng || _this4.language, options.fallbackLng);
+        namespaces.forEach(function (ns) {
+          if (_this4.isValidLookup(found)) return;
+          usedNS = ns;
+          codes.forEach(function (code) {
+            if (_this4.isValidLookup(found)) return;
+            usedLng = code;
+            var finalKey = key;
+            var finalKeys = [finalKey];
+
+            if (_this4.i18nFormat && _this4.i18nFormat.addLookupKeys) {
+              _this4.i18nFormat.addLookupKeys(finalKeys, key, code, ns, options);
+            } else {
+              var pluralSuffix;
+              if (needsPluralHandling) pluralSuffix = _this4.pluralResolver.getSuffix(code, options.count); // fallback for plural if context not found
+
+              if (needsPluralHandling && needsContextHandling) finalKeys.push(finalKey + pluralSuffix); // get key for context if needed
+
+              if (needsContextHandling) finalKeys.push(finalKey += "".concat(_this4.options.contextSeparator).concat(options.context)); // get key for plural if needed
+
+              if (needsPluralHandling) finalKeys.push(finalKey += pluralSuffix);
+            } // iterate over finalKeys starting with most specific pluralkey (-> contextkey only) -> singularkey only
+
+
+            var possibleKey;
+            /* eslint no-cond-assign: 0 */
+
+            while (possibleKey = finalKeys.pop()) {
+              if (!_this4.isValidLookup(found)) {
+                exactUsedKey = possibleKey;
+                found = _this4.getResource(code, ns, possibleKey, options);
+              }
+            }
+          });
+        });
+      });
+      return {
+        res: found,
+        usedKey: usedKey,
+        exactUsedKey: exactUsedKey,
+        usedLng: usedLng,
+        usedNS: usedNS
+      };
+    }
+  }, {
+    key: "isValidLookup",
+    value: function isValidLookup(res) {
+      return res !== undefined && !(!this.options.returnNull && res === null) && !(!this.options.returnEmptyString && res === '');
+    }
+  }, {
+    key: "getResource",
+    value: function getResource(code, ns, key) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+      if (this.i18nFormat && this.i18nFormat.getResource) return this.i18nFormat.getResource(code, ns, key, options);
+      return this.resourceStore.getResource(code, ns, key, options);
+    }
+  }]);
+
+  return Translator;
+}(EventEmitter);
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+var LanguageUtil =
+/*#__PURE__*/
+function () {
+  function LanguageUtil(options) {
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, LanguageUtil);
+
+    this.options = options;
+    this.whitelist = this.options.whitelist || false;
+    this.logger = baseLogger.create('languageUtils');
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(LanguageUtil, [{
+    key: "getScriptPartFromCode",
+    value: function getScriptPartFromCode(code) {
+      if (!code || code.indexOf('-') < 0) return null;
+      var p = code.split('-');
+      if (p.length === 2) return null;
+      p.pop();
+      return this.formatLanguageCode(p.join('-'));
+    }
+  }, {
+    key: "getLanguagePartFromCode",
+    value: function getLanguagePartFromCode(code) {
+      if (!code || code.indexOf('-') < 0) return code;
+      var p = code.split('-');
+      return this.formatLanguageCode(p[0]);
+    }
+  }, {
+    key: "formatLanguageCode",
+    value: function formatLanguageCode(code) {
+      // http://www.iana.org/assignments/language-tags/language-tags.xhtml
+      if (typeof code === 'string' && code.indexOf('-') > -1) {
+        var specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
+        var p = code.split('-');
+
+        if (this.options.lowerCaseLng) {
+          p = p.map(function (part) {
+            return part.toLowerCase();
+          });
+        } else if (p.length === 2) {
+          p[0] = p[0].toLowerCase();
+          p[1] = p[1].toUpperCase();
+          if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
+        } else if (p.length === 3) {
+          p[0] = p[0].toLowerCase(); // if lenght 2 guess it's a country
+
+          if (p[1].length === 2) p[1] = p[1].toUpperCase();
+          if (p[0] !== 'sgn' && p[2].length === 2) p[2] = p[2].toUpperCase();
+          if (specialCases.indexOf(p[1].toLowerCase()) > -1) p[1] = capitalize(p[1].toLowerCase());
+          if (specialCases.indexOf(p[2].toLowerCase()) > -1) p[2] = capitalize(p[2].toLowerCase());
+        }
+
+        return p.join('-');
+      }
+
+      return this.options.cleanCode || this.options.lowerCaseLng ? code.toLowerCase() : code;
+    }
+  }, {
+    key: "isWhitelisted",
+    value: function isWhitelisted(code) {
+      if (this.options.load === 'languageOnly' || this.options.nonExplicitWhitelist) {
+        code = this.getLanguagePartFromCode(code);
+      }
+
+      return !this.whitelist || !this.whitelist.length || this.whitelist.indexOf(code) > -1;
+    }
+  }, {
+    key: "getFallbackCodes",
+    value: function getFallbackCodes(fallbacks, code) {
+      if (!fallbacks) return [];
+      if (typeof fallbacks === 'string') fallbacks = [fallbacks];
+      if (Object.prototype.toString.apply(fallbacks) === '[object Array]') return fallbacks;
+      if (!code) return fallbacks["default"] || []; // asume we have an object defining fallbacks
+
+      var found = fallbacks[code];
+      if (!found) found = fallbacks[this.getScriptPartFromCode(code)];
+      if (!found) found = fallbacks[this.formatLanguageCode(code)];
+      if (!found) found = fallbacks["default"];
+      return found || [];
+    }
+  }, {
+    key: "toResolveHierarchy",
+    value: function toResolveHierarchy(code, fallbackCode) {
+      var _this = this;
+
+      var fallbackCodes = this.getFallbackCodes(fallbackCode || this.options.fallbackLng || [], code);
+      var codes = [];
+
+      var addCode = function addCode(c) {
+        if (!c) return;
+
+        if (_this.isWhitelisted(c)) {
+          codes.push(c);
+        } else {
+          _this.logger.warn("rejecting non-whitelisted language code: ".concat(c));
+        }
+      };
+
+      if (typeof code === 'string' && code.indexOf('-') > -1) {
+        if (this.options.load !== 'languageOnly') addCode(this.formatLanguageCode(code));
+        if (this.options.load !== 'languageOnly' && this.options.load !== 'currentOnly') addCode(this.getScriptPartFromCode(code));
+        if (this.options.load !== 'currentOnly') addCode(this.getLanguagePartFromCode(code));
+      } else if (typeof code === 'string') {
+        addCode(this.formatLanguageCode(code));
+      }
+
+      fallbackCodes.forEach(function (fc) {
+        if (codes.indexOf(fc) < 0) addCode(_this.formatLanguageCode(fc));
+      });
+      return codes;
+    }
+  }]);
+
+  return LanguageUtil;
+}();
+
+/* eslint-disable */
+
+var sets = [{
+  lngs: ['ach', 'ak', 'am', 'arn', 'br', 'fil', 'gun', 'ln', 'mfe', 'mg', 'mi', 'oc', 'pt', 'pt-BR', 'tg', 'ti', 'tr', 'uz', 'wa'],
+  nr: [1, 2],
+  fc: 1
+}, {
+  lngs: ['af', 'an', 'ast', 'az', 'bg', 'bn', 'ca', 'da', 'de', 'dev', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fi', 'fo', 'fur', 'fy', 'gl', 'gu', 'ha', 'hi', 'hu', 'hy', 'ia', 'it', 'kn', 'ku', 'lb', 'mai', 'ml', 'mn', 'mr', 'nah', 'nap', 'nb', 'ne', 'nl', 'nn', 'no', 'nso', 'pa', 'pap', 'pms', 'ps', 'pt-PT', 'rm', 'sco', 'se', 'si', 'so', 'son', 'sq', 'sv', 'sw', 'ta', 'te', 'tk', 'ur', 'yo'],
+  nr: [1, 2],
+  fc: 2
+}, {
+  lngs: ['ay', 'bo', 'cgg', 'fa', 'id', 'ja', 'jbo', 'ka', 'kk', 'km', 'ko', 'ky', 'lo', 'ms', 'sah', 'su', 'th', 'tt', 'ug', 'vi', 'wo', 'zh'],
+  nr: [1],
+  fc: 3
+}, {
+  lngs: ['be', 'bs', 'cnr', 'dz', 'hr', 'ru', 'sr', 'uk'],
+  nr: [1, 2, 5],
+  fc: 4
+}, {
+  lngs: ['ar'],
+  nr: [0, 1, 2, 3, 11, 100],
+  fc: 5
+}, {
+  lngs: ['cs', 'sk'],
+  nr: [1, 2, 5],
+  fc: 6
+}, {
+  lngs: ['csb', 'pl'],
+  nr: [1, 2, 5],
+  fc: 7
+}, {
+  lngs: ['cy'],
+  nr: [1, 2, 3, 8],
+  fc: 8
+}, {
+  lngs: ['fr'],
+  nr: [1, 2],
+  fc: 9
+}, {
+  lngs: ['ga'],
+  nr: [1, 2, 3, 7, 11],
+  fc: 10
+}, {
+  lngs: ['gd'],
+  nr: [1, 2, 3, 20],
+  fc: 11
+}, {
+  lngs: ['is'],
+  nr: [1, 2],
+  fc: 12
+}, {
+  lngs: ['jv'],
+  nr: [0, 1],
+  fc: 13
+}, {
+  lngs: ['kw'],
+  nr: [1, 2, 3, 4],
+  fc: 14
+}, {
+  lngs: ['lt'],
+  nr: [1, 2, 10],
+  fc: 15
+}, {
+  lngs: ['lv'],
+  nr: [1, 2, 0],
+  fc: 16
+}, {
+  lngs: ['mk'],
+  nr: [1, 2],
+  fc: 17
+}, {
+  lngs: ['mnk'],
+  nr: [0, 1, 2],
+  fc: 18
+}, {
+  lngs: ['mt'],
+  nr: [1, 2, 11, 20],
+  fc: 19
+}, {
+  lngs: ['or'],
+  nr: [2, 1],
+  fc: 2
+}, {
+  lngs: ['ro'],
+  nr: [1, 2, 20],
+  fc: 20
+}, {
+  lngs: ['sl'],
+  nr: [5, 1, 2, 3],
+  fc: 21
+}, {
+  lngs: ['he'],
+  nr: [1, 2, 20, 21],
+  fc: 22
+}];
+var _rulesPluralsTypes = {
+  1: function _(n) {
+    return Number(n > 1);
+  },
+  2: function _(n) {
+    return Number(n != 1);
+  },
+  3: function _(n) {
+    return 0;
+  },
+  4: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  5: function _(n) {
+    return Number(n === 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 ? 4 : 5);
+  },
+  6: function _(n) {
+    return Number(n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2);
+  },
+  7: function _(n) {
+    return Number(n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  8: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n != 8 && n != 11 ? 2 : 3);
+  },
+  9: function _(n) {
+    return Number(n >= 2);
+  },
+  10: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4);
+  },
+  11: function _(n) {
+    return Number(n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 2 && n < 20 ? 2 : 3);
+  },
+  12: function _(n) {
+    return Number(n % 10 != 1 || n % 100 == 11);
+  },
+  13: function _(n) {
+    return Number(n !== 0);
+  },
+  14: function _(n) {
+    return Number(n == 1 ? 0 : n == 2 ? 1 : n == 3 ? 2 : 3);
+  },
+  15: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2);
+  },
+  16: function _(n) {
+    return Number(n % 10 == 1 && n % 100 != 11 ? 0 : n !== 0 ? 1 : 2);
+  },
+  17: function _(n) {
+    return Number(n == 1 || n % 10 == 1 ? 0 : 1);
+  },
+  18: function _(n) {
+    return Number(n == 0 ? 0 : n == 1 ? 1 : 2);
+  },
+  19: function _(n) {
+    return Number(n == 1 ? 0 : n === 0 || n % 100 > 1 && n % 100 < 11 ? 1 : n % 100 > 10 && n % 100 < 20 ? 2 : 3);
+  },
+  20: function _(n) {
+    return Number(n == 1 ? 0 : n === 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2);
+  },
+  21: function _(n) {
+    return Number(n % 100 == 1 ? 1 : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0);
+  },
+  22: function _(n) {
+    return Number(n === 1 ? 0 : n === 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3);
+  }
+};
+/* eslint-enable */
+
+function createRules() {
+  var rules = {};
+  sets.forEach(function (set) {
+    set.lngs.forEach(function (l) {
+      rules[l] = {
+        numbers: set.nr,
+        plurals: _rulesPluralsTypes[set.fc]
+      };
+    });
+  });
+  return rules;
+}
+
+var PluralResolver =
+/*#__PURE__*/
+function () {
+  function PluralResolver(languageUtils) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, PluralResolver);
+
+    this.languageUtils = languageUtils;
+    this.options = options;
+    this.logger = baseLogger.create('pluralResolver');
+    this.rules = createRules();
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(PluralResolver, [{
+    key: "addRule",
+    value: function addRule(lng, obj) {
+      this.rules[lng] = obj;
+    }
+  }, {
+    key: "getRule",
+    value: function getRule(code) {
+      return this.rules[code] || this.rules[this.languageUtils.getLanguagePartFromCode(code)];
+    }
+  }, {
+    key: "needsPlural",
+    value: function needsPlural(code) {
+      var rule = this.getRule(code);
+      return rule && rule.numbers.length > 1;
+    }
+  }, {
+    key: "getPluralFormsOfKey",
+    value: function getPluralFormsOfKey(code, key) {
+      var _this = this;
+
+      var ret = [];
+      var rule = this.getRule(code);
+      if (!rule) return ret;
+      rule.numbers.forEach(function (n) {
+        var suffix = _this.getSuffix(code, n);
+
+        ret.push("".concat(key).concat(suffix));
+      });
+      return ret;
+    }
+  }, {
+    key: "getSuffix",
+    value: function getSuffix(code, count) {
+      var _this2 = this;
+
+      var rule = this.getRule(code);
+
+      if (rule) {
+        // if (rule.numbers.length === 1) return ''; // only singular
+        var idx = rule.noAbs ? rule.plurals(count) : rule.plurals(Math.abs(count));
+        var suffix = rule.numbers[idx]; // special treatment for lngs only having singular and plural
+
+        if (this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          if (suffix === 2) {
+            suffix = 'plural';
+          } else if (suffix === 1) {
+            suffix = '';
+          }
+        }
+
+        var returnSuffix = function returnSuffix() {
+          return _this2.options.prepend && suffix.toString() ? _this2.options.prepend + suffix.toString() : suffix.toString();
+        }; // COMPATIBILITY JSON
+        // v1
+
+
+        if (this.options.compatibilityJSON === 'v1') {
+          if (suffix === 1) return '';
+          if (typeof suffix === 'number') return "_plural_".concat(suffix.toString());
+          return returnSuffix();
+        } else if (
+        /* v2 */
+        this.options.compatibilityJSON === 'v2') {
+          return returnSuffix();
+        } else if (
+        /* v3 - gettext index */
+        this.options.simplifyPluralSuffix && rule.numbers.length === 2 && rule.numbers[0] === 1) {
+          return returnSuffix();
+        }
+
+        return this.options.prepend && idx.toString() ? this.options.prepend + idx.toString() : idx.toString();
+      }
+
+      this.logger.warn("no plural rule found for: ".concat(code));
+      return '';
+    }
+  }]);
+
+  return PluralResolver;
+}();
+
+var Interpolator =
+/*#__PURE__*/
+function () {
+  function Interpolator() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Interpolator);
+
+    this.logger = baseLogger.create('interpolator');
+    this.init(options, true);
+  }
+  /* eslint no-param-reassign: 0 */
+
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Interpolator, [{
+    key: "init",
+    value: function init() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var reset = arguments.length > 1 ? arguments[1] : undefined;
+
+      if (reset) {
+        this.options = options;
+
+        this.format = options.interpolation && options.interpolation.format || function (value) {
+          return value;
+        };
+      }
+
+      if (!options.interpolation) options.interpolation = {
+        escapeValue: true
+      };
+      var iOpts = options.interpolation;
+      this.escape = iOpts.escape !== undefined ? iOpts.escape : escape;
+      this.escapeValue = iOpts.escapeValue !== undefined ? iOpts.escapeValue : true;
+      this.useRawValueToEscape = iOpts.useRawValueToEscape !== undefined ? iOpts.useRawValueToEscape : false;
+      this.prefix = iOpts.prefix ? regexEscape(iOpts.prefix) : iOpts.prefixEscaped || '{{';
+      this.suffix = iOpts.suffix ? regexEscape(iOpts.suffix) : iOpts.suffixEscaped || '}}';
+      this.formatSeparator = iOpts.formatSeparator ? iOpts.formatSeparator : iOpts.formatSeparator || ',';
+      this.unescapePrefix = iOpts.unescapeSuffix ? '' : iOpts.unescapePrefix || '-';
+      this.unescapeSuffix = this.unescapePrefix ? '' : iOpts.unescapeSuffix || '';
+      this.nestingPrefix = iOpts.nestingPrefix ? regexEscape(iOpts.nestingPrefix) : iOpts.nestingPrefixEscaped || regexEscape('$t(');
+      this.nestingSuffix = iOpts.nestingSuffix ? regexEscape(iOpts.nestingSuffix) : iOpts.nestingSuffixEscaped || regexEscape(')');
+      this.maxReplaces = iOpts.maxReplaces ? iOpts.maxReplaces : 1000; // the regexp
+
+      this.resetRegExp();
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      if (this.options) this.init(this.options);
+    }
+  }, {
+    key: "resetRegExp",
+    value: function resetRegExp() {
+      // the regexp
+      var regexpStr = "".concat(this.prefix, "(.+?)").concat(this.suffix);
+      this.regexp = new RegExp(regexpStr, 'g');
+      var regexpUnescapeStr = "".concat(this.prefix).concat(this.unescapePrefix, "(.+?)").concat(this.unescapeSuffix).concat(this.suffix);
+      this.regexpUnescape = new RegExp(regexpUnescapeStr, 'g');
+      var nestingRegexpStr = "".concat(this.nestingPrefix, "(.+?)").concat(this.nestingSuffix);
+      this.nestingRegexp = new RegExp(nestingRegexpStr, 'g');
+    }
+  }, {
+    key: "interpolate",
+    value: function interpolate(str, data, lng, options) {
+      var _this = this;
+
+      var match;
+      var value;
+      var replaces;
+
+      function regexSafe(val) {
+        return val.replace(/\$/g, '$$$$');
+      }
+
+      var handleFormat = function handleFormat(key) {
+        if (key.indexOf(_this.formatSeparator) < 0) return getPath(data, key);
+        var p = key.split(_this.formatSeparator);
+        var k = p.shift().trim();
+        var f = p.join(_this.formatSeparator).trim();
+        return _this.format(getPath(data, k), f, lng);
+      };
+
+      this.resetRegExp();
+      var missingInterpolationHandler = options && options.missingInterpolationHandler || this.options.missingInterpolationHandler;
+      replaces = 0; // unescape if has unescapePrefix/Suffix
+
+      /* eslint no-cond-assign: 0 */
+
+      while (match = this.regexpUnescape.exec(str)) {
+        value = handleFormat(match[1].trim());
+        str = str.replace(match[0], value);
+        this.regexpUnescape.lastIndex = 0;
+        replaces++;
+
+        if (replaces >= this.maxReplaces) {
+          break;
+        }
+      }
+
+      replaces = 0; // regular escape on demand
+
+      while (match = this.regexp.exec(str)) {
+        value = handleFormat(match[1].trim());
+
+        if (value === undefined) {
+          if (typeof missingInterpolationHandler === 'function') {
+            var temp = missingInterpolationHandler(str, match, options);
+            value = typeof temp === 'string' ? temp : '';
+          } else {
+            this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+            value = '';
+          }
+        } else if (typeof value !== 'string' && !this.useRawValueToEscape) {
+          value = makeString(value);
+        }
+
+        value = this.escapeValue ? regexSafe(this.escape(value)) : regexSafe(value);
+        str = str.replace(match[0], value);
+        this.regexp.lastIndex = 0;
+        replaces++;
+
+        if (replaces >= this.maxReplaces) {
+          break;
+        }
+      }
+
+      return str;
+    }
+  }, {
+    key: "nest",
+    value: function nest(str, fc) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var match;
+      var value;
+
+      var clonedOptions = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options);
+
+      clonedOptions.applyPostProcessor = false; // avoid post processing on nested lookup
+      // if value is something like "myKey": "lorem $(anotherKey, { "count": {{aValueInOptions}} })"
+
+      function handleHasOptions(key, inheritedOptions) {
+        if (key.indexOf(',') < 0) return key;
+        var p = key.split(',');
+        key = p.shift();
+        var optionsString = p.join(',');
+        optionsString = this.interpolate(optionsString, clonedOptions);
+        optionsString = optionsString.replace(/'/g, '"');
+
+        try {
+          clonedOptions = JSON.parse(optionsString);
+          if (inheritedOptions) clonedOptions = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, inheritedOptions, clonedOptions);
+        } catch (e) {
+          this.logger.error("failed parsing options string in nesting for key ".concat(key), e);
+        }
+
+        return key;
+      } // regular escape on demand
+
+
+      while (match = this.nestingRegexp.exec(str)) {
+        value = fc(handleHasOptions.call(this, match[1].trim(), clonedOptions), clonedOptions); // is only the nesting key (key1 = '$(key2)') return the value without stringify
+
+        if (value && match[0] === str && typeof value !== 'string') return value; // no string to include or empty
+
+        if (typeof value !== 'string') value = makeString(value);
+
+        if (!value) {
+          this.logger.warn("missed to resolve ".concat(match[1], " for nesting ").concat(str));
+          value = '';
+        } // Nested keys should not be escaped by default #854
+        // value = this.escapeValue ? regexSafe(utils.escape(value)) : regexSafe(value);
+
+
+        str = str.replace(match[0], value);
+        this.regexp.lastIndex = 0;
+      }
+
+      return str;
+    }
+  }]);
+
+  return Interpolator;
+}();
+
+function remove(arr, what) {
+  var found = arr.indexOf(what);
+
+  while (found !== -1) {
+    arr.splice(found, 1);
+    found = arr.indexOf(what);
+  }
+}
+
+var Connector =
+/*#__PURE__*/
+function (_EventEmitter) {
+  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(Connector, _EventEmitter);
+
+  function Connector(backend, store, services) {
+    var _this;
+
+    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, Connector);
+
+    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(Connector).call(this));
+    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
+
+    _this.backend = backend;
+    _this.store = store;
+    _this.languageUtils = services.languageUtils;
+    _this.options = options;
+    _this.logger = baseLogger.create('backendConnector');
+    _this.state = {};
+    _this.queue = [];
+
+    if (_this.backend && _this.backend.init) {
+      _this.backend.init(services, options.backend, options);
+    }
+
+    return _this;
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(Connector, [{
+    key: "queueLoad",
+    value: function queueLoad(languages, namespaces, options, callback) {
+      var _this2 = this;
+
+      // find what needs to be loaded
+      var toLoad = [];
+      var pending = [];
+      var toLoadLanguages = [];
+      var toLoadNamespaces = [];
+      languages.forEach(function (lng) {
+        var hasAllNamespaces = true;
+        namespaces.forEach(function (ns) {
+          var name = "".concat(lng, "|").concat(ns);
+
+          if (!options.reload && _this2.store.hasResourceBundle(lng, ns)) {
+            _this2.state[name] = 2; // loaded
+          } else if (_this2.state[name] < 0) ; else if (_this2.state[name] === 1) {
+            if (pending.indexOf(name) < 0) pending.push(name);
+          } else {
+            _this2.state[name] = 1; // pending
+
+            hasAllNamespaces = false;
+            if (pending.indexOf(name) < 0) pending.push(name);
+            if (toLoad.indexOf(name) < 0) toLoad.push(name);
+            if (toLoadNamespaces.indexOf(ns) < 0) toLoadNamespaces.push(ns);
+          }
+        });
+        if (!hasAllNamespaces) toLoadLanguages.push(lng);
+      });
+
+      if (toLoad.length || pending.length) {
+        this.queue.push({
+          pending: pending,
+          loaded: {},
+          errors: [],
+          callback: callback
+        });
+      }
+
+      return {
+        toLoad: toLoad,
+        pending: pending,
+        toLoadLanguages: toLoadLanguages,
+        toLoadNamespaces: toLoadNamespaces
+      };
+    }
+  }, {
+    key: "loaded",
+    value: function loaded(name, err, data) {
+      var _name$split = name.split('|'),
+          _name$split2 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_9__["default"])(_name$split, 2),
+          lng = _name$split2[0],
+          ns = _name$split2[1];
+
+      if (err) this.emit('failedLoading', lng, ns, err);
+
+      if (data) {
+        this.store.addResourceBundle(lng, ns, data);
+      } // set loaded
+
+
+      this.state[name] = err ? -1 : 2; // consolidated loading done in this run - only emit once for a loaded namespace
+
+      var loaded = {}; // callback if ready
+
+      this.queue.forEach(function (q) {
+        pushPath(q.loaded, [lng], ns);
+        remove(q.pending, name);
+        if (err) q.errors.push(err);
+
+        if (q.pending.length === 0 && !q.done) {
+          // only do once per loaded -> this.emit('loaded', q.loaded);
+          Object.keys(q.loaded).forEach(function (l) {
+            if (!loaded[l]) loaded[l] = [];
+
+            if (q.loaded[l].length) {
+              q.loaded[l].forEach(function (ns) {
+                if (loaded[l].indexOf(ns) < 0) loaded[l].push(ns);
+              });
+            }
+          });
+          /* eslint no-param-reassign: 0 */
+
+          q.done = true;
+
+          if (q.errors.length) {
+            q.callback(q.errors);
+          } else {
+            q.callback();
+          }
+        }
+      }); // emit consolidated loaded event
+
+      this.emit('loaded', loaded); // remove done load requests
+
+      this.queue = this.queue.filter(function (q) {
+        return !q.done;
+      });
+    }
+  }, {
+    key: "read",
+    value: function read(lng, ns, fcName) {
+      var _this3 = this;
+
+      var tried = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+      var wait = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
+      var callback = arguments.length > 5 ? arguments[5] : undefined;
+      if (!lng.length) return callback(null, {}); // noting to load
+
+      return this.backend[fcName](lng, ns, function (err, data) {
+        if (err && data
+        /* = retryFlag */
+        && tried < 5) {
+          setTimeout(function () {
+            _this3.read.call(_this3, lng, ns, fcName, tried + 1, wait * 2, callback);
+          }, wait);
+          return;
+        }
+
+        callback(err, data);
+      });
+    }
+    /* eslint consistent-return: 0 */
+
+  }, {
+    key: "prepareLoading",
+    value: function prepareLoading(languages, namespaces) {
+      var _this4 = this;
+
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+      var callback = arguments.length > 3 ? arguments[3] : undefined;
+
+      if (!this.backend) {
+        this.logger.warn('No backend was added via i18next.use. Will not load resources.');
+        return callback && callback();
+      }
+
+      if (typeof languages === 'string') languages = this.languageUtils.toResolveHierarchy(languages);
+      if (typeof namespaces === 'string') namespaces = [namespaces];
+      var toLoad = this.queueLoad(languages, namespaces, options, callback);
+
+      if (!toLoad.toLoad.length) {
+        if (!toLoad.pending.length) callback(); // nothing to load and no pendings...callback now
+
+        return null; // pendings will trigger callback
+      }
+
+      toLoad.toLoad.forEach(function (name) {
+        _this4.loadOne(name);
+      });
+    }
+  }, {
+    key: "load",
+    value: function load(languages, namespaces, callback) {
+      this.prepareLoading(languages, namespaces, {}, callback);
+    }
+  }, {
+    key: "reload",
+    value: function reload(languages, namespaces, callback) {
+      this.prepareLoading(languages, namespaces, {
+        reload: true
+      }, callback);
+    }
+  }, {
+    key: "loadOne",
+    value: function loadOne(name) {
+      var _this5 = this;
+
+      var prefix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+      var _name$split3 = name.split('|'),
+          _name$split4 = Object(_babel_runtime_helpers_esm_slicedToArray__WEBPACK_IMPORTED_MODULE_9__["default"])(_name$split3, 2),
+          lng = _name$split4[0],
+          ns = _name$split4[1];
+
+      this.read(lng, ns, 'read', null, null, function (err, data) {
+        if (err) _this5.logger.warn("".concat(prefix, "loading namespace ").concat(ns, " for language ").concat(lng, " failed"), err);
+        if (!err && data) _this5.logger.log("".concat(prefix, "loaded namespace ").concat(ns, " for language ").concat(lng), data);
+
+        _this5.loaded(name, err, data);
+      });
+    }
+  }, {
+    key: "saveMissing",
+    value: function saveMissing(languages, namespace, key, fallbackValue, isUpdate) {
+      var options = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+
+      if (this.backend && this.backend.create) {
+        this.backend.create(languages, namespace, key, fallbackValue, null
+        /* unused callback */
+        , Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, options, {
+          isUpdate: isUpdate
+        }));
+      } // write to store to avoid resending
+
+
+      if (!languages || !languages[0]) return;
+      this.store.addResource(languages[0], namespace, key, fallbackValue);
+    }
+  }]);
+
+  return Connector;
+}(EventEmitter);
+
+function get() {
+  return {
+    debug: false,
+    initImmediate: true,
+    ns: ['translation'],
+    defaultNS: ['translation'],
+    fallbackLng: ['dev'],
+    fallbackNS: false,
+    // string or array of namespaces
+    whitelist: false,
+    // array with whitelisted languages
+    nonExplicitWhitelist: false,
+    load: 'all',
+    // | currentOnly | languageOnly
+    preload: false,
+    // array with preload languages
+    simplifyPluralSuffix: true,
+    keySeparator: '.',
+    nsSeparator: ':',
+    pluralSeparator: '_',
+    contextSeparator: '_',
+    partialBundledLanguages: false,
+    // allow bundling certain languages that are not remotely fetched
+    saveMissing: false,
+    // enable to send missing values
+    updateMissing: false,
+    // enable to update default values if different from translated value (only useful on initial development, or when keeping code as source of truth)
+    saveMissingTo: 'fallback',
+    // 'current' || 'all'
+    saveMissingPlurals: true,
+    // will save all forms not only singular key
+    missingKeyHandler: false,
+    // function(lng, ns, key, fallbackValue) -> override if prefer on handling
+    missingInterpolationHandler: false,
+    // function(str, match)
+    postProcess: false,
+    // string or array of postProcessor names
+    returnNull: true,
+    // allows null value as valid translation
+    returnEmptyString: true,
+    // allows empty string value as valid translation
+    returnObjects: false,
+    joinArrays: false,
+    // or string to join array
+    returnedObjectHandler: function returnedObjectHandler() {},
+    // function(key, value, options) triggered if key returns object but returnObjects is set to false
+    parseMissingKeyHandler: false,
+    // function(key) parsed a key that was not found in t() before returning
+    appendNamespaceToMissingKey: false,
+    appendNamespaceToCIMode: false,
+    overloadTranslationOptionHandler: function handle(args) {
+      var ret = {};
+      if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(args[1]) === 'object') ret = args[1];
+      if (typeof args[1] === 'string') ret.defaultValue = args[1];
+      if (typeof args[2] === 'string') ret.tDescription = args[2];
+
+      if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(args[2]) === 'object' || Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(args[3]) === 'object') {
+        var options = args[3] || args[2];
+        Object.keys(options).forEach(function (key) {
+          ret[key] = options[key];
+        });
+      }
+
+      return ret;
+    },
+    interpolation: {
+      escapeValue: true,
+      format: function format(value, _format, lng) {
+        return value;
+      },
+      prefix: '{{',
+      suffix: '}}',
+      formatSeparator: ',',
+      // prefixEscaped: '{{',
+      // suffixEscaped: '}}',
+      // unescapeSuffix: '',
+      unescapePrefix: '-',
+      nestingPrefix: '$t(',
+      nestingSuffix: ')',
+      // nestingPrefixEscaped: '$t(',
+      // nestingSuffixEscaped: ')',
+      // defaultVariables: undefined // object that can have values to interpolate on - extends passed in interpolation data
+      maxReplaces: 1000 // max replaces to prevent endless loop
+
+    }
+  };
+}
+/* eslint no-param-reassign: 0 */
+
+function transformOptions(options) {
+  // create namespace object if namespace is passed in as string
+  if (typeof options.ns === 'string') options.ns = [options.ns];
+  if (typeof options.fallbackLng === 'string') options.fallbackLng = [options.fallbackLng];
+  if (typeof options.fallbackNS === 'string') options.fallbackNS = [options.fallbackNS]; // extend whitelist with cimode
+
+  if (options.whitelist && options.whitelist.indexOf('cimode') < 0) {
+    options.whitelist = options.whitelist.concat(['cimode']);
+  }
+
+  return options;
+}
+
+function noop() {}
+
+var I18n =
+/*#__PURE__*/
+function (_EventEmitter) {
+  Object(_babel_runtime_helpers_esm_inherits__WEBPACK_IMPORTED_MODULE_7__["default"])(I18n, _EventEmitter);
+
+  function I18n() {
+    var _this;
+
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var callback = arguments.length > 1 ? arguments[1] : undefined;
+
+    Object(_babel_runtime_helpers_esm_classCallCheck__WEBPACK_IMPORTED_MODULE_2__["default"])(this, I18n);
+
+    _this = Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(this, Object(_babel_runtime_helpers_esm_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__["default"])(I18n).call(this));
+    EventEmitter.call(Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this)); // <=IE10 fix (unable to call parent constructor)
+
+    _this.options = transformOptions(options);
+    _this.services = {};
+    _this.logger = baseLogger;
+    _this.modules = {
+      external: []
+    };
+
+    if (callback && !_this.isInitialized && !options.isClone) {
+      // https://github.com/i18next/i18next/issues/879
+      if (!_this.options.initImmediate) {
+        _this.init(options, callback);
+
+        return Object(_babel_runtime_helpers_esm_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__["default"])(_this, Object(_babel_runtime_helpers_esm_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__["default"])(_this));
+      }
+
+      setTimeout(function () {
+        _this.init(options, callback);
+      }, 0);
+    }
+
+    return _this;
+  }
+
+  Object(_babel_runtime_helpers_esm_createClass__WEBPACK_IMPORTED_MODULE_3__["default"])(I18n, [{
+    key: "init",
+    value: function init() {
+      var _this2 = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var callback = arguments.length > 1 ? arguments[1] : undefined;
+
+      if (typeof options === 'function') {
+        callback = options;
+        options = {};
+      }
+
+      this.options = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, get(), this.options, transformOptions(options));
+      this.format = this.options.interpolation.format;
+      if (!callback) callback = noop;
+
+      function createClassOnDemand(ClassOrObject) {
+        if (!ClassOrObject) return null;
+        if (typeof ClassOrObject === 'function') return new ClassOrObject();
+        return ClassOrObject;
+      } // init services
+
+
+      if (!this.options.isClone) {
+        if (this.modules.logger) {
+          baseLogger.init(createClassOnDemand(this.modules.logger), this.options);
+        } else {
+          baseLogger.init(null, this.options);
+        }
+
+        var lu = new LanguageUtil(this.options);
+        this.store = new ResourceStore(this.options.resources, this.options);
+        var s = this.services;
+        s.logger = baseLogger;
+        s.resourceStore = this.store;
+        s.languageUtils = lu;
+        s.pluralResolver = new PluralResolver(lu, {
+          prepend: this.options.pluralSeparator,
+          compatibilityJSON: this.options.compatibilityJSON,
+          simplifyPluralSuffix: this.options.simplifyPluralSuffix
+        });
+        s.interpolator = new Interpolator(this.options);
+        s.backendConnector = new Connector(createClassOnDemand(this.modules.backend), s.resourceStore, s, this.options); // pipe events from backendConnector
+
+        s.backendConnector.on('*', function (event) {
+          for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+          }
+
+          _this2.emit.apply(_this2, [event].concat(args));
+        });
+
+        if (this.modules.languageDetector) {
+          s.languageDetector = createClassOnDemand(this.modules.languageDetector);
+          s.languageDetector.init(s, this.options.detection, this.options);
+        }
+
+        if (this.modules.i18nFormat) {
+          s.i18nFormat = createClassOnDemand(this.modules.i18nFormat);
+          if (s.i18nFormat.init) s.i18nFormat.init(this);
+        }
+
+        this.translator = new Translator(this.services, this.options); // pipe events from translator
+
+        this.translator.on('*', function (event) {
+          for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+            args[_key2 - 1] = arguments[_key2];
+          }
+
+          _this2.emit.apply(_this2, [event].concat(args));
+        });
+        this.modules.external.forEach(function (m) {
+          if (m.init) m.init(_this2);
+        });
+      } // append api
+
+
+      var storeApi = ['getResource', 'addResource', 'addResources', 'addResourceBundle', 'removeResourceBundle', 'hasResourceBundle', 'getResourceBundle', 'getDataByLanguage'];
+      storeApi.forEach(function (fcName) {
+        _this2[fcName] = function () {
+          var _this2$store;
+
+          return (_this2$store = _this2.store)[fcName].apply(_this2$store, arguments);
+        };
+      });
+      var deferred = defer();
+
+      var load = function load() {
+        _this2.changeLanguage(_this2.options.lng, function (err, t) {
+          _this2.isInitialized = true;
+
+          _this2.logger.log('initialized', _this2.options);
+
+          _this2.emit('initialized', _this2.options);
+
+          deferred.resolve(t); // not rejecting on err (as err is only a loading translation failed warning)
+
+          callback(err, t);
+        });
+      };
+
+      if (this.options.resources || !this.options.initImmediate) {
+        load();
+      } else {
+        setTimeout(load, 0);
+      }
+
+      return deferred;
+    }
+    /* eslint consistent-return: 0 */
+
+  }, {
+    key: "loadResources",
+    value: function loadResources() {
+      var _this3 = this;
+
+      var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : noop;
+
+      if (!this.options.resources || this.options.partialBundledLanguages) {
+        if (this.language && this.language.toLowerCase() === 'cimode') return callback(); // avoid loading resources for cimode
+
+        var toLoad = [];
+
+        var append = function append(lng) {
+          if (!lng) return;
+
+          var lngs = _this3.services.languageUtils.toResolveHierarchy(lng);
+
+          lngs.forEach(function (l) {
+            if (toLoad.indexOf(l) < 0) toLoad.push(l);
+          });
+        };
+
+        if (!this.language) {
+          // at least load fallbacks in this case
+          var fallbacks = this.services.languageUtils.getFallbackCodes(this.options.fallbackLng);
+          fallbacks.forEach(function (l) {
+            return append(l);
+          });
+        } else {
+          append(this.language);
+        }
+
+        if (this.options.preload) {
+          this.options.preload.forEach(function (l) {
+            return append(l);
+          });
+        }
+
+        this.services.backendConnector.load(toLoad, this.options.ns, callback);
+      } else {
+        callback(null);
+      }
+    }
+  }, {
+    key: "reloadResources",
+    value: function reloadResources(lngs, ns, callback) {
+      var deferred = defer();
+      if (!lngs) lngs = this.languages;
+      if (!ns) ns = this.options.ns;
+      if (!callback) callback = noop;
+      this.services.backendConnector.reload(lngs, ns, function (err) {
+        deferred.resolve(); // not rejecting on err (as err is only a loading translation failed warning)
+
+        callback(err);
+      });
+      return deferred;
+    }
+  }, {
+    key: "use",
+    value: function use(module) {
+      if (module.type === 'backend') {
+        this.modules.backend = module;
+      }
+
+      if (module.type === 'logger' || module.log && module.warn && module.error) {
+        this.modules.logger = module;
+      }
+
+      if (module.type === 'languageDetector') {
+        this.modules.languageDetector = module;
+      }
+
+      if (module.type === 'i18nFormat') {
+        this.modules.i18nFormat = module;
+      }
+
+      if (module.type === 'postProcessor') {
+        postProcessor.addPostProcessor(module);
+      }
+
+      if (module.type === '3rdParty') {
+        this.modules.external.push(module);
+      }
+
+      return this;
+    }
+  }, {
+    key: "changeLanguage",
+    value: function changeLanguage(lng, callback) {
+      var _this4 = this;
+
+      var deferred = defer();
+      this.emit('languageChanging', lng);
+
+      var done = function done(err, l) {
+        _this4.translator.changeLanguage(l);
+
+        if (l) {
+          _this4.emit('languageChanged', l);
+
+          _this4.logger.log('languageChanged', l);
+        }
+
+        deferred.resolve(function () {
+          return _this4.t.apply(_this4, arguments);
+        });
+        if (callback) callback(err, function () {
+          return _this4.t.apply(_this4, arguments);
+        });
+      };
+
+      var setLng = function setLng(l) {
+        if (l) {
+          _this4.language = l;
+          _this4.languages = _this4.services.languageUtils.toResolveHierarchy(l);
+          if (!_this4.translator.language) _this4.translator.changeLanguage(l);
+          if (_this4.services.languageDetector) _this4.services.languageDetector.cacheUserLanguage(l);
+        }
+
+        _this4.loadResources(function (err) {
+          done(err, l);
+        });
+      };
+
+      if (!lng && this.services.languageDetector && !this.services.languageDetector.async) {
+        setLng(this.services.languageDetector.detect());
+      } else if (!lng && this.services.languageDetector && this.services.languageDetector.async) {
+        this.services.languageDetector.detect(setLng);
+      } else {
+        setLng(lng);
+      }
+
+      return deferred;
+    }
+  }, {
+    key: "getFixedT",
+    value: function getFixedT(lng, ns) {
+      var _this5 = this;
+
+      var fixedT = function fixedT(key, opts) {
+        var options = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, opts);
+
+        if (Object(_babel_runtime_helpers_esm_typeof__WEBPACK_IMPORTED_MODULE_0__["default"])(opts) !== 'object') {
+          for (var _len3 = arguments.length, rest = new Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+            rest[_key3 - 2] = arguments[_key3];
+          }
+
+          options = _this5.options.overloadTranslationOptionHandler([key, opts].concat(rest));
+        }
+
+        options.lng = options.lng || fixedT.lng;
+        options.lngs = options.lngs || fixedT.lngs;
+        options.ns = options.ns || fixedT.ns;
+        return _this5.t(key, options);
+      };
+
+      if (typeof lng === 'string') {
+        fixedT.lng = lng;
+      } else {
+        fixedT.lngs = lng;
+      }
+
+      fixedT.ns = ns;
+      return fixedT;
+    }
+  }, {
+    key: "t",
+    value: function t() {
+      var _this$translator;
+
+      return this.translator && (_this$translator = this.translator).translate.apply(_this$translator, arguments);
+    }
+  }, {
+    key: "exists",
+    value: function exists() {
+      var _this$translator2;
+
+      return this.translator && (_this$translator2 = this.translator).exists.apply(_this$translator2, arguments);
+    }
+  }, {
+    key: "setDefaultNamespace",
+    value: function setDefaultNamespace(ns) {
+      this.options.defaultNS = ns;
+    }
+  }, {
+    key: "loadNamespaces",
+    value: function loadNamespaces(ns, callback) {
+      var _this6 = this;
+
+      var deferred = defer();
+
+      if (!this.options.ns) {
+        callback && callback();
+        return Promise.resolve();
+      }
+
+      if (typeof ns === 'string') ns = [ns];
+      ns.forEach(function (n) {
+        if (_this6.options.ns.indexOf(n) < 0) _this6.options.ns.push(n);
+      });
+      this.loadResources(function (err) {
+        deferred.resolve();
+        if (callback) callback(err);
+      });
+      return deferred;
+    }
+  }, {
+    key: "loadLanguages",
+    value: function loadLanguages(lngs, callback) {
+      var deferred = defer();
+      if (typeof lngs === 'string') lngs = [lngs];
+      var preloaded = this.options.preload || [];
+      var newLngs = lngs.filter(function (lng) {
+        return preloaded.indexOf(lng) < 0;
+      }); // Exit early if all given languages are already preloaded
+
+      if (!newLngs.length) {
+        if (callback) callback();
+        return Promise.resolve();
+      }
+
+      this.options.preload = preloaded.concat(newLngs);
+      this.loadResources(function (err) {
+        deferred.resolve();
+        if (callback) callback(err);
+      });
+      return deferred;
+    }
+  }, {
+    key: "dir",
+    value: function dir(lng) {
+      if (!lng) lng = this.languages && this.languages.length > 0 ? this.languages[0] : this.language;
+      if (!lng) return 'rtl';
+      var rtlLngs = ['ar', 'shu', 'sqr', 'ssh', 'xaa', 'yhd', 'yud', 'aao', 'abh', 'abv', 'acm', 'acq', 'acw', 'acx', 'acy', 'adf', 'ads', 'aeb', 'aec', 'afb', 'ajp', 'apc', 'apd', 'arb', 'arq', 'ars', 'ary', 'arz', 'auz', 'avl', 'ayh', 'ayl', 'ayn', 'ayp', 'bbz', 'pga', 'he', 'iw', 'ps', 'pbt', 'pbu', 'pst', 'prp', 'prd', 'ur', 'ydd', 'yds', 'yih', 'ji', 'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam'];
+      return rtlLngs.indexOf(this.services.languageUtils.getLanguagePartFromCode(lng)) >= 0 ? 'rtl' : 'ltr';
+    }
+    /* eslint class-methods-use-this: 0 */
+
+  }, {
+    key: "createInstance",
+    value: function createInstance() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var callback = arguments.length > 1 ? arguments[1] : undefined;
+      return new I18n(options, callback);
+    }
+  }, {
+    key: "cloneInstance",
+    value: function cloneInstance() {
+      var _this7 = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : noop;
+
+      var mergedOptions = Object(_babel_runtime_helpers_esm_objectSpread__WEBPACK_IMPORTED_MODULE_1__["default"])({}, this.options, options, {
+        isClone: true
+      });
+
+      var clone = new I18n(mergedOptions);
+      var membersToCopy = ['store', 'services', 'language'];
+      membersToCopy.forEach(function (m) {
+        clone[m] = _this7[m];
+      });
+      clone.translator = new Translator(clone.services, clone.options);
+      clone.translator.on('*', function (event) {
+        for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+          args[_key4 - 1] = arguments[_key4];
+        }
+
+        clone.emit.apply(clone, [event].concat(args));
+      });
+      clone.init(mergedOptions, callback);
+      clone.translator.options = clone.options; // sync options
+
+      return clone;
+    }
+  }]);
+
+  return I18n;
+}(EventEmitter);
+
+var i18next = new I18n();
+
+/* harmony default export */ __webpack_exports__["default"] = (i18next);
+
+
+/***/ }),
+
+/***/ "./node_modules/json-logic-js/logic.js":
+/*!*********************************************!*\
+  !*** ./node_modules/json-logic-js/logic.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/* globals define,module */
+/*
+Using a Universal Module Loader that should be browser, require, and AMD friendly
+http://ricostacruz.com/cheatsheets/umdjs.html
+*/
+;(function(root, factory) {
+  if (true) {
+    !(__WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.call(exports, __webpack_require__, exports, module)) :
+				__WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {}
+}(this, function() {
+  "use strict";
+  /* globals console:false */
+
+  if ( ! Array.isArray) {
+    Array.isArray = function(arg) {
+      return Object.prototype.toString.call(arg) === "[object Array]";
+    };
+  }
+
+  /**
+   * Return an array that contains no duplicates (original not modified)
+   * @param  {array} array   Original reference array
+   * @return {array}         New array with no duplicates
+   */
+  function arrayUnique(array) {
+    var a = [];
+    for (var i=0, l=array.length; i<l; i++) {
+      if (a.indexOf(array[i]) === -1) {
+        a.push(array[i]);
+      }
+    }
+    return a;
+  }
+
+  var jsonLogic = {};
+  var operations = {
+    "==": function(a, b) {
+      return a == b;
+    },
+    "===": function(a, b) {
+      return a === b;
+    },
+    "!=": function(a, b) {
+      return a != b;
+    },
+    "!==": function(a, b) {
+      return a !== b;
+    },
+    ">": function(a, b) {
+      return a > b;
+    },
+    ">=": function(a, b) {
+      return a >= b;
+    },
+    "<": function(a, b, c) {
+      return (c === undefined) ? a < b : (a < b) && (b < c);
+    },
+    "<=": function(a, b, c) {
+      return (c === undefined) ? a <= b : (a <= b) && (b <= c);
+    },
+    "!!": function(a) {
+      return jsonLogic.truthy(a);
+    },
+    "!": function(a) {
+      return !jsonLogic.truthy(a);
+    },
+    "%": function(a, b) {
+      return a % b;
+    },
+    "log": function(a) {
+      console.log(a); return a;
+    },
+    "in": function(a, b) {
+      if(!b || typeof b.indexOf === "undefined") return false;
+      return (b.indexOf(a) !== -1);
+    },
+    "cat": function() {
+      return Array.prototype.join.call(arguments, "");
+    },
+    "substr":function(source, start, end) {
+      if(end < 0){
+        // JavaScript doesn't support negative end, this emulates PHP behavior
+        var temp = String(source).substr(start);
+        return temp.substr(0, temp.length + end);
+      }
+      return String(source).substr(start, end);
+    },
+    "+": function() {
+      return Array.prototype.reduce.call(arguments, function(a, b) {
+        return parseFloat(a, 10) + parseFloat(b, 10);
+      }, 0);
+    },
+    "*": function() {
+      return Array.prototype.reduce.call(arguments, function(a, b) {
+        return parseFloat(a, 10) * parseFloat(b, 10);
+      });
+    },
+    "-": function(a, b) {
+      if(b === undefined) {
+        return -a;
+      }else{
+        return a - b;
+      }
+    },
+    "/": function(a, b) {
+      return a / b;
+    },
+    "min": function() {
+      return Math.min.apply(this, arguments);
+    },
+    "max": function() {
+      return Math.max.apply(this, arguments);
+    },
+    "merge": function() {
+      return Array.prototype.reduce.call(arguments, function(a, b) {
+        return a.concat(b);
+      }, []);
+    },
+    "var": function(a, b) {
+      var not_found = (b === undefined) ? null : b;
+      var data = this;
+      if(typeof a === "undefined" || a==="" || a===null) {
+        return data;
+      }
+      var sub_props = String(a).split(".");
+      for(var i = 0; i < sub_props.length; i++) {
+        if(data === null) {
+          return not_found;
+        }
+        // Descending into data
+        data = data[sub_props[i]];
+        if(data === undefined) {
+          return not_found;
+        }
+      }
+      return data;
+    },
+    "missing": function() {
+      /*
+      Missing can receive many keys as many arguments, like {"missing:[1,2]}
+      Missing can also receive *one* argument that is an array of keys,
+      which typically happens if it's actually acting on the output of another command
+      (like 'if' or 'merge')
+      */
+
+      var missing = [];
+      var keys = Array.isArray(arguments[0]) ? arguments[0] : arguments;
+
+      for(var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var value = jsonLogic.apply({"var": key}, this);
+        if(value === null || value === "") {
+          missing.push(key);
+        }
+      }
+
+      return missing;
+    },
+    "missing_some": function(need_count, options) {
+      // missing_some takes two arguments, how many (minimum) items must be present, and an array of keys (just like 'missing') to check for presence.
+      var are_missing = jsonLogic.apply({"missing": options}, this);
+
+      if(options.length - are_missing.length >= need_count) {
+        return [];
+      }else{
+        return are_missing;
+      }
+    },
+    "method": function(obj, method, args) {
+      return obj[method].apply(obj, args);
+    },
+
+  };
+
+  jsonLogic.is_logic = function(logic) {
+    return (
+      typeof logic === "object" && // An object
+      logic !== null && // but not null
+      ! Array.isArray(logic) && // and not an array
+      Object.keys(logic).length === 1 // with exactly one key
+    );
+  };
+
+  /*
+  This helper will defer to the JsonLogic spec as a tie-breaker when different language interpreters define different behavior for the truthiness of primitives.  E.g., PHP considers empty arrays to be falsy, but Javascript considers them to be truthy. JsonLogic, as an ecosystem, needs one consistent answer.
+
+  Spec and rationale here: http://jsonlogic.com/truthy
+  */
+  jsonLogic.truthy = function(value) {
+    if(Array.isArray(value) && value.length === 0) {
+      return false;
+    }
+    return !! value;
+  };
+
+
+  jsonLogic.get_operator = function(logic) {
+    return Object.keys(logic)[0];
+  };
+
+  jsonLogic.get_values = function(logic) {
+    return logic[jsonLogic.get_operator(logic)];
+  };
+
+  jsonLogic.apply = function(logic, data) {
+    // Does this array contain logic? Only one way to find out.
+    if(Array.isArray(logic)) {
+      return logic.map(function(l) {
+        return jsonLogic.apply(l, data);
+      });
+    }
+    // You've recursed to a primitive, stop!
+    if( ! jsonLogic.is_logic(logic) ) {
+      return logic;
+    }
+
+    data = data || {};
+
+    var op = jsonLogic.get_operator(logic);
+    var values = logic[op];
+    var i;
+    var current;
+    var scopedLogic, scopedData, filtered, initial;
+
+    // easy syntax for unary operators, like {"var" : "x"} instead of strict {"var" : ["x"]}
+    if( ! Array.isArray(values)) {
+      values = [values];
+    }
+
+    // 'if', 'and', and 'or' violate the normal rule of depth-first calculating consequents, let each manage recursion as needed.
+    if(op === "if" || op == "?:") {
+      /* 'if' should be called with a odd number of parameters, 3 or greater
+      This works on the pattern:
+      if( 0 ){ 1 }else{ 2 };
+      if( 0 ){ 1 }else if( 2 ){ 3 }else{ 4 };
+      if( 0 ){ 1 }else if( 2 ){ 3 }else if( 4 ){ 5 }else{ 6 };
+
+      The implementation is:
+      For pairs of values (0,1 then 2,3 then 4,5 etc)
+      If the first evaluates truthy, evaluate and return the second
+      If the first evaluates falsy, jump to the next pair (e.g, 0,1 to 2,3)
+      given one parameter, evaluate and return it. (it's an Else and all the If/ElseIf were false)
+      given 0 parameters, return NULL (not great practice, but there was no Else)
+      */
+      for(i = 0; i < values.length - 1; i += 2) {
+        if( jsonLogic.truthy( jsonLogic.apply(values[i], data) ) ) {
+          return jsonLogic.apply(values[i+1], data);
+        }
+      }
+      if(values.length === i+1) return jsonLogic.apply(values[i], data);
+      return null;
+    }else if(op === "and") { // Return first falsy, or last
+      for(i=0; i < values.length; i+=1) {
+        current = jsonLogic.apply(values[i], data);
+        if( ! jsonLogic.truthy(current)) {
+          return current;
+        }
+      }
+      return current; // Last
+    }else if(op === "or") {// Return first truthy, or last
+      for(i=0; i < values.length; i+=1) {
+        current = jsonLogic.apply(values[i], data);
+        if( jsonLogic.truthy(current) ) {
+          return current;
+        }
+      }
+      return current; // Last
+
+
+
+
+    }else if(op === 'filter'){
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+
+      if ( ! Array.isArray(scopedData)) {
+          return [];
+      }
+      // Return only the elements from the array in the first argument,
+      // that return truthy when passed to the logic in the second argument.
+      // For parity with JavaScript, reindex the returned array
+      return scopedData.filter(function(datum){
+          return jsonLogic.truthy( jsonLogic.apply(scopedLogic, datum));
+      });
+  }else if(op === 'map'){
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+
+      if ( ! Array.isArray(scopedData)) {
+          return [];
+      }
+
+      return scopedData.map(function(datum){
+          return jsonLogic.apply(scopedLogic, datum);
+      });
+
+  }else if(op === 'reduce'){
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+      initial = typeof values[2] !== 'undefined' ? values[2] : null;
+
+      if ( ! Array.isArray(scopedData)) {
+          return initial;
+      }
+
+      return scopedData.reduce(
+          function(accumulator, current){
+              return jsonLogic.apply(
+                  scopedLogic,
+                  {'current':current, 'accumulator':accumulator}
+              );
+          },
+          initial
+      );
+
+    }else if(op === "all") {
+      scopedData = jsonLogic.apply(values[0], data);
+      scopedLogic = values[1];
+      // All of an empty set is false. Note, some and none have correct fallback after the for loop
+      if( ! scopedData.length) {
+        return false;
+      }
+      for(i=0; i < scopedData.length; i+=1) {
+        if( ! jsonLogic.truthy( jsonLogic.apply(scopedLogic, scopedData[i]) )) {
+          return false; // First falsy, short circuit
+        }
+      }
+      return true; // All were truthy
+    }else if(op === "none") {
+      filtered = jsonLogic.apply({'filter' : values}, data);
+      return filtered.length === 0;
+
+    }else if(op === "some") {
+      filtered = jsonLogic.apply({'filter' : values}, data);
+      return filtered.length > 0;
+    }
+
+    // Everyone else gets immediate depth-first recursion
+    values = values.map(function(val) {
+      return jsonLogic.apply(val, data);
+    });
+
+
+    // The operation is called with "data" bound to its "this" and "values" passed as arguments.
+    // Structured commands like % or > can name formal arguments while flexible commands (like missing or merge) can operate on the pseudo-array arguments
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+    if(typeof operations[op] === "function") {
+      return operations[op].apply(data, values);
+    }else if(op.indexOf(".") > 0) { // Contains a dot, and not in the 0th position
+      var sub_ops = String(op).split(".");
+      var operation = operations;
+      for(i = 0; i < sub_ops.length; i++) {
+        // Descending into operations
+        operation = operation[sub_ops[i]];
+        if(operation === undefined) {
+          throw new Error("Unrecognized operation " + op +
+          " (failed at " + sub_ops.slice(0, i+1).join(".") + ")");
+        }
+      }
+
+      return operation.apply(data, values);
+    }
+
+    throw new Error("Unrecognized operation " + op );
+  };
+
+  jsonLogic.uses_data = function(logic) {
+    var collection = [];
+
+    if( jsonLogic.is_logic(logic) ) {
+      var op = jsonLogic.get_operator(logic);
+      var values = logic[op];
+
+      if( ! Array.isArray(values)) {
+        values = [values];
+      }
+
+      if(op === "var") {
+        // This doesn't cover the case where the arg to var is itself a rule.
+        collection.push(values[0]);
+      }else{
+        // Recursion!
+        values.map(function(val) {
+          collection.push.apply(collection, jsonLogic.uses_data(val) );
+        });
+      }
+    }
+
+    return arrayUnique(collection);
+  };
+
+  jsonLogic.add_operation = function(name, code) {
+    operations[name] = code;
+  };
+
+  jsonLogic.rm_operation = function(name) {
+    delete operations[name];
+  };
+
+  jsonLogic.rule_like = function(rule, pattern) {
+    // console.log("Is ". JSON.stringify(rule) . " like " . JSON.stringify(pattern) . "?");
+    if(pattern === rule) {
+      return true;
+    } // TODO : Deep object equivalency?
+    if(pattern === "@") {
+      return true;
+    } // Wildcard!
+    if(pattern === "number") {
+      return (typeof rule === "number");
+    }
+    if(pattern === "string") {
+      return (typeof rule === "string");
+    }
+    if(pattern === "array") {
+      // !logic test might be superfluous in JavaScript
+      return Array.isArray(rule) && ! jsonLogic.is_logic(rule);
+    }
+
+    if(jsonLogic.is_logic(pattern)) {
+      if(jsonLogic.is_logic(rule)) {
+        var pattern_op = jsonLogic.get_operator(pattern);
+        var rule_op = jsonLogic.get_operator(rule);
+
+        if(pattern_op === "@" || pattern_op === rule_op) {
+        // echo "\nOperators match, go deeper\n";
+          return jsonLogic.rule_like(
+            jsonLogic.get_values(rule, false),
+            jsonLogic.get_values(pattern, false)
+          );
+        }
+      }
+      return false; // pattern is logic, rule isn't, can't be eq
+    }
+
+    if(Array.isArray(pattern)) {
+      if(Array.isArray(rule)) {
+        if(pattern.length !== rule.length) {
+          return false;
+        }
+        /*
+          Note, array order MATTERS, because we're using this array test logic to consider arguments, where order can matter. (e.g., + is commutative, but '-' or 'if' or 'var' are NOT)
+        */
+        for(var i = 0; i < pattern.length; i += 1) {
+          // If any fail, we fail
+          if( ! jsonLogic.rule_like(rule[i], pattern[i])) {
+            return false;
+          }
+        }
+        return true; // If they *all* passed, we pass
+      }else{
+        return false; // Pattern is array, rule isn't
+      }
+    }
+
+    // Not logic, not array, not a === match for rule.
+    return false;
+  };
+
+  return jsonLogic;
+}));
+
+
+/***/ }),
+
+/***/ "./node_modules/jstimezonedetect/dist/jstz.js":
+/*!****************************************************!*\
+  !*** ./node_modules/jstimezonedetect/dist/jstz.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root) {/*global exports, Intl*/
+/**
+ * This script gives you the zone info key representing your device's time zone setting.
+ *
+ * @name jsTimezoneDetect
+ * @version 1.0.6
+ * @author Jon Nylander
+ * @license MIT License - https://bitbucket.org/pellepim/jstimezonedetect/src/default/LICENCE.txt
+ *
+ * For usage and examples, visit:
+ * http://pellepim.bitbucket.org/jstz/
+ *
+ * Copyright (c) Jon Nylander
+ */
+
+
+/**
+ * Namespace to hold all the code for timezone detection.
+ */
+var jstz = (function () {
+    'use strict';
+    var HEMISPHERE_SOUTH = 's',
+
+        consts = {
+            DAY: 86400000,
+            HOUR: 3600000,
+            MINUTE: 60000,
+            SECOND: 1000,
+            BASELINE_YEAR: 2014,
+            MAX_SCORE: 864000000, // 10 days
+            AMBIGUITIES: {
+                'America/Denver':       ['America/Mazatlan'],
+                'Europe/London':        ['Africa/Casablanca'],
+                'America/Chicago':      ['America/Mexico_City'],
+                'America/Asuncion':     ['America/Campo_Grande', 'America/Santiago'],
+                'America/Montevideo':   ['America/Sao_Paulo', 'America/Santiago'],
+                // Europe/Minsk should not be in this list... but Windows.
+                'Asia/Beirut':          ['Asia/Amman', 'Asia/Jerusalem', 'Europe/Helsinki', 'Asia/Damascus', 'Africa/Cairo', 'Asia/Gaza', 'Europe/Minsk'],
+                'Pacific/Auckland':     ['Pacific/Fiji'],
+                'America/Los_Angeles':  ['America/Santa_Isabel'],
+                'America/New_York':     ['America/Havana'],
+                'America/Halifax':      ['America/Goose_Bay'],
+                'America/Godthab':      ['America/Miquelon'],
+                'Asia/Dubai':           ['Asia/Yerevan'],
+                'Asia/Jakarta':         ['Asia/Krasnoyarsk'],
+                'Asia/Shanghai':        ['Asia/Irkutsk', 'Australia/Perth'],
+                'Australia/Sydney':     ['Australia/Lord_Howe'],
+                'Asia/Tokyo':           ['Asia/Yakutsk'],
+                'Asia/Dhaka':           ['Asia/Omsk'],
+                // In the real world Yerevan is not ambigous for Baku... but Windows.
+                'Asia/Baku':            ['Asia/Yerevan'],
+                'Australia/Brisbane':   ['Asia/Vladivostok'],
+                'Pacific/Noumea':       ['Asia/Vladivostok'],
+                'Pacific/Majuro':       ['Asia/Kamchatka', 'Pacific/Fiji'],
+                'Pacific/Tongatapu':    ['Pacific/Apia'],
+                'Asia/Baghdad':         ['Europe/Minsk', 'Europe/Moscow'],
+                'Asia/Karachi':         ['Asia/Yekaterinburg'],
+                'Africa/Johannesburg':  ['Asia/Gaza', 'Africa/Cairo']
+            }
+        },
+
+        /**
+         * Gets the offset in minutes from UTC for a certain date.
+         * @param {Date} date
+         * @returns {Number}
+         */
+        get_date_offset = function get_date_offset(date) {
+            var offset = -date.getTimezoneOffset();
+            return (offset !== null ? offset : 0);
+        },
+
+        /**
+         * This function does some basic calculations to create information about
+         * the user's timezone. It uses REFERENCE_YEAR as a solid year for which
+         * the script has been tested rather than depend on the year set by the
+         * client device.
+         *
+         * Returns a key that can be used to do lookups in jstz.olson.timezones.
+         * eg: "720,1,2".
+         *
+         * @returns {String}
+         */
+        lookup_key = function lookup_key() {
+            var january_offset = get_date_offset(new Date(consts.BASELINE_YEAR, 0, 2)),
+                june_offset = get_date_offset(new Date(consts.BASELINE_YEAR, 5, 2)),
+                diff = january_offset - june_offset;
+
+            if (diff < 0) {
+                return january_offset + ",1";
+            } else if (diff > 0) {
+                return june_offset + ",1," + HEMISPHERE_SOUTH;
+            }
+
+            return january_offset + ",0";
+        },
+
+
+        /**
+         * Tries to get the time zone key directly from the operating system for those
+         * environments that support the ECMAScript Internationalization API.
+         */
+        get_from_internationalization_api = function get_from_internationalization_api() {
+            var format, timezone;
+            if (typeof Intl === "undefined" || typeof Intl.DateTimeFormat === "undefined") {
+                return;
+            }
+
+            format = Intl.DateTimeFormat();
+
+            if (typeof format === "undefined" || typeof format.resolvedOptions === "undefined") {
+                return;
+            }
+
+            timezone = format.resolvedOptions().timeZone;
+
+            if (timezone && (timezone.indexOf("/") > -1 || timezone === 'UTC')) {
+                return timezone;
+            }
+
+        },
+
+        /**
+         * Starting point for getting all the DST rules for a specific year
+         * for the current timezone (as described by the client system).
+         *
+         * Returns an object with start and end attributes, or false if no
+         * DST rules were found for the year.
+         *
+         * @param year
+         * @returns {Object} || {Boolean}
+         */
+        dst_dates = function dst_dates(year) {
+            var yearstart = new Date(year, 0, 1, 0, 0, 1, 0).getTime();
+            var yearend = new Date(year, 12, 31, 23, 59, 59).getTime();
+            var current = yearstart;
+            var offset = (new Date(current)).getTimezoneOffset();
+            var dst_start = null;
+            var dst_end = null;
+
+            while (current < yearend - 86400000) {
+                var dateToCheck = new Date(current);
+                var dateToCheckOffset = dateToCheck.getTimezoneOffset();
+
+                if (dateToCheckOffset !== offset) {
+                    if (dateToCheckOffset < offset) {
+                        dst_start = dateToCheck;
+                    }
+                    if (dateToCheckOffset > offset) {
+                        dst_end = dateToCheck;
+                    }
+                    offset = dateToCheckOffset;
+                }
+
+                current += 86400000;
+            }
+
+            if (dst_start && dst_end) {
+                return {
+                    s: find_dst_fold(dst_start).getTime(),
+                    e: find_dst_fold(dst_end).getTime()
+                };
+            }
+
+            return false;
+        },
+
+        /**
+         * Probably completely unnecessary function that recursively finds the
+         * exact (to the second) time when a DST rule was changed.
+         *
+         * @param a_date - The candidate Date.
+         * @param padding - integer specifying the padding to allow around the candidate
+         *                  date for finding the fold.
+         * @param iterator - integer specifying how many milliseconds to iterate while
+         *                   searching for the fold.
+         *
+         * @returns {Date}
+         */
+        find_dst_fold = function find_dst_fold(a_date, padding, iterator) {
+            if (typeof padding === 'undefined') {
+                padding = consts.DAY;
+                iterator = consts.HOUR;
+            }
+
+            var date_start = new Date(a_date.getTime() - padding).getTime();
+            var date_end = a_date.getTime() + padding;
+            var offset = new Date(date_start).getTimezoneOffset();
+
+            var current = date_start;
+
+            var dst_change = null;
+            while (current < date_end - iterator) {
+                var dateToCheck = new Date(current);
+                var dateToCheckOffset = dateToCheck.getTimezoneOffset();
+
+                if (dateToCheckOffset !== offset) {
+                    dst_change = dateToCheck;
+                    break;
+                }
+                current += iterator;
+            }
+
+            if (padding === consts.DAY) {
+                return find_dst_fold(dst_change, consts.HOUR, consts.MINUTE);
+            }
+
+            if (padding === consts.HOUR) {
+                return find_dst_fold(dst_change, consts.MINUTE, consts.SECOND);
+            }
+
+            return dst_change;
+        },
+
+        windows7_adaptations = function windows7_adaptions(rule_list, preliminary_timezone, score, sample) {
+            if (score !== 'N/A') {
+                return score;
+            }
+            if (preliminary_timezone === 'Asia/Beirut') {
+                if (sample.name === 'Africa/Cairo') {
+                    if (rule_list[6].s === 1398376800000 && rule_list[6].e === 1411678800000) {
+                        return 0;
+                    }
+                }
+                if (sample.name === 'Asia/Jerusalem') {
+                    if (rule_list[6].s === 1395964800000 && rule_list[6].e === 1411858800000) {
+                        return 0;
+                }
+            }
+            } else if (preliminary_timezone === 'America/Santiago') {
+                if (sample.name === 'America/Asuncion') {
+                    if (rule_list[6].s === 1412481600000 && rule_list[6].e === 1397358000000) {
+                        return 0;
+                    }
+                }
+                if (sample.name === 'America/Campo_Grande') {
+                    if (rule_list[6].s === 1413691200000 && rule_list[6].e === 1392519600000) {
+                        return 0;
+                    }
+                }
+            } else if (preliminary_timezone === 'America/Montevideo') {
+                if (sample.name === 'America/Sao_Paulo') {
+                    if (rule_list[6].s === 1413687600000 && rule_list[6].e === 1392516000000) {
+                        return 0;
+                    }
+                }
+            } else if (preliminary_timezone === 'Pacific/Auckland') {
+                if (sample.name === 'Pacific/Fiji') {
+                    if (rule_list[6].s === 1414245600000 && rule_list[6].e === 1396101600000) {
+                        return 0;
+                    }
+                }
+            }
+
+            return score;
+        },
+
+        /**
+         * Takes the DST rules for the current timezone, and proceeds to find matches
+         * in the jstz.olson.dst_rules.zones array.
+         *
+         * Compares samples to the current timezone on a scoring basis.
+         *
+         * Candidates are ruled immediately if either the candidate or the current zone
+         * has a DST rule where the other does not.
+         *
+         * Candidates are ruled out immediately if the current zone has a rule that is
+         * outside the DST scope of the candidate.
+         *
+         * Candidates are included for scoring if the current zones rules fall within the
+         * span of the samples rules.
+         *
+         * Low score is best, the score is calculated by summing up the differences in DST
+         * rules and if the consts.MAX_SCORE is overreached the candidate is ruled out.
+         *
+         * Yah follow? :)
+         *
+         * @param rule_list
+         * @param preliminary_timezone
+         * @returns {*}
+         */
+        best_dst_match = function best_dst_match(rule_list, preliminary_timezone) {
+            var score_sample = function score_sample(sample) {
+                var score = 0;
+
+                for (var j = 0; j < rule_list.length; j++) {
+
+                    // Both sample and current time zone report DST during the year.
+                    if (!!sample.rules[j] && !!rule_list[j]) {
+
+                        // The current time zone's DST rules are inside the sample's. Include.
+                        if (rule_list[j].s >= sample.rules[j].s && rule_list[j].e <= sample.rules[j].e) {
+                            score = 0;
+                            score += Math.abs(rule_list[j].s - sample.rules[j].s);
+                            score += Math.abs(sample.rules[j].e - rule_list[j].e);
+
+                        // The current time zone's DST rules are outside the sample's. Discard.
+                        } else {
+                            score = 'N/A';
+                            break;
+                        }
+
+                        // The max score has been reached. Discard.
+                        if (score > consts.MAX_SCORE) {
+                            score = 'N/A';
+                            break;
+                        }
+                    }
+                }
+
+                score = windows7_adaptations(rule_list, preliminary_timezone, score, sample);
+
+                return score;
+            };
+            var scoreboard = {};
+            var dst_zones = jstz.olson.dst_rules.zones;
+            var dst_zones_length = dst_zones.length;
+            var ambiguities = consts.AMBIGUITIES[preliminary_timezone];
+
+            for (var i = 0; i < dst_zones_length; i++) {
+                var sample = dst_zones[i];
+                var score = score_sample(dst_zones[i]);
+
+                if (score !== 'N/A') {
+                    scoreboard[sample.name] = score;
+                }
+            }
+
+            for (var tz in scoreboard) {
+                if (scoreboard.hasOwnProperty(tz)) {
+                    for (var j = 0; j < ambiguities.length; j++) {
+                        if (ambiguities[j] === tz) {
+                            return tz;
+                        }
+                    }
+                }
+            }
+
+            return preliminary_timezone;
+        },
+
+        /**
+         * Takes the preliminary_timezone as detected by lookup_key().
+         *
+         * Builds up the current timezones DST rules for the years defined
+         * in the jstz.olson.dst_rules.years array.
+         *
+         * If there are no DST occurences for those years, immediately returns
+         * the preliminary timezone. Otherwise proceeds and tries to solve
+         * ambiguities.
+         *
+         * @param preliminary_timezone
+         * @returns {String} timezone_name
+         */
+        get_by_dst = function get_by_dst(preliminary_timezone) {
+            var get_rules = function get_rules() {
+                var rule_list = [];
+                for (var i = 0; i < jstz.olson.dst_rules.years.length; i++) {
+                    var year_rules = dst_dates(jstz.olson.dst_rules.years[i]);
+                    rule_list.push(year_rules);
+                }
+                return rule_list;
+            };
+            var check_has_dst = function check_has_dst(rules) {
+                for (var i = 0; i < rules.length; i++) {
+                    if (rules[i] !== false) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            var rules = get_rules();
+            var has_dst = check_has_dst(rules);
+
+            if (has_dst) {
+                return best_dst_match(rules, preliminary_timezone);
+            }
+
+            return preliminary_timezone;
+        },
+
+        /**
+         * Uses get_timezone_info() to formulate a key to use in the olson.timezones dictionary.
+         *
+         * Returns an object with one function ".name()"
+         *
+         * @returns Object
+         */
+        determine = function determine() {
+            var preliminary_tz = get_from_internationalization_api();
+
+            if (!preliminary_tz) {
+                preliminary_tz = jstz.olson.timezones[lookup_key()];
+
+                if (typeof consts.AMBIGUITIES[preliminary_tz] !== 'undefined') {
+                    preliminary_tz = get_by_dst(preliminary_tz);
+                }
+            }
+
+            return {
+                name: function () {
+                    return preliminary_tz;
+                }
+            };
+        };
+
+    return {
+        determine: determine
+    };
+}());
+
+
+jstz.olson = jstz.olson || {};
+
+/**
+ * The keys in this dictionary are comma separated as such:
+ *
+ * First the offset compared to UTC time in minutes.
+ *
+ * Then a flag which is 0 if the timezone does not take daylight savings into account and 1 if it
+ * does.
+ *
+ * Thirdly an optional 's' signifies that the timezone is in the southern hemisphere,
+ * only interesting for timezones with DST.
+ *
+ * The mapped arrays is used for constructing the jstz.TimeZone object from within
+ * jstz.determine();
+ */
+jstz.olson.timezones = {
+    '-720,0': 'Etc/GMT+12',
+    '-660,0': 'Pacific/Pago_Pago',
+    '-660,1,s': 'Pacific/Apia', // Why? Because windows... cry!
+    '-600,1': 'America/Adak',
+    '-600,0': 'Pacific/Honolulu',
+    '-570,0': 'Pacific/Marquesas',
+    '-540,0': 'Pacific/Gambier',
+    '-540,1': 'America/Anchorage',
+    '-480,1': 'America/Los_Angeles',
+    '-480,0': 'Pacific/Pitcairn',
+    '-420,0': 'America/Phoenix',
+    '-420,1': 'America/Denver',
+    '-360,0': 'America/Guatemala',
+    '-360,1': 'America/Chicago',
+    '-360,1,s': 'Pacific/Easter',
+    '-300,0': 'America/Bogota',
+    '-300,1': 'America/New_York',
+    '-270,0': 'America/Caracas',
+    '-240,1': 'America/Halifax',
+    '-240,0': 'America/Santo_Domingo',
+    '-240,1,s': 'America/Asuncion',
+    '-210,1': 'America/St_Johns',
+    '-180,1': 'America/Godthab',
+    '-180,0': 'America/Argentina/Buenos_Aires',
+    '-180,1,s': 'America/Montevideo',
+    '-120,0': 'America/Noronha',
+    '-120,1': 'America/Noronha',
+    '-60,1': 'Atlantic/Azores',
+    '-60,0': 'Atlantic/Cape_Verde',
+    '0,0': 'UTC',
+    '0,1': 'Europe/London',
+    '60,1': 'Europe/Berlin',
+    '60,0': 'Africa/Lagos',
+    '60,1,s': 'Africa/Windhoek',
+    '120,1': 'Asia/Beirut',
+    '120,0': 'Africa/Johannesburg',
+    '180,0': 'Asia/Baghdad',
+    '180,1': 'Europe/Moscow',
+    '210,1': 'Asia/Tehran',
+    '240,0': 'Asia/Dubai',
+    '240,1': 'Asia/Baku',
+    '270,0': 'Asia/Kabul',
+    '300,1': 'Asia/Yekaterinburg',
+    '300,0': 'Asia/Karachi',
+    '330,0': 'Asia/Kolkata',
+    '345,0': 'Asia/Kathmandu',
+    '360,0': 'Asia/Dhaka',
+    '360,1': 'Asia/Omsk',
+    '390,0': 'Asia/Rangoon',
+    '420,1': 'Asia/Krasnoyarsk',
+    '420,0': 'Asia/Jakarta',
+    '480,0': 'Asia/Shanghai',
+    '480,1': 'Asia/Irkutsk',
+    '525,0': 'Australia/Eucla',
+    '525,1,s': 'Australia/Eucla',
+    '540,1': 'Asia/Yakutsk',
+    '540,0': 'Asia/Tokyo',
+    '570,0': 'Australia/Darwin',
+    '570,1,s': 'Australia/Adelaide',
+    '600,0': 'Australia/Brisbane',
+    '600,1': 'Asia/Vladivostok',
+    '600,1,s': 'Australia/Sydney',
+    '630,1,s': 'Australia/Lord_Howe',
+    '660,1': 'Asia/Kamchatka',
+    '660,0': 'Pacific/Noumea',
+    '690,0': 'Pacific/Norfolk',
+    '720,1,s': 'Pacific/Auckland',
+    '720,0': 'Pacific/Majuro',
+    '765,1,s': 'Pacific/Chatham',
+    '780,0': 'Pacific/Tongatapu',
+    '780,1,s': 'Pacific/Apia',
+    '840,0': 'Pacific/Kiritimati'
+};
+
+/* Build time: 2015-11-02 13:01:00Z Build by invoking python utilities/dst.py generate */
+jstz.olson.dst_rules = {
+    "years": [
+        2008,
+        2009,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014
+    ],
+    "zones": [
+        {
+            "name": "Africa/Cairo",
+            "rules": [
+                {
+                    "e": 1219957200000,
+                    "s": 1209074400000
+                },
+                {
+                    "e": 1250802000000,
+                    "s": 1240524000000
+                },
+                {
+                    "e": 1285880400000,
+                    "s": 1284069600000
+                },
+                false,
+                false,
+                false,
+                {
+                    "e": 1411678800000,
+                    "s": 1406844000000
+                }
+            ]
+        },
+        {
+            "name": "Africa/Casablanca",
+            "rules": [
+                {
+                    "e": 1220223600000,
+                    "s": 1212278400000
+                },
+                {
+                    "e": 1250809200000,
+                    "s": 1243814400000
+                },
+                {
+                    "e": 1281222000000,
+                    "s": 1272758400000
+                },
+                {
+                    "e": 1312066800000,
+                    "s": 1301788800000
+                },
+                {
+                    "e": 1348970400000,
+                    "s": 1345428000000
+                },
+                {
+                    "e": 1382839200000,
+                    "s": 1376100000000
+                },
+                {
+                    "e": 1414288800000,
+                    "s": 1406944800000
+                }
+            ]
+        },
+        {
+            "name": "America/Asuncion",
+            "rules": [
+                {
+                    "e": 1205031600000,
+                    "s": 1224388800000
+                },
+                {
+                    "e": 1236481200000,
+                    "s": 1255838400000
+                },
+                {
+                    "e": 1270954800000,
+                    "s": 1286078400000
+                },
+                {
+                    "e": 1302404400000,
+                    "s": 1317528000000
+                },
+                {
+                    "e": 1333854000000,
+                    "s": 1349582400000
+                },
+                {
+                    "e": 1364094000000,
+                    "s": 1381032000000
+                },
+                {
+                    "e": 1395543600000,
+                    "s": 1412481600000
+                }
+            ]
+        },
+        {
+            "name": "America/Campo_Grande",
+            "rules": [
+                {
+                    "e": 1203217200000,
+                    "s": 1224388800000
+                },
+                {
+                    "e": 1234666800000,
+                    "s": 1255838400000
+                },
+                {
+                    "e": 1266721200000,
+                    "s": 1287288000000
+                },
+                {
+                    "e": 1298170800000,
+                    "s": 1318737600000
+                },
+                {
+                    "e": 1330225200000,
+                    "s": 1350792000000
+                },
+                {
+                    "e": 1361070000000,
+                    "s": 1382241600000
+                },
+                {
+                    "e": 1392519600000,
+                    "s": 1413691200000
+                }
+            ]
+        },
+        {
+            "name": "America/Goose_Bay",
+            "rules": [
+                {
+                    "e": 1225594860000,
+                    "s": 1205035260000
+                },
+                {
+                    "e": 1257044460000,
+                    "s": 1236484860000
+                },
+                {
+                    "e": 1289098860000,
+                    "s": 1268539260000
+                },
+                {
+                    "e": 1320555600000,
+                    "s": 1299988860000
+                },
+                {
+                    "e": 1352005200000,
+                    "s": 1331445600000
+                },
+                {
+                    "e": 1383454800000,
+                    "s": 1362895200000
+                },
+                {
+                    "e": 1414904400000,
+                    "s": 1394344800000
+                }
+            ]
+        },
+        {
+            "name": "America/Havana",
+            "rules": [
+                {
+                    "e": 1224997200000,
+                    "s": 1205643600000
+                },
+                {
+                    "e": 1256446800000,
+                    "s": 1236488400000
+                },
+                {
+                    "e": 1288501200000,
+                    "s": 1268542800000
+                },
+                {
+                    "e": 1321160400000,
+                    "s": 1300597200000
+                },
+                {
+                    "e": 1352005200000,
+                    "s": 1333256400000
+                },
+                {
+                    "e": 1383454800000,
+                    "s": 1362891600000
+                },
+                {
+                    "e": 1414904400000,
+                    "s": 1394341200000
+                }
+            ]
+        },
+        {
+            "name": "America/Mazatlan",
+            "rules": [
+                {
+                    "e": 1225008000000,
+                    "s": 1207472400000
+                },
+                {
+                    "e": 1256457600000,
+                    "s": 1238922000000
+                },
+                {
+                    "e": 1288512000000,
+                    "s": 1270371600000
+                },
+                {
+                    "e": 1319961600000,
+                    "s": 1301821200000
+                },
+                {
+                    "e": 1351411200000,
+                    "s": 1333270800000
+                },
+                {
+                    "e": 1382860800000,
+                    "s": 1365325200000
+                },
+                {
+                    "e": 1414310400000,
+                    "s": 1396774800000
+                }
+            ]
+        },
+        {
+            "name": "America/Mexico_City",
+            "rules": [
+                {
+                    "e": 1225004400000,
+                    "s": 1207468800000
+                },
+                {
+                    "e": 1256454000000,
+                    "s": 1238918400000
+                },
+                {
+                    "e": 1288508400000,
+                    "s": 1270368000000
+                },
+                {
+                    "e": 1319958000000,
+                    "s": 1301817600000
+                },
+                {
+                    "e": 1351407600000,
+                    "s": 1333267200000
+                },
+                {
+                    "e": 1382857200000,
+                    "s": 1365321600000
+                },
+                {
+                    "e": 1414306800000,
+                    "s": 1396771200000
+                }
+            ]
+        },
+        {
+            "name": "America/Miquelon",
+            "rules": [
+                {
+                    "e": 1225598400000,
+                    "s": 1205038800000
+                },
+                {
+                    "e": 1257048000000,
+                    "s": 1236488400000
+                },
+                {
+                    "e": 1289102400000,
+                    "s": 1268542800000
+                },
+                {
+                    "e": 1320552000000,
+                    "s": 1299992400000
+                },
+                {
+                    "e": 1352001600000,
+                    "s": 1331442000000
+                },
+                {
+                    "e": 1383451200000,
+                    "s": 1362891600000
+                },
+                {
+                    "e": 1414900800000,
+                    "s": 1394341200000
+                }
+            ]
+        },
+        {
+            "name": "America/Santa_Isabel",
+            "rules": [
+                {
+                    "e": 1225011600000,
+                    "s": 1207476000000
+                },
+                {
+                    "e": 1256461200000,
+                    "s": 1238925600000
+                },
+                {
+                    "e": 1288515600000,
+                    "s": 1270375200000
+                },
+                {
+                    "e": 1319965200000,
+                    "s": 1301824800000
+                },
+                {
+                    "e": 1351414800000,
+                    "s": 1333274400000
+                },
+                {
+                    "e": 1382864400000,
+                    "s": 1365328800000
+                },
+                {
+                    "e": 1414314000000,
+                    "s": 1396778400000
+                }
+            ]
+        },
+        {
+            "name": "America/Santiago",
+            "rules": [
+                {
+                    "e": 1206846000000,
+                    "s": 1223784000000
+                },
+                {
+                    "e": 1237086000000,
+                    "s": 1255233600000
+                },
+                {
+                    "e": 1270350000000,
+                    "s": 1286683200000
+                },
+                {
+                    "e": 1304823600000,
+                    "s": 1313899200000
+                },
+                {
+                    "e": 1335668400000,
+                    "s": 1346558400000
+                },
+                {
+                    "e": 1367118000000,
+                    "s": 1378612800000
+                },
+                {
+                    "e": 1398567600000,
+                    "s": 1410062400000
+                }
+            ]
+        },
+        {
+            "name": "America/Sao_Paulo",
+            "rules": [
+                {
+                    "e": 1203213600000,
+                    "s": 1224385200000
+                },
+                {
+                    "e": 1234663200000,
+                    "s": 1255834800000
+                },
+                {
+                    "e": 1266717600000,
+                    "s": 1287284400000
+                },
+                {
+                    "e": 1298167200000,
+                    "s": 1318734000000
+                },
+                {
+                    "e": 1330221600000,
+                    "s": 1350788400000
+                },
+                {
+                    "e": 1361066400000,
+                    "s": 1382238000000
+                },
+                {
+                    "e": 1392516000000,
+                    "s": 1413687600000
+                }
+            ]
+        },
+        {
+            "name": "Asia/Amman",
+            "rules": [
+                {
+                    "e": 1225404000000,
+                    "s": 1206655200000
+                },
+                {
+                    "e": 1256853600000,
+                    "s": 1238104800000
+                },
+                {
+                    "e": 1288303200000,
+                    "s": 1269554400000
+                },
+                {
+                    "e": 1319752800000,
+                    "s": 1301608800000
+                },
+                false,
+                false,
+                {
+                    "e": 1414706400000,
+                    "s": 1395957600000
+                }
+            ]
+        },
+        {
+            "name": "Asia/Damascus",
+            "rules": [
+                {
+                    "e": 1225486800000,
+                    "s": 1207260000000
+                },
+                {
+                    "e": 1256850000000,
+                    "s": 1238104800000
+                },
+                {
+                    "e": 1288299600000,
+                    "s": 1270159200000
+                },
+                {
+                    "e": 1319749200000,
+                    "s": 1301608800000
+                },
+                {
+                    "e": 1351198800000,
+                    "s": 1333058400000
+                },
+                {
+                    "e": 1382648400000,
+                    "s": 1364508000000
+                },
+                {
+                    "e": 1414702800000,
+                    "s": 1395957600000
+                }
+            ]
+        },
+        {
+            "name": "Asia/Dubai",
+            "rules": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Gaza",
+            "rules": [
+                {
+                    "e": 1219957200000,
+                    "s": 1206655200000
+                },
+                {
+                    "e": 1252015200000,
+                    "s": 1238104800000
+                },
+                {
+                    "e": 1281474000000,
+                    "s": 1269640860000
+                },
+                {
+                    "e": 1312146000000,
+                    "s": 1301608860000
+                },
+                {
+                    "e": 1348178400000,
+                    "s": 1333058400000
+                },
+                {
+                    "e": 1380229200000,
+                    "s": 1364508000000
+                },
+                {
+                    "e": 1414098000000,
+                    "s": 1395957600000
+                }
+            ]
+        },
+        {
+            "name": "Asia/Irkutsk",
+            "rules": [
+                {
+                    "e": 1224957600000,
+                    "s": 1206813600000
+                },
+                {
+                    "e": 1256407200000,
+                    "s": 1238263200000
+                },
+                {
+                    "e": 1288461600000,
+                    "s": 1269712800000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Jerusalem",
+            "rules": [
+                {
+                    "e": 1223161200000,
+                    "s": 1206662400000
+                },
+                {
+                    "e": 1254006000000,
+                    "s": 1238112000000
+                },
+                {
+                    "e": 1284246000000,
+                    "s": 1269561600000
+                },
+                {
+                    "e": 1317510000000,
+                    "s": 1301616000000
+                },
+                {
+                    "e": 1348354800000,
+                    "s": 1333065600000
+                },
+                {
+                    "e": 1382828400000,
+                    "s": 1364515200000
+                },
+                {
+                    "e": 1414278000000,
+                    "s": 1395964800000
+                }
+            ]
+        },
+        {
+            "name": "Asia/Kamchatka",
+            "rules": [
+                {
+                    "e": 1224943200000,
+                    "s": 1206799200000
+                },
+                {
+                    "e": 1256392800000,
+                    "s": 1238248800000
+                },
+                {
+                    "e": 1288450800000,
+                    "s": 1269698400000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Krasnoyarsk",
+            "rules": [
+                {
+                    "e": 1224961200000,
+                    "s": 1206817200000
+                },
+                {
+                    "e": 1256410800000,
+                    "s": 1238266800000
+                },
+                {
+                    "e": 1288465200000,
+                    "s": 1269716400000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Omsk",
+            "rules": [
+                {
+                    "e": 1224964800000,
+                    "s": 1206820800000
+                },
+                {
+                    "e": 1256414400000,
+                    "s": 1238270400000
+                },
+                {
+                    "e": 1288468800000,
+                    "s": 1269720000000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Vladivostok",
+            "rules": [
+                {
+                    "e": 1224950400000,
+                    "s": 1206806400000
+                },
+                {
+                    "e": 1256400000000,
+                    "s": 1238256000000
+                },
+                {
+                    "e": 1288454400000,
+                    "s": 1269705600000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Yakutsk",
+            "rules": [
+                {
+                    "e": 1224954000000,
+                    "s": 1206810000000
+                },
+                {
+                    "e": 1256403600000,
+                    "s": 1238259600000
+                },
+                {
+                    "e": 1288458000000,
+                    "s": 1269709200000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Yekaterinburg",
+            "rules": [
+                {
+                    "e": 1224968400000,
+                    "s": 1206824400000
+                },
+                {
+                    "e": 1256418000000,
+                    "s": 1238274000000
+                },
+                {
+                    "e": 1288472400000,
+                    "s": 1269723600000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Asia/Yerevan",
+            "rules": [
+                {
+                    "e": 1224972000000,
+                    "s": 1206828000000
+                },
+                {
+                    "e": 1256421600000,
+                    "s": 1238277600000
+                },
+                {
+                    "e": 1288476000000,
+                    "s": 1269727200000
+                },
+                {
+                    "e": 1319925600000,
+                    "s": 1301176800000
+                },
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Australia/Lord_Howe",
+            "rules": [
+                {
+                    "e": 1207407600000,
+                    "s": 1223134200000
+                },
+                {
+                    "e": 1238857200000,
+                    "s": 1254583800000
+                },
+                {
+                    "e": 1270306800000,
+                    "s": 1286033400000
+                },
+                {
+                    "e": 1301756400000,
+                    "s": 1317483000000
+                },
+                {
+                    "e": 1333206000000,
+                    "s": 1349537400000
+                },
+                {
+                    "e": 1365260400000,
+                    "s": 1380987000000
+                },
+                {
+                    "e": 1396710000000,
+                    "s": 1412436600000
+                }
+            ]
+        },
+        {
+            "name": "Australia/Perth",
+            "rules": [
+                {
+                    "e": 1206813600000,
+                    "s": 1224957600000
+                },
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Europe/Helsinki",
+            "rules": [
+                {
+                    "e": 1224982800000,
+                    "s": 1206838800000
+                },
+                {
+                    "e": 1256432400000,
+                    "s": 1238288400000
+                },
+                {
+                    "e": 1288486800000,
+                    "s": 1269738000000
+                },
+                {
+                    "e": 1319936400000,
+                    "s": 1301187600000
+                },
+                {
+                    "e": 1351386000000,
+                    "s": 1332637200000
+                },
+                {
+                    "e": 1382835600000,
+                    "s": 1364691600000
+                },
+                {
+                    "e": 1414285200000,
+                    "s": 1396141200000
+                }
+            ]
+        },
+        {
+            "name": "Europe/Minsk",
+            "rules": [
+                {
+                    "e": 1224979200000,
+                    "s": 1206835200000
+                },
+                {
+                    "e": 1256428800000,
+                    "s": 1238284800000
+                },
+                {
+                    "e": 1288483200000,
+                    "s": 1269734400000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Europe/Moscow",
+            "rules": [
+                {
+                    "e": 1224975600000,
+                    "s": 1206831600000
+                },
+                {
+                    "e": 1256425200000,
+                    "s": 1238281200000
+                },
+                {
+                    "e": 1288479600000,
+                    "s": 1269730800000
+                },
+                false,
+                false,
+                false,
+                false
+            ]
+        },
+        {
+            "name": "Pacific/Apia",
+            "rules": [
+                false,
+                false,
+                false,
+                {
+                    "e": 1301752800000,
+                    "s": 1316872800000
+                },
+                {
+                    "e": 1333202400000,
+                    "s": 1348927200000
+                },
+                {
+                    "e": 1365256800000,
+                    "s": 1380376800000
+                },
+                {
+                    "e": 1396706400000,
+                    "s": 1411826400000
+                }
+            ]
+        },
+        {
+            "name": "Pacific/Fiji",
+            "rules": [
+                false,
+                false,
+                {
+                    "e": 1269698400000,
+                    "s": 1287842400000
+                },
+                {
+                    "e": 1327154400000,
+                    "s": 1319292000000
+                },
+                {
+                    "e": 1358604000000,
+                    "s": 1350741600000
+                },
+                {
+                    "e": 1390050000000,
+                    "s": 1382796000000
+                },
+                {
+                    "e": 1421503200000,
+                    "s": 1414850400000
+                }
+            ]
+        },
+        {
+            "name": "Europe/London",
+            "rules": [
+                {
+                    "e": 1224982800000,
+                    "s": 1206838800000
+                },
+                {
+                    "e": 1256432400000,
+                    "s": 1238288400000
+                },
+                {
+                    "e": 1288486800000,
+                    "s": 1269738000000
+                },
+                {
+                    "e": 1319936400000,
+                    "s": 1301187600000
+                },
+                {
+                    "e": 1351386000000,
+                    "s": 1332637200000
+                },
+                {
+                    "e": 1382835600000,
+                    "s": 1364691600000
+                },
+                {
+                    "e": 1414285200000,
+                    "s": 1396141200000
+                }
+            ]
+        }
+    ]
+};
+if ( true && typeof module.exports !== 'undefined') {
+    module.exports = jstz;
+} else if (( true && __webpack_require__(/*! !webpack amd define */ "./node_modules/webpack/buildin/amd-define.js") !== null) && (__webpack_require__(/*! !webpack amd options */ "./node_modules/webpack/buildin/amd-options.js") != null)) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+        return jstz;
+    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+} else {
+    if (typeof root === 'undefined') {
+        window.jstz = jstz;
+    } else {
+        root.jstz = jstz;
+    }
+}
+}());
 
 
 /***/ }),
