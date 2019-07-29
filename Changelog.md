@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Form Manager and Form View pro to use latest renderer.
  - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
 
+## 7.0.0-beta.18
+### Changed
+ - Upgraded formio.js to v3.23.2
+ - Upgraded tenant manager and form manager to latest versions.
+
 ## 7.0.0-beta.16
 ### Fixed
  - Issues with Tagpad and Sketchpad not working.
@@ -52,6 +57,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - CKEditor configurations for TextArea components.
+<<<<<<< HEAD
+=======
+
+## 6.6.0
+### Added 
+ - ActionItem log view added to portal.
+
+## 6.5.2
+### Changed
+ - Fixed issues regarding the tenant manager with pagination and also introduced searching.
+ - Form Manager and Form View pro to use latest renderer.
+ - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
+>>>>>>> 353deee51f5ea0271d5a44404023ad96f0afec22
 
 ## 6.5.1
 ### Fixed
@@ -118,7 +136,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  
 ### Changed
  - Upgraded @babel/core@7.4.4, @babel/preset-env@7.4.4, @progress/kendo-ui@2019.1.424, copy-webpack-plugin@5.0.3, mocha@6.1.4, protractor-helpers@1.1.509, swagger-ui@3.22.1, webpack-cli@3.3.1, formiojs@3.20.4, jquery@3.4.0, node-sass@4.12.0, webdriverio@5.8.0, webpack@4.30.0
->>>>>>> 5730f9b498b1a554c5fc06992cd0cab6f4957538
 
 ## 6.3.6
 ### Changed
