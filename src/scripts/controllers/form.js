@@ -1577,7 +1577,7 @@ app.controller('FormShareController', ['$scope', '$rootScope', function($scope, 
 
   // Method to load the preview.
   var loadPreview = function() {
-    $scope.previewUrl = $rootScope.onPremise ? $scope.projectUrl + '/manage/view/#/' : 'https://formview.io/#/';
+    $scope.previewUrl = $rootScope.onPremise ? $scope.projectUrl + '/manage/view/#/' : 'https://pro.formview.io/#/';
     $scope.previewUrl += $rootScope.onPremise ? 'form/' : $scope.currentProject.name + '/';
     $scope.previewUrl += $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
