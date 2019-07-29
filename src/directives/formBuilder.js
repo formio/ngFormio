@@ -47,14 +47,10 @@ export default angular.module('formio').directive('formBuilder', function() {
           }
           if (builderReady) {
             builderReady.then(() => {
-              if (form !== builder.form) {
-                builder.setForm(form);
-              }
               if ($scope.url) {
                 builder.instance.url = $scope.url;
               }
-              //need to build to enable drag & drop after form loads
-              builder.build();
+              builder.setForm(form);
             });
           }
         });
