@@ -6,6 +6,11 @@
   <label class="control-label">Form Tags</label>
   <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
 </div>
+<div class="checkbox" class="form-group">
+  <label form-builder-tooltip="Check this if you would like to include the Project public configurations in the Form JSON.">
+    <input type="checkbox" ng-model="form.settings.includeConfig"> Include Project Public Configuration
+  </label>
+</div>
 <object-builder data="form.properties" label="Custom Properties" tooltip-text="This allows you to configure any custom properties for this form." />
 <div class="panel panel-info">
   <div class="panel-heading">
