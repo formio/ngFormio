@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.6.3
+### Changed
+ - The configuration that adds the Public Configurations to forms to instead be at the project level for performance reasons.
+
 ## 6.6.2
 ### Added
  - A configuration to the form settings to add the project public configuration to the form JSON.
