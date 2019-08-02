@@ -15608,162 +15608,6 @@ function CustomEvent (type, params) {
 
 /***/ }),
 
-/***/ "./node_modules/deep-equal/index.js":
-/*!******************************************!*\
-  !*** ./node_modules/deep-equal/index.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(/*! ./lib/keys.js */ "./node_modules/deep-equal/lib/keys.js");
-var isArguments = __webpack_require__(/*! ./lib/is_arguments.js */ "./node_modules/deep-equal/lib/is_arguments.js");
-
-var deepEqual = module.exports = function (actual, expected, opts) {
-  if (!opts) opts = {};
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
-
-  } else if (actual instanceof Date && expected instanceof Date) {
-    return actual.getTime() === expected.getTime();
-
-  // 7.3. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if (!actual || !expected || typeof actual != 'object' && typeof expected != 'object') {
-    return opts.strict ? actual === expected : actual == expected;
-
-  // 7.4. For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else {
-    return objEquiv(actual, expected, opts);
-  }
-}
-
-function isUndefinedOrNull(value) {
-  return value === null || value === undefined;
-}
-
-function isBuffer (x) {
-  if (!x || typeof x !== 'object' || typeof x.length !== 'number') return false;
-  if (typeof x.copy !== 'function' || typeof x.slice !== 'function') {
-    return false;
-  }
-  if (x.length > 0 && typeof x[0] !== 'number') return false;
-  return true;
-}
-
-function objEquiv(a, b, opts) {
-  var i, key;
-  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
-    return false;
-  // an identical 'prototype' property.
-  if (a.prototype !== b.prototype) return false;
-  //~~~I've managed to break Object.keys through screwy arguments passing.
-  //   Converting to array solves the problem.
-  if (isArguments(a)) {
-    if (!isArguments(b)) {
-      return false;
-    }
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return deepEqual(a, b, opts);
-  }
-  if (isBuffer(a)) {
-    if (!isBuffer(b)) {
-      return false;
-    }
-    if (a.length !== b.length) return false;
-    for (i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) return false;
-    }
-    return true;
-  }
-  try {
-    var ka = objectKeys(a),
-        kb = objectKeys(b);
-  } catch (e) {//happens when one is a string literal and the other isn't
-    return false;
-  }
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length != kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!deepEqual(a[key], b[key], opts)) return false;
-  }
-  return typeof a === typeof b;
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/deep-equal/lib/is_arguments.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/deep-equal/lib/is_arguments.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-var supportsArgumentsClass = (function(){
-  return Object.prototype.toString.call(arguments)
-})() == '[object Arguments]';
-
-exports = module.exports = supportsArgumentsClass ? supported : unsupported;
-
-exports.supported = supported;
-function supported(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-};
-
-exports.unsupported = unsupported;
-function unsupported(object){
-  return object &&
-    typeof object == 'object' &&
-    typeof object.length == 'number' &&
-    Object.prototype.hasOwnProperty.call(object, 'callee') &&
-    !Object.prototype.propertyIsEnumerable.call(object, 'callee') ||
-    false;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/deep-equal/lib/keys.js":
-/*!*********************************************!*\
-  !*** ./node_modules/deep-equal/lib/keys.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-exports = module.exports = typeof Object.keys === 'function'
-  ? Object.keys : shim;
-
-exports.shim = shim;
-function shim (obj) {
-  var keys = [];
-  for (var key in obj) keys.push(key);
-  return keys;
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/dompurify/dist/purify.js":
 /*!***********************************************!*\
   !*** ./node_modules/dompurify/dist/purify.js ***!
@@ -18586,6 +18430,73 @@ module.exports = dragula;
 
 /***/ }),
 
+/***/ "./node_modules/fast-deep-equal/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/fast-deep-equal/index.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isArray = Array.isArray;
+var keyList = Object.keys;
+var hasProp = Object.prototype.hasOwnProperty;
+
+module.exports = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    var arrA = isArray(a)
+      , arrB = isArray(b)
+      , i
+      , length
+      , key;
+
+    if (arrA && arrB) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+    if (arrA != arrB) return false;
+
+    var dateA = a instanceof Date
+      , dateB = b instanceof Date;
+    if (dateA != dateB) return false;
+    if (dateA && dateB) return a.getTime() == b.getTime();
+
+    var regexpA = a instanceof RegExp
+      , regexpB = b instanceof RegExp;
+    if (regexpA != regexpB) return false;
+    if (regexpA && regexpB) return a.toString() == b.toString();
+
+    var keys = keyList(a);
+    length = keys.length;
+
+    if (length !== keyList(b).length)
+      return false;
+
+    for (i = length; i-- !== 0;)
+      if (!hasProp.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      key = keys[i];
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  return a!==a && b!==b;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/fast-json-patch/lib/core.js":
 /*!**************************************************!*\
   !*** ./node_modules/fast-json-patch/lib/core.js ***!
@@ -18593,11 +18504,8 @@ module.exports = dragula;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var equalsOptions = { strict: true };
-var _equals = __webpack_require__(/*! deep-equal */ "./node_modules/deep-equal/index.js");
-var areEquals = function (a, b) {
-    return _equals(a, b, equalsOptions);
-};
+Object.defineProperty(exports, "__esModule", { value: true });
+var areEquals = __webpack_require__(/*! fast-deep-equal */ "./node_modules/fast-deep-equal/index.js");
 var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
 exports.JsonPatchError = helpers_1.PatchError;
 exports.deepClone = helpers_1._deepClone;
@@ -18655,7 +18563,7 @@ var arrOps = {
         if (helpers_1.isInteger(i)) {
             arr.splice(i, 0, this.value);
         }
-        else {
+        else { // array props
             arr[i] = this.value;
         }
         // this may be needed when using '-' in an array
@@ -18731,9 +18639,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.removed = document; //document we removed
             return returnValue;
         }
-        else if (operation.op === 'move' || operation.op === 'copy') {
+        else if (operation.op === 'move' || operation.op === 'copy') { // it's a move or copy to root
             returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
-            if (operation.op === 'move') {
+            if (operation.op === 'move') { // report removed item
                 returnValue.removed = document;
             }
             return returnValue;
@@ -18746,7 +18654,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.newDocument = document;
             return returnValue;
         }
-        else if (operation.op === 'remove') {
+        else if (operation.op === 'remove') { // a remove on root
             returnValue.removed = document;
             returnValue.newDocument = null;
             return returnValue;
@@ -18755,7 +18663,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             operation.value = document;
             return returnValue;
         }
-        else {
+        else { /* bad operation */
             if (validateOperation) {
                 throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
             }
@@ -18887,7 +18795,7 @@ exports.applyPatch = applyPatch;
  */
 function applyReducer(document, operation, index) {
     var operationResult = applyOperation(document, operation);
-    if (operationResult.test === false) {
+    if (operationResult.test === false) { // failed test
         throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
     }
     return operationResult.newDocument;
@@ -18990,6 +18898,7 @@ exports.validate = validate;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester
@@ -18997,7 +18906,7 @@ exports.validate = validate;
  */
 var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
 var core_1 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
-/* export all core functions */
+/* export all core functions and types */
 var core_2 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
 exports.applyOperation = core_2.applyOperation;
 exports.applyPatch = core_2.applyPatch;
@@ -19012,14 +18921,14 @@ exports.deepClone = helpers_2._deepClone;
 exports.escapePathComponent = helpers_2.escapePathComponent;
 exports.unescapePathComponent = helpers_2.unescapePathComponent;
 var beforeDict = new WeakMap();
-var Mirror = (function () {
+var Mirror = /** @class */ (function () {
     function Mirror(obj) {
         this.observers = new Map();
         this.obj = obj;
     }
     return Mirror;
 }());
-var ObserverInfo = (function () {
+var ObserverInfo = /** @class */ (function () {
     function ObserverInfo(callback, observer) {
         this.callback = callback;
         this.observer = observer;
@@ -19072,21 +18981,12 @@ function observe(obj, callback) {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
-        if (typeof window !== 'undefined') {
-            if (window.addEventListener) {
-                window.addEventListener('mouseup', fastCheck);
-                window.addEventListener('keyup', fastCheck);
-                window.addEventListener('mousedown', fastCheck);
-                window.addEventListener('keydown', fastCheck);
-                window.addEventListener('change', fastCheck);
-            }
-            else {
-                document.documentElement.attachEvent('onmouseup', fastCheck);
-                document.documentElement.attachEvent('onkeyup', fastCheck);
-                document.documentElement.attachEvent('onmousedown', fastCheck);
-                document.documentElement.attachEvent('onkeydown', fastCheck);
-                document.documentElement.attachEvent('onchange', fastCheck);
-            }
+        if (typeof window !== 'undefined') { //not Node
+            window.addEventListener('mouseup', fastCheck);
+            window.addEventListener('keyup', fastCheck);
+            window.addEventListener('mousedown', fastCheck);
+            window.addEventListener('keydown', fastCheck);
+            window.addEventListener('change', fastCheck);
         }
     }
     observer.patches = patches;
@@ -19096,18 +18996,11 @@ function observe(obj, callback) {
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
         if (typeof window !== 'undefined') {
-            if (window.removeEventListener) {
-                window.removeEventListener('mouseup', fastCheck);
-                window.removeEventListener('keyup', fastCheck);
-                window.removeEventListener('mousedown', fastCheck);
-                window.removeEventListener('keydown', fastCheck);
-            }
-            else {
-                document.documentElement.detachEvent('onmouseup', fastCheck);
-                document.documentElement.detachEvent('onkeyup', fastCheck);
-                document.documentElement.detachEvent('onmousedown', fastCheck);
-                document.documentElement.detachEvent('onkeydown', fastCheck);
-            }
+            window.removeEventListener('mouseup', fastCheck);
+            window.removeEventListener('keyup', fastCheck);
+            window.removeEventListener('mousedown', fastCheck);
+            window.removeEventListener('keydown', fastCheck);
+            window.removeEventListener('change', fastCheck);
         }
     };
     mirror.observers.set(callback, new ObserverInfo(callback, observer));
@@ -19117,9 +19010,10 @@ exports.observe = observe;
 /**
  * Generate an array of patches from an observer
  */
-function generate(observer) {
+function generate(observer, invertible) {
+    if (invertible === void 0) { invertible = false; }
     var mirror = beforeDict.get(observer.object);
-    _generate(mirror.value, observer.object, observer.patches, "");
+    _generate(mirror.value, observer.object, observer.patches, "", invertible);
     if (observer.patches.length) {
         core_1.applyPatch(mirror.value, observer.patches);
     }
@@ -19134,7 +19028,7 @@ function generate(observer) {
 }
 exports.generate = generate;
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path) {
+function _generate(mirror, obj, patches, path, invertible) {
     if (obj === mirror) {
         return;
     }
@@ -19152,20 +19046,29 @@ function _generate(mirror, obj, patches, path) {
         if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
+                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key), invertible);
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
+                    if (invertible) {
+                        patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+                    }
                     patches.push({ op: "replace", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(newVal) });
                 }
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
+            if (invertible) {
+                patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+            }
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
         }
         else {
+            if (invertible) {
+                patches.push({ op: "test", path: path, value: mirror });
+            }
             patches.push({ op: "replace", path: path, value: obj });
             changed = true;
         }
@@ -19183,9 +19086,10 @@ function _generate(mirror, obj, patches, path) {
 /**
  * Create an array of patches from the differences in two objects
  */
-function compare(tree1, tree2) {
+function compare(tree1, tree2, invertible) {
+    if (invertible === void 0) { invertible = false; }
     var patches = [];
-    _generate(tree1, tree2, patches, '');
+    _generate(tree1, tree2, patches, '', invertible);
     return patches;
 }
 exports.compare = compare;
@@ -19205,11 +19109,20 @@ exports.compare = compare;
  * (c) 2017 Joachim Wester
  * MIT license
  */
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -19356,15 +19269,18 @@ function patchErrorMessageFormatter(message, args) {
     }
     return messageParts.join('\n');
 }
-var PatchError = (function (_super) {
+var PatchError = /** @class */ (function (_super) {
     __extends(PatchError, _super);
     function PatchError(message, name, index, operation, tree) {
-        _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree }));
-        this.name = name;
-        this.index = index;
-        this.operation = operation;
-        this.tree = tree;
-        this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
+        _this.name = name;
+        _this.index = index;
+        _this.operation = operation;
+        _this.tree = tree;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
+        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        return _this;
     }
     return PatchError;
 }(Error));
@@ -23566,12 +23482,29 @@ function (_Element) {
      * @returns {*}
      */
     value: function sanitize(dirty) {
-      return (0, _dompurify.sanitize)(dirty, {
+      // Dompurify configuration
+      var sanitizeOptions = {
         ADD_ATTR: ['ref'],
         USE_PROFILES: {
           html: true
         }
-      });
+      }; // Allow tags
+
+      if (this.options.sanitizeConfig && Array.isArray(this.options.sanitizeConfig.allowedTags) && this.options.sanitizeConfig.allowedTags.length > 0) {
+        sanitizeOptions.ALLOWED_TAGS = this.options.sanitizeConfig.allowedTags;
+      } // Allow attributes
+
+
+      if (this.options.sanitizeConfig && Array.isArray(this.options.sanitizeConfig.allowedAttrs) && this.options.sanitizeConfig.allowedAttrs.length > 0) {
+        sanitizeOptions.ALLOWED_ATTR = this.options.sanitizeConfig.allowedAttrs;
+      } // Allowd URI Regex
+
+
+      if (this.options.sanitizeConfig && this.options.sanitizeConfig.allowedUriRegex) {
+        sanitizeOptions.ALLOWED_URI_REGEXP = this.options.sanitizeConfig.allowedUriRegex;
+      }
+
+      return (0, _dompurify.sanitize)(dirty, sanitizeOptions);
     }
   }, {
     key: "setContent",
@@ -27284,7 +27217,9 @@ function (_NestedComponent) {
       this.addComponents();
       this.isBuilt = true;
       this.on('submitButton', function (options) {
-        return _this10.submit(false, options);
+        _this10.submit(false, options).catch(function (e) {
+          return e !== false && console.log(e);
+        });
       }, true);
       this.on('checkValidity', function (data) {
         return _this10.checkValidity(null, true, data);
@@ -27547,7 +27482,15 @@ function (_NestedComponent) {
       }
 
       this.submitting = false;
-      this.setPristine(false);
+      this.setPristine(false); // Allow for silent cancellations (no error message, no submit button error state)
+
+      if (error && error.silent) {
+        this.emit('change', {
+          isValid: true
+        });
+        return false;
+      }
+
       return this.showErrors(error, true);
     }
     /**
@@ -31112,7 +31055,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var CKEDITOR = 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/v12.2.0-formio.2/build/ckeditor.js';
+var CKEDITOR = 'https://cdn.form.io/ckeditor/12.2.0/ckeditor.js';
 /**
  * This is the Component class which all elements within the FormioForm derive from.
  */
@@ -31844,7 +31787,7 @@ function (_Element) {
       element = element || this.element;
       this.empty(element);
       this.setContent(element, this.render());
-      this.attach(element);
+      return this.attach(element);
     }
   }, {
     key: "render",
@@ -32087,9 +32030,11 @@ function (_Element) {
       });
       dialog.refs.dialogContents.appendChild(element);
       document.body.appendChild(dialog);
+      document.body.classList.add('modal-open');
 
       dialog.close = function () {
-        return dialog.dispatchEvent(new CustomEvent('close'));
+        document.body.classList.remove('modal-open');
+        dialog.dispatchEvent(new CustomEvent('close'));
       };
 
       this.addEventListener(dialog, 'close', function () {
@@ -32499,6 +32444,10 @@ function (_Element) {
     value: function addCKE(element, settings, onChange) {
       settings = _lodash.default.isEmpty(settings) ? {} : settings;
       settings.base64Upload = true;
+      settings.image = {
+        toolbar: ['imageTextAlternative', '|', 'imageStyle:alignLeft', 'imageStyle:alignCenter', 'imageStyle:full', 'imageStyle:alignRight'],
+        styles: ['full', 'side', 'alignLeft', 'alignCenter', 'alignRight']
+      };
       return _Formio.default.requireLibrary('ckeditor', 'ClassicEditor', CKEDITOR, true).then(function () {
         if (!element.parentNode) {
           return _nativePromiseOnly.default.reject();
@@ -35010,6 +34959,18 @@ function (_Multivalue) {
 
       this.addEventListener(element, this.inputInfo.changeEvent, function () {
         // Delay update slightly to give input mask a chance to run.
+        var textCase = _lodash.default.get(_this2.component, 'case', 'mixed');
+
+        if (textCase !== 'mixed') {
+          if (textCase === 'uppercase' && element.value) {
+            element.value = element.value.toUpperCase();
+          }
+
+          if (textCase === 'lowercase' && element.value) {
+            element.value = element.value.toLowerCase();
+          }
+        }
+
         setTimeout(function () {
           return _this2.updateValue(null, {
             modified: true
@@ -35327,7 +35288,7 @@ function (_Field) {
     value: function attach(dom) {
       var _this = this;
 
-      _get(_getPrototypeOf(Multivalue.prototype), "attach", this).call(this, dom);
+      var superAttach = _get(_getPrototypeOf(Multivalue.prototype), "attach", this).call(this, dom);
 
       this.loadRefs(dom, {
         addButton: 'multiple',
@@ -35355,6 +35316,7 @@ function (_Field) {
           _this.addValue();
         });
       });
+      return superAttach;
     }
     /**
      * Adds a new empty value to the data array.
@@ -35787,6 +35749,7 @@ function (_Field) {
     value: function init() {
       this.components = this.components || [];
       this.addComponents();
+      return _get(_getPrototypeOf(NestedComponent.prototype), "init", this).call(this);
     }
     /**
      *
@@ -37472,7 +37435,7 @@ function (_Field) {
         buttonMessage: 'single'
       });
 
-      _get(_getPrototypeOf(ButtonComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(ButtonComponent.prototype), "attach", this).call(this, element);
 
       if (!this.refs.button) {
         return;
@@ -37591,6 +37554,8 @@ function (_Field) {
           this.openOauth();
         }
       }
+
+      return superAttach;
     }
     /* eslint-enable max-statements */
 
@@ -38343,7 +38308,7 @@ function (_Field) {
         this.addShortcut(this.input);
       }
 
-      _get(_getPrototypeOf(CheckBoxComponent.prototype), "attach", this).call(this, element);
+      return _get(_getPrototypeOf(CheckBoxComponent.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "detach",
@@ -38922,11 +38887,12 @@ function (_NestedComponent) {
 
       this.loadRefs(element, _defineProperty({}, this.columnKey, 'multiple'));
 
-      _get(_getPrototypeOf(ColumnsComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(ColumnsComponent.prototype), "attach", this).call(this, element);
 
       this.refs[this.columnKey].forEach(function (column, index) {
         return _this4.attachComponents(column, _this4.columns[index], _this4.component.columns[index].components);
       });
+      return superAttach;
     }
   }, {
     key: "justifyRow",
@@ -39569,7 +39535,7 @@ function (_Component) {
         }, true);
       }
 
-      _get(_getPrototypeOf(ContentComponent.prototype), "attach", this).call(this, element);
+      return _get(_getPrototypeOf(ContentComponent.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "defaultSchema",
@@ -41042,8 +41008,7 @@ function (_NestedComponent) {
           }
         });
       });
-
-      _get(_getPrototypeOf(DataGridComponent.prototype), "attach", this).call(this, element);
+      return _get(_getPrototypeOf(DataGridComponent.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "onReorder",
@@ -42759,7 +42724,7 @@ function (_Field) {
         input: 'multiple'
       });
 
-      _get(_getPrototypeOf(DayComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(DayComponent.prototype), "attach", this).call(this, element);
 
       this.addEventListener(this.refs.day, 'change', function () {
         return _this2.updateValue(null, {
@@ -42794,6 +42759,7 @@ function (_Field) {
         });
       });
       this.setValue(this.dataValue);
+      return superAttach;
     }
   }, {
     key: "validateRequired",
@@ -43913,7 +43879,7 @@ function (_NestedComponent) {
         this.removeClass(this.refs.component, "formio-component-".concat(this.component.type, "-row-open"));
       }
 
-      _get(_getPrototypeOf(EditGridComponent.prototype), "attach", this).call(this, element);
+      return _get(_getPrototypeOf(EditGridComponent.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "renderRow",
@@ -45307,7 +45273,7 @@ function (_Field) {
         fileImage: 'multiple'
       });
 
-      _get(_getPrototypeOf(FileComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(FileComponent.prototype), "attach", this).call(this, element);
 
       if (this.refs.fileDrop) {
         var _element = this;
@@ -45453,6 +45419,8 @@ function (_Field) {
           });
         }
       }
+
+      return superAttach;
     }
     /* eslint-disable max-len */
 
@@ -47399,7 +47367,7 @@ function (_Component) {
         }, true);
       }
 
-      _get(_getPrototypeOf(HTMLComponent.prototype), "attach", this).call(this, element);
+      return _get(_getPrototypeOf(HTMLComponent.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "defaultSchema",
@@ -49298,8 +49266,7 @@ function (_Field) {
 
         _this.addShortcut(input, _this.component.values[index].shortcut);
       });
-
-      _get(_getPrototypeOf(RadioComponent.prototype), "attach", this).call(this, element);
+      return _get(_getPrototypeOf(RadioComponent.prototype), "attach", this).call(this, element);
     }
   }, {
     key: "detach",
@@ -50399,7 +50366,7 @@ function (_Field) {
 
       this.selectOptions = [];
 
-      if (this.isSelectResource) {
+      if (this.isInfiniteScrollProvided) {
         this.isFromSearch = false;
         this.searchServerCount = null;
         this.defaultServerCount = null;
@@ -50516,6 +50483,16 @@ function (_Field) {
 
       return false;
     }
+  }, {
+    key: "disableInfiniteScroll",
+    value: function disableInfiniteScroll() {
+      if (!this.downloadedResources) {
+        return;
+      }
+
+      this.downloadedResources.serverCount = this.downloadedResources.length;
+      this.serverCount = this.downloadedResources.length;
+    }
     /* eslint-disable max-statements */
 
   }, {
@@ -50554,15 +50531,30 @@ function (_Field) {
         items = _lodash.default.get(items, this.component.selectValues);
       }
 
-      if (this.isSelectResource && items.serverCount) {
-        this.serverCount = items.serverCount;
+      var areItemsEqual;
+
+      if (this.isInfiniteScrollProvided) {
+        areItemsEqual = this.isSelectURL ? _lodash.default.isEqual(items, this.downloadedResources) : false;
+        var areItemsEnded = this.component.limit > items.length;
+        var areItemsDownloaded = areItemsEqual && this.downloadedResources && this.downloadedResources.length === items.length;
+
+        if (areItemsEnded) {
+          this.disableInfiniteScroll();
+        } else if (areItemsDownloaded) {
+          this.selectOptions = [];
+        } else {
+          this.serverCount = items.serverCount;
+        }
       }
 
-      if (this.isScrollLoading) {
-        this.downloadedResources = this.downloadedResources.concat(items);
+      if (this.isScrollLoading && items) {
+        if (!areItemsEqual) {
+          this.downloadedResources = this.downloadedResources ? this.downloadedResources.concat(items) : items;
+        }
+
         this.downloadedResources.serverCount = items.serverCount || this.downloadedResources.serverCount;
       } else {
-        this.downloadedResources = items;
+        this.downloadedResources = items || [];
         this.selectOptions = [];
       } // Add the value options.
 
@@ -50644,9 +50636,9 @@ function (_Field) {
 
       if (this.component.searchField && search) {
         if (Array.isArray(search)) {
-          query["".concat(this.component.searchField, "__in")] = search.join(',');
+          query["".concat(this.component.searchField)] = search.join(',');
         } else {
-          query["".concat(this.component.searchField, "__regex")] = search;
+          query["".concat(this.component.searchField)] = search;
         }
       } // If they wish to return only some fields.
 
@@ -50681,11 +50673,10 @@ function (_Field) {
 
         _this3.setItems(response, !!search);
       }).catch(function (err) {
-        if (_this3.isSelectResource) {
-          _this3.downloadedResources.serverCount = _this3.downloadedResources.length;
-          _this3.serverCount = _this3.downloadedResources.length;
-
+        if (_this3.isInfiniteScrollProvided) {
           _this3.setItems([]);
+
+          _this3.disableInfiniteScroll();
         }
 
         _this3.isScrollLoading = false;
@@ -50942,7 +50933,7 @@ function (_Field) {
     value: function attach(element) {
       var _this5 = this;
 
-      _get(_getPrototypeOf(SelectComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(SelectComponent.prototype), "attach", this).call(this, element);
 
       this.loadRefs(element, {
         selectContainer: 'single',
@@ -51043,7 +51034,7 @@ function (_Field) {
         }
       }
 
-      if (this.isSelectResource) {
+      if (this.isInfiniteScrollProvided) {
         this.scrollList = this.choices.choiceList.element;
 
         this.onScroll = function () {
@@ -51149,6 +51140,7 @@ function (_Field) {
 
       this.disabled = this.disabled;
       this.triggerUpdate();
+      return superAttach;
     }
     /* eslint-enable max-statements */
 
@@ -51496,6 +51488,16 @@ function (_Field) {
     key: "isSelectResource",
     get: function get() {
       return this.component.dataSrc === 'resource';
+    }
+  }, {
+    key: "isSelectURL",
+    get: function get() {
+      return this.component.dataSrc === 'url';
+    }
+  }, {
+    key: "isInfiniteScrollProvided",
+    get: function get() {
+      return this.isSelectResource || this.isSelectURL;
     }
   }, {
     key: "requestHeaders",
@@ -52943,7 +52945,7 @@ function (_Input) {
         signatureImage: 'single'
       });
 
-      _get(_getPrototypeOf(SignatureComponent.prototype), "attach", this).call(this, element); // Create the signature pad.
+      var superAttach = _get(_getPrototypeOf(SignatureComponent.prototype), "attach", this).call(this, element); // Create the signature pad.
 
 
       if (this.refs.canvas) {
@@ -52986,6 +52988,7 @@ function (_Input) {
         _this.setValue(_this.defaultValue);
       });
       this.setValue(this.dataValue);
+      return superAttach;
     }
     /* eslint-enable max-statements */
 
@@ -54763,7 +54766,7 @@ function (_Field) {
         input: 'multiple'
       });
 
-      _get(_getPrototypeOf(SurveyComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(SurveyComponent.prototype), "attach", this).call(this, element);
 
       this.refs.input.forEach(function (input) {
         _this.addEventListener(input, 'change', function () {
@@ -54773,6 +54776,7 @@ function (_Field) {
         });
       });
       this.setValue(this.dataValue);
+      return superAttach;
     }
   }, {
     key: "setValue",
@@ -55312,13 +55316,14 @@ function (_NestedComponent) {
       }, {});
       this.loadRefs(element, keys);
 
-      _get(_getPrototypeOf(TableComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(TableComponent.prototype), "attach", this).call(this, element);
 
       this.table.forEach(function (row, rowIndex) {
         row.forEach(function (column, columnIndex) {
           _this5.attachComponents(_this5.refs["".concat(_this5.tableKey, "-").concat(rowIndex)][columnIndex], _this5.table[rowIndex][columnIndex], _this5.component.rows[rowIndex][columnIndex].components);
         });
       });
+      return superAttach;
     }
   }, {
     key: "destroy",
@@ -55545,9 +55550,12 @@ function (_NestedComponent) {
     get: function get() {
       var _this2 = this;
 
-      var schema = _get(_getPrototypeOf(TabsComponent.prototype), "schema", this);
+      var schema = _get(_getPrototypeOf(TabsComponent.prototype), "schema", this); // We need to clone this because the builder uses the "components" reference and this would reset that reference.
 
-      schema.components = this.component.components.map(function (tab, index) {
+
+      var components = _lodash.default.cloneDeep(this.component.components);
+
+      schema.components = components.map(function (tab, index) {
         if (index === _this2.currentTab) {
           tab.components = _this2.getComponents().map(function (component) {
             return component.schema;
@@ -55669,7 +55677,7 @@ function (_NestedComponent) {
 
       this.loadRefs(element, (_this$loadRefs = {}, _defineProperty(_this$loadRefs, this.tabLinkKey, 'multiple'), _defineProperty(_this$loadRefs, this.tabKey, 'multiple'), _defineProperty(_this$loadRefs, this.tabLikey, 'multiple'), _this$loadRefs));
 
-      _get(_getPrototypeOf(TabsComponent.prototype), "attach", this).call(this, element);
+      var superAttach = _get(_getPrototypeOf(TabsComponent.prototype), "attach", this).call(this, element);
 
       this.refs[this.tabLinkKey].forEach(function (tabLink, index) {
         _this5.addEventListener(tabLink, 'click', function (event) {
@@ -55681,6 +55689,7 @@ function (_NestedComponent) {
       this.refs[this.tabKey].forEach(function (tab, index) {
         _this5.attachComponents(tab, _this5.tabs[index], _this5.component.components[index].components);
       });
+      return superAttach;
     }
   }, {
     key: "detach",
@@ -57542,7 +57551,7 @@ function (_TextFieldComponent) {
         });
       };
 
-      var update = function update() {
+      var update = _lodash.default.debounce(function () {
         resize();
         var styleHeight = Math.round(parseFloat(textarea.style.height));
         var computed = window.getComputedStyle(textarea, null);
@@ -57561,7 +57570,7 @@ function (_TextFieldComponent) {
           previousHeight = currentHeight;
           update();
         }
-      };
+      }, 200);
 
       var computedStyle = window.getComputedStyle(textarea, null);
       textarea.style.resize = 'none';
@@ -57572,6 +57581,7 @@ function (_TextFieldComponent) {
       }
 
       this.addEventListener(textarea, 'input', update);
+      this.on('initialized', update);
       this.updateSize = update;
       update();
     }
@@ -58367,6 +58377,23 @@ var _default = [{
   },
   defaultValue: 'plain',
   input: true
+}, {
+  weight: 200,
+  type: 'radio',
+  label: 'Text Case',
+  key: 'case',
+  tooltip: 'When data is entered, you can change the case of the value.',
+  input: true,
+  values: [{
+    value: 'mixed',
+    label: 'Mixed (Allow upper and lower case)'
+  }, {
+    value: 'uppercase',
+    label: 'Uppercase'
+  }, {
+    value: 'lowercase',
+    label: 'Lowercase'
+  }]
 }];
 exports.default = _default;
 
@@ -58427,6 +58454,8 @@ var _default = [{
   type: 'textarea',
   key: 'widget',
   label: 'Widget Settings',
+  clearOnHide: false,
+  refreshOn: 'widget.type',
   calculateValue: function calculateValue(context) {
     if (_lodash.default.isEmpty(_lodash.default.omit(context.data.widget, 'type'))) {
       var settings = {};
@@ -58435,7 +58464,9 @@ var _default = [{
         settings = _widgets.default[context.data.widget.type].defaultSettings;
       }
 
-      return settings;
+      if (settings) {
+        return settings;
+      }
     }
 
     return context.data.widget;
@@ -58446,9 +58477,9 @@ var _default = [{
   as: 'json',
   conditional: {
     json: {
-      '!!': {
+      '===': [{
         var: 'data.widget.type'
-      }
+      }, 'calendar']
     }
   }
 }, {
@@ -91017,7 +91048,7 @@ function (_InputWidget) {
     value: function attach(input) {
       var _this3 = this;
 
-      _get(_getPrototypeOf(CalendarWidget.prototype), "attach", this).call(this, input);
+      var superAttach = _get(_getPrototypeOf(CalendarWidget.prototype), "attach", this).call(this, input);
 
       if (input && !input.getAttribute('placeholder')) {
         input.setAttribute('placeholder', this.settings.format);
@@ -91068,6 +91099,8 @@ function (_InputWidget) {
           return _this3.calendar.setDate(_this3.calendar._input.value, true, _this3.settings.altFormat);
         });
       }
+
+      return superAttach;
     }
   }, {
     key: "addSuffix",
@@ -91292,21 +91325,23 @@ var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_m
 
 var _Element2 = _interopRequireDefault(__webpack_require__(/*! ../Element */ "./node_modules/formiojs/Element.js"));
 
+var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
@@ -91316,6 +91351,15 @@ var InputWidget =
 /*#__PURE__*/
 function (_Element) {
   _inherits(InputWidget, _Element);
+
+  _createClass(InputWidget, null, [{
+    key: "defaultSettings",
+    get: function get() {
+      return {
+        type: 'input'
+      };
+    }
+  }]);
 
   function InputWidget(settings, component) {
     var _this;
@@ -91333,6 +91377,7 @@ function (_Element) {
     key: "attach",
     value: function attach(input) {
       this._input = input;
+      return _nativePromiseOnly.default.resolve();
     }
   }, {
     key: "getValue",
@@ -93124,7 +93169,7 @@ function get() {
     returnObjects: false,
     joinArrays: false,
     // or string to join array
-    returnedObjectHandler: function returnedObjectHandler() {},
+    returnedObjectHandler: false,
     // function(key, value, options) triggered if key returns object but returnObjects is set to false
     parseMissingKeyHandler: false,
     // function(key) parsed a key that was not found in t() before returning
