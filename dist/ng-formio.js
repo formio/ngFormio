@@ -31879,6 +31879,7 @@ function (_Element) {
   }, {
     key: "detach",
     value: function detach() {
+      this.refs = {};
       this.removeEventListeners();
 
       if (this.tooltip) {
@@ -33097,7 +33098,6 @@ function (_Element) {
     key: "clear",
     value: function clear() {
       this.detach();
-      this.refs = {};
       this.empty(this.getElement());
     }
   }, {
@@ -43591,6 +43591,8 @@ var _EditGridEdit2 = _interopRequireDefault(__webpack_require__(/*! ./editForm/E
 
 var _EditGridEdit3 = _interopRequireDefault(__webpack_require__(/*! ./editForm/EditGrid.edit.templates */ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.templates.js"));
 
+var _EditGridEdit4 = _interopRequireDefault(__webpack_require__(/*! ./editForm/EditGrid.edit.validation */ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.validation.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _default() {
@@ -43609,6 +43611,9 @@ function _default() {
   }, {
     key: 'data',
     components: _EditGridEdit.default
+  }, {
+    key: 'validation',
+    components: _EditGridEdit4.default
   }]].concat(extend));
 }
 
@@ -43717,6 +43722,11 @@ function (_NestedComponent) {
     get: function get() {
       return "editgrid-".concat(this.key);
     }
+  }, {
+    key: "minLength",
+    get: function get() {
+      return _lodash.default.get(this.component, 'validate.minLength', 0);
+    }
   }], [{
     key: "schema",
     value: function schema() {
@@ -43761,7 +43771,7 @@ function (_NestedComponent) {
   }, {
     key: "defaultRowTemplate",
     get: function get() {
-      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">\n      {{ getView(component, row[component.key]) }}\n    </div>\n  {% }) %}\n  {% if (!instance.options.readOnly) { %}\n    <div class=\"col-sm-2\">\n      <div class=\"btn-group pull-right\">\n        <button class=\"btn btn-default btn-sm editRow\">Edit</button>\n        <button class=\"btn btn-danger btn-sm removeRow\">Delete</button>\n      </div>\n    </div>\n  {% } %}\n</div>";
+      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">\n      {{ getView(component, row[component.key]) }}\n    </div>\n  {% }) %}\n\n  {% if (!instance.options.readOnly && !instance.originalComponent.disabled) { %}\n    <div class=\"col-sm-2\">\n      <div class=\"btn-group pull-right\">\n        <button class=\"btn btn-default btn-sm editRow\">Edit</button>\n        {% if (instance.hasRemoveButtons()) { %}\n          <button class=\"btn btn-danger btn-sm removeRow\">Delete</button>\n        {% } %}\n      </div>\n    </div>\n  {% } %}\n</div>";
     }
   }]);
 
@@ -43777,12 +43787,24 @@ function (_NestedComponent) {
     }
 
     _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(EditGridComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
-    _this.type = 'editgrid';
-    _this.editRows = [];
+    _this.type = 'editgrid'; // this.editRows = [];
+
     return _this;
   }
 
   _createClass(EditGridComponent, [{
+    key: "hasAddButton",
+    value: function hasAddButton() {
+      var maxLength = _lodash.default.get(this.component, 'validate.maxLength');
+
+      return !this.component.disableAddingRemovingRows && !this.disabled && this.fullMode && !this.options.preview && (!maxLength || this.editRows.length < maxLength);
+    }
+  }, {
+    key: "hasRemoveButtons",
+    value: function hasRemoveButtons() {
+      return !this.component.disableAddingRemovingRows && !this.disabled && this.fullMode && this.dataValue.length > _lodash.default.get(this.component, 'validate.minLength', 0);
+    }
+  }, {
     key: "init",
     value: function init() {
       var _this2 = this;
@@ -43827,7 +43849,9 @@ function (_NestedComponent) {
         }),
         errors: this.editRows.map(function (row) {
           return row.error;
-        })
+        }),
+        hasAddButton: this.hasAddButton(),
+        hasRemoveButtons: this.hasRemoveButtons()
       }));
     }
   }, {
@@ -44267,6 +44291,7 @@ function (_NestedComponent) {
       var _this9 = this;
 
       if (!value) {
+        this.dataValue = this.defaultValue;
         return;
       }
 
@@ -44339,7 +44364,13 @@ function (_NestedComponent) {
     get: function get() {
       var value = _get(_getPrototypeOf(EditGridComponent.prototype), "defaultValue", this);
 
-      return Array.isArray(value) ? value : [];
+      var defaultValue = Array.isArray(value) ? value : [];
+
+      for (var dIndex = defaultValue.length; dIndex < this.minLength; dIndex++) {
+        defaultValue.push({});
+      }
+
+      return defaultValue;
     }
   }]);
 
@@ -44401,6 +44432,15 @@ exports.default = void 0;
 var _default = [{
   key: 'placeholder',
   ignore: true
+}, {
+  type: 'checkbox',
+  label: 'Disable Adding / Removing Rows',
+  key: 'disableAddingRemovingRows',
+  tooltip: 'Check if you want to hide Add Another button and Remove Row button',
+  weight: 405,
+  input: true,
+  clearOnHide: false,
+  calculateValue: 'value = data.disableAddingRemovingRows;'
 }];
 exports.default = _default;
 
@@ -44481,6 +44521,41 @@ var _default = [{
   label: 'Remove Row Text',
   placeholder: 'Remove',
   tooltip: 'Set the text of the remove Row button.'
+}];
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.validation.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/formiojs/components/editgrid/editForm/EditGrid.edit.validation.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var _default = [{
+  weight: 110,
+  key: 'validate.minLength',
+  label: 'Minimum Length',
+  placeholder: 'Minimum Length',
+  type: 'number',
+  tooltip: 'The minimum length requirement this field must meet.',
+  input: true
+}, {
+  weight: 120,
+  key: 'validate.maxLength',
+  label: 'Maximum Length',
+  placeholder: 'Maximum Length',
+  type: 'number',
+  tooltip: 'The maximum length requirement this field must meet.',
+  input: true
 }];
 exports.default = _default;
 
@@ -85395,7 +85470,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<ul class=\"editgrid-listgroup list-group\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.bordered ? 'table-bordered' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \">\n  {% if (header) { %}\n  <li class=\"list-group-item list-group-header\">\n    {{header}}\n  </li>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <li class=\"list-group-item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"btn btn-primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"btn btn-danger\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </li>\n  {% }) %}\n  {% if (footer) { %}\n  <li class=\"list-group-item list-group-footer\">\n    {{footer}}\n  </li>\n  {% } %}\n</ul>\n{% if (!readOnly) { %}\n<button class=\"btn btn-primary\" ref=\"{{editgridKey}}-addRow\">\n  <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n</button>\n{% } %}\n";
+var form = "<ul class=\"editgrid-listgroup list-group\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.bordered ? 'table-bordered' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \">\n  {% if (header) { %}\n  <li class=\"list-group-item list-group-header\">\n    {{header}}\n  </li>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <li class=\"list-group-item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"btn btn-primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"btn btn-danger\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </li>\n  {% }) %}\n  {% if (footer) { %}\n  <li class=\"list-group-item list-group-footer\">\n    {{footer}}\n  </li>\n  {% } %}\n</ul>\n{% if (!readOnly && hasAddButton) { %}\n<button class=\"btn btn-primary\" ref=\"{{editgridKey}}-addRow\">\n  <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n</button>\n{% } %}\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<ul class=\"editgrid-listgroup list-group\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.bordered ? 'table-bordered' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \">\n  {% if (header) { %}\n  <li class=\"list-group-item list-group-header\">\n    {{header}}\n  </li>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <li class=\"list-group-item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"btn btn-primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"btn btn-danger\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </li>\n  {% }) %}\n  {% if (footer) { %}\n  <li class=\"list-group-item list-group-footer\">\n    {{footer}}\n  </li>\n  {% } %}\n</ul>\n";
@@ -86744,7 +86819,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<ul class=\"editgrid-listgroup list-group\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.bordered ? 'table-bordered' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-condensed' : ''}}\n    \">\n  {% if (header) { %}\n  <li class=\"list-group-item list-group-header\">\n    {{header}}\n  </li>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <li class=\"list-group-item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"btn btn-primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"btn btn-danger\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </li>\n  {% }) %}\n  {% if (footer) { %}\n  <li class=\"list-group-item list-group-footer\">\n    {{footer}}\n  </li>\n  {% } %}\n</ul>\n{% if (!readOnly) { %}\n<button class=\"btn btn-primary formio-button-add-another\" ref=\"{{editgridKey}}-addRow\">\n  <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n</button>\n{% } %}\n";
+var form = "<ul class=\"editgrid-listgroup list-group\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.bordered ? 'table-bordered' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-condensed' : ''}}\n    \">\n  {% if (header) { %}\n  <li class=\"list-group-item list-group-header\">\n    {{header}}\n  </li>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <li class=\"list-group-item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"btn btn-primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"btn btn-danger\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </li>\n  {% }) %}\n  {% if (footer) { %}\n  <li class=\"list-group-item list-group-footer\">\n    {{footer}}\n  </li>\n  {% } %}\n</ul>\n{% if (!readOnly && hasAddButton) { %}\n<button class=\"btn btn-primary formio-button-add-another\" ref=\"{{editgridKey}}-addRow\">\n  <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n</button>\n{% } %}\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<ul class=\"editgrid-listgroup list-group\n    {{ component.striped ? 'table-striped' : ''}}\n    {{ component.bordered ? 'table-bordered' : ''}}\n    {{ component.hover ? 'table-hover' : ''}}\n    {{ component.condensed ? 'table-sm' : ''}}\n    \">\n  {% if (header) { %}\n  <li class=\"list-group-item list-group-header\">\n    {{header}}\n  </li>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <li class=\"list-group-item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"btn btn-primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"btn btn-danger\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </li>\n  {% }) %}\n  {% if (footer) { %}\n  <li class=\"list-group-item list-group-footer\">\n    {{footer}}\n  </li>\n  {% } %}\n</ul>\n";
@@ -87852,7 +87927,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 /* babel-plugin-inline-import './form.hbs' */
-var form = "<div class=\"editgrid-listgroup ui celled list\">\n  {% if (header) { %}\n  <div class=\"item list-group-header\">\n    {{header}}\n  </div>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <div class=\"item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"ui button primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"ui button secondary\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n  {% if (footer) { %}\n  <div class=\"item list-group-footer\">\n    {{footer}}\n  </div>\n  {% } %}\n</div>\n{% if (!readOnly) { %}\n<button class=\"ui button primary\" ref=\"{{editgridKey}}-addRow\">\n  <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n</button>\n{% } %}\n";
+var form = "<div class=\"editgrid-listgroup ui celled list\">\n  {% if (header) { %}\n  <div class=\"item list-group-header\">\n    {{header}}\n  </div>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <div class=\"item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"ui button primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"ui button secondary\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n  {% if (footer) { %}\n  <div class=\"item list-group-footer\">\n    {{footer}}\n  </div>\n  {% } %}\n</div>\n{% if (!readOnly && hasAddButton) { %}\n<button class=\"ui button primary\" ref=\"{{editgridKey}}-addRow\">\n  <i class=\"{{iconClass('plus')}}\"></i> {{t(component.addAnother || 'Add Another')}}\n</button>\n{% } %}\n";
 
 /* babel-plugin-inline-import './html.hbs' */
 var html = "<div class=\"editgrid-listgroup ui celled list\">\n  {% if (header) { %}\n  <div class=\"item list-group-header\">\n    {{header}}\n  </div>\n  {% } %}\n  {% rows.forEach(function(row, rowIndex) { %}\n  <div class=\"item\" ref=\"{{editgridKey}}\">\n    {{row}}\n    {% if (openRows[rowIndex] && !readOnly) { %}\n    <div class=\"editgrid-actions\">\n      <button class=\"ui button primary\" ref=\"{{editgridKey}}-saveRow\">{{t(component.saveRow || 'Save')}}</button>\n      {% if (component.removeRow) { %}\n      <button class=\"ui button secondary\" ref=\"{{editgridKey}}-cancelRow\">{{t(component.removeRow || 'Cancel')}}</button>\n      {% } %}\n    </div>\n    {% } %}\n    <div class=\"has-error\">\n      <div class=\"editgrid-row-error help-block\">\n        {{errors[rowIndex]}}\n      </div>\n    </div>\n  </div>\n  {% }) %}\n  {% if (footer) { %}\n  <div class=\"item list-group-footer\">\n    {{footer}}\n  </div>\n  {% } %}\n</div>\n";
