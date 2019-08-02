@@ -2,7 +2,7 @@
 <hr></hr>
 <div class="row">
   <div class="col col-sm-8">
-    <div class="checkbox">
+    <div class="checkbox" class="form-group">
       <label>
         <input type="checkbox" ng-model="currentProject.settings.allowConfig">
         Enable Public Configurations
@@ -10,6 +10,11 @@
     </div>
     <p>These are <strong>Public</strong> configurations that will be available at the following endpoint</p>
     <pre>{{ projectUrl }}/config.json</pre>
+    <div ng-if="currentProject.settings.allowConfig" class="checkbox" class="form-group">
+      <label form-builder-tooltip="Check this if you would like to include this to all Form JSON schemas.">
+        <input type="checkbox" ng-model="currentProject.settings.addConfigToForms"> Add Public Configuration to Forms schema.
+      </label>
+    </div>
     <div ng-if="currentProject.settings.allowConfig">
       <div class="alert alert-warning">
         <strong>Do not put any private information within these settings as they are available to the public.</strong>
