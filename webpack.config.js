@@ -18,12 +18,9 @@ module.exports = {
       chunkFilename: "[id].css"
     }),
     new CopyWebpackPlugin([
-      {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'}
-    ]),
-    new CopyWebpackPlugin([
-      {from: 'node_modules/formio-tenant/dist', to: 'tenant', toType: 'dir'}
-    ]),
-    new CopyWebpackPlugin([
+      {from: 'src/index.html'},
+      {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'},
+      {from: 'node_modules/formio-tenant/dist', to: 'tenant', toType: 'dir'},
       {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'}
     ]),
     new webpack.ProvidePlugin({
@@ -104,11 +101,6 @@ module.exports = {
           'css-loader?-url',
           'sass-loader',
         ]
-      },
-      {
-        test: /index\.html$/,
-        exclude: /src\/views/,
-        use: ['file-loader?name=[name].[ext]']
       },
       {
         test: /robots\.txt$/,
