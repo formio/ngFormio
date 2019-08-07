@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.6.5
+### Removed
+ - Hubspot stylesheet
+
 ## 6.6.4
 ### Changed
  - Force google analytic scripts to load from https for security reasons.
