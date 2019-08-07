@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.6.4
+### Changed
+ - Force google analytic scripts to load from https for security reasons.
+ - Fix headers on remote environment requests.
+ - Fix some templates loading.
+
 ## 6.6.3
 ### Changed
  - The configuration that adds the Public Configurations to forms to instead be at the project level for performance reasons.
