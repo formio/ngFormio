@@ -8690,7 +8690,8 @@ var isPrototypeOf = ObjectPrototype.isPrototypeOf;
 var TO_STRING_TAG = wellKnownSymbol('toStringTag');
 var TYPED_ARRAY_TAG = uid('TYPED_ARRAY_TAG');
 var NATIVE_ARRAY_BUFFER = !!(global.ArrayBuffer && DataView);
-var NATIVE_ARRAY_BUFFER_VIEWS = NATIVE_ARRAY_BUFFER && !!setPrototypeOf;
+// Fixing native typed arrays in Opera Presto crashes the browser, see #595
+var NATIVE_ARRAY_BUFFER_VIEWS = NATIVE_ARRAY_BUFFER && !!setPrototypeOf && classof(global.opera) !== 'Opera';
 var TYPED_ARRAY_TAG_REQIRED = false;
 var NAME;
 
@@ -11643,7 +11644,7 @@ var store = global[SHARED] || setGlobal(SHARED, {});
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.1.3',
+  version: '3.2.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
 });
@@ -15488,162 +15489,6 @@ function CustomEvent (type, params) {
 
 /***/ }),
 
-/***/ "./node_modules/deep-equal/index.js":
-/*!******************************************!*\
-  !*** ./node_modules/deep-equal/index.js ***!
-  \******************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var pSlice = Array.prototype.slice;
-var objectKeys = __webpack_require__(/*! ./lib/keys.js */ "./node_modules/deep-equal/lib/keys.js");
-var isArguments = __webpack_require__(/*! ./lib/is_arguments.js */ "./node_modules/deep-equal/lib/is_arguments.js");
-
-var deepEqual = module.exports = function (actual, expected, opts) {
-  if (!opts) opts = {};
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
-
-  } else if (actual instanceof Date && expected instanceof Date) {
-    return actual.getTime() === expected.getTime();
-
-  // 7.3. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if (!actual || !expected || typeof actual != 'object' && typeof expected != 'object') {
-    return opts.strict ? actual === expected : actual == expected;
-
-  // 7.4. For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else {
-    return objEquiv(actual, expected, opts);
-  }
-}
-
-function isUndefinedOrNull(value) {
-  return value === null || value === undefined;
-}
-
-function isBuffer (x) {
-  if (!x || typeof x !== 'object' || typeof x.length !== 'number') return false;
-  if (typeof x.copy !== 'function' || typeof x.slice !== 'function') {
-    return false;
-  }
-  if (x.length > 0 && typeof x[0] !== 'number') return false;
-  return true;
-}
-
-function objEquiv(a, b, opts) {
-  var i, key;
-  if (isUndefinedOrNull(a) || isUndefinedOrNull(b))
-    return false;
-  // an identical 'prototype' property.
-  if (a.prototype !== b.prototype) return false;
-  //~~~I've managed to break Object.keys through screwy arguments passing.
-  //   Converting to array solves the problem.
-  if (isArguments(a)) {
-    if (!isArguments(b)) {
-      return false;
-    }
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return deepEqual(a, b, opts);
-  }
-  if (isBuffer(a)) {
-    if (!isBuffer(b)) {
-      return false;
-    }
-    if (a.length !== b.length) return false;
-    for (i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) return false;
-    }
-    return true;
-  }
-  try {
-    var ka = objectKeys(a),
-        kb = objectKeys(b);
-  } catch (e) {//happens when one is a string literal and the other isn't
-    return false;
-  }
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length != kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!deepEqual(a[key], b[key], opts)) return false;
-  }
-  return typeof a === typeof b;
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/deep-equal/lib/is_arguments.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/deep-equal/lib/is_arguments.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-var supportsArgumentsClass = (function(){
-  return Object.prototype.toString.call(arguments)
-})() == '[object Arguments]';
-
-exports = module.exports = supportsArgumentsClass ? supported : unsupported;
-
-exports.supported = supported;
-function supported(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-};
-
-exports.unsupported = unsupported;
-function unsupported(object){
-  return object &&
-    typeof object == 'object' &&
-    typeof object.length == 'number' &&
-    Object.prototype.hasOwnProperty.call(object, 'callee') &&
-    !Object.prototype.propertyIsEnumerable.call(object, 'callee') ||
-    false;
-};
-
-
-/***/ }),
-
-/***/ "./node_modules/deep-equal/lib/keys.js":
-/*!*********************************************!*\
-  !*** ./node_modules/deep-equal/lib/keys.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-exports = module.exports = typeof Object.keys === 'function'
-  ? Object.keys : shim;
-
-exports.shim = shim;
-function shim (obj) {
-  var keys = [];
-  for (var key in obj) keys.push(key);
-  return keys;
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/downloadjs/download.js":
 /*!*********************************************!*\
   !*** ./node_modules/downloadjs/download.js ***!
@@ -17271,6 +17116,73 @@ module.exports = dragula;
 
 /***/ }),
 
+/***/ "./node_modules/fast-deep-equal/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/fast-deep-equal/index.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var isArray = Array.isArray;
+var keyList = Object.keys;
+var hasProp = Object.prototype.hasOwnProperty;
+
+module.exports = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    var arrA = isArray(a)
+      , arrB = isArray(b)
+      , i
+      , length
+      , key;
+
+    if (arrA && arrB) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+    if (arrA != arrB) return false;
+
+    var dateA = a instanceof Date
+      , dateB = b instanceof Date;
+    if (dateA != dateB) return false;
+    if (dateA && dateB) return a.getTime() == b.getTime();
+
+    var regexpA = a instanceof RegExp
+      , regexpB = b instanceof RegExp;
+    if (regexpA != regexpB) return false;
+    if (regexpA && regexpB) return a.toString() == b.toString();
+
+    var keys = keyList(a);
+    length = keys.length;
+
+    if (length !== keyList(b).length)
+      return false;
+
+    for (i = length; i-- !== 0;)
+      if (!hasProp.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      key = keys[i];
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  return a!==a && b!==b;
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/fast-json-patch/lib/core.js":
 /*!**************************************************!*\
   !*** ./node_modules/fast-json-patch/lib/core.js ***!
@@ -17278,11 +17190,8 @@ module.exports = dragula;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var equalsOptions = { strict: true };
-var _equals = __webpack_require__(/*! deep-equal */ "./node_modules/deep-equal/index.js");
-var areEquals = function (a, b) {
-    return _equals(a, b, equalsOptions);
-};
+Object.defineProperty(exports, "__esModule", { value: true });
+var areEquals = __webpack_require__(/*! fast-deep-equal */ "./node_modules/fast-deep-equal/index.js");
 var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
 exports.JsonPatchError = helpers_1.PatchError;
 exports.deepClone = helpers_1._deepClone;
@@ -17340,7 +17249,7 @@ var arrOps = {
         if (helpers_1.isInteger(i)) {
             arr.splice(i, 0, this.value);
         }
-        else {
+        else { // array props
             arr[i] = this.value;
         }
         // this may be needed when using '-' in an array
@@ -17416,9 +17325,9 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.removed = document; //document we removed
             return returnValue;
         }
-        else if (operation.op === 'move' || operation.op === 'copy') {
+        else if (operation.op === 'move' || operation.op === 'copy') { // it's a move or copy to root
             returnValue.newDocument = getValueByPointer(document, operation.from); // get the value by json-pointer in `from` field
-            if (operation.op === 'move') {
+            if (operation.op === 'move') { // report removed item
                 returnValue.removed = document;
             }
             return returnValue;
@@ -17431,7 +17340,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             returnValue.newDocument = document;
             return returnValue;
         }
-        else if (operation.op === 'remove') {
+        else if (operation.op === 'remove') { // a remove on root
             returnValue.removed = document;
             returnValue.newDocument = null;
             return returnValue;
@@ -17440,7 +17349,7 @@ function applyOperation(document, operation, validateOperation, mutateDocument, 
             operation.value = document;
             return returnValue;
         }
-        else {
+        else { /* bad operation */
             if (validateOperation) {
                 throw new exports.JsonPatchError('Operation `op` property is not one of operations defined in RFC-6902', 'OPERATION_OP_INVALID', index, operation, document);
             }
@@ -17572,7 +17481,7 @@ exports.applyPatch = applyPatch;
  */
 function applyReducer(document, operation, index) {
     var operationResult = applyOperation(document, operation);
-    if (operationResult.test === false) {
+    if (operationResult.test === false) { // failed test
         throw new exports.JsonPatchError("Test operation failed", 'TEST_OPERATION_FAILED', index, operation, document);
     }
     return operationResult.newDocument;
@@ -17664,6 +17573,19 @@ function validate(sequence, document, externalValidator) {
     }
 }
 exports.validate = validate;
+/**
+ * Default export for backwards compat
+ */
+exports.default = {
+    JsonPatchError: exports.JsonPatchError,
+    deepClone: exports.deepClone,
+    getValueByPointer: getValueByPointer,
+    applyOperation: applyOperation,
+    applyPatch: applyPatch,
+    applyReducer: applyReducer,
+    validator: validator,
+    validate: validate
+};
 
 
 /***/ }),
@@ -17675,6 +17597,18 @@ exports.validate = validate;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * https://github.com/Starcounter-Jack/JSON-Patch
  * (c) 2017 Joachim Wester
@@ -17682,7 +17616,7 @@ exports.validate = validate;
  */
 var helpers_1 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
 var core_1 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
-/* export all core functions */
+/* export all core functions and types */
 var core_2 = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
 exports.applyOperation = core_2.applyOperation;
 exports.applyPatch = core_2.applyPatch;
@@ -17697,14 +17631,14 @@ exports.deepClone = helpers_2._deepClone;
 exports.escapePathComponent = helpers_2.escapePathComponent;
 exports.unescapePathComponent = helpers_2.unescapePathComponent;
 var beforeDict = new WeakMap();
-var Mirror = (function () {
+var Mirror = /** @class */ (function () {
     function Mirror(obj) {
         this.observers = new Map();
         this.obj = obj;
     }
     return Mirror;
 }());
-var ObserverInfo = (function () {
+var ObserverInfo = /** @class */ (function () {
     function ObserverInfo(callback, observer) {
         this.callback = callback;
         this.observer = observer;
@@ -17757,21 +17691,12 @@ function observe(obj, callback) {
             clearTimeout(observer.next);
             observer.next = setTimeout(dirtyCheck);
         };
-        if (typeof window !== 'undefined') {
-            if (window.addEventListener) {
-                window.addEventListener('mouseup', fastCheck);
-                window.addEventListener('keyup', fastCheck);
-                window.addEventListener('mousedown', fastCheck);
-                window.addEventListener('keydown', fastCheck);
-                window.addEventListener('change', fastCheck);
-            }
-            else {
-                document.documentElement.attachEvent('onmouseup', fastCheck);
-                document.documentElement.attachEvent('onkeyup', fastCheck);
-                document.documentElement.attachEvent('onmousedown', fastCheck);
-                document.documentElement.attachEvent('onkeydown', fastCheck);
-                document.documentElement.attachEvent('onchange', fastCheck);
-            }
+        if (typeof window !== 'undefined') { //not Node
+            window.addEventListener('mouseup', fastCheck);
+            window.addEventListener('keyup', fastCheck);
+            window.addEventListener('mousedown', fastCheck);
+            window.addEventListener('keydown', fastCheck);
+            window.addEventListener('change', fastCheck);
         }
     }
     observer.patches = patches;
@@ -17781,18 +17706,11 @@ function observe(obj, callback) {
         clearTimeout(observer.next);
         removeObserverFromMirror(mirror, observer);
         if (typeof window !== 'undefined') {
-            if (window.removeEventListener) {
-                window.removeEventListener('mouseup', fastCheck);
-                window.removeEventListener('keyup', fastCheck);
-                window.removeEventListener('mousedown', fastCheck);
-                window.removeEventListener('keydown', fastCheck);
-            }
-            else {
-                document.documentElement.detachEvent('onmouseup', fastCheck);
-                document.documentElement.detachEvent('onkeyup', fastCheck);
-                document.documentElement.detachEvent('onmousedown', fastCheck);
-                document.documentElement.detachEvent('onkeydown', fastCheck);
-            }
+            window.removeEventListener('mouseup', fastCheck);
+            window.removeEventListener('keyup', fastCheck);
+            window.removeEventListener('mousedown', fastCheck);
+            window.removeEventListener('keydown', fastCheck);
+            window.removeEventListener('change', fastCheck);
         }
     };
     mirror.observers.set(callback, new ObserverInfo(callback, observer));
@@ -17802,9 +17720,10 @@ exports.observe = observe;
 /**
  * Generate an array of patches from an observer
  */
-function generate(observer) {
+function generate(observer, invertible) {
+    if (invertible === void 0) { invertible = false; }
     var mirror = beforeDict.get(observer.object);
-    _generate(mirror.value, observer.object, observer.patches, "");
+    _generate(mirror.value, observer.object, observer.patches, "", invertible);
     if (observer.patches.length) {
         core_1.applyPatch(mirror.value, observer.patches);
     }
@@ -17819,7 +17738,7 @@ function generate(observer) {
 }
 exports.generate = generate;
 // Dirty check if obj is different from mirror, generate patches and update mirror
-function _generate(mirror, obj, patches, path) {
+function _generate(mirror, obj, patches, path, invertible) {
     if (obj === mirror) {
         return;
     }
@@ -17837,20 +17756,29 @@ function _generate(mirror, obj, patches, path) {
         if (helpers_1.hasOwnProperty(obj, key) && !(obj[key] === undefined && oldVal !== undefined && Array.isArray(obj) === false)) {
             var newVal = obj[key];
             if (typeof oldVal == "object" && oldVal != null && typeof newVal == "object" && newVal != null) {
-                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key));
+                _generate(oldVal, newVal, patches, path + "/" + helpers_1.escapePathComponent(key), invertible);
             }
             else {
                 if (oldVal !== newVal) {
                     changed = true;
+                    if (invertible) {
+                        patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+                    }
                     patches.push({ op: "replace", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(newVal) });
                 }
             }
         }
         else if (Array.isArray(mirror) === Array.isArray(obj)) {
+            if (invertible) {
+                patches.push({ op: "test", path: path + "/" + helpers_1.escapePathComponent(key), value: helpers_1._deepClone(oldVal) });
+            }
             patches.push({ op: "remove", path: path + "/" + helpers_1.escapePathComponent(key) });
             deleted = true; // property has been deleted
         }
         else {
+            if (invertible) {
+                patches.push({ op: "test", path: path, value: mirror });
+            }
             patches.push({ op: "replace", path: path, value: obj });
             changed = true;
         }
@@ -17868,12 +17796,28 @@ function _generate(mirror, obj, patches, path) {
 /**
  * Create an array of patches from the differences in two objects
  */
-function compare(tree1, tree2) {
+function compare(tree1, tree2, invertible) {
+    if (invertible === void 0) { invertible = false; }
     var patches = [];
-    _generate(tree1, tree2, patches, '');
+    _generate(tree1, tree2, patches, '', invertible);
     return patches;
 }
 exports.compare = compare;
+/**
+ * Default export for backwards compat
+ */
+// import just to re-export as default
+var core = __webpack_require__(/*! ./core */ "./node_modules/fast-json-patch/lib/core.js");
+var helpers_3 = __webpack_require__(/*! ./helpers */ "./node_modules/fast-json-patch/lib/helpers.js");
+exports.default = __assign({}, core, { 
+    // duplex
+    unobserve: unobserve,
+    observe: observe,
+    generate: generate,
+    compare: compare,
+    // helpers
+    JsonPatchError: helpers_3.PatchError, deepClone: helpers_1._deepClone, escapePathComponent: helpers_1.escapePathComponent,
+    unescapePathComponent: helpers_3.unescapePathComponent });
 
 
 /***/ }),
@@ -17890,11 +17834,20 @@ exports.compare = compare;
  * (c) 2017 Joachim Wester
  * MIT license
  */
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 function hasOwnProperty(obj, key) {
     return _hasOwnProperty.call(obj, key);
@@ -18041,15 +17994,18 @@ function patchErrorMessageFormatter(message, args) {
     }
     return messageParts.join('\n');
 }
-var PatchError = (function (_super) {
+var PatchError = /** @class */ (function (_super) {
     __extends(PatchError, _super);
     function PatchError(message, name, index, operation, tree) {
-        _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree }));
-        this.name = name;
-        this.index = index;
-        this.operation = operation;
-        this.tree = tree;
-        this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        var _newTarget = this.constructor;
+        var _this = _super.call(this, patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree })) || this;
+        _this.name = name;
+        _this.index = index;
+        _this.operation = operation;
+        _this.tree = tree;
+        Object.setPrototypeOf(_this, _newTarget.prototype); // restore prototype chain, see https://stackoverflow.com/a/48342359
+        _this.message = patchErrorMessageFormatter(message, { name: name, index: index, operation: operation, tree: tree });
+        return _this;
     }
     return PatchError;
 }(Error));
@@ -21830,6 +21786,7 @@ function () {
         user: _Formio.default.getUser(),
         moment: _moment.default,
         instance: this,
+        iconClass: this.iconClass.bind(this),
         config: this.root && this.root.form && this.root.form.config ? this.root.form.config : {}
       }, additional);
     }
@@ -25891,7 +25848,9 @@ function (_NestedComponent) {
         return _this13.removeEventListener(h.obj, h.type);
       });
       this.on('submitButton', function (options) {
-        return _this13.submit(false, options);
+        _this13.submit(false, options).catch(function (e) {
+          return e !== false && console.log(e);
+        });
       }, true);
       this.on('checkValidity', function (data) {
         return _this13.checkValidity(null, true, data);
@@ -26026,7 +25985,15 @@ function (_NestedComponent) {
       }
 
       this.submitting = false;
-      this.setPristine(false);
+      this.setPristine(false); // Allow for silent cancellations (no error message, no submit button error state)
+
+      if (error && error.silent) {
+        this.emit('change', {
+          isValid: true
+        });
+        return false;
+      }
+
       return this.showErrors(error, true);
     }
     /**
@@ -30400,8 +30367,6 @@ __webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/cor
 
 __webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
 
-__webpack_require__(/*! core-js/modules/es.string.trim */ "./node_modules/core-js/modules/es.string.trim.js");
-
 __webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
 
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
@@ -30457,7 +30422,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var CKEDITOR = 'https://cdn.staticaly.com/gh/formio/ckeditor5-build-classic/v12.2.0-formio.2/build/ckeditor.js';
+var CKEDITOR = 'https://cdn.form.io/ckeditor/12.2.0/ckeditor.js';
 /**
  * This is the BaseComponent class which all elements within the FormioForm derive from.
  */
@@ -31150,10 +31115,12 @@ function (_Component) {
         _this6.removeChildFrom(dialog, document.body);
       });
       document.body.appendChild(dialog);
+      document.body.classList.add('modal-open');
       dialog.body = modalBody;
       dialog.bodyContainer = modalBodyContainer;
 
       dialog.close = function () {
+        document.body.classList.remove('modal-open');
         dialog.dispatchEvent(new CustomEvent('close'));
 
         _this6.removeChildFrom(dialog, document.body);
@@ -31982,7 +31949,7 @@ function (_Component) {
     key: "renderTemplateToElement",
     value: function renderTemplateToElement(element, template, data) {
       var actions = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
-      element.innerHTML = this.interpolate(template, data).trim();
+      element.innerHTML = this.interpolate(template, data);
       this.attachActions(element, actions);
       return element;
     }
@@ -33694,7 +33661,18 @@ var _default = [{
     dataSrc: 'custom',
     valueProperty: 'value',
     data: {
-      custom: "\n            utils.eachComponent(instance.root.editForm.components, function(component, path) {\n              if (component.key !== data.key) {\n                values.push({\n                  label: component.label || component.key,\n                  value: component.key\n                });\n              }\n            });\n          "
+      custom: function custom(context) {
+        var values = [];
+        context.utils.eachComponent(context.instance.root.editForm.components, function (component) {
+          if (component.key !== context.data.key) {
+            values.push({
+              label: component.label || component.key,
+              value: component.key
+            });
+          }
+        });
+        return values;
+      }
     }
   }, {
     type: 'textfield',
@@ -33747,7 +33725,22 @@ var _default = [{
   dataSrc: 'custom',
   valueProperty: 'value',
   data: {
-    custom: "\n        values.push({label: 'Any Change', value: 'data'});\n        utils.eachComponent(instance.root.editForm.components, function(component, path) {\n          if (component.key !== data.key) {\n            values.push({\n              label: component.label || component.key,\n              value: path\n            });\n          }\n        });\n      "
+    custom: function custom(context) {
+      var values = [];
+      values.push({
+        label: 'Any Change',
+        value: 'data'
+      });
+      context.utils.eachComponent(context.instance.root.editForm.components, function (component, path) {
+        if (component.key !== context.data.key) {
+          values.push({
+            label: component.label || component.key,
+            value: path
+          });
+        }
+      });
+      return values;
+    }
   }
 }, {
   type: 'checkbox',
@@ -33981,7 +33974,9 @@ var _default = [{
   label: 'Allow Reordering',
   tooltip: 'Allows changing order of multiple values using drag and drop',
   key: 'reorder',
-  customConditional: 'show = !!data.multiple || data.type === "datagrid" || data.type === "editgrid"',
+  customConditional: function customConditional(context) {
+    return !!context.data.multiple || context.data.type === 'datagrid' || context.data.type === 'editgrid';
+  },
   input: true
 }, {
   weight: 900,
@@ -34018,7 +34013,9 @@ var _default = [{
   tooltip: 'Show the label when in a Datagrid.',
   key: 'dataGridLabel',
   input: true,
-  customConditional: 'show = instance.root.editComponent.inDataGrid'
+  customConditional: function customConditional(context) {
+    return context.instance.root.editComponent.inDataGrid;
+  }
 }, {
   weight: 1400,
   type: 'checkbox',
@@ -34131,14 +34128,17 @@ var _default = [{
     key: 'triggerPanel',
     input: false,
     title: 'Trigger',
+    tableView: false,
     components: [{
       weight: 0,
       input: true,
+      tableView: false,
       components: [{
         weight: 0,
         input: true,
         label: 'Type',
         key: 'type',
+        tableView: false,
         data: {
           values: [{
             value: 'simple',
@@ -34162,12 +34162,16 @@ var _default = [{
         label: '',
         key: 'simple',
         type: 'container',
-        customConditional: 'show = row.type === "simple";',
+        tableView: false,
+        customConditional: function customConditional(context) {
+          return context.row.type === 'simple';
+        },
         components: [{
           input: true,
           key: 'show',
           label: 'Show',
           type: 'hidden',
+          tableView: false,
           defaultValue: true
         }, {
           type: 'select',
@@ -34176,14 +34180,27 @@ var _default = [{
           key: 'when',
           dataSrc: 'custom',
           valueProperty: 'value',
+          tableView: false,
           data: {
-            custom: "\n                        utils.eachComponent(instance.root.editForm.components, function(component, path) {\n                          if (component.key !== data.key) {\n                            values.push({\n                              label: component.label || component.key,\n                              value: path\n                            });\n                          }\n                        });\n                      "
+            custom: function custom(context) {
+              var values = [];
+              context.utils.eachComponent(context.instance.root.editForm.components, function (component, path) {
+                if (component.key !== context.data.key) {
+                  values.push({
+                    label: component.label || component.key,
+                    value: path
+                  });
+                }
+              });
+              return values;
+            }
           }
         }, {
           type: 'textfield',
           input: true,
           label: 'Has the value:',
-          key: 'eq'
+          key: 'eq',
+          tableView: false
         }]
       }, {
         weight: 10,
@@ -34192,9 +34209,12 @@ var _default = [{
         rows: 5,
         editor: 'ace',
         input: true,
+        tableView: false,
         placeholder: "result = (data['mykey'] > 1);",
         description: '"row", "data", and "component" variables are available. Return "result".',
-        customConditional: 'show = row.type === "javascript";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'javascript';
+        }
       }, {
         weight: 10,
         type: 'textarea',
@@ -34204,9 +34224,12 @@ var _default = [{
         label: 'JSON Logic',
         as: 'json',
         input: true,
+        tableView: false,
         placeholder: "{ ... }",
         description: '"row", "data", "component" and "_" variables are available. Return the result to be passed to the action if truthy.',
-        customConditional: 'show = row.type === "json";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'json';
+        }
       }, {
         weight: 10,
         type: 'textfield',
@@ -34214,7 +34237,10 @@ var _default = [{
         label: 'Event Name',
         placeholder: 'event',
         description: 'The event that will trigger this logic. You can trigger events externally or via a button.',
-        customConditional: 'show = row.type === "event";'
+        tableView: false,
+        customConditional: function customConditional(context) {
+          return context.row.type === 'event';
+        }
       }],
       key: 'trigger',
       type: 'container'
@@ -34225,6 +34251,7 @@ var _default = [{
     input: true,
     label: 'Actions',
     key: 'actions',
+    tableView: false,
     templates: {
       header: '<div class="row"> \n  <div class="col-sm-6"><strong>{{ value.length }} actions</strong></div>\n</div>',
       row: '<div class="row"> \n  <div class="col-sm-6">\n    <div>{{ row.name }} </div>\n  </div>\n  <div class="col-sm-2"> \n    <div class="btn-group pull-right"> \n      <div class="btn btn-default editRow">Edit</div> \n      <div class="btn btn-danger removeRow">Delete</div> \n    </div> \n  </div> \n</div>',
@@ -34274,6 +34301,7 @@ var _default = [{
         type: 'select',
         template: '<span>{{ item.label }}</span>',
         dataSrc: 'json',
+        tableView: false,
         data: {
           json: [{
             label: 'Hidden',
@@ -34321,12 +34349,15 @@ var _default = [{
         key: 'property',
         label: 'Component Property',
         input: true,
-        customConditional: 'show = row.type === "property";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'property';
+        }
       }, {
         weight: 30,
         input: true,
         label: 'Set State',
         key: 'state',
+        tableView: false,
         data: {
           values: [{
             label: 'True',
@@ -34339,7 +34370,9 @@ var _default = [{
         dataSrc: 'values',
         template: '<span>{{ item.label }}</span>',
         type: 'select',
-        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "boolean";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'property' && context.row.hasOwnProperty('property') && context.row.property.type === 'boolean';
+        }
       }, {
         weight: 30,
         type: 'textfield',
@@ -34347,8 +34380,11 @@ var _default = [{
         label: 'Text',
         inputType: 'text',
         input: true,
+        tableView: false,
         description: 'Can use templating with {{ data.myfield }}. "data", "row", "component" and "result" variables are available.',
-        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string" && !row.property.component;'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'property' && context.row.hasOwnProperty('property') && context.row.property.type === 'string' && !context.row.property.component;
+        }
       }, {
         weight: 20,
         input: true,
@@ -34358,8 +34394,11 @@ var _default = [{
         rows: 5,
         placeholder: "value = data.myfield;",
         type: 'textarea',
+        tableView: false,
         description: '"row", "data", "component", and "result" variables are available. Return the value.',
-        customConditional: 'show = row.type === "value";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'value';
+        }
       }]
     }]
   }]
@@ -34386,6 +34425,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 
 var _utils = _interopRequireDefault(__webpack_require__(/*! ./utils */ "./node_modules/formiojs/components/base/editForm/utils.js"));
+
+var _Evaluator = _interopRequireDefault(__webpack_require__(/*! ../../../utils/Evaluator */ "./node_modules/formiojs/utils/Evaluator.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -34440,6 +34481,9 @@ var _default = [{
   },
   key: 'custom-validation-js',
   weight: 300,
+  customConditional: function customConditional() {
+    return !_Evaluator.default.noeval;
+  },
   components: [_utils.default.logicVariablesTable('<tr><th>input</th><td>The value that was input into this component</td></tr>'), {
     type: 'textarea',
     key: 'validate.custom',
@@ -34519,6 +34563,8 @@ exports.default = void 0;
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
+var _Evaluator = _interopRequireDefault(__webpack_require__(/*! ../../../utils/Evaluator */ "./node_modules/formiojs/utils/Evaluator.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var EditFormUtils = {
@@ -34589,6 +34635,9 @@ var EditFormUtils = {
           'margin-bottom': '10px'
         },
         key: "".concat(property, "-js"),
+        customConditional: function customConditional() {
+          return !_Evaluator.default.noeval;
+        },
         components: [{
           type: 'textarea',
           key: property,
@@ -36139,12 +36188,14 @@ function (_BaseComponent) {
 
       var changed = _get(_getPrototypeOf(CheckBoxComponent.prototype), "updateValue", this).call(this, flags, value);
 
-      if (this.input.checked) {
-        this.input.setAttribute('checked', true);
-        this.addClass(this.element, 'checkbox-checked');
-      } else {
-        this.input.removeAttribute('checked');
-        this.removeClass(this.element, 'checkbox-checked');
+      if (this.input) {
+        if (this.input.checked) {
+          this.input.setAttribute('checked', true);
+          this.addClass(this.element, 'checkbox-checked');
+        } else {
+          this.input.removeAttribute('checked');
+          this.removeClass(this.element, 'checkbox-checked');
+        }
       }
 
       return changed;
@@ -37078,7 +37129,7 @@ function (_NestedComponent) {
       flags = this.getFlags.apply(this, arguments);
 
       if (!value || !_lodash.default.isObject(value)) {
-        return;
+        return false;
       }
 
       var hasValue = this.hasValue();
@@ -37447,7 +37498,9 @@ var _default = [{
         key: 'content',
         weight: 30,
         input: true,
-        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string" && row.property.component === "content";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'property' && context.row.hasOwnProperty('property') && context.row.property.type === 'string' && context.row.property.component === 'content';
+        }
       }]
     }]
   }]
@@ -39175,8 +39228,12 @@ var _default = [{
   weight: 405,
   input: true,
   clearOnHide: false,
-  customConditional: 'show = !data.enableRowGroups',
-  calculateValue: 'value = data.enableRowGroups ? true : data.disableAddingRemovingRows;'
+  customConditional: function customConditional(context) {
+    return !context.data.enableRowGroups;
+  },
+  calculateValue: function calculateValue(context) {
+    return context.data.enableRowGroups ? true : context.data.disableAddingRemovingRows;
+  }
 }, {
   type: 'textfield',
   label: 'Add Another Text',
@@ -39185,7 +39242,9 @@ var _default = [{
   placeholder: 'Add Another',
   weight: 410,
   input: true,
-  customConditional: 'show = !data.disableAddingRemovingRows'
+  customConditional: function customConditional(context) {
+    return !context.data.disableAddingRemovingRows;
+  }
 }, {
   type: 'select',
   label: 'Add Another Position',
@@ -39207,7 +39266,9 @@ var _default = [{
     }]
   },
   weight: 411,
-  customConditional: 'show = !data.disableAddingRemovingRows'
+  customConditional: function customConditional(context) {
+    return !context.data.disableAddingRemovingRows;
+  }
 }, {
   type: 'select',
   label: 'Remove Button Placement',
@@ -39225,7 +39286,9 @@ var _default = [{
   },
   weight: 412,
   input: true,
-  customConditional: 'show = !data.disableAddingRemovingRows'
+  customConditional: function customConditional(context) {
+    return !context.data.disableAddingRemovingRows;
+  }
 }, {
   type: 'checkbox',
   label: 'Default Open Rows',
@@ -39846,7 +39909,9 @@ var _default = [{
   placeholder: 'Add Another',
   weight: 410,
   input: true,
-  customConditional: 'show = !data.disableAddingRemovingRows'
+  customConditional: function customConditional(context) {
+    return !context.data.disableAddingRemovingRows;
+  }
 }];
 exports.default = _default;
 
@@ -41433,6 +41498,10 @@ var _Base = _interopRequireDefault(__webpack_require__(/*! ../base/Base */ "./no
 
 var _Components = _interopRequireDefault(__webpack_require__(/*! ../Components */ "./node_modules/formiojs/components/Components.js"));
 
+var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
+var _templates = _interopRequireDefault(__webpack_require__(/*! ./templates */ "./node_modules/formiojs/components/editgrid/templates/index.js"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -41477,7 +41546,7 @@ function (_NestedComponent) {
         input: true,
         tree: true,
         defaultOpen: false,
-        removeRow: '',
+        removeRow: 'Cancel',
         components: [],
         inlineEdit: false,
         templates: {
@@ -41502,12 +41571,12 @@ function (_NestedComponent) {
   }, {
     key: "defaultHeaderTemplate",
     get: function get() {
-      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">{{ component.label }}</div>\n  {% }) %}\n</div>";
+      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    {% if (!component.hasOwnProperty('tableView') || component.tableView) { %}\n      <div class=\"col-sm-2\">{{ component.label }}</div>\n    {% } %}\n  {% }) %}\n</div>";
     }
   }, {
     key: "defaultRowTemplate",
     get: function get() {
-      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    <div class=\"col-sm-2\">\n      {{ getView(component, row[component.key]) }}\n    </div>\n  {% }) %}\n  {% if (!instance.options.readOnly) { %}\n    <div class=\"col-sm-2\">\n      <div class=\"btn-group pull-right\">\n        <button class=\"btn btn-default btn-sm editRow\">Edit</button>\n        <button class=\"btn btn-danger btn-sm removeRow\">Delete</button>\n      </div>\n    </div>\n  {% } %}\n</div>";
+      return "<div class=\"row\">\n  {% util.eachComponent(components, function(component) { %}\n    {% if (!component.hasOwnProperty('tableView') || component.tableView) { %}\n      <div class=\"col-sm-2\">\n        {{ getView(component, row[component.key]) }}\n      </div>\n    {% } %}\n  {% }) %}\n  {% if (!instance.options.readOnly) { %}\n    <div class=\"col-sm-2\">\n      <div class=\"btn-group pull-right\">\n        <button class=\"btn btn-default btn-sm editRow\"><i class=\"{{ iconClass('edit') }}\"></i></button>\n        <button class=\"btn btn-danger btn-sm removeRow\"><i class=\"{{ iconClass('trash') }}\"></i></button>\n      </div>\n    </div>\n  {% } %}\n</div>";
     }
   }]);
 
@@ -41627,7 +41696,7 @@ function (_NestedComponent) {
   }, {
     key: "createHeader",
     value: function createHeader() {
-      var templateHeader = _lodash.default.get(this.component, 'templates.header');
+      var templateHeader = _utils.Evaluator.noeval ? _templates.default.header : _lodash.default.get(this.component, 'templates.header');
 
       if (!templateHeader) {
         return this.text('');
@@ -41663,9 +41732,7 @@ function (_NestedComponent) {
       var wrapper = this.ce('li', {
         class: 'list-group-item'
       });
-
-      var rowTemplate = _lodash.default.get(this.component, 'templates.row', EditGridComponent.defaultRowTemplate); // Store info so we can detect changes later.
-
+      var rowTemplate = _utils.Evaluator.noeval ? _templates.default.row : _lodash.default.get(this.component, 'templates.row', EditGridComponent.defaultRowTemplate); // Store info so we can detect changes later.
 
       wrapper.rowData = row.data;
       wrapper.rowIndex = rowIndex;
@@ -41695,10 +41762,10 @@ function (_NestedComponent) {
           }, [this.ce('button', {
             class: 'btn btn-primary',
             onClick: this.saveRow.bind(this, rowIndex, dialog)
-          }, this.component.saveRow || 'Save'), ' ', this.component.removeRow ? this.ce('button', {
+          }, this.t(this.component.saveRow || 'Save')), ' ', this.component.removeRow ? this.ce('button', {
             class: 'btn btn-danger',
             onClick: this.cancelRow.bind(this, rowIndex)
-          }, this.component.removeRow || 'Cancel') : null]));
+          }, this.t(this.component.removeRow || 'Cancel')) : null]));
         }
 
         if (!this.component.modal) {
@@ -42241,6 +42308,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+
+var _Evaluator = _interopRequireDefault(__webpack_require__(/*! ../../../utils/Evaluator */ "./node_modules/formiojs/utils/Evaluator.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var _default = [{
   type: 'textarea',
   label: 'Header Template',
@@ -42251,7 +42323,10 @@ var _default = [{
   input: true,
   placeholder: '/*** Lodash Template Code ***/',
   description: 'Two available variables. "value" is the array of row data and "components" is the array of components in the grid.',
-  tooltip: 'This is the <a href="https://lodash.com/docs/4.17.5#template">Lodash Template</a> used to render the header of the Edit grid.'
+  tooltip: 'This is the <a href="https://lodash.com/docs/4.17.5#template">Lodash Template</a> used to render the header of the Edit grid.',
+  customConditional: function customConditional() {
+    return !_Evaluator.default.noeval;
+  }
 }, {
   type: 'textarea',
   label: 'Row Template',
@@ -42262,7 +42337,10 @@ var _default = [{
   input: true,
   placeholder: '/*** Lodash Template Code ***/',
   description: 'Two available variables. "row" is an object of one row\'s data and "components" is the array of components in the grid. To add click events, add the classes "editRow" and "removeRow" to elements.',
-  tooltip: 'This is the <a href="https://lodash.com/docs/4.17.5#template">Lodash Template</a> used to render each row of the Edit grid.'
+  tooltip: 'This is the <a href="https://lodash.com/docs/4.17.5#template">Lodash Template</a> used to render each row of the Edit grid.',
+  customConditional: function customConditional() {
+    return !_Evaluator.default.noeval;
+  }
 }, {
   type: 'textarea',
   label: 'Footer Template',
@@ -42273,7 +42351,10 @@ var _default = [{
   input: true,
   placeholder: '/*** Lodash Template Code ***/',
   description: 'Two available variables. "value" is the array of row data and "components" is the array of components in the grid.',
-  tooltip: 'This is the <a href="https://lodash.com/docs/4.17.5#template">Lodash Template</a> used to render the footer of the Edit grid.'
+  tooltip: 'This is the <a href="https://lodash.com/docs/4.17.5#template">Lodash Template</a> used to render the footer of the Edit grid.',
+  customConditional: function customConditional() {
+    return !_Evaluator.default.noeval;
+  }
 }, {
   type: 'textfield',
   input: true,
@@ -42310,6 +42391,109 @@ var _default = [{
   tooltip: 'Set the text of the remove Row button.'
 }];
 exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/editgrid/templates/header.ejs.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/formiojs/components/editgrid/templates/header.ejs.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default=function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="row">\n  ';
+ util.eachComponent(components, function(component) { ;
+__p += '\n    ';
+ if (!component.hasOwnProperty('tableView') || component.tableView) { ;
+__p += '\n      <div class="col-sm-2">' +
+((__t = ( component.label )) == null ? '' : __t) +
+'</div>\n    ';
+ } ;
+__p += '\n  ';
+ }) ;
+__p += '\n</div>\n';
+
+}
+return __p
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/editgrid/templates/index.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/components/editgrid/templates/index.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _row = _interopRequireDefault(__webpack_require__(/*! ./row.ejs */ "./node_modules/formiojs/components/editgrid/templates/row.ejs.js"));
+
+var _header = _interopRequireDefault(__webpack_require__(/*! ./header.ejs */ "./node_modules/formiojs/components/editgrid/templates/header.ejs.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = {
+  row: _row.default,
+  header: _header.default
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/editgrid/templates/row.ejs.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/formiojs/components/editgrid/templates/row.ejs.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default=function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="row">\n  ';
+ util.eachComponent(components, function(component) { ;
+__p += '\n    ';
+ if (!component.hasOwnProperty('tableView') || component.tableView) { ;
+__p += '\n      <div class="col-sm-2">\n        ' +
+((__t = ( getView(component, row[component.key]) )) == null ? '' : __t) +
+'\n      </div>\n    ';
+ } ;
+__p += '\n  ';
+ }) ;
+__p += '\n  ';
+ if (!instance.options.readOnly) { ;
+__p += '\n    <div class="col-sm-2">\n      <div class="btn-group pull-right">\n        <button class="btn btn-default btn-sm editRow"><i class="' +
+((__t = ( iconClass('edit') )) == null ? '' : __t) +
+'"></i></button>\n        <button class="btn btn-danger btn-sm removeRow"><i class="' +
+((__t = ( iconClass('trash') )) == null ? '' : __t) +
+'"></i></button>\n      </div>\n    </div>\n  ';
+ } ;
+__p += '\n</div>\n';
+
+}
+return __p
+}
 
 /***/ }),
 
@@ -42357,7 +42541,9 @@ function _default() {
       type: 'hidden',
       input: true,
       key: 'disableAddingRemovingRows',
-      calculateValue: 'value = data.enableRowGroups',
+      calculateValue: function calculateValue(context) {
+        return context.instance.data.enableRowGroups;
+      },
       encrypted: false
     }, {
       key: 'enableRowGroups',
@@ -43281,7 +43467,9 @@ exports.default = void 0;
 var _default = [{
   key: 'label',
   hidden: true,
-  calculateValue: 'value = data.legend'
+  calculateValue: function calculateValue(context) {
+    return context.data.legend;
+  }
 }, {
   weight: 1,
   type: 'textfield',
@@ -43587,6 +43775,7 @@ function (_BaseComponent) {
       var _this2 = this;
 
       var newValue = value || [];
+      var changed = this.hasChanged(newValue, this.dataValue);
       this.dataValue = newValue;
 
       if (this.component.image) {
@@ -43613,6 +43802,8 @@ function (_BaseComponent) {
         this.refreshDOM();
         this.filesReadyResolve();
       }
+
+      return changed;
     }
   }, {
     key: "validateMultiple",
@@ -45796,7 +45987,7 @@ function (_BaseComponent) {
 
       _lodash.default.each(this.component.attrs, function (attr) {
         if (attr.attr) {
-          _this.htmlElement.setAttribute(attr.attr, attr.value);
+          _this.htmlElement.setAttribute(attr.attr, _this.interpolate(attr.value));
         }
       });
 
@@ -46008,7 +46199,9 @@ var _default = [{
         key: 'content',
         weight: 30,
         input: true,
-        customConditional: 'show = row.type === "property" && row.hasOwnProperty("property") && row.property.type === "string" && row.property.component === "content";'
+        customConditional: function customConditional(context) {
+          return context.row.type === 'property' && context.row.hasOwnProperty('property') && context.row.property.type === 'string' && context.row.property.component === 'content';
+        }
       }]
     }]
   }]
@@ -46364,8 +46557,7 @@ function (_BaseComponent) {
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
       flags.noValidate = true;
-
-      _get(_getPrototypeOf(LocationComponent.prototype), "setValue", this).call(this, value, flags);
+      return _get(_getPrototypeOf(LocationComponent.prototype), "setValue", this).call(this, value, flags);
     }
   }, {
     key: "addInput",
@@ -48641,7 +48833,9 @@ var jsonDocHTML = "\n  <p>Submission data is available as JsonLogic variables, w
 var settingComponent = _utils.default.javaScriptValue(title, jsProp, jsonProp, 110, jsDocHTML, jsonDocHTML);
 
 var _default = [_objectSpread({}, settingComponent, {
-  customConditional: 'show = instance.root.editForm.display === "wizard"'
+  customConditional: function customConditional(context) {
+    return context.instance.root.editForm.display === 'wizard';
+  }
 })];
 /* eslint-enable quotes, max-len */
 
@@ -48666,7 +48860,9 @@ exports.default = void 0;
 var _default = [{
   key: 'label',
   hidden: true,
-  calculateValue: 'value = data.title'
+  calculateValue: function calculateValue(context) {
+    return context.data.title;
+  }
 }, {
   weight: 1,
   type: 'textfield',
@@ -48771,7 +48967,9 @@ var _default = [{
       next: true
     }
   }],
-  customConditional: 'show = instance.root.editForm.display === "wizard"'
+  customConditional: function customConditional(context) {
+    return context.instance.root.editForm.display === 'wizard';
+  }
 }, {
   weight: 650,
   type: 'checkbox',
@@ -49826,7 +50024,9 @@ function (_BaseComponent) {
   }, {
     key: "setValue",
     value: function setValue(value) {
+      var changed = this.hasChanged(value, this.dataValue);
       this.dataValue = value;
+      return changed;
     }
   }, {
     key: "getValue",
@@ -49899,7 +50099,9 @@ var _default = [{
   label: 'Button Key',
   tooltip: 'Specify key of button on this form that this reCAPTCHA should react to',
   type: 'textfield',
-  customConditional: 'show = data.eventType === "buttonClick";',
+  customConditional: function customConditional(context) {
+    return context.data.eventType === 'buttonClick';
+  },
   weight: 660
 }, {
   key: 'label',
@@ -50409,8 +50611,6 @@ __webpack_require__(/*! core-js/modules/es.array.filter */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es.array.find */ "./node_modules/core-js/modules/es.array.find.js");
 
-__webpack_require__(/*! core-js/modules/es.array.from */ "./node_modules/core-js/modules/es.array.from.js");
-
 __webpack_require__(/*! core-js/modules/es.array.includes */ "./node_modules/core-js/modules/es.array.includes.js");
 
 __webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
@@ -50467,14 +50667,6 @@ var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-p
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -50568,12 +50760,17 @@ function (_BaseComponent) {
 
     _this.triggerUpdate = _lodash.default.debounce(_this.updateItems.bind(_assertThisInitialized(_this)), 100); // Keep track of the select options.
 
-    _this.selectOptions = []; // Keep track of the last batch of items loaded.
+    _this.selectOptions = [];
 
-    _this.currentItems = [];
-    _this.loadedItems = 0;
-    _this.isScrollLoading = false;
-    _this.scrollTop = 0; // If this component has been activated.
+    if (_this.isInfiniteScrollProvided) {
+      _this.isFromSearch = false;
+      _this.searchServerCount = null;
+      _this.defaultServerCount = null;
+      _this.isScrollLoading = false;
+      _this.searchDownloadedResources = [];
+      _this.defaultDownloadedResources = [];
+    } // If this component has been activated.
+
 
     _this.activated = false; // Determine when the items have been loaded.
 
@@ -50738,21 +50935,15 @@ function (_BaseComponent) {
 
       return false;
     }
-    /**
-     * Return if the list is loading from scroll. or not.
-     *
-     * @return {boolean|*}
-     */
-
   }, {
-    key: "stopInfiniteScroll",
-    value: function stopInfiniteScroll() {
-      // Remove the infinite scroll listener.
-      this.scrollLoading = false;
-
-      if (this.scrollList) {
-        this.scrollList.removeEventListener('scroll', this.onScroll);
+    key: "disableInfiniteScroll",
+    value: function disableInfiniteScroll() {
+      if (!this.downloadedResources) {
+        return;
       }
+
+      this.downloadedResources.serverCount = this.downloadedResources.length;
+      this.serverCount = this.downloadedResources.length;
     }
     /* eslint-disable max-statements */
 
@@ -50781,40 +50972,41 @@ function (_BaseComponent) {
       }
 
       if (!this.choices && this.selectInput) {
-        if (this.loading) {
-          this.removeChildFrom(this.selectInput, this.selectContainer);
-        }
-
         this.selectInput.innerHTML = '';
       } // If they provided select values, then we need to get them instead.
 
 
       if (this.component.selectValues) {
-        items = _lodash.default.get(items, this.component.selectValues);
+        items = _lodash.default.get(items, this.component.selectValues, items) || [];
       }
 
-      if (this.scrollLoading) {
-        // Check if the first two items are equal, and if so, then we can assume that this is the same list
-        // and we should skip over the loading.
-        if (this.currentItems.length && items.length && _lodash.default.isEqual(this.currentItems[0], items[0]) && _lodash.default.isEqual(this.currentItems[1], items[1])) {
-          this.stopInfiniteScroll();
-          this.loading = false;
-          return;
-        } // If we have gone beyond our limit, then stop.
+      var areItemsEqual;
 
+      if (this.isInfiniteScrollProvided) {
+        areItemsEqual = this.isSelectURL ? _lodash.default.isEqual(items, this.downloadedResources) : false;
+        var areItemsEnded = this.component.limit > items.length;
+        var areItemsDownloaded = areItemsEqual && this.downloadedResources && this.downloadedResources.length === items.length;
 
-        if (items.limit && items.length < items.limit) {
-          this.stopInfiniteScroll();
-        } // Increment the loadedItems.
+        if (areItemsEnded) {
+          this.disableInfiniteScroll();
+        } else if (areItemsDownloaded) {
+          this.selectOptions = [];
+        } else {
+          this.serverCount = items.serverCount;
+        }
+      }
 
+      if (this.isScrollLoading && items) {
+        if (!areItemsEqual) {
+          this.downloadedResources = this.downloadedResources ? this.downloadedResources.concat(items) : items;
+        }
 
-        this.loadedItems += items.length;
+        this.downloadedResources.serverCount = items.serverCount || this.downloadedResources.serverCount;
       } else {
+        this.downloadedResources = items || [];
         this.selectOptions = [];
-        this.loadedItems = items.length;
-      }
+      } // Add the value options.
 
-      this.currentItems = items; // Add the value options.
 
       if (!fromSearch) {
         this.addValueOptions(items);
@@ -50831,13 +51023,10 @@ function (_BaseComponent) {
 
       if (this.choices) {
         this.choices.setChoices(this.selectOptions, 'value', 'label', true);
-      } else if (this.loading) {
-        // Re-attach select input.
-        this.appendTo(this.selectInput, this.selectContainer);
       } // We are no longer loading.
 
 
-      this.scrollLoading = false;
+      this.isScrollLoading = false;
       this.loading = false; // If a value is provided, then select it.
 
       if (this.dataValue) {
@@ -50878,7 +51067,7 @@ function (_BaseComponent) {
       }
 
       var limit = this.component.limit || 100;
-      var skip = this.loadedItems || 0;
+      var skip = this.isScrollLoading ? this.selectOptions.length : 0;
       var query = this.component.dataSrc === 'url' ? {} : {
         limit: limit,
         skip: skip
@@ -50928,16 +51117,16 @@ function (_BaseComponent) {
 
       _Formio.default.makeRequest(this.options.formio, 'select', url, method, body, options).then(function (response) {
         _this4.loading = false;
-        var scrollTop = !_this4.scrollLoading && _this4.currentItems.length === 0;
 
         _this4.setItems(response, !!search);
-
-        if (scrollTop && _this4.choices) {
-          _this4.choices.choiceList.scrollToTop();
-        }
       }).catch(function (err) {
-        _this4.stopInfiniteScroll();
+        if (_this4.isInfiniteScrollProvided) {
+          _this4.setItems([]);
 
+          _this4.disableInfiniteScroll();
+        }
+
+        _this4.isScrollLoading = false;
         _this4.loading = false;
 
         _this4.itemsLoadedResolve();
@@ -50966,10 +51155,10 @@ function (_BaseComponent) {
     value: function updateCustomItems() {
       this.setItems(this.getCustomItems() || []);
     }
-    /* eslint-disable max-statements */
-
   }, {
     key: "updateItems",
+
+    /* eslint-disable max-statements */
     value: function updateItems(searchInput, forceUpdate) {
       if (!this.component.data) {
         console.warn("Select component ".concat(this.key, " does not have data configuration."));
@@ -51007,10 +51196,14 @@ function (_BaseComponent) {
             var resourceUrl = this.options.formio ? this.options.formio.formsUrl : "".concat(_Formio.default.getProjectUrl(), "/form");
             resourceUrl += "/".concat(this.component.data.resource, "/submission");
 
-            try {
-              this.loadItems(resourceUrl, searchInput, this.requestHeaders);
-            } catch (err) {
-              console.warn("Unable to load resources for ".concat(this.key));
+            if (this.additionalResourcesAvailable) {
+              try {
+                this.loadItems(resourceUrl, searchInput, this.requestHeaders);
+              } catch (err) {
+                console.warn("Unable to load resources for ".concat(this.key));
+              }
+            } else {
+              this.setItems(this.downloadedResources);
             }
 
             break;
@@ -51161,7 +51354,8 @@ function (_BaseComponent) {
           include: 'score',
           threshold: _lodash.default.get(this, 'component.searchThreshold', 0.3)
         }, _lodash.default.get(this, 'component.fuseOptions', {})),
-        itemComparer: _lodash.default.isEqual
+        itemComparer: _lodash.default.isEqual,
+        resetScrollPosition: false
       }, customOptions);
 
       var tabIndex = input.tabIndex;
@@ -51182,18 +51376,28 @@ function (_BaseComponent) {
         }
       }
 
-      this.scrollList = this.choices.choiceList.element;
+      if (this.isInfiniteScrollProvided) {
+        this.scrollList = this.choices.choiceList.element;
 
-      this.onScroll = function () {
-        if (!_this5.scrollLoading && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight) {
-          _this5.scrollTop = _this5.scrollList.scrollTop;
-          _this5.scrollLoading = true;
+        this.onScroll = function () {
+          var isLoadingAvailable = !_this5.isScrollLoading && _this5.additionalResourcesAvailable && _this5.scrollList.scrollTop + _this5.scrollList.clientHeight >= _this5.scrollList.scrollHeight;
 
-          _this5.triggerUpdate(_this5.choices.input.element.value);
-        }
-      };
+          if (isLoadingAvailable) {
+            _this5.isScrollLoading = true;
 
-      this.scrollList.addEventListener('scroll', this.onScroll);
+            _this5.choices.setChoices([{
+              value: "".concat(_this5.id, "-loading"),
+              label: 'Loading...',
+              disabled: true
+            }], 'value', 'label');
+
+            _this5.triggerUpdate(_this5.choices.input.element.value);
+          }
+        };
+
+        this.scrollList.addEventListener('scroll', this.onScroll);
+      }
+
       this.addFocusBlurEvents(this.focusableElement);
       this.focusableElement.setAttribute('tabIndex', tabIndex);
       this.setInputStyles(this.choices.containerOuter.element); // If a search field is provided, then add an event listener to update items on search.
@@ -51202,8 +51406,13 @@ function (_BaseComponent) {
         // Make sure to clear the search when no value is provided.
         if (this.choices && this.choices.input && this.choices.input.element) {
           this.addEventListener(this.choices.input.element, 'input', function (event) {
+            _this5.isFromSearch = !!event.target.value;
+
             if (!event.target.value) {
               _this5.triggerUpdate();
+            } else {
+              _this5.serverCount = null;
+              _this5.downloadedResources = [];
             }
           });
         }
@@ -51250,6 +51459,15 @@ function (_BaseComponent) {
 
       this.disabled = this.disabled;
       this.triggerUpdate();
+    }
+  }, {
+    key: "restoreValue",
+    value: function restoreValue() {
+      _get(_getPrototypeOf(SelectComponent.prototype), "restoreValue", this).call(this);
+
+      if (this.choices) {
+        this.choices.setChoiceByValue(this.dataValue);
+      }
     }
     /* eslint-enable max-statements */
 
@@ -51360,7 +51578,7 @@ function (_BaseComponent) {
         value = this.choices.getValue(true); // Make sure we don't get the placeholder
 
         if (!this.component.multiple && this.component.placeholder && value === this.t(this.component.placeholder)) {
-          value = '';
+          value = this.emptyValue;
         }
       } else {
         var values = [];
@@ -51376,7 +51594,7 @@ function (_BaseComponent) {
 
 
       if (value === undefined || value === null) {
-        value = '';
+        value = this.emptyValue;
       }
 
       return value;
@@ -51561,41 +51779,19 @@ function (_BaseComponent) {
       return '';
     }
   }, {
-    key: "scrollLoading",
+    key: "isSelectResource",
     get: function get() {
-      return this.isScrollLoading;
+      return this.component.dataSrc === 'resource';
     }
-    /**
-     * Sets the scroll loading state.
-     *
-     * @param isScrolling
-     * @return {*}
-     */
-    ,
-    set: function set(isScrolling) {
-      // Only continue if they are different.
-      if (this.isScrollLoading === isScrolling) {
-        return;
-      }
-
-      if (isScrolling) {
-        this.choices.setChoices([].concat(_toConsumableArray(this.selectOptions), [{
-          value: '',
-          label: 'Loading...',
-          disabled: true
-        }]), 'value', 'label', true);
-      } else if (this.scrollList) {
-        var loadingItem = this.scrollList.querySelector('.choices__item--disabled');
-
-        if (loadingItem) {
-          // Remove the loading text.
-          this.scrollList.removeChild(loadingItem);
-        }
-      }
-
-      this.scrollList.scrollTo(0, this.scrollTop);
-      this.isScrollLoading = isScrolling;
-      return isScrolling;
+  }, {
+    key: "isSelectURL",
+    get: function get() {
+      return this.component.dataSrc === 'url';
+    }
+  }, {
+    key: "isInfiniteScrollProvided",
+    get: function get() {
+      return this.isSelectResource || this.isSelectURL;
     }
   }, {
     key: "requestHeaders",
@@ -51618,6 +51814,43 @@ function (_BaseComponent) {
       }
 
       return headers;
+    }
+  }, {
+    key: "additionalResourcesAvailable",
+    get: function get() {
+      return _lodash.default.isNil(this.serverCount) || this.serverCount > this.downloadedResources.length;
+    }
+  }, {
+    key: "serverCount",
+    get: function get() {
+      if (this.isFromSearch) {
+        return this.searchServerCount;
+      }
+
+      return this.defaultServerCount;
+    },
+    set: function set(value) {
+      if (this.isFromSearch) {
+        this.searchServerCount = value;
+      } else {
+        this.defaultServerCount = value;
+      }
+    }
+  }, {
+    key: "downloadedResources",
+    get: function get() {
+      if (this.isFromSearch) {
+        return this.searchDownloadedResources;
+      }
+
+      return this.defaultDownloadedResources;
+    },
+    set: function set(value) {
+      if (this.isFromSearch) {
+        this.searchDownloadedResources = value;
+      } else {
+        this.defaultDownloadedResources = value;
+      }
     }
   }, {
     key: "active",
@@ -51835,15 +52068,17 @@ var _default = [{
   onSetItems: function onSetItems(component, form) {
     var newItems = [];
     (0, _utils.eachComponent)(form.components, function (component, path) {
-      newItems.push({
-        label: component.label || component.key,
-        key: path
-      });
+      if (component.input) {
+        newItems.push({
+          label: component.label || component.key,
+          key: "data.".concat(path)
+        });
+      }
     });
     return newItems;
   },
   data: {
-    url: '/form/{{ data.resource }}'
+    url: '/form/{{ data.data.resource }}'
   },
   conditional: {
     json: {
@@ -51852,7 +52087,7 @@ var _default = [{
           var: 'data.dataSrc'
         }, 'resource']
       }, {
-        var: 'data.resource'
+        var: 'data.data.resource'
       }]
     }
   }
@@ -52420,7 +52655,7 @@ function (_RadioComponent) {
         input.checked = !!value[input.value];
       });
 
-      this.updateValue(flags);
+      return this.updateValue(flags);
     }
   }, {
     key: "checkValidity",
@@ -52725,7 +52960,7 @@ function (_BaseComponent) {
     value: function setValue(value, flags) {
       flags = this.getFlags.apply(this, arguments);
 
-      _get(_getPrototypeOf(SignatureComponent.prototype), "setValue", this).call(this, value, flags);
+      var changed = _get(_getPrototypeOf(SignatureComponent.prototype), "setValue", this).call(this, value, flags);
 
       if (this.signaturePad) {
         if (value && !flags.noSign) {
@@ -52737,6 +52972,8 @@ function (_BaseComponent) {
           this.signaturePad.clear();
         }
       }
+
+      return changed;
     }
   }, {
     key: "showCanvas",
@@ -53195,7 +53432,7 @@ function (_BaseComponent) {
       flags = this.getFlags.apply(this, arguments);
 
       if (!value) {
-        return;
+        return false;
       }
 
       _lodash.default.each(this.component.questions, function (question) {
@@ -53206,7 +53443,7 @@ function (_BaseComponent) {
         });
       });
 
-      this.updateValue(flags);
+      return this.updateValue(flags);
     }
   }, {
     key: "getValue",
@@ -55124,7 +55361,7 @@ function (_TextFieldComponent) {
         });
       };
 
-      var update = function update() {
+      var update = _lodash.default.debounce(function () {
         resize();
         var styleHeight = Math.round(parseFloat(textarea.style.height));
         var computed = window.getComputedStyle(textarea, null);
@@ -55143,7 +55380,7 @@ function (_TextFieldComponent) {
           previousHeight = currentHeight;
           update();
         }
-      };
+      }, 200);
 
       var computedStyle = window.getComputedStyle(textarea, null);
       textarea.style.resize = 'none';
@@ -55234,12 +55471,10 @@ function (_TextFieldComponent) {
           return _this8.setConvertedValue(val);
         }) : this.setConvertedValue(value);
         return _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, value, flags);
-      } // Set the value when the editor is ready.
+      }
 
-
-      this.dataValue = value;
       this.setWysiwygValue(value, skipSetting, flags);
-      this.updateValue(flags);
+      return this.updateValue(flags);
     }
   }, {
     key: "getConvertedValue",
@@ -56176,7 +56411,9 @@ var _default = [{
   key: 'inputMask',
   label: 'Input Mask',
   tooltip: 'An input mask helps the user with input by ensuring a predefined format.<br><br>9: numeric<br>a: alphabetical<br>*: alphanumeric<br><br>Example telephone mask: (999) 999-9999<br><br>See the <a target=\'_blank\' href=\'https://github.com/RobinHerbots/jquery.inputmask\'>jquery.inputmask documentation</a> for more information.</a>',
-  customConditional: 'show = !data.allowMultipleMasks;'
+  customConditional: function customConditional(context) {
+    return !context.data.allowMultipleMasks;
+  }
 }, {
   weight: 413,
   type: 'checkbox',
@@ -56189,7 +56426,9 @@ var _default = [{
   input: true,
   key: 'inputMasks',
   label: 'Input Masks',
-  customConditional: 'show = data.allowMultipleMasks === true;',
+  customConditional: function customConditional(context) {
+    return context.data.allowMultipleMasks === true;
+  },
   reorder: true,
   components: [{
     type: 'textfield',
@@ -56590,7 +56829,9 @@ var _Components = _interopRequireDefault(__webpack_require__(/*! ../Components *
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../nested/NestedComponent */ "./node_modules/formiojs/components/nested/NestedComponent.js"));
 
-var _utils = _interopRequireDefault(__webpack_require__(/*! ../../utils */ "./node_modules/formiojs/utils/index.js"));
+var _Evaluator = _interopRequireDefault(__webpack_require__(/*! ../../utils/Evaluator */ "./node_modules/formiojs/utils/Evaluator.js"));
+
+var _templates = _interopRequireDefault(__webpack_require__(/*! ./templates */ "./node_modules/formiojs/components/tree/templates/index.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -56858,11 +57099,11 @@ function (_NestedComponent) {
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(TreeComponent).call(this, component, options, data));
     _this2.type = 'tree';
     _this2.changingNodeClassName = 'formio-component-tree-node-changing';
-    _this2.templateHash = {
-      edit: _utils.default.addTemplateHash(((_this2$component$temp = _this2.component.template) === null || _this2$component$temp === void 0 ? void 0 : _this2$component$temp.edit) || TreeComponent.defaultEditTemplate),
-      view: _utils.default.addTemplateHash(((_this2$component$temp2 = _this2.component.template) === null || _this2$component$temp2 === void 0 ? void 0 : _this2$component$temp2.view) || TreeComponent.defaultViewTemplate),
-      child: _utils.default.addTemplateHash(((_this2$component$temp3 = _this2.component.template) === null || _this2$component$temp3 === void 0 ? void 0 : _this2$component$temp3.child) || TreeComponent.defaultChildTemplate),
-      children: _utils.default.addTemplateHash(((_this2$component$temp4 = _this2.component.template) === null || _this2$component$temp4 === void 0 ? void 0 : _this2$component$temp4.children) || TreeComponent.defaultChildrenTemplate)
+    _this2.templates = {
+      edit: _Evaluator.default.noeval ? _templates.default.edit : _Evaluator.default.template(((_this2$component$temp = _this2.component.template) === null || _this2$component$temp === void 0 ? void 0 : _this2$component$temp.edit) || _templates.default.edit),
+      view: _Evaluator.default.noeval ? _templates.default.view : _Evaluator.default.template(((_this2$component$temp2 = _this2.component.template) === null || _this2$component$temp2 === void 0 ? void 0 : _this2$component$temp2.view) || _templates.default.view),
+      child: _Evaluator.default.noeval ? _templates.default.child : _Evaluator.default.template(((_this2$component$temp3 = _this2.component.template) === null || _this2$component$temp3 === void 0 ? void 0 : _this2$component$temp3.child) || _templates.default.child),
+      children: _Evaluator.default.noeval ? _templates.default.children : _Evaluator.default.template(((_this2$component$temp4 = _this2.component.template) === null || _this2$component$temp4 === void 0 ? void 0 : _this2$component$temp4.children) || _templates.default.children)
     };
     return _this2;
   }
@@ -56873,6 +57114,11 @@ function (_NestedComponent) {
       var _this$tree;
 
       return ((_this$tree = this.tree) === null || _this$tree === void 0 ? void 0 : _this$tree.getComponents()) || _get(_getPrototypeOf(TreeComponent.prototype), "getComponents", this).call(this);
+    }
+  }, {
+    key: "collapseText",
+    value: function collapseText(node) {
+      return node.collapsed ? this.t('Expand') : this.t('Collapse');
     }
   }, {
     key: "build",
@@ -56915,7 +57161,7 @@ function (_NestedComponent) {
       var _this3 = this;
 
       var childNodes = parent.children.map(this.buildNode.bind(this));
-      var element = this.renderElement(this.templateHash.children, {
+      var element = this.renderElement(this.templates.children, {
         node: parent,
         nodeData: parent.persistentData,
         data: this.data,
@@ -56940,7 +57186,7 @@ function (_NestedComponent) {
     value: function buildNode(node) {
       var _this4 = this;
 
-      var element = this.renderElement(this.templateHash.child, {
+      var element = this.renderElement(this.templates.child, {
         node: node,
         nodeData: node.persistentData,
         data: this.data,
@@ -56965,7 +57211,7 @@ function (_NestedComponent) {
           instance.node = node;
           return instance;
         });
-        this.renderTemplateToElement(element, this.templateHash.edit, {
+        this.renderTemplateToElement(element, this.templates.edit, {
           node: node,
           nodeData: node.data,
           data: this.data,
@@ -56987,7 +57233,7 @@ function (_NestedComponent) {
           return _this4.appendChild(element, editForm);
         });
       } else {
-        this.renderTemplateToElement(element, this.templateHash.view, {
+        this.renderTemplateToElement(element, this.templates.view, {
           node: node,
           nodeData: node.persistentData,
           data: this.data,
@@ -57225,6 +57471,170 @@ function (_NestedComponent) {
 }(_NestedComponent2.default);
 
 exports.default = TreeComponent;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/templates/child.ejs.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/templates/child.ejs.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default=function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+
+ if (node.isRoot) { ;
+__p += '\n  <div class="list-group-item"></div>\n';
+ } else { ;
+__p += '\n  <li class="list-group-item col-sm-12"></li>\n';
+ } ;
+__p += '\n';
+
+}
+return __p
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/templates/children.ejs.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/templates/children.ejs.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default=function(obj) {
+obj || (obj = {});
+var __t, __p = '';
+with (obj) {
+__p += '<ul class="tree-listgroup list-group row"></ul>\n';
+
+}
+return __p
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/templates/edit.ejs.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/templates/edit.ejs.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default=function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+
+ if (!node.isRoot) { ;
+__p += '\n  <div class="list-group-item">\n';
+ } else { ;
+__p += '\n  <li class="list-group-item">\n';
+ } ;
+__p += '\n    <div class="node-edit">\n      <div node-edit-form></div>\n      ';
+ if (!instance.options.readOnly) { ;
+__p += '\n      <div class="node-actions">\n        <button class="btn btn-primary saveNode">Save</button>\n        <button class="btn btn-danger cancelNode">Cancel</button>\n      </div>\n      ';
+ } ;
+__p += '\n    </div>\n';
+ if (!node.isRoot) { ;
+__p += '\n  </div>\n';
+ } else { ;
+__p += '\n  </li>\n';
+ } ;
+__p += '\n';
+
+}
+return __p
+}
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/templates/index.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/templates/index.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _child = _interopRequireDefault(__webpack_require__(/*! ./child.ejs */ "./node_modules/formiojs/components/tree/templates/child.ejs.js"));
+
+var _children = _interopRequireDefault(__webpack_require__(/*! ./children.ejs */ "./node_modules/formiojs/components/tree/templates/children.ejs.js"));
+
+var _edit = _interopRequireDefault(__webpack_require__(/*! ./edit.ejs */ "./node_modules/formiojs/components/tree/templates/edit.ejs.js"));
+
+var _view = _interopRequireDefault(__webpack_require__(/*! ./view.ejs */ "./node_modules/formiojs/components/tree/templates/view.ejs.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = {
+  child: _child.default,
+  children: _children.default,
+  edit: _edit.default,
+  view: _view.default
+};
+exports.default = _default;
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/components/tree/templates/view.ejs.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/components/tree/templates/view.ejs.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default=function(obj) {
+obj || (obj = {});
+var __t, __p = '', __j = Array.prototype.join;
+function print() { __p += __j.call(arguments, '') }
+with (obj) {
+__p += '<div class="row">\n  ';
+ util.eachComponent(components, function(component) { ;
+__p += '\n    <div class="col-sm-2">\n      ' +
+((__t = ( getView(component, nodeData[component.key]) )) == null ? '' : __t) +
+'\n    </div>\n  ';
+ }) ;
+__p += '\n  <div class="col-sm-3">\n    <div class="btn-group pull-right">\n      <button class="btn btn-default btn-sm toggleNode">' +
+((__t = ( collapseText(node) )) == null ? '' : __t) +
+'</button>\n      ';
+ if (!instance.options.readOnly) { ;
+__p += '\n        <button class="btn btn-default btn-sm addChild">Add</button>\n        <button class="btn btn-default btn-sm editNode">Edit</button>\n        <button class="btn btn-danger btn-sm removeNode">Delete</button>\n        ';
+ if (node.revertAvailable) { ;
+__p += '\n          <button class="btn btn-danger btn-sm revertNode">Revert</button>\n        ';
+ } ;
+__p += '\n      ';
+ } ;
+__p += '\n    </div>\n  </div>\n</div>\n';
+
+}
+return __p
+}
 
 /***/ }),
 
@@ -83599,6 +84009,111 @@ exports.default = _default;
 
 /***/ }),
 
+/***/ "./node_modules/formiojs/utils/Evaluator.js":
+/*!**************************************************!*\
+  !*** ./node_modules/formiojs/utils/Evaluator.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-js/modules/es.array.concat.js");
+
+__webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.reflect.construct */ "./node_modules/core-js/modules/es.reflect.construct.js");
+
+__webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
+
+__webpack_require__(/*! core-js/modules/es.string.replace */ "./node_modules/core-js/modules/es.string.replace.js");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
+
+var _stringHash = _interopRequireDefault(__webpack_require__(/*! string-hash */ "./node_modules/string-hash/index.js"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var Evaluator = {
+  noeval: false,
+  cache: {},
+  templateSettings: {
+    evaluate: /\{%([\s\S]+?)%\}/g,
+    interpolate: /\{\{([\s\S]+?)\}\}/g,
+    escape: /\{\{\{([\s\S]+?)\}\}\}/g
+  },
+  evaluator: function evaluator(func) {
+    if (Evaluator.noeval) {
+      console.warn('No evaluations allowed for this renderer.');
+      return _lodash.default.noop;
+    } else {
+      for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        params[_key - 1] = arguments[_key];
+      }
+
+      return _construct(Function, params.concat([func]));
+    }
+  },
+  template: function template(_template, hash) {
+    if (typeof _template === 'function') {
+      return _template;
+    }
+
+    hash = hash || (0, _stringHash.default)(_template);
+
+    try {
+      return Evaluator.cache[hash] = _lodash.default.template(_template, Evaluator.templateSettings);
+    } catch (err) {
+      console.warn('Error while processing template', err, _template);
+    }
+  },
+  interpolate: function interpolate(rawTemplate, data) {
+    if (typeof rawTemplate === 'function') {
+      return rawTemplate(data);
+    }
+
+    var hash = _lodash.default.isNumber(rawTemplate) ? rawTemplate : (0, _stringHash.default)(rawTemplate);
+    var template;
+
+    if (Evaluator.cache[hash]) {
+      template = Evaluator.cache[hash];
+    } else if (Evaluator.noeval) {
+      // No cached template methods available. Use poor-mans interpolate without eval.
+      return rawTemplate.replace(/({{\s+(.*)\s+}})/, function (match, $1, $2) {
+        return _lodash.default.get(data, $2);
+      });
+    } else {
+      template = Evaluator.template(rawTemplate, hash);
+    }
+
+    if (typeof template === 'function') {
+      try {
+        return template(data);
+      } catch (err) {
+        console.warn('Error interpolating template', err, rawTemplate, data);
+      }
+    }
+
+    return template;
+  }
+};
+var _default = Evaluator;
+exports.default = _default;
+
+/***/ }),
+
 /***/ "./node_modules/formiojs/utils/builder.js":
 /*!************************************************!*\
   !*** ./node_modules/formiojs/utils/builder.js ***!
@@ -84542,8 +85057,6 @@ __webpack_require__(/*! core-js/modules/es.object.keys */ "./node_modules/core-j
 
 __webpack_require__(/*! core-js/modules/es.object.to-string */ "./node_modules/core-js/modules/es.object.to-string.js");
 
-__webpack_require__(/*! core-js/modules/es.reflect.construct */ "./node_modules/core-js/modules/es.reflect.construct.js");
-
 __webpack_require__(/*! core-js/modules/es.regexp.constructor */ "./node_modules/core-js/modules/es.regexp.constructor.js");
 
 __webpack_require__(/*! core-js/modules/es.regexp.to-string */ "./node_modules/core-js/modules/es.regexp.to-string.js");
@@ -84579,8 +85092,6 @@ var _exportNames = {
   checkCondition: true,
   checkTrigger: true,
   setActionProperty: true,
-  addTemplateHash: true,
-  interpolate: true,
   uniqueName: true,
   guid: true,
   getDateSetting: true,
@@ -84611,8 +85122,10 @@ var _exportNames = {
   firstNonNil: true,
   withSwitch: true,
   observeOverload: true,
+  interpolate: true,
   jsonLogic: true,
-  moment: true
+  moment: true,
+  Evaluator: true
 };
 exports.evaluate = evaluate;
 exports.getRandomComponentId = getRandomComponentId;
@@ -84627,8 +85140,6 @@ exports.checkJsonConditional = checkJsonConditional;
 exports.checkCondition = checkCondition;
 exports.checkTrigger = checkTrigger;
 exports.setActionProperty = setActionProperty;
-exports.addTemplateHash = addTemplateHash;
-exports.interpolate = interpolate;
 exports.uniqueName = uniqueName;
 exports.guid = guid;
 exports.getDateSetting = getDateSetting;
@@ -84670,7 +85181,13 @@ Object.defineProperty(exports, "moment", {
     return _momentTimezone.default;
   }
 });
-exports.firstNonNil = void 0;
+Object.defineProperty(exports, "Evaluator", {
+  enumerable: true,
+  get: function get() {
+    return _Evaluator.default;
+  }
+});
+exports.interpolate = exports.firstNonNil = void 0;
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
@@ -84699,17 +85216,11 @@ Object.keys(_formUtils).forEach(function (key) {
   });
 });
 
-var _stringHash = _interopRequireDefault(__webpack_require__(/*! string-hash */ "./node_modules/string-hash/index.js"));
+var _Evaluator = _interopRequireDefault(__webpack_require__(/*! ./Evaluator */ "./node_modules/formiojs/utils/Evaluator.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _construct(Parent, args, Class) { if (isNativeReflectConstruct()) { _construct = Reflect.construct; } else { _construct = function _construct(Parent, args, Class) { var a = [null]; a.push.apply(a, args); var Constructor = Function.bind.apply(Parent, a); var instance = new Constructor(); if (Class) _setPrototypeOf(instance, Class.prototype); return instance; }; } return _construct.apply(null, arguments); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
@@ -84718,6 +85229,9 @@ function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread n
 function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+var interpolate = _Evaluator.default.interpolate;
+exports.interpolate = interpolate;
 
 var _fetchPonyfill = (0, _fetchPonyfill2.default)({
   Promise: _nativePromiseOnly.default
@@ -84794,7 +85308,7 @@ function evaluate(func, args, ret, tokenize) {
     }
 
     try {
-      func = _construct(Function, _toConsumableArray(params).concat([func]));
+      func = _Evaluator.default.evaluator.apply(_Evaluator.default, [func].concat(_toConsumableArray(params)));
       args = _lodash.default.values(args);
     } catch (err) {
       console.warn("An error occured within the custom function for ".concat(componentKey), err);
@@ -85069,7 +85583,7 @@ function setActionProperty(component, action, row, data, result, instance) {
           result: result
         };
         var textValue = action.property.component ? action[action.property.component] : action.text;
-        var newValue = instance && instance.interpolate ? instance.interpolate(textValue, evalData) : interpolate(textValue, evalData);
+        var newValue = instance && instance.interpolate ? instance.interpolate(textValue, evalData) : _Evaluator.default.interpolate(textValue, evalData);
 
         if (newValue !== _lodash.default.get(component, action.property.value, '')) {
           _lodash.default.set(component, action.property.value, newValue);
@@ -85080,51 +85594,6 @@ function setActionProperty(component, action, row, data, result, instance) {
   }
 
   return component;
-}
-
-var templateCache = {};
-var templateHashCache = {};
-
-function interpolateTemplate(template) {
-  var templateSettings = {
-    evaluate: /\{%([\s\S]+?)%\}/g,
-    interpolate: /\{\{([\s\S]+?)\}\}/g,
-    escape: /\{\{\{([\s\S]+?)\}\}\}/g
-  };
-
-  try {
-    return _lodash.default.template(template, templateSettings);
-  } catch (err) {
-    console.warn('Error while processing template', err, template);
-  }
-}
-
-function addTemplateHash(template) {
-  var hash = (0, _stringHash.default)(template);
-  templateHashCache[hash] = interpolateTemplate(template);
-  return hash;
-}
-/**
- * Interpolate a string and add data replacements.
- *
- * @param string
- * @param data
- * @returns {XML|string|*|void}
- */
-
-
-function interpolate(rawTemplate, data) {
-  var template = _lodash.default.isNumber(rawTemplate) && templateHashCache.hasOwnProperty(rawTemplate) ? templateHashCache[rawTemplate] : templateCache[rawTemplate] = templateCache[rawTemplate] || interpolateTemplate(rawTemplate);
-
-  if (typeof template === 'function') {
-    try {
-      return template(data);
-    } catch (err) {
-      console.warn('Error interpolating template', err, rawTemplate, data);
-    }
-  }
-
-  return template;
 }
 /**
  * Make a filename guaranteed to be unique.
@@ -85152,7 +85621,7 @@ function uniqueName(name, template, evalContext) {
     guid: guid()
   }); //only letters, numbers, dots, dashes, underscores and spaces are allowed. Anything else will be replaced with dash
 
-  var uniqueName = "".concat(interpolate(template, evalContext)).concat(extension).replace(/[^0-9a-zA-Z.\-_ ]/g, '-');
+  var uniqueName = "".concat(_Evaluator.default.interpolate(template, evalContext)).concat(extension).replace(/[^0-9a-zA-Z.\-_ ]/g, '-');
   return uniqueName;
 }
 
@@ -85191,7 +85660,7 @@ function getDateSetting(date) {
   dateSetting = null;
 
   try {
-    var value = new Function('moment', "return ".concat(date, ";"))(_momentTimezone.default);
+    var value = _Evaluator.default.evaluator("return ".concat(date, ";"), 'moment')(_momentTimezone.default);
 
     if (typeof value === 'string') {
       dateSetting = (0, _momentTimezone.default)(value);
@@ -87722,7 +88191,18 @@ function () {
 
       while (match = this.regexpUnescape.exec(str)) {
         value = handleFormat(match[1].trim());
-        str = str.replace(match[0], value);
+
+        if (value === undefined) {
+          if (typeof missingInterpolationHandler === 'function') {
+            var temp = missingInterpolationHandler(str, match, options);
+            value = typeof temp === 'string' ? temp : '';
+          } else {
+            this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
+            value = '';
+          }
+        }
+
+        str = str.replace(match[0], regexSafe(value));
         this.regexpUnescape.lastIndex = 0;
         replaces++;
 
@@ -87738,8 +88218,9 @@ function () {
 
         if (value === undefined) {
           if (typeof missingInterpolationHandler === 'function') {
-            var temp = missingInterpolationHandler(str, match, options);
-            value = typeof temp === 'string' ? temp : '';
+            var _temp = missingInterpolationHandler(str, match, options);
+
+            value = typeof _temp === 'string' ? _temp : '';
           } else {
             this.logger.warn("missed to pass in variable ".concat(match[1], " for interpolating ").concat(str));
             value = '';
@@ -88104,7 +88585,7 @@ function get() {
     returnObjects: false,
     joinArrays: false,
     // or string to join array
-    returnedObjectHandler: function returnedObjectHandler() {},
+    returnedObjectHandler: false,
     // function(key, value, options) triggered if key returns object but returnObjects is set to false
     parseMissingKeyHandler: false,
     // function(key) parsed a key that was not found in t() before returning

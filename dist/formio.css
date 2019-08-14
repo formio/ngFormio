@@ -1,4 +1,4 @@
-/*! ng-formio v3.20.0 | https://unpkg.com/ngFormio@3.20.0/LICENSE.txt */
+/*! ng-formio v3.21.0 | https://unpkg.com/ngFormio@3.21.0/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -3563,7 +3563,8 @@ td > .form-group {
   -webkit-backface-visibility: hidden;
   -webkit-animation: formio-dialog-fadein .5s;
   animation: formio-dialog-fadein .5s;
-  pointer-events: all; }
+  pointer-events: all;
+  overflow: auto; }
 
 .formio-dialog.formio-dialog-closing .formio-dialog-content {
   -webkit-backface-visibility: hidden;

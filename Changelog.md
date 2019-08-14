@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 3.21.0
+### Changed
+ - Upgraded core-js@3.2.1, css-loader@3.2.0, file-loader@4.2.0, formiojs@3.25.1, sass-loader@7.2.0, uglifyjs-webpack-plugin@2.2.0, webpack@4.39.2
+
 ## 3.20.0
 ### Changed
  - Upgraded @babel/cli@7.5.5, @babel/core@7.5.5, @babel/preset-env@7.5.5, css-loader@3.1.0, file-loader@4.1.0, formiojs@3.24.0, webpack@4.38.0
