@@ -920,6 +920,10 @@ angular
 
       $rootScope.onPremise = AppConfig.onPremise;
 
+      $rootScope.switchPortal = function() {
+        window.location.href = 'https://next.form.io' + window.location.pathname + window.location.hash + window.location.search;
+      };
+
       // Force SSL.
       if (AppConfig.forceSSL && $location.protocol() !== 'https') {
         $window.location.href = $location.absUrl().replace('http', 'https');
