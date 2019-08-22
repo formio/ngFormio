@@ -24,3 +24,4 @@ import './mstile-150x150.png';
 import './mstile-310x150.png';
 import './mstile-310x310.png';
 import './mstile-70x70.png';
+import './browserconfig.xml';

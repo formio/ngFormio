@@ -26,6 +26,9 @@ module.exports = {
     new CopyWebpackPlugin([
       {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'}
     ]),
+    new CopyWebpackPlugin([
+      {from: 'src/images/favicons/manifest.json', to: 'images/favicons', toType: 'dir'}
+    ]),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery",
       "jQuery": "jquery",
@@ -81,7 +84,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(svg|gif|png|jpe?g|ico)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(xml|svg|gif|png|jpe?g|ico)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
             loader: 'file-loader',
