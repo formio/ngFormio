@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const postcssPresetEnv = require('postcss-preset-env');
 module.exports = {
   performance: { hints: false },
   entry: './lib/index.js',
@@ -25,7 +26,19 @@ module.exports = {
         test: /\.(css|scss)$/,
         loader: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader', 'postcss-loader']
+          use: [
+            'css-loader',
+            'sass-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: 'postcss',
+                plugins: () => [
+                  postcssPresetEnv()
+                ]
+              }
+            }
+          ]
         })
       },
       {
