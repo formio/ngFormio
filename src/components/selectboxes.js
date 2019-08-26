@@ -19,16 +19,6 @@ module.exports = function(app) {
       link: function($scope, el, attrs, ngModel) {
         if ($scope.options && $scope.options.building) return;
 
-        ngModel.$isEmpty = function(value) {
-          if (typeof value === 'undefined') {
-            return true;
-          }
-
-          return Object.keys(value).every(function(key) {
-            return !value[key];
-          });
-        };
-
         // Initialize model
         var model = {};
         angular.forEach($scope.component.values, function(v) {
