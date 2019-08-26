@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.38.0
+### Fixed
+ - Fixed Selectboxes missing false values for pristine checkboxes
+
+### Changed
+ - Upgraded dependencies.
+
 ## 2.37.4
 ### Added
  - FOR-2210: Added ability to provide HTML attributes for components inputs, enabled autocomplete for select
