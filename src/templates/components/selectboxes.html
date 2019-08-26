@@ -1,5 +1,5 @@
 <fieldset ng-if="component.fieldSet">
-  <legend ng-if="component.label">
+  <legend ng-if="component.label" class="select-boxes-legend">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>
   </legend>
@@ -26,7 +26,7 @@
   </div>
 </fieldset>
 <div class="select-boxes" ng-if="!component.fieldSet">
-  <label ng-if="labelVisible() && (component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label" id="{{ componentId+'Label' }}" ng-class="{'field-required': isRequired(component)}"
+  <label ng-if="labelVisible() && (component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label select-boxes-label" id="{{ componentId+'Label' }}" ng-class="{'field-required': isRequired(component)}"
          ng-style="getLabelStyles(component)">
     {{ component.label }}
     <formio-component-tooltip></formio-component-tooltip>
