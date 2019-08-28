@@ -1,4 +1,3 @@
-import './index.html';
 import './robots.txt';
 import './images';
 import './fonts';
