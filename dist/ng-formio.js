@@ -43839,7 +43839,11 @@ function (_BaseComponent) {
   }, {
     key: "getView",
     value: function getView(value) {
-      return value ? value.originalName : '';
+      if (_lodash.default.isArray(value)) {
+        return _lodash.default.map(value, 'originalName').join(', ');
+      }
+
+      return _lodash.default.get(value, 'originalName', '');
     }
   }, {
     key: "loadImage",
