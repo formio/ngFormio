@@ -21,9 +21,7 @@ module.exports = {
       {from: 'src/index.html'},
       {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'},
       {from: 'node_modules/formio-tenant/dist', to: 'tenant', toType: 'dir'},
-      {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'}
-    ]),
-    new CopyWebpackPlugin([
+      {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'},
       {from: 'src/images/favicons/manifest.json', to: 'images/favicons', toType: 'dir'}
     ]),
     new webpack.ProvidePlugin({
