@@ -608,38 +608,10 @@ app.controller('FormController', [
       baseUrl: $scope.baseUrl,
       building: true,
       sideBarScrollOffset: 60,
+      resourceTag: '',
       bootstrap: 3,
       builder: {}
     };
-
-    $scope.formio.loadForms({params: {
-      type: 'resource',
-      select: '_id,title,name,components',
-      limit: 100
-    }}).then(function (resources) {
-      $scope.builderConfig.builder.resource = {
-        title: 'Existing Resource Fields',
-        key: 'resource',
-        weight: 50,
-        groups: {}
-      };
-      _.each(resources, function(resource) {
-        $scope.builderConfig.builder.resource.groups[resource.name] = {
-          title: resource.title,
-          key: resource.name,
-          components: {}
-        };
-        var groupInfo = $scope.builderConfig.builder.resource.groups[resource.name];
-        FormioUtils.eachComponent(resource.components, function(component) {
-          groupInfo.components[component.key] = {
-            title: component.label || component.title || component.legend || component.key,
-            key: resource.name + '_' + component.key,
-            schema: component
-          };
-        });
-      });
-      $scope.$broadcast('buildSidebar');
-    });
 
     // The url to goto for embedding.
     $scope.iframeCode = '';
