@@ -16,11 +16,11 @@
     "angular": "^1.7.8"
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
+    "@babel/cli": "^7.6.0",
+    "@babel/core": "^7.6.0",
     "@babel/plugin-proposal-export-default-from": "^7.5.2",
-    "@babel/plugin-proposal-optional-chaining": "^7.2.0",
-    "@babel/preset-env": "^7.5.5",
+    "@babel/plugin-proposal-optional-chaining": "^7.6.0",
+    "@babel/preset-env": "^7.6.0",
     "babel-loader": "^8.0.6",
     "core-js": "^3.2.1",
     "css-loader": "^3.2.0",
@@ -45,7 +45,7 @@
     "json-logic-js": "^1.1.0"
   },
   "dependencies": {
-    "formiojs": "^4.0.0-rc.45"
+    "formiojs": "^4.0.0-rc.46"
   },
   "browserify": {
     "transform": [
