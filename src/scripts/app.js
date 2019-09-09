@@ -1434,9 +1434,7 @@ angular
 
       return Interceptor;
     }
-  ]).config(['$locationProvider', function($locationProvider) {
-  $locationProvider.hashPrefix('');
-}])
+  ])
   .run($run);
 
 // Safely instantiate dataLayer
