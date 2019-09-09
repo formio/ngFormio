@@ -73,7 +73,8 @@ if (Formio) {
     loading = Formio.ssoInit(sso, {
       forceAuth: true
     });
-    if (!loading) {
+    // Check if already logged in
+    if (!loading && !localStorage.getItem('formioToken')) {
       // We are starting the handshake process with SSO, disable the app for now.
       disable = true;
     }
