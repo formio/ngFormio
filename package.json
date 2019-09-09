@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.0-rc.13",
+  "version": "7.0.0-rc.14",
   "dependencies": {
     "@babel/core": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
