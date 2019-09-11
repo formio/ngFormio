@@ -2301,6 +2301,17 @@ app.controller('FormSubmissionsController', [
             value = val.toJSON();
           }
 
+          if (!value && component.type === 'form') {
+            let componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
+
+            value = componentInfo.tableView(val.toJSON()[component.key], {
+              component: component,
+              $interpolate: $interpolate,
+              componentInfo: formioComponents,
+              util: FormioUtils
+            });
+          }
+
           var submissionTimezone = '';
           if (dataItem && dataItem.metadata && dataItem.metadata.timezone) {
             submissionTimezone = dataItem.metadata.timezone;
