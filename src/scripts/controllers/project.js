@@ -1,7 +1,5 @@
 'use strict';
 import semver from 'semver';
-import chanceLib from 'chance';
-const chance = chanceLib();
 
 /* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
@@ -2325,10 +2323,7 @@ app.controller('ProjectSettingsController', [
       });
       $scope.currentProject.settings.keys.push({
         name: 'Key ' + keyIndex,
-        key: chance.string({
-          length: 30,
-          pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-        })
+        key: Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12)
       });
       $scope._saveProject($scope.currentProject, $scope.formio);
     };

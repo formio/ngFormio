@@ -1,6 +1,4 @@
 'use strict';
-import chanceLib from 'chance';
-const chance = chanceLib();
 
 /* globals location */
 
@@ -36,10 +34,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           }
 
           // Create a key and save the project.
-          project.settings.filetoken = chance.string({
-            length: 30,
-            pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-          });
+          project.settings.filetoken = Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12);
           return (new Formio('/project/' + project._id)).saveProject(project);
         },
         ensureFileToken: function(project) {
