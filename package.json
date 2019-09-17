@@ -45,7 +45,7 @@
     "json-logic-js": "^1.1.0"
   },
   "dependencies": {
-    "formiojs": "^4.0.5"
+    "formiojs": "^4.0.11"
   },
   "browserify": {
     "transform": [
