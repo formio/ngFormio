@@ -2321,9 +2321,10 @@ app.controller('ProjectSettingsController', [
           keyIndex++;
         }
       });
+      var s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       $scope.currentProject.settings.keys.push({
         name: 'Key ' + keyIndex,
-        key: Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12)
+        key: Array(30).join().split(',').map(function() { return s.charAt(Math.floor(Math.random() * s.length)); }).join(''),
       });
       $scope._saveProject($scope.currentProject, $scope.formio);
     };

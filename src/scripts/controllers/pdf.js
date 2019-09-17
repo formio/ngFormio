@@ -34,7 +34,8 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
           }
 
           // Create a key and save the project.
-          project.settings.filetoken = Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 12);
+          var s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+          project.settings.filetoken = Array(30).join().split(',').map(function() { return s.charAt(Math.floor(Math.random() * s.length)); }).join('');
           return (new Formio('/project/' + project._id)).saveProject(project);
         },
         ensureFileToken: function(project) {
