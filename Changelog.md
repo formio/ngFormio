@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.38.1
+### Fixed
+ - A build issue with angular-ckeditor.
+
 ## 2.38.0
 ### Fixed
  - Fixed Selectboxes missing false values for pristine checkboxes
