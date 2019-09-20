@@ -70,10 +70,13 @@ if (Formio) {
   Formio.setBaseUrl(apiBase);
   Formio.setProjectUrl(formioBase);
   if (sso) {
-    if(query.saml) {
+    if (query.saml) {
       window.location.hash = localStorage.getItem('redirectUrl');
+      localStorage.removeItem('redirectUrl');
     }
-    localStorage.setItem('redirectUrl', location.hash);
+    else {
+      localStorage.setItem('redirectUrl', location.hash);
+    }
     loading = Formio.ssoInit(sso, {
       forceAuth: true
     });
