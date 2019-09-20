@@ -70,9 +70,14 @@ if (Formio) {
   Formio.setBaseUrl(apiBase);
   Formio.setProjectUrl(formioBase);
   if (sso) {
+    if(query.saml) {
+      window.location.hash = localStorage.getItem('redirectUrl');
+    }
+    localStorage.setItem('redirectUrl', location.hash);
     loading = Formio.ssoInit(sso, {
       forceAuth: true
     });
+    // Check if already logged in
     if (!loading) {
       // We are starting the handshake process with SSO, disable the app for now.
       disable = true;
