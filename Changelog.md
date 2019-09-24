@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.17
+### Changed
+ - Upgrade formio.js to 4.2.0-rc.7 branch.
+
 ## 7.0.0-rc.16
 ### Fixed
  - Add template loading for nested form submissions table
@@ -14,6 +18,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.0.0-rc-15
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
+
+## 6.8.1
+### Fixed
+ - Tenant manager where you could only see 10 forms in the settings configurations.
+
+### Changed
+ - Upgraded Tenant Manager dependencies for latest angular.
+ - Upgraded Form Manager for latest angular and formio.js@4.2.0-rc.7
+ - Upgraded FormView Pro for latest angular and formio.js@4.2.0-rc.7 
+ - Upgraded @babel/core@7.6.2, @babel/preset-env@7.6.2
+
+## 6.8.0
+### Changed
+ - Upgraded depdendencies.
+ - Upgraded ng-formio fronm 2.37.4 to 2.38.1: See https://github.com/formio/ngFormio/blob/2.x/Changelog.md
+ - Upgraded ngFormBuilder from 2.37.6 to 2.38.0: See https://github.com/formio/ngFormBuilder/blob/master/Changelog.md
+
+### Fixed
+ - SAML redirect to not reset back to the homepage.
 
 ## 6.6.5
 ### Removed

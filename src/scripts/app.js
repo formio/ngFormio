@@ -955,8 +955,10 @@ angular
 
       // If the app is loading then go home.
       if (AppConfig.loading) {
-        AppConfig.loading.then(() => {
-          $state.go('home');
+        AppConfig.loading.then(function() {
+          Formio.currentUser().then(function(user) {
+            $rootScope.user = user;
+          });
         });
       }
       else if (!$rootScope.user) {
