@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.8.1
+### Fixed
+ - Tenant manager where you could only see 10 forms in the settings configurations.
+
+### Changed
+ - Upgraded Tenant Manager dependencies for latest angular.
+ - Upgraded Form Manager for latest angular and formio.js@4.2.0-rc.7
+ - Upgraded FormView Pro for latest angular and formio.js@4.2.0-rc.7 
+ - Upgraded @babel/core@7.6.2, @babel/preset-env@7.6.2
+
 ## 6.8.0
 ### Changed
  - Upgraded depdendencies.
