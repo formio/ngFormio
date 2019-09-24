@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.8.2
+### Changed
+ - Upgrade form manager to resolve issues with defining project object.
+
 ## 6.8.1
 ### Fixed
  - Tenant manager where you could only see 10 forms in the settings configurations.
