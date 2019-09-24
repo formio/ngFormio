@@ -74,7 +74,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.delimiter),
           decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
           allowNegative: _.get(scope.component, 'allowNegative', true)
-        }
+        };
 
         if (_.get(scope.component, 'decimalLimit', scope.decimalLimit) === 0 ||
           (scope.component.validate && scope.component.validate.integer) ||
@@ -103,6 +103,15 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           // Numeric input mask.
           mask = createNumberMask(maskOptions);
         }
+        else if (format === 'datetime') {
+          mask = formioUtils.getInputMask((scope.component.format.replace(/[hHmMyYdD]/g, '9').replace(/[a]/g, 'P')));
+          mask.forEach(function(item, index) {
+            if (item === 'P') {
+              mask[index] = /[AP]/;
+              mask.splice(index + 1, 0, /[M]/);
+            }
+          });
+        }
 
         // Set the mask on the input element.
         if (mask) {
@@ -110,7 +119,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           maskInput({
             inputElement: input,
             mask: mask,
-            showMask: (format !== 'number' && format !== 'currency'),
+            showMask: (format !== 'number' && format !== 'currency' && format !== 'datetime'),
             keepCharPositions: false,
             guide: true,
             placeholderChar: '_'
@@ -120,62 +129,82 @@ module.exports = ['FormioUtils', function(FormioUtils) {
 
       setInputMask(inputElement);
 
-      controller.$validators.mask = function(modelValue, viewValue) {
-        var input = modelValue || viewValue;
-        if (input) {
-          return formioUtils.matchInputMask(input, scope.inputMask);
-        }
-
-        return true;
-      };
-
-      // Only use for currency or number formats.
-      if (format) {
-        // Convert from view to model
-        controller.$parsers.push(function(value) {
-          if (!value) {
-            return value;
+      if (format !== 'datetime') {
+        controller.$validators.mask = function(modelValue, viewValue) {
+          var input = modelValue || viewValue;
+          if (input) {
+            return formioUtils.matchInputMask(input, scope.inputMask);
           }
 
-          // Strip out the prefix and suffix before parsing.
-          value = value.replace(scope.prefix, '').replace(scope.suffix, '');
+          return true;
+        };
+      }
 
-          // Remove thousands separators and convert decimal separator to dot.
-          value = value.split(scope.delimiter).join('').replace(scope.decimalSeparator, '.');
+      switch (format) {
+        case 'currency':
+        case 'number':
+          // Convert from view to model
+          controller.$parsers.push(function(value) {
+            if (!value) {
+              return value;
+            }
 
-          if (scope.component.validate && scope.component.validate.integer) {
-            return parseInt(value, 10);
-          }
-          else {
-            return parseFloat(value);
-          }
-        });
-
-        // Convert from model to view
-        controller.$formatters.push(function(value) {
-          if (Array.isArray(value)) {
-            value = value[0];
-          }
-          try {
-            // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
+            // Strip out the prefix and suffix before parsing.
             value = value.replace(scope.prefix, '').replace(scope.suffix, '');
-          }
-          catch (e) {
-            // If value doesn't have a replace method, continue on as before.
-          }
 
-          // If not a number, return empty string.
-          if (isNaN(value)) {
-            return '';
-          }
+            // Remove thousands separators and convert decimal separator to dot.
+            value = value.split(scope.delimiter).join('').replace(scope.decimalSeparator, '.');
 
-          // If empty string, zero or other, don't format.
-          if (!value) {
-            return value;
-          }
+            if (scope.component.validate && scope.component.validate.integer) {
+              return parseInt(value, 10);
+            }
+            else {
+              return parseFloat(value);
+            }
+          });
 
-          return FormioUtils.formatNumber(value, scope.inputMask);
-        });
+          // Convert from model to view
+          controller.$formatters.push(function(value) {
+            if (Array.isArray(value)) {
+              value = value[0];
+            }
+            try {
+              // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
+              value = value.replace(scope.prefix, '').replace(scope.suffix, '');
+            }
+            catch (e) {
+              // If value doesn't have a replace method, continue on as before.
+            }
+
+            // If not a number, return empty string.
+            if (isNaN(value)) {
+              return '';
+            }
+
+            // If empty string, zero or other, don't format.
+            if (!value) {
+              return value;
+            }
+
+            return FormioUtils.formatNumber(value, scope.inputMask);
+          });
+          break;
+        case 'datetime':
+          // Convert from view to model
+          // controller.$parsers.push(function(value) {
+          //   console.log('value', value);
+          //   if (!value) {
+          //     return value;
+          //   }
+          //
+          //   return new Date(value);
+          // });
+          //
+          // // Convert from model to view
+          // controller.$formatters.push(function(value) {
+          //   return value;
+          // });
+          break;
       }
     }
   };

@@ -19,6 +19,12 @@ module.exports = function(app) {
             return event.keyCode === 9 ? false : $scope.calendarOpen;
           };
 
+          $scope.onBlur = function(event) {
+            if (!$scope.data[$scope.component.key]) {
+              event.target.value = '';
+            }
+          };
+
           var dateValue = function() {
             // If the date is set, then return the true date value.
             if ($scope.data[$scope.component.key]) {

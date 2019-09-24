@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.38.2
+### Fixed
+ - Use input mask when manually entering date/time into a datetime component.
+
 ## 2.38.1
 ### Fixed
  - A build issue with angular-ckeditor.

@@ -5,6 +5,7 @@
     name="{{ componentId }}"
     id="{{ componentId }}"
     ng-focus="calendarOpen = autoOpen"
+    ng-blur="onBlur($event)"
     ng-click="calendarOpen = true"
     ng-init="calendarOpen = false"
     ng-disabled="readOnly"
@@ -22,10 +23,11 @@
     ng-model="data[component.key]"
     ng-model-options="{allowInvalid: true}"
     tabindex="{{ component.tabindex || 0 }}"
-    ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building }}"
+    ng-attr-placeholder="{{ component.placeholder || component.format | formioTranslate:null:options.building }}"
     datepicker-options="component.datePicker"
     timepicker-options="component.timePicker"
     formio-custom-attributes="{{component.attributes}}"
+    formio-mask="datetime"
   />
   <span class="input-group-btn">
     <button type="button" ng-disabled="readOnly" class="btn btn-default" ng-click="calendarOpen = true" tabindex="-1" ng-keydown="calendarOpen = onKeyDown($event)">
