@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+<<<<<<< HEAD
 ## 7.0.0-rc.19
 ### Changed
  - Upgrade formio.js to 4.2.0-rc.7 branch.
@@ -29,6 +30,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.0.0-rc-15
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
+=======
+## 6.8.2
+### Changed
+ - Upgrade form manager to resolve issues with defining project object.
+>>>>>>> 293166678eaa45cbbf0a30136995fbc9924a2ccc
 
 ## 6.8.1
 ### Fixed
