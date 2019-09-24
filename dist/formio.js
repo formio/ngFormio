@@ -1,4 +1,4 @@
-/*! ng-formio v2.38.1 | https://unpkg.com/ng-formio@2.38.1/LICENSE.txt */
+/*! ng-formio v2.38.2 | https://unpkg.com/ng-formio@2.38.2/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -43564,6 +43564,12 @@ module.exports = function(app) {
             return event.keyCode === 9 ? false : $scope.calendarOpen;
           };
 
+          $scope.onBlur = function(event) {
+            if (!$scope.data[$scope.component.key]) {
+              event.target.value = '';
+            }
+          };
+
           var dateValue = function() {
             // If the date is set, then return the true date value.
             if ($scope.data[$scope.component.key]) {
@@ -43653,7 +43659,7 @@ module.exports = function(app) {
     'FormioUtils',
     function($templateCache, FormioUtils) {
       $templateCache.put('formio/components/datetime.html', FormioUtils.fieldWrap(
-        "<div class=\"input-group\">\n  <input\n    type=\"text\"\n    class=\"form-control\"\n    name=\"{{ componentId }}\"\n    id=\"{{ componentId }}\"\n    ng-focus=\"calendarOpen = autoOpen\"\n    ng-click=\"calendarOpen = true\"\n    ng-init=\"calendarOpen = false\"\n    ng-disabled=\"readOnly\"\n    auto-focus=\"true\"\n    ng-required=\"isRequired(component)\"\n    is-open=\"calendarOpen\"\n    datetime-picker=\"{{ component.format }}\"\n    datepicker-mode=\"component.datepickerMode\"\n    when-closed=\"onClosed()\"\n    aria-labelledby=\"{{ componentId +'Label'}}\"\n    aria-describedby=\"{{componentId + 'Desc'}}\"\n    custom-validator=\"component.validate.custom\"\n    enable-date=\"component.enableDate\"\n    enable-time=\"component.enableTime\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-attr-placeholder=\"{{ component.placeholder | formioTranslate:null:options.building }}\"\n    datepicker-options=\"component.datePicker\"\n    timepicker-options=\"component.timePicker\"\n    formio-custom-attributes=\"{{component.attributes}}\"\n  />\n  <span class=\"input-group-btn\">\n    <button type=\"button\" ng-disabled=\"readOnly\" class=\"btn btn-default\" ng-click=\"calendarOpen = true\" tabindex=\"-1\" ng-keydown=\"calendarOpen = onKeyDown($event)\">\n      <i ng-if=\"component.enableDate\" class=\"glyphicon glyphicon-calendar\"></i>\n      <i ng-if=\"!component.enableDate\" class=\"glyphicon glyphicon-time\"></i>\n    </button>\n  </span>\n</div>\n"
+        "<div class=\"input-group\">\n  <input\n    type=\"text\"\n    class=\"form-control\"\n    name=\"{{ componentId }}\"\n    id=\"{{ componentId }}\"\n    ng-focus=\"calendarOpen = autoOpen\"\n    ng-blur=\"onBlur($event)\"\n    ng-click=\"calendarOpen = true\"\n    ng-init=\"calendarOpen = false\"\n    ng-disabled=\"readOnly\"\n    auto-focus=\"true\"\n    ng-required=\"isRequired(component)\"\n    is-open=\"calendarOpen\"\n    datetime-picker=\"{{ component.format }}\"\n    datepicker-mode=\"component.datepickerMode\"\n    when-closed=\"onClosed()\"\n    aria-labelledby=\"{{ componentId +'Label'}}\"\n    aria-describedby=\"{{componentId + 'Desc'}}\"\n    custom-validator=\"component.validate.custom\"\n    enable-date=\"component.enableDate\"\n    enable-time=\"component.enableTime\"\n    ng-model=\"data[component.key]\"\n    ng-model-options=\"{allowInvalid: true}\"\n    tabindex=\"{{ component.tabindex || 0 }}\"\n    ng-attr-placeholder=\"{{ component.placeholder || component.format | formioTranslate:null:options.building }}\"\n    datepicker-options=\"component.datePicker\"\n    timepicker-options=\"component.timePicker\"\n    formio-custom-attributes=\"{{component.attributes}}\"\n    formio-mask=\"datetime\"\n  />\n  <span class=\"input-group-btn\">\n    <button type=\"button\" ng-disabled=\"readOnly\" class=\"btn btn-default\" ng-click=\"calendarOpen = true\" tabindex=\"-1\" ng-keydown=\"calendarOpen = onKeyDown($event)\">\n      <i ng-if=\"component.enableDate\" class=\"glyphicon glyphicon-calendar\"></i>\n      <i ng-if=\"!component.enableDate\" class=\"glyphicon glyphicon-time\"></i>\n    </button>\n  </span>\n</div>\n"
       ));
     }
   ]);
@@ -48445,7 +48451,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           thousandsSeparatorSymbol: _.get(scope.component, 'thousandsSeparator', scope.delimiter),
           decimalSymbol: _.get(scope.component, 'decimalSymbol', scope.decimalSeparator),
           allowNegative: _.get(scope.component, 'allowNegative', true)
-        }
+        };
 
         if (_.get(scope.component, 'decimalLimit', scope.decimalLimit) === 0 ||
           (scope.component.validate && scope.component.validate.integer) ||
@@ -48474,6 +48480,15 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           // Numeric input mask.
           mask = createNumberMask(maskOptions);
         }
+        else if (format === 'datetime') {
+          mask = formioUtils.getInputMask((scope.component.format.replace(/[hHmMyYdD]/g, '9').replace(/[a]/g, 'P')));
+          mask.forEach(function(item, index) {
+            if (item === 'P') {
+              mask[index] = /[AP]/;
+              mask.splice(index + 1, 0, /[M]/);
+            }
+          });
+        }
 
         // Set the mask on the input element.
         if (mask) {
@@ -48481,7 +48496,7 @@ module.exports = ['FormioUtils', function(FormioUtils) {
           maskInput({
             inputElement: input,
             mask: mask,
-            showMask: (format !== 'number' && format !== 'currency'),
+            showMask: (format !== 'number' && format !== 'currency' && format !== 'datetime'),
             keepCharPositions: false,
             guide: true,
             placeholderChar: '_'
@@ -48491,62 +48506,82 @@ module.exports = ['FormioUtils', function(FormioUtils) {
 
       setInputMask(inputElement);
 
-      controller.$validators.mask = function(modelValue, viewValue) {
-        var input = modelValue || viewValue;
-        if (input) {
-          return formioUtils.matchInputMask(input, scope.inputMask);
-        }
-
-        return true;
-      };
-
-      // Only use for currency or number formats.
-      if (format) {
-        // Convert from view to model
-        controller.$parsers.push(function(value) {
-          if (!value) {
-            return value;
+      if (format !== 'datetime') {
+        controller.$validators.mask = function(modelValue, viewValue) {
+          var input = modelValue || viewValue;
+          if (input) {
+            return formioUtils.matchInputMask(input, scope.inputMask);
           }
 
-          // Strip out the prefix and suffix before parsing.
-          value = value.replace(scope.prefix, '').replace(scope.suffix, '');
+          return true;
+        };
+      }
 
-          // Remove thousands separators and convert decimal separator to dot.
-          value = value.split(scope.delimiter).join('').replace(scope.decimalSeparator, '.');
+      switch (format) {
+        case 'currency':
+        case 'number':
+          // Convert from view to model
+          controller.$parsers.push(function(value) {
+            if (!value) {
+              return value;
+            }
 
-          if (scope.component.validate && scope.component.validate.integer) {
-            return parseInt(value, 10);
-          }
-          else {
-            return parseFloat(value);
-          }
-        });
-
-        // Convert from model to view
-        controller.$formatters.push(function(value) {
-          if (Array.isArray(value)) {
-            value = value[0];
-          }
-          try {
-            // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
+            // Strip out the prefix and suffix before parsing.
             value = value.replace(scope.prefix, '').replace(scope.suffix, '');
-          }
-          catch (e) {
-            // If value doesn't have a replace method, continue on as before.
-          }
 
-          // If not a number, return empty string.
-          if (isNaN(value)) {
-            return '';
-          }
+            // Remove thousands separators and convert decimal separator to dot.
+            value = value.split(scope.delimiter).join('').replace(scope.decimalSeparator, '.');
 
-          // If empty string, zero or other, don't format.
-          if (!value) {
-            return value;
-          }
+            if (scope.component.validate && scope.component.validate.integer) {
+              return parseInt(value, 10);
+            }
+            else {
+              return parseFloat(value);
+            }
+          });
 
-          return FormioUtils.formatNumber(value, scope.inputMask);
-        });
+          // Convert from model to view
+          controller.$formatters.push(function(value) {
+            if (Array.isArray(value)) {
+              value = value[0];
+            }
+            try {
+              // Strip out the prefix and suffix. scope occurs when numbers are from an old renderer.
+              value = value.replace(scope.prefix, '').replace(scope.suffix, '');
+            }
+            catch (e) {
+              // If value doesn't have a replace method, continue on as before.
+            }
+
+            // If not a number, return empty string.
+            if (isNaN(value)) {
+              return '';
+            }
+
+            // If empty string, zero or other, don't format.
+            if (!value) {
+              return value;
+            }
+
+            return FormioUtils.formatNumber(value, scope.inputMask);
+          });
+          break;
+        case 'datetime':
+          // Convert from view to model
+          // controller.$parsers.push(function(value) {
+          //   console.log('value', value);
+          //   if (!value) {
+          //     return value;
+          //   }
+          //
+          //   return new Date(value);
+          // });
+          //
+          // // Convert from model to view
+          // controller.$formatters.push(function(value) {
+          //   return value;
+          // });
+          break;
       }
     }
   };
