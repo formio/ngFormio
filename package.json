@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.0-rc.17",
+  "version": "7.0.0-rc.19",
   "dependencies": {
     "@babel/core": "^7.6.2",
     "@babel/preset-env": "^7.6.2",
@@ -36,7 +36,6 @@
     "bootswatch": "^3.4.1",
     "chai": "^4.0.2",
     "chai-as-promised": "^7.0.0",
-    "chance": "^1.1.0",
     "chartist": "^0.11.4",
     "chartist-plugin-tooltip": "0.0.11",
     "ckeditor": "^4.12.1",

@@ -4,9 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 7.0.0-rc.17
+## 7.0.0-rc.19
 ### Changed
  - Upgrade formio.js to 4.2.0-rc.7 branch.
+
+## 7.0.0-rc.18
+### Changed
+ - Upgrade formio.js to 4.0.11
+ 
+### Fixed
+ - IE 11 compatibility with no es6. 
+
+## 7.0.0-rc.17
+### Removed
+ - Dependency on chance.js as it isn't ie11 compatible.
 
 ## 7.0.0-rc.16
 ### Fixed

@@ -1,7 +1,5 @@
 'use strict';
 import semver from 'semver';
-import chanceLib from 'chance';
-const chance = chanceLib();
 
 /* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
@@ -2323,12 +2321,10 @@ app.controller('ProjectSettingsController', [
           keyIndex++;
         }
       });
+      var s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
       $scope.currentProject.settings.keys.push({
         name: 'Key ' + keyIndex,
-        key: chance.string({
-          length: 30,
-          pool: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-        })
+        key: Array(30).join().split(',').map(function() { return s.charAt(Math.floor(Math.random() * s.length)); }).join(''),
       });
       $scope._saveProject($scope.currentProject, $scope.formio);
     };
