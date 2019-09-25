@@ -2297,7 +2297,7 @@ app.controller('FormSubmissionsController', [
           }
 
           var value = FormioUtils.fieldData(val.toJSON(), component);
-          if (!value && ['container', 'datagrid', 'well', 'panel', 'columns', 'fieldset', 'table'].indexOf(component.type) !== -1) {
+          if (!value && ['container', 'datagrid', 'editgrid', 'well', 'panel', 'columns', 'fieldset', 'table'].indexOf(component.type) !== -1) {
             value = val.toJSON();
           }
 
@@ -2512,7 +2512,7 @@ app.controller('FormSubmissionsController', [
               return;
             }
 
-            if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
+            if (['container', 'datagrid', 'editgrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
               FormioUtils.eachComponent(component.components, function(component) {
                 if (component.key) {
                   componentHistory.push(component.key);
