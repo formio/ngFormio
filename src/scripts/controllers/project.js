@@ -2404,6 +2404,7 @@ app.controller('oauthRoles', ['$scope', '$http', function($scope, $http) {
       return;
     }
     openIdData.roles = openIdData.roles || [{}];
+    openIdData.authorizationMethod = openIdData.authorizationMethod || 'body';
   }, true);
 
   $scope.addRow = function() {
