@@ -21,6 +21,13 @@
   <label for="openidClientSecret">Client Secret</label>
   <input ng-model="currentProject.settings.oauth.openid.clientSecret" type="password" class="form-control" id="openidClientSecret" name="openidClientSecret" placeholder="Enter OpenID Connect Application Client Secret">
 </div>
+<div class="form-group">
+  <label for="openidAuthorizationMethod">Authorization Method</label>
+  <select ng-model="currentProject.settings.oauth.openid.authorizationMethod" class="form-control" id="openidAuthorizationMethod" name="openidAuthorizationMethod">
+    <option value="body">Body</option>
+    <option value="header">Header</option>
+  </select>
+</div>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h4>OpenID Connect</h4>
