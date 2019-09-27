@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - The Delete page with PDF's not showing up.
  - Upgraded to latest 4.2.4 core renderer / builder.
 
+### Changed
+ - Made some improvements to the OpenID configurations and functionality.
+
 ## 7.0.0-rc.19
 ### Changed
  - Upgrade formio.js to 4.2.0-rc.7 branch.
