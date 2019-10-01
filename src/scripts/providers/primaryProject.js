@@ -9,27 +9,17 @@ app.factory('PrimaryProject', [
   '$rootScope',
   function (AppConfig, $q, $http, $rootScope) {
     var scope = false;
-
-    return {
-      set: function (project, $scope) {
-
-        // Don't recalculate if primary project hasn't changed.
-        if (scope && project._id === scope.primaryProject._id) {
-          return _.assign($scope, scope);
+    var PrimaryProject = {
+      loadStages: function (project, $scope) {
+        if ($scope.stagesProject && project._id === $scope.stagesProject._id) {
+          return;
         }
 
-        scope = {};
-
-        scope.primaryProject = project;
-        scope.highestRoleLoaded = $scope.highestRoleLoaded;
-        scope.highestRoleQ = $scope.highestRoleQ;
-
-        // Load project environments
+        $scope.stagesProject = project;
+        // Load project stages
         $http.get(AppConfig.apiBase + '/project?project=' + project._id + '&type=stage').then(function (result) {
-          scope.environments = result.data;
-          _.assign($scope, scope);
-
-          scope.environments.forEach(function(environment) {
+          $scope.environments = result.data;
+          $scope.environments.forEach(function(environment) {
             // If environment has a remote, load remote info for lastDeploy and modified.
             if (environment.remote) {
               var remoteProjectUrl = $rootScope.projectPath(environment.remote.project, environment.remote.url, environment.remote.type);
@@ -40,6 +30,25 @@ app.factory('PrimaryProject', [
             }
           });
         });
+      },
+      set: function (project, $scope) {
+
+        // Don't recalculate if primary project hasn't changed.
+        if (scope && project._id === scope.primaryProject._id) {
+          if (!$scope.tenantProject) {
+            PrimaryProject.loadStages(project, $scope);
+          }
+          return _.assign($scope, scope);
+        }
+
+        scope = {};
+
+        scope.primaryProject = project;
+        scope.highestRoleLoaded = $scope.highestRoleLoaded;
+        scope.highestRoleQ = $scope.highestRoleQ;
+        if (!$scope.tenantProject) {
+          PrimaryProject.loadStages(project, $scope);
+        }
 
         // Load the projects teams.
         $http.get(AppConfig.apiBase + '/team/project/' + project._id).then(function (result) {
@@ -122,5 +131,6 @@ app.factory('PrimaryProject', [
         scope = false;
       }
     };
+    return PrimaryProject;
   }
 ]);
