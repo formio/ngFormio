@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.23
+### Added
+ - Renderer version to the bottom version numbers.
+
+### Changed
+ - Upgraded formio.js to 4.2.9
+
 ## 7.0.0-rc.22
 ### Fixed
  - Issues with the EditGrid data not showing when nested forms are used.
@@ -38,6 +45,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.0.0-rc-15
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
+
+## 6.8.3
+### Added
+ - Added possibility to specify authorization method for OpenID.
+
+### Changed
+ - Upgraded Form Manager @ 1.43.0, Form View Pro @ 1.42.0, and Tenant Manager @ 1.3.0
+ - Upgraded dompurify@2.0.3, formiojs@4.2.4, protractor-helpers@1.1.636, webdriverio@5.13.2, webpack@4.41.0, angular-swagger-ui@0.6.2
 
 ## 6.8.2
 ### Changed

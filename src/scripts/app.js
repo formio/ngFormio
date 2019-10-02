@@ -1,5 +1,5 @@
 'use strict';
-
+const packageJSON = require('../../package.json');
 import { Templates, Formio } from 'ng-formio/lib/modules';
 Templates.framework = 'bootstrap3';
 Formio.icons = 'fa';
@@ -1419,6 +1419,8 @@ function $run($rootScope, $location, $window) {
 
   var dataLayer = $window.dataLayer = $window.dataLayer || [];
 
+  $rootScope.appVersion = packageJSON.version;
+  $rootScope.rendererVersion = packageJSON.dependencies.formiojs.replace('^', '');
   $rootScope.$on('$stateChangeSuccess', function() {
 
     dataLayer.push({
