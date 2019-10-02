@@ -221,15 +221,15 @@ module.exports = function(app) {
         // For some reason required validation doesn't fire properly after removing an item from an array which results
         // in an empty array that is marked as valid. Fix by removing the empty array.
         // Check also if the component value is an array with an empty string: [""]
-        const isEmptyArray = Array.isArray(value) && value.length === 0;
-        const isArrayWithEmptyItem = Array.isArray(value) && value.length === 1 && !value[0];
+        var isEmptyArray = Array.isArray(value) && value.length === 0;
+        var isArrayWithEmptyItem = Array.isArray(value) && value.length === 1 && !value[0];
         if (isEmptyArray || isArrayWithEmptyItem) {
           delete $scope.data[$scope.component.key];
         }
 
         // The file model is not getting dirty automatically
-        const form = $scope.$parent[$scope.formName];
-        const componentModel = form ? form[$scope.component.key] : null;
+        var form = $scope.$parent[$scope.formName];
+        var componentModel = form ? form[$scope.component.key] : null;
         if (componentModel) {
           componentModel.$setDirty();
         }

@@ -1,4 +1,4 @@
-/*! ng-formio v2.38.2 | https://unpkg.com/ng-formio@2.38.2/LICENSE.txt */
+/*! ng-formio v2.38.3 | https://unpkg.com/ng-formio@2.38.3/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 (function (root, factory) {
   // AMD
@@ -101374,8 +101374,18 @@ module.exports = function(app) {
       $scope.$watch('data.' + $scope.component.key, function(value) {
         // For some reason required validation doesn't fire properly after removing an item from an array which results
         // in an empty array that is marked as valid. Fix by removing the empty array.
-        if (Array.isArray(value) && value.length === 0) {
+        // Check also if the component value is an array with an empty string: [""]
+        var isEmptyArray = Array.isArray(value) && value.length === 0;
+        var isArrayWithEmptyItem = Array.isArray(value) && value.length === 1 && !value[0];
+        if (isEmptyArray || isArrayWithEmptyItem) {
           delete $scope.data[$scope.component.key];
+        }
+
+        // The file model is not getting dirty automatically
+        var form = $scope.$parent[$scope.formName];
+        var componentModel = form ? form[$scope.component.key] : null;
+        if (componentModel) {
+          componentModel.$setDirty();
         }
       }, true);
 
