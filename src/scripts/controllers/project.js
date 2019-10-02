@@ -220,13 +220,14 @@ app.controller('ProjectCreateEnvironmentController', [
 
     $scope.currentProject = {};
     $scope.primaryProjectPromise.then(function(primaryProject) {
+      var parentProject = $scope.tenantProject ? $scope.tenantProject : primaryProject;
       $scope.currentProject = {
         title: '',
         type: 'stage',
-        project: primaryProject._id
+        project: parentProject._id
       };
       $scope.$watch('currentProject.title', function(newTitle) {
-        $scope.currentProject.name = newTitle.replace(/\W/g, '').toLowerCase() + '-' + primaryProject.name;
+        $scope.currentProject.name = newTitle.replace(/\W/g, '').toLowerCase() + '-' + parentProject.name;
       });
     });
 
@@ -411,15 +412,28 @@ app.controller('ProjectController', [
     };
 
     var primaryProjectQ = $q.defer();
+    var tenantProjectQ = $q.defer();
     var formioReady = $q.defer();
     $scope.formioReady = formioReady.promise;
     $scope.primaryProjectPromise = primaryProjectQ.promise;
+    $scope.tenantProject = null;
+    $scope.tenantProjectPromise = tenantProjectQ.promise;
     PDFServer.setPrimaryProject(primaryProjectQ.promise);
     $scope.highestRoleQ = $q.defer();
     $scope.highestRoleLoaded = $scope.highestRoleQ.promise;
 
+    // Sets the tenant project.
+    var setTenant = function(tenant) {
+      if (tenant && tenant.type === 'tenant') {
+        $scope.tenantProject = tenant;
+        PrimaryProject.loadStages(tenant, $scope);
+        tenantProjectQ.resolve(tenant);
+      }
+    };
+
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
       $scope.localProject = result;
+      setTenant($scope.localProject);
       $scope.localProjectUrl = $rootScope.projectPath(result);
       var promiseResult = result;
       // If this is a remote project, load the remote.
@@ -545,14 +559,21 @@ app.controller('ProjectController', [
       });
 
       $scope.projectTeamsLoading = true;
-      if ($scope.localProject.project) {
-        // This is an environment. Load the primary Project
-        primaryProjectQ.resolve((new Formio('/project/' + $scope.localProject.project)).loadProject(null, {ignoreCache: true}));
-      }
-      else {
-        // This is the primary environment.
-        primaryProjectQ.resolve($scope.localProject);
-      }
+
+      // Traverses the project parent tree until it gets to the primary project until it reaches the primary.
+      var loadPrimaryProject = function(project) {
+        if (!project.project) {
+          return project;
+        }
+
+        return (new Formio('/project/' + project.project))
+          .loadProject(null, {ignoreCache: true}).then((parentProject) => {
+            setTenant(parentProject);
+            return loadPrimaryProject(parentProject);
+          });
+      };
+
+      primaryProjectQ.resolve(loadPrimaryProject($scope.localProject));
       $scope.projectViewReady = false;
       $scope.primaryProjectPromise.then(function(primaryProject) {
         var currTime = (new Date()).getTime();
