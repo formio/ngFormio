@@ -1,4 +1,5 @@
 'use strict';
+const packageJSON = require('../../package.json');
 
 /**
  * @ngdoc overview
@@ -1446,6 +1447,8 @@ function $run($rootScope, $location, $window) {
 
   var dataLayer = $window.dataLayer = $window.dataLayer || [];
 
+  $rootScope.appVersion = packageJSON.version;
+  $rootScope.rendererVersion = packageJSON.dependencies['ng-formio'].replace('^', '');
   $rootScope.$on('$stateChangeSuccess', function() {
 
     dataLayer.push({

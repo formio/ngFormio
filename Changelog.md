@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.8.4
+### Changed
+ - Upgraded ng-formio renderer that resolves bug with File component errors. https://github.com/formio/ngFormio/pull/650
+ - Added the renderer version and application version to the application.
+
 ## 6.8.3
 ### Added
  - Added possibility to specify authorization method for OpenID.
