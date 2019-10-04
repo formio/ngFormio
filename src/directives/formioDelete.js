@@ -55,6 +55,13 @@ export default app.directive('formioDelete', function() {
           resourceName = name;
         });
 
+        $scope.$watch('formAction', function (action) {
+          if (!action) { return; }
+
+          $scope.action = action;
+          $scope.deleteMessage = $scope.message || 'Are you sure you wish to delete the ' + resourceName + '?';
+        });
+
         // Create delete capability.
         $scope.onDelete = function() {
           resourceName = resourceName || 'resource';
