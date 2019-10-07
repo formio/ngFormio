@@ -278,7 +278,43 @@ node server</pre>
             when: null,
             eq: ''
           }
-        }, {
+        }, 
+        {
+          autofocus: false,
+          input: true,
+          tableView: true,
+          label: 'Test min-max',
+          key: 'page1TestminMax',
+          image: true,
+          imageSize: '200',
+          placeholder: '',
+          multiple: true,
+          defaultValue: '',
+          protected: false,
+          persistent: true,
+          hidden: false,
+          filePattern: '*',
+          fileMinSize: '0KB',
+          fileMaxSize: '1GB',
+          type: 'file',
+          storage: 's3',
+          slides: true,
+          labelPosition: 'top',
+          tags: [],
+          conditional: {
+              show: '',
+              when: null,
+              eq: ''
+          },
+          weight: 0,
+          properties: {},
+          validate: {
+              minItems: 1,
+              maxItems: 5
+          },
+          clearOnHide: true
+        },
+        {
           type: 'button',
           theme: 'primary',
           disableOnInvalid: true,
@@ -293,6 +329,19 @@ node server</pre>
           input: true
         }],
         display: 'form'
+      };
+      Formio.providers.storage.s3 = function() {
+        this.uploadFile = (file, key, dir, evt) => {
+          return {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            storage: 'url',
+            key: key,
+            url: 'https://help.form.io/assets/formio-logo.png'
+          }
+        };
+        this.downloadFile = fileInfo => fileInfo;
       };
     }]);
 </script>

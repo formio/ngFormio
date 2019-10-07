@@ -5,8 +5,8 @@
 <span ng-if="!component.label && isRequired(component)" class="glyphicon glyphicon-asterisk form-control-feedback field-required-inline" aria-hidden="true"></span>
 <div class="formio-errors"><formio-errors ng-if="::!options.building"></formio-errors></div>
 <div ng-controller="formioFileUpload" ng-style="getInputGroupStyles(component)">
-  <formio-file-list files="data[component.key]" form="formio.formUrl" ng-if="!component.image" ng-required="isRequired(component)" ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" name="{{ componentId }}" read-only="readOnly"></formio-file-list>
-  <formio-image-list files="data[component.key]" form="formio.formUrl" width="component.imageSize" ng-if="component.image" ng-required="isRequired(component)" ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" name="{{ componentId }}" read-only="readOnly"></formio-image-list>
+  <formio-file-list files="data[component.key]" form="formio.formUrl" ng-if="!component.image" ng-required="isRequired(component)" validate-items-length ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" name="{{ componentId }}" read-only="readOnly"></formio-file-list>
+  <formio-image-list files="data[component.key]" form="formio.formUrl" width="component.imageSize" ng-if="component.image" validate-items-length ng-required="isRequired(component)" ng-model="data[component.key]" ng-model-options="{allowInvalid: true}" name="{{ componentId }}" read-only="readOnly"></formio-image-list>
   <div ng-if="!readOnly && (component.multiple || (!component.multiple && !data[component.key].length))">
     <div ngf-drop="upload($files, $invalidFiles)"
       class="fileSelector"
