@@ -740,11 +740,11 @@ angular
       $scope.projectSearch = {};
       $scope.projectsLoaded = false;
       // TODO: query for unlimited projects instead of this limit
-      var _projectsPromise = Formio.loadProjects('?limit=9007199254740991&sort=-modified&project__exists=false')
+      var _projectsPromise = Formio.loadProjects('?limit=100000&sort=-modified&project__exists=false')
         .then(function(projects) {
           // If this is an old server, this will load without the project__exists.
           if (projects.length === 0) {
-            return Formio.loadProjects('?limit=9007199254740991&sort=-modified');
+            return Formio.loadProjects('?limit=100000&sort=-modified');
           } else {
             return projects;
           }
