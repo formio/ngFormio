@@ -173,7 +173,13 @@ export default app.directive('formio', function() {
           if (!submission) {
             return;
           }
-          $scope.onFormio.then(() => ($scope.formio.submission = submission));
+          $scope.onFormio.then(() => {
+            const isSame = angular.equals($scope.formio.submission, submission);
+            // don't set submission if new and old are same because it might cause a redraw on typing which would cause cursor jumping
+            if (!isSame) {
+              $scope.formio.submission = submission
+            }
+          });
         }, true);
 
         $scope.$on('componentChange', function () {
