@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.24
+### Changed
+ - Upgraded formio.js@4.3.3
+ - Upgraded Form Manager @ 1.45.0
+ - Upgraded Form View Pro @ 1.44.0
+ - Upgraded @babel/core@7.6.4, @babel/preset-env@7.6.3, @progress/kendo-ui@2019.3.1010, dompurify@2.0.6, protractor-helpers@1.1.649, webdriverio@5.14.5
+
 ## 7.0.0-rc.23
 ### Added
  - Renderer version to the bottom version numbers.
