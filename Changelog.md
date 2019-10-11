@@ -53,6 +53,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
 
+## 6.8.5
+### Changed
+ - Fix project limit to be a sane value so we don't overrun max_int on some systems.
+
+## 6.8.4
+### Changed
+ - Upgraded ng-formio renderer that resolves bug with File component errors. https://github.com/formio/ngFormio/pull/650
+ - Added the renderer version and application version to the application.
+
 ## 6.8.3
 ### Added
  - Added possibility to specify authorization method for OpenID.
