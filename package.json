@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.0-rc.24",
+  "version": "7.0.0-rc.25",
   "dependencies": {
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
@@ -78,7 +78,7 @@
     "selenium-server-standalone-jar": "^3.141.59",
     "signature_pad": "^2.3.2",
     "style-loader": "^1.0.0",
-    "swagger-ui": "^3.23.11",
+    "swagger-ui": "^3.24.0",
     "ui-select": "^0.19.8",
     "webdriverio": "^5.15.0",
     "webdriverjs-angular": "^0.1.3",

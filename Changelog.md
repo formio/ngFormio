@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.25
+### Fixed
+ - Staging deployments for Tenants.
+
 ## 7.0.0-rc.24
 ### Changed
  - Upgraded formio.js@4.3.3
@@ -52,6 +56,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.0.0-rc-15
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
+
+## 6.8.6
+### Fixed
+ - Staging deployments for Tenants.
+
+### Changed
+ - Upgraded Form Managaer to v1.45.0 https://github.com/formio/formmanager/blob/master/CHANGELOG.md#1450
+ - Upgraded @babel/core@7.6.4, @babel/preset-env@7.6.3, @progress/kendo-ui@2019.3.1010, chance@1.1.3, dompurify@2.0.6, protractor-helpers@1.1.651, webpack@4.41.1, core-js@3.3.1, formiojs@4.3.3, swagger-ui@3.24.0, webdriverio@5.15.0
 
 ## 6.8.5
 ### Changed

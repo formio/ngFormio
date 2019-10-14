@@ -715,13 +715,6 @@ app.controller('ProjectDeployController', [
     FormioAlerts,
     PrimaryProject
   ) {
-    var loadTags = function(project) {
-      Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag?limit=10&sort=-created', 'GET', null, {ignoreCache: true})
-        .then(function(tags) {
-          $scope.tags = tags;
-        });
-    };
-
     if ($stateParams.tag) {
       Formio.makeStaticRequest($scope.localProjectUrl + '/tag/' + $stateParams.tag._id, 'GET')
         .then(function(tag) {
@@ -729,7 +722,13 @@ app.controller('ProjectDeployController', [
         });
     }
     else {
-      $scope.primaryProjectPromise.then(loadTags);
+      $scope.primaryProjectPromise.then(function(project) {
+        project = $scope.tenantProject ? $scope.tenantProject : project;
+        Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + project._id + '/tag?limit=10&sort=-created', 'GET', null, {ignoreCache: true})
+          .then(function(tags) {
+            $scope.tags = tags;
+          });
+      });
     }
 
     $scope.deployTag = function(tag) {
@@ -814,7 +813,7 @@ app.controller('ProjectTagCreateController', [
       Formio.makeStaticRequest($scope.projectUrl + '/export', 'GET')
         .then(function(template) {
           Formio.makeStaticRequest(AppConfig.apiBase + '/project/' + $scope.localProject._id + '/tag', 'POST', {
-            project: $scope.primaryProject._id,
+            project: $scope.tenantProject ? $scope.tenantProject._id : $scope.primaryProject._id,
             tag: tag.substr(0, 32),
             description: description.substr(0, 256),
             template: template
@@ -861,6 +860,7 @@ app.controller('ProjectTagManageController', [
       $scope.tagsParams = {
         sort: '-created'
       };
+      project = $scope.tenantProject ? $scope.tenantProject : project;
       $scope.tagsUrl = AppConfig.apiBase + '/project/' + project._id + '/tag?sort=-created';
     });
 
