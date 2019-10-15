@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.3.2
+### Changed
+ - Upgrade formio.js to 4.3.5
+ - Fixes issue with resetting the textfield and text areas while typing.
+
 ## 4.3.1
 ### Changed
  - Upgrade formio.js to 4.3.3
