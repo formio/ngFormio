@@ -8,6 +8,8 @@ var loadedFiles = [];
 
 var app = angular.module('formioApp.controllers.project', ['angular-chartist']);
 
+const EVERYONE_ROLE = {_id: '000000000000000000000000', title: 'Everyone', description: 'A role for all Users'};
+
 /*
 * Prevents user inputting non-alphanumeric characters or starting the domain with a hyphen.
 * Also automatically lowercases the domain.
@@ -339,6 +341,8 @@ app.controller('ProjectController', [
           if ($scope.projectPermissions.read) {
             return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
               $scope.currentProjectRoles = result.data;
+              // Add Everyone role.
+              $scope.currentProjectRoles.push(EVERYONE_ROLE);
               $scope.rolesLoading = false;
 
               return $scope.currentProjectRoles;
