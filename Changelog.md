@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.26
+### Added
+ - The Everyone role to the roles & permissions section.
+
+### Fixed
+ - Actions system.
+ - Public Configurations to work.
+
+### Changed
+ - Upgrade formiojs@4.4.1
+ - Upgrade @progress/kendo-ui@2019.3.1016, ng-formio@4.3.3, protractor-helpers@1.1.654, webdriverio@5.15.1, dotenv@8.2.0, formiojs@4.4.1
+
 ## 7.0.0-rc.25
 ### Fixed
  - Staging deployments for Tenants.
