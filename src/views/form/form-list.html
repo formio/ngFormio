@@ -36,7 +36,7 @@
             <div class="form-list-description" ng-if="listMode === 'form' || listMode === 'resource'">Name: {{ form.name }}</div>
             <div class="form-list-description" ng-if="listMode === 'form' || listMode === 'resource'">
               <span>Tags:</span>
-              <span ng-repeat="tag in form.tags">
+              <span ng-repeat="tag in form.tags track by $index">
                 <span class="label label-default">{{ tag }}</span>
               </span>
             </div>

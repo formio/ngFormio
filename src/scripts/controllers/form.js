@@ -1836,6 +1836,7 @@ app.factory('ActionInfoLoader', [
        */
       load: function($scope, $stateParams) {
         // Get the action information.
+        $scope.actionLoaded = false;
         $scope.actionUrl = $scope.formio.formUrl + '/action';
         if ($stateParams.actionId) {
           $scope.actionUrl += ('/' + $stateParams.actionId);
@@ -1866,12 +1867,14 @@ app.factory('ActionInfoLoader', [
             var loader = new Formio($scope.actionUrl, {base: $scope.baseUrl});
             return loader.loadAction().then(function(action) {
               $scope.action = _.merge($scope.action, {data: action});
+              $scope.actionLoaded = true;
               return getActionInfo(action.name);
             });
           }
           else if (defaults) {
             $scope.action = _.merge($scope.action, {data: defaults});
             $scope.action.data.settings = {};
+            $scope.actionLoaded = true;
             return $q.when($scope.actionInfo);
           }
         };
@@ -1919,7 +1922,7 @@ app.controller('FormActionEditController', [
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
-
+    $scope.actionLoaded = false;
     $scope.loadProjectPromise.then(function() {
       // Helpful warnings for certain actions
       ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
@@ -2085,6 +2088,7 @@ app.controller('FormActionEditController', [
 
     $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
+      Formio.cache = {};
       var method = $scope.actionUrl ? 'updated' : 'created';
       FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
       $state.go('project.' + $scope.formInfo.type + '.form.action.index');

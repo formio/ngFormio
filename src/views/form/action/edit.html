@@ -7,4 +7,12 @@
     </div>
   </div>
 </div>
-<formio form="actionInfo.settingsForm" submission="action" form-action="actionUrl" read-only="highestRole === 'team_read' || formDisabled" options="{ baseUrl: baseUrl, currentForm: currentForm }"></formio>
+<i id="form-loader" ng-if="!actionLoaded" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i>
+<formio
+  *ngIf="actionLoaded"
+  form="actionInfo.settingsForm"
+  submission="action"
+  form-action="actionUrl"
+  read-only="highestRole === 'team_read' || formDisabled"
+  options="{ baseUrl: baseUrl, currentForm: currentForm }">
+</formio>
