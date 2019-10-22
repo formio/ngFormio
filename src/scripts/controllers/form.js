@@ -2439,7 +2439,7 @@ app.controller('FormSubmissionsController', [
               read: function(options) {
                 var filters = options.data.filter && options.data.filter.filters;
                 var params = {
-                  limit: options.data.take,
+                  limit: options.data.take || dataSource.total(),
                   skip: options.data.skip,
                   sort: getSortQuery(options.data.sort)
                 };
