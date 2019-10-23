@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.4.0
+### Changed
+ - Upgraded formio.js to 4.5.0
+
 ## 4.3.4
 ### Changed
  - Upgrade formio.js to 4.4.2
