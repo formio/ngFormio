@@ -226,11 +226,11 @@ module.exports = function(app) {
         if (isEmptyArray || isArrayWithEmptyItem) {
           delete $scope.data[$scope.component.key];
         }
-
         // The file model is not getting dirty automatically
         var form = $scope.$parent[$scope.formName];
         var componentModel = form ? form[$scope.component.key] : null;
         if (componentModel) {
+          componentModel.$validate();
           componentModel.$setDirty();
         }
       }, true);
@@ -327,6 +327,35 @@ module.exports = function(app) {
       };
     }
   ]);
+  app.directive('validateItemsLength', function() {
+    return {
+      require: 'ngModel',
+      link: function(scope, ele, attrs, ngModelCtrl) {
+        ngModelCtrl.$validators.minItems = function(modelValue, viewValue) {
+          var isValid = true;
+          if (scope.component && !isNaN(scope.component.validate.minItems)) {
+            if (Array.isArray(modelValue)) {
+              isValid = modelValue.length >= scope.component.validate.minItems;
+            } else {
+              isValid = false;
+            }
+          }
+          ngModelCtrl.$error.minItems = !isValid;
+          return isValid;
+        }
+        ngModelCtrl.$validators.maxItems = function(modelValue, viewValue) {
+          var isValid = true;
+          if (scope.component && !isNaN(scope.component.validate.maxItems)) {
+            if (Array.isArray(modelValue)) {
+              isValid = modelValue.length <= scope.component.validate.maxItems;
+            }
+          }
+          ngModelCtrl.$error.maxItems = !isValid;
+          return isValid;
+        }
+      }
+    };
+  });
   app.run([
     '$templateCache',
     function(
