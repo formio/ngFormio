@@ -1,0 +1,63 @@
+{
+  "name": "@formio/bootstrap3",
+  "version": "1.0.0",
+  "description": "Bootstrap 3 templates for form.io",
+  "main": "lib/index.js",
+  "private": true,
+  "scripts": {
+    "test:coverage": "nyc --reporter=text mocha --reporter spec './{,!(node_modules)/**/}*.spec.js'",
+    "test": "mocha --require ts-node/register --reporter spec './{,!(node_modules)/**/}*.spec.ts'",
+    "watch": "tsc -w",
+    "build": "tsc && gulp templates",
+    "lint": "tslint -p .",
+    "prepublish": "npm run build"
+  },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/formio/bootstrap3.git"
+  },
+  "keywords": [
+    "Form.io",
+    "USWDS",
+    "Us",
+    "Web",
+    "Design",
+    "Standards"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.2.3",
+    "@types/ejs": "^2.6.3",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.11.2",
+    "@types/sinon": "^7.5.0",
+    "chai": "^4.2.0",
+    "gulp": "^4.0.2",
+    "gulp-insert": "^0.5.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-template": "^5.0.0",
+    "mocha": "^6.2.2",
+    "nyc": "^14.1.1",
+    "pre-commit": "^1.2.2",
+    "sinon": "^7.5.0",
+    "ts-node": "^8.4.1",
+    "ts-sinon": "^1.0.24",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4"
+  },
+  "author": "Randall Knutson <randall@form.io>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/formio/bootstrap3/issues"
+  },
+  "homepage": "https://github.com/formio/bootstrap3#readme",
+  "dependencies": {
+    "resize-observer-polyfill": "^1.5.1"
+  }
+}

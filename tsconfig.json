@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "preserveConstEnums": true,
+    "outDir": "lib",
+    "noImplicitAny": false,
+    "sourceMap": false,
+    "declaration": true,
+    "rootDir": "src"
+  },
+  "include": [
+    "src/*.ts",
+    "src/*.ejs",
+    "src/**/*.ts",
+    "src/**/*.ejs"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
