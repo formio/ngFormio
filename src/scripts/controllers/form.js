@@ -990,31 +990,21 @@ app.controller('FormViewController', [
       }
       $scope.formReady = true;
     });
-
     $scope.$on('formSubmission', function(event, submission) {
       if ($stateParams.revision) {
         submission._fvid = $stateParams.revision._vid;
       }
-      $scope.formio.saveSubmission(submission)
-        .then(function(submission) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'New submission added!'
-          });
-          GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
-          if (submission._id) {
-            $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
-          }
-          else {
-            $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
-          }
-        })
-        .catch(function(err) {
-          _.each(_.isString(err) ? [err] : err.details, function(errDetails) {
-            FormioAlerts.onError.call(FormioAlerts, errDetails);
-            $scope.$broadcast('submitError', err);
-          });
-        });
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'New submission added!'
+      });
+      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+      if (submission._id) {
+        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+      }
+      else {
+        $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
+      }
     });
   }
 ]);
