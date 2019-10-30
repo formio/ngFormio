@@ -25376,7 +25376,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.6.1';
+Formio.version = '4.6.2';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
@@ -36024,11 +36024,18 @@ function (_Field) {
       // If single value field.
       if (!this.useWrapper()) {
         return _get(_getPrototypeOf(Multivalue.prototype), "render", this).call(this, "<div ref=\"element\">".concat(this.renderElement(this.dataValue), "</div>"));
+      } // Make sure dataValue is in the correct array format.
+
+
+      var dataValue = this.dataValue;
+
+      if (!Array.isArray(dataValue)) {
+        dataValue = dataValue ? [dataValue] : [];
       } // If multiple value field.
 
 
       return _get(_getPrototypeOf(Multivalue.prototype), "render", this).call(this, this.renderTemplate('multiValueTable', {
-        rows: this.dataValue.map(this.renderRow.bind(this)).join(''),
+        rows: dataValue.map(this.renderRow.bind(this)).join(''),
         disabled: this.disabled,
         addAnother: this.addAnother
       }));
@@ -42045,11 +42052,10 @@ function (_NestedComponent) {
 
   }, {
     key: "checkRows",
-    value: function checkRows(method) {
+    value: function checkRows(method, data, opts) {
       var _this6 = this;
 
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.data;
-      var opts = arguments.length > 2 ? arguments[2] : undefined;
+      data = data || this.data;
       return this.rows.reduce(function (valid, row, index) {
         return _this6.checkRow(method, data[index], row, opts) && valid;
       }, true);
@@ -43610,6 +43616,8 @@ __webpack_require__(/*! core-js/modules/es.string.pad-start */ "./node_modules/c
 
 __webpack_require__(/*! core-js/modules/es.string.split */ "./node_modules/core-js/modules/es.string.split.js");
 
+__webpack_require__(/*! core-js/modules/web.dom-collections.for-each */ "./node_modules/core-js/modules/web.dom-collections.for-each.js");
+
 __webpack_require__(/*! core-js/modules/web.dom-collections.iterator */ "./node_modules/core-js/modules/web.dom-collections.iterator.js");
 
 Object.defineProperty(exports, "__esModule", {
@@ -43779,38 +43787,51 @@ function (_Field) {
 
       var superAttach = _get(_getPrototypeOf(DayComponent.prototype), "attach", this).call(this, element);
 
-      this.addEventListener(this.refs.day, 'input', function () {
-        return _this2.updateValue(null, {
-          modified: true
-        });
-      }); // TODO: Need to rework this to work with day select as well.
-      // Change day max input when month changes.
+      if (this.shouldDisabled) {
+        this.setDisabled(this.refs.day, true);
+        this.setDisabled(this.refs.month, true);
+        this.setDisabled(this.refs.year, true);
 
-      this.addEventListener(this.refs.month, 'input', function () {
-        var maxDay = parseInt(new Date(_this2.refs.year.value, _this2.refs.month.value, 0).getDate(), 10);
-
-        var day = _this2.getFieldValue('day');
-
-        _this2.refs.day.max = maxDay;
-
-        if (day > maxDay) {
-          _this2.refs.day.value = _this2.refs.day.max;
+        if (this.refs.input) {
+          this.refs.input.forEach(function (input) {
+            return _this2.setDisabled(input, true);
+          });
         }
+      } else {
+        this.addEventListener(this.refs.day, 'input', function () {
+          return _this2.updateValue(null, {
+            modified: true
+          });
+        }); // TODO: Need to rework this to work with day select as well.
+        // Change day max input when month changes.
 
-        _this2.updateValue(null, {
-          modified: true
+        this.addEventListener(this.refs.month, 'input', function () {
+          var maxDay = parseInt(new Date(_this2.refs.year.value, _this2.refs.month.value, 0).getDate(), 10);
+
+          var day = _this2.getFieldValue('day');
+
+          _this2.refs.day.max = maxDay;
+
+          if (day > maxDay) {
+            _this2.refs.day.value = _this2.refs.day.max;
+          }
+
+          _this2.updateValue(null, {
+            modified: true
+          });
         });
-      });
-      this.addEventListener(this.refs.year, 'input', function () {
-        return _this2.updateValue(null, {
-          modified: true
+        this.addEventListener(this.refs.year, 'input', function () {
+          return _this2.updateValue(null, {
+            modified: true
+          });
         });
-      });
-      this.addEventListener(this.refs.input, this.info.changeEvent, function () {
-        return _this2.updateValue(null, {
-          modified: true
+        this.addEventListener(this.refs.input, this.info.changeEvent, function () {
+          return _this2.updateValue(null, {
+            modified: true
+          });
         });
-      });
+      }
+
       this.setValue(this.dataValue);
       return superAttach;
     }
@@ -46939,6 +46960,10 @@ function (_Field) {
 
               fileInfo.originalName = file.name;
 
+              if (!_this5.hasValue()) {
+                _this5.dataValue = [];
+              }
+
               _this5.dataValue.push(fileInfo);
 
               _this5.redraw();
@@ -47959,7 +47984,8 @@ function (_Component) {
 
       // If we wish to submit the form on next page, then do that here.
       if (this.shouldSubmit) {
-        return this.createSubForm().then(function () {
+        var subFormReady = this.subFormReady || this.createSubForm();
+        return subFormReady.then(function () {
           if (!_this4.subForm) {
             return _this4.dataValue;
           }
@@ -50814,10 +50840,9 @@ function (_Field) {
       if (shouldResetValue) {
         this.resetValue();
         this.triggerChange();
-      } else {
-        this.previousValue = this.dataValue;
       }
 
+      this.previousValue = this.dataValue;
       return changed;
     }
     /**
@@ -52318,7 +52343,7 @@ function (_Field) {
             var resourceUrl = this.options.formio ? this.options.formio.formsUrl : "".concat(_Formio.default.getProjectUrl(), "/form");
             resourceUrl += "/".concat(this.component.data.resource, "/submission");
 
-            if (this.additionalResourcesAvailable) {
+            if (forceUpdate || this.additionalResourcesAvailable) {
               try {
                 this.loadItems(resourceUrl, searchInput, this.requestHeaders);
               } catch (err) {
@@ -53738,7 +53763,7 @@ var _default = [{
     json: {
       in: [{
         var: 'data.dataSrc'
-      }, ['url', 'resource', 'json']]
+      }, ['url', 'resource']]
     }
   }
 }, {
@@ -55064,11 +55089,15 @@ function (_Field) {
       var superAttach = _get(_getPrototypeOf(SurveyComponent.prototype), "attach", this).call(this, element);
 
       this.refs.input.forEach(function (input) {
-        _this.addEventListener(input, 'change', function () {
-          return _this.updateValue(null, {
-            modified: true
+        if (_this.disabled) {
+          input.setAttribute('disabled', 'disabled');
+        } else {
+          _this.addEventListener(input, 'change', function () {
+            return _this.updateValue(null, {
+              modified: true
+            });
           });
-        });
+        }
       });
       this.setValue(this.dataValue);
       return superAttach;
@@ -57130,7 +57159,14 @@ function (_TextFieldComponent) {
         value = Array.isArray(value) ? value.map(function (val) {
           return _this7.setConvertedValue(val);
         }) : this.setConvertedValue(value);
-        return _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, value, flags);
+
+        var _changed = _get(_getPrototypeOf(TextAreaComponent.prototype), "setValue", this).call(this, value, flags);
+
+        if (_changed && (this.disabled || this.options.readOnly)) {
+          this.triggerRedraw();
+        }
+
+        return _changed;
       } // Set the value when the editor is ready.
 
 
