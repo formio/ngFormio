@@ -7,3 +7,7 @@ import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflin
 import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf';
 import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff';
 import '../node_modules/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2';
+import '../node_modules/@progress/kendo-ui/css/web/fonts/glyphs/WebComponentsIcons.eot';
+import '../node_modules/@progress/kendo-ui/css/web/fonts/glyphs/WebComponentsIcons.ttf';
+import '../node_modules/@progress/kendo-ui/css/web/fonts/glyphs/WebComponentsIcons.woff';
+import '../node_modules/@progress/kendo-ui/css/web/fonts/glyphs/WebComponentsIcons.svg';
