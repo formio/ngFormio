@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.32
+### Fixed
+ - Issues with KendoUI Grid only showing triangles.
+ 
+### Changed
+ - Upgrade formio.js@4.7.0
+
 ## 7.0.0-rc.30
 ### Changed
  - Upgrade formio.j@4.6.1
