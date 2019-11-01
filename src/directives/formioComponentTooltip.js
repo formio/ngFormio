@@ -6,7 +6,7 @@ module.exports = function() {
     template: '<i ng-if="component.tooltip"' +
     ' class="glyphicon glyphicon-question-sign"' +
     ' ng-class="{ \'text-muted\': component.type !== \'button\' }"' +
-    ' uib-tooltip="{{ component.tooltip }}"' +
+    ' uib-tooltip="{{ component.tooltip | formioTranslate:null:options.building }}"' +
     ' tooltip-placement="right"' +
     ' tooltip-popup-close-delay="100" id="{{component.key+\'Desc\'}}"></i>'
   };
