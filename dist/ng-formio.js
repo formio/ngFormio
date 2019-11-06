@@ -29604,7 +29604,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.7.2';
+Formio.version = '4.7.3';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
@@ -37116,7 +37116,7 @@ function (_Element) {
           case 'property':
             FormioUtils.setActionProperty(newComponent, action, row, data, newComponent, result, _this10);
 
-            if (!_lodash.default.isEqual(_this10, newComponent)) {
+            if (!_lodash.default.isEqual(_this10.component, newComponent)) {
               changed = true;
             }
 
@@ -44200,7 +44200,9 @@ function (_NestedComponent) {
         _lodash.default.last(visible).component.width += span;
 
         _lodash.default.each(visible, function (col) {
-          col.element.setAttribute('class', col.className);
+          if (col.element) {
+            col.element.setAttribute('class', col.className);
+          }
         });
       }
     }
