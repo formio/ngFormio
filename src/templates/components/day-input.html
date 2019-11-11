@@ -13,7 +13,7 @@
         ng-change="onChange()"
         style="padding-right: 10px;"
         auto-focus="true"
-        ng-attr-placeholder="{{component.fields.day.placeholder}}"
+        ng-attr-placeholder="{{component.fields.day.placeholder | formioTranslate:null:options.building }}"
         day-part
         characters="2"
         min="1"
@@ -56,7 +56,7 @@
         style="padding-right: 10px;"
         aria-labelledby="{{ componentId }}-day1Label"
         auto-focus="{{ component.fields.month.hide }}"
-        ng-attr-placeholder="{{component.fields.day.placeholder}}"
+        ng-attr-placeholder="{{component.fields.day.placeholder | formioTranslate:null:options.building }}"
         day-part
         characters="2"
         min="1"
@@ -78,7 +78,7 @@
         ng-change="onChange()"
         aria-labelledby="{{ componentId }}-yearLabel"
         style="padding-right: 10px;"
-        ng-attr-placeholder="{{component.fields.year.placeholder}}"
+        ng-attr-placeholder="{{component.fields.year.placeholder | formioTranslate:null:options.building }}"
         auto-focus="{{ component.fields.day.hide && component.fields.month.hide }}"
         characters="4"
         min="0"
