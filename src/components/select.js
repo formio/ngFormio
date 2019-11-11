@@ -10,7 +10,8 @@ var _isNil = require('lodash/isNil');
 module.exports = function(app) {
   app.directive('formioSelectItem', [
     '$compile',
-    function($compile) {
+    '$filter',
+    function($compile, $filter) {
       return {
         restrict: 'E',
         scope: {
@@ -21,6 +22,9 @@ module.exports = function(app) {
         link: function(scope, element) {
           if (scope.options && scope.options.building) return;
           if (scope.template) {
+            if (scope.item) {
+              scope.item.label = $filter('formioTranslate')(scope.item.label);
+            }
             element.append($compile(angular.element(scope.template))(scope));
           }
         }

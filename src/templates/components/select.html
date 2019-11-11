@@ -42,6 +42,6 @@
   <formio-component-tooltip></formio-component-tooltip>
 </label>
 <div ng-if="!!component.description" class="help-block">
-  <span id="{{ componentId+'Desc' }}">{{ component.description }}</span>
+  <span id="{{ componentId+'Desc' }}">{{ component.description | formioTranslate:null:options.building }}</span>
 </div>
 <formio-errors ng-if="::!options.building"></formio-errors>
