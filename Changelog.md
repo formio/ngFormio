@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.0.0-rc.36
 ### Changed
+ - Adding Premium components into the portal application.
  - Upgrade formiojs@4.7.5 which should fix IE11 issues.
  - Upgraded core-js@3.4.1, formiojs@4.7.5, ng-formio@4.6.4, protractor-helpers@1.1.678, webdriverio@5.16.6
 
