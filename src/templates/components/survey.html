@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <td></td>
-      <th ng-repeat="v in component.values track by $index" style="text-align: center;">{{ v.label }}</th>
+      <th ng-repeat="v in component.values track by $index" style="text-align: center;">{{ v.label | formioTranslate:null:options.building}}</th>
     </tr>
   </thead>
   <tr ng-repeat="question in component.questions"
@@ -10,7 +10,7 @@
     ng-class="{
       'text-danger': !formioForm[inputName].$pristine && formioForm[inputName].$invalid
     }">
-    <td>{{ question.label }}</td>
+    <td>{{ question.label | formioTranslate:null:options.building}}</td>
     <td ng-repeat="v in component.values track by $index" style="text-align: center;">
       <input
         type="radio"
