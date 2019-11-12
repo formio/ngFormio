@@ -1,6 +1,6 @@
 {
   "name": "@formio/bootstrap3",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Bootstrap 3 templates for form.io",
   "main": "lib/index.js",
   "scripts": {
