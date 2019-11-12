@@ -1616,7 +1616,7 @@ function _typeof(obj) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const templates_1 = __webpack_require__(/*! ./templates */ "./node_modules/@formio/bootstrap3/lib/templates/index.js");
+var templates_1 = __webpack_require__(/*! ./templates */ "./node_modules/@formio/bootstrap3/lib/templates/index.js");
 exports.default = {
     framework: 'bootstrap3',
     templates: templates_1.default,
@@ -1657,7 +1657,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builder/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builder/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -1705,7 +1705,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponent/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponent/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -1745,7 +1745,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponents/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponents/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -1828,7 +1828,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderEditForm/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderEditForm/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -1866,7 +1866,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderPlaceholder/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderPlaceholder/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -1911,7 +1911,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebar/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebar/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -1986,7 +1986,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebarGroup/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebarGroup/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2037,7 +2037,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/columns/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/columns/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2258,8 +2258,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/datagrid/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/datagrid/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/datagrid/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/datagrid/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -2366,7 +2366,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/day/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/day/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2400,7 +2400,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/dialog/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/dialog/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2556,8 +2556,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/editgrid/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/editgrid/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/editgrid/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/editgrid/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -2620,7 +2620,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/field/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/field/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2827,7 +2827,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/file/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/file/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2869,7 +2869,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/icon/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/icon/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -2885,7 +2885,7 @@ exports.default = { form: form_ejs_1.default };
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = (iconset, name, spinning) => {
+exports.default = (function (iconset, name, spinning) {
     if (iconset === 'fa') {
         switch (name) {
             case 'save':
@@ -2911,8 +2911,8 @@ exports.default = (iconset, name, spinning) => {
                 break;
         }
     }
-    return spinning ? `${iconset} ${iconset}-${name} ${iconset}-spin` : `${iconset} ${iconset}-${name}`;
-};
+    return spinning ? iconset + " " + iconset + "-" + name + " " + iconset + "-spin" : iconset + " " + iconset + "-" + name;
+});
 
 
 /***/ }),
@@ -2927,45 +2927,45 @@ exports.default = (iconset, name, spinning) => {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const resize_observer_polyfill_1 = __webpack_require__(/*! resize-observer-polyfill */ "./node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js");
-const builder_1 = __webpack_require__(/*! ./builder */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builder/index.js");
-const builderComponent_1 = __webpack_require__(/*! ./builderComponent */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponent/index.js");
-const builderComponents_1 = __webpack_require__(/*! ./builderComponents */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponents/index.js");
-const builderEditForm_1 = __webpack_require__(/*! ./builderEditForm */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderEditForm/index.js");
-const builderPlaceholder_1 = __webpack_require__(/*! ./builderPlaceholder */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderPlaceholder/index.js");
-const builderSidebar_1 = __webpack_require__(/*! ./builderSidebar */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebar/index.js");
-const builderSidebarGroup_1 = __webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebarGroup/index.js");
-const columns_1 = __webpack_require__(/*! ./columns */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/columns/index.js");
-const cssClasses_1 = __webpack_require__(/*! ./cssClasses */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/cssClasses.js");
-const datagrid_1 = __webpack_require__(/*! ./datagrid */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/datagrid/index.js");
-const day_1 = __webpack_require__(/*! ./day */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/day/index.js");
-const dialog_1 = __webpack_require__(/*! ./dialog */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/dialog/index.js");
-const editgrid_1 = __webpack_require__(/*! ./editgrid */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/editgrid/index.js");
-const field_1 = __webpack_require__(/*! ./field */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/field/index.js");
-const file_1 = __webpack_require__(/*! ./file */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/file/index.js");
-const icon_1 = __webpack_require__(/*! ./icon */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/icon/index.js");
-const iconClass_1 = __webpack_require__(/*! ./iconClass */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/iconClass.js");
-const input_1 = __webpack_require__(/*! ./input */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/input/index.js");
-const label_1 = __webpack_require__(/*! ./label */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/label/index.js");
-const message_1 = __webpack_require__(/*! ./message */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/message/index.js");
-const modaldialog_1 = __webpack_require__(/*! ./modaldialog */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaldialog/index.js");
-const modaledit_1 = __webpack_require__(/*! ./modaledit */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaledit/index.js");
-const multiValueRow_1 = __webpack_require__(/*! ./multiValueRow */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueRow/index.js");
-const multiValueTable_1 = __webpack_require__(/*! ./multiValueTable */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueTable/index.js");
-const panel_1 = __webpack_require__(/*! ./panel */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/panel/index.js");
-const radio_1 = __webpack_require__(/*! ./radio */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/radio/index.js");
-const resourceAdd_1 = __webpack_require__(/*! ./resourceAdd */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/resourceAdd/index.js");
-const signature_1 = __webpack_require__(/*! ./signature */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/signature/index.js");
-const survey_1 = __webpack_require__(/*! ./survey */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/survey/index.js");
-const tab_1 = __webpack_require__(/*! ./tab */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/tab/index.js");
-const table_1 = __webpack_require__(/*! ./table */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/table/index.js");
-const warning_1 = __webpack_require__(/*! ./warning */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/warning/index.js");
-const well_1 = __webpack_require__(/*! ./well */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/well/index.js");
-const wizard_1 = __webpack_require__(/*! ./wizard */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizard/index.js");
-const wizardHeader_1 = __webpack_require__(/*! ./wizardHeader */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardHeader/index.js");
-const wizardNav_1 = __webpack_require__(/*! ./wizardNav */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardNav/index.js");
+var resize_observer_polyfill_1 = __webpack_require__(/*! resize-observer-polyfill */ "./node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js");
+var builder_1 = __webpack_require__(/*! ./builder */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builder/index.js");
+var builderComponent_1 = __webpack_require__(/*! ./builderComponent */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponent/index.js");
+var builderComponents_1 = __webpack_require__(/*! ./builderComponents */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderComponents/index.js");
+var builderEditForm_1 = __webpack_require__(/*! ./builderEditForm */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderEditForm/index.js");
+var builderPlaceholder_1 = __webpack_require__(/*! ./builderPlaceholder */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderPlaceholder/index.js");
+var builderSidebar_1 = __webpack_require__(/*! ./builderSidebar */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebar/index.js");
+var builderSidebarGroup_1 = __webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/builderSidebarGroup/index.js");
+var columns_1 = __webpack_require__(/*! ./columns */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/columns/index.js");
+var cssClasses_1 = __webpack_require__(/*! ./cssClasses */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/cssClasses.js");
+var datagrid_1 = __webpack_require__(/*! ./datagrid */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/datagrid/index.js");
+var day_1 = __webpack_require__(/*! ./day */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/day/index.js");
+var dialog_1 = __webpack_require__(/*! ./dialog */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/dialog/index.js");
+var editgrid_1 = __webpack_require__(/*! ./editgrid */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/editgrid/index.js");
+var field_1 = __webpack_require__(/*! ./field */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/field/index.js");
+var file_1 = __webpack_require__(/*! ./file */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/file/index.js");
+var icon_1 = __webpack_require__(/*! ./icon */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/icon/index.js");
+var iconClass_1 = __webpack_require__(/*! ./iconClass */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/iconClass.js");
+var input_1 = __webpack_require__(/*! ./input */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/input/index.js");
+var label_1 = __webpack_require__(/*! ./label */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/label/index.js");
+var message_1 = __webpack_require__(/*! ./message */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/message/index.js");
+var modaldialog_1 = __webpack_require__(/*! ./modaldialog */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaldialog/index.js");
+var modaledit_1 = __webpack_require__(/*! ./modaledit */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaledit/index.js");
+var multiValueRow_1 = __webpack_require__(/*! ./multiValueRow */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueRow/index.js");
+var multiValueTable_1 = __webpack_require__(/*! ./multiValueTable */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueTable/index.js");
+var panel_1 = __webpack_require__(/*! ./panel */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/panel/index.js");
+var radio_1 = __webpack_require__(/*! ./radio */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/radio/index.js");
+var resourceAdd_1 = __webpack_require__(/*! ./resourceAdd */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/resourceAdd/index.js");
+var signature_1 = __webpack_require__(/*! ./signature */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/signature/index.js");
+var survey_1 = __webpack_require__(/*! ./survey */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/survey/index.js");
+var tab_1 = __webpack_require__(/*! ./tab */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/tab/index.js");
+var table_1 = __webpack_require__(/*! ./table */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/table/index.js");
+var warning_1 = __webpack_require__(/*! ./warning */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/warning/index.js");
+var well_1 = __webpack_require__(/*! ./well */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/well/index.js");
+var wizard_1 = __webpack_require__(/*! ./wizard */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizard/index.js");
+var wizardHeader_1 = __webpack_require__(/*! ./wizardHeader */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardHeader/index.js");
+var wizardNav_1 = __webpack_require__(/*! ./wizardNav */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardNav/index.js");
 exports.default = {
-    transform(type, text) {
+    transform: function (type, text) {
         if (!text) {
             return text;
         }
@@ -2975,20 +2975,20 @@ exports.default = {
         }
         return text;
     },
-    handleBuilderSidebarScroll(builder) {
+    handleBuilderSidebarScroll: function (builder) {
         if (builder.scrollResizeObserver) {
             builder.scrollResizeObserver.disconnect();
         }
-        builder.scrollResizeObserver = new resize_observer_polyfill_1.default(() => {
-            setTimeout(() => {
-                const { form: { parentNode: { clientHeight: formHeight, }, }, sidebar: { clientHeight: sidebarHeight, parentNode: { style, }, }, } = builder.refs;
-                style.height = `${Math.max(sidebarHeight + 20, formHeight)}px`;
+        builder.scrollResizeObserver = new resize_observer_polyfill_1.default(function () {
+            setTimeout(function () {
+                var _a = builder.refs, formHeight = _a.form.parentNode.clientHeight, _b = _a.sidebar, sidebarHeight = _b.clientHeight, style = _b.parentNode.style;
+                style.height = Math.max(sidebarHeight + 20, formHeight) + "px";
             });
         });
         builder.scrollResizeObserver.observe(builder.refs.form);
         builder.scrollResizeObserver.observe(builder.refs.sidebar);
     },
-    clearBuilderSidebarScroll(builder) {
+    clearBuilderSidebarScroll: function (builder) {
         if (builder.scrollResizeObserver) {
             builder.scrollResizeObserver.disconnect();
             builder.scrollResizeObserver = null;
@@ -3135,8 +3135,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/input/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/input/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/input/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/input/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -3185,7 +3185,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/label/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/label/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3221,7 +3221,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/message/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/message/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3257,7 +3257,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaldialog/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaldialog/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3295,7 +3295,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaledit/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/modaledit/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3338,7 +3338,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueRow/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueRow/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3383,7 +3383,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueTable/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/multiValueTable/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3442,7 +3442,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/panel/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/panel/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3550,8 +3550,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/radio/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/radio/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/radio/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/radio/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -3591,7 +3591,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/resourceAdd/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/resourceAdd/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3668,8 +3668,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/signature/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/signature/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/signature/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/signature/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -3765,8 +3765,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/survey/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/survey/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/survey/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/survey/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -3854,8 +3854,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const flat_ejs_1 = __webpack_require__(/*! ./flat.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/tab/flat.ejs.js");
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/tab/form.ejs.js");
+var flat_ejs_1 = __webpack_require__(/*! ./flat.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/tab/flat.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/tab/form.ejs.js");
 exports.default = { flat: flat_ejs_1.default, form: form_ejs_1.default };
 
 
@@ -3930,7 +3930,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/table/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/table/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -3966,7 +3966,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/warning/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/warning/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4004,7 +4004,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/well/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/well/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4066,8 +4066,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const builder_ejs_1 = __webpack_require__(/*! ./builder.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizard/builder.ejs.js");
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizard/form.ejs.js");
+var builder_ejs_1 = __webpack_require__(/*! ./builder.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizard/builder.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizard/form.ejs.js");
 exports.default = { form: form_ejs_1.default, builder: builder_ejs_1.default };
 
 
@@ -4114,7 +4114,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardHeader/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardHeader/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4183,7 +4183,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardNav/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/wizardNav/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4199,7 +4199,7 @@ exports.default = { form: form_ejs_1.default };
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const bootstrap3_1 = __webpack_require__(/*! ./bootstrap3 */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/index.js");
+var bootstrap3_1 = __webpack_require__(/*! ./bootstrap3 */ "./node_modules/@formio/bootstrap3/lib/templates/bootstrap3/index.js");
 exports.default = {
     bootstrap3: bootstrap3_1.default,
 };
@@ -4217,7 +4217,7 @@ exports.default = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const templates_1 = __webpack_require__(/*! ./templates */ "./node_modules/@formio/semantic/lib/templates/index.js");
+var templates_1 = __webpack_require__(/*! ./templates */ "./node_modules/@formio/semantic/lib/templates/index.js");
 exports.default = {
     framework: 'semantic',
     templates: templates_1.default,
@@ -4236,7 +4236,7 @@ exports.default = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const semantic_1 = __webpack_require__(/*! ./semantic */ "./node_modules/@formio/semantic/lib/templates/semantic/index.js");
+var semantic_1 = __webpack_require__(/*! ./semantic */ "./node_modules/@formio/semantic/lib/templates/semantic/index.js");
 exports.default = {
     semantic: semantic_1.default,
 };
@@ -4276,7 +4276,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builder/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builder/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4324,7 +4324,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponent/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponent/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4364,7 +4364,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponents/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponents/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4447,7 +4447,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderEditForm/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderEditForm/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4483,7 +4483,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderPlaceholder/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderPlaceholder/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4526,7 +4526,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebar/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebar/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4599,7 +4599,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebarGroup/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebarGroup/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4658,7 +4658,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderWizard/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/builderWizard/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4741,8 +4741,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/button/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/button/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/button/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/button/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -4850,8 +4850,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/checkbox/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/checkbox/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/checkbox/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/checkbox/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -4896,7 +4896,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/columns/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/columns/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -4947,7 +4947,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/component/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/component/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -5178,8 +5178,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/datagrid/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/datagrid/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/datagrid/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/datagrid/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -5254,7 +5254,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/day/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/day/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -5394,8 +5394,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/editgrid/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/editgrid/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/editgrid/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/editgrid/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -5460,7 +5460,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/field/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/field/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -5513,7 +5513,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/fieldset/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/fieldset/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -5720,7 +5720,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/file/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/file/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -5762,7 +5762,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/icon/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/icon/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -5778,8 +5778,8 @@ exports.default = { form: form_ejs_1.default };
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = (iconset, name, spinning) => {
-    const icons = {
+exports.default = (function (iconset, name, spinning) {
+    var icons = {
         'plus-squre-o': 'plus square outline',
         'minus-squre-o': 'minus square outline',
         'question-sign': 'question circle',
@@ -5795,8 +5795,8 @@ exports.default = (iconset, name, spinning) => {
     name = name || '';
     name = name.replace(/-/g, ' ');
     name = name.replace(/ o$/, ' outline');
-    return spinning ? `icon ${name} loading` : `icon ${name}`;
-};
+    return spinning ? "icon " + name + " loading" : "icon " + name;
+});
 
 
 /***/ }),
@@ -5810,54 +5810,65 @@ exports.default = (iconset, name, spinning) => {
 
 "use strict";
 
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const builder_1 = __webpack_require__(/*! ./builder */ "./node_modules/@formio/semantic/lib/templates/semantic/builder/index.js");
-const builderComponent_1 = __webpack_require__(/*! ./builderComponent */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponent/index.js");
-const builderComponents_1 = __webpack_require__(/*! ./builderComponents */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponents/index.js");
-const builderEditForm_1 = __webpack_require__(/*! ./builderEditForm */ "./node_modules/@formio/semantic/lib/templates/semantic/builderEditForm/index.js");
-const builderPlaceholder_1 = __webpack_require__(/*! ./builderPlaceholder */ "./node_modules/@formio/semantic/lib/templates/semantic/builderPlaceholder/index.js");
-const builderSidebar_1 = __webpack_require__(/*! ./builderSidebar */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebar/index.js");
-const builderSidebarGroup_1 = __webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebarGroup/index.js");
-const builderWizard_1 = __webpack_require__(/*! ./builderWizard */ "./node_modules/@formio/semantic/lib/templates/semantic/builderWizard/index.js");
-const button_1 = __webpack_require__(/*! ./button */ "./node_modules/@formio/semantic/lib/templates/semantic/button/index.js");
-const checkbox_1 = __webpack_require__(/*! ./checkbox */ "./node_modules/@formio/semantic/lib/templates/semantic/checkbox/index.js");
-const columns_1 = __webpack_require__(/*! ./columns */ "./node_modules/@formio/semantic/lib/templates/semantic/columns/index.js");
-const component_1 = __webpack_require__(/*! ./component */ "./node_modules/@formio/semantic/lib/templates/semantic/component/index.js");
-const cssClasses_1 = __webpack_require__(/*! ./cssClasses */ "./node_modules/@formio/semantic/lib/templates/semantic/cssClasses.js");
-const datagrid_1 = __webpack_require__(/*! ./datagrid */ "./node_modules/@formio/semantic/lib/templates/semantic/datagrid/index.js");
-const day_1 = __webpack_require__(/*! ./day */ "./node_modules/@formio/semantic/lib/templates/semantic/day/index.js");
-const editgrid_1 = __webpack_require__(/*! ./editgrid */ "./node_modules/@formio/semantic/lib/templates/semantic/editgrid/index.js");
-const field_1 = __webpack_require__(/*! ./field */ "./node_modules/@formio/semantic/lib/templates/semantic/field/index.js");
-const fieldset_1 = __webpack_require__(/*! ./fieldset */ "./node_modules/@formio/semantic/lib/templates/semantic/fieldset/index.js");
-const file_1 = __webpack_require__(/*! ./file */ "./node_modules/@formio/semantic/lib/templates/semantic/file/index.js");
-const icon_1 = __webpack_require__(/*! ./icon */ "./node_modules/@formio/semantic/lib/templates/semantic/icon/index.js");
-const iconClass_1 = __webpack_require__(/*! ./iconClass */ "./node_modules/@formio/semantic/lib/templates/semantic/iconClass.js");
-const input_1 = __webpack_require__(/*! ./input */ "./node_modules/@formio/semantic/lib/templates/semantic/input/index.js");
-const label_1 = __webpack_require__(/*! ./label */ "./node_modules/@formio/semantic/lib/templates/semantic/label/index.js");
-const loader_1 = __webpack_require__(/*! ./loader */ "./node_modules/@formio/semantic/lib/templates/semantic/loader/index.js");
-const loading_1 = __webpack_require__(/*! ./loading */ "./node_modules/@formio/semantic/lib/templates/semantic/loading/index.js");
-const message_1 = __webpack_require__(/*! ./message */ "./node_modules/@formio/semantic/lib/templates/semantic/message/index.js");
-const multiValueRow_1 = __webpack_require__(/*! ./multiValueRow */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueRow/index.js");
-const multiValueTable_1 = __webpack_require__(/*! ./multiValueTable */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueTable/index.js");
-const panel_1 = __webpack_require__(/*! ./panel */ "./node_modules/@formio/semantic/lib/templates/semantic/panel/index.js");
-const radio_1 = __webpack_require__(/*! ./radio */ "./node_modules/@formio/semantic/lib/templates/semantic/radio/index.js");
-const resourceAdd_1 = __webpack_require__(/*! ./resourceAdd */ "./node_modules/@formio/semantic/lib/templates/semantic/resourceAdd/index.js");
-const select_1 = __webpack_require__(/*! ./select */ "./node_modules/@formio/semantic/lib/templates/semantic/select/index.js");
-const selectOption_1 = __webpack_require__(/*! ./selectOption */ "./node_modules/@formio/semantic/lib/templates/semantic/selectOption/index.js");
-const signature_1 = __webpack_require__(/*! ./signature */ "./node_modules/@formio/semantic/lib/templates/semantic/signature/index.js");
-const survey_1 = __webpack_require__(/*! ./survey */ "./node_modules/@formio/semantic/lib/templates/semantic/survey/index.js");
-const tab_1 = __webpack_require__(/*! ./tab */ "./node_modules/@formio/semantic/lib/templates/semantic/tab/index.js");
-const table_1 = __webpack_require__(/*! ./table */ "./node_modules/@formio/semantic/lib/templates/semantic/table/index.js");
-const tree_1 = __webpack_require__(/*! ./tree */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/index.js");
-const partials_1 = __webpack_require__(/*! ./tree/partials */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/partials/index.js");
-const webform_1 = __webpack_require__(/*! ./webform */ "./node_modules/@formio/semantic/lib/templates/semantic/webform/index.js");
-const well_1 = __webpack_require__(/*! ./well */ "./node_modules/@formio/semantic/lib/templates/semantic/well/index.js");
-const wizard_1 = __webpack_require__(/*! ./wizard */ "./node_modules/@formio/semantic/lib/templates/semantic/wizard/index.js");
-exports.default = Object.assign(Object.assign({ transform(type, text) {
+var builder_1 = __webpack_require__(/*! ./builder */ "./node_modules/@formio/semantic/lib/templates/semantic/builder/index.js");
+var builderComponent_1 = __webpack_require__(/*! ./builderComponent */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponent/index.js");
+var builderComponents_1 = __webpack_require__(/*! ./builderComponents */ "./node_modules/@formio/semantic/lib/templates/semantic/builderComponents/index.js");
+var builderEditForm_1 = __webpack_require__(/*! ./builderEditForm */ "./node_modules/@formio/semantic/lib/templates/semantic/builderEditForm/index.js");
+var builderPlaceholder_1 = __webpack_require__(/*! ./builderPlaceholder */ "./node_modules/@formio/semantic/lib/templates/semantic/builderPlaceholder/index.js");
+var builderSidebar_1 = __webpack_require__(/*! ./builderSidebar */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebar/index.js");
+var builderSidebarGroup_1 = __webpack_require__(/*! ./builderSidebarGroup */ "./node_modules/@formio/semantic/lib/templates/semantic/builderSidebarGroup/index.js");
+var builderWizard_1 = __webpack_require__(/*! ./builderWizard */ "./node_modules/@formio/semantic/lib/templates/semantic/builderWizard/index.js");
+var button_1 = __webpack_require__(/*! ./button */ "./node_modules/@formio/semantic/lib/templates/semantic/button/index.js");
+var checkbox_1 = __webpack_require__(/*! ./checkbox */ "./node_modules/@formio/semantic/lib/templates/semantic/checkbox/index.js");
+var columns_1 = __webpack_require__(/*! ./columns */ "./node_modules/@formio/semantic/lib/templates/semantic/columns/index.js");
+var component_1 = __webpack_require__(/*! ./component */ "./node_modules/@formio/semantic/lib/templates/semantic/component/index.js");
+var cssClasses_1 = __webpack_require__(/*! ./cssClasses */ "./node_modules/@formio/semantic/lib/templates/semantic/cssClasses.js");
+var datagrid_1 = __webpack_require__(/*! ./datagrid */ "./node_modules/@formio/semantic/lib/templates/semantic/datagrid/index.js");
+var day_1 = __webpack_require__(/*! ./day */ "./node_modules/@formio/semantic/lib/templates/semantic/day/index.js");
+var editgrid_1 = __webpack_require__(/*! ./editgrid */ "./node_modules/@formio/semantic/lib/templates/semantic/editgrid/index.js");
+var field_1 = __webpack_require__(/*! ./field */ "./node_modules/@formio/semantic/lib/templates/semantic/field/index.js");
+var fieldset_1 = __webpack_require__(/*! ./fieldset */ "./node_modules/@formio/semantic/lib/templates/semantic/fieldset/index.js");
+var file_1 = __webpack_require__(/*! ./file */ "./node_modules/@formio/semantic/lib/templates/semantic/file/index.js");
+var icon_1 = __webpack_require__(/*! ./icon */ "./node_modules/@formio/semantic/lib/templates/semantic/icon/index.js");
+var iconClass_1 = __webpack_require__(/*! ./iconClass */ "./node_modules/@formio/semantic/lib/templates/semantic/iconClass.js");
+var input_1 = __webpack_require__(/*! ./input */ "./node_modules/@formio/semantic/lib/templates/semantic/input/index.js");
+var label_1 = __webpack_require__(/*! ./label */ "./node_modules/@formio/semantic/lib/templates/semantic/label/index.js");
+var loader_1 = __webpack_require__(/*! ./loader */ "./node_modules/@formio/semantic/lib/templates/semantic/loader/index.js");
+var loading_1 = __webpack_require__(/*! ./loading */ "./node_modules/@formio/semantic/lib/templates/semantic/loading/index.js");
+var message_1 = __webpack_require__(/*! ./message */ "./node_modules/@formio/semantic/lib/templates/semantic/message/index.js");
+var multiValueRow_1 = __webpack_require__(/*! ./multiValueRow */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueRow/index.js");
+var multiValueTable_1 = __webpack_require__(/*! ./multiValueTable */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueTable/index.js");
+var panel_1 = __webpack_require__(/*! ./panel */ "./node_modules/@formio/semantic/lib/templates/semantic/panel/index.js");
+var radio_1 = __webpack_require__(/*! ./radio */ "./node_modules/@formio/semantic/lib/templates/semantic/radio/index.js");
+var resourceAdd_1 = __webpack_require__(/*! ./resourceAdd */ "./node_modules/@formio/semantic/lib/templates/semantic/resourceAdd/index.js");
+var select_1 = __webpack_require__(/*! ./select */ "./node_modules/@formio/semantic/lib/templates/semantic/select/index.js");
+var selectOption_1 = __webpack_require__(/*! ./selectOption */ "./node_modules/@formio/semantic/lib/templates/semantic/selectOption/index.js");
+var signature_1 = __webpack_require__(/*! ./signature */ "./node_modules/@formio/semantic/lib/templates/semantic/signature/index.js");
+var survey_1 = __webpack_require__(/*! ./survey */ "./node_modules/@formio/semantic/lib/templates/semantic/survey/index.js");
+var tab_1 = __webpack_require__(/*! ./tab */ "./node_modules/@formio/semantic/lib/templates/semantic/tab/index.js");
+var table_1 = __webpack_require__(/*! ./table */ "./node_modules/@formio/semantic/lib/templates/semantic/table/index.js");
+var tree_1 = __webpack_require__(/*! ./tree */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/index.js");
+var partials_1 = __webpack_require__(/*! ./tree/partials */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/partials/index.js");
+var webform_1 = __webpack_require__(/*! ./webform */ "./node_modules/@formio/semantic/lib/templates/semantic/webform/index.js");
+var well_1 = __webpack_require__(/*! ./well */ "./node_modules/@formio/semantic/lib/templates/semantic/well/index.js");
+var wizard_1 = __webpack_require__(/*! ./wizard */ "./node_modules/@formio/semantic/lib/templates/semantic/wizard/index.js");
+exports.default = __assign(__assign({ transform: function (type, text) {
         if (!text) {
             return text;
         }
-        const columns = {
+        var columns = {
             1: 'one',
             2: 'two',
             3: 'three',
@@ -6023,8 +6034,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/input/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/input/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/input/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/input/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -6075,7 +6086,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/label/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/label/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6109,7 +6120,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/loader/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/loader/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6143,7 +6154,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/loading/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/loading/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6179,7 +6190,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/message/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/message/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6220,7 +6231,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueRow/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueRow/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6265,7 +6276,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueTable/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/multiValueTable/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6324,7 +6335,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/panel/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/panel/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6420,8 +6431,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/radio/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/radio/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/radio/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/radio/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -6461,7 +6472,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/resourceAdd/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/resourceAdd/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -6542,8 +6553,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/select/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/select/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/select/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/select/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -6616,8 +6627,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/selectOption/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/selectOption/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/selectOption/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/selectOption/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -6694,8 +6705,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/signature/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/signature/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/signature/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/signature/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -6791,8 +6802,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/survey/form.ejs.js");
-const html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/survey/html.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/survey/form.ejs.js");
+var html_ejs_1 = __webpack_require__(/*! ./html.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/survey/html.ejs.js");
 exports.default = { form: form_ejs_1.default, html: html_ejs_1.default };
 
 
@@ -6874,8 +6885,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const flat_ejs_1 = __webpack_require__(/*! ./flat.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tab/flat.ejs.js");
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tab/form.ejs.js");
+var flat_ejs_1 = __webpack_require__(/*! ./flat.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tab/flat.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tab/form.ejs.js");
 exports.default = { flat: flat_ejs_1.default, form: form_ejs_1.default };
 
 
@@ -6950,7 +6961,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/table/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/table/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -7009,7 +7020,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -7054,8 +7065,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const edit_ejs_1 = __webpack_require__(/*! ./edit.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/partials/edit.ejs.js");
-const view_ejs_1 = __webpack_require__(/*! ./view.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/partials/view.ejs.js");
+var edit_ejs_1 = __webpack_require__(/*! ./edit.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/partials/edit.ejs.js");
+var view_ejs_1 = __webpack_require__(/*! ./view.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/tree/partials/view.ejs.js");
 exports.default = {
     treeView: {
         form: view_ejs_1.default,
@@ -7167,8 +7178,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const builder_ejs_1 = __webpack_require__(/*! ./builder.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/webform/builder.ejs.js");
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/webform/form.ejs.js");
+var builder_ejs_1 = __webpack_require__(/*! ./builder.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/webform/builder.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/webform/form.ejs.js");
 exports.default = { form: form_ejs_1.default, builder: builder_ejs_1.default };
 
 
@@ -7206,7 +7217,7 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/well/form.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/well/form.ejs.js");
 exports.default = { form: form_ejs_1.default };
 
 
@@ -7268,8 +7279,8 @@ return __p
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const builder_ejs_1 = __webpack_require__(/*! ./builder.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/wizard/builder.ejs.js");
-const form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/wizard/form.ejs.js");
+var builder_ejs_1 = __webpack_require__(/*! ./builder.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/wizard/builder.ejs.js");
+var form_ejs_1 = __webpack_require__(/*! ./form.ejs */ "./node_modules/@formio/semantic/lib/templates/semantic/wizard/form.ejs.js");
 exports.default = { form: form_ejs_1.default, builder: builder_ejs_1.default };
 
 
@@ -14702,7 +14713,7 @@ var store = __webpack_require__(/*! ../internals/shared-store */ "./node_modules
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.4.0',
+  version: '3.4.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
 });
@@ -26416,7 +26427,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.7.4';
+Formio.version = '4.7.5';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
@@ -64668,7 +64679,7 @@ var store = __webpack_require__(/*! ../internals/shared-store */ "./node_modules
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.4.0',
+  version: '3.4.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
 });
