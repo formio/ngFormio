@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.36
+### Changed
+ - Upgrade formiojs@4.7.5 which should fix IE11 issues.
+ - Upgraded core-js@3.4.1, formiojs@4.7.5, ng-formio@4.6.4, protractor-helpers@1.1.678, webdriverio@5.16.6
+
 ## 7.0.0-rc.35
 ### Changed
  - Upgrade formiojs@4.7.4
