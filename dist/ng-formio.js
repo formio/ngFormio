@@ -2099,7 +2099,9 @@ __p += '\n        <th class="' +
 ((__t = ( col.hideLabel ? '' : ctx.t(col.label || col.title) )) == null ? '' : __t) +
 '\n          ';
  if (col.tooltip) { ;
-__p += ' <i ref="tooltip" class="' +
+__p += ' <i ref="tooltip" data-title="' +
+((__t = (col.tooltip)) == null ? '' : __t) +
+'" class="' +
 ((__t = (ctx.iconClass('question-sign'))) == null ? '' : __t) +
 ' text-muted"></i>';
  } ;
@@ -2222,7 +2224,9 @@ __p += '\n        <th class="' +
 ((__t = ( col.hideLabel ? '' : t(col.label || col.title) )) == null ? '' : __t) +
 '\n          ';
  if (col.tooltip) { ;
-__p += ' <i ref="tooltip" class="' +
+__p += ' <i ref="tooltip" data-title="' +
+((__t = (col.tooltip)) == null ? '' : __t) +
+'" class="' +
 ((__t = (iconClass('question-sign'))) == null ? '' : __t) +
 ' text-muted"></i>';
  } ;
@@ -29620,7 +29624,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.7.6';
+Formio.version = '4.7.7';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
