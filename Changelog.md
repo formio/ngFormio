@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.38
+### Changed
+ - Upgrade formiojs@4.7.7
+ - Upgrade premium components to v1.1.0 which should fix IE11 issues.
+
 ## 7.0.0-rc.37
 ### Changed
  - Upgrade formiojs@4.7.6
