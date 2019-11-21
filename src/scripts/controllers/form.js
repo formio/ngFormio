@@ -1090,6 +1090,10 @@ app.controller('FormEditController', [
 
     $scope.changes = [];
 
+    $scope.$on('formChange', (event, form) => {
+      $scope.form.components = form.components;
+    });
+
     $scope.$on('formBuilder:add', function(event, component, index, container, path) {
       $scope.changes.push({
         op: 'add',
@@ -2760,6 +2764,7 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     const saveForm = function() {
+      console.log('saveForm', $scope.form);
       $scope.formio.saveForm(angular.copy($scope.form)).then(function(form) {
         $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
