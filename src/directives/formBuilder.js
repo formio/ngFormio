@@ -34,6 +34,9 @@ export default angular.module('formio').directive('formBuilder', function() {
             builder.instance.on('removeComponent', () => {
               $scope.$emit('formChange', builder.instance.schema);
             });
+            builder.instance.onAny((event, ...args) => {
+              $scope.$emit(event, ...args);
+            });
           });
 
           builderReady = builder.ready;
