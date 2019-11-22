@@ -1092,6 +1092,7 @@ app.controller('FormEditController', [
 
     $scope.$on('formChange', (event, form) => {
       $scope.form.components = form.components;
+      $scope.dirty = true;
     });
 
     $scope.$on('formBuilder:add', function(event, component, index, container, path) {
