@@ -20,10 +20,25 @@ export default angular.module('formio').directive('formBuilder', function() {
         $scope.options = $scope.options || {};
 
         // Initialize the builder.
-        $scope.initBuilder = function(element) {
+        $scope.initBuilder = (element) => {
           builderElement = element;
           builderElement.innerHTML = '';
           builder = new Formio.FormBuilder(builderElement, $scope.form, $scope.options);
+          builder.ready.then(() => {
+            builder.instance.on('addComponent', () => {
+              $scope.$emit('formChange', builder.instance.schema);
+            });
+            builder.instance.on('saveComponent', () => {
+              $scope.$emit('formChange', builder.instance.schema);
+            });
+            builder.instance.on('removeComponent', () => {
+              $scope.$emit('formChange', builder.instance.schema);
+            });
+            builder.instance.onAny((event, ...args) => {
+              $scope.$emit(event, ...args);
+            });
+          });
+
           builderReady = builder.ready;
         };
 
