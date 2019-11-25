@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.39.0-beta.1
+### Changed
+ - Reverted change for select autocomplete that was causing issues with legacy forms.
+
 ## 2.38.4
 ### Chagned
  - Add min/max items file component validation
