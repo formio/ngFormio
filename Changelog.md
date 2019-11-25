@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.39
+### Fixed
+ - Include object builder directive to fix form settings.
+ - Save schema, set dirty and fix form change events for merging.
+
+### Changed
+ - Upgrade formiojs@4.8.0-beta.1
+
 ## 7.0.0-rc.38
 ### Changed
  - Upgrade formiojs@4.7.7
