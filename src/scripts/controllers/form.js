@@ -2,6 +2,7 @@
 import jsonpatch from 'fast-json-patch';
 import DOMPurify from 'dompurify';
 import moment from 'moment';
+import { Utils } from 'formiojs';
 
 /* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
 var app = angular.module('formioApp.controllers.form', [
@@ -1090,196 +1091,41 @@ app.controller('FormEditController', [
 
     $scope.changes = [];
 
-    $scope.$on('formBuilder:add', function(event, component, index, container, path) {
-      $scope.changes.push({
-        op: 'add',
-        key: component.key,
-        container: container.key,
-        path: path || 'components',
-        index: index,
-        component: angular.copy(component)
-      });
-
-      // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (component.type === 'content') {
-        $scope.dirty = true;
-      }
-    });
-
-    // Special case for content components
-    $scope.$on('formBuilder:update', function(event, component) {
-      // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (contentLoaded && component.type === 'content') {
-        var change = {
-          op: 'edit',
-          key: component.key,
-          patches: [{
-            op: 'replace',
-            path: '/html',
-            value: component.html
-          }]
-        };
-        // Since this gets fired a lot, clean up any exising changes to this component's html.
-        $scope.changes = $scope.changes.filter(function(change) {
-          return !(
-            change.op === 'edit' &&
-            change.key === component.key &&
-            change.patches &&
-            change.patches.length === 1 &&
-            change.patches[0].op === 'replace' &&
-            change.patches[0].path === '/html'
-          );
-        });
-
-        $scope.changes.push(change);
-
-        $scope.dirty = true;
-      }
-
-    });
-
-    $scope.$on('formBuilder:remove', function(event, component, index, moved) {
-      if (!moved) {
-        $scope.changes.push({
-          op: 'remove',
-          key: component.key,
-        });
-      }
+    $scope.$on('formChange', (event, form) => {
+      $scope.form.components = form.components;
       $scope.dirty = true;
     });
 
-    $scope.$on('formBuilder:edit', function(event, newComponent, oldComponent) {
-      var change = {
-        op: 'edit',
-        key: oldComponent.key,
-        patches: jsonpatch.compare(angular.copy(oldComponent), angular.copy(newComponent))
-      };
-      // Don't save if nothing changed.
-      if (change.patches.length) {
+    $scope.$on('formio.addComponent', (event, component, parent, path, index) => {
+      const change = Utils.generateFormChange('add', { component, parent, path, index });
+      if (change) {
         $scope.changes.push(change);
-        $scope.dirty = true;
       }
     });
 
-    /*
-     * This function will find a component in a form and return the component AND THE PATH to the component in the form.
-     */
-    var findComponent = function(components, key, fn, path) {
-      if (!components) return;
-      path = path || [];
-
-      if (!key) {
-        return fn(components);
+    $scope.$on('formio.saveComponent', (event, component, originalComponent) => {
+      const change = Utils.generateFormChange('edit', { component, originalComponent });
+      if (change) {
+        $scope.changes.push(change);
       }
+    });
 
-      components.forEach(function(component, index) {
-        var newPath = path.slice();
-        newPath.push(index);
-        if (!component) return;
-
-        if (component.hasOwnProperty('columns') && Array.isArray(component.columns)) {
-          newPath.push('columns');
-          component.columns.forEach(function(column, index) {
-            var colPath = newPath.slice();
-            colPath.push(index);
-            colPath.push('components');
-            findComponent(column.components, key, fn, colPath);
-          });
-        }
-
-        if (component.hasOwnProperty('rows') && Array.isArray(component.rows)) {
-          newPath.push('rows');
-          component.rows.forEach(function(row, index) {
-            var rowPath = newPath.slice();
-            rowPath.push(index);
-            row.forEach(function(column, index) {
-              var colPath = rowPath.slice();
-              colPath.push(index);
-              colPath.push('components');
-              findComponent(column.components, key, fn, colPath);
-            });
-          });
-        }
-
-        if (component.hasOwnProperty('components') && Array.isArray(component.components)) {
-          newPath.push('components');
-          findComponent(component.components, key, fn, newPath);
-        }
-
-        if (component.key === key) {
-          fn(component, newPath);
-        }
-      });
-    };
-
-    var removeComponent = function(components, path) {
-      // Using _.unset() leave a null value. Use Array splice instead.
-      var index = path.pop();
-      if (path.length !== 0) {
-        components = _.get(components, path);
+    $scope.$on('formio.deleteComponent', (event, component) => {
+      const change = Utils.generateFormChange('remove', { component });
+      if (change) {
+        $scope.changes.push(change);
       }
-      components.splice(index, 1);
-    };
+    });
 
-    var applyChanges = function(form) {
-      var failed = [];
-      $scope.changes.forEach(function(change) {
-        var found = false;
-        switch (change.op) {
-          case 'add':
-            var newComponent = change.component;
-
-            // Find the container to set the component in.
-            findComponent(form.components, change.container, function(parent) {
-              if (!change.container) {
-                parent = form;
-              }
-
-              // A move will first run an add so remove any existing components with matching key before inserting.
-              findComponent(form.components, change.key, function(component, path) {
-                // If found, use the existing component. (If someone else edited it, the changes would be here)
-                newComponent = component;
-                removeComponent(form.components, path);
-              });
-
-              found = true;
-              var container = _.get(parent, change.path);
-              container.splice(change.index, 0, newComponent);
-            });
-            break;
-          case 'remove':
-            findComponent(form.components, change.key, function(component, path) {
-              found = true;
-              removeComponent(form.components, path);
-            });
-            break;
-          case 'edit':
-            findComponent(form.components, change.key, function(component, path) {
-              found = true;
-              try {
-                _.set(form.components, path, jsonpatch.applyPatch(component, change.patches).newDocument);
-              }
-              catch (err) {
-                failed.push(change);
-              }
-            });
-            break;
-          case 'move':
-            break;
-        }
-        if (!found) {
-          failed.push(change);
-        }
-      });
-
-      return {
-        form: form,
-        failed: failed
-      };
-    };
+    $scope.$on('formio.cancelComponent', (event, component) => {
+      const change = Utils.generateFormChange('remove', { component });
+      if (change) {
+        $scope.changes.push(change);
+      }
+    });
 
     var handleFormConflict = function(newForm) {
-      var result = applyChanges(newForm);
+      var result = Utils.applyFormChanges(newForm, $scope.changes);
       return $scope.parentSave(result.form)
         .then(function() {
           if (result.failed.length) {
