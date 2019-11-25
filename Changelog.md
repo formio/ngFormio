@@ -93,10 +93,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Added ability to provide HTML attributes for components inputs
  - CSS classes for SelectBoxes label
 
-### Fixed
- - Select autocomplete not working
- - Selectboxes missing false values for pristine checkboxes
- 
 ## 2.25.4
 ### Fixed
  - Issue where Formio.fieldData is not defined and should use FormioUtils instead.

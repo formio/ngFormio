@@ -169,10 +169,6 @@ module.exports = function(app) {
             $scope.refreshItems = function() {
               return $q.resolve([]);
             };
-            $scope.autocompleteValueChanged = function () {
-              //update select value if autocomplete input changed
-              $scope.submission.data[$scope.component.key] = $scope.autocompleteValue;
-            };
             $scope.$on('refreshList', function(event, url, input) {
               $scope.refreshItems(input, url);
             });
