@@ -2344,7 +2344,7 @@ app.controller('FormSubmissionsController', [
           // Generate columns
           var columns = [];
           FormioUtils.eachComponent(currentForm.components, function(component, componentPath) {
-            if (component.tableView === false || !component.key) {
+            if (component.tableView === false || !component.key || !component.type) {
               return;
             }
             // FOR-310 - If this component was already added to the grid, dont add it again.
