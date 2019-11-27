@@ -578,6 +578,9 @@ app.controller('FormController', [
     };
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
+    $scope.definition = {
+      schema: false,
+    };
 
     if ($stateParams.form) {
       $scope.form = $stateParams.form;
@@ -875,7 +878,7 @@ app.controller('FormController', [
 
     // Save a form.
     $scope.saveForm = function(form) {
-      form = form || $scope.form;
+      form = form || $scope.definition.schema || $scope.form;
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
@@ -1092,7 +1095,10 @@ app.controller('FormEditController', [
     $scope.changes = [];
 
     $scope.$on('formChange', (event, form) => {
-      $scope.form.components = form.components;
+      $scope.definition.schema = {
+        ...$scope.form,
+        components: form.components,
+      };
       $scope.dirty = true;
     });
 
@@ -1110,14 +1116,7 @@ app.controller('FormEditController', [
       }
     });
 
-    $scope.$on('formio.deleteComponent', (event, component) => {
-      const change = Utils.generateFormChange('remove', { component });
-      if (change) {
-        $scope.changes.push(change);
-      }
-    });
-
-    $scope.$on('formio.cancelComponent', (event, component) => {
+    $scope.$on('formio.removeComponent', (event, component) => {
       const change = Utils.generateFormChange('remove', { component });
       if (change) {
         $scope.changes.push(change);
@@ -2606,7 +2605,7 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     const saveForm = function() {
-      $scope.formio.saveForm(angular.copy($scope.form)).then(function(form) {
+      $scope.formio.saveForm(angular.copy($scope.schema || $scope.form)).then(function(form) {
         $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
           type: 'success',
