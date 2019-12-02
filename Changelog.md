@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Changed
+ - Returned back fix for select autocomplete not working
+ 
+### Fixed
+ - UI issues with hidden autocomplete input for selects
+
 ## 2.39.0-beta.1
 ### Changed
  - Reverted change for select autocomplete that was causing issues with legacy forms.
