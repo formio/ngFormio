@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.40
+### Changed
+ - Upgrade formiojs@4.8.0-beta.5
+ - Upgrade Form View Pro to 1.47.0
+ - Upgrade Form Manager to 1.48.0
+ - Upgrade Tenant Manager to 1.4.0
+
+### Added
+ - Help text to the project plan usage section.
+
 ## 7.0.0-rc.39
 ### Fixed
  - Include object builder directive to fix form settings.
