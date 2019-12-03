@@ -847,6 +847,11 @@ angular
       return Math.floor(elapsed) + " second" + (elapsed > 1 ? 's' : '');
     };
   })
+  .filter('flattenComponents', function() {
+    return function(components) {
+      return FormioUtils.flattenComponents(components);
+    };
+  })
   .run([
     '$state',
     '$stateParams',
