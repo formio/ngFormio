@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.0-rc.40",
+  "version": "7.0.0-rc.41",
   "dependencies": {
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
@@ -70,7 +70,7 @@
     "node-sass": "^4.13.0",
     "number-abbreviate": "^2.0.0",
     "protractor": "^5.4.2",
-    "protractor-helpers": "^1.1.695",
+    "protractor-helpers": "^1.1.697",
     "raw-loader": "^1.0.0",
     "request": "^2.88.0",
     "require-dir": "^1.0.0",

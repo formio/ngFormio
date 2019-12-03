@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.41
+### Added
+ - flattenComponents filter
+
+### Fixed
+ - Change form save to use a separate schema in scope.
+ - Fix tabs showing data view when unchecked.
+
 ## 7.0.0-rc.40
 ### Changed
  - Upgrade formiojs@4.8.0-beta.5
