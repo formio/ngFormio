@@ -30594,7 +30594,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.8.0-beta.7';
+Formio.version = '4.8.0-beta.8';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
@@ -62824,7 +62824,13 @@ function (_Input) {
         this.choices.removeActiveItems();
 
         if (dataValue) {
-          this.choices.setValue(dataValue);
+          if (typeof dataValue === 'string') {
+            dataValue = dataValue.split(this.delimiter).filter(function (result) {
+              return result;
+            });
+          }
+
+          this.choices.setValue(Array.isArray(dataValue) ? dataValue : [dataValue]);
         }
       }
 
