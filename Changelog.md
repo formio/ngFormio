@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7,0.0-rc.42
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.7
+
+### Fixed
+ - Fixed the changed indictor not showing up all the time.
+
 ## 7.0.0-rc.41
 ### Added
  - flattenComponents filter

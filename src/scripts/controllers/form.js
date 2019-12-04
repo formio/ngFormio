@@ -1059,6 +1059,9 @@ app.controller('FormEditController', [
             $scope.form.components = $stateParams.components || $scope.form.components;
             if ($stateParams.components) {
               $scope.dirty = true;
+              if(!$scope.$$phase) {
+                $scope.$apply();
+              }
             }
             $scope.originalForm = _.cloneDeep($scope.form);
             $scope.formReady = true;
@@ -1070,6 +1073,9 @@ app.controller('FormEditController', [
         $scope.form.components = $stateParams.components || $scope.form.components;
         if ($stateParams.components) {
           $scope.dirty = true;
+          if(!$scope.$$phase) {
+            $scope.$apply();
+          }
         }
         $scope.originalForm = _.cloneDeep($scope.form);
         $scope.formReady = true;
@@ -1086,12 +1092,6 @@ app.controller('FormEditController', [
       });
     };
 
-    // Track any modifications for save/cancel prompt on navigation away from the builder.
-    var contentLoaded = false;
-    $timeout(function() {
-      contentLoaded = true;
-    }, 3000);
-
     $scope.changes = [];
 
     $scope.$on('formChange', (event, form) => {
@@ -1100,6 +1100,9 @@ app.controller('FormEditController', [
         components: form.components,
       };
       $scope.dirty = true;
+      if(!$scope.$$phase) {
+        $scope.$apply();
+      }
     });
 
     $scope.$on('formio.addComponent', (event, component, parent, path, index) => {
@@ -1146,7 +1149,6 @@ app.controller('FormEditController', [
     // Wrap saveForm in the editor to clear dirty when saved.
     $scope.parentSave = $scope.saveForm;
     $scope.saveForm = function() {
-      contentLoaded = false;
       $scope.dirty = false;
       return $scope.parentSave()
         .catch(handleFormConflict)
