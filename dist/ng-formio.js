@@ -28938,6 +28938,8 @@ var _cloneDeep2 = _interopRequireDefault(__webpack_require__(/*! lodash/cloneDee
 
 var _defaults2 = _interopRequireDefault(__webpack_require__(/*! lodash/defaults */ "./node_modules/formiojs/node_modules/lodash/defaults.js"));
 
+var _utils = __webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
@@ -29587,12 +29589,13 @@ function () {
   }, {
     key: "userPermissions",
     value: function userPermissions(user, form, submission) {
-      return _nativePromiseOnly.default.all([form !== undefined ? _nativePromiseOnly.default.resolve(form) : this.loadForm(), user !== undefined ? _nativePromiseOnly.default.resolve(user) : this.currentUser(), this.accessInfo()]).then(function (results) {
+      return _nativePromiseOnly.default.all([form !== undefined ? _nativePromiseOnly.default.resolve(form) : this.loadForm(), user !== undefined ? _nativePromiseOnly.default.resolve(user) : this.currentUser(), submission !== undefined ? _nativePromiseOnly.default.resolve(submission) : this.loadSubmission(), this.accessInfo()]).then(function (results) {
         var form = results.shift();
         var user = results.shift() || {
           _id: false,
           roles: []
         };
+        var submission = results.shift();
         var access = results.shift();
         var permMap = {
           create: 'create',
@@ -29642,6 +29645,43 @@ function () {
               }
             }
           }
+        } // check for Group Permissions
+
+
+        if (submission) {
+          // we would anyway need to loop through components for create permission, so we'll do that for all of them
+          (0, _utils.eachComponent)(form.components, function (component, path) {
+            if (component && component.defaultPermission) {
+              // we assume that there might be only single value of group component
+              var value = (0, _get2.default)(submission.data, path);
+
+              if (value && value._id && // group id is present
+              user.roles.indexOf(value._id) > -1 // user has group id in his roles
+              ) {
+                  if (component.defaultPermission === 'read') {
+                    perms[permMap.read] = true;
+                  }
+
+                  if (component.defaultPermission === 'create') {
+                    perms[permMap.create] = true;
+                    perms[permMap.read] = true;
+                  }
+
+                  if (component.defaultPermission === 'write') {
+                    perms[permMap.create] = true;
+                    perms[permMap.read] = true;
+                    perms[permMap.update] = true;
+                  }
+
+                  if (component.defaultPermission === 'admin') {
+                    perms[permMap.create] = true;
+                    perms[permMap.read] = true;
+                    perms[permMap.update] = true;
+                    perms[permMap.delete] = true;
+                  }
+                }
+            }
+          });
         }
 
         return perms;
@@ -30554,7 +30594,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.8.0-beta.5';
+Formio.version = '4.8.0-beta.7';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
@@ -30610,11 +30650,11 @@ exports.default = void 0;
 
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
-
 var _Formio = _interopRequireDefault(__webpack_require__(/*! ./Formio */ "./node_modules/formiojs/Formio.js"));
 
 var _Webform2 = _interopRequireDefault(__webpack_require__(/*! ./Webform */ "./node_modules/formiojs/Webform.js"));
+
+var _utils = __webpack_require__(/*! ./utils/utils */ "./node_modules/formiojs/utils/utils.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -30752,7 +30792,7 @@ function (_Webform) {
           });
         });
 
-        var form = _lodash.default.cloneDeep(_this3.form);
+        var form = (0, _utils.fastCloneDeep)(_this3.form);
 
         if (_this3.formio) {
           form.projectUrl = _this3.formio.projectUrl;
@@ -31503,9 +31543,7 @@ function (_WebformBuilder) {
 
       var element = e.target;
       var type = element.getAttribute('data-type');
-
-      var schema = _lodash.default.cloneDeep(this.schemas[type]);
-
+      var schema = (0, _utils.fastCloneDeep)(this.schemas[type]);
       schema.key = _lodash.default.camelCase(schema.label || schema.placeholder || schema.type); // Set a unique key for this component.
 
       _builder.default.uniquify([this.webform.component], schema);
@@ -32322,8 +32360,7 @@ function (_NestedComponent) {
         return;
       }
 
-      var draft = _lodash.default.cloneDeep(this.submission);
-
+      var draft = (0, _utils.fastCloneDeep)(this.submission);
       draft.state = 'draft';
 
       if (!this.savingDraft) {
@@ -32359,8 +32396,7 @@ function (_NestedComponent) {
         }
       }).then(function (submissions) {
         if (submissions.length > 0) {
-          var draft = _lodash.default.cloneDeep(submissions[0]);
-
+          var draft = (0, _utils.fastCloneDeep)(submissions[0]);
           return _this9.setSubmission(draft).then(function () {
             _this9.draftEnabled = true;
             _this9.savingDraft = false;
@@ -32677,7 +32713,7 @@ function (_NestedComponent) {
       this.submitting = false;
       this.setPristine(true); // We want to return the submitted submission and setValue will mutate the submission so cloneDeep it here.
 
-      this.setValue(_lodash.default.cloneDeep(submission), {
+      this.setValue((0, _utils.fastCloneDeep)(submission), {
         noValidate: true,
         noCheck: true
       });
@@ -32834,8 +32870,7 @@ function (_NestedComponent) {
           });
         }
 
-        var submission = _lodash.default.cloneDeep(_this15.submission || {}); // Add in metadata about client submitting the form
-
+        var submission = (0, _utils.fastCloneDeep)(_this15.submission || {}); // Add in metadata about client submitting the form
 
         submission.metadata = submission.metadata || {};
 
@@ -33205,8 +33240,7 @@ function (_NestedComponent) {
   }, {
     key: "schema",
     get: function get() {
-      var schema = _lodash.default.cloneDeep(_lodash.default.omit(this._form, ['components']));
-
+      var schema = (0, _utils.fastCloneDeep)(_lodash.default.omit(this._form, ['components']));
       schema.components = [];
       this.eachComponent(function (component) {
         return schema.components.push(component.schema);
@@ -33743,7 +33777,7 @@ function (_Component) {
           }
 
           subgroup.componentOrder.push(component.key);
-          subgroup.components[component.key] = _lodash.default.merge(_lodash.default.cloneDeep(_Components.default.components[component.type].builderInfo, true), {
+          subgroup.components[component.key] = _lodash.default.merge((0, _utils.fastCloneDeep)(_Components.default.components[component.type].builderInfo), {
             key: component.key,
             title: componentName,
             group: 'resource',
@@ -33987,12 +34021,12 @@ function (_Component) {
       var info; // This is a new component
 
       if (this.schemas.hasOwnProperty(key)) {
-        info = _lodash.default.cloneDeep(this.schemas[key]);
+        info = (0, _utils.fastCloneDeep)(this.schemas[key]);
       } else if (this.groups.hasOwnProperty(group)) {
         var groupComponents = this.groups[group].components;
 
         if (groupComponents.hasOwnProperty(key)) {
-          info = _lodash.default.cloneDeep(groupComponents[key].schema);
+          info = (0, _utils.fastCloneDeep)(groupComponents[key].schema);
         }
       } else {
         // This is an existing resource field.
@@ -34003,7 +34037,7 @@ function (_Component) {
         });
 
         if (resourceGroup && resourceGroup.components.hasOwnProperty(key)) {
-          info = _lodash.default.cloneDeep(resourceGroup.components[key].schema);
+          info = (0, _utils.fastCloneDeep)(resourceGroup.components[key].schema);
         }
       }
 
@@ -34286,6 +34320,32 @@ function (_Component) {
 
       this.emit('updateComponent', component);
     }
+  }, {
+    key: "highlightInvalidComponents",
+    value: function highlightInvalidComponents() {
+      var formKeys = {};
+      var repeatableKeys = [];
+      (0, _formUtils.eachComponent)(this.form.components, function (comp) {
+        if (!comp.key) {
+          return;
+        }
+
+        if (formKeys[comp.key] && !repeatableKeys.includes(comp.key)) {
+          repeatableKeys.push(comp.key);
+        }
+
+        formKeys[comp.key] = true;
+      });
+      var components = this.webform.getComponents();
+      repeatableKeys.forEach(function (key) {
+        var instances = components.filter(function (comp) {
+          return comp.key === key;
+        });
+        instances.forEach(function (instance) {
+          return instance.setCustomValidity("API Key is not unique: ".concat(key));
+        });
+      });
+    }
     /**
      * Called when a new component is saved.
      *
@@ -34336,9 +34396,12 @@ function (_Component) {
           _this9.emit('saveComponent', schema, component, parentComponent.schema, path, index, isNew);
 
           _this9.emit('change', _this9.form);
+
+          _this9.highlightInvalidComponents();
         });
       }
 
+      this.highlightInvalidComponents();
       return _nativePromiseOnly.default.resolve();
     }
   }, {
@@ -34351,16 +34414,15 @@ function (_Component) {
       }
 
       var saved = false;
-
-      var componentCopy = _lodash.default.cloneDeep(component);
-
-      var componentClass = _Components.default.components[componentCopy.type];
-      var isCustom = componentClass === undefined;
+      var componentCopy = (0, _utils.fastCloneDeep)(component);
+      var ComponentClass = _Components.default.components[componentCopy.type];
+      var isCustom = ComponentClass === undefined;
       isJsonEdit = isJsonEdit || isCustom;
-      componentClass = isCustom ? _Components.default.components.unknown : componentClass; // Make sure we only have one dialog open at a time.
+      ComponentClass = isCustom ? _Components.default.components.unknown : ComponentClass; // Make sure we only have one dialog open at a time.
 
       if (this.dialog) {
         this.dialog.close();
+        this.highlightInvalidComponents();
       } // This is the render step.
 
 
@@ -34390,26 +34452,27 @@ function (_Component) {
           label: 'Component JSON',
           tooltip: 'Edit the JSON for this component.'
         }]
-      } : componentClass.editForm(_lodash.default.cloneDeep(overrides));
+      } : ComponentClass.editForm(_lodash.default.cloneDeep(overrides));
+      var instance = new ComponentClass(componentCopy);
       this.editForm.submission = isJsonEdit ? {
         data: {
-          componentJson: componentCopy
+          componentJson: instance.component
         }
       } : {
-        data: componentCopy
+        data: instance.component
       };
 
       if (this.preview) {
         this.preview.destroy();
       }
 
-      if (!componentClass.builderInfo.hasOwnProperty('preview') || componentClass.builderInfo.preview) {
+      if (!ComponentClass.builderInfo.hasOwnProperty('preview') || ComponentClass.builderInfo.preview) {
         this.preview = new _Webform.default(_lodash.default.omit(this.options, ['hooks', 'builder', 'events', 'attachMode', 'calculateValue']));
       }
 
       this.componentEdit = this.ce('div');
       this.setContent(this.componentEdit, this.renderTemplate('builderEditForm', {
-        componentInfo: componentClass.builderInfo,
+        componentInfo: ComponentClass.builderInfo,
         editForm: this.editForm.render(),
         preview: this.preview ? this.preview.render() : false
       }));
@@ -34455,6 +34518,8 @@ function (_Component) {
         _this10.emit('cancelComponent', component);
 
         _this10.dialog.close();
+
+        _this10.highlightInvalidComponents();
       });
       this.addEventListener(this.componentEdit.querySelector('[ref="removeButton"]'), 'click', function (event) {
         event.preventDefault(); // Since we are already removing the component, don't trigger another remove.
@@ -34466,6 +34531,8 @@ function (_Component) {
         _this10.removeComponent(component, parent, original);
 
         _this10.dialog.close();
+
+        _this10.highlightInvalidComponents();
       });
       this.addEventListener(this.componentEdit.querySelector('[ref="saveButton"]'), 'click', function (event) {
         event.preventDefault();
@@ -34494,6 +34561,8 @@ function (_Component) {
 
         if (isNew && !saved) {
           _this10.removeComponent(component, parent, original);
+
+          _this10.highlightInvalidComponents();
         } // Clean up.
 
 
@@ -34520,10 +34589,7 @@ function (_Component) {
       }
 
       this.addClass(this.refs.form, 'builder-paste-mode');
-
-      var copy = _lodash.default.cloneDeep(component.schema);
-
-      window.sessionStorage.setItem('formio.clipboard', JSON.stringify(copy));
+      window.sessionStorage.setItem('formio.clipboard', JSON.stringify(component.schema));
     }
     /**
      * Paste copied component after the current component.
@@ -35129,7 +35195,7 @@ function (_Webform) {
     value: function pageFieldLogic(page) {
       // Handle field logic on pages.
       this.component = this.pages[page].component;
-      this.originalComponent = _lodash.default.cloneDeep(this.component);
+      this.originalComponent = (0, _utils.fastCloneDeep)(this.component);
       this.fieldLogic(this.data); // If disabled changed, be sure to distribute the setting.
 
       this.disabled = this.shouldDisabled;
@@ -36127,6 +36193,8 @@ function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) ||
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -36360,7 +36428,7 @@ function () {
           } // Isomorphic fetch
 
 
-          var isofetch = window && window.fetch ? {
+          var isofetch = (typeof window === "undefined" ? "undefined" : _typeof(window)) === 'object' && window.fetch ? {
             fetch: fetch,
             Headers: Headers,
             Request: Request,
@@ -37495,7 +37563,7 @@ function (_Element) {
       attachMode: 'full'
     }, options || {}))); // Save off the original component.
 
-    _this.originalComponent = _lodash.default.cloneDeep(component);
+    _this.originalComponent = (0, FormioUtils.fastCloneDeep)(component);
     /**
      * Determines if this component has a condition assigned to it.
      * @type {null}
@@ -37566,8 +37634,8 @@ function (_Element) {
      * Determines if this component is visible, or not.
      */
 
-    _this._visible = _this.conditionallyVisible(data);
     _this._parentVisible = _this.options.hasOwnProperty('parentVisible') ? _this.options.parentVisible : true;
+    _this._visible = _this._parentVisible && _this.conditionallyVisible(data);
     _this._parentDisabled = false;
     /**
      * If this input has been input and provided value.
@@ -38629,8 +38697,7 @@ function (_Element) {
         return;
       }
 
-      var newComponent = _lodash.default.cloneDeep(this.originalComponent);
-
+      var newComponent = (0, FormioUtils.fastCloneDeep)(this.originalComponent);
       var changed = logics.reduce(function (changed, logic) {
         var result = FormioUtils.checkTrigger(newComponent, logic.trigger, row, data, _this8.root ? _this8.root._form : {}, _this8);
         return (result ? _this8.applyActions(newComponent, logic.actions, result, row, data) : false) || changed;
@@ -39688,7 +39755,7 @@ function (_Element) {
           var event = _this18.interpolate(logic.trigger.event);
 
           _this18.on(event, function () {
-            var newComponent = _lodash.default.cloneDeep(_this18.originalComponent);
+            var newComponent = (0, FormioUtils.fastCloneDeep)(_this18.originalComponent);
 
             for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
               args[_key3] = arguments[_key3];
@@ -39922,7 +39989,7 @@ function (_Element) {
   }, {
     key: "schema",
     get: function get() {
-      return this.getModifiedSchema(_lodash.default.omit(this.component, 'id'), this.defaultSchema);
+      return (0, FormioUtils.fastCloneDeep)(this.getModifiedSchema(_lodash.default.omit(this.component, 'id'), this.defaultSchema));
     }
   }, {
     key: "transform",
@@ -42200,7 +42267,7 @@ function (_Field) {
       });
 
       if (!this.attachMultiMask(index)) {
-        this.setInputMask(this.refs.input[index]);
+        this.setInputMask(element);
       }
     }
   }, {
@@ -43108,9 +43175,9 @@ function (_Field) {
       this.components.forEach(function (component) {
         var conditionallyVisible = component.conditionallyVisible();
 
-        if (forceShow || !isVisible && conditionallyVisible) {
+        if (forceShow || conditionallyVisible) {
           component.visible = true;
-        } else if (forceHide || isVisible && !conditionallyVisible) {
+        } else if (forceHide || !isVisible || !conditionallyVisible) {
           component.visible = false;
         } // If hiding a nested component, clear all errors below.
 
@@ -45305,7 +45372,7 @@ function (_Field) {
     value: function setValue(value, flags) {
       flags = flags || {};
 
-      if (this.setCheckedState(value) !== undefined) {
+      if (this.setCheckedState(value) !== undefined || !this.input && value !== undefined && !this.component.clearOnHide) {
         return this.updateValue(value, flags);
       }
 
@@ -45931,6 +45998,7 @@ function (_NestedComponent) {
 
           var component = _this6.createComponent(clonedComp);
 
+          delete component.component.internal;
           schema.columns[colIndex].components[compIndex] = component.schema;
         });
       });
@@ -46231,7 +46299,7 @@ function (_NestedComponent) {
     }
   }, {
     key: "getValueAsString",
-    value: function getValueAsString(value) {
+    value: function getValueAsString() {
       return '[Complex Data]';
     }
   }, {
@@ -47674,6 +47742,8 @@ var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../_class
 
 var _Component = _interopRequireDefault(__webpack_require__(/*! ../_classes/component/Component */ "./node_modules/formiojs/components/_classes/component/Component.js"));
 
+var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest(); }
@@ -47790,7 +47860,7 @@ function (_NestedComponent) {
     }
   }, {
     key: "getValueAsString",
-    value: function getValueAsString(value) {
+    value: function getValueAsString() {
       return '[Complex Data]';
     }
     /**
@@ -48016,9 +48086,7 @@ function (_NestedComponent) {
 
       var newPosition = sibling ? sibling.dragInfo.index : this.dataValue.length;
       var movedBelow = newPosition > oldPosition;
-
-      var dataValue = _lodash.default.cloneDeep(this.dataValue);
-
+      var dataValue = (0, _utils.fastCloneDeep)(this.dataValue);
       var draggedRowData = dataValue[oldPosition]; //insert element at new position
 
       dataValue.splice(newPosition, 0, draggedRowData); //remove element from old position (if was moved above, after insertion it's at +1 index)
@@ -48883,7 +48951,7 @@ function (_DataGridComponent) {
         return [];
       }
 
-      return Object.keys(dataValue).map(function (key) {
+      return Object.keys(dataValue).map(function () {
         return dataValue;
       });
     }
@@ -48970,7 +49038,6 @@ function (_DataGridComponent) {
   }, {
     key: "addRow",
     value: function addRow() {
-      var newKey = (0, _utils.uniqueKey)(this.dataValue, 'key');
       var index = this.rows.length;
       this.rows[index] = this.createRowComponents(this.dataValue, index);
       this.redraw();
@@ -50968,7 +51035,7 @@ exports.default = void 0;
 
 var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
-var _fastDeepEqual = _interopRequireDefault(__webpack_require__(/*! fast-deep-equal */ "./node_modules/fast-deep-equal/index.js"));
+var _fastDeepEqual = _interopRequireDefault(__webpack_require__(/*! fast-deep-equal */ "./node_modules/formiojs/node_modules/fast-deep-equal/index.js"));
 
 var _NestedComponent2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/nested/NestedComponent */ "./node_modules/formiojs/components/_classes/nested/NestedComponent.js"));
 
@@ -51119,7 +51186,7 @@ function (_NestedComponent) {
 
   _createClass(EditGridComponent, [{
     key: "getValueAsString",
-    value: function getValueAsString(value) {
+    value: function getValueAsString() {
       return '[Complex Data]';
     }
   }, {
@@ -51409,7 +51476,7 @@ function (_NestedComponent) {
       var dataValue = this.dataValue || [];
       var editRow = this.editRows[rowIndex];
       this.setEditRowSettings(editRow);
-      var dataSnapshot = dataValue[rowIndex] ? _lodash.default.cloneDeep(dataValue[rowIndex]) : {};
+      var dataSnapshot = dataValue[rowIndex] ? (0, _utils.fastCloneDeep)(dataValue[rowIndex]) : {};
 
       if (this.component.inlineEdit) {
         editRow.backup = dataSnapshot;
@@ -54349,7 +54416,7 @@ function (_Component) {
         return _nativePromiseOnly.default.resolve(this.dataValue);
       }
 
-      return this.submitSubForm(false).then(function (data) {
+      return this.submitSubForm(false).then(function () {
         return _this6.dataValue;
       }).then(function () {
         return _get(_getPrototypeOf(FormComponent.prototype), "beforeSubmit", _this6).call(_this6);
@@ -55052,6 +55119,8 @@ __webpack_require__(/*! core-js/modules/es.array.concat */ "./node_modules/core-
 
 __webpack_require__(/*! core-js/modules/es.array.iterator */ "./node_modules/core-js/modules/es.array.iterator.js");
 
+__webpack_require__(/*! core-js/modules/es.array.map */ "./node_modules/core-js/modules/es.array.map.js");
+
 __webpack_require__(/*! core-js/modules/es.object.get-own-property-descriptor */ "./node_modules/core-js/modules/es.object.get-own-property-descriptor.js");
 
 __webpack_require__(/*! core-js/modules/es.object.get-prototype-of */ "./node_modules/core-js/modules/es.object.get-prototype-of.js");
@@ -55107,33 +55176,46 @@ function (_Component) {
   }
 
   _createClass(HTMLComponent, [{
-    key: "render",
-    value: function render() {
-      return _get(_getPrototypeOf(HTMLComponent.prototype), "render", this).call(this, this.renderTemplate('html', {
+    key: "checkRefreshOn",
+    value: function checkRefreshOn(changed) {
+      _get(_getPrototypeOf(HTMLComponent.prototype), "checkRefreshOn", this).call(this, changed);
+
+      if (this.component.refreshOnChange && this.refs.html) {
+        this.setContent(this.refs.html, this.content);
+      }
+    }
+  }, {
+    key: "renderContent",
+    value: function renderContent() {
+      var _this = this;
+
+      return this.renderTemplate('html', {
         component: this.component,
         tag: this.component.tag,
-        attrs: this.component.attrs || {},
+        attrs: (this.component.attrs || []).map(function (attr) {
+          return {
+            attr: attr.attr,
+            value: _this.interpolate(attr.value, {
+              data: _this.rootValue,
+              row: _this.data
+            })
+          };
+        }),
         content: this.content,
         singleTags: this.singleTags
-      }));
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return _get(_getPrototypeOf(HTMLComponent.prototype), "render", this).call(this, this.renderContent());
     }
   }, {
     key: "attach",
     value: function attach(element) {
-      var _this = this;
-
       this.loadRefs(element, {
         html: 'single'
       });
-
-      if (this.component.refreshOnChange) {
-        this.on('change', function () {
-          if (_this.refs.html) {
-            _this.setContent(_this.refs.html, _this.content);
-          }
-        }, true);
-      }
-
       return _get(_getPrototypeOf(HTMLComponent.prototype), "attach", this).call(this, element);
     }
   }, {
@@ -62630,8 +62712,6 @@ var _Input2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/input/I
 
 var _choices = _interopRequireDefault(__webpack_require__(/*! choices.js/public/assets/scripts/choices.js */ "./node_modules/choices.js/public/assets/scripts/choices.js"));
 
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -62698,7 +62778,7 @@ function (_Input) {
         duplicateItemsAllowed: false
       });
       this.choices.itemList.element.tabIndex = element.tabIndex;
-      this.addEventListener(this.choices.input.element, 'blur', function (target) {
+      this.addEventListener(this.choices.input.element, 'blur', function () {
         var value = _this.choices.input.value;
 
         if (value) {
@@ -62722,37 +62802,33 @@ function (_Input) {
       }
     }
   }, {
+    key: "normalizeValue",
+    value: function normalizeValue(value) {
+      if (this.component.storeas === 'string' && Array.isArray(value)) {
+        return value.join(this.delimiter);
+      } else if (this.component.storeas === 'array' && typeof value === 'string') {
+        return value.split(this.delimiter).filter(function (result) {
+          return result;
+        });
+      }
+
+      return value;
+    }
+  }, {
     key: "setValue",
     value: function setValue(value) {
-      if (this.component.storeas === 'string' && typeof value === 'string') {
-        value = value.split(this.delimiter).filter();
-      }
-
-      if (value && !_lodash.default.isArray(value)) {
-        value = [value];
-      }
-
       var changed = _get(_getPrototypeOf(TagsComponent.prototype), "setValue", this).call(this, value);
 
       if (this.choices) {
+        var dataValue = this.dataValue;
         this.choices.removeActiveItems();
 
-        if (value) {
-          this.choices.setValue(value);
+        if (dataValue) {
+          this.choices.setValue(dataValue);
         }
       }
 
       return changed;
-    }
-  }, {
-    key: "getValue",
-    value: function getValue() {
-      if (this.choices) {
-        var value = this.choices.getValue(true);
-        return this.component.storeas === 'string' ? value.join(this.delimiter) : value;
-      }
-
-      return this.dataValue;
     }
   }, {
     key: "emptyValue",
@@ -62982,8 +63058,6 @@ var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_m
 var _nativePromiseOnly = _interopRequireDefault(__webpack_require__(/*! native-promise-only */ "./node_modules/native-promise-only/lib/npo.src.js"));
 
 var _utils = __webpack_require__(/*! ../../utils/utils */ "./node_modules/formiojs/utils/utils.js");
-
-var _Formio = _interopRequireDefault(__webpack_require__(/*! ../../Formio */ "./node_modules/formiojs/Formio.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -64080,8 +64154,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-
-var _lodash = _interopRequireDefault(__webpack_require__(/*! lodash */ "./node_modules/formiojs/node_modules/lodash/lodash.js"));
 
 var _Input2 = _interopRequireDefault(__webpack_require__(/*! ../_classes/input/Input */ "./node_modules/formiojs/components/_classes/input/Input.js"));
 
@@ -66831,6 +66903,64 @@ Object.keys(_formio).forEach(function (key) {
 var _FormBuilder2 = _interopRequireDefault(__webpack_require__(/*! ./FormBuilder */ "./node_modules/formiojs/FormBuilder.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/node_modules/fast-deep-equal/index.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/formiojs/node_modules/fast-deep-equal/index.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// do not edit .js files directly - edit src/index.jst
+
+
+
+module.exports = function equal(a, b) {
+  if (a === b) return true;
+
+  if (a && b && typeof a == 'object' && typeof b == 'object') {
+    if (a.constructor !== b.constructor) return false;
+
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0;)
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+
+
+
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+
+    for (i = length; i-- !== 0;)
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+
+    for (i = length; i-- !== 0;) {
+      var key = keys[i];
+
+      if (!equal(a[key], b[key])) return false;
+    }
+
+    return true;
+  }
+
+  // true if both NaN, false otherwise
+  return a!==a && b!==b;
+};
+
 
 /***/ }),
 
@@ -97658,6 +97788,7 @@ var _exportNames = {
   observeOverload: true,
   getContextComponents: true,
   sanitize: true,
+  fastCloneDeep: true,
   interpolate: true,
   isInputComponent: true,
   jsonLogic: true,
@@ -97709,6 +97840,7 @@ exports.withSwitch = withSwitch;
 exports.observeOverload = observeOverload;
 exports.getContextComponents = getContextComponents;
 exports.sanitize = sanitize;
+exports.fastCloneDeep = fastCloneDeep;
 exports.isInputComponent = isInputComponent;
 Object.defineProperty(exports, "jsonLogic", {
   enumerable: true,
@@ -97771,13 +97903,13 @@ var _builder = _interopRequireDefault(__webpack_require__(/*! ./builder */ "./no
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
@@ -97868,7 +98000,7 @@ function evaluate(func, args, ret, tokenize) {
 
   if (typeof func === 'function') {
     try {
-      if (window) {
+      if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === 'object') {
         returnVal = Array.isArray(args) ? func.apply(void 0, _toConsumableArray(args)) : func(args);
       } else {
         // Need to assume we're server side and limit ourselves to a sandbox VM
@@ -98915,6 +99047,14 @@ function sanitize(string, options) {
   }
 
   return _dompurify.default.sanitize(string, sanitizeOptions);
+}
+/**
+ * Fast cloneDeep for JSON objects only.
+ */
+
+
+function fastCloneDeep(obj) {
+  return obj ? JSON.parse(JSON.stringify(obj)) : obj;
 }
 
 function isInputComponent(componentJson) {
