@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.0-rc.42",
+  "version": "7.0.0-rc.43",
   "dependencies": {
     "@babel/core": "^7.7.4",
     "@babel/preset-env": "^7.7.4",
@@ -51,7 +51,7 @@
     "file-saver": "^2.0.1",
     "font-awesome": "^4.7.0",
     "formio-tenant": "github:formio/formio-tenant#1.4.0",
-    "formiojs": "^4.8.0-beta.7",
+    "formiojs": "^4.8.0-beta.8",
     "formmanager": "github:formio/formmanager#v1.48.0",
     "gulp": "^4.0.2",
     "gulp-s3": "^0.11.0",
@@ -64,7 +64,7 @@
     "moment": "^2.24.0",
     "ng-dialog": "^1.4.0",
     "ng-file-upload": "^12.2.13",
-    "ng-formio": "^4.6.10",
+    "ng-formio": "^4.6.11",
     "ng-sortable": "^1.3.8",
     "ng-tags-input": "^3.2.0",
     "node-sass": "^4.13.0",
