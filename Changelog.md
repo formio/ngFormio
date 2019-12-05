@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.44
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.9
+ - Upgrade formmanager to include latest renderer.
+ - Upgrade formview pro to include latest renderer.
+
 ## 7.0.0-rc.43
 ### Changed
  - Upgrade formio.js to 4.8.0-beta.8
