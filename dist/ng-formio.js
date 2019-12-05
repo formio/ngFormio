@@ -29589,7 +29589,7 @@ function () {
   }, {
     key: "userPermissions",
     value: function userPermissions(user, form, submission) {
-      return _nativePromiseOnly.default.all([form !== undefined ? _nativePromiseOnly.default.resolve(form) : this.loadForm(), user !== undefined ? _nativePromiseOnly.default.resolve(user) : this.currentUser(), submission !== undefined ? _nativePromiseOnly.default.resolve(submission) : this.loadSubmission(), this.accessInfo()]).then(function (results) {
+      return _nativePromiseOnly.default.all([form !== undefined ? _nativePromiseOnly.default.resolve(form) : this.loadForm(), user !== undefined ? _nativePromiseOnly.default.resolve(user) : this.currentUser(), submission !== undefined || !this.submissionId ? _nativePromiseOnly.default.resolve(submission) : this.loadSubmission(), this.accessInfo()]).then(function (results) {
         var form = results.shift();
         var user = results.shift() || {
           _id: false,
@@ -30594,7 +30594,7 @@ Formio.projectUrlSet = false;
 Formio.plugins = [];
 Formio.cache = {};
 Formio.Providers = _providers.default;
-Formio.version = '4.8.0-beta.8';
+Formio.version = '4.8.0-beta.9';
 Formio.events = new _EventEmitter.default({
   wildcard: false,
   maxListeners: 0
