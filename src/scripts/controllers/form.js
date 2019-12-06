@@ -2694,13 +2694,17 @@ app.constant('ResourceAccessLabels', {
     label: 'Read',
     tooltip: 'The Read permission will allow a resource, defined in the submission, to read all of the submission data.'
   },
+  'create': {
+    label: 'Create',
+    tooltip: 'The Create permission will allow a resource, defined in the submission, to read and create all of the submission data.'
+  },
   'write': {
     label: 'Write',
-    tooltip: 'The Write permission will allow a resource, defined in the submission, to read all of the submission data and edit all of the data except for the Submission Resource Access and Owner information.'
+    tooltip: 'The Write permission will allow a resource, defined in the submission, to read, create and edit all of the submission data except for the Submission Resource Access and Owner information.'
   },
   'admin': {
     label: 'Admin',
-    tooltip: 'The Admin permission will allow a resource, defined in the submission, to read and edit all of the submission data.'
+    tooltip: 'The Admin permission will allow a resource, defined in the submission, to read, create, edit and delete all of the submission data.'
   }
 });
 
