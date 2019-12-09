@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
  - Upgrade formio.js to 4.8.0-rc.1
+ - Upgrade @formio/premium to v1.2.0
 
 ## 7.0.0-rc.44
 ### Changed
