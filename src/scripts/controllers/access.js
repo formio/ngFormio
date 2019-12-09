@@ -147,7 +147,7 @@ app.directive('permissionEditor', ['$q', function($q) {
 }]);
 
 app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, FormioUtils) {
-  var PERMISSION_TYPES = ['read', 'write', 'admin'];
+  var PERMISSION_TYPES = ['read', 'create', 'write', 'admin'];
 
   return {
     scope: {
