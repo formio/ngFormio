@@ -4,9 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 7.0.0-rc.45
 ### Added
  - Create level for Group Permissions (Field Based Resource Access)
+
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.1
 
 ## 7.0.0-rc.44
 ### Changed
