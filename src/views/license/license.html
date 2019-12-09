@@ -1,0 +1,139 @@
+<div ui-view class="container">
+  <!-- Header -->
+  <ul class="list-inline">
+    <li><h2><a ui-sref="home" title="Home"><i class="fa fa-home"></i><br /></a></h2></li>
+    <li><h2>›</h2></li>
+    <li><h2><i class="fa fa-bar-chart"></i> License Management</h2></li>
+  </ul>
+
+  <!-- Overview panel -->
+  <div class="panel panel-primary ng-scope">
+    <div class="panel-heading">
+      <h3 class="panel-title">Overview</h3>
+    </div>
+    <div class="panel-body">
+      <label class="control-label">License: </label>
+      <select
+        class="form-controls"
+        ng-model="selectedLicense"
+        ng-options="license._id for license in licenses"
+        ng-change="updateSelectedLicense(selectedLicense)"
+        ng-required="true"
+        placeholder="Select a license"></select>
+
+      <p></p>
+
+      <div class="license-usage-cards" ng-if="licenseAdminInfo.terms">
+        <!-- Plan Type -->
+        <div class="license-usage-card">
+          <div class="usage-label">Plan</div>
+          <div class="usage-stat">{{licenseAdminInfo.terms.plan.substr(0, 1).toUpperCase() + licenseAdminInfo.terms.plan.substr(1)}}</div>
+        </div>
+
+        <!-- Start Date -->
+        <div class="license-usage-card" ng-if="licenseAdminInfo.terms.startDateFormatted">
+          <div class="usage-label">Start Date</div>
+          <div class="usage-stat">{{licenseAdminInfo.terms.startDateFormatted}}</div>
+        </div>
+
+        <!-- End Date -->
+        <div class="license-usage-card" ng-if="licenseAdminInfo.terms.endDateFormatted">
+          <div class="usage-label">End Date</div>
+          <div class="usage-stat">{{licenseAdminInfo.terms.endDateFormatted}}</div>
+        </div>
+
+        <!-- API Servers -->
+        <div class="license-usage-card">
+          <div class="usage-label">API Servers</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.apiServers.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.apiServers.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- PDF Servers -->
+        <div class="license-usage-card">
+          <div class="usage-label">PDF Servers</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.pdfServers.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.pdfServers.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="license-usage-card">
+          <div class="usage-label">Projects</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.projects.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.projects.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- Tenants -->
+        <div class="license-usage-card">
+          <div class="usage-label">Tenants</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.tenants.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.tenants.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- Forms/Project -->
+        <div class="license-usage-card">
+          <div class="usage-label">Max Forms Per Project</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.formsPerProject.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.formsPerProject.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- Form Loads -->
+        <div class="license-usage-card">
+          <div class="usage-label">Form Loads</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.formLoads.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.formLoads.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- Submissions -->
+        <div class="license-usage-card">
+          <div class="usage-label">Submissions</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.submissions.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.submissions.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- PDF Downloads -->
+        <div class="license-usage-card">
+          <div class="usage-label">PDF
+            Downloads</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.pdfDownloads.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.pdfDownloads.toLocaleString()}}</span>
+          </div>
+        </div>
+
+        <!-- PDF Uploads -->
+        <div class="license-usage-card">
+          <div class="usage-label">PDF Uploads</div>
+          <div class="usage-stat">
+            <span class="usage-current">{{licenseAdminInfo.usage.pdfUploads.toLocaleString()}}</span> /
+            <span class="usage-max"    >{{licenseAdminInfo.terms.pdfUploads.toLocaleString()}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Utilizations panel -->
+  <div class="panel panel-primary ng-scope">
+    <div class="panel-heading">
+      <h3 class="panel-title">Utilizations</h3>
+    </div>
+    <div class="panel-body">
+      <div kendo-grid="grid" k-rebind="gridOptions" k-options="gridOptions"></div>
+    </div>
+  </div>
+</div>

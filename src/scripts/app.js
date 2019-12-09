@@ -125,6 +125,11 @@ angular
           url: '/resetpass/done',
           templateUrl: 'views/user/resetpass/resetpass-done.html'
         })
+        .state('license', {
+          url: '/license',
+          controller: 'LicenseManagementController',
+          templateUrl: 'views/license/license.html'
+        })
         .state('profile', {
           abstract: true,
           url: '/profile',
@@ -329,6 +334,12 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/pdf/index.html',
           controller: 'PDFController'
+        })
+        .state('project.env.integrations.licenseKey', {
+          url: '/license',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/licenseKey/index.html',
+          controller: 'LicenseKeyController'
         })
         .state('project.env.staging', {
           url: '/staging',

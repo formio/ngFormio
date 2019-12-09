@@ -521,7 +521,7 @@ app.controller('FormController', [
           Upload.upload({
             url: pdfServer + filePath,
             data: {file: file},
-            headers: {'x-file-token': project.settings.filetoken}
+            headers: {'x-license-key': project.settings.licenseKey}
           }).then(function (res) {
             PDFServer.clearCache();
             $scope.formReady = true;

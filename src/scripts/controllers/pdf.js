@@ -86,7 +86,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
             var pdfProjectUrl = this.pdfUrl(project);
             return $http.get(pdfProjectUrl, {
               headers: {
-                'x-file-token': project.settings.filetoken,
+                'x-license-key': project.settings.licenseKey,
                 'x-host': location.hostname
               }
             }).then(function(results) {
@@ -108,7 +108,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               delete infoCache[project._id];
               return $http.post(this.pdfUrl(project) + '/purchase', purchase, {
                 headers: {
-                  'x-file-token': project.settings.filetoken,
+                  'x-license-key': project.settings.licenseKey,
                   'x-host': location.hostname
                 }
               }, function(err) {
@@ -128,7 +128,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               var pdfFile = this.pdfUrl(project, true) + '/file/' + pdf.data.id;
               return $http.delete(pdfFile, {
                 headers: {
-                  'x-file-token': project.settings.filetoken,
+                  'x-license-key': project.settings.licenseKey,
                   'x-host': location.hostname
                 }
               }, function(err) {
@@ -176,7 +176,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
               var pdfsUrl = this.pdfUrl(project, true) + '/file';
               return $http.get(pdfsUrl, {
                 headers: {
-                  'x-file-token': project.settings.filetoken,
+                  'x-license-key': project.settings.licenseKey,
                   'x-host': location.hostname
                 }
               }).then(function(results) {
@@ -214,12 +214,7 @@ angular.module('formioApp.controllers.pdf', ['ngDialog'])
       $scope.numSubmissions = AppConfig.pdfHostedSubs.toLocaleString();
       $scope.totalPrice = AppConfig.pdfHostedPrice;
       $scope.currentPlan = 'hosted';
-      $scope.currentTab = 'pdf';
       $scope.loading = true;
-
-      $scope.setTab = function(tab) {
-        $scope.currentTab = tab;
-      };
 
       $scope.onPlanChange = function(plan) {
         $scope.currentPlan = plan || this.currentPlan;

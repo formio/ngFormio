@@ -1,0 +1,47 @@
+<!-- <span class="fa fa-spinner fa-pulse" ng-if="loading" style="font-size: 2em;"></span> -->
+<div class="row">
+  <div class="col-md-8">
+    <!-- Header -->
+    <h3>License Key</h3>
+
+    <!-- Instructions -->
+    <div ng-if="!primaryProject.settings.licenseKey || licenseError">
+      <p>This project is not currently tied to a license. Please supply a <strong>Client</strong> license key.</p>
+    </div>
+
+    <div>
+      <p>This license key will be visible in network requests sent by the application, so keys with server-related scopes (<code>apiServer</code> and <code>pdfServer</code>) should not be used here.</p>
+    </div>
+
+    <!-- License Key input, error alert -->
+    <input type="text" class="form-control" id="licenseKey" ng-model="primaryProject.settings.licenseKey" placeholder="client license key"/>
+    <p></p>
+    <div class="alert alert-danger" role="alert" ng-if="licenseError">
+      {{ licenseError }}
+    </div>
+
+    <!-- Scopes table -->
+    <div ng-if="primaryProject.settings.licenseKey && !licenseError">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Scope</th>
+            <th>OK</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="(index, name) in licenseKeyScopes">
+            <td>{{ name }}</td>
+            <td>
+              <i ng-if=" ['apiServer', 'pdfServer'].includes(name)" style="color:red;"   class="glyphicon glyphicon-ban-circle"></i>
+              <i ng-if="!['apiServer', 'pdfServer'].includes(name)" style="color:green;" class="glyphicon glyphicon-ok-circle" ></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Save button -->
+    <button ng-disabled="!enableSave" class="btn btn-primary" ng-click="saveLicenseKey()">Save License Key</button>
+  </div>
+</div>

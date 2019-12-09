@@ -269,6 +269,7 @@ app.controller('ProjectController', [
   'RemoteTokens',
   'PrimaryProject',
   'PDFServer',
+  'LicenseKeyHelper',
   function(
     $scope,
     $rootScope,
@@ -283,7 +284,8 @@ app.controller('ProjectController', [
     GoogleAnalytics,
     RemoteTokens,
     PrimaryProject,
-    PDFServer
+    PDFServer,
+    LicenseKeyHelper
   ) {
     // Load in existing primary project scope.
     $scope.status = {
@@ -424,6 +426,7 @@ app.controller('ProjectController', [
     $scope.tenantProject = null;
     $scope.tenantProjectPromise = tenantProjectQ.promise;
     PDFServer.setPrimaryProject(primaryProjectQ.promise);
+    LicenseKeyHelper.setPrimaryProject(primaryProjectQ.promise);
     $scope.highestRoleQ = $q.defer();
     $scope.highestRoleLoaded = $scope.highestRoleQ.promise;
 

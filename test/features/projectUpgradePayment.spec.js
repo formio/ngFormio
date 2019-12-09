@@ -164,7 +164,7 @@ module.exports = function (actions,tags) {
       // actions.iSeeText('Hosted PDF');
       // actions.iSeeText('$65/month');
       // actions.clickOnElementWithText('Settings');
-      // actions.clickOnElementWithText('PDF Management');
+      // actions.clickOnElementWithText('PDF Server Deployment');
       // actions.iSeeText('25');
       // actions.iSeeText('1,000');
       // actions.clickOnClass('.fa.fa-cog');
@@ -180,7 +180,7 @@ module.exports = function (actions,tags) {
       actions.iDonotSeeText('Hosted PDF');
       actions.iSeeText('$25/month');
       actions.clickOnElementWithText('Settings');
-      actions.clickOnElementWithText('PDF Management');
+      actions.clickOnElementWithText('PDF Server Deployment');
       actions.iSeeText('1');
       actions.iSeeText('10');
       actions.clickOnClass('.fa.fa-cog');

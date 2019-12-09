@@ -1,0 +1,8 @@
+<div ng-if="canDelete(currentPDF)">
+  <h3>Are you sure you wish to delete this PDF?</h3>
+  <button class="btn btn-danger" ng-click="confirmDelete()">Yes. Delete PDF</button>
+  <button class="btn btn-default" ng-click="cancel()">No</button>
+</div>
+<div ng-if="!canDelete(currentPDF)">
+  <h3>This PDF is still used by a form. Please remove it from all forms before deleting.</h3>
+</div>

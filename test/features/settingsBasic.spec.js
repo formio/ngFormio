@@ -129,7 +129,7 @@ module.exports = function (actions,tags) {
     });
     describe('Basic Plan > Integrations Settings',function(){
       actions.clickOnElementWithText('Settings');
-      actions.clickOnElementWithText('PDF Management');
+      actions.clickOnElementWithText('PDF Server Deployment');
       actions.checkingUrlEndsWith('env/pdf');
       actions.iSeeText('1');
       actions.iSeeText('10');
@@ -142,7 +142,7 @@ module.exports = function (actions,tags) {
       // actions.waitForActionToComplete(4000);
       // actions.iSeeText('$50/month');
       // actions.clickOnElementWithText('Settings');
-      // actions.clickOnElementWithText('PDF Management');
+      // actions.clickOnElementWithText('PDF Server Deployment');
       // actions.checkingUrlEndsWith('env/pdf');
       // actions.iSeeText('25');
       // actions.iSeeText('1,000');
