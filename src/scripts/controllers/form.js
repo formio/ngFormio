@@ -612,7 +612,6 @@ app.controller('FormController', [
       baseUrl: $scope.baseUrl,
       building: true,
       sideBarScrollOffset: 60,
-      resourceTag: '',
       bootstrap: 3,
       builder: {}
     };
