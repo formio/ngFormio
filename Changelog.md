@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.46
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.2
+ - Upgrade form manager to include latest renderer.
+ - Removed default existing resource tag from form
+
 ## 7.0.0-rc.45
 ### Added
  - Create level for Group Permissions (Field Based Resource Access)
