@@ -333,7 +333,7 @@ module.exports = function(app) {
       link: function(scope, ele, attrs, ngModelCtrl) {
         ngModelCtrl.$validators.minItems = function(modelValue, viewValue) {
           var isValid = true;
-          if (scope.component && !isNaN(scope.component.validate.minItems)) {
+          if (scope.component && scope.component.validate && !isNaN(scope.component.validate.minItems)) {
             if (Array.isArray(modelValue)) {
               isValid = modelValue.length >= scope.component.validate.minItems;
             } else {
@@ -345,7 +345,7 @@ module.exports = function(app) {
         }
         ngModelCtrl.$validators.maxItems = function(modelValue, viewValue) {
           var isValid = true;
-          if (scope.component && !isNaN(scope.component.validate.maxItems)) {
+          if (scope.component && scope.component.validate && !isNaN(scope.component.validate.maxItems)) {
             if (Array.isArray(modelValue)) {
               isValid = modelValue.length <= scope.component.validate.maxItems;
             }
