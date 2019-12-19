@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "4.7.1",
+  "version": "4.7.2",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/ng-formio.js",
   "scripts": {
@@ -16,14 +16,14 @@
     "angular": "^1.7.8"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.5",
-    "@babel/core": "^7.7.5",
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
     "@babel/plugin-proposal-export-default-from": "^7.7.4",
     "@babel/plugin-proposal-optional-chaining": "^7.7.5",
-    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
     "babel-loader": "^8.0.6",
-    "core-js": "^3.4.8",
-    "css-loader": "^3.2.1",
+    "core-js": "^3.6.0",
+    "css-loader": "^3.4.0",
     "eslint-loader": "^3.0.3",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^5.0.2",
@@ -34,9 +34,9 @@
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^6.7.0",
     "sass-loader": "^8.0.0",
-    "style-loader": "^1.0.1",
+    "style-loader": "^1.0.2",
     "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.41.2",
+    "webpack": "^4.41.3",
     "webpack-cli": "^3.3.10",
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2"
@@ -45,7 +45,7 @@
     "json-logic-js": "^1.1.0"
   },
   "dependencies": {
-    "formiojs": "^4.8.0-rc.2"
+    "formiojs": "^4.8.0-rc.3"
   },
   "browserify": {
     "transform": [
