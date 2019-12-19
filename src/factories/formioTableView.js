@@ -1,4 +1,4 @@
-import Components from 'formiojs/components/Components';
+import { Components } from 'formiojs';
 
 const app = angular.module('formio');
 export default app.factory('formioTableView', [function () {

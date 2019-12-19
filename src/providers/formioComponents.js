@@ -1,7 +1,9 @@
+import { Components } from 'formiojs';
+
 const app = angular.module('formio');
-const Components = require('formiojs/components').default;
+
 export default app.provider('formioComponents', function() {
-  var components = Components;
+  var components = Components.components;
   var groups = {
     __component: {
       title: 'Basic Components'

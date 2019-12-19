@@ -1,4 +1,4 @@
-import utils from 'formiojs/utils';
+import { Utils } from 'formiojs';
 
 const app = angular.module('formio');
 export default app.factory('FormioUtils', function() {
@@ -30,5 +30,5 @@ export default app.factory('FormioUtils', function() {
     fieldWrap: function(field) {
       return field;
     }
-  }, utils);
+  }, Utils);
 });
