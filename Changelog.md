@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.47
+### Changed
+ - Changed the Jira connector settings to use the email and apikey interface.
+ - Fixed custom scripts loading.
+ - Upgrade formio.js to 4.8.0-rc.3
+
 ## 7.0.0-rc.46
 ### Changed
  - Upgrade formio.js to 4.8.0-rc.2
