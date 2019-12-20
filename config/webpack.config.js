@@ -80,7 +80,8 @@ module.exports = {
   ],
   externals: {
     jquery: 'jquery',
-    angular: 'angular'
+    angular: 'angular',
+    formiojs: 'Formio',
   },
   devtool: 'source-map',
   resolve: {
