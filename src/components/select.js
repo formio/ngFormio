@@ -191,7 +191,7 @@ module.exports = function(app) {
               refreshing = true;
               var tempData = $scope.data[settings.key];
               $scope.data[settings.key] = settings.multiple ? [] : '';
-              if (!settings.clearOnRefresh) {
+              if (!settings.clearOnRefresh || $scope.readOnly) {
                 $timeout(function() {
                   $scope.data[settings.key] = tempData;
                   refreshing = false;
