@@ -68,6 +68,14 @@
           </div>
         </div>
       </div>
+      <div class="col-lg-2 col-md-3 col-sm-3">
+          <div id="form-group-errors" class="form-group">
+            <label for="form-errors" class="control-label">Errors display style</label>
+            <div class="input-group">
+              <select class="form-control" name="form-errors" id="form-errors" ng-options="style.name as style.title for style in formErrors" ng-model="form.errorsStyle"></select>
+            </div>
+          </div>
+        </div>
       <div class="col-lg-3 col-md-4 col-sm-4">
         <div id="form-group-path" class="form-group">
           <label for="path" class="control-label field-required">API Path</label>

@@ -135,6 +135,7 @@ app.config([
             components: null,
             display: null,
             properties: null,
+            errorsStyle: null,
             form: null,
           }
         })
@@ -595,6 +596,7 @@ app.controller('FormController', [
         submissionAccess: [],
         settings: {},
         properties: $stateParams.properties || {},
+        errorsStyle: $stateParams.errorsStyle || 'simple',
       };
     }
 
@@ -785,6 +787,16 @@ app.controller('FormController', [
           title: 'PDF'
         }
       ];
+      $scope.formErrors = [
+        {
+          name: 'simple',
+          title: 'Simple'
+        },
+        {
+          name: 'advanced',
+          title: 'Advanced'
+        }
+      ];
       $scope.formio = new Formio($scope.formUrl, {
         base: $scope.baseUrl,
         project: $scope.projectUrl
@@ -799,6 +811,10 @@ app.controller('FormController', [
             // Ensure the display is form.
             if (!form.display) {
               form.display = 'form';
+            }
+
+            if (!form.errorsStyle) {
+              form.errorsStyle = 'simple';
             }
 
             $scope.updateCurrentFormResources(form);
@@ -1088,6 +1104,7 @@ app.controller('FormEditController', [
         components: _.cloneDeep($scope.form.components),
         display: $scope.form.display,
         properties: _.cloneDeep($scope.form.properties),
+        errorsStyle: $scope.form.errorsStyle,
       });
     };
 
@@ -1346,7 +1363,7 @@ app.controller('FormImportController', [
     $scope.importForm = function() {
       (new Formio($scope.embedURL, {base: $scope.baseUrl})).loadForm(null, {noToken: true})
         .then(function(form) {
-          $state.go('project.' + form.type + '.create', _.pick(form, ['components', 'display', 'properties']));
+          $state.go('project.' + form.type + '.create', _.pick(form, ['components', 'display', 'properties', 'errorsStyle']));
         })
         .catch(function(error) {
           FormioAlerts.warn('Error fetching form: ' + _.escape(error));
