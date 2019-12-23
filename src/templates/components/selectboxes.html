@@ -1,6 +1,6 @@
 <fieldset ng-if="component.fieldSet">
   <legend ng-if="component.label" class="select-boxes-legend">
-    {{ component.label }}
+    {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
   </legend>
   <div class="select-boxes">
@@ -20,7 +20,7 @@
       ng-style="getInputGroupStyles(component)"
     ></formio-select-boxes>
     <div ng-if="!!component.description" class="help-block">
-      <span id="{{ componentId+'Desc'  }}">{{ component.description }}</span>
+      <span id="{{ componentId+'Desc'  }}">{{ component.description | formioTranslate:null:options.building }}</span>
     </div>
     <formio-errors ng-if="::!options.building"></formio-errors>
   </div>
@@ -28,7 +28,7 @@
 <div class="select-boxes" ng-if="!component.fieldSet">
   <label ng-if="labelVisible() && (component.labelPosition !== 'bottom')" for="{{ componentId }}" class="control-label select-boxes-label" id="{{ componentId+'Label' }}" ng-class="{'field-required': isRequired(component)}"
          ng-style="getLabelStyles(component)">
-    {{ component.label }}
+    {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
   </label>
   <formio-select-boxes
@@ -49,11 +49,11 @@
   ></formio-select-boxes>
   <label ng-if="labelVisible() && (component.labelPosition === 'bottom')" for="{{ componentId }}" class="control-label control-label--bottom" id="{{ componentId +'Desc'}}"
          ng-class="{'field-required': isRequired(component)}">
-    {{ component.label }}
+    {{ component.label | formioTranslate:null:options.building }}
     <formio-component-tooltip></formio-component-tooltip>
   </label>
   <div ng-if="!!component.description" class="help-block">
-    <span id="{{ componentId+'Desc' }}">{{ component.description }}</span>
+    <span id="{{ componentId+'Desc' }}">{{ component.description | formioTranslate:null:options.building }}</span>
   </div>
   <formio-errors ng-if="::!options.building"></formio-errors>
 </div>

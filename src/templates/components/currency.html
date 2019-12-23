@@ -13,7 +13,7 @@
   auto-focus="true"
   aria-labelledby="{{ componentId +'Label'}}"
   aria-describedby="{{componentId + 'Desc'}}"
-  ng-attr-placeholder="{{ component.placeholder }}"
+  ng-attr-placeholder="{{ component.placeholder | formioTranslate:null:options.building}}"
   custom-validator="component.validate.custom"
   formio-mask="currency"
   formio-custom-attributes="{{component.attributes}}"
