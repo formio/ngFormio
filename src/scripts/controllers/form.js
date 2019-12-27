@@ -201,6 +201,9 @@ app.config([
           url: '/settings',
           templateUrl: 'views/form/form-settings.html',
           controller: ['$scope', 'AppConfig', function ($scope, AppConfig) {
+            const formWithAceEditor = {"_id":"5e01fe04513912666f1c94ba","type":"form","tags":[],"owner":"5c5ab50f22697c0ad23ccdf8","components":[{"label":"Form Controller","labelPosition":"top","placeholder":"","description":"","tooltip":"","prefix":"","suffix":"","widget":{"type":"input"},"editor":"ace","customClass":"","tabindex":"","hidden":false,"hideLabel":true,"showWordCount":false,"showCharCount":false,"autofocus":false,"spellcheck":true,"disabled":false,"tableView":true,"modalEdit":false,"multiple":false,"persistent":true,"inputFormat":"html","protected":false,"dbIndex":false,"case":"","encrypted":false,"redrawOn":"","clearOnHide":true,"customDefaultValue":"","calculateValue":"","allowCalculateOverride":false,"validateOn":"change","validate":{"required":false,"pattern":"","customMessage":"","custom":"","customPrivate":false,"json":"","minLength":"","maxLength":"","minWords":"","maxWords":"","strictDateValidation":false,"unique":false,"multiple":false},"unique":false,"errorLabel":"","key":"formController","tags":[],"properties":{},"conditional":{"show":null,"when":null,"eq":"","json":""},"customConditional":"","logic":[],"attributes":{},"overlay":{"style":"","page":"","left":"","top":"","width":"","height":""},"type":"textarea","rows":3,"input":true,"refreshOn":"","allowMultipleMasks":false,"mask":false,"inputType":"text","inputMask":"","wysiwyg":false,"id":"epesjbk","defaultValue":"","as":""},{"label":"Save Controller","action":"submit","showValidations":false,"theme":"primary","size":"md","block":false,"leftIcon":"","rightIcon":"","shortcut":"","description":"","tooltip":"","customClass":"","tabindex":"","disableOnInvalid":true,"hidden":false,"autofocus":false,"disabled":false,"tableView":false,"modalEdit":false,"key":"submit","tags":[],"properties":{},"conditional":{"show":null,"when":null,"eq":"","json":""},"customConditional":"","logic":[],"attributes":{},"overlay":{"style":"","page":"","left":"","top":"","width":"","height":""},"type":"button","input":true,"validate":{"unique":false,"multiple":false,"required":false,"custom":"","customPrivate":false,"strictDateValidation":false},"placeholder":"","prefix":"","suffix":"","multiple":false,"defaultValue":null,"protected":false,"unique":false,"persistent":false,"clearOnHide":true,"refreshOn":"","redrawOn":"","labelPosition":"top","errorLabel":"","hideLabel":false,"dbIndex":false,"customDefaultValue":"","calculateValue":"","widget":{"type":"input"},"validateOn":"change","allowCalculateOverride":false,"encrypted":false,"showCharCount":false,"showWordCount":false,"allowMultipleMasks":false,"dataGridLabel":true,"id":"eii0yyf"}],"revisions":"","_vid":0,"title":"ACE Editor Form","display":"form","access":[{"roles":["5ca604953285517cc40c1d50","5ca604953285511ff90c1d51","5ca604953285512fc00c1d52"],"type":"read_all"}],"submissionAccess":[],"settings":{},"properties":{},"name":"aceEditorForm","path":"aceeditorform","project":"5ca6049532855178e40c1d4f","created":"2019-12-24T12:01:08.436Z","modified":"2019-12-24T12:01:08.438Z","machineName":"devtest:aceEditorForm"};
+
+            $scope.formWithAceEditor = formWithAceEditor;
             $scope.disableCollection = function () {
               // Don't allow collections for hosted projects
               if (!AppConfig.onPremise) {
@@ -808,6 +811,11 @@ app.controller('FormController', [
             $scope.formTags = _.map(form.tags, function(tag) {
               return {text: tag};
             });
+            $scope.controllerData = {
+              data: {
+                formController: $scope.form.controller,
+              }
+            };
 
             $rootScope.currentForm = $scope.form;
             $scope.formReady = true;
@@ -878,6 +886,7 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function(form) {
       form = form || $scope.definition.schema || $scope.form;
+      form.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
