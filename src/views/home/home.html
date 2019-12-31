@@ -61,38 +61,15 @@
       <div class="row" ng-if="projectsLoaded" ng-cloak>
         <div class="col-sm-4" ng-repeat="project in projects | filter:projectSearch">
           <div class="project well" ng-click="goToProject(project)" title="{{ project.title }}">
-            <span class="label project-plan-label" ng-class="getPlanLabel(project.plan)">{{ getPlanName(project.plan) | uppercase }}</span>
-            <h4 class="project-title ellipsis"><a ui-sref="project.overview({projectId: project._id})">{{ project.title }}</a></h4>
+            <h4 class="project-title ellipsis">{{ project.title }}</h4>
             <p class="project-framework"><strong>{{ getFrameworkTitle(project.framework) }}</strong></p>
             <p class="project-description">{{ project.description | characters: 50 }}</p>
-            <div class="project-section-separator"></div>
-            <div ng-if="!project.remote && !onPremise">
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'forms')}" ng-class="getProgressBarClass(project.apiCalls, 'forms')"></div>
-                <span><small>{{ project.apiCalls.used.forms || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.forms) }} Forms</small></span>
-              </div>
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'formRequests')}" ng-class="getProgressBarClass(project.apiCalls, 'formRequests')"></div>
-                <span><small>{{ project.apiCalls.used.formRequests || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.formRequests) }} FR</small></span>
-              </div>
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'submissionRequests')}" ng-class="getProgressBarClass(project.apiCalls, 'submissionRequests')"></div>
-                <span><small>{{ project.apiCalls.used.submissionRequests || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.submissionRequests) }} SR</small></span>
-              </div>
-              <div class="progress">
-                <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(project.apiCalls, 'emails')}" ng-class="getProgressBarClass(project.apiCalls, 'emails')"></div>
-                <span><small>{{ project.apiCalls.used.emails || 0 | number }} / {{ getAPICallsLimit(project.apiCalls.limit.emails) }} Emails</small></span>
-              </div>
-            </div>
-            <div ng-if="project.remote || onPremise">
-              <h4>Enterprise Edition <br /> (On Premise)</h4>
-            </div>
-            <div class="project-section-separator"></div>
-            <div class="row" style="z-index:1000;" ng-if="!onPremise">
-              <div class="col-sm-6 project-tile-button"><button ui-sref="project.overview({projectId: project._id})" class="btn btn-default btn-xs btn-block">Manage</button></div>
-              <div class="col-sm-6 project-tile-button"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
-            </div>
             <div class="row project-teams">
+              <div class="row project-tile-buttons" style="z-index:1000;" ng-if="!onPremise">
+                <div class="col-sm-6 project-tile-button"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" ng-class="getPlanLabel(project.plan)" class="btn btn-xs btn-block plan">{{ getPlanName(project.plan) }}</span></div>
+                <div class="col-sm-6 project-tile-button"><span ng-disabled="!isProjectOwner(project)" ui-sref="project.billing({projectId: project._id})" class="btn btn-default btn-xs btn-block" title="{{!isProjectOwner(project) ? 'You must be a project owner to upgrade its plan' : ''}}">Upgrade Plan</span></div>
+              </div>
+              <div class="project-section-separator"></div>
               <h5 class="text-center project-teams-header">Teams <i class="fa fa-users"></i></h5><hr />
               <span ng-show="!teamSupport(project)" class="project-team-upgrade">Plan does not support teams</span>
               <div ng-show="teamSupport(project)">
@@ -102,8 +79,8 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-4 project-example">
-          <div class="project well" title="My Awesome Project" ng-click="newProject();">
+        <div class="col-sm-4 project-new">
+          <div class="project well" title="New Project" ng-click="newProject();">
             <div class="text-center"><h4>New Project</h4></div>
             <div class="text-center"><i class="fa fa-plus"></i></div>
           </div>

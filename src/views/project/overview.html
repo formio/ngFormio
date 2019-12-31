@@ -33,40 +33,6 @@
           <a ui-sref="project.form.index">More...</a>
         </li>
       </ul>
-      <!--<ul class="list-group list-group-striped">
-        <li class="list-group-item list-group-heading">
-          <h3>Recent Submissions</h3>
-        </li>
-        <li class="list-group-item list-group-heading">
-          <div class="row">
-            <div class="col-sm-2">
-              <strong>Created</strong>
-            </div>
-            <div class="col-sm-8">
-              <strong>Form</strong>
-            </div>
-            <div class="col-sm-2">
-              <strong class="pull-right">Links</strong>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item" ng-repeat="submission in submissions track by $index">
-          <div class="row">
-            <div class="col-sm-2">
-              {{submission.created | date : 'short'}}
-            </div>
-            <div class="col-sm-8">
-              <strong>{{forms[submission.form].title}}</strong>
-            </div>
-            <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
-              <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item text-center">
-          <a ui-sref="project.data">Coming Soon...</a>
-        </li>
-      </ul>-->
     </div>
     <div class="col-md-4">
       <ul class="list-group list-group-striped" ng-if="!onPremise">

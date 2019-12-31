@@ -679,13 +679,13 @@ div.project-section-separator {
   }
 }
 
-.project-example {
+.project-new {
   .well {
     border: 2px dashed #ddd;
     background-color: inherit;
     box-shadow: none;
     cursor: pointer;
-    padding-top: 100px;
+    padding-top: 50px;
     i.fa-plus {
       font-size: 3em;
     }
@@ -1196,7 +1196,7 @@ footer {
     text-decoration: none;
     overflow: hidden;
     transition: .15s;
-    height: 320px;
+    height: 220px;
     &:hover {
       background-color: lighten($gray-lighter, 5%);
     }
@@ -1210,9 +1210,17 @@ footer {
       top: 0;
       right: 0;
     }
+    .project-tile-buttons {
+      margin-left: -5px;
+      margin-right: -5px;
+    }
     .project-tile-button {
       padding-left: 5px;
       padding-right: 5px;
+      margin-bottom: 5px;
+      span.plan {
+        color: #FFF;
+      }
     }
     .project-teams-header {
       margin-top: 5px;
@@ -1221,9 +1229,11 @@ footer {
     .project-title {
       margin-top: 0;
       margin-bottom: 0;
+      padding-bottom: 5px;
+      font-weight: 600;
+      color: $brand-primary;
     }
     .project-title, .team-name {
-      margin-top: 0;
       a {
         font-weight: 600;
         color: $brand-primary;
