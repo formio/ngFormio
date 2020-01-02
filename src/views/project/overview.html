@@ -60,6 +60,16 @@
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'emails')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'emails')"></div>
             <span>{{ currentProject.apiCalls.used.emails | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.emails) }} per month</span>
           </div>
+          <h4>PDFs</h4>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'pdfs')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'pdfs')"></div>
+            <span>{{ currentProject.apiCalls.used.pdfs | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.pdfs) }}</span>
+          </div>
+          <h4>PDF Downloads</h4>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'pdfDownloads')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'pdfDownloads')"></div>
+            <span>{{ currentProject.apiCalls.used.pdfDownloads | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.pdfDownloads) }} per month</span>
+          </div>
         </li>
         <li class="list-group-item" ng-if="currentProject._id !== localProject._id">
           <h4>Enterprise Edition (On Premise)</h4>

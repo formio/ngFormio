@@ -23,6 +23,12 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
           return response.data
         },
 
+        getLicenses: async () => {
+          return await LicenseServerHelper.get(`license`, {}, {
+            'x-jwt-token': await Formio.getToken(),
+          });
+        },
+
         getLicenseAdminInfo: async licenseId => {
           const adminInfo = await LicenseServerHelper.get(`license/${licenseId}/admin`, {}, {
             'x-jwt-token': await Formio.getToken()
@@ -34,21 +40,36 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
 
           adminInfo.terms.endDateFormatted = adminInfo.terms.endDate ?
             moment(adminInfo.terms.endDate  ).format('YYYY-MM-DD') :
-            ''
+            'Never';
 
-          adminInfo.usage = {
-            apiServers:      _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'apiServer'        ).length,
-            pdfServers:      _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'pdfServer'        ).length,
-            projects:        _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'project'          ).length,
-            tenants:         _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'tenant'           ).length,
-            formsPerProject: _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'form'             ).length,
-            formLoads:       _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'formRequest'      ).length,
-            submissions:     _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'submissionRequest').length,
-            pdfDownloads:    _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'pdfDownload'      ).length,
-            pdfUploads:      _.filter(adminInfo.utilizations, u => u.data.enabled && u.data.type === 'pdfUpload'        ).length,
-          }
+          const plans = {
+            basic: 'Basic',
+            trial: 'Trial',
+            independent: 'Independent',
+            team: 'Team Pro',
+            commercial: 'Enterprise',
+          };
+
+          adminInfo.terms.plan = plans[adminInfo.terms.plan];
 
           return adminInfo
+        },
+
+        getLicenseUtilizations: async (licenseId, type) => {
+          type = type.substring(0, type.length - 1);
+          const results = await LicenseServerHelper.get(`license/${licenseId}/utilizations/${type}`, {}, {
+            'x-jwt-token': await Formio.getToken()
+          });
+
+          return results;
+        },
+
+        utilizationAction: async (data, action) => {
+          const results = await LicenseServerHelper.post(`utilization/${action}`, data, {
+            'x-jwt-token': await Formio.getToken()
+          });
+
+          return results;
         },
       }
 
@@ -62,83 +83,167 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
       $scope,
       LicenseServerHelper
     ) {
-      // TODO: get licenses by current user
-      $scope.licenses = [
-        {_id: '5db89036f4e4449776821d38'},
-        {_id: '67890'}
-      ]
 
-      $scope.selectedLicense = null
+      $scope.currentLicense = null
       $scope.licenseAdminInfo = {}
 
-      // $scope.loading = true
-      // $scope.primaryProject = null
-      // $scope.licenseError = null
-      // $scope.licenseScopes = []
-      // $scope.enableSave = true
+      $scope.scopes = [
+        {
+          title: 'Plan',
+          prop: 'plan',
+          noScope: true,
+        },
+        {
+          title: 'Start Date',
+          prop: 'startDateFormatted',
+          noScope: true,
+        },
+        {
+          title: 'End Date',
+          prop: 'endDateFormatted',
+          noScope: true,
+        },
+        {
+          title: 'API Servers',
+          prop: 'apiServers',
+          columns: [
+            {
+              field: 'id',
+              title: 'Environment ID'
+            },
+            {
+              field: 'hostname',
+              title: 'Hostname'
+            },
+            {
+              field: 'mongoHash',
+              title: 'Mongo Hash'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+        {
+          title: 'PDF Servers',
+          prop: 'pdfServers',
+          columns: [
+            {
+              field: 'id',
+              title: 'Environment ID'
+            },
+            {
+              field: 'hostname',
+              title: 'Hostname'
+            },
+            {
+              field: 'mongoHash',
+              title: 'Mongo Hash'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+        {
+          title: 'Projects',
+          prop: 'projects',
+          columns: [
+            {
+              field: 'id',
+              title: 'Project ID'
+            },
+            {
+              field: 'title',
+              title: 'Title'
+            },
+            {
+              field: 'name',
+              title: 'Name'
+            },
+            {
+              field: 'projectType',
+              title: 'Type'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+        {
+          title: 'Tenants',
+          prop: 'tenants',
+          columns: [
+            {
+              field: 'id',
+              title: 'Tenant ID'
+            },
+            {
+              field: 'title',
+              title: 'Title'
+            },
+            {
+              field: 'name',
+              title: 'Name'
+            },
+            {
+              field: 'projectType',
+              title: 'Type'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+      ];
 
-      // // $scope.cancel = () => ngDialog.close()
-
-      // $scope.saveLicenseKey = () => LicenseServerHelper.setLicenseKey()
-
-      $scope.updateSelectedLicense = async newValue => {
-        $scope.selectedLicense = newValue
-        console.log('selectedLicense:', $scope.selectedLicense)
+      $scope.setLicense = async newValue => {
+        $scope.currentLicense = newValue
 
         try {
-          $scope.licenseAdminInfo = await LicenseServerHelper.getLicenseAdminInfo($scope.selectedLicense._id)
-          console.log('licenseAdminInfo:', $scope.licenseAdminInfo)
-
-          $scope.utilizations = _.map($scope.licenseAdminInfo.utilizations, utilization => {
-            const merged = _.merge({}, utilization, utilization.data)
-            delete merged.data
-
-            _.each(['projectId', 'tenantId', 'formId', 'fileId', 'path'], key => {
-              if (merged[key] === undefined) {
-                merged[key] = '-'
-              }
-            })
-
-            return merged
-          })
-
-          console.log('utilizations:', $scope.utilizations)
+          $scope.licenseAdminInfo = await LicenseServerHelper.getLicenseAdminInfo($scope.currentLicense._id)
         }
         catch (err) {
-          console.log('encountered error', err)
           $scope.licenseAdminInfo = {}
           $scope.utilizations = []
         }
         finally {
-          $scope.updateGridOptions()
-          $scope.$digest()
+          $scope.$apply()
         }
       }
 
-      $scope.updateGridOptions = () => {
-        $scope.gridOptions = {
-          dataSource: new kendo.data.DataSource({
-            sort: {dir: 'desc', field: 'created'},
-            data: $scope.utilizations
-          }),
-          columns: [
-            {field: 'created',    title: 'Date'       },
-            {field: 'licenseKey', title: 'License Key'},
-            {field: 'type',       title: 'Type'       },
-            {field: 'projectId',  title: 'Project ID' },
-            {field: 'tenantId',   title: 'Tenant ID'  },
-            {field: 'formId',     title: 'Form ID'    },
-            {field: 'fileId',     title: 'File ID'    },
-            {field: 'path',       title: 'Path'       },
-            {field: 'enabled',    title: 'Enabled'    },
-          ],
-          scrollable: true,
-          sortable: true,
-          width: 1500,
-          height: 600
-        }
-      }
+      $scope.setScope = async (scope) => {
+        $scope.currentScope = scope;
+        $scope.utilizations = await LicenseServerHelper.getLicenseUtilizations($scope.currentLicense._id, scope.prop);
+        $scope.$apply();
+      };
 
-      $scope.updateSelectedLicense($scope.licenses[0])
+      $scope.getValue = (value) => {
+        if (value === '1') {
+          return 'Yes';
+        }
+        if (value === '0') {
+          return 'No';
+        }
+        return value;
+      };
+
+      $scope.onAction = async (utilization, action) => {
+        const {id, status, lastCheck, ...data} = utilization;
+        data.licenseId = $scope.currentLicense._id;
+        data.type = $scope.currentScope.prop.substring(0, $scope.currentScope.prop.length - 1);
+        await LicenseServerHelper.utilizationAction(data, action);
+        $scope.setLicense($scope.currentLicense);
+        $scope.setScope($scope.currentScope);
+      };
+
+      $scope.licenses = await LicenseServerHelper.getLicenses();
+      if ($scope.licenses.length) {
+        $scope.setLicense($scope.licenses[0]);
+      }
     }
-  ])
+  ]);

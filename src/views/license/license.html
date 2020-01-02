@@ -15,9 +15,9 @@
       <label class="control-label">License: </label>
       <select
         class="form-controls"
-        ng-model="selectedLicense"
-        ng-options="license._id for license in licenses"
-        ng-change="updateSelectedLicense(selectedLicense)"
+        ng-model="currentLicense"
+        ng-options="license.data.licenseName for license in licenses"
+        ng-change="setLicense(currentLicense)"
         ng-required="true"
         placeholder="Select a license"></select>
 
@@ -25,102 +25,18 @@
 
       <div class="license-usage-cards" ng-if="licenseAdminInfo.terms">
         <!-- Plan Type -->
-        <div class="license-usage-card">
-          <div class="usage-label">Plan</div>
-          <div class="usage-stat">{{licenseAdminInfo.terms.plan.substr(0, 1).toUpperCase() + licenseAdminInfo.terms.plan.substr(1)}}</div>
-        </div>
-
-        <!-- Start Date -->
-        <div class="license-usage-card" ng-if="licenseAdminInfo.terms.startDateFormatted">
-          <div class="usage-label">Start Date</div>
-          <div class="usage-stat">{{licenseAdminInfo.terms.startDateFormatted}}</div>
-        </div>
-
-        <!-- End Date -->
-        <div class="license-usage-card" ng-if="licenseAdminInfo.terms.endDateFormatted">
-          <div class="usage-label">End Date</div>
-          <div class="usage-stat">{{licenseAdminInfo.terms.endDateFormatted}}</div>
-        </div>
-
-        <!-- API Servers -->
-        <div class="license-usage-card">
-          <div class="usage-label">API Servers</div>
+        <div
+          class="license-usage-card"
+          ng-repeat="license in scopes"
+          ng-if="license.noScope || licenseAdminInfo.scopes.indexOf(license.prop.substring(0, license.prop.length - 1)) !== -1"
+          ng-click="!license.noScope && setScope(license)"
+        >
+          <div class="usage-label">{{license.title}}</div>
           <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.apiServers.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.apiServers.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- PDF Servers -->
-        <div class="license-usage-card">
-          <div class="usage-label">PDF Servers</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.pdfServers.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.pdfServers.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- Projects -->
-        <div class="license-usage-card">
-          <div class="usage-label">Projects</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.projects.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.projects.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- Tenants -->
-        <div class="license-usage-card">
-          <div class="usage-label">Tenants</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.tenants.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.tenants.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- Forms/Project -->
-        <div class="license-usage-card">
-          <div class="usage-label">Max Forms Per Project</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.formsPerProject.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.formsPerProject.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- Form Loads -->
-        <div class="license-usage-card">
-          <div class="usage-label">Form Loads</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.formLoads.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.formLoads.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- Submissions -->
-        <div class="license-usage-card">
-          <div class="usage-label">Submissions</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.submissions.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.submissions.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- PDF Downloads -->
-        <div class="license-usage-card">
-          <div class="usage-label">PDF
-            Downloads</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.pdfDownloads.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.pdfDownloads.toLocaleString()}}</span>
-          </div>
-        </div>
-
-        <!-- PDF Uploads -->
-        <div class="license-usage-card">
-          <div class="usage-label">PDF Uploads</div>
-          <div class="usage-stat">
-            <span class="usage-current">{{licenseAdminInfo.usage.pdfUploads.toLocaleString()}}</span> /
-            <span class="usage-max"    >{{licenseAdminInfo.terms.pdfUploads.toLocaleString()}}</span>
+            <span class="usage-current" ng-if="!license.noScope">
+              {{licenseAdminInfo.usage[license.prop].toLocaleString() || 0}} /
+            </span>
+            <span class="usage-max">{{licenseAdminInfo.terms[license.prop].toLocaleString() || '∞'}}</span>
           </div>
         </div>
       </div>
@@ -128,12 +44,29 @@
   </div>
 
   <!-- Utilizations panel -->
-  <div class="panel panel-primary ng-scope">
+  <div class="panel panel-primary ng-scope" ng-if="currentScope">
     <div class="panel-heading">
-      <h3 class="panel-title">Utilizations</h3>
+      <h3 class="panel-title">{{currentScope.title}} Utilizations</h3>
     </div>
     <div class="panel-body">
-      <div kendo-grid="grid" k-rebind="gridOptions" k-options="gridOptions"></div>
+      <table class="table">
+        <thead>
+          <th ng-repeat="column in currentScope.columns">{{column.title}}</th>
+          <th>Action</th>
+        </thead>
+        <tbody>
+          <tr ng-repeat="utilization in utilizations">
+            <td ng-repeat="column in currentScope.columns">{{getValue(utilization[column.field])}}</td>
+            <td>
+              <span class="btn btn-info" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable')">Enable</span>
+              <span class="btn btn-danger" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable')">Disable</span>
+            </td>
+          </tr>
+          <tr ng-if="utilizations.length === 0">
+            <td>None</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
