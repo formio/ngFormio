@@ -1016,6 +1016,7 @@ app.controller('ProjectOverviewController', [
   'Formio',
   'FormioAlerts',
   'ProjectFrameworks',
+  'LicenseServerHelper',
   function(
     $scope,
     $stateParams,
@@ -1023,7 +1024,8 @@ app.controller('ProjectOverviewController', [
     AppConfig,
     Formio,
     FormioAlerts,
-    ProjectFrameworks
+    ProjectFrameworks,
+    LicenseServerHelper
   ) {
     // This is restricted to form.io domains.
     var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
@@ -1075,39 +1077,95 @@ app.controller('ProjectOverviewController', [
         }
       });
 
-      //$http.post($scope.projectUrl + '/report', [
-      //  {
-      //    $sort: {
-      //      created: -1
-      //    }
-      //  },
-      //  {
-      //    $limit: 10
-      //  },
-      //])
-      //  .then(function(result) {
-      //    $scope.submissions = result.data || [];
-      //
-      //    if ($scope.submissions.length) {
-      //      var formIds = _.uniq($scope.submissions.map(function(submission) {
-      //        return submission.form;
-      //      }));
-      //
-      //      $scope.formio.loadForms({
-      //        params: {
-      //          _id__in: formIds
-      //        }
-      //      }).then(function(results) {
-      //        $scope.forms = {};
-      //        results.forEach(function(form) {
-      //          $scope.forms[form._id] = form;
-      //        });
-      //      });
-      //    }
-      //  })
-      //  .catch(function(err) {
-      //    console.warn('Unable to get recent submissions', err);
-      //  });
+      $scope.scopes = [
+        {
+          title: 'Forms and Resources',
+          prop: 'forms',
+          key: 'form',
+          columns: [
+            {
+              field: 'id',
+              title: 'Form ID'
+            },
+            {
+              field: 'title',
+              title: 'Title'
+            },
+            {
+              field: 'name',
+              title: 'Name'
+            },
+            {
+              field: 'path',
+              title: 'Path'
+            },
+            {
+              field: 'formType',
+              title: 'Type'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+        {
+          title: 'PDFs',
+          prop: 'pdfs',
+          key: 'pdf',
+          columns: [
+
+          ]
+        },
+        {
+          title: 'Form Requests',
+          prop: 'formRequests',
+          key: 'formRequest',
+          monthly: true,
+        },
+        {
+          title: 'Submission Requests',
+          prop: 'submissionRequests',
+          key: 'submissionRequest',
+          monthly: true,
+        },
+        {
+          title: 'Emails',
+          prop: 'emails',
+          key: 'email',
+          monthly: true,
+        },
+        {
+          title: 'PDF Downloads',
+          prop: 'pdfDownloads',
+          key: 'pdfDownload',
+          monthly: true,
+        },
+      ];
+
+      $scope.setScope = async (scope) => {
+        $scope.currentScope = scope;
+        $scope.utilizations = await LicenseServerHelper.getLicenseUtilizations($scope.currentProject.apiCalls.licenseId, scope.prop, `projectId=${$scope.currentProject._id}`);
+        $scope.$apply();
+      };
+
+      $scope.getValue = (value) => {
+        if (value === '1') {
+          return 'Yes';
+        }
+        if (value === '0') {
+          return 'No';
+        }
+        return value;
+      };
+
+      $scope.onAction = async (utilization, action) => {
+        const {id, status, lastCheck, ...data} = utilization;
+        data.licenseId = $scope.currentProject.apiCalls.licenseId;
+        data.type = $scope.currentScope.prop.substring(0, $scope.currentScope.prop.length - 1);
+        await LicenseServerHelper.utilizationAction(data, action);
+        $scope.setScope($scope.currentScope);
+      };
     });
   }
 ]);

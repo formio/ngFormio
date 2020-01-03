@@ -55,9 +55,9 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
           return adminInfo
         },
 
-        getLicenseUtilizations: async (licenseId, type) => {
+        getLicenseUtilizations: async (licenseId, type, query = '') => {
           type = type.substring(0, type.length - 1);
-          const results = await LicenseServerHelper.get(`license/${licenseId}/utilizations/${type}`, {}, {
+          const results = await LicenseServerHelper.get(`license/${licenseId}/utilizations/${type}?${query}`, {}, {
             'x-jwt-token': await Formio.getToken()
           });
 
@@ -180,6 +180,32 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
             {
               field: 'id',
               title: 'Tenant ID'
+            },
+            {
+              field: 'title',
+              title: 'Title'
+            },
+            {
+              field: 'name',
+              title: 'Name'
+            },
+            {
+              field: 'projectType',
+              title: 'Type'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+        {
+          title: 'Form Manager Projects',
+          prop: 'formManagers',
+          columns: [
+            {
+              field: 'id',
+              title: 'Project ID'
             },
             {
               field: 'title',

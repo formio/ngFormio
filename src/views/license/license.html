@@ -51,12 +51,12 @@
     <div class="panel-body">
       <table class="table">
         <thead>
-          <th ng-repeat="column in currentScope.columns">{{column.title}}</th>
+          <th ng-repeat="column in currentScope.columns track by $index">{{column.title}}</th>
           <th>Action</th>
         </thead>
         <tbody>
-          <tr ng-repeat="utilization in utilizations">
-            <td ng-repeat="column in currentScope.columns">{{getValue(utilization[column.field])}}</td>
+          <tr ng-repeat="utilization in utilizations track by $index">
+            <td ng-repeat="column in currentScope.columns track by $index">{{getValue(utilization[column.field])}}</td>
             <td>
               <span class="btn btn-info" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable')">Enable</span>
               <span class="btn btn-danger" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable')">Disable</span>
