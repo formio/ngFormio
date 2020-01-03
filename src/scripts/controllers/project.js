@@ -314,27 +314,6 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
     $scope.unsecurePortal = 'http://' + window.location.host;
-    $scope.hasFormManager = (localStorage.getItem('formManager-' + $stateParams.projectId) === 'true');
-    const checkFormManager = function() {
-      if (!$scope.hasFormManager) {
-        Formio.request(
-          'https://license.form.io/check/manager?project=' + $scope.projectUrl
-        ).then(function(project) {
-          if (project && project.enabled) {
-            $scope.hasFormManager = true;
-            localStorage.setItem('formManager-' + $stateParams.projectId, 'true');
-            if(!$scope.$$phase) {
-              $scope.$apply();
-            }
-          }
-          else {
-            console.warn('Form Manager not enabled');
-          }
-        }).catch(() => {
-          console.warn('Form Manager not enabled');
-        });
-      }
-    };
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
@@ -451,7 +430,6 @@ app.controller('ProjectController', [
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
-        checkFormManager();
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         if ($scope.projectProtocol === 'http:' && $scope.projectProtocol !== window.location.protocol) {
           $scope.protocolSecureError = true;
@@ -477,6 +455,12 @@ app.controller('ProjectController', [
               })
               .then(function(currentProject) {
                 $scope.currentProject = currentProject;
+                if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.formManager === true) {
+                  $scope.hasFormManager = true;
+                }
+                else {
+                  $scope.hasFormManager = false
+                }
                 $scope.loadRoles();
                 formioReady.resolve($scope.formio);
                 return currentProject;
@@ -489,7 +473,12 @@ app.controller('ProjectController', [
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
-        checkFormManager();
+        if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.formManager === true) {
+          $scope.hasFormManager = true;
+        }
+        else {
+          $scope.hasFormManager = false
+        }
         formioReady.resolve($scope.formio);
         $scope.loadRoles();
       }
