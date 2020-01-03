@@ -55,8 +55,8 @@ module.exports = [
             ? '\\' + $scope.options.decimalSeparator
             : '';
 
-          var delimiter = $scope.options.delimeter
-            ? '\\' + $scope.options.delimeter
+          var delimiter = $scope.options.delimiter
+            ? '\\' + $scope.options.delimiter
             : '';
 
           var numberPattern = '[0-9' + decimalSeparator + delimiter + ']*';
