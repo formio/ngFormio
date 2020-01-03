@@ -51,10 +51,20 @@ module.exports = [
           $scope.options = $scope.options || {};
           $scope.formioForm = $scope.$parent[$scope.formName];
 
+          var decimalSeparator = $scope.options.decimalSeparator
+            ? '\\' + $scope.options.decimalSeparator
+            : '';
+
+          var delimiter = $scope.options.delimiter
+            ? '\\' + $scope.options.delimiter
+            : '';
+
+          var numberPattern = '[0-9' + decimalSeparator + delimiter + ']*';
+
           // Options to match jquery.maskedinput masks
           $scope.uiMaskOptions = {
             maskDefinitions: {
-              '9': /\d/,
+              '9': new RegExp(numberPattern),
               'a': /[a-zA-Z]/,
               '*': /[a-zA-Z0-9]/
             },
