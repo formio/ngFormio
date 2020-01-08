@@ -7,6 +7,80 @@
   <tags-input ng-model="formTags" on-tag-added="addTag($tag)" on-tag-removed="removeTag($tag)"></tags-input>
 </div>
 <object-builder data="form.properties" label="Custom Properties" tooltip-text="This allows you to configure any custom properties for this form." />
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">PDF Settings</h3>
+  </div>
+  <div class="panel-body">
+    <ul class="nav nav-tabs" role="tablist" ng-init="pdfSettingsTab = 'settings'" style="margin-bottom:10px;">
+      <li role="presentation" ng-class="{'active': (pdfSettingsTab === 'settings')}"><a ng-click="pdfSettingsTab = 'settings'"aria-controls="home" role="tab">Settings</a></li>
+      <li role="presentation" ng-class="{'active': (pdfSettingsTab === 'template')}"><a ng-click="pdfSettingsTab = 'template'" aria-controls="profile" role="tab">Templates</a></li>
+    </ul>
+    <div class="row" ng-if="pdfSettingsTab === 'settings'">
+      <div class="col col-sm-12">
+        <div id="form-group-viewer" class="form-group">
+          <label for="form-viewer" class="control-label">PDF Viewer URL</label>
+          <input type="text" ng-model="form.settings.viewer" class="form-control" id="form-viewer" name="form-viewer" placeholder="Enter the URL for your PDF viewer."/>
+          <div class="text-muted">Enter the URL for your PDF Viewer. See <a target="_blank" href="https://help.form.io/userguide/pdf/#custom-viewer">https://help.form.io/userguide/pdf/#custom-viewer</a> for more information.</div>
+        </div>
+        <div id="form-group-viewer-theme" class="form-group">
+          <label for="form-viewer-theme" class="control-label">PDF Theme</label>
+          <select class="form-control" id="form-viewer-theme" name="form-viewer-theme" ng-model="form.settings.theme" ng-options="item for item in themes" placeholder="Select a theme">
+            <option value="">Select a theme</option>
+          </select>
+          <div class="text-muted">Select the <a target="_blank" href="https://bootswatch.com/">Bootswatch</a> theme you would like to use when rendering your PDF.</div>
+        </div>
+        <div id="form-group-viewer-margins" class="form-group">
+          <label for="form-viewer-margins" class="control-label">PDF Margins</label>
+          <input type="text" ng-model="form.settings.margins" class="form-control" id="form-viewer-margins" name="form-viewer-margins" placeholder="0,0,0,0"/>
+          <div class="text-muted">Enter the margins for the pdf page as you would provide to the <strong>margin</strong> CSS attribute.</div>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="form.settings.hideTitle">
+            Hide Title Bar
+          </label><br/>
+          <small>Check this if you would like to hide the title bar within the rendered pdf form.</small>
+        </div>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="form.settings.viewAsHtml">
+            View as Plain Text
+          </label><br/>
+          <small>Check this if you would like to render the form as plain text view instead of a the default form view.</small>
+        </div>
+      </div>
+    </div>
+    <div class="row" ng-if="pdfSettingsTab === 'template'">
+      <div class="col col-sm-12">
+        <div class="form-group">
+          <label class="control-label">Header Template</label>
+          <textarea class="form-control" ng-model="form.settings.header"></textarea>
+          <div class="text-muted">
+            HTML to inject as a <strong>header</strong> for every page of the generated PDF. Should be valid HTML markup with following classes used to inject printing values into them:
+            <ul>
+              <li><code>date</code> - Formatted print date</li>
+              <li><code>pageNumber</code> - Current page number</li>
+              <li><code>totalPages</code> - Total amount of pages</li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label">Footer Template</label>
+          <textarea class="form-control" ng-model="form.settings.footer"></textarea>
+          <div class="text-muted">
+            HTML to inject as a <strong>footer</strong> for every page of the generated PDF. Should be valid HTML markup with following classes used to inject printing values into them:
+            <ul>
+              <li><code>date</code> - Formatted print date</li>
+              <li><code>pageNumber</code> - Current page number</li>
+              <li><code>totalPages</code> - Total amount of pages</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="panel panel-info">
   <div class="panel-heading">
     <h3 class="panel-title">Submissions Collection</h3>

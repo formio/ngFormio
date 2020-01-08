@@ -200,6 +200,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
 
+## 6.8.7
+### Fixed
+ - Issue with Jira action authentication.
+
+### Changed
+ - Upgrade Form Manager to v1.51.0
+ - Upgrade formiojs@4.7.8
+
 ## 6.8.6
 ### Fixed
  - Staging deployments for Tenants.

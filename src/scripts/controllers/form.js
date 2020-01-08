@@ -554,6 +554,25 @@ app.controller('FormController', [
       });
     };
 
+    $scope.themes = [
+      'Cerulean',
+      'Cosmo',
+      'Cyborg',
+      'Darkly',
+      'Flatly',
+      'Journal',
+      'Lumen',
+      'Materia',
+      'Readable',
+      'Sandstone',
+      'Simplex',
+      'Slate',
+      'Spacelab',
+      'Superhero',
+      'United',
+      'Yeti'
+    ];
+
     // Resource information.
     $scope.uploading = false;
     $scope.uploadProgress = 0;
@@ -1364,24 +1383,6 @@ app.controller('FormShareController', ['$scope', '$rootScope', function($scope, 
     showHeader: true,
     auth: false
   };
-  $scope.themes = [
-    'Cerulean',
-    'Cosmo',
-    'Cyborg',
-    'Darkly',
-    'Flatly',
-    'Journal',
-    'Lumen',
-    'Paper',
-    'Readable',
-    'Sandstone',
-    'Simplex',
-    'Slate',
-    'Spacelab',
-    'Superhero',
-    'United',
-    'Yeti'
-  ];
 
   // Method to load the preview.
   var loadPreview = function() {
