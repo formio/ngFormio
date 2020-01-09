@@ -30,6 +30,12 @@
       </div>
       <div id="advanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="advancedHeading">
         <div class="panel-body">
+          <div ng-if="!onPremise">
+            <label for="licenseKey" class="control-label">License Key</label>
+            <input type="text" class="form-control" id="licenseKey" name="title" ng-model="project.settings.licenseKey" ng-maxlength="30">
+            <p class="help-block">If you have an existing license key, you can enter it here so this project will use the license.</p>
+          </div>
+          <br />
           <div ng-if="!hasTemplate">
             <span class="btn btn-default btn-block btn-file">
               Upload A Project Template <input id="template-select" type="file" accept=".json" onchange="angular.element(this).scope().loadTemplate.call(this)">

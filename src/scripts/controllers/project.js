@@ -187,6 +187,9 @@ app.controller('ProjectCreateController', [
         localStorage.removeItem('stepFlowCurrentChildStep');
         ngDialog.close();
         $state.go('project.tour', {projectId: project._id});
+      }).catch((err) => {
+        $scope.isBusy = false;
+        throw err;
       });
     };
   }
