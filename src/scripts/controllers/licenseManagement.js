@@ -1,10 +1,50 @@
 'use strict'
+import _ from 'lodash';
 import moment from 'moment'
 
 /* globals location */
 
 
 angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
+  .filter('planName', function() {
+    return function(plan) {
+      if (!plan) {
+        return '';
+      }
+      const plans = {
+        basic: 'Basic',
+        trial: 'Trial',
+        independent: 'Independent',
+        team: 'Team Pro',
+        commercial: 'Enterprise',
+      };
+      return plans[plan];
+    };
+  })
+  .filter('planType', function() {
+    return function(hosted) {
+      return hosted ? 'Hosted' : 'On Premise';
+    };
+  })
+  .filter('planUsers', function() {
+    return function(users) {
+      return users.map(function(user) {
+        return user.data.name + ' (' + user.data.email + ')'
+      }).join(', ');
+    };
+  })
+  .filter('scopeValue', function() {
+    return function(value, type) {
+      switch (type) {
+        case 'boolean':
+          return value !== '0' ? 'Yes' : 'No';
+        case 'capitalize':
+          return _.capitalize(value);
+        default:
+          return value;
+      }
+    };
+  })
   .factory('LicenseServerHelper', [
     '$http',
     'Formio',
@@ -87,189 +127,245 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
       $scope.currentLicense = null
       $scope.licenseAdminInfo = {}
 
-      $scope.scopes = [
-        {
-          title: 'Plan',
-          prop: 'plan',
-          noScope: true,
-        },
-        {
-          title: 'Start Date',
-          prop: 'startDateFormatted',
-          noScope: true,
-        },
-        {
-          title: 'End Date',
-          prop: 'endDateFormatted',
-          noScope: true,
-        },
-        {
-          title: 'API Servers',
-          prop: 'apiServers',
-          columns: [
-            {
-              field: 'id',
-              title: 'Environment ID'
-            },
-            {
-              field: 'hostname',
-              title: 'Hostname'
-            },
-            {
-              field: 'mongoHash',
-              title: 'Mongo Hash'
-            },
-            {
-              field: 'status',
-              title: 'Enabled'
-            },
-          ]
-        },
-        {
-          title: 'PDF Servers',
-          prop: 'pdfServers',
-          columns: [
-            {
-              field: 'id',
-              title: 'Environment ID'
-            },
-            {
-              field: 'hostname',
-              title: 'Hostname'
-            },
-            {
-              field: 'mongoHash',
-              title: 'Mongo Hash'
-            },
-            {
-              field: 'status',
-              title: 'Enabled'
-            },
-          ]
-        },
-        {
-          title: 'Projects',
-          prop: 'projects',
-          columns: [
-            {
-              field: 'id',
-              title: 'Project ID'
-            },
-            {
-              field: 'title',
-              title: 'Title'
-            },
-            {
-              field: 'name',
-              title: 'Name'
-            },
-            {
-              field: 'projectType',
-              title: 'Type'
-            },
-            {
-              field: 'status',
-              title: 'Enabled'
-            },
-          ]
-        },
-        {
-          title: 'Tenants',
-          prop: 'tenants',
-          columns: [
-            {
-              field: 'id',
-              title: 'Tenant ID'
-            },
-            {
-              field: 'title',
-              title: 'Title'
-            },
-            {
-              field: 'name',
-              title: 'Name'
-            },
-            {
-              field: 'projectType',
-              title: 'Type'
-            },
-            {
-              field: 'status',
-              title: 'Enabled'
-            },
-          ]
-        },
-        {
-          title: 'Form Manager Projects',
-          prop: 'formManagers',
-          columns: [
-            {
-              field: 'id',
-              title: 'Project ID'
-            },
-            {
-              field: 'title',
-              title: 'Title'
-            },
-            {
-              field: 'name',
-              title: 'Name'
-            },
-            {
-              field: 'projectType',
-              title: 'Type'
-            },
-            {
-              field: 'status',
-              title: 'Enabled'
-            },
-          ]
-        },
-      ];
+      $scope.open = {};
+
+      $scope.openLicense = ($index) => {
+        $scope.open[$index] = true;
+      };
+
+      $scope.closeLicense = ($index) => {
+        $scope.open[$index] = false;
+      };
 
       $scope.setLicense = async newValue => {
-        $scope.currentLicense = newValue
+        $scope.currentLicense = newValue;
 
         try {
-          $scope.licenseAdminInfo = await LicenseServerHelper.getLicenseAdminInfo($scope.currentLicense._id)
+          $scope.licenseAdminInfo = await LicenseServerHelper.getLicenseAdminInfo($scope.currentLicense._id);
         }
         catch (err) {
-          $scope.licenseAdminInfo = {}
-          $scope.utilizations = []
+          $scope.licenseAdminInfo = {};
+          $scope.utilizations = [];
         }
         finally {
-          $scope.$apply()
+          $scope.$apply();
         }
-      }
-
-      $scope.setScope = async (scope) => {
-        $scope.currentScope = scope;
-        $scope.utilizations = await LicenseServerHelper.getLicenseUtilizations($scope.currentLicense._id, scope.prop);
-        $scope.$apply();
-      };
-
-      $scope.getValue = (value) => {
-        if (value === '1') {
-          return 'Yes';
-        }
-        if (value === '0') {
-          return 'No';
-        }
-        return value;
-      };
-
-      $scope.onAction = async (utilization, action) => {
-        const {id, status, lastCheck, ...data} = utilization;
-        data.licenseId = $scope.currentLicense._id;
-        data.type = $scope.currentScope.prop.substring(0, $scope.currentScope.prop.length - 1);
-        await LicenseServerHelper.utilizationAction(data, action);
-        $scope.setLicense($scope.currentLicense);
-        $scope.setScope($scope.currentScope);
       };
 
       $scope.licenses = await LicenseServerHelper.getLicenses();
+
       if ($scope.licenses.length) {
         $scope.setLicense($scope.licenses[0]);
       }
     }
-  ]);
+  ])
+  .directive('licenseInfo', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        license: '='
+      },
+      controller: ['LicenseServerHelper', '$scope', async function LicenseInfoController(LicenseServerHelper, $scope) {
+        $scope.scopes = [
+          {
+            title: 'API Servers',
+            prop: 'apiServers',
+            columns: [
+              {
+                field: 'id',
+                title: 'Environment ID'
+              },
+              {
+                field: 'hostname',
+                title: 'Hostname'
+              },
+              {
+                field: 'mongoHash',
+                title: 'Mongo Hash'
+              },
+              {
+                field: 'status',
+                title: 'Enabled',
+                type: 'boolean',
+              },
+            ]
+          },
+          {
+            title: 'PDF Servers',
+            prop: 'pdfServers',
+            columns: [
+              {
+                field: 'id',
+                title: 'Environment ID'
+              },
+              {
+                field: 'hostname',
+                title: 'Hostname'
+              },
+              {
+                field: 'mongoHash',
+                title: 'Mongo Hash'
+              },
+              {
+                field: 'status',
+                title: 'Enabled',
+                type: 'boolean',
+              },
+            ]
+          },
+          {
+            title: 'Projects',
+            prop: 'projects',
+            columns: [
+              {
+                field: 'id',
+                title: 'Project ID'
+              },
+              {
+                field: 'title',
+                title: 'Title'
+              },
+              {
+                field: 'name',
+                title: 'Name'
+              },
+              {
+                field: 'projectType',
+                title: 'Type',
+                type: 'capitalize'
+              },
+              {
+                field: 'status',
+                title: 'Enabled',
+                type: 'boolean',
+              },
+            ]
+          },
+          {
+            title: 'Tenants',
+            prop: 'tenants',
+            columns: [
+              {
+                field: 'id',
+                title: 'Tenant ID'
+              },
+              {
+                field: 'title',
+                title: 'Title'
+              },
+              {
+                field: 'name',
+                title: 'Name'
+              },
+              {
+                field: 'projectType',
+                title: 'Type',
+                type: 'capitalize'
+              },
+              {
+                field: 'status',
+                title: 'Enabled',
+                type: 'boolean',
+              },
+            ]
+          },
+          {
+            title: 'Form Manager Projects',
+            prop: 'formManagers',
+            columns: [
+              {
+                field: 'id',
+                title: 'Project ID'
+              },
+              {
+                field: 'title',
+                title: 'Title'
+              },
+              {
+                field: 'name',
+                title: 'Name'
+              },
+              {
+                field: 'projectType',
+                title: 'Type',
+                type: 'capitalize'
+              },
+              {
+                field: 'status',
+                title: 'Enabled',
+                type: 'boolean',
+              },
+            ]
+          },
+        ];
+
+        $scope.setScope = async (scope) => {
+          $scope.currentScope = scope;
+          $scope.utilizations = await LicenseServerHelper.getLicenseUtilizations($scope.license._id, scope.prop);
+          $scope.$apply();
+        };
+
+        try {
+          $scope.licenseAdminInfo = await LicenseServerHelper.getLicenseAdminInfo($scope.license._id);
+        }
+        catch (err) {
+          $scope.licenseAdminInfo = {};
+          $scope.utilizations = [];
+        }
+        finally {
+          $scope.$apply();
+        }
+
+        $scope.onAction = async (utilization, action, field) => {
+          const {id, status, lastCheck, ...data} = utilization;
+          data.licenseId = $scope.license._id;
+          data.type = $scope.currentScope.prop.substring(0, $scope.currentScope.prop.length - 1);
+          await LicenseServerHelper.utilizationAction(data, action);
+          if (action === 'enable') {
+            $scope.licenseAdminInfo.usage[$scope.currentScope.prop]++;
+          }
+          else {
+            $scope.licenseAdminInfo.usage[$scope.currentScope.prop]--;
+          }
+          $scope.setScope($scope.currentScope);
+          $scope.$apply();
+        };
+      }],
+      template: `
+<div>
+  <div ng-if="licenseAdminInfo.terms">
+    <div 
+      class="btn btn-primary" 
+      ng-repeat="scope in scopes track by $index" 
+      ng-click="setScope(scope)"
+      ng-if="licenseAdminInfo.scopes.indexOf(scope.prop.substring(0, scope.prop.length - 1)) !== -1"
+      style="margin-right: 10px;"
+    >{{scope.title}}: 
+      <span class="usage-current" ng-if="!scope.noScope">
+        {{licenseAdminInfo.usage[scope.prop].toLocaleString() || 0}} /
+      </span>
+      <span class="usage-max">{{licenseAdminInfo.terms[scope.prop].toLocaleString() || '∞'}}</span>
+    </div>&nbsp;
+  </div>
+  <table class="table" ng-if="currentScope">
+    <thead>
+      <th ng-repeat="column in currentScope.columns track by $index">{{column.title}}</th>
+      <th>Action</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="utilization in utilizations track by $index">
+        <td ng-repeat="column in currentScope.columns track by $index">{{utilization[column.field] | scopeValue : column.type}}</td>
+        <td>
+          <span class="btn btn-info" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable', column.field)">Enable</span>
+          <span class="btn btn-danger" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable', column.field)">Disable</span>
+        </td>
+      </tr>
+      <tr ng-if="utilizations.length === 0">
+        <td>None</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`
+    }
+  });

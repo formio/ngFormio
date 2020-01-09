@@ -6,64 +6,35 @@
     <li><h2><i class="fa fa-bar-chart"></i> License Management</h2></li>
   </ul>
 
-  <!-- Overview panel -->
   <div class="panel panel-primary ng-scope">
     <div class="panel-heading">
-      <h3 class="panel-title">Overview</h3>
-    </div>
-    <div class="panel-body">
-      <label class="control-label">License: </label>
-      <select
-        class="form-controls"
-        ng-model="currentLicense"
-        ng-options="license.data.licenseName for license in licenses"
-        ng-change="setLicense(currentLicense)"
-        ng-required="true"
-        placeholder="Select a license"></select>
-
-      <p></p>
-
-      <div class="license-usage-cards" ng-if="licenseAdminInfo.terms">
-        <!-- Plan Type -->
-        <div
-          class="license-usage-card"
-          ng-repeat="license in scopes"
-          ng-if="license.noScope || licenseAdminInfo.scopes.indexOf(license.prop.substring(0, license.prop.length - 1)) !== -1"
-          ng-click="!license.noScope && setScope(license)"
-        >
-          <div class="usage-label">{{license.title}}</div>
-          <div class="usage-stat">
-            <span class="usage-current" ng-if="!license.noScope">
-              {{licenseAdminInfo.usage[license.prop].toLocaleString() || 0}} /
-            </span>
-            <span class="usage-max">{{licenseAdminInfo.terms[license.prop].toLocaleString() || '∞'}}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Utilizations panel -->
-  <div class="panel panel-primary ng-scope" ng-if="currentScope">
-    <div class="panel-heading">
-      <h3 class="panel-title">{{currentScope.title}} Utilizations</h3>
+      <h3 class="panel-title">Licenses</h3>
     </div>
     <div class="panel-body">
       <table class="table">
         <thead>
-          <th ng-repeat="column in currentScope.columns track by $index">{{column.title}}</th>
-          <th>Action</th>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Plan</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Authorized Users</th>
+          </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="utilization in utilizations track by $index">
-            <td ng-repeat="column in currentScope.columns track by $index">{{getValue(utilization[column.field])}}</td>
-            <td>
-              <span class="btn btn-info" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable')">Enable</span>
-              <span class="btn btn-danger" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable')">Disable</span>
-            </td>
+          <tr ng-repeat-start="license in licenses track by $index">
+            <td><a href ng-if="!open[$index]" ng-click="openLicense($index)">view</a><a href ng-if="open[$index]" ng-click="closeLicense($index)">hide</a></td>
+            <td>{{license.data.licenseName}}</td>
+            <td>{{license.data.hosted | planType}}</td>
+            <td>{{license.data.plan | planName}}</td>
+            <td>{{license.data.startDate | date: 'medium'}}</td>
+            <td>{{license.data.endDate | date: 'medium'}}</td>
+            <td>{{license.data.user | planUsers}}</td>
           </tr>
-          <tr ng-if="utilizations.length === 0">
-            <td>None</td>
+          <tr ng-repeat-end ng-if="open[$index]" class="active">
+            <td colspan="8"><license-info license="license"></license-info></td>
           </tr>
         </tbody>
       </table>
