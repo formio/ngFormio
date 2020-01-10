@@ -83,6 +83,79 @@
 </div>
 <div class="panel panel-info">
   <div class="panel-heading">
+    <h3 class="panel-title">Form Controller</h3>
+  </div>
+  <div class="panel-body">
+    <div class="well">
+      This setting will enable a developer to write a custom JS which will be executed once the form is ready.
+    </div>
+    <div ref="component" class="formio-component formio-component-panel formio-component-calculateValue-js" id="ezh08f">
+      <div ref="html" class="">
+        <p>The following variables are available in all scripts.</p>
+        <table class="table table-bordered table-condensed table-striped">
+          <tbody>
+          <tr>
+            <th>form</th><td>The complete form JSON object</td>
+          </tr>
+          <tr>
+            <th>submission</th><td>The complete submission object.</td>
+          </tr>
+          <tr>
+            <th>data</th><td>The complete submission data object.</td>
+          </tr>
+          <tr>
+            <th>row</th><td>Contextual "row" data, used within DataGrid, EditGrid, and Container components</td>
+          </tr>
+          <tr>
+            <th>component</th><td>The current component JSON</td>
+          </tr>
+          <tr>
+            <th>instance</th><td>The current component instance.</td>
+          </tr>
+          <tr>
+            <th>components</th><td>An array of form components.</td>
+          </tr>
+          <tr>
+            <th>moment</th><td>The moment.js library for date manipulation.</td>
+          </tr>
+          <tr>
+            <th>_</th><td>An instance of <a target="_blank" href="https://lodash.com/docs/">Lodash</a>.</td>
+          </tr>
+          <tr>
+            <th>utils</th><td>An instance of the <a target="_blank" href="http://formio.github.io/formio.js/docs/identifiers.html#utils">FormioUtils</a> object.</td>
+          </tr>
+          <tr>
+            <th>util</th><td>An alias for "utils".</td>
+          </tr>
+          </tbody>
+        </table>
+        <br>
+      </div>
+      <div class="panel panel-default">
+        <div ref="header" class="panel-heading">
+          <h4 class="mb-0 panel-title">
+            Form Controller
+          </h4>
+        </div>
+        <div ref="nested-calculateValue-js" class="panel-body">
+          <div ref="component" class="form-group has-feedback formio-component formio-component-textarea formio-component-calculateValue  formio-component-label-hidden" id="e6fzqr">
+            <div ref="element"><div ref="input" class=" ace_editor ace-tm" style="height: 168px;">
+
+              <formio form="formWithAceEditor" submission="controllerData"></formio>
+
+          </div>
+          <div ref="component" class="formio-component formio-component-htmlelement" id="er5l8ub">
+            <div ref="html" class=""><p>Enter custom javascript code.</p><p></p><h4>Example:</h4><pre>data.textField = data.textField + 'changed';</pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+<div class="panel panel-info">
+  <div class="panel-heading">
     <h3 class="panel-title">Submissions Collection</h3>
   </div>
   <div class="panel-body">
