@@ -4,6 +4,92 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.46
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.2
+ - Upgrade form manager to include latest renderer.
+ - Removed default existing resource tag from form
+
+## 7.0.0-rc.45
+### Added
+ - Create level for Group Permissions (Field Based Resource Access)
+
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.1
+ - Upgrade @formio/premium to v1.2.0
+
+## 7.0.0-rc.44
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.9
+ - Upgrade formmanager to include latest renderer.
+ - Upgrade formview pro to include latest renderer.
+
+## 7.0.0-rc.43
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.8
+
+## 7,0.0-rc.42
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.7
+
+### Fixed
+ - Fixed the changed indictor not showing up all the time.
+
+## 7.0.0-rc.41
+### Added
+ - flattenComponents filter
+
+### Fixed
+ - Change form save to use a separate schema in scope.
+ - Fix tabs showing data view when unchecked.
+
+## 7.0.0-rc.40
+### Changed
+ - Upgrade formiojs@4.8.0-beta.5
+ - Upgrade Form View Pro to 1.47.0
+ - Upgrade Form Manager to 1.48.0
+ - Upgrade Tenant Manager to 1.4.0
+
+### Added
+ - Help text to the project plan usage section.
+
+## 7.0.0-rc.39
+### Fixed
+ - Include object builder directive to fix form settings.
+ - Save schema, set dirty and fix form change events for merging.
+
+### Changed
+ - Upgrade formiojs@4.8.0-beta.1
+
+## 7.0.0-rc.38
+### Changed
+ - Upgrade formiojs@4.7.7
+ - Upgrade premium components to v1.1.0 which should fix IE11 issues.
+
+## 7.0.0-rc.37
+### Changed
+ - Upgrade formiojs@4.7.6
+
+## 7.0.0-rc.36
+### Changed
+ - Adding Premium components into the portal application.
+ - Upgrade formiojs@4.7.5 which should fix IE11 issues.
+ - Upgraded core-js@3.4.1, formiojs@4.7.5, ng-formio@4.6.4, protractor-helpers@1.1.678, webdriverio@5.16.6
+
+## 7.0.0-rc.35
+### Changed
+ - Upgrade formiojs@4.7.4
+
+## 7.0.0-rc.34
+### Changed
+ - Upgrade formiojs@4.7.3
+ - Upgrade Form Manager to 1.47.0
+ - Upgrade Form View Pro to 1.45.0
+
+## 7.0.0-rc.33
+### Fixed
+ - Upgrade formiojs@4.7.2
+
 ## 7.0.0-rc.32
 ### Fixed
  - Issues with KendoUI Grid only showing triangles.

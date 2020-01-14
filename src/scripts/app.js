@@ -1,8 +1,10 @@
 'use strict';
 const packageJSON = require('../../package.json');
 import { Templates, Formio } from 'ng-formio/lib/modules';
+import premium from '@formio/premium';
 Templates.framework = 'bootstrap3';
 Formio.icons = 'fa';
+Formio.use(premium);
 
 /**
  * @ngdoc overview
@@ -854,6 +856,11 @@ angular
       }
 
       return Math.floor(elapsed) + " second" + (elapsed > 1 ? 's' : '');
+    };
+  })
+  .filter('flattenComponents', function() {
+    return function(components) {
+      return FormioUtils.flattenComponents(components);
     };
   })
   .run([
