@@ -34,7 +34,9 @@
             <td>{{license.data.user | planUsers}}</td>
           </tr>
           <tr ng-repeat-end ng-if="open[$index]" class="active">
-            <td colspan="8"><license-info license="license"></license-info></td>
+            <td colspan="8">
+              <license-info license="license"></license-info>
+            </td>
           </tr>
         </tbody>
       </table>

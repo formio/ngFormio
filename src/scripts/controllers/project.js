@@ -1,5 +1,6 @@
 'use strict';
 import semver from 'semver';
+import DOMPurify from "dompurify";
 
 /* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
@@ -1637,25 +1638,36 @@ app.controller('ProjectFormioController', [
   'AppConfig',
   '$window',
   '$http',
+  '$interpolate',
+  '$filter',
   'FormioAlerts',
+  'LicenseServerHelper',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts
+    $interpolate,
+    $filter,
+    FormioAlerts,
+    LicenseServerHelper
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
     $scope.currentSection.help = '';
-    $scope.views = ['Overview', 'Current', 'Usage', 'Users', 'Projects', 'Upgrades'];
-    $scope.view = $scope.views[0];
+    $scope.views = ['Overview', 'Current', 'Licenses', 'Users', 'Projects', 'Upgrades'];
     $scope.showDaily = false;
     $scope.showCreated = false;
     $scope.showIds = false;
     $scope.showEmployees = false;
     var _employees = null;
+
+    $scope.$watch('view', (view) => {
+      localStorage.setItem('adminView', view);
+    });
+
+    $scope.view = localStorage.getItem('adminView') || $scope.views[0];
 
     // Initialize the first graph, by loading the formio team and filtering out all bad data.
     $scope.init = function() {
@@ -2326,6 +2338,7 @@ app.controller('ProjectFormioController', [
     };
 
     $scope.usageLoading = false;
+
     $scope.updateUsage = function() {
       $scope.usageLoading = true;
 
@@ -2347,6 +2360,177 @@ app.controller('ProjectFormioController', [
         projects: null
       };
     };
+
+    $scope.initLicenses = async () => {
+      $scope.open = {};
+
+      $scope.openLicense = ($index) => {
+        $scope.open[$index] = true;
+      };
+
+      $scope.closeLicense = ($index) => {
+        $scope.open[$index] = false;
+      };
+
+      $scope.licenses = await LicenseServerHelper.getLicensesAdmin($scope.licenseQuerystring);
+      $scope.$apply();
+    };
+
+    $scope.licenseColumns = [
+      {
+        label: 'Name',
+        prop: 'licenseName',
+        type: 'text',
+        query: 'data.licenseName__regex',
+        filter: value => value,
+      },
+      {
+        label: 'Company',
+        prop: 'company',
+        type: 'text',
+        query: 'data.company__regex',
+        filter: value => value,
+      },
+      {
+        label: 'Location',
+        prop: 'location',
+        type: 'select',
+        query: 'data.location',
+        filter: location => {
+          if (!location) {
+            return '';
+          }
+          const locations = {
+            hosted: 'Hosted',
+            onPremise: 'On Premise',
+          };
+          return locations[location];
+        },
+        options: [
+          {
+            value: 'hosted',
+            label: 'Hosted'
+          },
+          {
+            value: 'onPremise',
+            label: 'On Premise'
+          },
+        ]
+      },
+      {
+        label: 'Plan',
+        prop: 'plan',
+        type: 'select',
+        query: 'data.plan',
+        filter: plan => {
+          if (!plan) {
+            return '';
+          }
+          const plans = {
+            basic: 'Basic',
+            trial: 'Trial',
+            independent: 'Independent',
+            team: 'Team Pro',
+            commercial: 'Enterprise',
+          };
+          return plans[plan];
+        },
+        options: [
+          {
+            value: 'basic',
+            label: 'Basic'
+          },
+          {
+            value: 'independent',
+            label: 'Independent'
+          },
+          {
+            value: 'team',
+            label: 'Team Pro'
+          },
+          {
+            value: 'commercial',
+            label: 'Enterprise'
+          },
+          {
+            value: 'trial',
+            label: 'Trial'
+          },
+        ]
+      },
+      {
+        label: 'Start Date',
+        prop: 'startDate',
+        type: 'date',
+        query: 'data.startDate__gt',
+        filter: value => $filter('date')(value, 'MM/dd/yyyy hh:mm a'),
+      },
+      {
+        label: 'End Date',
+        prop: 'endDate',
+        type: 'date',
+        query: 'data.endDate__lt',
+        filter: value => $filter('date')(value, 'MM/dd/yyyy hh:mm a'),
+      },
+      {
+        label: 'Authorized Users',
+        prop: 'user',
+        type: 'text',
+        query: 'data.user.data.email__regex',
+        filter: users => {
+          if (!users) {
+            return '';
+          }
+          return users.map(function(user) {
+            return user.data.name + ' (' + user.data.email + ')'
+          }).join(', ');
+        },
+      },
+    ];
+
+    const getLocalStorageJSON = (key) => {
+      const value = localStorage.getItem(key);
+
+      try {
+        return JSON.parse(value) || {};
+      }
+      catch (err) {
+        return {};
+      }
+    };
+
+    $scope.filters = getLocalStorageJSON('licenseFilter');
+    // Fix dates being stringified.
+    if ($scope.filters.startDate) {
+      $scope.filters.startDate = new Date($scope.filters.startDate);
+    }
+    if ($scope.filters.endDate) {
+      $scope.filters.endDate = new Date($scope.filters.endDate);
+    }
+
+    $scope.licenseQuerystring = getLocalStorageJSON('licenseFilterQuery');
+
+    $scope.open = {};
+
+    $scope.openCal = (prop) => {
+      $scope.open[prop] = !$scope.open[prop];
+    }
+
+    $scope.setLicenseFilter = async (col) => {
+      if ($scope.filters[col.prop]) {
+        $scope.licenseQuerystring[col.query] = $scope.filters[col.prop];
+      }
+      else {
+        delete $scope.licenseQuerystring[col.query];
+      }
+      localStorage.setItem('licenseFilter', JSON.stringify($scope.filters));
+      localStorage.setItem('licenseFilterQuery', JSON.stringify($scope.licenseQuerystring));
+      console.log($scope.filters);
+      $scope.licenses = await LicenseServerHelper.getLicensesAdmin($scope.licenseQuerystring);
+      $scope.$apply();
+    };
+
+    $scope.initLicenses();
   }
 ]);
 

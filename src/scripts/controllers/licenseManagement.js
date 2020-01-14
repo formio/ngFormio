@@ -6,6 +6,11 @@ import moment from 'moment'
 
 
 angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
+  .filter('filterFunc', function() {
+    return function(value, func) {
+      return func(value);
+    };
+  })
   .filter('planName', function() {
     return function(plan) {
       if (!plan) {
@@ -28,6 +33,9 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
   })
   .filter('planUsers', function() {
     return function(users) {
+      if (!users) {
+        return '';
+      }
       return users.map(function(user) {
         return user.data.name + ' (' + user.data.email + ')'
       }).join(', ');
@@ -65,6 +73,12 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
 
         getLicenses: async () => {
           return await LicenseServerHelper.get(`license`, {}, {
+            'x-jwt-token': await Formio.getToken(),
+          });
+        },
+
+        getLicensesAdmin: async (querystring) => {
+          return await LicenseServerHelper.get(`admin/license`, querystring, {
             'x-jwt-token': await Formio.getToken(),
           });
         },
@@ -123,10 +137,6 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
       $scope,
       LicenseServerHelper
     ) {
-
-      $scope.currentLicense = null
-      $scope.licenseAdminInfo = {}
-
       $scope.open = {};
 
       $scope.openLicense = ($index) => {
@@ -137,26 +147,8 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
         $scope.open[$index] = false;
       };
 
-      $scope.setLicense = async newValue => {
-        $scope.currentLicense = newValue;
-
-        try {
-          $scope.licenseAdminInfo = await LicenseServerHelper.getLicenseAdminInfo($scope.currentLicense._id);
-        }
-        catch (err) {
-          $scope.licenseAdminInfo = {};
-          $scope.utilizations = [];
-        }
-        finally {
-          $scope.$apply();
-        }
-      };
-
       $scope.licenses = await LicenseServerHelper.getLicenses();
-
-      if ($scope.licenses.length) {
-        $scope.setLicense($scope.licenses[0]);
-      }
+      $scope.$apply();
     }
   ])
   .directive('licenseInfo', function() {
