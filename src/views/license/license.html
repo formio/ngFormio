@@ -16,7 +16,7 @@
           <tr>
             <th></th>
             <th>Name</th>
-            <th>Type</th>
+            <th>Location</th>
             <th>Plan</th>
             <th>Start Date</th>
             <th>End Date</th>
@@ -27,7 +27,7 @@
           <tr ng-repeat-start="license in licenses track by $index">
             <td><a href ng-if="!open[$index]" ng-click="openLicense($index)">view</a><a href ng-if="open[$index]" ng-click="closeLicense($index)">hide</a></td>
             <td>{{license.data.licenseName}}</td>
-            <td>{{license.data.hosted | planType}}</td>
+            <td>{{license.data.location | planType}}</td>
             <td>{{license.data.plan | planName}}</td>
             <td>{{license.data.startDate | date: 'medium'}}</td>
             <td>{{license.data.endDate | date: 'medium'}}</td>

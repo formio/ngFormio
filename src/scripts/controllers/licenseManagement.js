@@ -27,8 +27,15 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
     };
   })
   .filter('planType', function() {
-    return function(hosted) {
-      return hosted ? 'Hosted' : 'On Premise';
+    return function(location) {
+      if (!location) {
+        return '';
+      }
+      const locations = {
+        hosted: 'Hosted',
+        onPremise: 'On Premise',
+      };
+      return locations[location];
     };
   })
   .filter('planUsers', function() {
