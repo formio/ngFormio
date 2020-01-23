@@ -30,6 +30,13 @@
           </select>
           <div class="text-muted">Select the <a target="_blank" href="https://bootswatch.com/">Bootswatch</a> theme you would like to use when rendering your PDF.</div>
         </div>
+        <div id="form-group-viewer-theme" class="form-group">
+          <label for="form-viewer-theme" class="control-label">Printed PDF page size</label>
+          <select class="form-control" id="form-viewer-page-size" name="form-viewer-page-size" ng-model="form.settings.pageSize" ng-options="item for item in pageSizes" placeholder="Select a page size">
+            <option value="">Select a page size</option>
+          </select>
+          <div class="text-muted">Select the page size you would like to use when rendering your PDF.</div>
+        </div>
         <div id="form-group-viewer-margins" class="form-group">
           <label for="form-viewer-margins" class="control-label">PDF Margins</label>
           <input type="text" ng-model="form.settings.margins" class="form-control" id="form-viewer-margins" name="form-viewer-margins" placeholder="0,0,0,0"/>

@@ -576,6 +576,12 @@ app.controller('FormController', [
       'Yeti'
     ];
 
+    $scope.pageSizes = [
+      'Legal',
+      'Letter',
+      'A4'
+    ];
+
     // Resource information.
     $scope.uploading = false;
     $scope.uploadProgress = 0;
