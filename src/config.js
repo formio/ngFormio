@@ -39,7 +39,7 @@ if (query['x-jwt-token']) {
 }
 
 var parts = host.split('.');
-if (parts[0] === 'portal' || parts[0] === 'beta') {
+if (parts[0] === 'portal' || parts[0] === 'beta'|| parts[0] === 'alpha' || parts[0] === 'next' || parts[0] === 'edge') {
   parts.shift();
   host = parts.join('.');
 }

@@ -21,7 +21,8 @@ module.exports = {
       {from: 'src/index.html'},
       {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'},
       {from: 'node_modules/formio-tenant/dist', to: 'tenant', toType: 'dir'},
-      {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'}
+      {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'},
+      {from: 'src/images/favicons/manifest.json', to: 'images/favicons', toType: 'dir'}
     ]),
     new webpack.ProvidePlugin({
       "window.jQuery": "jquery",
@@ -47,8 +48,10 @@ module.exports = {
                 [
                   '@babel/preset-env',
                   {
-                    useBuiltIns: 'entry',
-                    targets: 'last 2 major versions',
+                    useBuiltIns: 'usage',
+                    targets: {
+                      ie: '11',
+                    },
                     corejs: 3
                   }
                 ]
@@ -76,7 +79,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(svg|gif|png|jpe?g|ico)(\?v=\d+\.\d+\.\d+)?$/,
+        test: /\.(xml|svg|gif|png|jpe?g|ico)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
             loader: 'file-loader',
@@ -113,7 +116,7 @@ module.exports = {
       {
         test: /\.html/,
         exclude: /src\/index\.html$/,
-        use: ['raw-loader']
+        use: 'raw-loader'
       }
     ]
   },

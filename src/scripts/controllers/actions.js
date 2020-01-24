@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('formioApp.controllers.actions', ['ngFormBuilder']);
+var app = angular.module('formioApp.controllers.actions', []);
 
 app.controller('ActionsController', [
   '$scope',

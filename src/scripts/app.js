@@ -1,5 +1,10 @@
 'use strict';
 const packageJSON = require('../../package.json');
+import { Templates, Formio } from 'ng-formio/lib/modules';
+import premium from '@formio/premium';
+Templates.framework = 'bootstrap3';
+Formio.icons = 'fa';
+Formio.use(premium);
 
 /**
  * @ngdoc overview
@@ -19,15 +24,14 @@ angular
     'ui.bootstrap.tpls',
     'ui.bootstrap.tooltip',
     'ui.bootstrap.pagination',
+    'ngFileSaver',
+    'ngFileUpload',
     'ui.select',
-    'ui.bootstrap.datetimepicker',
-    'angularMoment',
     'ckeditor',
     'formioApp.controllers',
     'formioApp.utils',
     'kendo.directives',
     'truncate',
-    'ngFileUpload',
     'ngDialog',
     'swaggerUi',
     'toastr'
@@ -41,8 +45,6 @@ angular
     'AppConfig',
     'toastrConfig',
     'RemoteTokensProvider',
-    'formioComponentsProvider',
-    'COMMON_OPTIONS',
     function(
       $stateProvider,
       $urlRouterProvider,
@@ -51,17 +53,11 @@ angular
       FormioProvider,
       AppConfig,
       toastrConfig,
-      RemoteTokensProvider,
-      formioComponentsProvider,
-      COMMON_OPTIONS
+      RemoteTokensProvider
     ) {
       if (AppConfig.disable) {
         return;
       }
-
-      // Change the form builder options for encrypted to be enterprise only.
-      COMMON_OPTIONS.encrypted.label = 'Encrypted (Enterprise Only)';
-      COMMON_OPTIONS.dbIndex.label = 'Database Index (Enterprise Only)';
 
       // Reset the hashPrefix to remove the "!".
       $locationProvider.hashPrefix('');
@@ -73,26 +69,6 @@ angular
       FormioProvider.setBaseUrl(AppConfig.apiBase);
       FormioProvider.setProjectUrl(AppConfig.formioBase);
       FormioProvider.setDomain(AppConfig.domain);
-
-      formioComponentsProvider.addGroup('advanced', {
-        title: 'Advanced'
-      });
-      formioComponentsProvider.addGroup('data', {
-        title: 'Data'
-      });
-      formioComponentsProvider.addGroup('layout', {
-        title: 'Layout'
-      });
-      formioComponentsProvider.addGroup('premium', {
-        title: 'Premium'
-      });
-      formioComponentsProvider.register('datagrid', {group: 'data', title: 'Datagrid (Array)'});
-      formioComponentsProvider.register('editgrid', {group: 'data', title: 'Editgrid (Array)'});
-      formioComponentsProvider.register('container', {group: 'data', title: 'Container (Object)'});
-      formioComponentsProvider.register('hidden', {group: 'data'});
-      formioComponentsProvider.register('form', {group: 'premium', title: 'Nested Form'});
-      formioComponentsProvider.register('file', {group: 'premium'});
-      formioComponentsProvider.register('custom', {group: 'premium'});
 
       var RemotePlugin = function() {};
 
@@ -683,22 +659,20 @@ angular
         }
       });
 
-      Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
-        $scope.userTeams  = results;
-      });
-
       $scope.teamSupport = function(project) {
         return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
       };
 
       $scope.teamAdmin = function(project, user) {
-        user = user || $rootScope.user;
-        var userTeams = _($scope.userTeams ? $scope.userTeams : [])
-          .map('_id')
-          .filter()
-          .value();
+        return _teamsPromise.then(function() {
+          user = user || $rootScope.user;
+          var userTeams = _($scope.teams ? $scope.teams : [])
+            .map('_id')
+            .filter()
+            .value();
 
-        return project.owner === user._id || _.intersection(userTeams, project.adminTeams).length > 0;
+          return project.owner === user._id || _.intersection(userTeams, project.adminTeams).length > 0;
+        });
       };
 
       $scope.frameworks = ProjectFrameworks;
@@ -873,6 +847,11 @@ angular
       return Math.floor(elapsed) + " second" + (elapsed > 1 ? 's' : '');
     };
   })
+  .filter('flattenComponents', function() {
+    return function(components) {
+      return FormioUtils.flattenComponents(components);
+    };
+  })
   .run([
     '$state',
     '$stateParams',
@@ -922,7 +901,7 @@ angular
       $rootScope.onPremise = AppConfig.onPremise;
 
       $rootScope.switchPortal = function() {
-        window.location.href = 'https://next.form.io' + window.location.pathname + window.location.hash + window.location.search;
+        window.location.href = 'https://portal.form.io' + window.location.pathname + window.location.hash + window.location.search;
       };
 
       // Force SSL.
@@ -1145,7 +1124,7 @@ angular
       //   - Any attribute beginning with 'data-'
       //   - Any inline style
       //   - Any class name
-      CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
+      // CKEDITOR.config.extraAllowedContent = '*[data-*]{*}(*)';
 
       // Preload ng-include templates into cache.
     // <ng-include src="embedView"></ng-include>
@@ -1181,6 +1160,7 @@ angular
       $templateCache.put('views/project/env/authentication/oauth/google.html', require('../views/project/env/authentication/oauth/google.html'));
       $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
       $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
+      $templateCache.put('views/project/env/pdf/delete.html', require('../views/project/env/pdf/delete.html'));
       $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/javascript/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
@@ -1231,7 +1211,6 @@ angular
       $templateCache.put('views/frameworks/vue/embed-app.html', require('../views/frameworks/vue/embed-app.html'));
       $templateCache.put('views/form/submission/delete-confirmation.html', require('../views/form/submission/delete-confirmation.html'));
       $templateCache.put('views/form/cancel-confirm.html', require('../views/form/cancel-confirm.html'));
-
     }
   ])
   .factory('GoogleAnalytics', ['$window', '$state', function($window, $state) {
@@ -1448,7 +1427,7 @@ function $run($rootScope, $location, $window) {
   var dataLayer = $window.dataLayer = $window.dataLayer || [];
 
   $rootScope.appVersion = packageJSON.version;
-  $rootScope.rendererVersion = packageJSON.dependencies['ng-formio'].replace('^', '');
+  $rootScope.rendererVersion = packageJSON.dependencies.formiojs.replace('^', '');
   $rootScope.$on('$stateChangeSuccess', function() {
 
     dataLayer.push({

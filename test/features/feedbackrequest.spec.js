@@ -9,7 +9,7 @@ module.exports = function (actions,tags) {
       actions.goToPage('#/auth');
       actions.clickOnElement('.feedback ');
       actions.iSeeElement('.feedback');
-      actions.enterTextInField("#feedback","${empty}");
+      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',9,"${empty}");
       actions.btnDisabled('Send it!');
     });
     describe('Closes Feedback modal',function(){
@@ -21,7 +21,7 @@ module.exports = function (actions,tags) {
       actions.goToPage('#/auth');
       actions.clickOnElement('.feedback ');
       actions.iSeeElement('.feedback');
-      actions.enterTextInField("#feedback","feedback-test");
+      actions.enterTextInFieldIndex('xpath://*[contains(@class, \'form-control\')]',9,"feedback-test");
       actions.btnEnabled('Send it!');
       actions.clickOnElementWithText('Send it!');
       actions.iDonotSeeText('Close');

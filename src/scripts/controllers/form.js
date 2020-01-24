@@ -2,6 +2,7 @@
 import jsonpatch from 'fast-json-patch';
 import DOMPurify from 'dompurify';
 import moment from 'moment';
+import { Utils } from 'formiojs';
 
 /* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
 var app = angular.module('formioApp.controllers.form', [
@@ -10,7 +11,6 @@ var app = angular.module('formioApp.controllers.form', [
   'ui.bootstrap.tpls',
   'ui.bootstrap.accordion',
   'ui.bootstrap.pagination',
-  'ngFormBuilder',
   'formio',
   'bgf.paginateAnything',
   'ngTagsInput',
@@ -201,6 +201,9 @@ app.config([
           url: '/settings',
           templateUrl: 'views/form/form-settings.html',
           controller: ['$scope', 'AppConfig', function ($scope, AppConfig) {
+            const formWithAceEditor = {"_id":"5e01fe04513912666f1c94ba","type":"form","tags":[],"owner":"5c5ab50f22697c0ad23ccdf8","components":[{"label":"Form Controller","labelPosition":"top","placeholder":"","description":"","tooltip":"","prefix":"","suffix":"","widget":{"type":"input"},"editor":"ace","customClass":"","tabindex":"","hidden":false,"hideLabel":true,"showWordCount":false,"showCharCount":false,"autofocus":false,"spellcheck":true,"disabled":false,"tableView":true,"modalEdit":false,"multiple":false,"persistent":true,"inputFormat":"html","protected":false,"dbIndex":false,"case":"","encrypted":false,"redrawOn":"","clearOnHide":true,"customDefaultValue":"","calculateValue":"","allowCalculateOverride":false,"validateOn":"change","validate":{"required":false,"pattern":"","customMessage":"","custom":"","customPrivate":false,"json":"","minLength":"","maxLength":"","minWords":"","maxWords":"","strictDateValidation":false,"unique":false,"multiple":false},"unique":false,"errorLabel":"","key":"formController","tags":[],"properties":{},"conditional":{"show":null,"when":null,"eq":"","json":""},"customConditional":"","logic":[],"attributes":{},"overlay":{"style":"","page":"","left":"","top":"","width":"","height":""},"type":"textarea","rows":3,"input":true,"refreshOn":"","allowMultipleMasks":false,"mask":false,"inputType":"text","inputMask":"","wysiwyg":false,"id":"epesjbk","defaultValue":"","as":""},{"label":"Save Controller","action":"submit","showValidations":false,"theme":"primary","size":"md","block":false,"leftIcon":"","rightIcon":"","shortcut":"","description":"","tooltip":"","customClass":"","tabindex":"","disableOnInvalid":true,"hidden":false,"autofocus":false,"disabled":false,"tableView":false,"modalEdit":false,"key":"submit","tags":[],"properties":{},"conditional":{"show":null,"when":null,"eq":"","json":""},"customConditional":"","logic":[],"attributes":{},"overlay":{"style":"","page":"","left":"","top":"","width":"","height":""},"type":"button","input":true,"validate":{"unique":false,"multiple":false,"required":false,"custom":"","customPrivate":false,"strictDateValidation":false},"placeholder":"","prefix":"","suffix":"","multiple":false,"defaultValue":null,"protected":false,"unique":false,"persistent":false,"clearOnHide":true,"refreshOn":"","redrawOn":"","labelPosition":"top","errorLabel":"","hideLabel":false,"dbIndex":false,"customDefaultValue":"","calculateValue":"","widget":{"type":"input"},"validateOn":"change","allowCalculateOverride":false,"encrypted":false,"showCharCount":false,"showWordCount":false,"allowMultipleMasks":false,"dataGridLabel":true,"id":"eii0yyf"}],"revisions":"","_vid":0,"title":"ACE Editor Form","display":"form","access":[{"roles":["5ca604953285517cc40c1d50","5ca604953285511ff90c1d51","5ca604953285512fc00c1d52"],"type":"read_all"}],"submissionAccess":[],"settings":{},"properties":{},"name":"aceEditorForm","path":"aceeditorform","project":"5ca6049532855178e40c1d4f","created":"2019-12-24T12:01:08.436Z","modified":"2019-12-24T12:01:08.438Z","machineName":"devtest:aceEditorForm"};
+
+            $scope.formWithAceEditor = formWithAceEditor;
             $scope.disableCollection = function () {
               // Don't allow collections for hosted projects
               if (!AppConfig.onPremise) {
@@ -573,6 +576,12 @@ app.controller('FormController', [
       'Yeti'
     ];
 
+    $scope.pageSizes = [
+      'Legal',
+      'Letter',
+      'A4'
+    ];
+
     // Resource information.
     $scope.uploading = false;
     $scope.uploadProgress = 0;
@@ -597,6 +606,9 @@ app.controller('FormController', [
     };
     var formType = $stateParams.formType || 'form';
     $scope.capitalize = _.capitalize;
+    $scope.definition = {
+      schema: false,
+    };
 
     if ($stateParams.form) {
       $scope.form = $stateParams.form;
@@ -622,6 +634,14 @@ app.controller('FormController', [
       if (!$scope.form.path || $scope.form.path === _.camelCase(oldTitle).toLowerCase()) {
         $scope.form.path = _.camelCase($scope.form.title).toLowerCase();
       }
+    };
+
+    $scope.builderConfig = {
+      baseUrl: $scope.baseUrl,
+      building: true,
+      sideBarScrollOffset: 60,
+      bootstrap: 3,
+      builder: {}
     };
 
     // The url to goto for embedding.
@@ -736,10 +756,6 @@ app.controller('FormController', [
       $scope.$broadcast('permissionsChange');
     };
 
-    $scope.$watch('form.display', function(display) {
-      $scope.$broadcast('formDisplay', display);
-    });
-
     $scope.$watch('form', function(form) {
       if (!form) {
         return;
@@ -820,6 +836,11 @@ app.controller('FormController', [
             $scope.formTags = _.map(form.tags, function(tag) {
               return {text: tag};
             });
+            $scope.controllerData = {
+              data: {
+                formController: $scope.form.controller,
+              }
+            };
 
             $rootScope.currentForm = $scope.form;
             $scope.formReady = true;
@@ -889,7 +910,8 @@ app.controller('FormController', [
 
     // Save a form.
     $scope.saveForm = function(form) {
-      form = form || $scope.form;
+      form = form || $scope.definition.schema || $scope.form;
+      form.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
@@ -1005,31 +1027,21 @@ app.controller('FormViewController', [
       }
       $scope.formReady = true;
     });
-
     $scope.$on('formSubmission', function(event, submission) {
       if ($stateParams.revision) {
         submission._fvid = $stateParams.revision._vid;
       }
-      $scope.formio.saveSubmission(submission)
-        .then(function(submission) {
-          FormioAlerts.addAlert({
-            type: 'success',
-            message: 'New submission added!'
-          });
-          GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
-          if (submission._id) {
-            $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
-          }
-          else {
-            $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
-          }
-        })
-        .catch(function(err) {
-          _.each(_.isString(err) ? [err] : err.details, function(errDetails) {
-            FormioAlerts.onError.call(FormioAlerts, errDetails);
-            $scope.$broadcast('submitError', err);
-          });
-        });
+      FormioAlerts.addAlert({
+        type: 'success',
+        message: 'New submission added!'
+      });
+      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+      if (submission._id) {
+        $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
+      }
+      else {
+        $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
+      }
     });
   }
 ]);
@@ -1080,6 +1092,9 @@ app.controller('FormEditController', [
             $scope.form.components = $stateParams.components || $scope.form.components;
             if ($stateParams.components) {
               $scope.dirty = true;
+              if(!$scope.$$phase) {
+                $scope.$apply();
+              }
             }
             $scope.originalForm = _.cloneDeep($scope.form);
             $scope.formReady = true;
@@ -1091,6 +1106,9 @@ app.controller('FormEditController', [
         $scope.form.components = $stateParams.components || $scope.form.components;
         if ($stateParams.components) {
           $scope.dirty = true;
+          if(!$scope.$$phase) {
+            $scope.$apply();
+          }
         }
         $scope.originalForm = _.cloneDeep($scope.form);
         $scope.formReady = true;
@@ -1107,204 +1125,42 @@ app.controller('FormEditController', [
       });
     };
 
-    // Track any modifications for save/cancel prompt on navigation away from the builder.
-    var contentLoaded = false;
-    $timeout(function() {
-      contentLoaded = true;
-    }, 3000);
-
     $scope.changes = [];
 
-    $scope.$on('formBuilder:add', function(event, component, index, container, path) {
-      $scope.changes.push({
-        op: 'add',
-        key: component.key,
-        container: container.key,
-        path: path || 'components',
-        index: index,
-        component: angular.copy(component)
-      });
-
-      // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (component.type === 'content') {
-        $scope.dirty = true;
-      }
-    });
-
-    // Special case for content components
-    $scope.$on('formBuilder:update', function(event, component) {
-      // FOR-488 - Fix issues with loading the content component and flagging the builder as dirty.
-      if (contentLoaded && component.type === 'content') {
-        var change = {
-          op: 'edit',
-          key: component.key,
-          patches: [{
-            op: 'replace',
-            path: '/html',
-            value: component.html
-          }]
-        };
-        // Since this gets fired a lot, clean up any exising changes to this component's html.
-        $scope.changes = $scope.changes.filter(function(change) {
-          return !(
-            change.op === 'edit' &&
-            change.key === component.key &&
-            change.patches &&
-            change.patches.length === 1 &&
-            change.patches[0].op === 'replace' &&
-            change.patches[0].path === '/html'
-          );
-        });
-
-        $scope.changes.push(change);
-
-        $scope.dirty = true;
-      }
-
-    });
-
-    $scope.$on('formBuilder:remove', function(event, component, index, moved) {
-      if (!moved) {
-        $scope.changes.push({
-          op: 'remove',
-          key: component.key,
-        });
-      }
+    $scope.$on('formChange', (event, form) => {
+      $scope.definition.schema = {
+        ...$scope.form,
+        components: form.components,
+      };
       $scope.dirty = true;
+      if(!$scope.$$phase) {
+        $scope.$apply();
+      }
     });
 
-    $scope.$on('formBuilder:edit', function(event, newComponent, oldComponent) {
-      var change = {
-        op: 'edit',
-        key: oldComponent.key,
-        patches: jsonpatch.compare(angular.copy(oldComponent), angular.copy(newComponent))
-      };
-      // Don't save if nothing changed.
-      if (change.patches.length) {
+    $scope.$on('formio.addComponent', (event, component, parent, path, index) => {
+      const change = Utils.generateFormChange('add', { component, parent, path, index });
+      if (change) {
         $scope.changes.push(change);
-        $scope.dirty = true;
       }
     });
 
-    /*
-     * This function will find a component in a form and return the component AND THE PATH to the component in the form.
-     */
-    var findComponent = function(components, key, fn, path) {
-      if (!components) return;
-      path = path || [];
-
-      if (!key) {
-        return fn(components);
+    $scope.$on('formio.saveComponent', (event, component, originalComponent) => {
+      const change = Utils.generateFormChange('edit', { component, originalComponent });
+      if (change) {
+        $scope.changes.push(change);
       }
+    });
 
-      components.forEach(function(component, index) {
-        var newPath = path.slice();
-        newPath.push(index);
-        if (!component) return;
-
-        if (component.hasOwnProperty('columns') && Array.isArray(component.columns)) {
-          newPath.push('columns');
-          component.columns.forEach(function(column, index) {
-            var colPath = newPath.slice();
-            colPath.push(index);
-            colPath.push('components');
-            findComponent(column.components, key, fn, colPath);
-          });
-        }
-
-        if (component.hasOwnProperty('rows') && Array.isArray(component.rows)) {
-          newPath.push('rows');
-          component.rows.forEach(function(row, index) {
-            var rowPath = newPath.slice();
-            rowPath.push(index);
-            row.forEach(function(column, index) {
-              var colPath = rowPath.slice();
-              colPath.push(index);
-              colPath.push('components');
-              findComponent(column.components, key, fn, colPath);
-            });
-          });
-        }
-
-        if (component.hasOwnProperty('components') && Array.isArray(component.components)) {
-          newPath.push('components');
-          findComponent(component.components, key, fn, newPath);
-        }
-
-        if (component.key === key) {
-          fn(component, newPath);
-        }
-      });
-    };
-
-    var removeComponent = function(components, path) {
-      // Using _.unset() leave a null value. Use Array splice instead.
-      var index = path.pop();
-      if (path.length !== 0) {
-        components = _.get(components, path);
+    $scope.$on('formio.removeComponent', (event, component) => {
+      const change = Utils.generateFormChange('remove', { component });
+      if (change) {
+        $scope.changes.push(change);
       }
-      components.splice(index, 1);
-    };
-
-    var applyChanges = function(form) {
-      var failed = [];
-      $scope.changes.forEach(function(change) {
-        var found = false;
-        switch (change.op) {
-          case 'add':
-            var newComponent = change.component;
-
-            // Find the container to set the component in.
-            findComponent(form.components, change.container, function(parent) {
-              if (!change.container) {
-                parent = form;
-              }
-
-              // A move will first run an add so remove any existing components with matching key before inserting.
-              findComponent(form.components, change.key, function(component, path) {
-                // If found, use the existing component. (If someone else edited it, the changes would be here)
-                newComponent = component;
-                removeComponent(form.components, path);
-              });
-
-              found = true;
-              var container = _.get(parent, change.path);
-              container.splice(change.index, 0, newComponent);
-            });
-            break;
-          case 'remove':
-            findComponent(form.components, change.key, function(component, path) {
-              found = true;
-              removeComponent(form.components, path);
-            });
-            break;
-          case 'edit':
-            findComponent(form.components, change.key, function(component, path) {
-              found = true;
-              try {
-                _.set(form.components, path, jsonpatch.applyPatch(component, change.patches).newDocument);
-              }
-              catch (err) {
-                failed.push(change);
-              }
-            });
-            break;
-          case 'move':
-            break;
-        }
-        if (!found) {
-          failed.push(change);
-        }
-      });
-
-      return {
-        form: form,
-        failed: failed
-      };
-    };
+    });
 
     var handleFormConflict = function(newForm) {
-      var result = applyChanges(newForm);
+      var result = Utils.applyFormChanges(newForm, $scope.changes);
       return $scope.parentSave(result.form)
         .then(function() {
           if (result.failed.length) {
@@ -1326,7 +1182,6 @@ app.controller('FormEditController', [
     // Wrap saveForm in the editor to clear dirty when saved.
     $scope.parentSave = $scope.saveForm;
     $scope.saveForm = function() {
-      contentLoaded = false;
       $scope.dirty = false;
       return $scope.parentSave()
         .catch(handleFormConflict)
@@ -1546,7 +1401,7 @@ app.controller('FormShareController', ['$scope', '$rootScope', function($scope, 
 
   // Method to load the preview.
   var loadPreview = function() {
-    $scope.previewUrl = $rootScope.onPremise ? $scope.projectUrl + '/manage/view/#/' : 'https://formview.io/#/';
+    $scope.previewUrl = $rootScope.onPremise ? $scope.projectUrl + '/manage/view/#/' : 'https://pro.formview.io/#/';
     $scope.previewUrl += $rootScope.onPremise ? 'form/' : $scope.currentProject.name + '/';
     $scope.previewUrl += $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
@@ -1735,7 +1590,7 @@ app.controller('FormDeleteController', [
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
       GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
-      $scope.back('project.' + $scope.formInfo.type + '.form.view');
+      $scope.back('project.' + $scope.formInfo.type + 'Index');
     });
 
     $scope.$on('cancel', function(event) {
@@ -1833,6 +1688,7 @@ app.factory('ActionInfoLoader', [
        */
       load: function($scope, $stateParams) {
         // Get the action information.
+        $scope.actionLoaded = false;
         $scope.actionUrl = $scope.formio.formUrl + '/action';
         if ($stateParams.actionId) {
           $scope.actionUrl += ('/' + $stateParams.actionId);
@@ -1863,12 +1719,14 @@ app.factory('ActionInfoLoader', [
             var loader = new Formio($scope.actionUrl, {base: $scope.baseUrl});
             return loader.loadAction().then(function(action) {
               $scope.action = _.merge($scope.action, {data: action});
+              $scope.actionLoaded = true;
               return getActionInfo(action.name);
             });
           }
           else if (defaults) {
             $scope.action = _.merge($scope.action, {data: defaults});
             $scope.action.data.settings = {};
+            $scope.actionLoaded = true;
             return $q.when($scope.actionInfo);
           }
         };
@@ -1916,14 +1774,14 @@ app.controller('FormActionEditController', [
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
     $cacheFactory.get('$http').removeAll();
-
+    $scope.actionLoaded = false;
     $scope.loadProjectPromise.then(function() {
       // Helpful warnings for certain actions
       ActionInfoLoader.load($scope, $stateParams).then(function(actionInfo) {
         // SQL Action missing sql server warning
         if(actionInfo && actionInfo.name === 'sql') {
           var typeComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'type');
-          if(JSON.parse(typeComponent.data.json).length === 0) {
+          if(typeComponent && typeComponent.data && JSON.parse(typeComponent.data.json).length === 0) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any SQL servers configured. You can add a SQL server in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/data">Stage Settings</a>.');
           }
         }
@@ -1961,7 +1819,7 @@ app.controller('FormActionEditController', [
           });
 
           var transportComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'transport');
-          if(transportComponent && JSON.parse(transportComponent.data.json).length <= 1) {
+          if(transportComponent && transportComponent.data && JSON.parse(transportComponent.data.json).length <= 1) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any email transports configured. You can add an email transport in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/email">Stage Settings</a>, or you can use the default transport (charges may apply).');
           }
         }
@@ -1969,7 +1827,7 @@ app.controller('FormActionEditController', [
         // Oauth action alert for new resource missing role assignment.
         if (actionInfo && actionInfo.name === 'oauth') {
           var providers = FormioUtils.getComponent(actionInfo.settingsForm.components, 'provider');
-          if (providers.data && providers.data.json && providers.data.json === '[]') {
+          if (providers && providers.data && providers.data.json && providers.data.json === '[]') {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> The OAuth Action requires a provider to be configured, before it can be used. You can add an OAuth provider in your <a href="#/project/'+$scope.currentProject._id+'/env/integrations/oauth">Stage Settings</a>.');
           }
         }
@@ -2032,7 +1890,7 @@ app.controller('FormActionEditController', [
 
         if(actionInfo && actionInfo.name === 'oauth') {
           // Show warning if button component has no options
-          var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'button');
+          var buttonComponent = FormioUtils.getComponent(actionInfo.settingsForm.components, 'settings.button');
           if(JSON.parse(buttonComponent.data.json).length === 0) {
             FormioAlerts.warn('<i class="glyphicon glyphicon-exclamation-sign"></i> You do not have any Button components with the `oauth` action on this form, which is required to use this action. You can add a Button component on the <a href="#/project/'+$scope.projectId+'/form/'+$scope.formId+'/edit">form edit page</a>.');
           }
@@ -2082,6 +1940,7 @@ app.controller('FormActionEditController', [
 
     $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
+      Formio.cache = {};
       var method = $scope.actionUrl ? 'updated' : 'created';
       FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
       $state.go('project.' + $scope.formInfo.type + '.form.action.index');
@@ -2161,6 +2020,13 @@ app.controller('FormSubmissionsController', [
         (!component.hasOwnProperty('persistent') || component.persistent) &&
         (component.tableView);
     };
+
+    // Refresh the grid when the timezones are done loading.
+    document.body.addEventListener('zonesLoaded', function() {
+      if ($scope.grid) {
+        $scope.grid.refresh();
+      }
+    });
 
     $scope.export = function(form, type) {
       $scope.isBusy = true;
@@ -2287,10 +2153,25 @@ app.controller('FormSubmissionsController', [
           }
 
           var value = FormioUtils.fieldData(val.toJSON(), component);
-          if (!value && ['container', 'datagrid', 'well', 'panel', 'columns', 'fieldset', 'table'].indexOf(component.type) !== -1) {
+          if (!value && ['container', 'datagrid', 'editgrid', 'well', 'panel', 'columns', 'fieldset', 'table'].indexOf(component.type) !== -1) {
             value = val.toJSON();
           }
 
+          if (!value && component.type === 'form') {
+            let componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
+
+            value = componentInfo.tableView(val.toJSON()[component.key], {
+              component: component,
+              $interpolate: $interpolate,
+              componentInfo: formioComponents,
+              util: FormioUtils
+            });
+          }
+
+          var submissionTimezone = '';
+          if (dataItem && dataItem.metadata && dataItem.metadata.timezone) {
+            submissionTimezone = dataItem.metadata.timezone;
+          }
           var componentInfo = formioComponents.components[component.type] || formioComponents.components.custom;
           if (!componentInfo || !componentInfo.tableView) {
             if (value === undefined) {
@@ -2306,6 +2187,9 @@ app.controller('FormSubmissionsController', [
             angular.forEach(value, function(arrayValue) {
               arrayValue = componentInfo.tableView(arrayValue, {
                 component: component,
+                options: {
+                  submissionTimezone: submissionTimezone
+                },
                 $interpolate: $interpolate,
                 componentInfo: formioComponents,
                 util: FormioUtils
@@ -2319,6 +2203,9 @@ app.controller('FormSubmissionsController', [
           }
           value = componentInfo.tableView(value, {
             component: component,
+            options: {
+              submissionTimezone: submissionTimezone
+            },
             $interpolate: $interpolate,
             componentInfo: formioComponents,
             util: FormioUtils
@@ -2404,7 +2291,7 @@ app.controller('FormSubmissionsController', [
               read: function(options) {
                 var filters = options.data.filter && options.data.filter.filters;
                 var params = {
-                  limit: options.data.take,
+                  limit: options.data.take || dataSource.total(),
                   skip: options.data.skip,
                   sort: getSortQuery(options.data.sort)
                 };
@@ -2447,6 +2334,7 @@ app.controller('FormSubmissionsController', [
                   })
                   .then(options.success)
                   .catch(function(err) {
+                    console.warn(err);
                     FormioAlerts.onError(err);
                     options.error(err);
                   });
@@ -2458,6 +2346,7 @@ app.controller('FormSubmissionsController', [
                     options.success();
                   })
                   .catch(function(err) {
+                    console.warn(err);
                     FormioAlerts.onError(err);
                     options.error(err);
                   }));
@@ -2471,7 +2360,7 @@ app.controller('FormSubmissionsController', [
           // Generate columns
           var columns = [];
           FormioUtils.eachComponent(currentForm.components, function(component, componentPath) {
-            if (component.tableView === false || !component.key) {
+            if (component.tableView === false || !component.key || !component.type) {
               return;
             }
             // FOR-310 - If this component was already added to the grid, dont add it again.
@@ -2479,7 +2368,7 @@ app.controller('FormSubmissionsController', [
               return;
             }
 
-            if (['container', 'datagrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
+            if (['container', 'datagrid', 'editgrid', 'well', 'fieldset', 'panel'].indexOf(component.type) !== -1) {
               FormioUtils.eachComponent(component.components, function(component) {
                 if (component.key) {
                   componentHistory.push(component.key);
@@ -2733,7 +2622,7 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     const saveForm = function() {
-      $scope.formio.saveForm(angular.copy($scope.form)).then(function(form) {
+      $scope.formio.saveForm(angular.copy($scope.definition.schema || $scope.form)).then(function(form) {
         $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
           type: 'success',
@@ -2820,13 +2709,17 @@ app.constant('ResourceAccessLabels', {
     label: 'Read',
     tooltip: 'The Read permission will allow a resource, defined in the submission, to read all of the submission data.'
   },
+  'create': {
+    label: 'Create',
+    tooltip: 'The Create permission will allow a resource, defined in the submission, to read and create all of the submission data.'
+  },
   'write': {
     label: 'Write',
-    tooltip: 'The Write permission will allow a resource, defined in the submission, to read all of the submission data and edit all of the data except for the Submission Resource Access and Owner information.'
+    tooltip: 'The Write permission will allow a resource, defined in the submission, to read, create and edit all of the submission data except for the Submission Resource Access and Owner information.'
   },
   'admin': {
     label: 'Admin',
-    tooltip: 'The Admin permission will allow a resource, defined in the submission, to read and edit all of the submission data.'
+    tooltip: 'The Admin permission will allow a resource, defined in the submission, to read, create, edit and delete all of the submission data.'
   }
 });
 

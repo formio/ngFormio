@@ -402,9 +402,8 @@ module.exports = function (config) {
   this.enterTextInField = function (field, text) {
     text=replacements(text);
     it('I enter ' + text + ' in ' + field + ' field', function (done) {
-      var ele = field.startsWith("xpath:") ? element(by.xpath(field.substring(field.indexOf(':') + 1))) : element.all(by.css(field)).first();
+      var ele = field.startsWith("xpath:") ? element(by.xpath(field.substring(field.indexOf(':') + 1))) : element(by.css(field));
       //var ele = element(by.css(field));
-      //console.log(ele);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
@@ -946,21 +945,22 @@ module.exports = function (config) {
       });
     });
   };
-  this.iSeeValueInIndex = function (ele, text,index) {
+  this.iSeeValueInIndex = function (field,index, text) {
     text = replacements(text.toString());
-    it('I see value ' + text + ' in ' + ele, function (next) {
-      var ele1 = (typeof (ele) == 'object') ? ele : element.all(by.css(ele, text)).get(index);
+    it('I see text ' + text + ' in ' + field, function (next) {
+      var ele1 = field.startsWith("xpath:") ? element.all(by.xpath(field.substring(field.indexOf(':') + 1))).get(index) : element.all(by.css(field)).get(index);
       browser.wait(function () {
         return ele1.isPresent();
       }, timeout).then(function () {
         ele1.getAttribute('value').then(function (value) {
-          assert.equal(value,text);
+          config.expect(value === text);
           next();
         })
           .catch(next);
       });
     });
   };
+
   this.iSeeTextIn = function (ele, text) {
     text = replacements(text);
     it('I see text ' + text + ' in', function (next) {
@@ -1144,11 +1144,11 @@ module.exports = function (config) {
 
   this.dragTo = function (field, dropZone) {
     it("Drag " + field + " to " + dropZone, function(next) {
-      const ele = element(by.xpath('//span[@title="' + field + '"]'));
+      const ele = element(by.xpath('//span[@id="' + field + '"]'));
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {
-        const drop = element(by.xpath('//*[contains(@class, "' + dropZone + '")]//ul[contains(@class, "component-list")]'));
+        const drop = element(by.xpath('//*[contains(@class, "' + dropZone + '")]'));
         browser.executeScript(dragAndDrop, ele, drop, 0, 0)
           .then(next);
       });
@@ -1504,7 +1504,9 @@ module.exports = function (config) {
   this.enterTextInFieldIndex = function (field,index, text) {
     text=replacements(text);
     it('I enter ' + text + ' in ' + field + ' field', function (next) {
-      var ele = element.all(by.css(field)).get(index);
+      text = replacements(text.toString());
+      var ele = field.startsWith("xpath:") ? element.all(by.xpath(field.substring(field.indexOf(':') + 1))).get(index) : element.all(by.css(field)).get(index);
+      //var ele = element.all(by.css(field)).get(index);
       browser.wait(function () {
         return ele.isPresent();
       }, timeout).then(function () {

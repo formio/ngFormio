@@ -1,1 +1,2 @@
-import './resourcefields.js';
+import './resourcefields';
+import './email';

@@ -1,5 +1,16 @@
 @import "variables.scss";
+@import "~font-awesome/scss/font-awesome.scss";
+@import "~bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "~bootswatch/yeti/_bootswatch.scss";
 @import "mixins.scss";
+@import '~ng-sortable/dist/ng-sortable';
+@import '~chartist/dist/chartist';
+@import '~ng-dialog/css/ngDialog';
+@import '~ng-dialog/css/ngDialog-theme-default';
+@import '~angular-swagger-ui/dist/css/swagger-ui';
+@import '~ui-select/dist/select';
+@import '~ng-tags-input/build/ng-tags-input';
+@import '~angular-toastr/dist/angular-toastr.min';
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
@@ -946,15 +957,19 @@ pre code {
   }
 
   p {
-    text-align: right;
+    text-align: center;
     font-weight: 100;
     a {
       color: #FFF;
     }
   }
 
+  .alert p {
+    text-align: left;
+  }
+
   // FOR-124 - ie does defaults to submit type, and does not allow you to change it.
-  button[type="submit"]#login {
+  button[name="data[login]"] {
     margin-top: 87px;
     background-color: $brand-secondary;
   }
@@ -1856,6 +1871,10 @@ footer {
   }
 }
 
+.alert-danger {
+  background-color: $alert-danger-bg;
+}
+
 .caret {
   border-top: 4px dashed;
 }
@@ -2198,9 +2217,9 @@ formio-header-wrapper>formio-header.fixed.absolute {
   position: absolute;
 }
 
-#navbar {
-  position: relative !important;
-}
+//#navbar {
+//  position: relative !important;
+//}
 
 .input-group .form-control {
   z-index: auto;

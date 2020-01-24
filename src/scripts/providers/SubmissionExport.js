@@ -5,12 +5,18 @@ var app = angular.module('formioApp');
 app.factory('SubmissionExport', [
   '$http',
   'FileSaver',
-  function($http, FileSaver) {
+  'FormioUtils',
+  function($http, FileSaver, FormioUtils) {
     return {
       export: function(formio, form, type) {
-        console.log(formio.projectUrl + '/form/' + form._id + '/export?format=' + type);
+        var url = formio.projectUrl + '/form/' + form._id + '/export?format=' + type;
+        if (type === 'csv') {
+          url += '&view=formatted';
+        }
+        url += '&timezone=' + encodeURIComponent(FormioUtils.currentTimezone());
+        console.log(url);
         return $http({
-          url: formio.projectUrl + '/form/' + form._id + '/export?format=' + type,
+          url: url,
           method: 'GET',
           responseType: 'blob'
         }).then(function(response) {

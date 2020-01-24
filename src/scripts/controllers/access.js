@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('formioApp.controllers.access', ['ngFormBuilder']);
+var app = angular.module('formioApp.controllers.access', []);
 
 app.controller('AccessController', ['$scope', function($scope) {
   $scope.permissionLabels = {
@@ -147,7 +147,7 @@ app.directive('permissionEditor', ['$q', function($q) {
 }]);
 
 app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, FormioUtils) {
-  var PERMISSION_TYPES = ['read', 'write', 'admin'];
+  var PERMISSION_TYPES = ['read', 'create', 'write', 'admin'];
 
   return {
     scope: {

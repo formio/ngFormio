@@ -4,9 +4,205 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 6.8.8
+## 7.0.0-rc.53
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.13
+
+## 7.0.0-rc.51
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.11
+ - Upgrade Form Manager to 1.54.0
+ - Upgrade Form View Pro to 1.53.0
+
+## 7.0.0-rc.50
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.9
+ - Upgrade Form manager to 1.53.0
+ - Upgrade Tenant Manager to 1.5.0
+
+## 7.0.0-rc.49
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.4
+
+## 7.0.0-rc.47
+### Changed
+ - Changed the Jira connector settings to use the email and apikey interface.
+ - Fixed custom scripts loading.
+ - Upgrade formio.js to 4.8.0-rc.3
+
+## 7.0.0-rc.46
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.2
+ - Upgrade form manager to include latest renderer.
+ - Removed default existing resource tag from form
+
+## 7.0.0-rc.45
 ### Added
- - PDF configuration settings.
+ - Create level for Group Permissions (Field Based Resource Access)
+
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.1
+ - Upgrade @formio/premium to v1.2.0
+
+## 7.0.0-rc.44
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.9
+ - Upgrade formmanager to include latest renderer.
+ - Upgrade formview pro to include latest renderer.
+
+## 7.0.0-rc.43
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.8
+
+## 7,0.0-rc.42
+### Changed
+ - Upgrade formio.js to 4.8.0-beta.7
+
+### Fixed
+ - Fixed the changed indictor not showing up all the time.
+
+## 7.0.0-rc.41
+### Added
+ - flattenComponents filter
+
+### Fixed
+ - Change form save to use a separate schema in scope.
+ - Fix tabs showing data view when unchecked.
+
+## 7.0.0-rc.40
+### Changed
+ - Upgrade formiojs@4.8.0-beta.5
+ - Upgrade Form View Pro to 1.47.0
+ - Upgrade Form Manager to 1.48.0
+ - Upgrade Tenant Manager to 1.4.0
+
+### Added
+ - Help text to the project plan usage section.
+
+## 7.0.0-rc.39
+### Fixed
+ - Include object builder directive to fix form settings.
+ - Save schema, set dirty and fix form change events for merging.
+
+### Changed
+ - Upgrade formiojs@4.8.0-beta.1
+
+## 7.0.0-rc.38
+### Changed
+ - Upgrade formiojs@4.7.7
+ - Upgrade premium components to v1.1.0 which should fix IE11 issues.
+
+## 7.0.0-rc.37
+### Changed
+ - Upgrade formiojs@4.7.6
+
+## 7.0.0-rc.36
+### Changed
+ - Adding Premium components into the portal application.
+ - Upgrade formiojs@4.7.5 which should fix IE11 issues.
+ - Upgraded core-js@3.4.1, formiojs@4.7.5, ng-formio@4.6.4, protractor-helpers@1.1.678, webdriverio@5.16.6
+
+## 7.0.0-rc.35
+### Changed
+ - Upgrade formiojs@4.7.4
+
+## 7.0.0-rc.34
+### Changed
+ - Upgrade formiojs@4.7.3
+ - Upgrade Form Manager to 1.47.0
+ - Upgrade Form View Pro to 1.45.0
+
+## 7.0.0-rc.33
+### Fixed
+ - Upgrade formiojs@4.7.2
+
+## 7.0.0-rc.32
+### Fixed
+ - Issues with KendoUI Grid only showing triangles.
+ 
+### Changed
+ - Upgrade formio.js@4.7.0
+
+## 7.0.0-rc.30
+### Changed
+ - Upgrade formio.j@4.6.1
+
+## 7.0.0-rc.29
+### Changed
+ - Upgrade formio.js@4.6.0
+
+## 7.0.0-rc.28
+### Changed
+ - Upgrade formio.js@4.5.0
+
+## 7.0.0-rc.27
+### Changed
+ - Upgrade formio.js@4.4.2
+
+## 7.0.0-rc.26
+### Added
+ - The Everyone role to the roles & permissions section.
+
+### Fixed
+ - Actions system.
+ - Public Configurations to work.
+
+### Changed
+ - Upgrade formiojs@4.4.1
+ - Upgrade @progress/kendo-ui@2019.3.1016, ng-formio@4.3.3, protractor-helpers@1.1.654, webdriverio@5.15.1, dotenv@8.2.0, formiojs@4.4.1
+
+## 7.0.0-rc.25
+### Fixed
+ - Staging deployments for Tenants.
+
+## 7.0.0-rc.24
+### Changed
+ - Upgraded formio.js@4.3.3
+ - Upgraded Form Manager @ 1.45.0
+ - Upgraded Form View Pro @ 1.44.0
+ - Upgraded @babel/core@7.6.4, @babel/preset-env@7.6.3, @progress/kendo-ui@2019.3.1010, dompurify@2.0.6, protractor-helpers@1.1.649, webdriverio@5.14.5
+
+## 7.0.0-rc.23
+### Added
+ - Renderer version to the bottom version numbers.
+
+### Changed
+ - Upgraded formio.js to 4.2.9
+
+## 7.0.0-rc.22
+### Fixed
+ - Issues with the EditGrid data not showing when nested forms are used.
+ - The Delete page with PDF's not showing up.
+ - Upgraded to latest 4.2.4 core renderer / builder.
+
+### Changed
+ - Made some improvements to the OpenID configurations and functionality.
+
+## 7.0.0-rc.19
+### Changed
+ - Upgrade formio.js to 4.2.0-rc.7 branch.
+
+## 7.0.0-rc.18
+### Changed
+ - Upgrade formio.js to 4.0.11
+ 
+### Fixed
+ - IE 11 compatibility with no es6. 
+
+## 7.0.0-rc.17
+### Removed
+ - Dependency on chance.js as it isn't ie11 compatible.
+
+## 7.0.0-rc.16
+### Fixed
+ - Add template loading for nested form submissions table
+ 
+### Changed
+ - Upgrade formio.js to 4.0.5 branch.
+
+## 7.0.0-rc-15
+### Changed
+ - Upgrade formio.js to 4.0.2 branch.
 
 ## 6.8.7
 ### Fixed
@@ -86,6 +282,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgraded @babel/core@7.5.5, @babel/preset-env@7.5.5, @progress/kendo-ui@2019.2.724, lodash@4.17.15, protractor-helpers@1.1.589, webdriverio@5.11.10, copy-webpack-plugin@5.0.4, formiojs@3.24.0, mocha@6.2.0, webpack@4.38.0
 
 ## 6.6.0
+### Added
+ - ActionItem views.
+
 ### Added 
  - ActionItem log view added to portal.
 
@@ -94,6 +293,60 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed issues regarding the tenant manager with pagination and also introduced searching.
  - Form Manager and Form View pro to use latest renderer.
  - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
+
+## 7.0.0-beta.18
+### Changed
+ - Upgraded formio.js to v3.23.2
+ - Upgraded tenant manager and form manager to latest versions.
+
+## 7.0.0-beta.16
+### Fixed
+ - Issues with Tagpad and Sketchpad not working.
+
+## 7.0.0-beta.14
+### Changed
+ - Upgrade core renderer with following changes. https://github.com/formio/formio.js/blob/master/Changelog.md#3229
+
+## 7.0.0-beta.13
+### Fixed
+ - The inline embed script when using deployed portal to set the base and project properties.
+
+### Changed
+ - Upgraded protractor-helpers@1.1.560, webpack@4.35.0
+
+## 7.0.0-beta.12
+### Fixed
+ - Issue with the Form Manager button so that it will not show up unless the project is enabled.
+
+## 7.0.0-beta.11
+### Changed
+ - Upgrade core renderer to 3.22.8
+ - Upgrade form-manager to 1.34.0 with following changes to formview pro.  https://github.com/formio/pro.formview.io/blob/master/Changlog.md#1340
+
+## 7.0.0-beta.10
+### Changed
+ - Upgraded @progress/kendo-ui@2019.2.619, core-js@3.1.4, dompurify@1.0.11, formiojs@3.22.7, ng-formio@3.17.4, protractor-helpers@1.1.558, webdriverio@5.10.7, webpack-dev-server@3.7.2
+ - Upgraded core renderer to 3.22.7 https://github.com/formio/formio.js/blob/master/Changelog.md#3227
+
+## 7.0.0-beta.8
+### Fixed
+ - Renderer to fix CKEditor rows property.
+
+### Added
+ - CKEditor configurations for TextArea components.
+<<<<<<< HEAD
+=======
+
+## 6.6.0
+### Added 
+ - ActionItem log view added to portal.
+
+## 6.5.2
+### Changed
+ - Fixed issues regarding the tenant manager with pagination and also introduced searching.
+ - Form Manager and Form View pro to use latest renderer.
+ - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
+>>>>>>> 353deee51f5ea0271d5a44404023ad96f0afec22
 
 ## 6.5.1
 ### Fixed
@@ -284,6 +537,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Form custom properties fixed to be compatible with beta.
  - Embed walkthrough for vue.
  - Roles not reloading properly on refresh of page.
+ - Fixed Form custom properties section.
 
 ## 5.7.0
 ### Fixed

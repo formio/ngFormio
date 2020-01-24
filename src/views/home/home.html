@@ -97,7 +97,7 @@
               <span ng-show="!teamSupport(project)" class="project-team-upgrade">Plan does not support teams</span>
               <div ng-show="teamSupport(project)">
                 <span ui-sref="team.view({teamId: team._id})" ng-repeat="team in project.teams track by $index" ng-if="team.data.name" class="label label-default ellipsis project-team-label">{{team.data.name}}</span>
-                <a ng-show="teamSupport(project) && teamAdmin(project)" ui-sref="project.teams({projectId: project._id})"><span class="label label-default ellipsis project-add-team"><i class="fa fa-user-plus"></i> Manage Teams</span></a>
+                <a ng-init="isTeamAdmin=teamAdmin(project)" ng-show="teamSupport(project) && isTeamAdmin" ui-sref="project.teams({projectId: project._id})"><span class="label label-default ellipsis project-add-team"><i class="fa fa-user-plus"></i> Manage Teams</span></a>
               </div>
             </div>
           </div>

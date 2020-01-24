@@ -74,22 +74,22 @@
           <h3>Project Limits</h3>
         </li>
         <li class="list-group-item" ng-if="currentProject._id === localProject._id">
-          <h4>Forms and Resources</h4>
+          <h4>Forms and Resources <i uib-tooltip="The total amount of combined forms and resources that this project is allowed to have within this plan." class="fa fa-info-circle"></i></h4>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'forms')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'forms')"></div>
             <span>{{ currentProject.apiCalls.used.forms | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.forms) }}</span>
           </div>
-          <h4>Form Requests</h4>
+          <h4>Form Requests <i uib-tooltip="The total amount of API requests (per month) that can be made to Create, Read, Update, and Delete forms." class="fa fa-info-circle"></i></h4>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'formRequests')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'formRequests')"></div>
             <span>{{ currentProject.apiCalls.used.formRequests | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.formRequests) }} per month</span>
           </div>
-          <h4>Submission Requests</h4>
+          <h4>Submission Requests <i uib-tooltip="The total amount of API requests (per month) that can be made to Create, Read, Update, and Delete form submissions." class="fa fa-info-circle"></i></h4>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'submissionRequests')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'submissionRequests')"></div>
             <span>{{ currentProject.apiCalls.used.submissionRequests | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.submissionRequests) }} per month</span>
           </div>
-          <h4>Emails</h4>
+          <h4>Emails <i uib-tooltip="The total amount of emails per month that can be sent using the Default email transport. If your project uses its own Email provider, then this limit does not apply." class="fa fa-info-circle"></i></h4>
           <div class="progress">
             <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'emails')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'emails')"></div>
             <span>{{ currentProject.apiCalls.used.emails | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.emails) }} per month</span>
