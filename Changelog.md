@@ -4,6 +4,42 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.54
+### Added
+ - PDF page size settings.
+ 
+### Changed
+ - Upgrade formio.js to 4.8.0
+ - Upgrade form view pro to 1.57.0
+ - Upgrade form manager to 1.56.0
+ - Upgrade tenant manager to 1.6.0
+
+## 7.0.0-rc.53
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.13
+
+## 7.0.0-rc.51
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.11
+ - Upgrade Form Manager to 1.54.0
+ - Upgrade Form View Pro to 1.53.0
+
+## 7.0.0-rc.50
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.9
+ - Upgrade Form manager to 1.53.0
+ - Upgrade Tenant Manager to 1.5.0
+
+## 7.0.0-rc.49
+### Changed
+ - Upgrade formio.js to 4.8.0-rc.4
+
+## 7.0.0-rc.47
+### Changed
+ - Changed the Jira connector settings to use the email and apikey interface.
+ - Fixed custom scripts loading.
+ - Upgrade formio.js to 4.8.0-rc.3
+
 ## 7.0.0-rc.46
 ### Changed
  - Upgrade formio.js to 4.8.0-rc.2
@@ -177,6 +213,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.0.0-rc-15
 ### Changed
  - Upgrade formio.js to 4.0.2 branch.
+
+## 6.8.7
+### Fixed
+ - Issue with Jira action authentication.
+
+### Changed
+ - Upgrade Form Manager to v1.51.0
+ - Upgrade formiojs@4.7.8
 
 ## 6.8.6
 ### Fixed
