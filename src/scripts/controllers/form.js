@@ -1797,7 +1797,9 @@ app.controller('FormActionIndexController', [
 
     var getActions = function() {
       $scope.loadProjectPromise.then(function() {
-        $scope.formio.loadActions(query)
+        const ignoreCache = $scope.previousState === 'project.form.form.action.add';
+
+        $scope.formio.loadActions(query, {ignoreCache})
           .then(function(actions) {
             $scope.totalItems = actions.serverCount || 0;
             $scope.actions = actions;
