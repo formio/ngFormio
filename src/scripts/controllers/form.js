@@ -1645,7 +1645,9 @@ app.controller('FormActionIndexController', [
 
     var getActions = function() {
       $scope.loadProjectPromise.then(function() {
-        $scope.formio.loadActions(query)
+        const ignoreCache = $scope.previousState === 'project.form.form.action.add';
+
+        $scope.formio.loadActions(query, {ignoreCache})
           .then(function(actions) {
             $scope.totalItems = actions.serverCount || 0;
             $scope.actions = actions;
@@ -1940,7 +1942,6 @@ app.controller('FormActionEditController', [
 
     $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
-      Formio.cache = {};
       var method = $scope.actionUrl ? 'updated' : 'created';
       FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
       $state.go('project.' + $scope.formInfo.type + '.form.action.index');
