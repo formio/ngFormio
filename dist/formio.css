@@ -1,4 +1,4 @@
-/*! ng-formio v3.22.1 | https://unpkg.com/ngFormio@3.22.1/LICENSE.txt */
+/*! ng-formio v3.22.2 | https://unpkg.com/ngFormio@3.22.2/LICENSE.txt */
 @charset "UTF-8";
 .flatpickr-calendar {
   background: 0 0;
@@ -684,8 +684,8 @@ span.flatpickr-weekday {
   background-color: #eaeaea;
   cursor: not-allowed;
   -webkit-user-select: none;
-  -moz-user-select: none;
   -ms-user-select: none;
+  -moz-user-select: none;
   user-select: none; }
 
 .choices.is-disabled .choices__item {
@@ -731,7 +731,7 @@ span.flatpickr-weekday {
   height: 0;
   width: 0;
   border-style: solid;
-  border-color: #333 transparent transparent transparent;
+  border-color: #333 transparent transparent;
   border-width: 5px;
   position: absolute;
   right: 11.5px;
@@ -740,7 +740,7 @@ span.flatpickr-weekday {
   pointer-events: none; }
 
 .choices[data-type*=select-one].is-open:after {
-  border-color: transparent transparent #333 transparent;
+  border-color: transparent transparent #333;
   margin-top: -7.5px; }
 
 .choices[data-type*=select-one][dir=rtl]:after {
@@ -919,8 +919,8 @@ span.flatpickr-weekday {
 .choices__item--disabled {
   cursor: not-allowed;
   -webkit-user-select: none;
-  -moz-user-select: none;
   -ms-user-select: none;
+  -moz-user-select: none;
   user-select: none;
   opacity: .5; }
 
@@ -942,7 +942,7 @@ span.flatpickr-weekday {
   background-position: center;
   cursor: pointer; }
 
-.choices__button:focus {
+.choices__button:focus, .choices__input:focus {
   outline: 0; }
 
 .choices__input {
@@ -955,9 +955,6 @@ span.flatpickr-weekday {
   border-radius: 0;
   max-width: 100%;
   padding: 4px 0 4px 2px; }
-
-.choices__input:focus {
-  outline: 0; }
 
 [dir=rtl] .choices__input {
   padding-right: 2px;
