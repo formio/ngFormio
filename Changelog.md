@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Changed
+ - Upgraded formiojs@3.29.7
+
 ## 3.21.0
 ### Changed
  - Upgraded core-js@3.2.1, css-loader@3.2.0, file-loader@4.2.0, formiojs@3.25.1, sass-loader@7.2.0, uglifyjs-webpack-plugin@2.2.0, webpack@4.39.2
