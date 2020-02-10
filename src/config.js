@@ -7,6 +7,7 @@ var pathType = 'Subdomains';
 var onPremise = false;
 var hostedPDFServer = '';
 var sso = '';
+var ssoTeamsEnabled = false;
 var ssoLogout = '';
 /*******************************/
 
@@ -69,7 +70,7 @@ var loading = false;
 if (Formio) {
   Formio.setBaseUrl(apiBase);
   Formio.setProjectUrl(formioBase);
-  if (sso) {
+  if (sso && query.skipSsoAuth !== 'true') {
     if (query.saml) {
       window.location.hash = localStorage.getItem('redirectUrl');
       localStorage.removeItem('redirectUrl');
@@ -91,6 +92,7 @@ angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),
   sso: sso,
+  ssoTeamsEnabled: ssoTeamsEnabled,
   ssoLogout: ssoLogout,
   loading: loading,
   disable: disable,
