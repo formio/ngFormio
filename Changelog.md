@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade form manager to 1.58.0
  - Provide access to logs for any Team admin.
  - Added ssoTeamsEnabled variable and skipSsoAuth query param.
+ - Added copying notes from scope
 
 ## 6.9.0
 ### Added
