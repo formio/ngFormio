@@ -43,7 +43,7 @@ app.controller('TeamCreateController', [
     $scope.team.data.admins = [];
     const teamFormio = (new Formio($rootScope.teamForm));
     teamFormio.loadForm().then((form) => {
-      if ($rootScope.onPremise && AppConfig.sso) {
+      if ($rootScope.onPremise && AppConfig.ssoTeamsEnabled) {
         form.components.splice(form.components.length - 2, 0, {
           type: 'checkbox',
           label: 'SSO Team',
@@ -104,7 +104,7 @@ app.controller('TeamViewController', [
     TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
-    $scope.ssoPortal = $rootScope.onPremise && AppConfig.sso;
+    $scope.ssoTeamsEnabled = $rootScope.onPremise && AppConfig.ssoTeamsEnabled;
     $scope.activeView = 'members';
     $scope.switchView = function(view) {
       $scope.activeView = view;
