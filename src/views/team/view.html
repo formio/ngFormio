@@ -7,7 +7,7 @@
     <ul class="list-group">
       <li class="list-group-item">
         <h3>{{ team.data.name }}</h3>
-        <div ng-if="ssoPortal">
+        <div ng-if="ssoTeamsEnabled">
           <div class="checkbox">
             <label>
               <input type="checkbox" ng-model="team.metadata.ssoteam" ng-change="saveTeam()">
