@@ -896,6 +896,7 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function(form) {
       form = form || $scope.form;
+      form._vnote = $scope.form._vnote || '';
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
