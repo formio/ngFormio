@@ -53,21 +53,6 @@ module.exports = function() {
           $scope.formioAlerts = [].concat(alerts);
         };
 
-        $scope.getIframeSrc = function(pdf) {
-          var iframeSrc = pdf.src + '.html';
-          var params = [];
-          if ($scope.options && $scope.options.building) {
-            params.push('builder=1');
-          }
-          if ($scope.readOnly) {
-            params.push('readonly=1');
-          }
-          if (params.length) {
-            iframeSrc += '?' + params.join('&');
-          }
-          return iframeSrc;
-        };
-
         $scope.downloadUrl = '';
         $scope.setDownloadUrl = function(form) {
           if (!$scope.formio || $scope.options.noDownload) {
