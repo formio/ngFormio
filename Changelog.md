@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.8.9
+### Changed
+ - Small tweak to how payment methods are loaded to only return approved methods.
+
 ## 6.8.8
 ### Added
  - PDF configuration settings.
