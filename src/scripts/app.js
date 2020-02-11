@@ -1256,7 +1256,17 @@ angular
           title: 'Trial',
           labelStyle: 'label-trial',
           price: 0,
-          priceDescription: 'Free for 30 days'
+          priceDescription: 'Free for 30 days',
+          features: {
+            forms: '10',
+            formRequests: '10,000',
+            submissionRequests: '10,000',
+            emails: '100',
+            features: 'Enterprise',
+            pdfs: 1,
+            pdfDownloads: 100,
+            pdfUpgradeable: false,
+          }
         },
         basic: {
           order: 1,
@@ -1266,7 +1276,17 @@ angular
           labelStyle: 'label-info',
           price: 0,
           priceDescription: '$0/month',
-          hide: true
+          hide: true,
+          features: {
+            forms: '10',
+            formRequests: '1,000',
+            submissionRequests: '1,000',
+            emails: '100',
+            features: 'Basic',
+            pdfs: 1,
+            pdfDownloads: 100,
+            pdfUpgradeable: false,
+          }
         },
         independent: {
           order: 2,
@@ -1275,7 +1295,17 @@ angular
           title: 'Independent',
           labelStyle: 'label-warning',
           price: 25,
-          priceDescription: '$25/month'
+          priceDescription: '$25/month',
+          features: {
+            forms: '50',
+            formRequests: '10,000',
+            submissionRequests: '10,000',
+            emails: '1000',
+            features: 'Independent',
+            pdfs: 1,
+            pdfDownloads: 100,
+            pdfUpgradeable: false,
+          }
         },
         team: {
           order: 3,
@@ -1284,7 +1314,17 @@ angular
           title: 'Team Pro',
           labelStyle: 'label-success',
           price: 100,
-          priceDescription: '$100/month'
+          priceDescription: '$100/month',
+          features: {
+            forms: '50',
+            formRequests: '250,000',
+            submissionRequests: '250,000',
+            emails: '1,000',
+            features: 'Team Pro',
+            pdfs: 1,
+            pdfDownloads: 100,
+            pdfUpgradeable: true,
+          }
         },
         commercial: {
           order: 4,
@@ -1293,7 +1333,17 @@ angular
           title: 'Enterprise',
           labelStyle: 'label-commercial',
           price: 250,
-          priceDescription: '$250/month'
+          priceDescription: '$250/month',
+          features: {
+            forms: 'Unlimited',
+            formRequests: 'Unlimited',
+            submissionRequests: '2,000,000',
+            emails: '10,000',
+            features: 'Enterprise',
+            pdfs: 25,
+            pdfDownloads: 1000,
+            pdfUpgradeable: true,
+          }
         }
       },
       getPlans: function() {

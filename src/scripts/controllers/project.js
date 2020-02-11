@@ -3498,11 +3498,6 @@ app.controller('ProjectBilling', [
   function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans, PDFServer) {
     $scope.primaryProjectPromise.then(function(project) {
 
-      $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
-        api: 0,
-        pdf: 0
-      };
-
       $scope.planLoading = false;
       $scope.pdfInfo = {};
 
@@ -3529,7 +3524,19 @@ app.controller('ProjectBilling', [
 
       // Default to the commercial from trial or to current plan.
       $scope.selectedPlan = $scope.getPlan(project.plan);
+      $scope.pdfs = (project.billing && project.billing.pdfs) ? project.billing.pdfs : $scope.selectedPlan.features.pdfs;
+      $scope.pdfDownloads = (project.billing && project.billing.pdfDownloads) ? project.billing.pdfDownloads : $scope.selectedPlan.features.pdfDownloads;
+      $scope.pdfPrice = calculatePdfPrice();
+      $scope.hasFormManager = !!(project.billing && project.billing.formManager);
     });
+
+    var calculatePdfPrice = function() {
+      if ($scope.selectedPlan.features.pdfs === $scope.pdfs) {
+        return 0;
+      }
+      const base = $scope.selectedPlan.features.pdfs === 1 ? 0 : $scope.selectedPlan.features.pdfs;
+      return ($scope.pdfs - base) * 2; // (total - base) / 25 * 50
+    };
 
     var getActiveForm = function() {
       if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
@@ -3546,30 +3553,29 @@ app.controller('ProjectBilling', [
       $scope.paymentInfo = null;
     };
     $scope.setSelectedPlan = function(plan) {
+      const pdfModified = $scope.selectedPlan.features.pdfs !== $scope.pdfs || $scope.selectedPlan.features.pdfDownloads !== $scope.pdfDownloads;
       $scope.selectedPlan = plan;
+      if (!pdfModified) {
+        $scope.pdfs = plan.features.pdfs;
+        $scope.pdfDownloads = plan.features.pdfDownloads;
+      }
+      // If not upgradeable, reset to default.
+      if (!plan.features.pdfUpgradeable) {
+        $scope.pdfs = plan.features.pdfs;
+        $scope.pdfDownloads = plan.features.pdfDownloads;
+      }
+      $scope.pdfPrice = calculatePdfPrice();
     };
 
     $scope.changePlan = function() {
       $scope.planLoading = true;
 
-      PDFServer.purchasePDF($scope.primaryProjectPromise, {
-        plan: $scope.pdfInfo.plan
-      }).then(function(results) {
-        $scope.pdfInfo = results.data.data;
-        $scope.pdfPlanLoading = false;
-        $scope.planLoading = false;
-      }, function(err) {
-        FormioAlerts.onError({message: err.data || err.message});
-        $scope.pdfPlanLoading = false;
-      }).catch(function(err) {
-        FormioAlerts.onError({message: err.data || err.message});
-        $scope.pdfPlanLoading = false;
-      });
-
       $http.post(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/upgrade',
         {
           plan: $scope.selectedPlan.name,
-          servers: $scope.servers
+          pdfs: $scope.pdfs,
+          pdfDownloads: $scope.pdfDownloads,
+          formManager: $scope.hasFormManager,
         }
         )
         .then(function() {
@@ -3580,10 +3586,6 @@ app.controller('ProjectBilling', [
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
-    $scope.setSelectedPlan = function(plan) {
-      $scope.selectedPlan = plan;
-    };
-
     $scope.capitalize = _.capitalize;
     $scope.plans = ProjectPlans.getPlans();
     $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
@@ -3591,19 +3593,8 @@ app.controller('ProjectBilling', [
 
     var calculatePrice = function() {
       if ($scope.selectedPlan) {
-        if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
-          $scope.servers = {
-            api: 0,
-            pdf: 0
-          };
-        }
-
         var pdfPrice = 0;
-        if (parseInt($scope.servers.pdf, 10) > 0) {
-          $scope.pdfInfo.plan = 'enterprise';
-          pdfPrice = ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500);
-        }
-        else if ($scope.pdfInfo.plan === 'hosted') {
+        if ($scope.pdfInfo.plan === 'hosted') {
           pdfPrice = 50;
         }
         else {
@@ -3612,33 +3603,46 @@ app.controller('ProjectBilling', [
 
         $scope.pricing = {
           plan: $scope.selectedPlan.price,
-          api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
-          pdf: {
-            plan: $scope.pdfInfo.plan,
-            servers: $scope.servers.pdf,
-            price: pdfPrice
-          }
+          pdfPrice: $scope.pdfPrice,
+          formManager: $scope.hasFormManager ? 150 : 0,
         };
-        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf.price;
+        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.pdfPrice + $scope.pricing.formManager;
       }
     };
 
-    $scope.setPDFHostedPlan = function(plan) {
-      $scope.servers.pdf = 0;
-      $scope.pdfInfo.plan = plan;
+    $scope.increasePdfs = function() {
+      if ($scope.pdfs === 1) {
+        $scope.pdfs = 25;
+        $scope.pdfDownloads = 1000;
+      }
+      else {
+        $scope.pdfs += 25;
+        $scope.pdfDownloads += 1000;
+      }
+      $scope.pdfPrice = calculatePdfPrice();
       calculatePrice();
     };
 
-    PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
-      if (!info) {
-        return console.warn('Cannot find project information.');
+    $scope.decreasePdfs = function() {
+      if ($scope.pdfs === 25) {
+        $scope.pdfs = 1;
+        $scope.pdfDownloads = 1000;
       }
-      $scope.pdfInfo = info.data;
-      $scope.pdfInfoOriginalPlan = $scope.pdfInfo.plan;
+      else {
+        $scope.pdfs -= 25;
+        $scope.pdfDownloads -= 1000;
+      }
+      $scope.pdfPrice = calculatePdfPrice();
       calculatePrice();
-    });
+    };
 
-    $scope.$watch('servers', calculatePrice, true);
+    $scope.toggleFormManager = function() {
+      $scope.hasFormManager = !$scope.hasFormManager;
+      calculatePrice();
+    };
+
+    calculatePrice();
+
     $scope.$watch('selectedPlan', calculatePrice, true);
   }
 ]);
