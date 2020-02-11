@@ -911,6 +911,7 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function(form) {
       form = form || $scope.definition.schema || $scope.form;
+      form._vnote = $scope.form._vnote || '';
       form.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
       angular.element('.has-error').removeClass('has-error');
 
