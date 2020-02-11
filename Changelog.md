@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.56
+### Fixed
+ - Added copying version notes from scope
+ - Upgrade formio.js to 4.9.0-beta.4
+ - Upgrade form manager to 1.57.0
+ - Upgrade form view pro to 1.56.0
+
 ## 7.0.0-rc.55
 ### Added
  - Portal SSO flexibilities by adding ssoTeamsEnabled variable.
