@@ -69,7 +69,7 @@
         class="btn btn-success pull-right"
         ng-if="primaryProject.plan !== selectedPlan.name
          || pdfInfo.plan !== pdfInfoOriginalPlan"
-        ng-disabled="(selectedPlan.price !== 0 || pdfInfo.plan === 'hosted') && !paymentInfo"
+        ng-disabled="selectedPlan.price !== 0 && !paymentInfo"
         ng-click="changePlan()">
         <i ng-if="planLoading" class="fa fa-spinner fa-pulse"></i> Confirm Billing Change
     </button>
