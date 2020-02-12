@@ -1,3 +1,7 @@
+<div class="alert alert-info" ng-if="!belongs(user, team)">
+  <p><strong>IMPORTANT:</strong> You have been added to the team <strong>{{ team.data.name }}</strong>.</p>
+  <p>Do not accept this invitation unless you know the user who invited you and were expecting to be added to this team.</p>
+</div>
 <div class="row">
   <div class="col col-sm-3">
     <ul class="list-group">
@@ -26,16 +30,19 @@
           </div>
         </div>
       </li>
-      <li class="list-group-item" ng-show="!isAdmin" >
-        <span class="btn btn-danger btn-xs" ng-click="leaveTeam(team._id)">Leave</span>
+      <li class="list-group-item" ng-if="!belongs(user, team)" >
+        <span class="btn btn-success btn-xs btn-block" ng-click="accept()">Accept Invitation</span>
       </li>
-      <li class="list-group-item" ng-show="isAdmin" >
-        <a class="btn btn-danger btn-xs" ui-sref="team.delete()">Delete Team</a>
+      <li class="list-group-item" ng-if="belongs(user, team) && !isAdmin" >
+        <span class="btn btn-danger btn-xs btn-block" ng-click="leaveTeam(team._id)">Leave</span>
+      </li>
+      <li class="list-group-item" ng-if="belongs(user, team) && isAdmin" >
+        <a class="btn btn-danger btn-xs btn-block" ui-sref="team.delete()">Delete Team</a>
       </li>
     </ul>
   </div>
   <div class="col col-sm-9">
-    <div class="team-header">
+    <div class="team-header" ng-if="belongs(user, team)" style="margin-bottom: 10px;">
       <div class="col-xs-5 pull-right" ng-if="activeView === 'members' && isAdmin">
         <div class="input-group ">
           <span class="input-group-addon"><i class='fa fa-user' /></span>
@@ -52,12 +59,11 @@
         <span ng-click="switchView('projects')" ng-class="{ 'btn-primary': activeView === 'projects' }"  class="btn btn-default btn-sm">Projects</span>
       </div>
     </div>
-    <br />
     <div class="panel panel-default" ng-if="activeView === 'members'">
       <ul class="list-group">
         <li class="list-group-item" ng-if="team.data.admins.length" ng-repeat="member in team.data.admins">
           <div class="btn-group pull-right" ng-if="isAdmin && team.owner !== member._id">
-            <span class="dropdown">
+            <span class="dropdown" ng-if="belongs(user, team)">
               <span ng-if="authenticated" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" /></span>
               <ul class="dropdown-menu">
                 <li><a ng-click="changeRole(member, 'members')">Make team member</a></li>
@@ -66,11 +72,12 @@
             </span>
           </div>
           <div><strong>{{ member.data.name }}</strong></div>
-          <span class="label label-success">{{ team.owner === member._id ? 'OWNER' : 'TEAM ADMIN'}}</span>
+          <span class="label label-success" ng-if="team.data.name">{{ team.owner === member._id ? 'OWNER' : 'ADMIN' }}</span>
+          <span class="label label-warning" ng-if="invitationPending(member)">INVITATION PENDING</span>
         </li>
         <li class="list-group-item" ng-if="team.data.members.length" ng-repeat="member in team.data.members">
           <div class="btn-group pull-right" ng-if="isAdmin && team.owner !== member._id">
-            <span class="dropdown">
+            <span class="dropdown" ng-if="belongs(user, team)">
               <span ng-if="authenticated" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-cog" /></span>
               <ul class="dropdown-menu">
                 <li><a ng-click="changeRole(member, 'admins')">Make team admin</a></li>
@@ -79,7 +86,8 @@
             </span>
           </div>
           <div><strong>{{ member.data.name }}</strong></div>
-          <span class="label label-success">{{ team.owner === member._id ? 'OWNER' : 'TEAM MEMBER'}}</span>
+          <span class="label label-success" ng-if="team.data.name">{{ team.owner === member._id ? 'OWNER' : 'TEAM MEMBER' }}</span>
+          <span class="label label-warning" ng-if="team.data.name && invitationPending(member)">INVITATION PENDING</span>
         </li>
         <li class="list-group-item" ng-if="!team.data.members.length">
           No members in this team.
