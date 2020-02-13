@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Provide access to logs for any Team admin.
  - Added ssoTeamsEnabled variable and skipSsoAuth query param.
  - Added copying notes from scope
+ - Prevent rewriting user with paymentInfo submission and loding the latest paymentInfo submission
+ - Added ignoreCache options after adding new action
 
 ## 6.9.0
 ### Added
