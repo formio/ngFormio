@@ -53,7 +53,7 @@
     "font-awesome": "^4.7.0",
     "formio-tenant": "github:formio/formio-tenant#1.6.0",
     "formiojs": "^4.9.0-beta.4",
-    "formmanager": "github:formio/formmanager#v1.57.0",
+    "formmanager": "github:formio/formmanager#v1.58.0",
     "gulp": "^4.0.2",
     "gulp-s3": "^0.11.0",
     "html-dnd": "^1.2.1",
