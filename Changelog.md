@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.41.0
+### Changed
+ - Upgrade dependencies.
+ - Add local iframe src configuration for PDF building
+ - Add handler for validation errors for PDF's
+
 ## 2.40.0
 ### Fixed
  - Problem where the decimal would not show up on new iOS devices.
