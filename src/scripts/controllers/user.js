@@ -200,6 +200,7 @@ app.factory('UserInfo', [
         var formio = new Formio(AppConfig.paymentForm);
         return formio.loadSubmissions({params: {
           owner: $rootScope.user._id,
+          'data.transactionStatus': 'approved',
           sort: '-created'
         }})
         .then(function(submissions) {

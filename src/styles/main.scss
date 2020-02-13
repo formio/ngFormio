@@ -1013,11 +1013,12 @@ body {
 }
 
 footer {
+  margin: 0;
+  padding: 0;
   color: #f0f0f0;
   text-align: center;
   background-color: darken($brand-primary, 25%);
   display: table-row;
-  border-left: 85px solid darken($brand-primary, 25%);
   a {
     color: white;
   }
@@ -1032,7 +1033,6 @@ footer {
     padding: 50px 0;
   }
   .footer-banner {
-    position:absolute;
     z-index: 100;
     img {
       margin-top: -2.2em;
