@@ -141,9 +141,21 @@ module.exports = function() {
           $scope.submitForm(submission);
         });
 
+        $scope.$on('iframe-errors', function(event, errors) {
+          if (errors.length) {
+            $scope.formioAlerts = [{
+              type: 'danger',
+              message: 'Please fix the following errors before submitting.'
+            }];
+            $scope.$apply();
+          } else {
+            sendIframeMessage({name: 'getSubmission'});
+          }
+        });
+
         // Called from the submit on iframe.
         $scope.submitIFrameForm = function() {
-          sendIframeMessage({name: 'getSubmission'});
+          sendIframeMessage({name: 'getErrors'});
         };
 
         $scope.zoomIn = function() {
