@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.0.0-rc.57
 ### Added
  - Team invite support.
+ - Upgrade form manager to 1.58.0
 
 ## 7.0.0-rc.56
 ### Fixed
