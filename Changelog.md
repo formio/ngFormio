@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.9.0
+### Added
+ - Added team invites
+
+### Changed
+ - Upgrade ng-formio@2.41.0
+ - Upgrade ng-formio-builder@2.39.0
+ - Upgrade form manager to 1.57.0
+ - Upgrade tenant manager to 1.6.0
+ - Upgrade @progress/kendo-ui@2020.1.115, mocha@7.0.1
+
 ## 6.8.9
 ### Changed
  - Small tweak to how payment methods are loaded to only return approved methods.
