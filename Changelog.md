@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.57
+### Added
+ - Team invite support.
+
 ## 7.0.0-rc.56
 ### Fixed
  - Added copying version notes from scope
@@ -164,6 +168,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade formio.js@4.4.2
 
 ## 7.0.0-rc.26
+
+## 6.9.0
+### Added
+ - Added team invites
+
+### Changed
+ - Upgrade ng-formio@2.41.0
+ - Upgrade ng-formio-builder@2.39.0
+ - Upgrade form manager to 1.57.0
+ - Upgrade tenant manager to 1.6.0
+ - Upgrade @progress/kendo-ui@2020.1.115, mocha@7.0.1
+
+## 6.8.9
+### Changed
+ - Small tweak to how payment methods are loaded to only return approved methods.
+
+## 6.8.8
 ### Added
  - The Everyone role to the roles & permissions section.
 
@@ -358,9 +379,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - CKEditor configurations for TextArea components.
-<<<<<<< HEAD
-=======
-
+ 
 ## 6.6.0
 ### Added 
  - ActionItem log view added to portal.
@@ -370,7 +389,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed issues regarding the tenant manager with pagination and also introduced searching.
  - Form Manager and Form View pro to use latest renderer.
  - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
->>>>>>> 353deee51f5ea0271d5a44404023ad96f0afec22
 
 ## 6.5.1
 ### Fixed
