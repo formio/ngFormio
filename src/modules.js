@@ -28,6 +28,7 @@ import 'number-abbreviate';
 import 'angular-ui-ace';
 import 'ui-select';
 import 'angular-ckeditor/angular-ckeditor';
+import 'angular-moment';
 import 'formiojs';
 import 'formiojs/contrib';
 import 'ng-formio/lib/module';
