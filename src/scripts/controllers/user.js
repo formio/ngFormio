@@ -132,6 +132,9 @@ app.controller('ProfileController', [
       if (typeof submission === 'string' || submission.data === 'OK') {
         return;
       }
+      if (submission.owner !== submission._id && $rootScope.user) {
+        return;
+      }
       $rootScope.user = submission;
       Formio.setUser(submission); // Update the cached user in localstorage.
     });
@@ -190,13 +193,14 @@ app.factory('UserInfo', [
   ) {
     return {
       getPaymentInfo: function() {
-        if (!$rootScope.user) {
+        if (!$rootScope.authenticated) {
           return $q.reject('Must be logged in to get payment info.');
         }
 
         var formio = new Formio(AppConfig.paymentForm);
         return formio.loadSubmissions({params: {
-          owner: $rootScope.user._id
+          owner: $rootScope.user._id,
+          sort: '-created'
         }})
         .then(function(submissions) {
           if(!submissions || !submissions.length) {
