@@ -28,6 +28,7 @@ angular
     'ngFileUpload',
     'ui.select',
     'ckeditor',
+    'angularMoment',
     'formioApp.controllers',
     'formioApp.utils',
     'kendo.directives',
@@ -449,12 +450,12 @@ angular
         .state('project.access', {
           url: '/access',
           templateUrl: 'views/project/access/index.html',
-            controller: 'AccessController'
+          controller: 'AccessController'
         })
         .state('project.actions', {
           url: '/actions',
           templateUrl: 'views/project/actions/index.html',
-            controller: 'ActionsController'
+          controller: 'ActionsController'
         })
         .state('project.roles', {
           abstract: true,
