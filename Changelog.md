@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.9.2
+### Changed
+ - Upgrade form manager to 1.59.0
+ - Upgrade form view pro to 1.57.0
+
 ## 6.9.1
 ### Changed
  - Upgrade form manager to 1.58.0
