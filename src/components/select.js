@@ -22,7 +22,7 @@ module.exports = function(app) {
         link: function(scope, element) {
           if (scope.options && scope.options.building) return;
           if (scope.template) {
-            if (scope.item) {
+            if (scope.item && scope.item.label) {
               scope.item.label = $filter('formioTranslate')(scope.item.label);
             }
             element.append($compile(angular.element(scope.template))(scope));

@@ -106,7 +106,7 @@ module.exports = [
         });
 
         $scope.$watch('form.settings.pdf', function() {
-          if (!$scope.form.settings.pdf) {
+          if (!$scope.form || !$scope.form.settings || !$scope.form.settings.pdf) {
             return '';
           }
 
