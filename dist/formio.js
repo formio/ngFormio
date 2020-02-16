@@ -1,4 +1,4 @@
-/*! ng-formio v2.41.0 | https://unpkg.com/ng-formio@2.41.0/LICENSE.txt */
+/*! ng-formio v2.42.0 | https://unpkg.com/ng-formio@2.42.0/LICENSE.txt */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.formio = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(_dereq_,module,exports){
 exports.defaults = {};
 
@@ -45809,7 +45809,7 @@ module.exports = function(app) {
         link: function(scope, element) {
           if (scope.options && scope.options.building) return;
           if (scope.template) {
-            if (scope.item) {
+            if (scope.item && scope.item.label) {
               scope.item.label = $filter('formioTranslate')(scope.item.label);
             }
             element.append($compile(angular.element(scope.template))(scope));
@@ -49614,7 +49614,7 @@ module.exports = [
         });
 
         $scope.$watch('form.settings.pdf', function() {
-          if (!$scope.form.settings.pdf) {
+          if (!$scope.form || !$scope.form.settings || !$scope.form.settings.pdf) {
             return '';
           }
 
