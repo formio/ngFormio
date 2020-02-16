@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.9.3
+### Fixed
+ - Credit card processing form to show the Month and Year in dropdowns.
+ - Crash in the pdf display functions.
+
 ## 6.9.2
 ### Changed
  - Upgrade form manager to 1.59.0
