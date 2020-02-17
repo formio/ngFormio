@@ -284,7 +284,8 @@ angular
         .state('project.env.settings.customjscss', {
           url: '/settings/customjscss',
           parent: 'project.env',
-          templateUrl: 'views/project/env/settings/customjscss/index.html'
+          templateUrl: 'views/project/env/settings/customjscss/index.html',
+          controller: 'ProjectSettingsScriptController'
         })
         .state('project.env.settings.cors', {
           url: '/settings/cors',
