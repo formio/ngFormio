@@ -1358,7 +1358,8 @@ app.controller('FormEditController', [
           });
 
           // Reload page.
-          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id}, {reload: true});
+          $state.go('project.' + $scope.formInfo.type + '.form.edit', {formId: $scope.form._id});
+          window.location.reload();
         })
         .catch(function(err) {
           if (err) {
