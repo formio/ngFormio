@@ -2,7 +2,7 @@
 import jsonpatch from 'fast-json-patch';
 import DOMPurify from 'dompurify';
 import moment from 'moment';
-import { Utils } from 'formiojs';
+import { Utils } from 'ng-formio/lib/modules';
 
 /* global _: false, document: false, Promise: false, jsonpatch: false, DOMPurify: false */
 var app = angular.module('formioApp.controllers.form', [
