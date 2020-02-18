@@ -176,6 +176,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.0.0-rc.26
 
+## 6.9.3
+### Fixed
+ - Credit card processing form to show the Month and Year in dropdowns.
+ - Crash in the pdf display functions.
+
+## 6.9.2
+### Changed
+ - Upgrade form manager to 1.59.0
+ - Upgrade form view pro to 1.57.0
+
+## 6.9.1
+### Changed
+ - Upgrade form manager to 1.58.0
+ - Provide access to logs for any Team admin.
+ - Added ssoTeamsEnabled variable and skipSsoAuth query param.
+ - Added copying notes from scope
+ - Prevent rewriting user with paymentInfo submission and loding the latest paymentInfo submission
+ - Added ignoreCache options after adding new action
+
 ## 6.9.0
 ### Added
  - Added team invites

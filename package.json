@@ -71,7 +71,7 @@
     "node-sass": "^4.13.1",
     "number-abbreviate": "^2.0.0",
     "protractor": "^5.4.3",
-    "protractor-helpers": "^1.1.762",
+    "protractor-helpers": "^1.1.763",
     "raw-loader": "^1.0.0",
     "request": "^2.88.2",
     "require-dir": "^1.0.0",

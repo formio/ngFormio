@@ -3514,6 +3514,7 @@ app.controller('ProjectExportController', [
     ];
 
     $scope.includeAll = true;
+    $scope.excludeAccess = true;
 
     $scope.toggleItem = function(section, key, item) {
       $scope.doToggle(section, key, item, $scope.export[section.key].hasOwnProperty(key));
@@ -3552,6 +3553,32 @@ app.controller('ProjectExportController', [
       section.toggle = 'removed';
     };
 
+    const excludeAccessProperties = (template) => {
+      if (!$scope.excludeAccess) {
+        return template;
+      }
+
+      template = _.cloneDeep(template);
+
+      var {access, ...template} = template;
+
+      Object.keys(template.forms)
+        .forEach((key) => {
+          var {access, submissionAccess, ...form} = template.forms[key];
+          template.forms[key] = form;
+        });
+
+      Object.keys(template.resources)
+        .forEach((key) => {
+          var {access, submissionAccess, ...resource} = template.resources[key];
+          template.resources[key] = resource;
+        });
+
+      template.excludeAccess = true;
+
+      return template;
+    }
+
     $scope.downloadTemplate = function() {
       if (!$scope.export.name) {
         return FormioAlerts.addAlert({
@@ -3571,7 +3598,7 @@ app.controller('ProjectExportController', [
       if ($scope.includeAll) {
         var name = $scope.export.name;
         var title = $scope.export.title;
-        $scope.export = $scope.template;
+        $scope.export = excludeAccessProperties($scope.template);
         $scope.export.name = name;
         $scope.export.title = title;
       }
