@@ -541,75 +541,75 @@ app.controller('ProjectController', [
 
         PrimaryProject.set(primaryProject, $scope);
         $scope.highestRoleLoaded.then(function() {
-          // If they already have a high role, skip this.
-          if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
-            $scope.projectViewReady = true;
-            return;
-          }
-
-          // If any stage roles exist, override the project role.
-          return $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function (result) {
-            $scope.stageProjectTeams = result.data;
-            $scope.projectTeamsLoading = false;
-
-            // Calculate the users highest role within the project.
-            $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
-              var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
-              var teams = _($scope.userTeams ? $scope.userTeams : [])
-                .map('_id')
-                .filter()
-                .value();
-              var allRoles = _(roles.concat(teams)).filter().value();
-
-              /**
-               * Determine if the user contains a role of the given type.
-               *
-               * @param {String} type
-               *   The type of role to search for.
-               * @returns {boolean}
-               *   If the current user has the role or not.
-               */
-              var hasRoles = function (type) {
-                if ($scope.stageProjectTeams) {
-                  var potential = _($scope.stageProjectTeams)
-                    .filter({permission: type})
-                    .map('_id')
-                    .value();
-                  return (_.intersection(allRoles, potential).length > 0);
-                }
-              };
-
-              if (hasRoles('stage_write')) {
-                $scope.highestRole = 'team_write';
-              }
-              else if (hasRoles('stage_read')) {
-                $scope.highestRole = 'team_read';
-              }
-
-              // Reassign permissions.
-              $scope.projectPermissions.admin = false;
-              $scope.projectPermissions.write = false;
-              $scope.projectPermissions.read = false;
-
-              // Permissions are fallthrough so allow to pass.
-              switch ($scope.highestRole) {
-                case 'owner':
-                  /* falls through */
-                case 'team_admin':
-                  $scope.projectPermissions.admin = true;
-                  /* falls through */
-                case 'team_write':
-                  $scope.projectPermissions.write = true;
-                  /* falls through */
-                case 'team_read':
-                  $scope.projectPermissions.read = true;
-                  /* falls through */
-              }
-
+            // If they already have a high role, skip this.
+            if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
               $scope.projectViewReady = true;
-            });
-          });
-        });
+              return;
+            }
+
+            // If any stage roles exist, override the project role.
+            return $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function (result) {
+                $scope.stageProjectTeams = result.data;
+                $scope.projectTeamsLoading = false;
+
+                // Calculate the users highest role within the project.
+                $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
+                  var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+                  var teams = _($scope.userTeams ? $scope.userTeams : [])
+                    .map('_id')
+                    .filter()
+                    .value();
+                  var allRoles = _(roles.concat(teams)).filter().value();
+
+                  /**
+                   * Determine if the user contains a role of the given type.
+                   *
+                   * @param {String} type
+                   *   The type of role to search for.
+                   * @returns {boolean}
+                   *   If the current user has the role or not.
+                   */
+                  var hasRoles = function (type) {
+                    if ($scope.stageProjectTeams) {
+                      var potential = _($scope.stageProjectTeams)
+                        .filter({permission: type})
+                        .map('_id')
+                        .value();
+                      return (_.intersection(allRoles, potential).length > 0);
+                    }
+                  };
+
+                  if (hasRoles('stage_write')) {
+                    $scope.highestRole = 'team_write';
+                  }
+                  else if (hasRoles('stage_read')) {
+                    $scope.highestRole = 'team_read';
+                  }
+
+                  // Reassign permissions.
+                  $scope.projectPermissions.admin = false;
+                  $scope.projectPermissions.write = false;
+                  $scope.projectPermissions.read = false;
+
+                  // Permissions are fallthrough so allow to pass.
+                  switch ($scope.highestRole) {
+                    case 'owner':
+                      /* falls through */
+                    case 'team_admin':
+                      $scope.projectPermissions.admin = true;
+                      /* falls through */
+                    case 'team_write':
+                      $scope.projectPermissions.write = true;
+                      /* falls through */
+                    case 'team_read':
+                      $scope.projectPermissions.read = true;
+                      /* falls through */
+                  }
+
+                  $scope.projectViewReady = true;
+                }).catch(() => ($scope.projectViewReady = true));
+            }).catch(() => ($scope.projectViewReady = true));
+        }).catch(() => ($scope.projectViewReady = true));
       });
 
       $scope.projectSettingsVisible = function() {
