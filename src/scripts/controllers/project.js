@@ -632,12 +632,30 @@ app.controller('ProjectController', [
     });
 
     $scope.loadProjectPromise.then(function() {
-      if (!$scope.currentProject.settings || !$scope.currentProject.settings.custom) {
+      if (!$scope.currentProject.public) {
+        return;
+      }
+
+      // See if they have a module available.
+      if ($scope.currentProject.public.formModule) {
+        let formModule = null;
+        try {
+          eval(`formModule = ${$scope.currentProject.public.formModule}`);
+        }
+        catch (err) {
+          console.warn(err);
+        }
+        if (formModule) {
+          Formio.use(formModule);
+        }
+      }
+
+      if (!$scope.currentProject.public.custom) {
         return;
       }
 
       var allowedFiles, allow, element;
-      var custom = $scope.currentProject.settings.custom;
+      var custom = $scope.currentProject.public.custom;
 
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
@@ -2426,6 +2444,40 @@ app.controller('ProjectSettingsController', [
         });
       });
     };
+  }
+]);
+
+app.controller('ProjectSettingsScriptController', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  function(
+    $scope,
+    $rootScope,
+    $state
+  ) {
+    $scope.scriptSub = {data: {script: ''}};
+    $scope.scriptForm = {
+      components: [
+        {
+          type: 'textarea',
+          label: 'Form Module',
+          hideLabel: true,
+          editor: 'ace',
+          key: 'module',
+          rows: 5,
+          input: true,
+          tableView: false
+        }
+      ]
+    };
+
+    $scope.loadProjectPromise.then(() => {
+      $scope.scriptSub.data.module = _.get($scope.currentProject, 'settings.formModule');
+      $scope.$watch('scriptSub.data.module', (script) => {
+        _.set($scope.currentProject, 'settings.formModule', script);
+      });
+    });
   }
 ]);
 
