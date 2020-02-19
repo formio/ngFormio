@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.60
+### Changed
+ - Upgrade formio.js@4.9.0-beta.8
+ - Upgrade formmanager@1.63.0
+ - Upgrade formviewpro@1.60.0
+ 
+### Fixed
+ - Issue where Save Submission would not find the resourcefields component.
+ - Issue where the KickBox information would not show up.
+ - Problems where different components would import Formio from different locations.
+ - Made Edit/Access/Actions tabs disabled if the project is protected
+
 ## 7.0.0-rc.58
 ### Changed
  - Upgrade formmanager@1.59.0
