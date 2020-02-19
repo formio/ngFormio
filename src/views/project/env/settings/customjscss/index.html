@@ -29,7 +29,7 @@
   }
 }</pre>
     <p>This code could now be used within Custom Validation using the following.</p>
-    <pre>valid = (input === validatePhone(input)) ? true : 'Phone number is invalid';</pre>
+    <pre>valid = validatePhone(input) ? true : 'Phone number is invalid';</pre>
     <h3>Custom Form Builder Example</h3>
     <p>This feature can also be used to inject a custom Form Builder by either creating "Pre-defined" components or Custom Components. The following code will inject a new form builder section called "Pre-Defined Components" and allow the form builders to drag and drop these fields into the forms.</p>
     <pre>{

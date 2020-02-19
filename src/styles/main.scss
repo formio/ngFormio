@@ -2213,6 +2213,13 @@ formio-header-wrapper>formio-header.fixed.absolute {
   position: absolute;
 }
 
+.builder-sidebar {
+  &_scroll {
+    position: sticky;
+    top: 55px !important;
+  }
+}
+
 //#navbar {
 //  position: relative !important;
 //}
