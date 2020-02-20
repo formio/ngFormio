@@ -180,6 +180,14 @@ app.controller('TeamViewController', [
 
       if(!id) return $state.go('home', null, {reload: true});
 
+      if (!$rootScope.user.metadata) {
+        $rootScope.user.metadata = {};
+      }
+      if (!$rootScope.user.metadata.teams) {
+        $rootScope.user.metadata.teams = [];
+      }
+      _.remove($rootScope.user.metadata.teams, (team) => (team === id));
+      Formio.setUser($rootScope.user);
       Formio.request(AppConfig.apiBase + '/team/' + id + '/leave', 'POST')
         .then(function() {
           FormioAlerts.addAlert({
