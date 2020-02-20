@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.62
+### Fixed
+ - Issue where the user cache would not reset when leaving a team.
+
+## 7.0.0-rc.61
+### Changed 
+ - Upgrade formio.js@4.9.0-rc.1
+ - Upgrade formmanager@1.64.0
+ - Upgrade formviewpro@1.60.0
+
 ## 7.0.0-rc.60
 ### Changed
  - Upgrade formio.js@4.9.0-beta.8
