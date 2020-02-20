@@ -33,6 +33,9 @@
       <li class="list-group-item" ng-if="!belongs(user, team)" >
         <span class="btn btn-success btn-xs btn-block" ng-click="accept()">Accept Invitation</span>
       </li>
+      <li class="list-group-item" ng-if="!belongs(user, team) && !isAdmin" >
+        <span class="btn btn-danger btn-xs btn-block" ng-click="leaveTeam(team._id)">Reject Invitation</span>
+      </li>
       <li class="list-group-item" ng-if="belongs(user, team) && !isAdmin" >
         <span class="btn btn-danger btn-xs btn-block" ng-click="leaveTeam(team._id)">Leave</span>
       </li>
