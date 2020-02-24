@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.64
+### Fixed
+ - Issues where a bad state could occur if "access" is granted to primary project, and "read" is granted to stage.
+ 
+### Changed
+ - Upgrade ng-formio@4.9.7
+ - Upgrade formiojs@4.9.0-rc.2
+
 ## 7.0.0-rc.63
 ### Fixed
  - Issues with Form Manager not loading projects.
