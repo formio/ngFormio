@@ -338,13 +338,12 @@ app.controller('ProjectController', [
     $scope.loadRoles = function() {
       return $scope.loadProjectPromise.then(function() {
         return $scope.highestRoleLoaded.then(function() {
-          if ($scope.projectPermissions.read) {
+          if ($scope.projectPermissions.access) {
             return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
               $scope.currentProjectRoles = result.data;
               // Add Everyone role.
               $scope.currentProjectRoles.push(EVERYONE_ROLE);
               $scope.rolesLoading = false;
-
               return $scope.currentProjectRoles;
             });
           }
@@ -590,6 +589,7 @@ app.controller('ProjectController', [
                   $scope.projectPermissions.admin = false;
                   $scope.projectPermissions.write = false;
                   $scope.projectPermissions.read = false;
+                  $scope.projectPermissions.access = false;
 
                   // Permissions are fallthrough so allow to pass.
                   switch ($scope.highestRole) {
@@ -603,6 +603,9 @@ app.controller('ProjectController', [
                       /* falls through */
                     case 'team_read':
                       $scope.projectPermissions.read = true;
+                      /* falls through */
+                    case 'team_access':
+                      $scope.projectPermissions.access = true;
                       /* falls through */
                   }
 

@@ -88,6 +88,7 @@ app.factory('PrimaryProject', [
 
 
               scope.projectPermissions = {
+                access: false,
                 read: false,
                 write: false,
                 admin: false
@@ -97,21 +98,29 @@ app.factory('PrimaryProject', [
                 scope.projectPermissions.admin = true;
                 scope.projectPermissions.write = true;
                 scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
               }
               else if (hasRoles('team_admin')) {
                 highestRole = 'team_admin';
                 scope.projectPermissions.admin = true;
                 scope.projectPermissions.write = true;
                 scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
               }
               else if (hasRoles('team_write')) {
                 highestRole = 'team_write';
                 scope.projectPermissions.write = true;
                 scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
               }
               else if (hasRoles('team_read')) {
                 highestRole = 'team_read';
                 scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
+              }
+              else if (hasRoles('team_access')) {
+                highestRole = 'team_access';
+                scope.projectPermissions.access = true;
               }
               else {
                 highestRole = 'anonymous';
