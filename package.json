@@ -5,12 +5,12 @@
     "run": "webpack-dev-server --port 3001 --content-base dist/",
     "start": "node app",
     "manager": "rm -rf dist/manager && mkdir dist/manager && cp -av ./node_modules/formmanager/dist/. dist/manager",
-    "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" webpack -p",
+    "build": "NODE_OPTIONS=\"--max-old-space-size=4096\" webpack",
     "build:dev": "webpack && npm run manager",
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.0-rc.64",
+  "version": "7.0.0-debug.64",
   "dependencies": {
     "@babel/core": "^7.8.4",
     "@babel/preset-env": "^7.8.4",
