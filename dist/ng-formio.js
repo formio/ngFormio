@@ -401,7 +401,8 @@ var _default = app.directive('formio', function () {
         }
       });
       $scope.$watch('submission', function (submission) {
-        if (!submission) {
+        if (!submission || $scope.nowatch) {
+          $scope.nowatch = false;
           return;
         }
 
@@ -410,6 +411,7 @@ var _default = app.directive('formio', function () {
         });
       }, true);
       $scope.$on('componentChange', function () {
+        $scope.nowatch = true;
         $scope.$apply();
       }); // Clean up the Form from DOM.
 
