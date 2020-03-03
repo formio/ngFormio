@@ -641,7 +641,8 @@ app.controller('FormController', [
       building: true,
       sideBarScrollOffset: 60,
       bootstrap: 3,
-      builder: {}
+      builder: {},
+      resourceTag: false
     };
 
     // The url to goto for embedding.

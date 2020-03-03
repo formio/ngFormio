@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.65
+### Fixed
+ - Issue with Existing resources not showing up.
+ - Problems with Text Area's removing ending spaces.
+
 ## 7.0.0-rc.64
 ### Fixed
  - Issues where a bad state could occur if "access" is granted to primary project, and "read" is granted to stage.
