@@ -170,13 +170,15 @@ export default app.directive('formio', function() {
         });
 
         $scope.$watch('submission', submission => {
-          if (!submission) {
+          if (!submission || $scope.nowatch) {
+            $scope.nowatch = false;
             return;
           }
           $scope.onFormio.then(() => ($scope.formio.submission = submission));
         }, true);
 
         $scope.$on('componentChange', function () {
+          $scope.nowatch = true;
           $scope.$apply();
         });
 
