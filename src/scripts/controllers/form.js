@@ -910,8 +910,9 @@ app.controller('FormController', [
 
     // Save a form.
     $scope.saveForm = function(form) {
-      form = form || $scope.definition.schema || $scope.form;
-      form._vnote = $scope.form._vnote || '';
+      form = form || $scope.form || $scope.definition.schema;
+      //Make sure that form will be saved with relevant components set
+      form = $scope.definition.schema ? { ...form, components: $scope.definition.schema.components} : form;
       form.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
       angular.element('.has-error').removeClass('has-error');
 
@@ -2625,7 +2626,7 @@ app.controller('FormPermissionController', [
     FormioAlerts
   ) {
     const saveForm = function() {
-      $scope.formio.saveForm(angular.copy($scope.definition.schema || $scope.form)).then(function(form) {
+      $scope.formio.saveForm(angular.copy($scope.form || $scope.definition.schema)).then(function(form) {
         $scope.$emit('updateFormPermissions', form);
         FormioAlerts.addAlert({
           type: 'success',
