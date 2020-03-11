@@ -41,6 +41,7 @@ module.exports = function() {
         $scope.formioAlerts = [];
         $scope.iframeReady = false;
         $scope.formName = $scope.name || 'formioForm';
+        $scope.validationErrorPresent = false;
         // Shows the given alerts (single or array), and dismisses old alerts
         this.showAlerts = $scope.showAlerts = function(alerts) {
           /* eslint-disable no-empty */
@@ -147,6 +148,7 @@ module.exports = function() {
               type: 'danger',
               message: 'Please fix the following errors before submitting.'
             }];
+            $scope.validationErrorPresent = true;
             $scope.$apply();
           } else {
             sendIframeMessage({name: 'getSubmission'});
