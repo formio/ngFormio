@@ -10,6 +10,11 @@
     <a ng-if="downloadUrl" style="position:absolute;right:10px;top:110px;cursor:pointer;" class="no-disable" href="{{ downloadUrl | trustAsResourceUrl }}" target="_blank"><img ng-src="{{ pdfImage }}" style="width:3em;" /></a>
     <iframe ng-src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
     <button ng-if="!readOnly && !options.building" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">Submit</button>
+    <div ng-if="validationErrorPresent" class="has-error">
+      <p class="help-block" onclick="scroll=window.scrollTo(0,0)">
+        Please correct all errors before submitting.
+      </p>
+    </div>
   </div>
   <form ng-if="!form.display || (form.display === 'form')" role="form" name="{{ formName }}" class="formio-form" ng-submit="onSubmit(formioForm)" novalidate>
     <div ng-repeat="alert in formioAlerts track by $index" class="alert alert-{{ alert.type }}" role="alert" ng-if="::!options.building">
