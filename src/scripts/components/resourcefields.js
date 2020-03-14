@@ -14,6 +14,11 @@ class ResourceFieldsComponent extends NestedDataComponent {
         dataSrc: 'url',
         lazyLoad: false,
         tooltip: 'Select the Resource to save submissions to.',
+        onChange(context) {
+          if (context.instance && context.instance.parent) {
+            context.instance.parent.addDynamicFields();
+          }
+        },
         data: {
           url: `${Formio.getProjectUrl()}/form?type=resource&limit=4294967295&select=_id,title`
         }
@@ -60,40 +65,45 @@ class ResourceFieldsComponent extends NestedDataComponent {
     super(component, options, data);
   }
 
+  addDynamicFields() {
+    if (!this.data.resource) {
+      return;
+    }
+    Formio.request(`${Formio.getProjectUrl()}/form/${this.data.resource}`).then((result) => {
+      const dynamicFields = this.getComponent('dynamic');
+      dynamicFields.destroyComponents();
+      const formFields = [];
+      FormioUtils.eachComponent(this.options.currentForm.components, (component) => {
+        if (component.type !== 'button') {
+          formFields.push({
+            value: component.key,
+            label: component.label
+          });
+        }
+      });
+
+      FormioUtils.eachComponent(result.components, (component) => {
+        if (component.type !== 'button') {
+          dynamicFields.addComponent({
+            type: 'select',
+            input: true,
+            label: component.label,
+            key: `fields.${component.key}`,
+            dataSrc: 'values',
+            data: {values: formFields},
+            validate: {
+              required: component.validate ? (component.validate.required) : false
+            }
+          }, this.data);
+        }
+      });
+      dynamicFields.redraw();
+    });
+  }
+
   setValue(value, flags) {
     const changed = super.setValue(value, flags);
-    if (value.resource) {
-      Formio.request(`${Formio.getProjectUrl()}/form/${value.resource}`).then((result) => {
-        const dynamicFields = this.getComponent('dynamic');
-        dynamicFields.destroyComponents();
-        const formFields = [];
-        FormioUtils.eachComponent(this.options.currentForm.components, (component) => {
-          if (component.type !== 'button') {
-            formFields.push({
-              value: component.key,
-              label: component.label
-            });
-          }
-        });
-
-        FormioUtils.eachComponent(result.components, (component) => {
-          if (component.type !== 'button') {
-            dynamicFields.addComponent({
-              type: 'select',
-              input: true,
-              label: component.label,
-              key: `fields.${component.key}`,
-              dataSrc: 'values',
-              data: {values: formFields},
-              validate: {
-                required: component.validate ? (component.validate.required) : false
-              }
-            }, this.data);
-          }
-        });
-        dynamicFields.redraw();
-      });
-    }
+    this.addDynamicFields();
     return changed;
   }
 }
