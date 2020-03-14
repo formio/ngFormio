@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.70
+### Changed
+ - Upgrade formio.js to 4.9.0-rc.10
+
+### Fixed
+ - Problems with Save Submission action not able to select resource fields.
+
 ## 7.0.0-rc.65
 ### Fixed
  - Issue with Existing resources not showing up.
