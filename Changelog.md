@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.44.0
+### Changed
+ - Changed the pdf to use local hosting.
+ - Show the errors of a pdf above the submit button.
+
 ## 2.43.0
 ### Changed
  - Reverted local iframe src configurations for PDF building until we have time to resolve issues described @ https://stackoverflow.com/questions/48604989/load-iframe-into-the-page-using-chrome-extension-content-script.
