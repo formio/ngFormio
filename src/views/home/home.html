@@ -132,7 +132,7 @@
         <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams | filter:filterTeam">
           <span class="badge"><i class="fa fa-users"></i>&nbsp;{{(team.data.members.length + team.data.admins.length) || 0 }}</span>
           <h4 class="list-group-item-heading">{{ team.data.name }}</h4>
-          <span ng-if="!belongs(user, team)" class="label label-success">INVITATION</span>
+          <span ng-if="!belongs(user, team)" class="label label-warning">INVITATION</span>
           <span ng-if="belongs(user, team)" class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
         </a>
       </div>
