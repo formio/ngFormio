@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.10.0
+### Changed
+ - How the $scope.submission is set internally in the formio renderer.
+
 ## 4.9.15
 ### Changed
  - Upgrade formio.js to 4.9.0-rc.10

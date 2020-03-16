@@ -292,7 +292,7 @@ var _default = app.directive('formio', function () {
 
       $scope.setupForm = function () {
         if ($scope.submission) {
-          $scope.formio.submission = $scope.submission;
+          $scope.formio.submission = angular.copy($scope.submission);
         }
 
         if ($scope.url) {
@@ -407,11 +407,12 @@ var _default = app.directive('formio', function () {
         }
 
         $scope.onFormio.then(function () {
-          return $scope.formio.submission = submission;
+          return $scope.formio.submission = angular.copy(submission);
         });
       }, true);
-      $scope.$on('componentChange', function () {
+      $scope.$on('change', function () {
         $scope.nowatch = true;
+        angular.merge($scope.submission, $scope.formio.submission);
         $scope.$apply();
       }); // Clean up the Form from DOM.
 
