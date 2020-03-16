@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.71
+### Changed
+ - Upgrade ng-formio@4.10.0 to resolve auto validation issues.
+
 ## 7.0.0-rc.70
 ### Changed
  - Upgrade formio.js to 4.9.0-rc.10
