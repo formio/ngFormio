@@ -19,17 +19,21 @@ app.controller('UserLoginController', [
   '$state',
   '$rootScope',
   'GoogleAnalytics',
+  'AppConfig',
   function(
     $scope,
     $state,
     $rootScope,
-    GoogleAnalytics
+    GoogleAnalytics,
+    AppConfig
   ) {
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
       if (!submission) { return; }
       $rootScope.user = submission;
-      GoogleAnalytics.sendEvent('User', 'login', null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('User', 'login', null, 1);
+      }
       $state.go('home');
     });
   }
@@ -41,28 +45,32 @@ app.controller('UserRegisterController', [
   '$rootScope',
   'GoogleAnalytics',
   '$window',
+  'AppConfig',
   function(
     $scope,
     $state,
     $rootScope,
     GoogleAnalytics,
-    $window
+    $window,
+    AppConfig
   ) {
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
       if (!submission) { return; }
       $rootScope.user = submission;
-      GoogleAnalytics.sendEvent('User', 'register', null, 1);
-      if ($window && $window.google_trackConversion) {
-        $window.google_trackConversion({
-          google_conversion_id : 874586484,
-          google_conversion_language : 'en',
-          google_conversion_format : '3',
-          google_conversion_color : 'ffffff',
-          google_conversion_label : 'J0hUCK3dtGoQ9MKEoQM',
-          google_conversion_value : 0,
-          google_remarketing_only : false
-        });
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('User', 'register', null, 1);
+        if ($window && $window.google_trackConversion) {
+          $window.google_trackConversion({
+            google_conversion_id : 874586484,
+            google_conversion_language : 'en',
+            google_conversion_format : '3',
+            google_conversion_color : 'ffffff',
+            google_conversion_label : 'J0hUCK3dtGoQ9MKEoQM',
+            google_conversion_value : 0,
+            google_remarketing_only : false
+          });
+        }
       }
       $state.go('home');
     });

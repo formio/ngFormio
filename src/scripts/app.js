@@ -525,15 +525,13 @@ angular
     'FormioAlerts',
     'GoogleAnalytics',
     'AppConfig',
-    '$rootScope',
     function(
       $http,
       $q,
       Formio,
       FormioAlerts,
       GoogleAnalytics,
-      AppConfig,
-      $rootScope
+      AppConfig
     ) {
       return {
         createProject: function(project) {
@@ -553,7 +551,9 @@ angular
               type: 'success',
               message: 'New Project created!'
             });
-            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            if (!AppConfig.onPremise) {
+              GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            }
             deferred.resolve(project);
           }, function(error) {
             if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
@@ -585,7 +585,9 @@ angular
               type: 'success',
               message: 'New Stage created!'
             });
-            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            if (!AppConfig.onPremise) {
+              GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            }
             deferred.resolve(project);
           }, function(error) {
             if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
@@ -1017,7 +1019,9 @@ angular
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
-        GoogleAnalytics.sendPageView();
+        if (!AppConfig.onPremise) {
+          GoogleAnalytics.sendPageView();
+        }
       });
 
       $rootScope.goToProject = function(project) {
