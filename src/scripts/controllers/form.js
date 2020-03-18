@@ -1962,6 +1962,9 @@ app.controller('FormActionEditController', [
     $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
       var method = $scope.actionUrl ? 'updated' : 'created';
+      if (method === 'updated') {
+        Formio.clearCache();
+      }
       FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
       $state.go('project.' + $scope.formInfo.type + '.form.action.index');
       var eventAction = $scope.actionUrl ? 'update' : 'create';
