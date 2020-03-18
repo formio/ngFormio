@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.45.0
+### Changed
+ - Reverted change to iframe src using blob.
+
 ## 2.44.0
 ### Changed
  - Changed the pdf to use local hosting.
