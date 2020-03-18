@@ -194,7 +194,9 @@ app.controller('TeamViewController', [
             type: 'success',
             message: 'Team membership updated.'
           });
-          GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+          if (!AppConfig.onPremise) {
+            GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+          }
 
           // Reload state so alerts display and project updates.
           $state.go('home', null, {reload: true});

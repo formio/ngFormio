@@ -396,7 +396,9 @@ app.controller('ProjectController', [
             message: 'Project settings saved.'
           });
           PrimaryProject.clear();
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          if (!AppConfig.onPremise) {
+            GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          }
           $scope.status.save = 'saved';
           return project;
         }, FormioAlerts.onError.bind(FormioAlerts))
@@ -2329,7 +2331,6 @@ app.controller('ProjectSettingsController', [
   '$scope',
   '$rootScope',
   '$state',
-  'GoogleAnalytics',
   'FormioAlerts',
   'ProjectFrameworks',
   '$http',
@@ -2338,7 +2339,6 @@ app.controller('ProjectSettingsController', [
     $scope,
     $rootScope,
     $state,
-    GoogleAnalytics,
     FormioAlerts,
     ProjectFrameworks,
     $http,
@@ -2729,15 +2729,13 @@ app.controller('ProjectTeamController', [
   'Formio',
   'FormioAlerts',
   'TeamPermissions',
-  'GoogleAnalytics',
   function(
     $scope,
     $http,
     AppConfig,
     Formio,
     FormioAlerts,
-    TeamPermissions,
-    GoogleAnalytics
+    TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
 
@@ -3021,15 +3019,13 @@ app.controller('StageTeamController', [
   'Formio',
   'FormioAlerts',
   'TeamPermissions',
-  'GoogleAnalytics',
   function(
     $scope,
     $http,
     AppConfig,
     Formio,
     FormioAlerts,
-    TeamPermissions,
-    GoogleAnalytics
+    TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
 
@@ -3261,6 +3257,7 @@ app.controller('ProjectDeleteController', [
   'PrimaryProject',
   'Formio',
   '$q',
+  'AppConfig',
   function(
     $scope,
     $state,
@@ -3268,7 +3265,8 @@ app.controller('ProjectDeleteController', [
     GoogleAnalytics,
     PrimaryProject,
     Formio,
-    $q
+    $q,
+    AppConfig
   ) {
     $scope.primaryProjectPromise.then(function(primaryProject) {
       var isProject = ($scope.currentProject._id === primaryProject._id);
@@ -3288,7 +3286,9 @@ app.controller('ProjectDeleteController', [
               message: type + ' was deleted!'
             });
             $scope.isBusy = false;
-            GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+            if (!AppConfig.onPremise) {
+              GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+            }
             PrimaryProject.clear();
             if (isProject) {
               $state.go('home');

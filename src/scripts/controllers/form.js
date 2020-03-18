@@ -929,7 +929,9 @@ app.controller('FormController', [
         $scope.form = $scope.originalForm = response.result;
         var headers = response.headers;
         var method = $stateParams.formId ? 'updated' : 'created';
-        GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+        if (!AppConfig.onPremise) {
+          GoogleAnalytics.sendEvent('Form', method.substring(0, method.length - 1), null, 1);
+        }
 
         if (headers.hasOwnProperty('x-form-merge')) {
           FormioAlerts.addAlert({
@@ -1016,7 +1018,8 @@ app.controller('FormViewController', [
   '$stateParams',
   'FormioAlerts',
   'GoogleAnalytics',
-  function($scope, $state, $stateParams, FormioAlerts, GoogleAnalytics) {
+  'AppConfig',
+  function($scope, $state, $stateParams, FormioAlerts, GoogleAnalytics, AppConfig) {
     $scope.formReady = false;
 
     $scope.submission = {data: {}};
@@ -1038,7 +1041,9 @@ app.controller('FormViewController', [
         type: 'success',
         message: 'New submission added!'
       });
-      GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('Submission', 'create', null, 1);
+      }
       if (submission._id) {
         $state.go('project.' + $scope.formInfo.type + '.form.submission.item.view', {formId: submission.form, subId: submission._id});
       }
@@ -1059,6 +1064,7 @@ app.controller('FormEditController', [
   'Formio',
   'FormioAlerts',
   'GoogleAnalytics',
+  'AppConfig',
   function(
     $scope,
     $stateParams,
@@ -1068,7 +1074,8 @@ app.controller('FormEditController', [
     $timeout,
     Formio,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    AppConfig
   ) {
     $scope.loadFormPromise.then(function() {
       $scope.form.builder = true;
@@ -1201,7 +1208,9 @@ app.controller('FormEditController', [
       // Copy to remove angular $$hashKey
       return Formio.makeStaticRequest($scope.formUrl + '/draft', 'PUT', angular.copy($scope.form), {base: $scope.baseUrl})
         .then(function(response) {
-          GoogleAnalytics.sendEvent('FormDraft', 'PUT'.substring(0, 'PUT'.length - 1), null, 1);
+          if (!AppConfig.onPremise) {
+            GoogleAnalytics.sendEvent('FormDraft', 'PUT'.substring(0, 'PUT'.length - 1), null, 1);
+          }
 
           FormioAlerts.addAlert({
             type: 'success',
@@ -1581,11 +1590,13 @@ app.controller('FormDeleteController', [
   '$state',
   'FormioAlerts',
   'GoogleAnalytics',
+  'AppConfig',
   function(
     $scope,
     $state,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    AppConfig
   ) {
     $scope.$on('delete', function(event) {
       event.stopPropagation();
@@ -1593,7 +1604,9 @@ app.controller('FormDeleteController', [
         type: 'success',
         message: _.capitalize($scope.form.type) + ' was deleted.'
       });
-      GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('Form', 'delete', null, 1);
+      }
       $scope.back('project.' + $scope.formInfo.type + 'Index');
     });
 
@@ -1765,6 +1778,7 @@ app.controller('FormActionEditController', [
   'GoogleAnalytics',
   '$timeout',
   'PDFServer',
+  'AppConfig',
   function(
     $scope,
     $stateParams,
@@ -1775,7 +1789,8 @@ app.controller('FormActionEditController', [
     FormioUtils,
     GoogleAnalytics,
     $timeout,
-    PDFServer
+    PDFServer,
+    AppConfig
   ) {
     // Invalidate cache so actions fetch fresh request for
     // component selection inputs.
@@ -1947,10 +1962,15 @@ app.controller('FormActionEditController', [
     $scope.$on('formSubmission', function(event) {
       event.stopPropagation();
       var method = $scope.actionUrl ? 'updated' : 'created';
+      if (method === 'updated') {
+        Formio.clearCache();
+      }
       FormioAlerts.addAlert({type: 'success', message: 'Action was ' + method + '.'});
       $state.go('project.' + $scope.formInfo.type + '.form.action.index');
       var eventAction = $scope.actionUrl ? 'update' : 'create';
-      GoogleAnalytics.sendEvent('Action', eventAction, null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('Action', eventAction, null, 1);
+      }
     });
   }
 ]);
@@ -1961,18 +1981,22 @@ app.controller('FormActionDeleteController', [
   '$state',
   'FormioAlerts',
   'GoogleAnalytics',
+  'AppConfig',
   function(
     $scope,
     $stateParams,
     $state,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    AppConfig
   ) {
     $scope.actionUrl = $scope.formio.formUrl + '/action/' + $stateParams.actionId;
     $scope.$on('delete', function(event) {
       event.stopPropagation();
       FormioAlerts.addAlert({type: 'success', message: 'Action was deleted.'});
-      GoogleAnalytics.sendEvent('Action', 'delete', null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('Action', 'delete', null, 1);
+      }
       $state.go('project.' + $scope.formInfo.type + '.form.action.index');
     });
     $scope.$on('cancel', function(event) {
@@ -1999,6 +2023,7 @@ app.controller('FormSubmissionsController', [
   'ngDialog',
   '$interpolate',
   'SubmissionExport',
+  'AppConfig',
   function(
     $scope,
     $state,
@@ -2014,7 +2039,8 @@ app.controller('FormSubmissionsController', [
     GoogleAnalytics,
     ngDialog,
     $interpolate,
-    SubmissionExport
+    SubmissionExport,
+    AppConfig
   ) {
     if ($stateParams._vid) {
       $scope._vid = $stateParams._vid;
@@ -2347,7 +2373,9 @@ app.controller('FormSubmissionsController', [
               destroy: function(options) {
                 $scope.recentlyDeletedPromises.push($http.delete($scope.formio.submissionsUrl + '/' + options.data._id)
                   .then(function(result) {
-                    GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                    if (!AppConfig.onPremise) {
+                      GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+                    }
                     options.success();
                   })
                   .catch(function(err) {
@@ -2567,11 +2595,13 @@ app.controller('FormSubmissionEditController', [
   '$state',
   'FormioAlerts',
   'GoogleAnalytics',
+  'AppConfig',
   function(
     $scope,
     $state,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    AppConfig
   ) {
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
@@ -2580,7 +2610,9 @@ app.controller('FormSubmissionEditController', [
         type: 'success',
         message: 'Submission was ' + message + '.'
       });
-      GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+      }
       $state.go('project.' + $scope.formInfo.type + '.form.submission.index', {formId: $scope.formId});
     });
   }
@@ -2591,11 +2623,13 @@ app.controller('FormSubmissionDeleteController', [
   '$state',
   'FormioAlerts',
   'GoogleAnalytics',
+  'AppConfig',
   function(
     $scope,
     $state,
     FormioAlerts,
-    GoogleAnalytics
+    GoogleAnalytics,
+    AppConfig
   ) {
     $scope.$on('delete', function(event) {
       event.stopPropagation();
@@ -2603,7 +2637,9 @@ app.controller('FormSubmissionDeleteController', [
         type: 'success',
         message: 'Submission was deleted.'
       });
-      GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+      if (!AppConfig.onPremise) {
+        GoogleAnalytics.sendEvent('Submission', 'delete', null, 1);
+      }
       $state.go('project.' + $scope.formInfo.type + '.form.submission.index');
     });
 
