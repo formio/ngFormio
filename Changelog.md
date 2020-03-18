@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.72
+### Changed
+ - Upgrade formiojs@4.9.0-rc.11
+ - Upgrade ng-formio@4.11.0
+ - Upgrade form manager 1.71.0
+ - Upgrade form view pro 1.69.0
+ - Removed all Google Analytics calls from hosted portals.
+ 
+### Fixed
+ - Issue where the action settings would not show as updated.
+
 ## 7.0.0-rc.71
 ### Changed
  - Upgrade ng-formio@4.10.0 to resolve auto validation issues.
