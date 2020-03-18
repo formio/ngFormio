@@ -2,12 +2,10 @@ module.exports = [
   'Formio',
   'formioComponents',
   '$timeout',
-  '$http',
   function(
     Formio,
     formioComponents,
-    $timeout,
-    $http
+    $timeout
   ) {
     return {
       onError: function($scope, $element) {
@@ -103,32 +101,6 @@ module.exports = [
           }
           $scope.setLoading(false);
           $scope.$emit('formLoad', $scope.form);
-        });
-
-        $scope.$watch('form.settings.pdf', function() {
-          if (!$scope.form.settings.pdf) {
-            return '';
-          }
-
-          var url = $scope.form.settings.pdf.src + '.html';
-
-          $http
-            .get(url, { responseType: 'blob' })
-            .then(function(response) {
-              var iframeSrc = URL.createObjectURL(response.data);
-              var params = [];
-              if ($scope.options && $scope.options.building) {
-                params.push('builder=1');
-              }
-              if ($scope.readOnly) {
-                params.push('readonly=1');
-              }
-              if (params.length) {
-                iframeSrc += '#' + params.join('&');
-              }
-
-              $scope.iframeSrc = iframeSrc;
-            });
         });
 
         $scope.updateSubmissions = function() {
