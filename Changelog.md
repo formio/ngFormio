@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.73
+### Changed
+ - Upgrade formiojs@4.9.0-rc.12
+ - Upgrade ng-formio@4.12.0
+ - Upgrade form view pro 1.70.0
+ - Upgrade form manager 1.72.0
+ - Upgrade mocha@7.1.1, protractor-helpers@1.1.794, webdriverio@5.22.1
+
 ## 7.0.0-rc.72
 ### Changed
  - Upgrade formiojs@4.9.0-rc.11
