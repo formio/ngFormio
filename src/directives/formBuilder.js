@@ -25,14 +25,11 @@ export default angular.module('formio').directive('formBuilder', function() {
           builderElement.innerHTML = '';
           builder = new Formio.FormBuilder(builderElement, $scope.form, $scope.options);
           builder.ready.then(() => {
-            builder.instance.on('addComponent', () => {
-              $scope.$emit('formChange', builder.instance.schema);
-            });
-            builder.instance.on('saveComponent', () => {
-              $scope.$emit('formChange', builder.instance.schema);
-            });
-            builder.instance.on('removeComponent', () => {
-              $scope.$emit('formChange', builder.instance.schema);
+            builder.instance.on('change', (event) => {
+              // Do not emit form change events if this is from submission data.
+              if (!event.data) {
+                $scope.$emit('formChange', builder.instance.schema);
+              }
             });
             builder.instance.onAny((event, ...args) => {
               $scope.$emit(event, ...args);

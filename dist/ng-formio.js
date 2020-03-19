@@ -138,14 +138,11 @@ var _default = angular.module('formio').directive('formBuilder', function () {
         builderElement.innerHTML = '';
         builder = new _formiojs.Formio.FormBuilder(builderElement, $scope.form, $scope.options);
         builder.ready.then(function () {
-          builder.instance.on('addComponent', function () {
-            $scope.$emit('formChange', builder.instance.schema);
-          });
-          builder.instance.on('saveComponent', function () {
-            $scope.$emit('formChange', builder.instance.schema);
-          });
-          builder.instance.on('removeComponent', function () {
-            $scope.$emit('formChange', builder.instance.schema);
+          builder.instance.on('change', function (event) {
+            // Do not emit form change events if this is from submission data.
+            if (!event.data) {
+              $scope.$emit('formChange', builder.instance.schema);
+            }
           });
           builder.instance.onAny(function (event) {
             for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
