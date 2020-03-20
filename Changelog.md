@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.76
+### Changed
+ - Upgrade formiojs@4.9.2
+ - Upgrade formmanager@1.74.0
+ - Upgrade pro.formview.io@1.72.0
+ - Upgrade ng-formio@4.13.0
+
 ## 7.0.0-rc.75
 ### Changed
  - Upgrade formiojs@4.9.1 - Introduced way for pdf to fetch iframe bounding rect.
