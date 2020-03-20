@@ -155,6 +155,17 @@ module.exports = function() {
           }
         });
 
+        $scope.$on('iframe-getIframePositions', () => {
+          const iframeBoundingClientRect = $element.find('.formio-iframe')[0].getBoundingClientRect();
+          sendIframeMessage({
+            name: 'iframePositions',
+            data: {
+              iframeBoundingClientRect,
+              scrollY: window.scrollY
+            }
+          });
+        });
+
         // Called from the submit on iframe.
         $scope.submitIFrameForm = function() {
           sendIframeMessage({name: 'getErrors'});
