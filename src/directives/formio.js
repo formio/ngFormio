@@ -155,12 +155,12 @@ module.exports = function() {
           }
         });
 
-        $scope.$on('iframe-getIframePositions', () => {
-          const iframeBoundingClientRect = $element.find('.formio-iframe')[0].getBoundingClientRect();
+        $scope.$on('iframe-getIframePositions', function() {
+          var iframeBoundingClientRect = $element.find('.formio-iframe')[0].getBoundingClientRect();
           sendIframeMessage({
             name: 'iframePositions',
             data: {
-              iframeBoundingClientRect,
+              iframeBoundingClientRect: iframeBoundingClientRect,
               scrollY: window.scrollY
             }
           });
