@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 2.45.1
+### Changed
+ - Added a way for pdf form to fetch the parent iframe dimensions.
+
 ## 2.45.0
 ### Changed
  - Reverted change to iframe src using blob.
