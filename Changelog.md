@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.74
+### Changed
+ - Upgrade formiojs@4.9.0
+ - Upgrade pro.formview.io@1.71.0
+ - Upgrade formmanager@1.70.0
+ - Upgrade ng-formio@4.13.0
+
 ## 7.0.0-rc.73
 ### Changed
  - Upgrade formiojs@4.9.0-rc.12
