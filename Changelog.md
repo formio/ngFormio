@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.13.4
+### Changed
+ - Upgrade formio.js to 4.9.3
+ - Reverted "action url pass to directive".
+
 ## 4.13.3
 ### Changed
  - Upgrade formio.js to 4.9.2
