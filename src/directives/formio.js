@@ -10,7 +10,6 @@ export default app.directive('formio', function() {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
-      formAction: '=?',
       hideComponents: '=?',
       noSubmit: '=?',
       options: '<?'
@@ -56,11 +55,6 @@ export default app.directive('formio', function() {
             $scope.initialized = true;
             Formio.createForm($scope.element, $scope.src || $scope.form, _.cloneDeep($scope.options)).then(formio => {
               formio.nosubmit = $scope.noSubmit;
-              if ($scope.formAction) {
-                if (formio.form) {
-                  formio.form.action = Formio.getBaseUrl() + $scope.formAction;
-                }
-              }
               $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
               $scope.formio = formio;
               $scope.setupForm();
