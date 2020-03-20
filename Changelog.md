@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade formiojs@4.9.2
  - Upgrade formmanager@1.74.0
  - Upgrade pro.formview.io@1.72.0
- - Upgrade ng-formio@4.13.0
+ - Upgrade ng-formio@4.13.3
 
 ## 7.0.0-rc.75
 ### Changed
