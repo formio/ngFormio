@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.75
+### Changed
+ - Upgrade formiojs@4.9.1 - Introduced way for pdf to fetch iframe bounding rect.
+ - Upgrade ng-formio@4.13.1
+
 ## 7.0.0-rc.74
 ### Changed
  - Upgrade formiojs@4.9.0
