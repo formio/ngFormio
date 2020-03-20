@@ -236,6 +236,7 @@ var _default = app.directive('formio', function () {
       form: '=?',
       submission: '=?',
       readOnly: '=?',
+      formAction: '=?',
       hideComponents: '=?',
       noSubmit: '=?',
       options: '<?'
@@ -280,6 +281,13 @@ var _default = app.directive('formio', function () {
 
           _formiojs.Formio.createForm($scope.element, $scope.src || $scope.form, _.cloneDeep($scope.options)).then(function (formio) {
             formio.nosubmit = $scope.noSubmit;
+
+            if ($scope.formAction) {
+              if (formio.form) {
+                formio.form.action = _formiojs.Formio.getBaseUrl() + $scope.formAction;
+              }
+            }
+
             $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
             $scope.formio = formio;
             $scope.setupForm();
