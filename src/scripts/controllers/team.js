@@ -7,18 +7,21 @@ app.controller('TeamController', [
   '$stateParams',
   '$rootScope',
   'Formio',
+  'AppConfig',
   function(
     $scope,
     $stateParams,
     $rootScope,
-    Formio
+    Formio,
+    AppConfig
   ) {
     $scope.teamUrl = $rootScope.teamForm + '/submission/' + $stateParams.teamId;
     $scope.team = {};
     $scope.formio = new Formio($scope.teamUrl);
-    $scope.loadTeamPromise = $scope.formio.loadSubmission().then(function(team) {
-      $scope.team = team;
-    });
+    $scope.loadTeamPromise = Formio.request(AppConfig.apiBase + '/team/' + $stateParams.teamId, 'GET')
+      .then(function(team) {
+        $scope.team = team;
+      });
   }
 ]);
 
@@ -43,7 +46,7 @@ app.controller('TeamCreateController', [
     $scope.team.data.admins = [];
     const teamFormio = (new Formio($rootScope.teamForm));
     teamFormio.loadForm().then((form) => {
-      if ($rootScope.onPremise && AppConfig.sso) {
+      if ($rootScope.onPremise && AppConfig.ssoTeamsEnabled) {
         form.components.splice(form.components.length - 2, 0, {
           type: 'checkbox',
           label: 'SSO Team',
@@ -104,7 +107,8 @@ app.controller('TeamViewController', [
     TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
-    $scope.ssoPortal = $rootScope.onPremise && AppConfig.sso;
+    $scope.ssoTeamsEnabled = $rootScope.onPremise && AppConfig.ssoTeamsEnabled;
+    $scope.belongs = TeamPermissions.belongs.bind(TeamPermissions);
     $scope.activeView = 'members';
     $scope.switchView = function(view) {
       $scope.activeView = view;
@@ -128,19 +132,71 @@ app.controller('TeamViewController', [
       });
     });
 
+    $scope.invitationPending = function(member) {
+      if ($scope.team.owner.toString() === member._id.toString()) {
+        return false;
+      }
+      if (member._id.toString() === $scope.user._id.toString()) {
+        return !$scope.belongs($scope.user, $scope.team);
+      }
+      return !member.status || (member.status === 'pending');
+    };
+
+    $scope.memberString = function(member, memberString) {
+      if ($scope.team.owner === member._id) {
+        return 'OWNER';
+      }
+      if (member.status === 'accepted') {
+        return 'TEAM MEMBER';
+      }
+      else if (TeamPermissions.belongs(member, $scope.team)) {
+        return 'TEAM MEMBER';
+      }
+      return 'INVITED';
+    };
+
+    $scope.accept = function() {
+      if (!$rootScope.user.metadata) {
+        $rootScope.user.metadata = {};
+      }
+      if (!$rootScope.user.metadata.teams) {
+        $rootScope.user.metadata.teams = [];
+      }
+      $rootScope.user.metadata.teams.push($scope.team._id.toString());
+      Formio.setUser($rootScope.user);
+
+      // Save the user.
+      (new Formio(AppConfig.formioBase + '/user')).saveSubmission($rootScope.user).then(() => {
+        FormioAlerts.addAlert({
+          type: 'success',
+          message: 'Team membership updated.'
+        });
+      });
+    };
+
     $scope.leaveTeam = function(id) {
       // Always clear cache for the current teams.
       Formio.clearCache();
 
       if(!id) return $state.go('home', null, {reload: true});
 
+      if (!$rootScope.user.metadata) {
+        $rootScope.user.metadata = {};
+      }
+      if (!$rootScope.user.metadata.teams) {
+        $rootScope.user.metadata.teams = [];
+      }
+      _.remove($rootScope.user.metadata.teams, (team) => (team === id));
+      Formio.setUser($rootScope.user);
       Formio.request(AppConfig.apiBase + '/team/' + id + '/leave', 'POST')
         .then(function() {
           FormioAlerts.addAlert({
             type: 'success',
             message: 'Team membership updated.'
           });
-          GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+          if (!AppConfig.onPremise) {
+            GoogleAnalytics.sendEvent('Submission', 'update', null, 1);
+          }
 
           // Reload state so alerts display and project updates.
           $state.go('home', null, {reload: true});
@@ -170,17 +226,21 @@ app.controller('TeamViewController', [
     };
 
     $scope.saveTeam = function() {
-      $scope.formio.saveSubmission(angular.copy($scope.team)).then(function() {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: 'Team membership updated.'
+      Formio.request(AppConfig.apiBase + '/team/' + $stateParams.teamId, 'PUT', angular.copy($scope.team))
+        .then(function() {
+          Formio.clearCache();
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: 'Team membership updated.'
+          });
+        })
+        .catch(function(err) {
+          Formio.clearCache();
+          FormioAlerts.addAlert({
+            type: 'danger',
+            message: err.message
+          });
         });
-      }).catch(function(err) {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: err.message
-        });
-      });
     };
 
     $scope.changeRole = function(member, role) {

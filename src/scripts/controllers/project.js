@@ -323,13 +323,12 @@ app.controller('ProjectController', [
     $scope.loadRoles = function() {
       return $scope.loadProjectPromise.then(function() {
         return $scope.highestRoleLoaded.then(function() {
-          if ($scope.projectPermissions.read) {
+          if ($scope.projectPermissions.access) {
             return $http.get($scope.formio.projectUrl + '/role?limit=1000').then(function(result) {
               $scope.currentProjectRoles = result.data;
               // Add Everyone role.
               $scope.currentProjectRoles.push(EVERYONE_ROLE);
               $scope.rolesLoading = false;
-
               return $scope.currentProjectRoles;
             });
           }
@@ -382,7 +381,9 @@ app.controller('ProjectController', [
             message: 'Project settings saved.'
           });
           PrimaryProject.clear();
-          GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          if (!AppConfig.onPremise) {
+            GoogleAnalytics.sendEvent('Project', 'update', null, 1);
+          }
           $scope.status.save = 'saved';
           return project;
         }, FormioAlerts.onError.bind(FormioAlerts))
@@ -549,75 +550,79 @@ app.controller('ProjectController', [
 
         PrimaryProject.set(primaryProject, $scope);
         $scope.highestRoleLoaded.then(function() {
-          // If they already have a high role, skip this.
-          if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
-            $scope.projectViewReady = true;
-            return;
-          }
-
-          // If any stage roles exist, override the project role.
-          return $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function (result) {
-            $scope.stageProjectTeams = result.data;
-            $scope.projectTeamsLoading = false;
-
-            // Calculate the users highest role within the project.
-            $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
-              var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
-              var teams = _($scope.userTeams ? $scope.userTeams : [])
-                .map('_id')
-                .filter()
-                .value();
-              var allRoles = _(roles.concat(teams)).filter().value();
-
-              /**
-               * Determine if the user contains a role of the given type.
-               *
-               * @param {String} type
-               *   The type of role to search for.
-               * @returns {boolean}
-               *   If the current user has the role or not.
-               */
-              var hasRoles = function (type) {
-                if ($scope.stageProjectTeams) {
-                  var potential = _($scope.stageProjectTeams)
-                    .filter({permission: type})
-                    .map('_id')
-                    .value();
-                  return (_.intersection(allRoles, potential).length > 0);
-                }
-              };
-
-              if (hasRoles('stage_write')) {
-                $scope.highestRole = 'team_write';
-              }
-              else if (hasRoles('stage_read')) {
-                $scope.highestRole = 'team_read';
-              }
-
-              // Reassign permissions.
-              $scope.projectPermissions.admin = false;
-              $scope.projectPermissions.write = false;
-              $scope.projectPermissions.read = false;
-
-              // Permissions are fallthrough so allow to pass.
-              switch ($scope.highestRole) {
-                case 'owner':
-                  /* falls through */
-                case 'team_admin':
-                  $scope.projectPermissions.admin = true;
-                  /* falls through */
-                case 'team_write':
-                  $scope.projectPermissions.write = true;
-                  /* falls through */
-                case 'team_read':
-                  $scope.projectPermissions.read = true;
-                  /* falls through */
-              }
-
+            // If they already have a high role, skip this.
+            if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
               $scope.projectViewReady = true;
-            });
-          });
-        });
+              return;
+            }
+
+            // If any stage roles exist, override the project role.
+            return $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function (result) {
+                $scope.stageProjectTeams = result.data;
+                $scope.projectTeamsLoading = false;
+
+                // Calculate the users highest role within the project.
+                $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
+                  var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+                  var teams = _($scope.userTeams ? $scope.userTeams : [])
+                    .map('_id')
+                    .filter()
+                    .value();
+                  var allRoles = _(roles.concat(teams)).filter().value();
+
+                  /**
+                   * Determine if the user contains a role of the given type.
+                   *
+                   * @param {String} type
+                   *   The type of role to search for.
+                   * @returns {boolean}
+                   *   If the current user has the role or not.
+                   */
+                  var hasRoles = function (type) {
+                    if ($scope.stageProjectTeams) {
+                      var potential = _($scope.stageProjectTeams)
+                        .filter({permission: type})
+                        .map('_id')
+                        .value();
+                      return (_.intersection(allRoles, potential).length > 0);
+                    }
+                  };
+
+                  if (hasRoles('stage_write')) {
+                    $scope.highestRole = 'team_write';
+                  }
+                  else if (hasRoles('stage_read')) {
+                    $scope.highestRole = 'team_read';
+                  }
+
+                  // Reassign permissions.
+                  $scope.projectPermissions.admin = false;
+                  $scope.projectPermissions.write = false;
+                  $scope.projectPermissions.read = false;
+                  $scope.projectPermissions.access = false;
+
+                  // Permissions are fallthrough so allow to pass.
+                  switch ($scope.highestRole) {
+                    case 'owner':
+                      /* falls through */
+                    case 'team_admin':
+                      $scope.projectPermissions.admin = true;
+                      /* falls through */
+                    case 'team_write':
+                      $scope.projectPermissions.write = true;
+                      /* falls through */
+                    case 'team_read':
+                      $scope.projectPermissions.read = true;
+                      /* falls through */
+                    case 'team_access':
+                      $scope.projectPermissions.access = true;
+                      /* falls through */
+                  }
+
+                  $scope.projectViewReady = true;
+                }).catch(() => ($scope.projectViewReady = true));
+            }).catch(() => ($scope.projectViewReady = true));
+        }).catch(() => ($scope.projectViewReady = true));
       });
 
       $scope.projectSettingsVisible = function() {
@@ -640,12 +645,30 @@ app.controller('ProjectController', [
     });
 
     $scope.loadProjectPromise.then(function() {
-      if (!$scope.currentProject.settings || !$scope.currentProject.settings.custom) {
+      if (!$scope.currentProject.public) {
+        return;
+      }
+
+      // See if they have a module available.
+      if ($scope.currentProject.public.formModule) {
+        let formModule = null;
+        try {
+          eval(`formModule = ${$scope.currentProject.public.formModule}`);
+        }
+        catch (err) {
+          console.warn(err);
+        }
+        if (formModule) {
+          Formio.use(formModule);
+        }
+      }
+
+      if (!$scope.currentProject.public.custom) {
         return;
       }
 
       var allowedFiles, allow, element;
-      var custom = $scope.currentProject.settings.custom;
+      var custom = $scope.currentProject.public.custom;
 
       try {
         allowedFiles = JSON.parse(localStorage.getItem('allowedFiles')) || {};
@@ -2557,7 +2580,6 @@ app.controller('ProjectSettingsController', [
   '$scope',
   '$rootScope',
   '$state',
-  'GoogleAnalytics',
   'FormioAlerts',
   'ProjectFrameworks',
   '$http',
@@ -2566,7 +2588,6 @@ app.controller('ProjectSettingsController', [
     $scope,
     $rootScope,
     $state,
-    GoogleAnalytics,
     FormioAlerts,
     ProjectFrameworks,
     $http,
@@ -2675,6 +2696,40 @@ app.controller('ProjectSettingsController', [
         });
       });
     };
+  }
+]);
+
+app.controller('ProjectSettingsScriptController', [
+  '$scope',
+  '$rootScope',
+  '$state',
+  function(
+    $scope,
+    $rootScope,
+    $state
+  ) {
+    $scope.scriptSub = {data: {script: ''}};
+    $scope.scriptForm = {
+      components: [
+        {
+          type: 'textarea',
+          label: 'Form Module',
+          hideLabel: true,
+          editor: 'ace',
+          key: 'module',
+          rows: 5,
+          input: true,
+          tableView: false
+        }
+      ]
+    };
+
+    $scope.loadProjectPromise.then(() => {
+      $scope.scriptSub.data.module = _.get($scope.currentProject, 'settings.formModule');
+      $scope.$watch('scriptSub.data.module', (script) => {
+        _.set($scope.currentProject, 'settings.formModule', script);
+      });
+    });
   }
 ]);
 
@@ -2923,15 +2978,13 @@ app.controller('ProjectTeamController', [
   'Formio',
   'FormioAlerts',
   'TeamPermissions',
-  'GoogleAnalytics',
   function(
     $scope,
     $http,
     AppConfig,
     Formio,
     FormioAlerts,
-    TeamPermissions,
-    GoogleAnalytics
+    TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
 
@@ -3199,15 +3252,13 @@ app.controller('StageTeamController', [
   'Formio',
   'FormioAlerts',
   'TeamPermissions',
-  'GoogleAnalytics',
   function(
     $scope,
     $http,
     AppConfig,
     Formio,
     FormioAlerts,
-    TeamPermissions,
-    GoogleAnalytics
+    TeamPermissions
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
 
@@ -3439,6 +3490,7 @@ app.controller('ProjectDeleteController', [
   'PrimaryProject',
   'Formio',
   '$q',
+  'AppConfig',
   function(
     $scope,
     $state,
@@ -3446,7 +3498,8 @@ app.controller('ProjectDeleteController', [
     GoogleAnalytics,
     PrimaryProject,
     Formio,
-    $q
+    $q,
+    AppConfig
   ) {
     $scope.primaryProjectPromise.then(function(primaryProject) {
       var isProject = ($scope.currentProject._id === primaryProject._id);
@@ -3466,7 +3519,9 @@ app.controller('ProjectDeleteController', [
               message: type + ' was deleted!'
             });
             $scope.isBusy = false;
-            GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+            if (!AppConfig.onPremise) {
+              GoogleAnalytics.sendEvent(type, 'delete', null, 1);
+            }
             PrimaryProject.clear();
             if (isProject) {
               $state.go('home');
@@ -3699,6 +3754,7 @@ app.controller('ProjectExportController', [
     ];
 
     $scope.includeAll = true;
+    $scope.excludeAccess = true;
 
     $scope.toggleItem = function(section, key, item) {
       $scope.doToggle(section, key, item, $scope.export[section.key].hasOwnProperty(key));
@@ -3737,6 +3793,32 @@ app.controller('ProjectExportController', [
       section.toggle = 'removed';
     };
 
+    const excludeAccessProperties = (template) => {
+      if (!$scope.excludeAccess) {
+        return template;
+      }
+
+      template = _.cloneDeep(template);
+
+      var {access, ...template} = template;
+
+      Object.keys(template.forms)
+        .forEach((key) => {
+          var {access, submissionAccess, ...form} = template.forms[key];
+          template.forms[key] = form;
+        });
+
+      Object.keys(template.resources)
+        .forEach((key) => {
+          var {access, submissionAccess, ...resource} = template.resources[key];
+          template.resources[key] = resource;
+        });
+
+      template.excludeAccess = true;
+
+      return template;
+    }
+
     $scope.downloadTemplate = function() {
       if (!$scope.export.name) {
         return FormioAlerts.addAlert({
@@ -3756,7 +3838,7 @@ app.controller('ProjectExportController', [
       if ($scope.includeAll) {
         var name = $scope.export.name;
         var title = $scope.export.title;
-        $scope.export = $scope.template;
+        $scope.export = excludeAccessProperties($scope.template);
         $scope.export.name = name;
         $scope.export.title = title;
       }

@@ -38,6 +38,7 @@ app.factory('PrimaryProject', [
           if (!$scope.tenantProject) {
             PrimaryProject.loadStages(project, $scope);
           }
+          $scope.highestRoleQ.resolve();
           return _.assign($scope, scope);
         }
 
@@ -51,75 +52,85 @@ app.factory('PrimaryProject', [
         }
 
         // Load the projects teams.
-        $http.get(AppConfig.apiBase + '/team/project/' + project._id).then(function (result) {
-          scope.primaryProjectTeams = result.data;
-          scope.projectTeamsLoading = false;
-          _.assign($scope, scope);
-
-
-          // Calculate the users highest role within the project.
-          $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
-            var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
-            var teams = _($scope.userTeams ? $scope.userTeams : [])
-              .map('_id')
-              .filter()
-              .value();
-            var allRoles = _(roles.concat(teams)).filter().value();
-            var highestRole = null;
-            /**
-             * Determine if the user contains a role of the given type.
-             *
-             * @param {String} type
-             *   The type of role to search for.
-             * @returns {boolean}
-             *   If the current user has the role or not.
-             */
-            var hasRoles = function (type) {
-              if (scope.primaryProjectTeams) {
-                var potential = _(scope.primaryProjectTeams)
-                  .filter({permission: type})
-                  .map('_id')
-                  .value();
-                return (_.intersection(allRoles, potential).length > 0);
-              }
-            };
-
-
-            scope.projectPermissions = {
-              read: false,
-              write: false,
-              admin: false
-            };
-            if (_.has($scope.user, '_id') && _.has($scope.localProject, 'owner') && ($scope.user._id === $scope.localProject.owner)) {
-              highestRole = 'owner';
-              scope.projectPermissions.admin = true;
-              scope.projectPermissions.write = true;
-              scope.projectPermissions.read = true;
-            }
-            else if (hasRoles('team_admin')) {
-              highestRole = 'team_admin';
-              scope.projectPermissions.admin = true;
-              scope.projectPermissions.write = true;
-              scope.projectPermissions.read = true;
-            }
-            else if (hasRoles('team_write')) {
-              highestRole = 'team_write';
-              scope.projectPermissions.write = true;
-              scope.projectPermissions.read = true;
-            }
-            else if (hasRoles('team_read')) {
-              highestRole = 'team_read';
-              scope.projectPermissions.read = true;
-            }
-            else {
-              highestRole = 'anonymous';
-            }
-
-            scope.highestRole = highestRole;
+        $http.get(AppConfig.apiBase + '/team/project/' + project._id)
+          .then(function (result) {
+            scope.primaryProjectTeams = result.data;
+            scope.projectTeamsLoading = false;
             _.assign($scope, scope);
-            $scope.highestRoleQ.resolve();
-          });
-        });
+
+
+            // Calculate the users highest role within the project.
+            $q.all([$scope.userTeamsPromise, $scope.projectTeamsPromise]).then(function () {
+              var roles = _.has($scope.user, 'roles') ? $scope.user.roles : [];
+              var teams = _($scope.userTeams ? $scope.userTeams : [])
+                .map('_id')
+                .filter()
+                .value();
+              var allRoles = _(roles.concat(teams)).filter().value();
+              var highestRole = null;
+              /**
+               * Determine if the user contains a role of the given type.
+               *
+               * @param {String} type
+               *   The type of role to search for.
+               * @returns {boolean}
+               *   If the current user has the role or not.
+               */
+              var hasRoles = function (type) {
+                if (scope.primaryProjectTeams) {
+                  var potential = _(scope.primaryProjectTeams)
+                    .filter({permission: type})
+                    .map('_id')
+                    .value();
+                  return (_.intersection(allRoles, potential).length > 0);
+                }
+              };
+
+
+              scope.projectPermissions = {
+                access: false,
+                read: false,
+                write: false,
+                admin: false
+              };
+              if (_.has($scope.user, '_id') && _.has($scope.localProject, 'owner') && ($scope.user._id === $scope.localProject.owner)) {
+                highestRole = 'owner';
+                scope.projectPermissions.admin = true;
+                scope.projectPermissions.write = true;
+                scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
+              }
+              else if (hasRoles('team_admin')) {
+                highestRole = 'team_admin';
+                scope.projectPermissions.admin = true;
+                scope.projectPermissions.write = true;
+                scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
+              }
+              else if (hasRoles('team_write')) {
+                highestRole = 'team_write';
+                scope.projectPermissions.write = true;
+                scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
+              }
+              else if (hasRoles('team_read')) {
+                highestRole = 'team_read';
+                scope.projectPermissions.read = true;
+                scope.projectPermissions.access = true;
+              }
+              else if (hasRoles('team_access')) {
+                highestRole = 'team_access';
+                scope.projectPermissions.access = true;
+              }
+              else {
+                highestRole = 'anonymous';
+              }
+
+              scope.highestRole = highestRole;
+              _.assign($scope, scope);
+              $scope.highestRoleQ.resolve();
+            }).catch((err) => $scope.highestRoleQ.reject(err))
+          }).catch((err) => $scope.highestRoleQ.reject(err));
         return _.assign($scope, scope);
       },
       get: function ($scope) {

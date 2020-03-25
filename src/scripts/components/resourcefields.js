@@ -1,5 +1,6 @@
-const NestedComponent = Formio.Components.components.nested;
-class ResourceFieldsComponent extends NestedComponent {
+import { Formio } from 'ng-formio/lib/modules';
+const NestedDataComponent = Formio.Components.components.nesteddata;
+class ResourceFieldsComponent extends NestedDataComponent {
   constructor(component, options, data) {
     component.components = [
       {
@@ -14,39 +15,9 @@ class ResourceFieldsComponent extends NestedComponent {
         lazyLoad: false,
         tooltip: 'Select the Resource to save submissions to.',
         onChange(context) {
-          if (!context.instance.data.resource) {
-            return;
+          if (context.instance && context.instance.parent) {
+            context.instance.parent.addDynamicFields();
           }
-          Formio.request(`${Formio.getProjectUrl()}/form/${context.instance.data.resource}`).then((result) => {
-            const dynamicFields = context.instance.root.getComponent('dynamic');
-            dynamicFields.destroyComponents();
-            const formFields = [];
-            FormioUtils.eachComponent(context.instance.options.currentForm.components, (component) => {
-              if (component.type !== 'button') {
-                formFields.push({
-                  value: component.key,
-                  label: component.label
-                });
-              }
-            });
-
-            FormioUtils.eachComponent(result.components, (component) => {
-              if (component.type !== 'button') {
-                dynamicFields.addComponent({
-                  type: 'select',
-                  input: true,
-                  label: component.label,
-                  key: `fields.${component.key}`,
-                  dataSrc: 'values',
-                  data: {values: formFields},
-                  validate: {
-                    required: component.validate ? (component.validate.required) : false
-                  }
-                }, context.instance.data);
-              }
-            });
-            dynamicFields.redraw();
-          });
         },
         data: {
           url: `${Formio.getProjectUrl()}/form?type=resource&limit=4294967295&select=_id,title`
@@ -80,7 +51,8 @@ class ResourceFieldsComponent extends NestedComponent {
             ]
           },
           {
-            type: 'nested',
+            type: 'panel',
+            title: 'Field Mappings',
             key: 'dynamic',
             components: []
           }
@@ -91,6 +63,48 @@ class ResourceFieldsComponent extends NestedComponent {
       }
     ];
     super(component, options, data);
+  }
+
+  addDynamicFields() {
+    if (!this.data.resource) {
+      return;
+    }
+    Formio.request(`${Formio.getProjectUrl()}/form/${this.data.resource}`).then((result) => {
+      const dynamicFields = this.getComponent('dynamic');
+      dynamicFields.destroyComponents();
+      const formFields = [];
+      FormioUtils.eachComponent(this.options.currentForm.components, (component) => {
+        if (component.type !== 'button') {
+          formFields.push({
+            value: component.key,
+            label: component.label
+          });
+        }
+      });
+
+      FormioUtils.eachComponent(result.components, (component) => {
+        if (component.type !== 'button') {
+          dynamicFields.addComponent({
+            type: 'select',
+            input: true,
+            label: component.label,
+            key: `fields.${component.key}`,
+            dataSrc: 'values',
+            data: {values: formFields},
+            validate: {
+              required: component.validate ? (component.validate.required) : false
+            }
+          }, this.data);
+        }
+      });
+      dynamicFields.redraw();
+    });
+  }
+
+  setValue(value, flags) {
+    const changed = super.setValue(value, flags);
+    this.addDynamicFields();
+    return changed;
   }
 }
 

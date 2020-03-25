@@ -28,6 +28,7 @@ angular
     'ngFileUpload',
     'ui.select',
     'ckeditor',
+    'angularMoment',
     'formioApp.controllers',
     'formioApp.utils',
     'kendo.directives',
@@ -288,7 +289,8 @@ angular
         .state('project.env.settings.customjscss', {
           url: '/settings/customjscss',
           parent: 'project.env',
-          templateUrl: 'views/project/env/settings/customjscss/index.html'
+          templateUrl: 'views/project/env/settings/customjscss/index.html',
+          controller: 'ProjectSettingsScriptController'
         })
         .state('project.env.settings.cors', {
           url: '/settings/cors',
@@ -460,12 +462,12 @@ angular
         .state('project.access', {
           url: '/access',
           templateUrl: 'views/project/access/index.html',
-            controller: 'AccessController'
+          controller: 'AccessController'
         })
         .state('project.actions', {
           url: '/actions',
           templateUrl: 'views/project/actions/index.html',
-            controller: 'ActionsController'
+          controller: 'ActionsController'
         })
         .state('project.roles', {
           abstract: true,
@@ -534,15 +536,13 @@ angular
     'FormioAlerts',
     'GoogleAnalytics',
     'AppConfig',
-    '$rootScope',
     function(
       $http,
       $q,
       Formio,
       FormioAlerts,
       GoogleAnalytics,
-      AppConfig,
-      $rootScope
+      AppConfig
     ) {
       return {
         createProject: function(project) {
@@ -562,7 +562,9 @@ angular
               type: 'success',
               message: 'New Project created!'
             });
-            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            if (!AppConfig.onPremise) {
+              GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            }
             deferred.resolve(project);
           }, function(error) {
             if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
@@ -594,7 +596,9 @@ angular
               type: 'success',
               message: 'New Stage created!'
             });
-            GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            if (!AppConfig.onPremise) {
+              GoogleAnalytics.sendEvent('Project', 'create', null, 1);
+            }
             deferred.resolve(project);
           }, function(error) {
             if (error.data && error.data.message && error.data.message.indexOf('duplicate key error index') !== -1) {
@@ -624,6 +628,7 @@ angular
     '$timeout',
     '$q',
     'ngDialog',
+    'TeamPermissions',
     function(
       $scope,
       $state,
@@ -636,7 +641,8 @@ angular
       ProjectFrameworks,
       $timeout,
       $q,
-      ngDialog
+      ngDialog,
+      TeamPermissions
     ) {
       Formio.setBaseUrl(AppConfig.apiBase);
       Formio.setProjectUrl(AppConfig.formioBase);
@@ -648,7 +654,8 @@ angular
       // Determine if the current users can make teams or is a team member.
       $scope.teamsEnabled = false;
       $scope.teamMember = false;
-
+      $scope.teamFilter = 'all';
+      $scope.teamSearch = '';
       $scope.teams = [];
       $scope.teamsLoading = true;
       var _teamsPromise = Formio.request($scope.appConfig.apiBase + '/team/all', 'GET').then(function(results) {
@@ -669,6 +676,22 @@ angular
           });
         }
       });
+
+      $scope.belongs = TeamPermissions.belongs;
+
+      $scope.filterTeam = function(team) {
+        if ($scope.teamSearch) {
+          const searchRegExp = new RegExp(`.*${$scope.teamSearch}.*`, 'i');
+          return (team && team.data && (team.data.name.match(searchRegExp) !== null));
+        }
+        switch ($scope.teamFilter) {
+          case 'member':
+            return $scope.belongs($rootScope.user, team);
+          case 'invite':
+            return !$scope.belongs($rootScope.user, team);
+        }
+        return true;
+      };
 
       $scope.teamSupport = function(project) {
         return (project.plan === 'team' || project.plan === 'commercial' || project.plan === 'trial');
@@ -1007,7 +1030,9 @@ angular
         $rootScope.previousState = fromState.name;
         $rootScope.previousParams = fromParams;
         $rootScope.currentState = toState.name;
-        GoogleAnalytics.sendPageView();
+        if (!AppConfig.onPremise) {
+          GoogleAnalytics.sendPageView();
+        }
       });
 
       $rootScope.goToProject = function(project) {
@@ -1404,6 +1429,18 @@ angular
       getPermissionLabel: function(type) {
         if (!this.permissions[type]) return '';
         return this.permissions[type].label;
+      },
+      belongs: function(user, team) {
+        if (!team || !team._id || !user) {
+          return false;
+        }
+        if (team.owner.toString() === user._id.toString()) {
+          return true;
+        }
+        if (!user.metadata || !user.metadata.teams) {
+          return false;
+        }
+        return (user.metadata.teams.indexOf(team._id.toString()) !== -1);
       }
     };
   })

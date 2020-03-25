@@ -1,8 +1,8 @@
 import './robots.txt';
 import './images';
-import './fonts';
+import './fonts.js';
 import './styles.scss';
-import './modules';
+import './modules.js';
 import './scripts/index';
 import './config.js';
 

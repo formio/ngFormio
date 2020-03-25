@@ -10,13 +10,86 @@
     <p>Custom Javascript is useful for adding custom components to a project.</p>
   </div>
 </div>
-<!--<div class="panel panel-default">-->
-  <!--<div class="panel-heading">Preview</div>-->
-  <!--<div class="panel-body">-->
-    <!--<label for="preview-repo" class="control-label">Preview Git Repo</label>-->
-    <!--<input type="text" class="form-control" id="preview-repo" ng-model="currentProject.settings.preview.repo" placeholder="The git repository for the preview app." />-->
-    <!--<label for="preview-repo" class="control-label">Preview App Url</label>-->
-    <!--<input type="text" class="form-control" id="preview-url" ng-model="currentProject.settings.preview.url" placeholder="The app url for the preview app." />-->
-  <!--</div>-->
-<!--</div>-->
+<div class="panel panel-default">
+  <div class="panel-heading">Form Module</div>
+  <div class="panel-body">
+    <p>A form module is a way to extend the basic functionality of the Form.io Renderer by allowing custom logic to be introduced into the runtime evaluation of a rendered form. This functionality is documented on the <a href="https://github.com/formio/formio.js/wiki/Modules" target="_blank">Github Wiki Documentation</a>.</p>
+    <formio form="scriptForm" submission="scriptSub"></formio>
+    <h3>Global Functions Example</h3>
+    <p>An example use case is to inject custom global functions into the evaluation context for Custom Vaidations, Calculated Values, etc.</p>
+    <pre>{
+  options: {
+    form: {
+      evalContext: {
+        validatePhone: function(input) {
+          return input.match(/^[2-9]\d{2}-\d{3}-\d{4}$/);
+        }
+      }
+    }
+  }
+}</pre>
+    <p>This code could now be used within Custom Validation using the following.</p>
+    <pre>valid = validatePhone(input) ? true : 'Phone number is invalid';</pre>
+    <h3>Custom Form Builder Example</h3>
+    <p>This feature can also be used to inject a custom Form Builder by either creating "Pre-defined" components or Custom Components. The following code will inject a new form builder section called "Pre-Defined Components" and allow the form builders to drag and drop these fields into the forms.</p>
+    <pre>{
+  options: {
+    builder: {
+      builder: {
+        custom: {
+          title: 'Pre-Defined Fields',
+          weight: 10,
+          components: {
+            firstName: {
+              title: 'First Name',
+              key: 'firstName',
+              icon: 'terminal',
+              schema: {
+                label: 'First Name',
+                type: 'textfield',
+                key: 'firstName',
+                input: true
+              }
+            },
+            lastName: {
+              title: 'Last Name',
+              key: 'lastName',
+              icon: 'terminal',
+              schema: {
+                label: 'Last Name',
+                type: 'textfield',
+                key: 'lastName',
+                input: true
+              }
+            },
+            email: {
+              title: 'Email',
+              key: 'email',
+              icon: 'at',
+              schema: {
+                label: 'Email',
+                type: 'email',
+                key: 'email',
+                input: true
+              }
+            },
+            phoneNumber: {
+              title: 'Mobile Phone',
+              key: 'mobilePhone',
+              icon: 'phone-square',
+              schema: {
+                label: 'Mobile Phone',
+                type: 'phoneNumber',
+                key: 'mobilePhone',
+                input: true
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}</pre>
+  </div>
+</div>
 <button class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

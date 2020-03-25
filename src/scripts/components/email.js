@@ -1,4 +1,5 @@
 // Modify the Email form to add Kickbox settings.
+import { Formio } from 'ng-formio/lib/modules';
 const EmailComponent = Formio.Components.components.email;
 class FormioEmailComponent extends EmailComponent {
   static get builderInfo() {

@@ -4,6 +4,148 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.80
+### Changed
+ - Upgrade formiojs@4.9.6.
+ - Upgrade ng-formio@4.13.7
+
+## 7.0.0-rc.79
+### Changed
+ - Upgrade formiojs@4.9.5
+ - Upgrade formio-tenant@1.12.0
+ - Upgrade pro.formview.io@1.75.0
+ - Upgrade formmanager@1.77.0
+ - Upgrade ng-formio@4.13.6
+
+## 7.0.0-rc.78
+### Changed
+ - Upgrade formiojs@4.9.4
+ - Upgrade formio-tenant@1.11.0
+ - Upgrade pro.formview.io@1.74.0
+ - Upgrade formmanager@1.76.0
+ - Upgrade ng-formio@4.13.5
+
+## 7.0.0-rc.77
+### Changed
+ - Upgrade formiojs@4.9.3
+ - Upgrade formio-tenant@1.10.0
+ - Upgrade pro.formview.io@1.73.0
+ - Upgrade formmanager@1.75.0
+ - Upgrade ng-formio@4.13.4
+
+## 7.0.0-rc.76
+### Changed
+ - Upgrade formiojs@4.9.2
+ - Upgrade formmanager@1.74.0
+ - Upgrade pro.formview.io@1.72.0
+ - Upgrade ng-formio@4.13.3
+
+## 7.0.0-rc.75
+### Changed
+ - Upgrade formiojs@4.9.1 - Introduced way for pdf to fetch iframe bounding rect.
+ - Upgrade ng-formio@4.13.1
+
+## 7.0.0-rc.74
+### Changed
+ - Upgrade formiojs@4.9.0
+ - Upgrade pro.formview.io@1.71.0
+ - Upgrade formmanager@1.70.0
+ - Upgrade ng-formio@4.13.0
+
+## 7.0.0-rc.73
+### Changed
+ - Upgrade formiojs@4.9.0-rc.12
+ - Upgrade ng-formio@4.12.0
+ - Upgrade form view pro 1.70.0
+ - Upgrade form manager 1.72.0
+ - Upgrade mocha@7.1.1, protractor-helpers@1.1.794, webdriverio@5.22.1
+
+## 7.0.0-rc.72
+### Changed
+ - Upgrade formiojs@4.9.0-rc.11
+ - Upgrade ng-formio@4.11.0
+ - Upgrade form manager 1.71.0
+ - Upgrade form view pro 1.69.0
+ - Removed all Google Analytics calls from hosted portals.
+ 
+### Fixed
+ - Issue where the action settings would not show as updated.
+
+## 7.0.0-rc.71
+### Changed
+ - Upgrade ng-formio@4.10.0 to resolve auto validation issues.
+
+## 7.0.0-rc.70
+### Changed
+ - Upgrade formio.js to 4.9.0-rc.10
+
+### Fixed
+ - Problems with Save Submission action not able to select resource fields.
+
+## 7.0.0-rc.65
+### Fixed
+ - Issue with Existing resources not showing up.
+ - Problems with Text Area's removing ending spaces.
+
+## 7.0.0-rc.64
+### Fixed
+ - Issues where a bad state could occur if "access" is granted to primary project, and "read" is granted to stage.
+ 
+### Changed
+ - Upgrade ng-formio@4.9.7
+ - Upgrade formiojs@4.9.0-rc.2
+
+## 7.0.0-rc.63
+### Fixed
+ - Issues with Form Manager not loading projects.
+
+## 7.0.0-rc.62
+### Fixed
+ - Issue where the user cache would not reset when leaving a team.
+
+## 7.0.0-rc.61
+### Changed 
+ - Upgrade formio.js@4.9.0-rc.1
+ - Upgrade formmanager@1.64.0
+ - Upgrade formviewpro@1.60.0
+
+## 7.0.0-rc.60
+### Changed
+ - Upgrade formio.js@4.9.0-beta.8
+ - Upgrade formmanager@1.63.0
+ - Upgrade formviewpro@1.60.0
+ 
+### Fixed
+ - Issue where Save Submission would not find the resourcefields component.
+ - Issue where the KickBox information would not show up.
+ - Problems where different components would import Formio from different locations.
+ - Made Edit/Access/Actions tabs disabled if the project is protected
+
+## 7.0.0-rc.58
+### Changed
+ - Upgrade formmanager@1.59.0
+ - Upgrade formio.js@4.9.0-beta.5
+ - Upgrade ng-formio@4.9.2
+
+## 7.0.0-rc.57
+### Added
+ - Team invite support.
+ - Upgrade form manager to 1.58.0
+
+## 7.0.0-rc.56
+### Fixed
+ - Added copying version notes from scope
+ - Upgrade formio.js to 4.9.0-beta.4
+ - Upgrade form manager to 1.57.0
+ - Upgrade form view pro to 1.56.0
+
+## 7.0.0-rc.55
+### Added
+ - Portal SSO flexibilities by adding ssoTeamsEnabled variable.
+ 
+### Changed
+ - Upgraded formio.js 4.9.0-beta.3
+
 ## 7.0.0-rc.54
 ### Added
  - PDF page size settings.
@@ -150,6 +292,42 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Upgrade formio.js@4.4.2
 
 ## 7.0.0-rc.26
+
+## 6.9.3
+### Fixed
+ - Credit card processing form to show the Month and Year in dropdowns.
+ - Crash in the pdf display functions.
+
+## 6.9.2
+### Changed
+ - Upgrade form manager to 1.59.0
+ - Upgrade form view pro to 1.57.0
+
+## 6.9.1
+### Changed
+ - Upgrade form manager to 1.58.0
+ - Provide access to logs for any Team admin.
+ - Added ssoTeamsEnabled variable and skipSsoAuth query param.
+ - Added copying notes from scope
+ - Prevent rewriting user with paymentInfo submission and loding the latest paymentInfo submission
+ - Added ignoreCache options after adding new action
+
+## 6.9.0
+### Added
+ - Added team invites
+
+### Changed
+ - Upgrade ng-formio@2.41.0
+ - Upgrade ng-formio-builder@2.39.0
+ - Upgrade form manager to 1.57.0
+ - Upgrade tenant manager to 1.6.0
+ - Upgrade @progress/kendo-ui@2020.1.115, mocha@7.0.1
+
+## 6.8.9
+### Changed
+ - Small tweak to how payment methods are loaded to only return approved methods.
+
+## 6.8.8
 ### Added
  - The Everyone role to the roles & permissions section.
 
@@ -344,9 +522,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - CKEditor configurations for TextArea components.
-<<<<<<< HEAD
-=======
-
+ 
 ## 6.6.0
 ### Added 
  - ActionItem log view added to portal.
@@ -356,7 +532,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed issues regarding the tenant manager with pagination and also introduced searching.
  - Form Manager and Form View pro to use latest renderer.
  - Upgraded  formiojs@3.22.15, protractor-helpers@1.1.568, webpack@4.35.2, ckeditor@4.12.1, swagger-ui@3.23.0
->>>>>>> 353deee51f5ea0271d5a44404023ad96f0afec22
 
 ## 6.5.1
 ### Fixed

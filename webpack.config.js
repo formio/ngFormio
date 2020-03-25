@@ -19,6 +19,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       {from: 'src/index.html'},
+      {from: 'src/externalModules.js'},
       {from: 'node_modules/ckeditor', to: 'lib/ckeditor', toType: 'dir'},
       {from: 'node_modules/formio-tenant/dist', to: 'tenant', toType: 'dir'},
       {from: 'node_modules/formmanager/dist', to: 'manager', toType: 'dir'},

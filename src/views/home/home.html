@@ -93,18 +93,24 @@
         <div class="form-group">
           <div class="input-group">
             <div class="input-group-addon">Search</div>
-            <input id="team-search" type="text" class="form-control" ng-model="teamSearch.data.name" placeholder="Find a team...">
+            <input id="team-search" type="text" class="form-control" ng-model="teamSearch" placeholder="Find a team...">
           </div>
         </div>
+      </div>
+      <div class="btn-group" style="width: 100%; margin-bottom: 10px;">
+        <button ng-click="teamFilter = 'all'" type="button" ng-class="{'btn-primary': (teamFilter === 'all')}" class="btn btn-default" style="width:33%">All</button>
+        <button ng-click="teamFilter = 'member'" type="button" ng-class="{'btn-primary': (teamFilter === 'member')}" class="btn btn-default" style="width:34%">Member</button>
+        <button ng-click="teamFilter = 'invite'" type="button" ng-class="{'btn-primary': (teamFilter === 'invite')}" class="btn btn-default" style="width:33%">Invites</button>
       </div>
       <div class="list-group" ng-show="!teamsLoading">
         <div class="well" ng-show="!teams.length">
           <span class="team-upgrade">Want to work collaboratively? Create a team to allow others to help work on your project.</span>
         </div>
-        <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams | filter:teamSearch">
+        <a ui-sref="team.view({teamId: team._id})" class="list-group-item" ng-repeat="team in teams | filter:filterTeam">
           <span class="badge"><i class="fa fa-users"></i>&nbsp;{{(team.data.members.length + team.data.admins.length) || 0 }}</span>
           <h4 class="list-group-item-heading">{{ team.data.name }}</h4>
-          <span class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
+          <span ng-if="!belongs(user, team)" class="label label-warning">INVITATION</span>
+          <span ng-if="belongs(user, team)" class="label label-success">{{ team.owner === user._id ? 'OWNER' : 'MEMBER'}}</span>
         </a>
       </div>
       <div class="list-group">
