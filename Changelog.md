@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 6.9.10
+### Changed
+ - Upgrade Form Manager to 1.77.0
+ - Upgrade Tenant Manager to 1.12.0
+
 ## 6.9.8
 ### Fixed
  - Changed the iframe source to not use the blob mechanism.
