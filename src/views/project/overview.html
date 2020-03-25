@@ -1,6 +1,35 @@
 <div class="project-section-inner-content">
   <div class="row overview">
     <div class="col-md-8 overview-content">
+      <ul class="list-group list-group-striped" ng-if="currentScope">
+        <li class="list-group-item list-group-heading">
+          <h3>{{currentScope.title}} Utilizations</h3>
+        </li>
+        <li class="list-group-item">
+          <div class="row">
+            <div class="col-sm-12">
+              <table class="table">
+                <thead>
+                <th ng-repeat="column in currentScope.columns track by $index">{{column.title}}</th>
+                <th>Action</th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="utilization in utilizations track by $index">
+                  <td ng-repeat="column in currentScope.columns track by $index">{{getValue(utilization[column.field])}}</td>
+                  <td>
+                    <span class="btn btn-info" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable')">Enable</span>
+                    <span class="btn btn-danger" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable')">Disable</span>
+                  </td>
+                </tr>
+                <tr ng-if="utilizations.length === 0">
+                  <td>None</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </li>
+      </ul>
       <ul class="list-group list-group-striped">
         <li class="list-group-item list-group-heading">
           <h3>Recent Resources</h3>
@@ -33,40 +62,6 @@
           <a ui-sref="project.form.index">More...</a>
         </li>
       </ul>
-      <!--<ul class="list-group list-group-striped">
-        <li class="list-group-item list-group-heading">
-          <h3>Recent Submissions</h3>
-        </li>
-        <li class="list-group-item list-group-heading">
-          <div class="row">
-            <div class="col-sm-2">
-              <strong>Created</strong>
-            </div>
-            <div class="col-sm-8">
-              <strong>Form</strong>
-            </div>
-            <div class="col-sm-2">
-              <strong class="pull-right">Links</strong>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item" ng-repeat="submission in submissions track by $index">
-          <div class="row">
-            <div class="col-sm-2">
-              {{submission.created | date : 'short'}}
-            </div>
-            <div class="col-sm-8">
-              <strong>{{forms[submission.form].title}}</strong>
-            </div>
-            <div class="col-sm-2 pull-right" ng-if="forms[submission.form]">
-              <a ui-sref="project.{{forms[submission.form].type}}.form.submission.item.view({formId: submission.form, subId: submission._id})" class="btn btn-default pull-right">View</a>
-            </div>
-          </div>
-        </li>
-        <li class="list-group-item text-center">
-          <a ui-sref="project.data">Coming Soon...</a>
-        </li>
-      </ul>-->
     </div>
     <div class="col-md-4">
       <ul class="list-group list-group-striped" ng-if="!onPremise">
@@ -74,25 +69,12 @@
           <h3>Project Limits</h3>
         </li>
         <li class="list-group-item" ng-if="currentProject._id === localProject._id">
-          <h4>Forms and Resources <i uib-tooltip="The total amount of combined forms and resources that this project is allowed to have within this plan." class="fa fa-info-circle"></i></h4>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'forms')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'forms')"></div>
-            <span>{{ currentProject.apiCalls.used.forms | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.forms) }}</span>
-          </div>
-          <h4>Form Requests <i uib-tooltip="The total amount of API requests (per month) that can be made to Create, Read, Update, and Delete forms." class="fa fa-info-circle"></i></h4>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'formRequests')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'formRequests')"></div>
-            <span>{{ currentProject.apiCalls.used.formRequests | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.formRequests) }} per month</span>
-          </div>
-          <h4>Submission Requests <i uib-tooltip="The total amount of API requests (per month) that can be made to Create, Read, Update, and Delete form submissions." class="fa fa-info-circle"></i></h4>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'submissionRequests')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'submissionRequests')"></div>
-            <span>{{ currentProject.apiCalls.used.submissionRequests | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.submissionRequests) }} per month</span>
-          </div>
-          <h4>Emails <i uib-tooltip="The total amount of emails per month that can be sent using the Default email transport. If your project uses its own Email provider, then this limit does not apply." class="fa fa-info-circle"></i></h4>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, 'emails')}" ng-class="getProgressBarClass(currentProject.apiCalls, 'emails')"></div>
-            <span>{{ currentProject.apiCalls.used.emails | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit.emails) }} per month</span>
+          <div ng-repeat="scope in scopes">
+            <h4>{{scope.title}} <a href ng-if="scope.columns" ng-click="setScope(scope)">manage</a></h4>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" ng-style="{width: getAPICallsPercent(currentProject.apiCalls, scope.prop)}" ng-class="getProgressBarClass(currentProject.apiCalls, scope.props)"></div>
+              <span>{{ currentProject.apiCalls.used[scope.prop] | number }} / {{ getAPICallsLimit(currentProject.apiCalls.limit[scope.prop]) }} {{scope.monthly ? 'per month' : ''}}</span>
+            </div>
           </div>
         </li>
         <li class="list-group-item" ng-if="currentProject._id !== localProject._id">

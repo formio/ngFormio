@@ -1,5 +1,5 @@
 <h3>Upload a PDF</h3>
-<div ng-if="!purchaseRequired">
+<div>
   <label class="btn btn-default btn-file btn-block">
     <div class="button" ngf-select="upload($file)" ngf-pattern="'application/pdf'" accept="application/pdf" ngf-max-size="20MB"><i class="fa fa-upload"></i> Upload PDF</div>
   </label>
@@ -7,10 +7,5 @@
     <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="{{ uploadProgress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ uploadProgress }}%">
       <span class="sr-only">{{ uploadProgress }}% Complete</span>
     </div>
-  </div>
-</div>
-<div ng-if="purchaseRequired">
-  <div class="alert alert-info" role="alert">
-    <p>You need to <a ui-sref="project.env.integrations.pdf">Purchase more PDF Forms</a> to upload another PDF.</p>
   </div>
 </div>

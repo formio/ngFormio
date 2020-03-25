@@ -118,23 +118,14 @@
       </div>
     </div>
 
+    <!-- The Current display -->
     <div class="row" ng-if="view === 'Current'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
           Upgrade Project
         </div>
         <div class="panel-body">
-          <div class="row">
-            <div class="col-md-6">
-              <input type="text" class="form-control" ng-model="input.project" placeholder="Project _id to upgrade">
-            </div>
-            <div class="col-md-4">
-              <select class="form-control" ng-model="input.plan" ng-options="plan for plan in plans"></select>
-            </div>
-            <div class="col-md-2">
-              <button class="btn btn-primary btn-block" ng-click="updateProject()">Update</button>
-            </div>
-          </div>
+          Upgrades are no longer managed from here. Please find the associated license and upgrade the license.
         </div>
       </div>
 
@@ -399,110 +390,62 @@
       </div>
     </div>
 
-    <!-- The Usage display -->
-    <div class="row" ng-if="view === 'Usage'">
+    <!-- The Licenses display -->
+    <div class="row" ng-if="view === 'Licenses'">
       <div class="panel panel-default control-panel">
         <div class="panel-heading">
-          Usage<i class="pull-right glyphicon glyphicon-refresh" ng-click="getAPIUsage()"></i>
+          Licenses
         </div>
         <div class="panel-body">
-          <div class="row">
-            <div class="col-md-12">
-              <h3>
-                {{showDaily ? 'Daily' : 'Monthly'}}
-                Submission Requests for
-                {{ viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year }},
-                by Project ({{totalMonthlySubmissions}})
-              </h3>
-
-              <div class="row" ng-if="!showDaily">
-                <div class="col-sm-12 project-data">
-                  <h6>{{submissionDisplayTop}}</h6>
-                  <chartist class="ct-chart" chartist-data="submissionGraphData" chartist-chart-type="Line" chartist-chart-options="submissionGraphOptions"></chartist>
+          <table class="table">
+            <thead>
+            <tr>
+              <th></th>
+              <th ng-repeat="col in licenseColumns track by $index">{{col.label}}</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td ng-repeat="col in licenseColumns">
+                <div ng-if="col.type === 'text'">
+                  <input type="text" class="form-control" ng-change="setLicenseFilter(col)" ng-model="filters[col.prop]" ng-model-options='{ debounce: 300 }'>
                 </div>
-              </div>
-
-              <table class="table table-striped">
-                <thead>
-                <tr>
-                  <td>#</td>
-                  <td ng-if="showIds">Project _id</td>
-                  <td>Project Requests</td>
-                  <td>Project Name</td>
-                  <td>Project Title</td>
-                  <td>Project Plan</td>
-                  <td ng-if="showCreated">Project Created</td>
-                  <td ng-if="showIds">Owner _id</td>
-                  <td>Owner Name</td>
-                  <td>Owner Email</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="element in monthlySubmissions track by $index">
-                  <td>{{$index + 1}}</td>
-                  <td ng-if="showIds">{{element._id}}</td>
-                  <td>{{element.submissions}}</td>
-                  <td>{{element.name}}</td>
-                  <td>{{element.title}}</td>
-                  <td>{{element.plan}}</td>
-                  <td ng-if="showCreated">{{element.created}}</td>
-                  <td ng-if="showIds">{{element.owner}}</td>
-                  <td>{{element.ownerData.name}}</td>
-                  <td>{{element.ownerData.email}}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <br>
-          <div class="row">
-            <div class="col-md-12">
-              <h3>
-                {{showDaily ? 'Daily' : 'Monthly'}}
-                Non-Submission Requests for
-                {{viewDate.month + ' / ' + (showDaily ? viewDate.month + ' / ' : '') + viewDate.year}},
-                by Project ({{totalMonthlyNonsubmissions}})
-              </h3>
-
-              <div class="row" ng-if="!showDaily">
-                <div class="col-sm-12 project-data">
-                  <h6>{{nonsubmissionDisplayTop}}</h6>
-                  <chartist class="ct-chart" chartist-data="nonsubmissionGraphData" chartist-chart-type="Line" chartist-chart-options="nonsubmissionGraphOptions"></chartist>
+                <div ng-if="col.type === 'date'">
+                  <div class="input-group">
+                    <input type="text" class="form-control" uib-datepicker-popup="MM/dd/yyyy" ng-model="filters[col.prop]" ng-change="setLicenseFilter(col)" is-open="open[col.prop]" datepicker-options="dateOptions" close-text="Close" />
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="openCal(col.prop)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                  </div>
                 </div>
-              </div>
-
-              <table class="table table-striped">
-                <thead>
-                <tr>
-                  <td>#</td>
-                  <td ng-if="showIds">Project _id</td>
-                  <td>Project Requests</td>
-                  <td>Project Name</td>
-                  <td>Project Title</td>
-                  <td>Project Plan</td>
-                  <td ng-if="showCreated">Project Created</td>
-                  <td ng-if="showIds">Owner _id</td>
-                  <td>Owner Name</td>
-                  <td>Owner Email</td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="element in monthlyNonsubmissions track by $index">
-                  <td>{{$index + 1}}</td>
-                  <td ng-if="showIds">{{element._id}}</td>
-                  <td>{{element.nonsubmissions}}</td>
-                  <td>{{element.name}}</td>
-                  <td>{{element.title}}</td>
-                  <td>{{element.plan}}</td>
-                  <td ng-if="showCreated">{{element.created}}</td>
-                  <td ng-if="showIds">{{element.owner}}</td>
-                  <td>{{element.ownerData.name}}</td>
-                  <td>{{element.ownerData.email}}</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+                <div ng-if="col.type === 'select'">
+                  <select class="form-control" ng-change="setLicenseFilter(col, this)" ng-model="filters[col.prop]">
+                    <option value=""></option>
+                    <option value="{{option.value}}" ng-repeat="option in col.options">{{option.label}}</option>
+                  </select>
+                </div>
+              </td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat-start="license in licenses track by $index">
+              <td style="width: 120px;">
+                <div class="btn-group" role="group" aria-label="Actions">
+                  <a class="btn btn-default btn-xs" href ng-if="!open[$index]" ng-click="openLicense($index)">Open</a>
+                  <a class="btn btn-default btn-xs" href ng-if="open[$index]" ng-click="closeLicense($index)">Close</a>
+                  <a class="btn btn-default btn-xs" ui-sref="project.resource.form.submission.item.edit({projectId: currentProject._id, formId: license.form, submissionId: license._id})">Edit</a>
+                </div>
+              </td>
+              <td ng-repeat="col in licenseColumns track by $index">
+                {{license.data[col.prop] | filterFunc : col.filter}}
+              </td>
+            </tr>
+            <tr ng-repeat-end ng-if="open[$index]" class="active">
+              <td colspan="8">
+                <license-info license="license"></license-info>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

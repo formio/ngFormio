@@ -1,7 +1,7 @@
 <div class="project-section-header">
   <a class="pull-right project-section-header-icon" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.settings" uib-tooltip="Project Settings" tooltip-placement="bottom"><i class="fa fa-cog" title="Project Settings"></i></a>
   <a class="btn btn-primary pull-right project-section-header-button" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.teams"><i class="fa fa-users"></i> Teams</a>
-  <a ng-if="minPlan('commercial')" class="btn btn-warning pull-right project-section-header-button" ng-if="highestRole === 'team_admin' || highestRole === 'owner'" ui-sref="project.tenants"><i class="fa fa-sitemap"></i> Tenants</a>
+  <a ng-if="tenantEnabled && (highestRole === 'team_admin' || highestRole === 'owner')" class="btn btn-warning pull-right project-section-header-button" ui-sref="project.tenants"><i class="fa fa-sitemap"></i> Tenants</a>
   <a ng-if="hasFormManager" class="btn btn-info pull-right project-section-header-button" href="{{ projectUrl }}/manage" target="_blank"><i class="fa fa-wpforms"></i> Form Manager</a>
   <a class="btn btn-blink pull-right project-section-header-button" ng-if="!$state.includes('project.tour') && createdDays <= 3" ui-sref="project.tour"><i class="fa fa-hand-o-right"></i> Continue Walkthrough</a>
   <span class="pull-right" style="margin: 10px;">
@@ -37,16 +37,15 @@
   <div class="project-sidebar sidebar">
     <ul class="nav nav-sidebar">
       <li ng-class="{active: isActive('project.overview')}"><a ui-sref="project.overview"><i class="fa fa-sitemap"></i><br/><span>Overview</span></a></li>
-      <li ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-object-group"></i><br/><span>Resources</span></a></li>
-      <li ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
-      <li ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
-      <li ng-class="{active: isActive('project.data')}"><a ui-sref="project.data"><i class="fa fa-database"></i><br/><span>Data</span></a></li>
-      <li ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
-      <li ng-class="{active: isActive('project.actions')}" ng-if="projectPermissions.admin">
+      <li ng-if="!currentProject.disabled" ng-class="{active: isActive('project.resource') && !isActive('project.form.form.submission')}"><a ui-sref="project.resource.index"><i class="fa fa-object-group"></i><br/><span>Resources</span></a></li>
+      <li ng-if="!currentProject.disabled" ng-class="{active: isActive('project.form')}"><a ui-sref="project.form.index"><i class="fa fa-tasks"></i><br/><span>Forms</span></a></li>
+      <li ng-if="!currentProject.disabled" ng-class="{active: isActive('project.api')}"><a ui-sref="project.api"><img src="images/swagger-logo.png" style="width:2em;" /><br/><span>API</span></a></li>
+      <li ng-if="!currentProject.disabled" ng-class="{active: isActive('project.data')}"><a ui-sref="project.data"><i class="fa fa-database"></i><br/><span>Data</span></a></li>
+      <li ng-if="!currentProject.disabled" ng-class="{active: isActive('project.access')}"><a ui-sref="project.access"><i class="fa fa-shield"></i><br/><span>Access</span></a></li>
+      <li ng-if="!currentProject.disabled && projectPermissions.admin" ng-class="{active: isActive('project.actions')}">
         <a ui-sref="project.actions"><i class="fa fa-play-circle-o"></i><br/><span>Actions</span></a>
       </li>
       <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
-      <!--<li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>-->
       <li ng-class="{active: isActive('project.env')}" ng-if="projectPermissions.admin">
         <a ui-sref="project.env.settings.info"><i class="fa fa-gear"></i><br /><span>Settings</span></a>
       </li>
@@ -70,8 +69,16 @@
     <div ng-if="currentProject.name === 'formio' && onPremise">
       <div class="well">
         <div class="alert alert-warning">
-          <p>This is the Portal Base project in your Primary environment. You should use it to manage your admimnistrative users and teams.</p>
+          <p>This is the Portal Base project in your Primary environment. You should use it to manage your administrative users and teams.</p>
           <p>DO NOT build your application from this project or add additional forms to it. Instead, go to the home page and create a new project.</p>
+        </div>
+      </div>
+    </div>
+    <div ng-if="currentProject.disabled">
+      <div class="well">
+        <div class="alert alert-danger">
+          <p>This is project has been disabled with the following message: {{currentProject.disabled}}.</p>
+          <p>Please correct the problem before continuing.</p>
         </div>
       </div>
     </div>

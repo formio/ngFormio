@@ -1,5 +1,6 @@
 'use strict';
 import semver from 'semver';
+import DOMPurify from "dompurify";
 
 /* globals NumberAbbreviate, Chartist, localStorage, Blob */
 
@@ -187,6 +188,9 @@ app.controller('ProjectCreateController', [
         localStorage.removeItem('stepFlowCurrentChildStep');
         ngDialog.close();
         $state.go('project.tour', {projectId: project._id});
+      }).catch((err) => {
+        $scope.isBusy = false;
+        throw err;
       });
     };
   }
@@ -269,6 +273,7 @@ app.controller('ProjectController', [
   'RemoteTokens',
   'PrimaryProject',
   'PDFServer',
+  'LicenseKeyHelper',
   function(
     $scope,
     $rootScope,
@@ -283,7 +288,8 @@ app.controller('ProjectController', [
     GoogleAnalytics,
     RemoteTokens,
     PrimaryProject,
-    PDFServer
+    PDFServer,
+    LicenseKeyHelper
   ) {
     // Load in existing primary project scope.
     $scope.status = {
@@ -312,27 +318,6 @@ app.controller('ProjectController', [
     $scope.currentProject = {_id: $stateParams.projectId, access: []};
     $scope.projectUrl = '';
     $scope.unsecurePortal = 'http://' + window.location.host;
-    $scope.hasFormManager = (localStorage.getItem('formManager-' + $stateParams.projectId) === 'true');
-    const checkFormManager = function() {
-      if (!$scope.hasFormManager) {
-        Formio.request(
-          'https://license.form.io/check/manager?project=' + $scope.projectUrl
-        ).then(function(project) {
-          if (project && project.enabled) {
-            $scope.hasFormManager = true;
-            localStorage.setItem('formManager-' + $stateParams.projectId, 'true');
-            if(!$scope.$$phase) {
-              $scope.$apply();
-            }
-          }
-          else {
-            console.warn('Form Manager not enabled');
-          }
-        }).catch(() => {
-          console.warn('Form Manager not enabled');
-        });
-      }
-    };
 
     $scope.rolesLoading = true;
     $scope.loadRoles = function() {
@@ -425,6 +410,7 @@ app.controller('ProjectController', [
     $scope.tenantProject = null;
     $scope.tenantProjectPromise = tenantProjectQ.promise;
     PDFServer.setPrimaryProject(primaryProjectQ.promise);
+    LicenseKeyHelper.setPrimaryProject(primaryProjectQ.promise);
     $scope.highestRoleQ = $q.defer();
     $scope.highestRoleLoaded = $scope.highestRoleQ.promise;
 
@@ -449,7 +435,6 @@ app.controller('ProjectController', [
       if ($scope.localProject.remote) {
         $scope.isRemote = true;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath($scope.localProject.remote.project, $scope.localProject.remote.url, $scope.localProject.remote.type));
-        checkFormManager();
         $scope.projectProtocol = $scope.localProject.remote.url.indexOf('https') === 0 ? 'https:' : 'http:';
         if ($scope.projectProtocol === 'http:' && $scope.projectProtocol !== window.location.protocol) {
           $scope.protocolSecureError = true;
@@ -475,6 +460,18 @@ app.controller('ProjectController', [
               })
               .then(function(currentProject) {
                 $scope.currentProject = currentProject;
+                if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.formManager === true) {
+                  $scope.hasFormManager = true;
+                }
+                else {
+                  $scope.hasFormManager = false
+                }
+                if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.tenant === true) {
+                  $scope.tenantEnabled = true;
+                }
+                else {
+                  $scope.tenantEnabled = false
+                }
                 $scope.loadRoles();
                 formioReady.resolve($scope.formio);
                 return currentProject;
@@ -487,7 +484,18 @@ app.controller('ProjectController', [
         $scope.baseUrl = AppConfig.apiBase;
         $scope.currentProject = $scope.localProject;
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
-        checkFormManager();
+        if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.formManager === true) {
+          $scope.hasFormManager = true;
+        }
+        else {
+          $scope.hasFormManager = false
+        }
+        if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.tenant === true) {
+          $scope.tenantEnabled = true;
+        }
+        else {
+          $scope.tenantEnabled = false
+        }
         formioReady.resolve($scope.formio);
         $scope.loadRoles();
       }
@@ -1043,6 +1051,7 @@ app.controller('ProjectOverviewController', [
   'Formio',
   'FormioAlerts',
   'ProjectFrameworks',
+  'LicenseServerHelper',
   function(
     $scope,
     $stateParams,
@@ -1050,7 +1059,8 @@ app.controller('ProjectOverviewController', [
     AppConfig,
     Formio,
     FormioAlerts,
-    ProjectFrameworks
+    ProjectFrameworks,
+    LicenseServerHelper
   ) {
     // This is restricted to form.io domains.
     var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
@@ -1102,39 +1112,95 @@ app.controller('ProjectOverviewController', [
         }
       });
 
-      //$http.post($scope.projectUrl + '/report', [
-      //  {
-      //    $sort: {
-      //      created: -1
-      //    }
-      //  },
-      //  {
-      //    $limit: 10
-      //  },
-      //])
-      //  .then(function(result) {
-      //    $scope.submissions = result.data || [];
-      //
-      //    if ($scope.submissions.length) {
-      //      var formIds = _.uniq($scope.submissions.map(function(submission) {
-      //        return submission.form;
-      //      }));
-      //
-      //      $scope.formio.loadForms({
-      //        params: {
-      //          _id__in: formIds
-      //        }
-      //      }).then(function(results) {
-      //        $scope.forms = {};
-      //        results.forEach(function(form) {
-      //          $scope.forms[form._id] = form;
-      //        });
-      //      });
-      //    }
-      //  })
-      //  .catch(function(err) {
-      //    console.warn('Unable to get recent submissions', err);
-      //  });
+      $scope.scopes = [
+        {
+          title: 'Forms and Resources',
+          prop: 'forms',
+          key: 'form',
+          columns: [
+            {
+              field: 'id',
+              title: 'Form ID'
+            },
+            {
+              field: 'title',
+              title: 'Title'
+            },
+            {
+              field: 'name',
+              title: 'Name'
+            },
+            {
+              field: 'path',
+              title: 'Path'
+            },
+            {
+              field: 'formType',
+              title: 'Type'
+            },
+            {
+              field: 'status',
+              title: 'Enabled'
+            },
+          ]
+        },
+        {
+          title: 'PDFs',
+          prop: 'pdfs',
+          key: 'pdf',
+          columns: [
+
+          ]
+        },
+        {
+          title: 'Form Requests',
+          prop: 'formRequests',
+          key: 'formRequest',
+          monthly: true,
+        },
+        {
+          title: 'Submission Requests',
+          prop: 'submissionRequests',
+          key: 'submissionRequest',
+          monthly: true,
+        },
+        {
+          title: 'Emails',
+          prop: 'emails',
+          key: 'email',
+          monthly: true,
+        },
+        {
+          title: 'PDF Downloads',
+          prop: 'pdfDownloads',
+          key: 'pdfDownload',
+          monthly: true,
+        },
+      ];
+
+      $scope.setScope = async (scope) => {
+        $scope.currentScope = scope;
+        $scope.utilizations = await LicenseServerHelper.getLicenseUtilizations($scope.currentProject.apiCalls.licenseId, scope.prop, `projectId=${$scope.currentProject._id}`);
+        $scope.$apply();
+      };
+
+      $scope.getValue = (value) => {
+        if (value === '1') {
+          return 'Yes';
+        }
+        if (value === '0') {
+          return 'No';
+        }
+        return value;
+      };
+
+      $scope.onAction = async (utilization, action) => {
+        const {id, status, lastCheck, ...data} = utilization;
+        data.licenseId = $scope.currentProject.apiCalls.licenseId;
+        data.type = $scope.currentScope.prop.substring(0, $scope.currentScope.prop.length - 1);
+        await LicenseServerHelper.utilizationAction(data, action);
+        $scope.setScope($scope.currentScope);
+      };
     });
   }
 ]);
@@ -1614,25 +1680,36 @@ app.controller('ProjectFormioController', [
   'AppConfig',
   '$window',
   '$http',
+  '$interpolate',
+  '$filter',
   'FormioAlerts',
+  'LicenseServerHelper',
   function(
     $scope,
     Formio,
     AppConfig,
     $window,
     $http,
-    FormioAlerts
+    $interpolate,
+    $filter,
+    FormioAlerts,
+    LicenseServerHelper
   ) {
     $scope.currentSection.title = 'Admin Data';
     $scope.currentSection.icon = 'glyphicon glyphicon-globe';
     $scope.currentSection.help = '';
-    $scope.views = ['Overview', 'Current', 'Usage', 'Users', 'Projects', 'Upgrades'];
-    $scope.view = $scope.views[0];
+    $scope.views = ['Overview', 'Current', 'Licenses', 'Users', 'Projects', 'Upgrades'];
     $scope.showDaily = false;
     $scope.showCreated = false;
     $scope.showIds = false;
     $scope.showEmployees = false;
     var _employees = null;
+
+    $scope.$watch('view', (view) => {
+      localStorage.setItem('adminView', view);
+    });
+
+    $scope.view = localStorage.getItem('adminView') || $scope.views[0];
 
     // Initialize the first graph, by loading the formio team and filtering out all bad data.
     $scope.init = function() {
@@ -2303,6 +2380,7 @@ app.controller('ProjectFormioController', [
     };
 
     $scope.usageLoading = false;
+
     $scope.updateUsage = function() {
       $scope.usageLoading = true;
 
@@ -2324,6 +2402,177 @@ app.controller('ProjectFormioController', [
         projects: null
       };
     };
+
+    $scope.initLicenses = async () => {
+      $scope.open = {};
+
+      $scope.openLicense = ($index) => {
+        $scope.open[$index] = true;
+      };
+
+      $scope.closeLicense = ($index) => {
+        $scope.open[$index] = false;
+      };
+
+      $scope.licenses = await LicenseServerHelper.getLicensesAdmin($scope.licenseQuerystring);
+      $scope.$apply();
+    };
+
+    $scope.licenseColumns = [
+      {
+        label: 'Name',
+        prop: 'licenseName',
+        type: 'text',
+        query: 'data.licenseName__regex',
+        filter: value => value,
+      },
+      {
+        label: 'Company',
+        prop: 'company',
+        type: 'text',
+        query: 'data.company__regex',
+        filter: value => value,
+      },
+      {
+        label: 'Location',
+        prop: 'location',
+        type: 'select',
+        query: 'data.location',
+        filter: location => {
+          if (!location) {
+            return '';
+          }
+          const locations = {
+            hosted: 'Hosted',
+            onPremise: 'On Premise',
+          };
+          return locations[location];
+        },
+        options: [
+          {
+            value: 'hosted',
+            label: 'Hosted'
+          },
+          {
+            value: 'onPremise',
+            label: 'On Premise'
+          },
+        ]
+      },
+      {
+        label: 'Plan',
+        prop: 'plan',
+        type: 'select',
+        query: 'data.plan',
+        filter: plan => {
+          if (!plan) {
+            return '';
+          }
+          const plans = {
+            basic: 'Basic',
+            trial: 'Trial',
+            independent: 'Independent',
+            team: 'Team Pro',
+            commercial: 'Enterprise',
+          };
+          return plans[plan];
+        },
+        options: [
+          {
+            value: 'basic',
+            label: 'Basic'
+          },
+          {
+            value: 'independent',
+            label: 'Independent'
+          },
+          {
+            value: 'team',
+            label: 'Team Pro'
+          },
+          {
+            value: 'commercial',
+            label: 'Enterprise'
+          },
+          {
+            value: 'trial',
+            label: 'Trial'
+          },
+        ]
+      },
+      {
+        label: 'Start Date',
+        prop: 'startDate',
+        type: 'date',
+        query: 'data.startDate__gt',
+        filter: value => $filter('date')(value, 'MM/dd/yyyy hh:mm a'),
+      },
+      {
+        label: 'End Date',
+        prop: 'endDate',
+        type: 'date',
+        query: 'data.endDate__lt',
+        filter: value => $filter('date')(value, 'MM/dd/yyyy hh:mm a'),
+      },
+      {
+        label: 'Authorized Users',
+        prop: 'user',
+        type: 'text',
+        query: 'data.user.data.email__regex',
+        filter: users => {
+          if (!users) {
+            return '';
+          }
+          return users.map(function(user) {
+            return user.data.name + ' (' + user.data.email + ')'
+          }).join(', ');
+        },
+      },
+    ];
+
+    const getLocalStorageJSON = (key) => {
+      const value = localStorage.getItem(key);
+
+      try {
+        return JSON.parse(value) || {};
+      }
+      catch (err) {
+        return {};
+      }
+    };
+
+    $scope.filters = getLocalStorageJSON('licenseFilter');
+    // Fix dates being stringified.
+    if ($scope.filters.startDate) {
+      $scope.filters.startDate = new Date($scope.filters.startDate);
+    }
+    if ($scope.filters.endDate) {
+      $scope.filters.endDate = new Date($scope.filters.endDate);
+    }
+
+    $scope.licenseQuerystring = getLocalStorageJSON('licenseFilterQuery');
+
+    $scope.open = {};
+
+    $scope.openCal = (prop) => {
+      $scope.open[prop] = !$scope.open[prop];
+    }
+
+    $scope.setLicenseFilter = async (col) => {
+      if ($scope.filters[col.prop]) {
+        $scope.licenseQuerystring[col.query] = $scope.filters[col.prop];
+      }
+      else {
+        delete $scope.licenseQuerystring[col.query];
+      }
+      localStorage.setItem('licenseFilter', JSON.stringify($scope.filters));
+      localStorage.setItem('licenseFilterQuery', JSON.stringify($scope.licenseQuerystring));
+      console.log($scope.filters);
+      $scope.licenses = await LicenseServerHelper.getLicensesAdmin($scope.licenseQuerystring);
+      $scope.$apply();
+    };
+
+    $scope.initLicenses();
   }
 ]);
 
@@ -2861,45 +3110,29 @@ app.controller('ProjectTenantController', [
     $state,
   ) {
     $scope.primaryProjectUrl = '';
-    $scope.tenantDisabled = false;
     const tenantContainer = document.getElementById('tenant-app');
     $scope.primaryProjectPromise.then(function(primaryProject) {
       $scope.primaryProjectUrl = AppConfig.apiBase + '/' + $scope.primaryProject.name;
-      Formio.request(
-        'https://license.form.io/check/tenant?project=' + $scope.primaryProjectUrl
-      ).then(function(project) {
-        if (project && project.enabled) {
-          let url = `${AppConfig.appBase}/tenant/?iframe=true`;
-          url += `&project=${encodeURIComponent($scope.primaryProjectUrl)}`;
-          url += `&base=${encodeURIComponent($scope.baseUrl)}`;
-          url += `#/project/${primaryProject._id}/tenant/index`;
-          tenantContainer.innerHTML = '';
-          const tenantElement = document.createElement('iframe');
-          tenantElement.setAttribute('style', 'width: 100%');
-          tenantElement.setAttribute('id', 'tenant-frame');
-          tenantElement.setAttribute('src', $sce.trustAsResourceUrl(url));
-          tenantContainer.appendChild(tenantElement);
-          const tenantFrame = window.seamless(tenantElement);
-          tenantFrame.receive(function(data, event) {
-            if (data.event === 'gotoTenant') {
-              $state.go('project.overview', {projectId: data.tenant._id});
-            }
-          });
-        }
-        else {
-          $scope.tenantDisabled = true;
-          if(!$scope.$$phase) {
-            $scope.$apply();
+      if ($scope.tenantEnabled) {
+        let url = `${AppConfig.appBase}/tenant/?iframe=true`;
+        url += `&project=${encodeURIComponent($scope.primaryProjectUrl)}`;
+        url += `&base=${encodeURIComponent($scope.baseUrl)}`;
+        url += `#/project/${primaryProject._id}/tenant/index`;
+        tenantContainer.innerHTML = '';
+        const tenantElement = document.createElement('iframe');
+        tenantElement.setAttribute('style', 'width: 100%');
+        tenantElement.setAttribute('id', 'tenant-frame');
+        tenantElement.setAttribute('src', $sce.trustAsResourceUrl(url));
+        tenantContainer.appendChild(tenantElement);
+        const tenantFrame = window.seamless(tenantElement);
+        tenantFrame.receive(function (data, event) {
+          if (data.event === 'gotoTenant') {
+            $state.go('project.overview', {projectId: data.tenant._id});
           }
-          console.warn('Multi-Tenant not enabled');
-        }
-      }).catch(() => {
-        $scope.tenantDisabled = true;
-        if(!$scope.$$phase) {
-          $scope.$apply();
-        }
+        });
+      } else {
         console.warn('Multi-Tenant not enabled');
-      });
+      }
     });
   }
 ]);
@@ -3320,11 +3553,6 @@ app.controller('ProjectBilling', [
   function($rootScope, $scope, $http, $state, $window, AppConfig, Formio, FormioAlerts, UserInfo, ProjectPlans, PDFServer) {
     $scope.primaryProjectPromise.then(function(project) {
 
-      $scope.servers = (project.billing && project.billing.servers) ? angular.copy(project.billing.servers) : {
-        api: 0,
-        pdf: 0
-      };
-
       $scope.planLoading = false;
       $scope.pdfInfo = {};
 
@@ -3351,7 +3579,19 @@ app.controller('ProjectBilling', [
 
       // Default to the commercial from trial or to current plan.
       $scope.selectedPlan = $scope.getPlan(project.plan);
+      $scope.pdfs = (project.billing && project.billing.pdfs) ? project.billing.pdfs : $scope.selectedPlan.features.pdfs;
+      $scope.pdfDownloads = (project.billing && project.billing.pdfDownloads) ? project.billing.pdfDownloads : $scope.selectedPlan.features.pdfDownloads;
+      $scope.pdfPrice = calculatePdfPrice();
+      $scope.hasFormManager = !!(project.billing && project.billing.formManager);
     });
+
+    var calculatePdfPrice = function() {
+      if ($scope.selectedPlan.features.pdfs === $scope.pdfs) {
+        return 0;
+      }
+      const base = $scope.selectedPlan.features.pdfs === 1 ? 0 : $scope.selectedPlan.features.pdfs;
+      return ($scope.pdfs - base) * 2; // (total - base) / 25 * 50
+    };
 
     var getActiveForm = function() {
       if(!$scope.paymentInfoLoading && !$scope.paymentInfo) {
@@ -3368,30 +3608,29 @@ app.controller('ProjectBilling', [
       $scope.paymentInfo = null;
     };
     $scope.setSelectedPlan = function(plan) {
+      const pdfModified = $scope.selectedPlan.features.pdfs !== $scope.pdfs || $scope.selectedPlan.features.pdfDownloads !== $scope.pdfDownloads;
       $scope.selectedPlan = plan;
+      if (!pdfModified) {
+        $scope.pdfs = plan.features.pdfs;
+        $scope.pdfDownloads = plan.features.pdfDownloads;
+      }
+      // If not upgradeable, reset to default.
+      if (!plan.features.pdfUpgradeable) {
+        $scope.pdfs = plan.features.pdfs;
+        $scope.pdfDownloads = plan.features.pdfDownloads;
+      }
+      $scope.pdfPrice = calculatePdfPrice();
     };
 
     $scope.changePlan = function() {
       $scope.planLoading = true;
 
-      PDFServer.purchasePDF($scope.primaryProjectPromise, {
-        plan: $scope.pdfInfo.plan
-      }).then(function(results) {
-        $scope.pdfInfo = results.data.data;
-        $scope.pdfPlanLoading = false;
-        $scope.planLoading = false;
-      }, function(err) {
-        FormioAlerts.onError({message: err.data || err.message});
-        $scope.pdfPlanLoading = false;
-      }).catch(function(err) {
-        FormioAlerts.onError({message: err.data || err.message});
-        $scope.pdfPlanLoading = false;
-      });
-
       $http.post(AppConfig.apiBase + '/project/' + $scope.primaryProject._id + '/upgrade',
         {
           plan: $scope.selectedPlan.name,
-          servers: $scope.servers
+          pdfs: $scope.pdfs,
+          pdfDownloads: $scope.pdfDownloads,
+          formManager: $scope.hasFormManager,
         }
         )
         .then(function() {
@@ -3402,10 +3641,6 @@ app.controller('ProjectBilling', [
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
-    $scope.setSelectedPlan = function(plan) {
-      $scope.selectedPlan = plan;
-    };
-
     $scope.capitalize = _.capitalize;
     $scope.plans = ProjectPlans.getPlans();
     $scope.getPlan = ProjectPlans.getPlan.bind(ProjectPlans);
@@ -3413,19 +3648,8 @@ app.controller('ProjectBilling', [
 
     var calculatePrice = function() {
       if ($scope.selectedPlan) {
-        if ($scope.selectedPlan.order < $scope.getPlan('team').order) {
-          $scope.servers = {
-            api: 0,
-            pdf: 0
-          };
-        }
-
         var pdfPrice = 0;
-        if (parseInt($scope.servers.pdf, 10) > 0) {
-          $scope.pdfInfo.plan = 'enterprise';
-          pdfPrice = ($scope.servers.pdf % 3 * 250) + (Math.floor($scope.servers.pdf / 3) * 500);
-        }
-        else if ($scope.pdfInfo.plan === 'hosted') {
+        if ($scope.pdfInfo.plan === 'hosted') {
           pdfPrice = 50;
         }
         else {
@@ -3434,33 +3658,46 @@ app.controller('ProjectBilling', [
 
         $scope.pricing = {
           plan: $scope.selectedPlan.price,
-          api: ($scope.servers.api % 3 * 250) + (Math.floor($scope.servers.api / 3) * 500),
-          pdf: {
-            plan: $scope.pdfInfo.plan,
-            servers: $scope.servers.pdf,
-            price: pdfPrice
-          }
+          pdfPrice: $scope.pdfPrice,
+          formManager: $scope.hasFormManager ? 150 : 0,
         };
-        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.api + $scope.pricing.pdf.price;
+        $scope.pricing.total = $scope.pricing.plan + $scope.pricing.pdfPrice + $scope.pricing.formManager;
       }
     };
 
-    $scope.setPDFHostedPlan = function(plan) {
-      $scope.servers.pdf = 0;
-      $scope.pdfInfo.plan = plan;
+    $scope.increasePdfs = function() {
+      if ($scope.pdfs === 1) {
+        $scope.pdfs = 25;
+        $scope.pdfDownloads = 1000;
+      }
+      else {
+        $scope.pdfs += 25;
+        $scope.pdfDownloads += 1000;
+      }
+      $scope.pdfPrice = calculatePdfPrice();
       calculatePrice();
     };
 
-    PDFServer.getInfo($scope.primaryProjectPromise).then(function(info) {
-      if (!info) {
-        return console.warn('Cannot find project information.');
+    $scope.decreasePdfs = function() {
+      if ($scope.pdfs === 25) {
+        $scope.pdfs = 1;
+        $scope.pdfDownloads = 1000;
       }
-      $scope.pdfInfo = info.data;
-      $scope.pdfInfoOriginalPlan = $scope.pdfInfo.plan;
+      else {
+        $scope.pdfs -= 25;
+        $scope.pdfDownloads -= 1000;
+      }
+      $scope.pdfPrice = calculatePdfPrice();
       calculatePrice();
-    });
+    };
 
-    $scope.$watch('servers', calculatePrice, true);
+    $scope.toggleFormManager = function() {
+      $scope.hasFormManager = !$scope.hasFormManager;
+      calculatePrice();
+    };
+
+    calculatePrice();
+
     $scope.$watch('selectedPlan', calculatePrice, true);
   }
 ]);

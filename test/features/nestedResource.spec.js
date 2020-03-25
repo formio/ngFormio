@@ -27,7 +27,7 @@ module.exports = function(actions,tags){
      actions.clickOnElementWithText('Create Form');
    // actions.clickOnClass('.toast-message');
      });
-    describe('Setup ‘Test Resource’',function(){
+    describe('Set Up ‘Test Resource’',function(){
       actions.clickOnElementWithText('Resources');
       actions.iSeeElement('.form-list li.list-group-item');
       actions.clickOnElementWithText('Test Resource');

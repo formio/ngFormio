@@ -256,7 +256,7 @@ module.exports = function (actions,tags) {
       actions.clickOnElementWithText('Custom JS and CSS');
       actions.checkingUrlEndsWith('/env/settings/customjscss');
       actions.clickOnElementWithText('Settings');
-      actions.clickOnElementWithText('PDF Management');
+      actions.clickOnElementWithText('PDF Server Deployment');
       // actions.checkingUrlEndsWith('env/pdf');
       // actions.iSeeText('1');
       // actions.iSeeText('10');
@@ -269,7 +269,7 @@ module.exports = function (actions,tags) {
       // actions.waitForActionToComplete(4000);
       // actions.iSeeText('$65/month');
       // actions.clickOnElementWithText('Settings');
-      // actions.clickOnElementWithText('PDF Management');
+      // actions.clickOnElementWithText('PDF Server Deployment');
       // actions.checkingUrlEndsWith('env/pdf');
       // actions.iSeeText('25');
       // actions.iSeeText('1,000');

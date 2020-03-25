@@ -121,6 +121,53 @@ li.user-dropdown a {
   cursor: pointer;
 }
 
+.license-usage-cards {
+  display: flex;
+  flex-flow: row wrap;
+  margin: -0.5em;
+}
+
+.license-usage-card {
+  width: 8em;
+  height: 8em;
+  border: 1px solid #999;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px #bbb;
+  margin: 0.5em;
+  display: table;
+}
+
+.license-usage-card:hover {
+  background-color: #eaf2ff;
+  width: calc(8em + 6px);
+  height: calc(8em + 6px);
+  margin: calc(0.5em - 3px);
+  box-shadow: 5px 5px 9px #bbb;
+  padding: 3px;
+  cursor: pointer;
+}
+
+.license-usage-card .usage-label {
+  width: 9.7em;
+  height: 1.3em;
+  color: #aaa;
+  font-size: 0.83em;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: absolute;
+  padding: 0.3em 0.4em;
+}
+
+.license-usage-card .usage-stat {
+  width: 8em;
+  vertical-align: middle;
+  text-align: center;
+  display: table-cell;
+  font-weight: bold;
+  font-size: 1.3em;
+  color: #444;
+}
+
 .navbar-header {
   .breadcrumb>li+li:before {
     content: ">";
@@ -628,13 +675,13 @@ div.project-section-separator {
   }
 }
 
-.project-example {
+.project-new {
   .well {
     border: 2px dashed #ddd;
     background-color: inherit;
     box-shadow: none;
     cursor: pointer;
-    padding-top: 100px;
+    padding-top: 50px;
     i.fa-plus {
       font-size: 3em;
     }
@@ -1145,7 +1192,7 @@ footer {
     text-decoration: none;
     overflow: hidden;
     transition: .15s;
-    height: 320px;
+    height: 220px;
     &:hover {
       background-color: lighten($gray-lighter, 5%);
     }
@@ -1159,9 +1206,17 @@ footer {
       top: 0;
       right: 0;
     }
+    .project-tile-buttons {
+      margin-left: -5px;
+      margin-right: -5px;
+    }
     .project-tile-button {
       padding-left: 5px;
       padding-right: 5px;
+      margin-bottom: 5px;
+      span.plan {
+        color: #FFF;
+      }
     }
     .project-teams-header {
       margin-top: 5px;
@@ -1170,9 +1225,11 @@ footer {
     .project-title {
       margin-top: 0;
       margin-bottom: 0;
+      padding-bottom: 5px;
+      font-weight: 600;
+      color: $brand-primary;
     }
     .project-title, .team-name {
-      margin-top: 0;
       a {
         font-weight: 600;
         color: $brand-primary;
