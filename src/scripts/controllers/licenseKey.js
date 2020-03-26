@@ -6,9 +6,11 @@ angular.module('formioApp.controllers.licenseKey', ['ngDialog'])
   .factory('LicenseKeyHelper', [
     '$http',
     'Formio',
+    'AppConfig',
     function(
       $http,
-      Formio
+      Formio,
+      AppConfig,
     ) {
       var primaryPromise = null;
 
@@ -38,7 +40,7 @@ angular.module('formioApp.controllers.licenseKey', ['ngDialog'])
             throw new Error('No license key specified on primary project')
           }
 
-          const response = await $http.get(`http://localhost:3006/key/${licenseKey}/scope`);
+          const response = await $http.get(`${AppConfig.licenseServer}/key/${licenseKey}/scope`);
 
           return response.data;
         },

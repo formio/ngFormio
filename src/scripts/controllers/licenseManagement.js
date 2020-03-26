@@ -63,18 +63,20 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
   .factory('LicenseServerHelper', [
     '$http',
     'Formio',
+    'AppConfig',
     function(
       $http,
-      Formio
+      Formio,
+      AppConfig
     ) {
       var LicenseServerHelper = {
         get: async (path, params = {}, headers = {}) => {
-          const response = await $http.get('http://localhost:3006/' + path, {params, headers})
+          const response = await $http.get($AppConfig.licenseServer + '/' + path, {params, headers})
           return response.data
         },
 
         post: async (path, body = {}, headers = {}) => {
-          const response = await $http.post('http://localhost:3006/' + path, body, {headers})
+          const response = await $http.post($AppConfig.licenseServer + '/' + path, body, {headers})
           return response.data
         },
 
