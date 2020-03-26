@@ -9,7 +9,7 @@
     <input type="text" class="form-control" id="description" name="description" ng-model="project.description" placeholder="Enter a short description for your project." ng-maxlength="512">
     <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
   </div>
-  <div ng-if="!hideFrameworks">
+  <div ng-if="!hideFrameworks" class="form-group">
     <label class="control-label">Target Framework</label>
     <p class="text-muted">Select which framework you plan to build this project in.</p>
     <ui-select ng-model="project.framework" theme="bootstrap">
@@ -18,6 +18,29 @@
         <span>{{ framework.title }}</span>
       </ui-select-choices>
     </ui-select>
+  </div>
+  <div class="form-group" ng-if="project._id">
+    <h3>Form Defaults</h3>
+    <div class="panel panel-default" ng-if="minPlan('commercial')">
+      <div class="panel-heading">
+        Form Revisions (Enterprise Only)
+      </div>
+      <div class="panel-body">
+        <div class="well well-sm">
+          Form revisions will save a copy of each form revision and allow matching submissions with the revision of the form it was submitted with.
+        </div>
+        <div id="form-group-versioning" class="form-group">
+          <label class="control-label">
+            <select ng-model="project.formDefaults.revisions">
+              <option value="">Disabled</option>
+              <option value="current">Enabled - Use current form version when viewing submissions.</option>
+              <option value="original">Enabled - Use original form version when viewing submissions.</option>
+            </select>
+          </label>
+          <div class="text-muted">When enabled, you can configure whether existing form submissions will be viewed in the latest version of the form or in the original version the submission was submitted with.</div>
+        </div>
+      </div>
+    </div>
   </div>
   <div ng-if="!project._id">
     <div class="panel panel-default">
