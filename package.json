@@ -11,6 +11,7 @@
     "test-win": "protractor protractor.conf.js"
   },
   "version": "7.0.0-rc.81",
+  "cache": "1",
   "dependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
