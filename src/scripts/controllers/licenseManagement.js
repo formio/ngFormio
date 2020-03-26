@@ -71,12 +71,12 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
     ) {
       var LicenseServerHelper = {
         get: async (path, params = {}, headers = {}) => {
-          const response = await $http.get($AppConfig.licenseServer + '/' + path, {params, headers})
+          const response = await $http.get(AppConfig.licenseServer + '/' + path, {params, headers})
           return response.data
         },
 
         post: async (path, body = {}, headers = {}) => {
-          const response = await $http.post($AppConfig.licenseServer + '/' + path, body, {headers})
+          const response = await $http.post(AppConfig.licenseServer + '/' + path, body, {headers})
           return response.data
         },
 
