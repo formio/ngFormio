@@ -15,7 +15,7 @@
   "dependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
-    "@formio/premium": "github:formio/premium#v1.6.0",
+    "@formio/premium": "github:formio/premium#v1.7.0",
     "@progress/kendo-ui": "^2020.1.219",
     "ajv": "^6.12.0",
     "angular": "^1.7.9",
