@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Licensing UI
 
+## 7.0.0-rc.82
+### Changed
+ - Upgrade formmanager@1.79.0
+ - Upgrade pro.formview.io@1.77.0
+
+## 7.0.0-rc.81
+### Changed
+ - Upgrade formiojs@4.9.8
+ - Upgrade ng-formio@4.13.9
+ - Upgrade formmanager@1.78.0
+ - Upgrade pro.formview.io@1.77.0
+ - Upgrade premium@1.6.0
+
 ## 7.0.0-rc.80
 ### Changed
  - Upgrade formiojs@4.9.6.
