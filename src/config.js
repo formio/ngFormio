@@ -89,6 +89,9 @@ if (Formio) {
       disable = true;
     }
   }
+  if ('loadModules' in Formio) {
+    Formio.loadModules();
+  }
 }
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
