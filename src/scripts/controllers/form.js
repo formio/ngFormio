@@ -519,7 +519,7 @@ app.controller('FormController', [
         Upload.upload({
           url: $scope.projectUrl + '/upload',
           data: {file: file},
-          headers: {'x-jwt-key': Formio.getToken()}
+          headers: {'x-jwt-token': Formio.getToken()}
         }).then(function (res) {
           PDFServer.clearCache();
           $scope.formReady = true;
