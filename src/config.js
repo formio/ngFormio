@@ -66,6 +66,9 @@ if (onPremise) {
   licenseServer = 'https://license.form.io';
   pathType = 'Subdirectories';
 }
+if (host.indexOf('localhost') === 0) {
+  licenseServer = 'http://localhost:3006';
+}
 
 var disable = false;
 var loading = false;

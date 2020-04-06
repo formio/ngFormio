@@ -184,11 +184,6 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
                 field: 'mongoHash',
                 title: 'Mongo Hash'
               },
-              {
-                field: 'status',
-                title: 'Enabled',
-                type: 'boolean',
-              },
             ]
           },
           {
@@ -206,11 +201,6 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
               {
                 field: 'mongoHash',
                 title: 'Mongo Hash'
-              },
-              {
-                field: 'status',
-                title: 'Enabled',
-                type: 'boolean',
               },
             ]
           },
@@ -235,11 +225,6 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
                 title: 'Type',
                 type: 'capitalize'
               },
-              {
-                field: 'status',
-                title: 'Enabled',
-                type: 'boolean',
-              },
             ]
           },
           {
@@ -263,11 +248,6 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
                 title: 'Type',
                 type: 'capitalize'
               },
-              {
-                field: 'status',
-                title: 'Enabled',
-                type: 'boolean',
-              },
             ]
           },
           {
@@ -290,11 +270,6 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
                 field: 'projectType',
                 title: 'Type',
                 type: 'capitalize'
-              },
-              {
-                field: 'status',
-                title: 'Enabled',
-                type: 'boolean',
               },
             ]
           },
@@ -351,14 +326,14 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
   <table class="table" ng-if="currentScope">
     <thead>
       <th ng-repeat="column in currentScope.columns track by $index">{{column.title}}</th>
-      <th>Action</th>
+      <th>Status</th>
     </thead>
     <tbody>
       <tr ng-repeat="utilization in utilizations track by $index">
         <td ng-repeat="column in currentScope.columns track by $index">{{utilization[column.field] | scopeValue : column.type}}</td>
         <td>
-          <span class="btn btn-info" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable', column.field)">Enable</span>
-          <span class="btn btn-danger" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable', column.field)">Disable</span>
+          <span class="btn btn-danger" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable', column.field)">Disabled</span>
+          <span class="btn btn-info" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable', column.field)">Enabled</span>
         </td>
       </tr>
       <tr ng-if="utilizations.length === 0">
