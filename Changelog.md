@@ -4,9 +4,36 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 7.1.0-7.1.3
+## 7.1.0-7.1.4
 ### Changed
  - Licensing UI
+
+## 7.0.0-rc.86
+### Changed
+ - Updated formiojs@4.9.13
+ - Updated formmanager@1.83.0
+
+## 7.0.0-rc.85
+### Fixed
+ - IE issues with premium components.
+
+### Changed
+ - Upgrade formmanager@1.82.0
+ - Upgrade pro.formview.io@1.81.0
+ - Upgrade formiojs@4.9.12
+
+## 7.0.0-rc.84
+### Changed
+ - Upgrade formmanager@1.81.0
+ - Upgrade pro.formview.io@1.80.0
+ - Upgrade formiojs@4.9.10
+
+## 7.0.0-rc.83
+### Changed
+ - Upgrade formmanager@1.80.0
+ - Upgrade pro.formview.io@1.79.0
+ - Upgrade formiojs@4.9.9
+ - Upgrade formio-tenant@1.13.0
 
 ## 7.0.0-rc.82
 ### Changed
