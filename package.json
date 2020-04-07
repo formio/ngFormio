@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "4.13.14",
+  "version": "4.13.15",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/ng-formio.js",
   "scripts": {
@@ -23,8 +23,8 @@
     "@babel/preset-env": "^7.9.0",
     "babel-loader": "^8.1.0",
     "core-js": "^3.6.4",
-    "css-loader": "^3.4.2",
-    "eslint-loader": "^3.0.4",
+    "css-loader": "^3.5.1",
+    "eslint-loader": "^4.0.0",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^6.0.0",
     "hoek": "^6.1.3",
@@ -45,7 +45,7 @@
     "json-logic-js": "^1.1.0"
   },
   "dependencies": {
-    "formiojs": "^4.9.13"
+    "formiojs": "^4.9.15"
   },
   "browserify": {
     "transform": [
