@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.0.0-rc.87
 ### Changed
- - Updated formiojs@4.9.15
- - Updated formmanager@1.85.0
+ - Updated formiojs@4.9.16
+ - Updated formmanager@1.86.0
+ - Updated @formio/premium@1.10.0
 
 ## 7.0.0-rc.86
 ### Changed
