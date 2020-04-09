@@ -1,4 +1,3 @@
-import { Formio } from 'formiojs';
 const app = angular.module('formio');
 export default app.factory('FormioScope', function() {
   return {
