@@ -3609,6 +3609,8 @@ app.controller('ProjectExportController', [
         $scope.export = excludeAccessProperties($scope.template);
         $scope.export.name = name;
         $scope.export.title = title;
+      } else {
+        $scope.export = excludeAccessProperties($scope.export);
       }
 
       FileSaver.saveAs(new Blob([JSON.stringify($scope.export, null, 2)], {type : 'application/json'}), $scope.currentProject.name + '-' + $scope.currentProject.tag + '.json');
