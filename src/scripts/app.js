@@ -1100,10 +1100,10 @@ angular
       }, 1000);
 
       // Catches error from expired/invalid session.
-      $rootScope.$on('formio.unauthorized', authError);
+      Formio.events.on('formio.unauthorized', authError);
 
       // Catches error from expired/invalid session.
-      $rootScope.$on('formio.sessionExpired', logoutError);
+      Formio.events.on('formio.sessionExpired', logoutError);
 
       // Logout of form.io and go to login page.
       $rootScope.logout = function() {
