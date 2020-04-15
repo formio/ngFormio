@@ -629,6 +629,15 @@ app.controller('ProjectController', [
         return ($scope.highestRole === 'owner' || $scope.highestRole === 'team_admin');
       };
 
+      $scope.spec = {};
+      $scope.swaggerLoading = true;
+      Formio.makeStaticRequest($scope.projectUrl + '/spec.json')
+        .then(function(spec) {
+          $scope.swaggerLoading = false;
+          $scope.spec = spec;
+          spec.host = $scope.projectUrl.replace(/https?:\/\//, '');
+        });
+
       $scope.projectError = false;
       return promiseResult;
     }).catch(function(err) {
@@ -725,10 +734,6 @@ app.controller('ProjectController', [
 
     $scope.getRole = function(id) {
       return _.find($scope.currentProjectRoles, {_id: id});
-    };
-
-    $scope.getSwaggerURL = function(format) {
-      return $scope.projectUrl + '/spec.json';
     };
 
     $scope.getPlanName = ProjectPlans.getPlanName.bind(ProjectPlans);

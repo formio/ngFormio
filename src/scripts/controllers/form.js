@@ -878,11 +878,6 @@ app.controller('FormController', [
     $scope.resourceAccessLabels = ResourceAccessLabels;
     $scope.accessLabels = AccessLabels;
 
-    // Get the swagger URL.
-    $scope.getSwaggerURL = function(format) {
-      return $scope.projectUrl + '/form/' + $scope.formId + '/spec.json';
-    };
-
     //// When a submission is made.
     //$scope.$on('formSubmit', function(event, submission) {
     //  event.stopPropagation();
