@@ -10,6 +10,6 @@
     <p class="well">For full API documentation, check out our <a class="btn btn-success btn-sm" href="https://documenter.getpostman.com/view/684631/formio-api/2Jvuks" target="_blank"><i class="fa fa-book"></i> Online API Documenation</a></p>
     <p class="well"><b>Warning: The API Explorer can change and delete your *live* Form Submission data.</b></p>
     <div ng-show="swaggerLoading">Loading...</div>
-    <div id="docs" swagger-ui url="getSwaggerURL()" api-explorer="true" loading="swaggerLoading" validator-url="false"></div>
+    <div ng-if="!swaggerLoading" id="docs" swagger-ui input-type="json" input="spec" api-explorer="true" validator-url="false"></div>
   </div>
 </div>
