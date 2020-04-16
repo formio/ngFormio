@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0-rc.92
+### Fixed
+ - FOR-2617: Update export template json
+ - FOR-2661: Fixed project spec.json host
+ - FOR-2655: Fixed redirect to auth state when token expired
+
 ## 7.0.0-rc.91
 ### Changed
  - Upgrade formiojs@4.9.19-rc.3
