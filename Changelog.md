@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.0
+### Changed
+ - No changes. Releasing 7.0.0-rc.92
+
 ## 7.0.0-rc.92
 ### Fixed
  - FOR-2617: Update export template json
