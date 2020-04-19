@@ -178,9 +178,11 @@ export default app.directive('formio', function() {
         }, true);
 
         $scope.$on('change', function () {
-          $scope.nowatch = true;
-          angular.merge($scope.submission, $scope.formio.submission);
-          $scope.$apply();
+          if ($scope.submission) {
+            $scope.nowatch = true;
+            angular.merge($scope.submission, $scope.formio.submission);
+            $scope.$apply();
+          }
         });
 
         // Clean up the Form from DOM.
