@@ -10,12 +10,12 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.1-rc.1",
+  "version": "7.0.1-rc.2",
   "cache": "1",
   "dependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
-    "@formio/premium": "github:formio/premium#v1.12.4",
+    "@formio/premium": "github:formio/premium#v1.12.5",
     "@progress/kendo-ui": "^2020.1.406",
     "ajv": "^6.12.0",
     "angular": "^1.7.9",
@@ -53,7 +53,7 @@
     "file-saver": "^2.0.1",
     "font-awesome": "^4.7.0",
     "formio-tenant": "github:formio/formio-tenant#1.13.0",
-    "formiojs": "^4.9.20-rc.1",
+    "formiojs": "^4.9.20-rc.3",
     "formmanager": "github:formio/formmanager#v1.90.0",
     "gulp": "^4.0.2",
     "gulp-s3": "^0.11.0",
