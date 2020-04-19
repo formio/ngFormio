@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.1-rc.4
+### Fixed
+ - Upgrade ng-formio to resolve $hashkey errors.
+
 ## 7.0.1-rc.3
 ### Fixed
  - Problems with PDF builder not allowing deleting components.
