@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.3
+### Changed
+ - Upgrade formiojs@4.9.22
+ - Upgrade formmanager@1.93.0
+ - Upgrade pro.formview.io@1.93.0
+
 ## 7.0.2
 ### Changed
  - Upgrade formiojs@4.9.21
