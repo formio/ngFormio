@@ -231,6 +231,18 @@ module.exports = function() {
           );
         };
 
+        $scope.isVisibleSubmitButton = function(form) {
+          var visible = true;
+
+          FormioUtils.eachComponent(form.components, function(component) {
+            if ((component.type === 'button') && (component.action === 'submit')) {
+              visible = !component.hidden;
+            }
+          });
+
+          return visible;
+        }
+
         // Show the submit message and say the form is no longer submitting.
         var onSubmit = function(submission, message, form) {
           if (message) {
