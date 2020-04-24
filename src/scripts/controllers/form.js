@@ -1824,7 +1824,7 @@ app.controller('FormActionEditController', [
                         '<strong>Warning:</strong> This project is currently on the <strong>Basic PDF plan</strong> which only allows for <strong>10</strong> submission PDF attachments per month. ' +
                         'Please <a class="btn btn-default" href="/#/project/' + $scope.primaryProject._id + '/billing">Upgrade your PDF Plan</a> to remove this message.'
                       )
-                      .insertBefore('#form-group-attachPDF');
+                      .insertBefore('.formio-component-attachPDF');
                   });
                 }
               });
