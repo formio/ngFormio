@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.6
+### Changed
+ - Merged changes from 7.0.2
+
 ## 7.1.5
 ### Changed
  - Merged changes from 7.0.0-rc.86
@@ -11,6 +15,54 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.1.0-7.1.4
 ### Changed
  - Licensing UI
+
+## 7.0.2
+### Changed
+ - Upgrade formiojs@4.9.21
+ - Upgrade formmanager@1.92.0
+ - Upgrade pro.formview.io@1.92.0
+
+## 7.0.1
+### Changed
+ - Upgrade formiojs@4.9.20
+ - Upgrade formmanager@1.91.0
+ - Upgrade pro.formview.io@1.91.0
+
+## 7.0.1-rc.4
+### Fixed
+ - Upgrade ng-formio to resolve $hashkey errors.
+
+## 7.0.1-rc.3
+### Fixed
+ - Problems with PDF builder not allowing deleting components.
+
+## 7.0.1-rc.2
+### Changed
+ - Upgrade formiojs@4.9.20-rc.3
+
+## 7.0.1-rc.1
+### Changed
+ - Upgrade formiojs@4.9.20-rc.1
+
+## 7.0.0
+### Changed
+ - No changes. Releasing 7.0.0-rc.92
+
+## 7.0.0-rc.92
+### Fixed
+ - FOR-2617: Update export template json
+ - FOR-2661: Fixed project spec.json host
+ - FOR-2655: Fixed redirect to auth state when token expired
+
+## 7.0.0-rc.91
+### Changed
+ - Upgrade formiojs@4.9.19-rc.3
+
+## 7.0.0-rc.87
+### Changed
+ - Updated formiojs@4.9.16
+ - Updated formmanager@1.86.0
+ - Updated @formio/premium@1.10.0
 
 ## 7.0.0-rc.86
 ### Changed
