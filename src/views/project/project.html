@@ -30,7 +30,12 @@
     <li ng-if="environments.length < 9 && projectPermissions.admin"><a ui-sref="project.environment">+ New Stage</a></li>
   </ul>
 </div>
-<div class="well" style="min-height: 400px;" ng-if="!projectViewReady">
+<div class="project-container" ng-if="projectError">
+  <div class="alert alert-danger">
+    Error accessing project: {{projectError}}
+  </div>
+</div>
+<div class="well" style="min-height: 400px;" ng-if="!projectViewReady && !projectError">
   <i id="project-loader" style="font-size: 2em;" class="fa fa-spinner fa-pulse"></i><span style="margin-left:1em;">Loading Project</span>
 </div>
 <div class="project-container" ng-if="projectViewReady && projectPermissions.read">
