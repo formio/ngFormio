@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.1.6
 ### Changed
- - Merged changes from 7.0.2
+ - Merged changes from 7.0.3
 
 ## 7.1.5
 ### Changed
