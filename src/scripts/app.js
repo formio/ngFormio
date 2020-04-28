@@ -331,12 +331,6 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/database/wipe.html',
         })
-        .state('project.env.integrations.pdf', {
-          url: '/pdf',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/pdf/index.html',
-          controller: 'PDFController'
-        })
         .state('project.env.integrations.licenseKey', {
           url: '/license',
           parent: 'project.env',
@@ -1194,7 +1188,6 @@ angular
       $templateCache.put('views/project/env/authentication/oauth/google.html', require('../views/project/env/authentication/oauth/google.html'));
       $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
       $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
-      $templateCache.put('views/project/env/pdf/delete.html', require('../views/project/env/pdf/delete.html'));
       $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/javascript/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));

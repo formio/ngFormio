@@ -1067,9 +1067,6 @@ app.controller('ProjectOverviewController', [
     ProjectFrameworks,
     LicenseServerHelper
   ) {
-    // This is restricted to form.io domains.
-    var key = 'AIzaSyDms9ureQ45lp6BT6LuZtoANB_GcR2jZmE';
-
     $scope.currentSection.title = 'Overview';
     $scope.currentSection.icon = 'fa fa-dashboard';
     $scope.currentSection.help = '';
@@ -1143,10 +1140,6 @@ app.controller('ProjectOverviewController', [
               field: 'formType',
               title: 'Type'
             },
-            {
-              field: 'status',
-              title: 'Enabled'
-            },
           ]
         },
         {
@@ -1154,7 +1147,14 @@ app.controller('ProjectOverviewController', [
           prop: 'pdfs',
           key: 'pdf',
           columns: [
-
+            {
+              field: 'fileId',
+              title: 'File Id'
+            },
+            {
+              field: 'path',
+              title: 'Path'
+            },
           ]
         },
         {
@@ -1197,6 +1197,12 @@ app.controller('ProjectOverviewController', [
           return 'No';
         }
         return value;
+      };
+
+      $scope.reloadProject = () => {
+        $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
+          $scope.currentProject = result;
+        });
       };
 
       $scope.onAction = async (utilization, action) => {
