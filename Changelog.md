@@ -5,8 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.1.6
+### Added
+ - Project Limits refresh icon
+
 ### Changed
  - Merged changes from 7.0.3
+ 
+### Fixed
+ - Utilizations in projects
+ 
+### Removed
+ - PDF Management page
 
 ## 7.1.5
 ### Changed
