@@ -1313,7 +1313,7 @@ angular
           price: 25,
           priceDescription: '$25/month',
           features: {
-            forms: '50',
+            forms: '25',
             formRequests: '10,000',
             submissionRequests: '10,000',
             emails: '1000',
