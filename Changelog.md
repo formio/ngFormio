@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  
 ### Fixed
  - Utilizations in projects
+ - Don't display manage links without permissions.
  
 ### Removed
  - PDF Management page
