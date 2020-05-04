@@ -3,8 +3,9 @@
   <p>SMTP is a standard protocol for sending mail on your behalf. Please provide your credentials below.</p>
 </div>
 <div class="form-group">
-  <label for="smtpSecure">SSL</label>
+  <label for="smtpSecure">Force TLS</label>
   <input ng-model="currentProject.settings.email.smtp.secure" type="checkbox" id="smtpSecure" name="smtpSecure">
+  <p>If unchecked, will use TLS via STARTTLS if available.</p>
 </div>
 <div class="form-group">
   <label for="smtpHost">Host</label>
