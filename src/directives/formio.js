@@ -174,7 +174,8 @@ export default app.directive('formio', function() {
             $scope.nowatch = false;
             return;
           }
-          $scope.onFormio.then(() => ($scope.formio.submission = angular.copy(submission)));
+          const submissionCopy = angular.copy(submission);
+          $scope.onFormio.then(() => ($scope.formio.submission = submissionCopy));
         }, true);
 
         $scope.$on('change', function () {
