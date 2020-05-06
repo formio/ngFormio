@@ -374,7 +374,7 @@ module.exports = function() {
               }, FormioScope.onError($scope, $element));
             }
             else if ($scope.formio && !$scope.formio.noSubmit) {
-              $scope.formio.saveSubmission(submissionData).then(onDone).catch(FormioScope.onError($scope, $element));
+              $scope.formio.saveSubmission(submissionData, $scope.formioOptions).then(onDone).catch(FormioScope.onError($scope, $element));
             }
             else {
               onDone(submissionData);
