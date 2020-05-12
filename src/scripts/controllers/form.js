@@ -2141,6 +2141,16 @@ app.controller('FormSubmissionsController', [
       });
     };
 
+    var sanitize = function(value) {
+      const maliciousInterpolationRegExp = /^\{\{.+\(.+[)]{1}\([)]{1}.*\}\}$/;
+
+      if (maliciousInterpolationRegExp.test(value)) {
+        return DOMPurify.sanitize(`<span class="ng-non-bindable">${value}</span>`);
+      }
+
+      return DOMPurify.sanitize(value);
+    }
+
     var getKendoCell = function(component, path) {
       var filterable;
       switch(component.type) {
@@ -2191,9 +2201,9 @@ app.controller('FormSubmissionsController', [
               return '';
             }
             if (component.multiple) {
-              return DOMPurify.sanitize(value.join(', '));
+              return sanitize(value.join(', '));
             }
-            return DOMPurify.sanitize(value);
+            return sanitize(value);
           }
           if (component.multiple && (value.length > 0)) {
             var values = [];
@@ -2212,7 +2222,7 @@ app.controller('FormSubmissionsController', [
               }
               values.push(arrayValue);
             });
-            return DOMPurify.sanitize(values.join(', '));
+            return sanitize(values.join(', '));
           }
           value = componentInfo.tableView(value, {
             component: component,
@@ -2226,7 +2236,7 @@ app.controller('FormSubmissionsController', [
           if (value === undefined) {
             return '';
           }
-          return DOMPurify.sanitize(value);
+          return sanitize(value);
         },
         // Disabling sorting on embedded fields because it doesn't work in resourcejs yet
         width: '200px',
