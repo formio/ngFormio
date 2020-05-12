@@ -631,7 +631,7 @@ app.controller('ProjectController', [
 
       $scope.spec = {};
       $scope.swaggerLoading = true;
-      Formio.makeStaticRequest($scope.projectUrl + '/spec.json')
+      Formio.makeStaticRequest($scope.projectUrl + '/spec.json', 'GET', null, { noToken:true })
         .then(function(spec) {
           $scope.swaggerLoading = false;
           $scope.spec = spec;
