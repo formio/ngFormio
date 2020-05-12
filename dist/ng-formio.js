@@ -414,8 +414,9 @@ var _default = app.directive('formio', function () {
           return;
         }
 
+        var submissionCopy = angular.copy(submission);
         $scope.onFormio.then(function () {
-          return $scope.formio.submission = angular.copy(submission);
+          return $scope.formio.submission = submissionCopy;
         });
       }, true);
       $scope.$on('change', function () {
