@@ -28,11 +28,16 @@ export default angular.module('formio').directive('formBuilder', function() {
             builder.instance.on('change', (event) => {
               // Do not emit form change events if this is from submission data.
               if (!event.data) {
-                $scope.$emit('formChange', builder.instance.form);
+                $scope.$emit('formChange', builder.instance.schema);
               }
             });
             builder.instance.onAny((event, ...args) => {
-              $scope.$emit(event, ...args);
+              if (event === 'formio.render') {
+                $scope.$emit(event, builder.instance.schema);
+              } 
+              else {
+                $scope.$emit(event, ...args);
+              } 
             });
           });
 
