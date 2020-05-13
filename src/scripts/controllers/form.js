@@ -988,6 +988,28 @@ app.controller('FormController', [
         .catch(FormioAlerts.onError.bind(FormioAlerts));
     };
 
+    const createDefinitionSchema = (form) => {
+      $scope.definition.schema = {
+        ...$scope.form,
+        components: form.components,
+      };
+
+      if(!$scope.$$phase) {
+        $scope.$apply();
+      }
+    }
+    
+    $scope.$on('formChange', (event, form) => {
+      createDefinitionSchema(form);
+    });
+
+    $scope.$on('formio.render', (event, form) => {
+      //set definition schema on load and change definition schema if display mode is changed
+      if (form.components && (!$scope.definition.schema ||$scope.definition.schema.display !== form.display)) {
+        createDefinitionSchema(form);
+      }
+    });
+
     // Called when the form is updated.
     $scope.$on('formUpdate', function(event, form) {
       event.stopPropagation();
@@ -1001,7 +1023,6 @@ app.controller('FormController', [
       $scope.updateCurrentFormResources(form);
       $scope.form = form;
     });
-
 
     $rootScope.currentForm = $scope.form;
   }
@@ -1133,14 +1154,7 @@ app.controller('FormEditController', [
     $scope.changes = [];
 
     $scope.$on('formChange', (event, form) => {
-      $scope.definition.schema = {
-        ...$scope.form,
-        components: form.components,
-      };
       $scope.dirty = true;
-      if(!$scope.$$phase) {
-        $scope.$apply();
-      }
     });
 
     $scope.$on('formio.addComponent', (event, component, parent, path, index) => {
