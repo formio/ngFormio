@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.4
+### Added
+ - Added Form Defaults setting to Project Settings.
+
+### Fixed
+ - Implement sanitizing values for being potentially malicious code
+ - FOR-2671: Fixed close access to LDAP settings for Team Pro
+ - FJS-657: Changed warnings wrapper selector to valid one
+ - FJS-888: Fixed logging out when switching within stages
+ - PDF 34: Added help message regarding images for header/footer templates
+
+### Changed
+ - Upgrade @babel/core@7.9.6, @babel/preset-env@7.9.6, css-loader@3.5.3, dompurify@2.0.11, mocha@7.1.2, swagger-ui@3.25.2, @progress/kendo-ui@2020.2.512, jquery@3.5.1, moment@2.25.3, node-sass@4.14.1, style-loader@1.2.1, webpack-dev-server@3.11.0
+
 ## 7.0.3
 ### Changed
  - Upgrade formiojs@4.9.22
