@@ -9,7 +9,7 @@ class ResourceFieldsComponent extends NestedDataComponent {
         authenticate: true,
         valueProperty: '_id',
         template: '<span>{{ item.title }}</span>',
-        searchField: 'title',
+        searchField: 'title__regex',
         key: 'resource',
         dataSrc: 'url',
         lazyLoad: false,
@@ -46,15 +46,34 @@ class ResourceFieldsComponent extends NestedDataComponent {
             components: [
               {
                 type: 'content',
-                html: 'Below are the fields within the selected resource. For each of these fields, select the corresponding field within this form that you wish to map to the selected Resource.'
+                html: 'Below are the fields within the selected resource. For each of these fields, select the corresponding field within this form that you wish to map to the selected Resource. <br /> Simple mappings may be used for any component that is not nested within a container, editgrid, datagrid or other nested data component.'
               }
             ]
           },
           {
             type: 'panel',
-            title: 'Field Mappings',
+            title: 'Simple Mappings',
             key: 'dynamic',
             components: []
+          },
+          {
+            type: 'panel',
+            title: 'Transform Mappings',
+            key: 'transformPanel',
+            components: [
+              {
+                input: true,
+                label: "Transform Data",
+                key: "transform",
+                placeholder: "/** Example Code **/\ndata = submission.data;",
+                rows: 8,
+                defaultValue: "",
+                persistent: true,
+                editor: "ace",
+                type: "textarea",
+                description: "Available variables are submission and data (data is already transformed by simple mappings)."
+              }
+            ]
           }
         ],
         conditional: {
@@ -72,22 +91,25 @@ class ResourceFieldsComponent extends NestedDataComponent {
     Formio.request(`${Formio.getProjectUrl()}/form/${this.data.resource}`).then((result) => {
       const dynamicFields = this.getComponent('dynamic');
       dynamicFields.destroyComponents();
-      const formFields = [];
-      FormioUtils.eachComponent(this.options.currentForm.components, (component) => {
-        if (component.type !== 'button') {
+      const formFields = [{
+        value: 'data',
+        label: 'Entire Submission Data',
+      }];
+      FormioUtils.eachComponent(this.options.currentForm.components, (component, path) => {
+        if (component.type !== 'button' && path.indexOf('.') === -1) {
           formFields.push({
             value: component.key,
-            label: component.label
+            label: `${component.label || component.title || component.legend} (${component.key})`
           });
         }
       });
 
-      FormioUtils.eachComponent(result.components, (component) => {
-        if (component.type !== 'button') {
+      FormioUtils.eachComponent(result.components, (component, path) => {
+        if (component.type !== 'button' && path.indexOf('.') === -1) {
           dynamicFields.addComponent({
             type: 'select',
             input: true,
-            label: component.label,
+            label: `${component.label} (${component.key})`,
             key: `fields.${component.key}`,
             dataSrc: 'values',
             data: {values: formFields},
