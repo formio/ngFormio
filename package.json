@@ -10,7 +10,7 @@
     "test": "APPPROTOCOL=http APPDOMAIN=portal.localhost APPPORT=$PORT protractor protractor.conf.js",
     "test-win": "protractor protractor.conf.js"
   },
-  "version": "7.0.7",
+  "version": "7.0.8",
   "cache": "1",
   "dependencies": {
     "@babel/core": "^7.9.6",
@@ -53,8 +53,8 @@
     "file-saver": "^2.0.1",
     "font-awesome": "^4.7.0",
     "formio-tenant": "github:formio/formio-tenant#1.13.0",
-    "formiojs": "^4.10.0-beta.18",
-    "formmanager": "github:formio/formmanager#v1.93.0",
+    "formiojs": "^4.9.27-rc.4",
+    "formmanager": "github:formio/formmanager#v1.93.1",
     "gulp": "^4.0.2",
     "gulp-s3": "^0.11.0",
     "html-dnd": "^1.2.1",
@@ -82,7 +82,7 @@
     "selenium-server-standalone-jar": "^3.141.59",
     "signature_pad": "^2.3.2",
     "style-loader": "^1.2.1",
-    "swagger-ui": "^3.25.2",
+    "swagger-ui": "^3.25.3",
     "ui-select": "^0.19.8",
     "webdriverio": "^5.22.4",
     "webdriverjs-angular": "^0.1.3",
