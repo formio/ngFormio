@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## UNRELEASED
+### Added
+ - Additional options to the resourcefield component to configure Save Submission to a Resource.
+
 ## 7.0.7
 ### Fixed
  - Reverted issue with select dropdowns with complex objects.
