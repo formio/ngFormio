@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## UNRELEASED
+## 7.0.8-beta.1
 ### Added
  - Additional options to the resourcefield component to configure Save Submission to a Resource.
 
