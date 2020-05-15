@@ -9,6 +9,11 @@
     <input type="text" class="form-control" id="description" name="description" ng-model="project.description" placeholder="Enter a short description for your project." ng-maxlength="512">
     <p class="help-block" ng-show="projectForm.description.$error.maxlength">Description cannot be longer than 512 characters.</p>
   </div>
+  <div ng-if="project._id" class="form-group" ng-class="{'has-error': projectForm.description.$invalid}">
+    <label for="licenseKey" class="control-label">License Key</label>
+    <input type="text" class="form-control" id="licenseKey" ng-model="primaryProject.settings.licenseKey" placeholder="client license key"/>
+    <div class="text-muted">Enter the license key associated with this project.</div>
+  </div>
   <div ng-if="!hideFrameworks" class="form-group">
     <label class="control-label">Target Framework</label>
     <p class="text-muted">Select which framework you plan to build this project in.</p>

@@ -331,12 +331,6 @@ angular
           parent: 'project.env',
           templateUrl: 'views/project/env/database/wipe.html',
         })
-        .state('project.env.integrations.licenseKey', {
-          url: '/license',
-          parent: 'project.env',
-          templateUrl: 'views/project/env/licenseKey/index.html',
-          controller: 'LicenseKeyController'
-        })
         .state('project.env.staging', {
           url: '/staging',
           abstract: true,
