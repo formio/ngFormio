@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Fix (handle forms conflict): prevent overriding merged form schema
  - PDF 34 - Extended PDF settings tips with time zones info
  - FJS-876: fixed always save minified form schema
+ 
+### Added
+ - Additional options to the resourcefield component to configure Save Submission to a Resource.
 
 ## 7.0.8
 ### Changed
