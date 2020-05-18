@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.10
+### Changed
+ - Pin jquery version so it works with KendoUI.
+
 ## 7.0.9
 ### Changed
  - Update formiojs@4.10.0-beta.19
