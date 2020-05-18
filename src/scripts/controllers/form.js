@@ -905,15 +905,16 @@ app.controller('FormController', [
     //});
 
     // Save a form.
-    $scope.saveForm = function(form) {
-      form = form || $scope.form || $scope.definition.schema;
+    $scope.saveForm = function(form, noSchemaUpdate) {
+      let formToSave = form || $scope.form || $scope.definition.schema;
       //Make sure that form will be saved with relevant components set
-      form = $scope.definition.schema ? { ...form, components: $scope.definition.schema.components} : form;
-      form.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
+      const updatedFormSchema = { ...formToSave, components: $scope.definition.schema.components};
+      formToSave = !noSchemaUpdate && $scope.definition.schema ? updatedFormSchema : formToSave;
+      formToSave.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
-      return $scope.formio.saveForm(angular.copy(form), {
+      return $scope.formio.saveForm(angular.copy(formToSave), {
         getHeaders: true
       })
       .then(function(response) {
@@ -1180,7 +1181,7 @@ app.controller('FormEditController', [
 
     var handleFormConflict = function(newForm) {
       var result = Utils.applyFormChanges(newForm, $scope.changes);
-      return $scope.parentSave(result.form)
+      return $scope.parentSave(result.form, true)
         .then(function() {
           if (result.failed.length) {
             $scope.failed = result.failed;
