@@ -32,7 +32,12 @@ export default angular.module('formio').directive('formBuilder', function() {
               }
             });
             builder.instance.onAny((event, ...args) => {
-              $scope.$emit(event, ...args);
+              if (event === 'formio.render') {
+                $scope.$emit(event, builder.instance.schema);
+              } 
+              else {
+                $scope.$emit(event, ...args);
+              } 
             });
           });
 
