@@ -136,6 +136,7 @@ app.config([
             display: null,
             properties: null,
             form: null,
+            controller: ''
           }
         })
         .state(parentName + '.import', {
@@ -623,6 +624,7 @@ app.controller('FormController', [
         submissionAccess: [],
         settings: {},
         properties: $stateParams.properties || {},
+        controller: $stateParams.controller || ''
       };
     }
 
@@ -907,10 +909,11 @@ app.controller('FormController', [
     // Save a form.
     $scope.saveForm = function(form, noSchemaUpdate) {
       let formToSave = form || $scope.form || $scope.definition.schema;
+      const formController = formToSave.controller || '';
       //Make sure that form will be saved with relevant components set
       const updatedFormSchema = { ...formToSave, components: $scope.definition.schema.components};
       formToSave = !noSchemaUpdate && $scope.definition.schema ? updatedFormSchema : formToSave;
-      formToSave.controller =  $scope.controllerData ? $scope.controllerData.data.formController : '';
+      formToSave.controller =  $scope.controllerData ? $scope.controllerData.data.formController : formController;
       angular.element('.has-error').removeClass('has-error');
 
       // Copy to remove angular $$hashKey
@@ -999,7 +1002,7 @@ app.controller('FormController', [
         $scope.$apply();
       }
     }
-    
+
     $scope.$on('formChange', (event, form) => {
       createDefinitionSchema(form);
     });
@@ -1403,7 +1406,12 @@ app.controller('FormImportController', [
     $scope.importForm = function() {
       (new Formio($scope.embedURL, {base: $scope.baseUrl})).loadForm(null, {noToken: true})
         .then(function(form) {
-          $state.go('project.' + form.type + '.create', _.pick(form, ['components', 'display', 'properties']));
+          $state.go('project.' + form.type + '.create', _.pick(form, [
+            'components',
+            'display',
+            'properties',
+            'controller',
+          ]));
         })
         .catch(function(error) {
           FormioAlerts.warn('Error fetching form: ' + _.escape(error));
