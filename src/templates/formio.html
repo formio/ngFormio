@@ -11,6 +11,7 @@
     <iframe ng-src="{{ getIframeSrc(form.settings.pdf) | trustAsResourceUrl }}" seamless class="formio-iframe"></iframe>
     <button ng-if="!readOnly && !options.building && isVisibleSubmitButton(form)" ng-disabled="readOnly || form.submitting" type="button" class="btn btn-primary" ng-click="submitIFrameForm()">
       Submit
+      <i ng-if="form.submitting" class="glyphicon glyphicon-refresh glyphicon-spin"></i>
     </button>
     <div ng-if="validationErrorPresent" class="has-error">
       <p class="help-block" onclick="scroll=window.scrollTo(0,0)">
