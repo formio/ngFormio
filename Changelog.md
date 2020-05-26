@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.14.0-rc.1
+### Changed
+ - Upgrade formiojs@4.10.0-rc.3
+
 ## 4.13.18
 ### Fixed
  - Error with $hashkey undefined errors.
