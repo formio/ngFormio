@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.11
+### Fixed
+ - FOR-2671: Fixed LDAP access message
+ - FOR-2669: Added possibility to form controller.
+
+### Changed
+ - Upgrade formiojs@4.10.0-rc.3
+ - Upgrade formmanager@v1.94.0-rc.1
+ - Upgrade premium@1.13.0-rc.1
+
 ## 7.0.10
 ### Changed
  - Pin jquery version so it works with KendoUI.
