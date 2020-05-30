@@ -2155,7 +2155,7 @@ app.controller('FormSubmissionsController', [
     };
 
     var sanitize = function(value) {
-      const maliciousInterpolationRegExp = /^\{\{.+\(.+[)]{1}\([)]{1}.*\}\}$/;
+      const maliciousInterpolationRegExp = /\$eval|constructor/gim;
 
       if (maliciousInterpolationRegExp.test(value)) {
         return DOMPurify.sanitize(`<span class="ng-non-bindable">${value}</span>`);
