@@ -30,9 +30,50 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Licensing UI
 
+## 7.0.13
+### Fixed
+ - FJS-916: change regexp testing submission for xss attacks
+ - FVP-31: Add Reset param to not onpremise projects
+
+## 7.0.12
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.0-rc.2",
+ - Upgrade "formiojs": "^4.10.0-rc.6"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.0-rc.2"
+ - Upgrade "ng-formio": "^4.14.0-rc.2"
+
+## 7.0.11
+### Fixed
+ - FOR-2671: Fixed LDAP access message
+ - FOR-2669: Added possibility to form controller.
+
+### Changed
+ - Upgrade formiojs@4.10.0-rc.3
+ - Upgrade formmanager@v1.94.0-rc.1
+ - Upgrade premium@1.13.0-rc.1
+
+## 7.0.10
+### Changed
+ - Pin jquery version so it works with KendoUI.
+
+## 7.0.9
+### Changed
+ - Update formiojs@4.10.0-beta.19
+
+### Fixed
+ - Fix (handle forms conflict): prevent overriding merged form schema
+ - PDF 34 - Extended PDF settings tips with time zones info
+ - FJS-876: fixed always save minified form schema
+ 
 ## 7.0.8
 ### Added
  - Additional options to the resourcefield component to configure Save Submission to a Resource.
+
+## 7.0.8
+### Changed
+ - Reverted formiojs@4.9.27-rc.4
+ - Upgrade formmanager@v1.93.1
+ - Upgrade formview pro@v1.93.1
 
 ## 7.0.7
 ### Fixed
