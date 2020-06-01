@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.8-1
+### Changed
+ - FJS-916 change regexp testing submission for xss attacks
+
 ## 7.0.8
 ### Changed
  - Reverted formiojs@4.9.27-rc.4
