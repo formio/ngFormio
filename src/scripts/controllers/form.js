@@ -1423,6 +1423,7 @@ app.controller('FormShareController', ['$scope', '$rootScope', function($scope, 
     $scope.previewUrl += $rootScope.onPremise ? 'form/' : $scope.currentProject.name + '/';
     $scope.previewUrl += $scope.currentForm.path + '?';
     $scope.previewUrl += $scope.options.showHeader ? 'header=1' : 'header=0';
+    $scope.previewUrl += $rootScope.onPremise ? '' : '&reset=1';
     if ($scope.options.theme) {
       $scope.previewUrl += '&theme=' + $scope.options.theme.toLowerCase();
     }
