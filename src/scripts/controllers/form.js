@@ -2165,14 +2165,8 @@ app.controller('FormSubmissionsController', [
     };
 
     var sanitize = function(value) {
-      const maliciousInterpolationRegExp = /^\{\{.+\(.+[)]{1}\([)]{1}.*\}\}$/;
-
-      if (maliciousInterpolationRegExp.test(value)) {
-        return DOMPurify.sanitize(`<span class="ng-non-bindable">${value}</span>`);
-      }
-
-      return DOMPurify.sanitize(value);
-    }
+      return DOMPurify.sanitize(`<span class="ng-non-bindable">${value}</span>`);
+    };
 
     var getKendoCell = function(component, path) {
       var filterable;
