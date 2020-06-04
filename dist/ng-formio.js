@@ -96,17 +96,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ({
 
-/***/ "../../../../node_modules/formiojs/dist/formio.full.min.css":
-/*!***************************************************************************!*\
-  !*** /Users/travistidwell/node_modules/formiojs/dist/formio.full.min.css ***!
-  \***************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-
 /***/ "./lib/directives/formBuilder.js":
 /*!***************************************!*\
   !*** ./lib/directives/formBuilder.js ***!
@@ -833,7 +822,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-__webpack_require__(/*! formiojs/dist/formio.full.min.css */ "../../../../node_modules/formiojs/dist/formio.full.min.css");
+__webpack_require__(/*! formiojs/dist/formio.full.min.css */ "./node_modules/formiojs/dist/formio.full.min.css");
 
 var _modules = __webpack_require__(/*! ./modules */ "./lib/modules.js");
 
@@ -5286,6 +5275,17 @@ for (var COLLECTION_NAME in DOMIterables) {
   }
 }
 
+
+/***/ }),
+
+/***/ "./node_modules/formiojs/dist/formio.full.min.css":
+/*!********************************************************!*\
+  !*** ./node_modules/formiojs/dist/formio.full.min.css ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ }),
 
