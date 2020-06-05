@@ -181,7 +181,7 @@ export default app.directive('formio', function() {
         $scope.$on('change', function () {
           if ($scope.submission) {
             $scope.nowatch = true;
-            angular.merge($scope.submission, $scope.formio.submission);
+            $scope.submission = angular.copy($scope.formio.submission);
             $scope.$apply();
           }
         });
