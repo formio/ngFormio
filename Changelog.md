@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.0.14
 ### Changed
+ - Upgrade angularjs@1.8.0
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.0-rc.4",
  - Upgrade "formiojs": "^4.10.0-rc.11"
  - Upgrade "formmanager": "github:formio/formmanager#v1.94.0-rc.3"
