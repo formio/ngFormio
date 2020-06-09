@@ -6,23 +6,8 @@
   <div uib-accordion-group class="panel panel-default" heading="GitHub">
     <ng-include src="'views/project/env/authentication/oauth/github.html'"></ng-include>
   </div>
-  <div uib-accordion-group class="panel panel-default" heading="Facebook">
-    <ng-include src="'views/project/env/authentication/oauth/facebook.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Dropbox">
-    <ng-include src="'views/project/env/authentication/oauth/dropbox.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Office 365">
-    <ng-include src="'views/project/env/authentication/oauth/office365.html'"></ng-include>
-  </div>
   <div uib-accordion-group class="panel panel-default" heading="Google">
     <ng-include src="'views/project/env/authentication/oauth/google.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Twitter">
-    <ng-include src="'views/project/env/authentication/oauth/twitter.html'"></ng-include>
-  </div>
-  <div uib-accordion-group class="panel panel-default" heading="Linkedin">
-    <ng-include src="'views/project/env/authentication/oauth/linkedin.html'"></ng-include>
   </div>
 </uib-accordion>
 <button ng-disabled="!minPlan('independent')" class="btn btn-primary" ng-click="saveProject()">Save Settings</button>

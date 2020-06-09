@@ -1164,24 +1164,16 @@ angular
       $templateCache.put('views/project/env/integrations/storage/s3.html', require('../views/project/env/integrations/storage/s3.html'));
       $templateCache.put('views/project/env/integrations/storage/azure.html', require('../views/project/env/integrations/storage/azure.html'));
       $templateCache.put('views/project/env/integrations/storage/dropbox.html', require('../views/project/env/integrations/storage/dropbox.html'));
-      $templateCache.put('views/project/env/integrations/data/office365.html', require('../views/project/env/integrations/data/office365.html'));
       $templateCache.put('views/project/env/integrations/data/google.html', require('../views/project/env/integrations/data/google.html'));
       $templateCache.put('views/project/env/integrations/data/kickbox.html', require('../views/project/env/integrations/data/kickbox.html'));
-      $templateCache.put('views/project/env/integrations/data/hubspot.html', require('../views/project/env/integrations/data/hubspot.html'));
       $templateCache.put('views/project/env/integrations/data/sqlconnector.html', require('../views/project/env/integrations/data/sqlconnector.html'));
-      $templateCache.put('views/project/env/integrations/data/atlassian.html', require('../views/project/env/integrations/data/atlassian.html'));
       $templateCache.put('views/project/env/integrations/email/smtp.html', require('../views/project/env/integrations/email/smtp.html'));
       $templateCache.put('views/project/env/integrations/email/sendgrid.html', require('../views/project/env/integrations/email/sendgrid.html'));
       $templateCache.put('views/project/env/integrations/email/mailgun.html', require('../views/project/env/integrations/email/mailgun.html'));
       $templateCache.put('views/project/env/integrations/email/custom.html', require('../views/project/env/integrations/email/custom.html'));
       $templateCache.put('views/project/env/authentication/oauth/openid.html', require('../views/project/env/authentication/oauth/openid.html'));
       $templateCache.put('views/project/env/authentication/oauth/github.html', require('../views/project/env/authentication/oauth/github.html'));
-      $templateCache.put('views/project/env/authentication/oauth/facebook.html', require('../views/project/env/authentication/oauth/facebook.html'));
-      $templateCache.put('views/project/env/authentication/oauth/dropbox.html', require('../views/project/env/authentication/oauth/dropbox.html'));
-      $templateCache.put('views/project/env/authentication/oauth/office365.html', require('../views/project/env/authentication/oauth/office365.html'));
       $templateCache.put('views/project/env/authentication/oauth/google.html', require('../views/project/env/authentication/oauth/google.html'));
-      $templateCache.put('views/project/env/authentication/oauth/twitter.html', require('../views/project/env/authentication/oauth/twitter.html'));
-      $templateCache.put('views/project/env/authentication/oauth/linkedin.html', require('../views/project/env/authentication/oauth/linkedin.html'));
       $templateCache.put('views/frameworks/html5/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/javascript/embed.html', require('../views/frameworks/html5/embed.html'));
       $templateCache.put('views/frameworks/angular2/embed.html', require('../views/frameworks/angular2/embed.html'));
@@ -1274,7 +1266,7 @@ angular
             emails: '100',
             features: 'Enterprise',
             pdfs: 1,
-            pdfDownloads: 100,
+            pdfDownloads: 10,
             pdfUpgradeable: false,
           }
         },
@@ -1294,7 +1286,7 @@ angular
             emails: '100',
             features: 'Basic',
             pdfs: 1,
-            pdfDownloads: 100,
+            pdfDownloads: 10,
             pdfUpgradeable: false,
           }
         },
@@ -1313,7 +1305,7 @@ angular
             emails: '1000',
             features: 'Independent',
             pdfs: 1,
-            pdfDownloads: 100,
+            pdfDownloads: 10,
             pdfUpgradeable: false,
           }
         },
@@ -1332,7 +1324,7 @@ angular
             emails: '1,000',
             features: 'Team Pro',
             pdfs: 1,
-            pdfDownloads: 100,
+            pdfDownloads: 10,
             pdfUpgradeable: true,
           }
         },
