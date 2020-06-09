@@ -30,6 +30,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Licensing UI
 
+## 7.0.15
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.0-rc.5",
+ - Upgrade "formiojs": "^4.10.0-rc.12"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.0-rc.4"
+ - Upgrade "ng-formio": "^4.14.0-rc.5"
+ - Upgrade "formio-tenant": "^1.13.2" 
+
+## 7.0.14
+### Changed
+ - Upgrade angularjs@1.8.0
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.0-rc.4",
+ - Upgrade "formiojs": "^4.10.0-rc.11"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.0-rc.3"
+ - Upgrade "ng-formio": "^4.14.0-rc.4"
+ - Upgrade "formio-tenant": "^1.13.1" 
+
 ## 7.0.13
 ### Fixed
  - FJS-916: change regexp testing submission for xss attacks
