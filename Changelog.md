@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.8
+### Removed
+ - Deprecated actions and settings.
+
 ## 7.1.7
 ### Changed
  - Move license key setting to project where it belongs.
