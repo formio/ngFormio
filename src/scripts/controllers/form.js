@@ -1168,8 +1168,8 @@ app.controller('FormEditController', [
       }
     });
 
-    $scope.$on('formio.saveComponent', (event, component, originalComponent) => {
-      const change = Utils.generateFormChange('edit', { component, originalComponent });
+    $scope.$on('formio.saveComponent', (event, component, originalComponent, parentSchema, path, index, isNew, originalComponentSchema) => {
+      const change = Utils.generateFormChange('edit', { component: parentSchema.components[index], originalComponent: originalComponentSchema });
       if (change) {
         $scope.changes.push(change);
       }
