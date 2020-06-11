@@ -1581,9 +1581,12 @@ app.factory('FormioAlerts', [
           });
         }
         else {
+          const errorMessage = !_.isString(error)
+            ? error.statusText || JSON.stringify(error)
+            : error;
           this.addAlert({
             type: 'danger',
-            message: _.escape(error)
+            message: _.escape(errorMessage)
           });
         }
       }
