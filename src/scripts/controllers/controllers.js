@@ -9,6 +9,8 @@ angular.module('formioApp.controllers', [
   'formioApp.controllers.help',
   'formioApp.controllers.role',
   'formioApp.controllers.pdf',
+  'formioApp.controllers.licenseKey',
+  'formioApp.controllers.licenseManagement',
   'formioApp.controllers.access',
   'formioApp.controllers.actions',
 ]);
