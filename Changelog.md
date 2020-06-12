@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.18
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.1",
+ - Upgrade "formiojs": "^4.10.1"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.1"
+ - Upgrade "ng-formio": "^4.14.1"
+ - Upgrade "formio-tenant": "^1.13.5"
+
 ## 7.0.17
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.0",
