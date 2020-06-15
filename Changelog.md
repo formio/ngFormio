@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+ - Fix documentation that gave incorrect start command for react.
+ - Prevent displaying [Object Object] for errors
+ - FJS-892: Fix (Conflict Forms merging)
+ 
+### Added
+ - Add license manager to 7.0.x branch (from master).
+
 ## 7.0.19
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.2",
