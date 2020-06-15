@@ -4,6 +4,8 @@ import './controllers.js';
 import './feedback.js';
 import './form.js';
 import './help.js';
+import './licenseKey.js';
+import './licenseManagement.js';
 import './pdf.js';
 import './project.js';
 import './role.js';

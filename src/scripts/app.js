@@ -128,6 +128,11 @@ angular
           url: '/resetpass/done',
           templateUrl: 'views/user/resetpass/resetpass-done.html'
         })
+        .state('license', {
+          url: '/license',
+          controller: 'LicenseManagementController',
+          templateUrl: 'views/license/license.html'
+        })
         .state('profile', {
           abstract: true,
           url: '/profile',

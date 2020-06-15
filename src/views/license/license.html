@@ -1,0 +1,45 @@
+<div ui-view class="container">
+  <!-- Header -->
+  <ul class="list-inline">
+    <li><h2><a ui-sref="home" title="Home"><i class="fa fa-home"></i><br /></a></h2></li>
+    <li><h2>›</h2></li>
+    <li><h2><i class="fa fa-bar-chart"></i> License Management</h2></li>
+  </ul>
+
+  <div class="panel panel-primary ng-scope">
+    <div class="panel-heading">
+      <h3 class="panel-title">Licenses</h3>
+    </div>
+    <div class="panel-body">
+      <table class="table">
+        <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Plan</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Authorized Users</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat-start="license in licenses track by $index">
+          <td><a href ng-if="!open[$index]" ng-click="openLicense($index)">view</a><a href ng-if="open[$index]" ng-click="closeLicense($index)">hide</a></td>
+          <td>{{license.data.licenseName}}</td>
+          <td>{{license.data.location | planType}}</td>
+          <td>{{license.data.plan | planName}}</td>
+          <td>{{license.data.startDate | date: 'medium'}}</td>
+          <td>{{license.data.endDate | date: 'medium'}}</td>
+          <td>{{license.data.user | planUsers}}</td>
+        </tr>
+        <tr ng-repeat-end ng-if="open[$index]" class="active">
+          <td colspan="8">
+            <license-info license="license"></license-info>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

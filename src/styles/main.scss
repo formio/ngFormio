@@ -122,6 +122,53 @@ li.user-dropdown a {
   cursor: pointer;
 }
 
+.license-usage-cards {
+  display: flex;
+  flex-flow: row wrap;
+  margin: -0.5em;
+}
+
+.license-usage-card {
+  width: 8em;
+  height: 8em;
+  border: 1px solid #999;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px #bbb;
+  margin: 0.5em;
+  display: table;
+}
+
+.license-usage-card:hover {
+  background-color: #eaf2ff;
+  width: calc(8em + 6px);
+  height: calc(8em + 6px);
+  margin: calc(0.5em - 3px);
+  box-shadow: 5px 5px 9px #bbb;
+  padding: 3px;
+  cursor: pointer;
+}
+
+.license-usage-card .usage-label {
+  width: 9.7em;
+  height: 1.3em;
+  color: #aaa;
+  font-size: 0.83em;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: absolute;
+  padding: 0.3em 0.4em;
+}
+
+.license-usage-card .usage-stat {
+  width: 8em;
+  vertical-align: middle;
+  text-align: center;
+  display: table-cell;
+  font-weight: bold;
+  font-size: 1.3em;
+  color: #444;
+}
+
 .navbar-header {
   .breadcrumb>li+li:before {
     content: ">";
@@ -924,7 +971,7 @@ pre code {
   }
 
   form .has-error p {
-     text-align: center;
+    text-align: center;
   }
 
   // Turn error message into box
@@ -1829,7 +1876,7 @@ footer {
   .api-name,
   .api-description,
   .api-infos {
-     display: none;
+    display: none;
   }
   .operations {
     display: block;
