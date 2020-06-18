@@ -54,6 +54,9 @@ app.controller('UserRegisterController', [
     $window,
     AppConfig
   ) {
+  $scope.submission = {data: {}, metadata: {
+    appUrl: window.location.origin
+    }};
     $scope.$on('formSubmission', function(event, submission) {
       event.stopPropagation();
       if (!submission) { return; }
@@ -72,7 +75,7 @@ app.controller('UserRegisterController', [
           });
         }
       }
-      $state.go('home');
+      $state.go('auth-sent');
     });
   }
 ]);
@@ -109,6 +112,51 @@ app.controller('ResetPasswordController', [
       if (!submission) { return; }
       $state.go('auth-resetpass-done');
     });
+  }
+]);
+
+app.controller('VerifyController', [
+  '$scope',
+  '$state',
+  '$rootScope',
+  '$location',
+  'Formio',
+  'FormioAlerts',
+  function(
+    $scope,
+    $state,
+    $rootScope,
+    $location,
+    Formio,
+    FormioAlerts
+  ) {
+    $scope.submission = {data: {}};
+    var params = $location.search();
+    if(params.token) {
+      Formio.setToken(params.token).then(function (user) {
+        if(!user) {
+          // 'BAD TOKEN or Expired'
+          console.log('BAD TOKEN');
+          $state.go('auth');
+        }
+        $scope.submission.data['email']= user.data.email;
+        var newUser = user;
+        $scope.$on('formSubmit', function(event, submission) {
+          newUser.data.password = submission.data.password;
+          var userResource = new Formio($rootScope.userForm);
+          userResource.saveSubmission(newUser).then(function (user) {
+            Formio.setUser(user);
+            $state.go('home');
+          })
+        })
+      })
+        .catch(FormioAlerts.onError.bind(FormioAlerts));
+
+    } else {
+      // 'NO TOKEN'
+      console.log('NO TOKEN');
+      $state.go('auth');
+    }
   }
 ]);
 
