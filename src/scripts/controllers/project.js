@@ -1084,7 +1084,7 @@ app.controller('ProjectOverviewController', [
       $scope.formio.loadForms({
           params: {
             type: 'form',
-            modified__gt: projectCreated,
+            modified__gt: projectCreated.toISOString(),
             sort: '-modified',
             select: 'type,title,_id'
           }
@@ -1097,7 +1097,7 @@ app.controller('ProjectOverviewController', [
       $scope.formio.loadForms({
           params: {
             type: 'resource',
-            modified__gt: projectCreated,
+            modified__gt: projectCreated.toISOString(),
             sort: '-modified',
             select: 'type,title,_id'
           }
