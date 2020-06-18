@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-<<<<<<< HEAD
 ## 7.1.8
 ### Removed
  - Deprecated actions and settings.
@@ -34,6 +33,61 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.1.0-7.1.4
 ### Changed
  - Licensing UI
+
+## 7.0.23
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.6",
+ - Upgrade "formiojs": "^4.10.3-rc.5"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.5"
+ - Upgrade "ng-formio": "^4.14.3-rc.5"
+ - Upgrade "formio-tenant": "^1.13.10"
+
+## 7.0.22
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.5",
+ - Upgrade "formiojs": "^4.10.3-rc.4"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.4"
+ - Upgrade "ng-formio": "^4.14.3-rc.4"
+ - Upgrade "formio-tenant": "^1.13.9"
+ 
+## 7.0.21
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.4",
+ - Upgrade "formiojs": "^4.10.3-rc.3"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.3"
+ - Upgrade "ng-formio": "^4.14.3-rc.3"
+ - Upgrade "formio-tenant": "^1.13.8"
+ 
+## 7.0.20
+### Fixed
+ - Fix documentation that gave incorrect start command for react.
+ - Prevent displaying [Object Object] for errors
+ - FJS-892: Fix (Conflict Forms merging)
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.1",
+ - Upgrade "formiojs": "^4.10.3-rc.1"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.1"
+ - Upgrade "ng-formio": "^4.14.3-rc.1"
+ - Upgrade "formio-tenant": "^1.13.7"
+ 
+### Added
+ - Add license manager to 7.0.x branch (from master).
+
+## 7.0.19
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.2",
+ - Upgrade "formiojs": "^4.10.2"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.2"
+ - Upgrade "ng-formio": "^4.14.2"
+ - Upgrade "formio-tenant": "^1.13.6"
+
+## 7.0.18
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.1",
+ - Upgrade "formiojs": "^4.10.1"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.1"
+ - Upgrade "ng-formio": "^4.14.1"
+ - Upgrade "formio-tenant": "^1.13.5"
 
 ## 7.0.17
 ### Changed
