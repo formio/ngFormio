@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-sm-4">
       <ng-include src="'views/project/settings/menu.html'" />
-      <div class="panel panel-danger" ng-if="primaryProject.owner === user._id">
+      <div class="panel panel-danger" ng-if="primaryProject.owner === user._id || projectPermissions.admin">
         <div class="panel-heading">Delete Project</div>
         <div class="panel-body">
           <p>To remove this project and all of it's environments, select this delete button.</p>
