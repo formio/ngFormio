@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 7.0.23
 ### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.7",
+ - Upgrade "formiojs": "^4.10.3-rc.6"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.6"
+ - Upgrade "ng-formio": "^4.14.3-rc.6"
+ - Upgrade "formio-tenant": "^1.13.11"
+ 
+## 7.0.23
+### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.6",
  - Upgrade "formiojs": "^4.10.3-rc.5"
  - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.5"
