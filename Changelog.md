@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.26
+### Fixed
+ - Version issue where formmanager was not updating renderer versions.
+
 ## 7.0.25
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.3",
