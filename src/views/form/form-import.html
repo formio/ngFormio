@@ -12,6 +12,13 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <label class="checkbox-inline"><input type="checkbox" ng-model="include.controller"> Include Controller</label>
+        <label class="checkbox-inline"><input type="checkbox" ng-model="include.properties"> Include Properties</label>
+        <label class="checkbox-inline"><input type="checkbox" ng-model="include.settings"> Include Settings</label>
+      </div>
+    </div>
     <input type="hidden" ng-model="formType"/>
     <div class="form-group pull-right">
       <a class="btn btn-default" ng-click="formId ? cancel() : $state.go('project.' + formType + '.index')">Cancel</a>
