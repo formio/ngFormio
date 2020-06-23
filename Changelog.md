@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+ - FOR-2696: Fixes an issue where team admins couldn't delete a project.
+
 ## 7.0.27
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.5-rc.5",
