@@ -4,9 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 7.0.28
 ### Fixed
  - FOR-2696: Fixes an issue where team admins couldn't delete a project.
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.5-rc.6",
+ - Upgrade "formiojs": "^4.10.5-rc.4"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.4-rc.2"
+ - Upgrade "ng-formio": "^4.14.5-rc.4"
+ - Upgrade "formio-tenant": "^1.13.13-rc.2"
+ 
 
 ## 7.0.27
 ### Changed
