@@ -134,9 +134,10 @@ app.config([
             formType: type,
             components: null,
             display: null,
-            properties: null,
             form: null,
-            controller: ''
+            controller: '',
+            properties: null,
+            settings: null,
           }
         })
         .state(parentName + '.import', {
@@ -609,9 +610,9 @@ app.controller('FormController', [
         components: $stateParams.components || [],
         access: [],
         submissionAccess: [],
-        settings: {},
+        controller: $stateParams.controller || '',
         properties: $stateParams.properties || {},
-        controller: $stateParams.controller || ''
+        settings: $stateParams.settings || {}
       };
     }
 
@@ -1389,16 +1390,25 @@ app.controller('FormImportController', [
   ) {
     $scope.capitalize = _.capitalize;
     $scope.formType = $stateParams.formType || 'form';
+    $scope.include = {
+      controller: true,
+      properties: true,
+      settings: true,
+    };
 
     $scope.importForm = function() {
       (new Formio($scope.embedURL, {base: $scope.baseUrl})).loadForm(null, {noToken: true})
         .then(function(form) {
-          $state.go('project.' + form.type + '.create', _.pick(form, [
+          var propertiesToPick = [
             'components',
             'display',
-            'properties',
-            'controller',
-          ]));
+          ].concat(
+            _.reduce($scope.include, function(result, include, property) {
+              return include ? result.concat(property) : result;
+            }, [])
+          );
+
+          $state.go('project.' + form.type + '.create', _.pick(form, propertiesToPick));
         })
         .catch(function(error) {
           FormioAlerts.warn('Error fetching form: ' + _.escape(error));
