@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+ - IE11 fix in config.js
+
 ## 7.0.28
 ### Fixed
  - FOR-2696: Fixes an issue where team admins couldn't delete a project.
