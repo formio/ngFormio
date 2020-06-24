@@ -132,31 +132,35 @@ app.controller('VerifyController', [
   ) {
     $scope.submission = {data: {}};
     var params = $location.search();
-    if(params.token) {
-      Formio.setToken(params.token).then(function (user) {
-        if(!user) {
-          // 'BAD TOKEN or Expired'
-          console.log('BAD TOKEN');
-          $state.go('auth');
-        }
-        $scope.submission.data['email']= user.data.email;
-        var newUser = user;
-        $scope.$on('formSubmit', function(event, submission) {
-          newUser.data.password = submission.data.password;
-          var userResource = new Formio($rootScope.userForm);
-          userResource.saveSubmission(newUser).then(function (user) {
-            Formio.setUser(user);
-            $state.go('home');
+    var verifyFormio = new Formio($rootScope.verifyAccount);
+    verifyFormio.loadForm().then(function (form) {
+      $scope.form = form;
+      if(params.token) {
+        Formio.setToken(params.token).then(function (user) {
+          if(!user) {
+            // 'BAD TOKEN or Expired'
+            console.log('BAD TOKEN');
+            $state.go('auth');
+          }
+          $scope.submission.data['email']= user.data.email;
+          var newUser = user;
+          $scope.$on('formSubmission', function(event, submission) {
+            newUser.data.password = submission.data.password;
+            var userResource = new Formio($rootScope.userForm);
+            userResource.saveSubmission(newUser).then(function (user) {
+              Formio.setUser(user);
+              $state.go('home');
+            })
           })
         })
-      })
-        .catch(FormioAlerts.onError.bind(FormioAlerts));
+          .catch(FormioAlerts.onError.bind(FormioAlerts));
 
-    } else {
-      // 'NO TOKEN'
-      console.log('NO TOKEN');
-      $state.go('auth');
-    }
+      } else {
+        // 'NO TOKEN'
+        console.log('NO TOKEN');
+        $state.go('auth');
+      }
+    });
   }
 ]);
 
