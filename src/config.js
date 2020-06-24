@@ -116,7 +116,7 @@ angular.module('formioApp').constant('AppConfig', {
   pdfHostedPrice: 50,
   pdfHostedForms: 25,
   pdfHostedSubs: 1000,
-  licenseServer,
+  licenseServer: licenseServer,
   pdfEnterprisePrice: 250,
   tutorial: 'https://help.form.io/start/',
   userForm: formioBase + '/user',
