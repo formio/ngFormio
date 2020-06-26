@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.33
+### Changed
+ - Upgrade "formio-tenant": "^1.13.13-rc.4"
+
 ## 7.0.32
 ### Changed
  - Upgrade "formmanager": "github:formio/formmanager#v1.94.4-rc.4"
