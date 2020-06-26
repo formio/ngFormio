@@ -187,9 +187,35 @@ app.controller('ProjectCreateController', [
         localStorage.removeItem('stepFlowCurrentParentStep');
         localStorage.removeItem('stepFlowCurrentChildStep');
         ngDialog.close();
-        $state.go('project.tour', {projectId: project._id});
-      }).catch((err) => {
+
+        const stageProject = {
+          title: 'Stage',
+          type: 'stage',
+          project: project._id,
+          name: `stage-${project.name}`,
+          defaultStage: 'stage',
+        };
+
+        const prodProject = {
+          title: 'Prod',
+          type: 'stage',
+          project: project._id,
+          name: `prod-${project.name}`,
+          protect: true,
+          defaultStage: 'prod',
+        };
+        $scope.isBusy = true;
+        FormioProject.createEnvironment(stageProject).then(function(stage) {
+          FormioProject.createEnvironment(prodProject).then(function() {
+            $scope.isBusy = false;
+            $state.go('project.tour', {projectId: stage._id});
+          });
+        });
+
+      })
+      .catch((err) => {
         $scope.isBusy = false;
+        FormioAlerts.onError.bind(FormioAlerts, err);
         throw err;
       });
     };
@@ -499,6 +525,11 @@ app.controller('ProjectController', [
         formioReady.resolve($scope.formio);
         $scope.loadRoles();
       }
+
+      if ($scope.currentProject.type === 'project') {
+        $scope.currentProject.liveTitle = $scope.currentProject.liveTitle || 'Live';
+      }
+
       $scope.projectType = 'Stage';
       $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';
       $scope.projectsLoaded = true;
@@ -2656,6 +2687,10 @@ app.controller('ProjectSettingsController', [
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
+      }
+
+      if ($scope.currentProject.liveTitle === 'Live') {
+        delete $scope.currentProject.liveTitle;
       }
 
       $scope._saveProject($scope.currentProject, $scope.formio).then(function(project) {

@@ -2,7 +2,7 @@
   <div id="form-group-title" class="form-group" ng-class="{'has-error': projectForm.title.$invalid && projectForm.title.$dirty}">
     <label for="title" class="control-label required-field">{{ createType }} Title</label>
     <input ng-if="!currentProject._id || currentProject._id !== primaryProject._id" type="text" class="form-control" id="title" name="title" ng-model="currentProject.title" placeholder="Give your {{ createType }} a name." ng-maxlength="63" ng-required="true" autofocus="true">
-    <input ng-if="currentProject._id && currentProject._id === primaryProject._id" type="text" class="form-control" value="Live" disabled="true">
+    <input ng-if="currentProject._id && currentProject._id === primaryProject._id" type="text" class="form-control" value="Live" ng-model="currentProject.liveTitle" ng-maxlength="63" placeholder="Give your Live stage a name." ng-required="true">
     <p class="help-block" ng-show="projectForm.title.$error.maxlength">{{ projectType }} Title cannot be longer than 63 characters.</p>
   </div>
   <div id="form-group-name" class="form-group" ng-class="{'has-error': projectForm.name.$invalid && projectForm.name.$dirty, 'has-success': projectForm.name.$valid}">

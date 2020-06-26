@@ -17,7 +17,7 @@ app.factory('PrimaryProject', [
 
         $scope.stagesProject = project;
         // Load project stages
-        $http.get(AppConfig.apiBase + '/project?project=' + project._id + '&type=stage').then(function (result) {
+        return $http.get(AppConfig.apiBase + '/project?project=' + project._id + '&type=stage').then(function (result) {
           $scope.environments = result.data;
           $scope.environments.forEach(function(environment) {
             // If environment has a remote, load remote info for lastDeploy and modified.
