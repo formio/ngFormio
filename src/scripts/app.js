@@ -1,8 +1,10 @@
 'use strict';
 const packageJSON = require('../../package.json');
 import { Templates, Formio } from 'ng-formio/lib/modules';
+import premium from '@formio/premium';
 Templates.framework = 'bootstrap3';
 Formio.icons = 'fa';
+Formio.use(premium);
 
 /**
  * @ngdoc overview
