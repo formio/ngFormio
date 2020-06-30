@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.10
+### Fixed
+ - Fix old currentProject taking over.
+ - Don't allow adding form manager to Independent or Basic plans.
+ - Add premium components.
+
 ## 7.1.9
 ### Changed 
  - Form/Resource modified filter sometimes sent incorrectly.
