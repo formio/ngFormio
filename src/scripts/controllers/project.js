@@ -413,6 +413,9 @@ app.controller('ProjectController', [
     LicenseKeyHelper.setPrimaryProject(primaryProjectQ.promise);
     $scope.highestRoleQ = $q.defer();
     $scope.highestRoleLoaded = $scope.highestRoleQ.promise;
+    $scope.setCurrentProject = function(currentProject) {
+      $scope.currentProject = currentProject;
+    };
 
     // Sets the tenant project.
     var setTenant = function(tenant) {
@@ -459,7 +462,7 @@ app.controller('ProjectController', [
                 ignoreCache: true
               })
               .then(function(currentProject) {
-                $scope.currentProject = currentProject;
+                $scope.setCurrentProject(currentProject);
                 if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.formManager === true) {
                   $scope.hasFormManager = true;
                 }
@@ -482,7 +485,7 @@ app.controller('ProjectController', [
         $scope.projectProtocol = AppConfig.apiProtocol;
         $scope.projectServer = AppConfig.apiServer;
         $scope.baseUrl = AppConfig.apiBase;
-        $scope.currentProject = $scope.localProject;
+        $scope.setCurrentProject($scope.localProject);
         Formio.setProjectUrl($scope.projectUrl = $rootScope.projectPath(result));
         if ($scope.currentProject.apiCalls && $scope.currentProject.apiCalls.formManager === true) {
           $scope.hasFormManager = true;
@@ -1201,7 +1204,7 @@ app.controller('ProjectOverviewController', [
 
       $scope.reloadProject = () => {
         $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
-          $scope.currentProject = result;
+          $scope.setCurrentProject(result);
         });
       };
 
@@ -2578,7 +2581,6 @@ app.controller('ProjectFormioController', [
       }
       localStorage.setItem('licenseFilter', JSON.stringify($scope.filters));
       localStorage.setItem('licenseFilterQuery', JSON.stringify($scope.licenseQuerystring));
-      console.log($scope.filters);
       $scope.licenses = await LicenseServerHelper.getLicensesAdmin($scope.licenseQuerystring);
       $scope.$apply();
     };
