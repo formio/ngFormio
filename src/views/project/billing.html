@@ -191,7 +191,7 @@
                 <h4>$150 / month</h4>
               </div>
               <div class="col-sm-3">
-                <span class="btn btn-default" ng-click="toggleFormManager()">{{hasFormManager ? 'Remove' : 'Add'}}</span>
+                <span class="btn btn-default" ng-style="{visibility: (selectedPlan.features.pdfUpgradeable) ? 'visible' : 'hidden'}" ng-click="toggleFormManager()">{{hasFormManager ? 'Remove' : 'Add'}}</span>
                 <p ng-if="!selectedPlan.features.pdfUpgradeable">Only available for Team Pro and above</p>
               </div>
             </div>

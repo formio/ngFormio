@@ -3629,6 +3629,7 @@ app.controller('ProjectBilling', [
       if (!plan.features.pdfUpgradeable) {
         $scope.pdfs = plan.features.pdfs;
         $scope.pdfDownloads = plan.features.pdfDownloads;
+        $scope.hasFormManager = false;
       }
       $scope.pdfPrice = calculatePdfPrice();
     };
