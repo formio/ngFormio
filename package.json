@@ -43,7 +43,7 @@
     "chartist-plugin-tooltip": "0.0.11",
     "ckeditor": "^4.12.1",
     "copy-webpack-plugin": "^5.1.1",
-    "core-js": "^3.6.5",
+    "core-js": "3.5.0",
     "css-loader": "^3.5.3",
     "dompurify": "^2.0.11",
     "dotenv": "^8.2.0",
