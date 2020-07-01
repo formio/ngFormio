@@ -52,7 +52,7 @@
     "file-loader": "^4.3.0",
     "file-saver": "^2.0.1",
     "font-awesome": "^4.7.0",
-    "formio-tenant": "github:formio/formio-tenant#v1.13.13",
+    "formio-tenant": "github:formio/formio-tenant#v1.13.14",
     "formiojs": "^4.10.5",
     "formmanager": "github:formio/formmanager#v1.94.5",
     "gulp": "^4.0.2",
