@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+ - Pin core-js@3.5.0 to resolve IE11 issues.
+
 ## 7.0.33
 ### Changed
  - Upgrade "formio-tenant": "^1.13.13-rc.4"
