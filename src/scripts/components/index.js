@@ -1,2 +1,1 @@
 import './resourcefields';
-import './email';
