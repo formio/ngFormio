@@ -3034,24 +3034,6 @@ app.controller('StageTeamController', [
   ) {
     $scope.getPermissionLabel = TeamPermissions.getPermissionLabel.bind(TeamPermissions);
 
-    $scope.loadProjectPromise.then(function() {
-      $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function(result) {
-        $scope.stageProjectTeams = result.data;
-
-        $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
-          $scope.userTeams = result.data;
-          $scope.userTeamsLoading = false;
-        });
-
-        $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
-          $scope.stageProjectEligibleTeams = result.data;
-          $scope.uniqueEligibleTeams = _.filter($scope.stageProjectEligibleTeams, function(team) {
-            return _.findIndex($scope.stageProjectTeams, { _id: team._id }) === -1;
-          });
-        });
-      });
-    });
-
     var setTeamPermission = function(project, team, newPermission) {
       var access = project.access ||  [];
       var found = false;
@@ -3082,6 +3064,32 @@ app.controller('StageTeamController', [
       // Update the current project access with the new team access.
       project.access = access;
     };
+
+    $scope.loadProjectPromise.then(function() {
+      $http.get(AppConfig.apiBase + '/team/stage/' + $scope.localProject._id).then(function(result) {
+        $scope.stageProjectTeams = result.data;
+
+        if ($scope.stageProjectTeams && $scope.localProject) {
+          _.forEach($scope.stageProjectTeams, function(team){
+            if (team) {
+              setTeamPermission($scope.localProject, team, team.permission)
+            }
+          });
+        }
+
+        $http.get(AppConfig.apiBase + '/team/all').then(function(result) {
+          $scope.userTeams = result.data;
+          $scope.userTeamsLoading = false;
+        });
+
+        $http.get(AppConfig.apiBase + '/team/own').then(function(result) {
+          $scope.stageProjectEligibleTeams = result.data;
+          $scope.uniqueEligibleTeams = _.filter($scope.stageProjectEligibleTeams, function(team) {
+            return _.findIndex($scope.stageProjectTeams, { _id: team._id }) === -1;
+          });
+        });
+      });
+    });
 
     $scope.teamPermissions = [
       {
