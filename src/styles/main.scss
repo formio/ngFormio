@@ -2285,3 +2285,9 @@ formio-header-wrapper>formio-header.fixed.absolute {
 .input-group .form-control {
   z-index: auto;
 }
+
+#form-field-path, #user-field-path {
+  height: auto;
+  box-sizing: border-box;
+  padding: 3px 5px 6px 3px;
+}
