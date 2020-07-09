@@ -287,3 +287,92 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
     }
   };
 }]);
+
+app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, FormioUtils) {
+  var PERMISSION_TYPES = ['read', 'create', 'write', 'admin'];
+
+  return {
+    scope: {
+      waitFor: '=',
+      form: '=',
+      labels: '=',
+    },
+    restrict: 'E',
+    templateUrl: 'views/project/access/access/field-match-permission-editor.html',
+    link: function($scope) {
+      $scope.saveFieldPath = function(permission) {
+        let accessPermission;
+        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || {
+          read: { formFieldPath: '',  userFieldPath: '' },
+          create: { formFieldPath: '',  userFieldPath: '' },
+          write: { formFieldPath: '',  userFieldPath: '' },
+          admin: { formFieldPath: '',  userFieldPath: '' }
+        };
+        accessPermission = $scope.form.fieldMatchAccess[permission.type];
+        accessPermission.formFieldPath = permission.formFieldPath;
+        accessPermission.userFieldPath = permission.userFieldPath;
+        $scope.onChange();
+      };
+
+      var permissions = [];
+      // Fill in missing permissions / enforce order
+      ($scope.waitFor || $q.when()).then(function() {
+
+        if ($scope.form.fieldMatchAccess) {
+          const fieldMatchAccess = $scope.form.fieldMatchAccess;
+          _.each(PERMISSION_TYPES, function(type) {
+            if (fieldMatchAccess[type] && fieldMatchAccess[type].formFieldPath && fieldMatchAccess[type].userFieldPath) {
+              let existingPerm = _.find(permissions, {type: type});
+              const { formFieldPath, userFieldPath } = fieldMatchAccess[type];
+              if (existingPerm) {
+                existingPerm.formFieldPath = formFieldPath;
+                existingPerm.userFieldPath = userFieldPath;
+              }
+              else {
+                permissions.push({
+                  type,
+                  formFieldPath,
+                  userFieldPath
+                });
+              }
+            }
+          })
+        }
+
+        // Ensure all the permission fields are available.
+        var tempPerms = [];
+        _.each(PERMISSION_TYPES, function(type) {
+          var existingPerm = _.find(permissions, {type: type}) || {
+            type,
+            formFieldPath: '',
+            userFieldPath: ''
+          };
+          tempPerms.push(existingPerm);
+        });
+
+        // Replace permissions with complete set of permissions
+        permissions.splice.apply(permissions, [0, permissions.length].concat(tempPerms));
+      });
+
+      $scope.getPermissionsToShow = function() {
+        return permissions.filter($scope.shouldShowPermission);
+      };
+
+      $scope.shouldShowPermission = function(permission) {
+        return !!$scope.labels[permission.type];
+      };
+
+      $scope.getPermissionLabel = function(permission) {
+        return $scope.labels[permission.type].label;
+      };
+
+      $scope.getPermissionTooltip = function(permission) {
+        return $scope.labels[permission.type].tooltip;
+      };
+
+      $scope.onChange = function() {
+        $scope.$emit('permissionsChange');
+      };
+    }
+  };
+}]);

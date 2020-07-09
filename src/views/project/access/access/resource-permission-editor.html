@@ -8,12 +8,6 @@
         <div class="col col-sm-3">
           <strong>Resources</strong>
         </div>
-        <div class="col col-sm-3">
-          <strong>Form Field Path</strong>
-        </div>
-        <div class="col col-sm-3">
-          <strong>User Field Path</strong>
-        </div>
       </div>
     </li>
     <li class="list-group-item" ng-repeat="permission in getPermissionsToShow()">
@@ -28,15 +22,6 @@
               <div>{{ resource.label }} ({{resource.key}})</div>
             </ui-select-choices>
           </ui-select>
-        </div>
-        <div class=" col col-sm-3">
-          <input class="form-control" type="text" ng-model="permission.formFieldPath"/>
-        </div>
-        <div class=" col col-sm-3">
-          <input class="form-control" type="text" ng-model="permission.userFieldPath"/>
-        </div>
-        <div class=" col col-sm-3">
-          <button ng-click="addFieldPath(permission)">Save</button>
         </div>
       </div>
       <div class="row" style="margin-top: 10px;">

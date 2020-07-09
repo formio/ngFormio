@@ -1,0 +1,40 @@
+<div>
+  <ul class="list-group list-group-striped">
+    <li class="list-group-item  list-group-heading">
+      <div class="row">
+        <div class="col col-sm-3">
+          <strong>Permission</strong>
+        </div>
+        <div class="col col-sm-3">
+          <strong>Form Field Path</strong>
+        </div>
+        <div class="col col-sm-3">
+          <strong>User Field Path</strong>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item" ng-repeat="permission in getPermissionsToShow()">
+      <div class="row">
+        <div class="col col-sm-3">
+          <h4>{{getPermissionLabel(permission)}}</h4>
+        </div>
+        <div class=" col col-sm-3">
+          <input class="form-control" type="text" ng-model="permission.formFieldPath"/>
+        </div>
+        <div class=" col col-sm-3">
+          <input class="form-control" type="text" ng-model="permission.userFieldPath"/>
+        </div>
+        <div class=" col col-sm-3">
+          <button ng-click="saveFieldPath(permission)" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top: 10px;">
+        <div class="col col-xs-12">
+          <div class="text-muted">
+            {{getPermissionTooltip(permission)}}
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
