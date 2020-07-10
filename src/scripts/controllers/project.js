@@ -552,6 +552,9 @@ app.controller('ProjectController', [
         document.body.className += ' ' + 'project-' + primaryProject.plan;
 
         PrimaryProject.set(primaryProject, $scope);
+        $scope.refreshStages = () => {
+          PrimaryProject.loadStages(primaryProject, $scope);
+        };
         $scope.highestRoleLoaded.then(function() {
             // If they already have a high role, skip this.
             if (['owner', 'team_admin'].indexOf($scope.highestRole) !== -1) {
@@ -3104,6 +3107,45 @@ app.controller('ProjectTeamController', [
         $scope.primaryProject = project;
       });
     };
+  }
+]);
+
+app.controller('ProjectStages', [
+  '$scope',
+  'LicenseServerHelper',
+  'PrimaryProject',
+  async function(
+    $scope,
+    LicenseServerHelper,
+    PrimaryProject,
+  ) {
+    const licenses = await LicenseServerHelper.getLicenses();
+    // Find the current license.
+    $scope.license = licenses.filter((lic) => !!lic.data.licenseKeys.filter((key) => key.key === $scope.primaryProject.settings.licenseKey).length)[0];
+
+    // If we can't find the license, the user doesn't have access to the license.
+    $scope.refresh = async () => {
+      if ($scope.license) {
+        $scope.stages = await LicenseServerHelper.getLicenseUtilizations($scope.license._id, 'stages', `projectId=${$scope.primaryProject._id}`);
+        $scope.enabledStages = $scope.stages.filter((stage) => stage.status === "1");
+        $scope.livestages = await LicenseServerHelper.getLicenseUtilizations($scope.license._id, 'livestages', `projectId=${$scope.primaryProject._id}`);
+        $scope.livestages = $scope.livestages.reduce((prev, stage) => {
+          prev[stage.stageId] = stage.status === '1';
+          return prev;
+        }, {});
+        $scope.$apply();
+      }
+    };
+
+    $scope.refresh();
+
+    $scope.onAction = async (stage, utilization, action) => {
+      const {id, status, lastCheck, ...data} = stage;
+      data.licenseId = $scope.license._id;
+      data.type = utilization;
+      await LicenseServerHelper.utilizationAction(data, action);
+      $scope.refresh();
+    }
   }
 ]);
 

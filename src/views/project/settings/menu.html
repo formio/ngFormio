@@ -3,6 +3,9 @@
     <li role="presentation" ng-class="{active:($state.includes('project.settings'))}">
       <a ui-sref="project.settings">Project Settings</a>
     </li>
+    <li role="presentation" ng-class="{active:($state.includes('project.stages'))}">
+      <a ui-sref="project.stages">Stages</a>
+    </li>
     <li role="presentation" ng-class="{active:($state.includes('project.billing'))}" ng-if="!onPremise">
       <a ui-sref="project.billing">Plan and Pricing</a>
     </li>

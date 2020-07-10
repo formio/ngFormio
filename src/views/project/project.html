@@ -25,9 +25,18 @@
     </li>
     <li ng-if="tenantProject"><a ng-click="switchEnv(primaryProject._id)" class="environment-tab"><i class="fa fa-chevron-left"></i></a></li>
     <li ng-if="tenantProject" ng-class="{ active: localProject._id === tenantProject._id }"><a ng-click="switchEnv(tenantProject._id)" class="environment-tab">{{ tenantProject.title }} <span class="badge" ng-if="tenantProject.tag !== '0.0.0'">{{ tenantProject.tag }}</span></a></li>
-    <li ng-class="{ active: localProject._id === environment._id }" ng-repeat="environment in environments"><a ng-click="switchEnv(environment._id)" class="environment-tab"><i class="fa fa-shield" ng-if="environment.protect"></i> {{ environment.title }} <span class="badge" ng-if="environment.tag !== '0.0.0'">{{ environment.tag }}<span ng-if="projectModified(environment)">*</span></span></a></li>
+    <li ng-class="{ active: localProject._id === environment._id }" ng-repeat="environment in environments" ng-if="!environment.disabled">
+      <a ng-click="switchEnv(environment._id)" class="environment-tab">
+        <i class="fa fa-shield" ng-if="environment.protect"></i>
+        <i class="fa fa-pencil" title="Authoring mode" ng-if="environment.authoring"></i>
+        {{ environment.title }}
+        <span class="badge" ng-if="environment.tag !== '0.0.0'">{{ environment.tag }}
+          <span ng-if="projectModified(environment)">*</span>
+        </span>
+      </a>
+    </li>
     <li ng-if="!tenantProject" ng-class="{ active: localProject._id === primaryProject._id }"><a ng-click="switchEnv(primaryProject._id)" class="environment-tab"><i class="fa fa-shield" ng-if="primaryProject.protect"></i> Live <span class="badge" ng-if="primaryProject.tag !== '0.0.0'">{{ primaryProject.tag }}</span></a></li>
-    <li ng-if="environments.length < 9 && projectPermissions.admin"><a ui-sref="project.environment">+ New Stage</a></li>
+    <li ng-if="environments.length < primaryProject.apiCalls.limit.stages && projectPermissions.admin"><a ui-sref="project.environment">+ New Stage</a></li>
   </ul>
 </div>
 <div class="project-container" ng-if="projectError">

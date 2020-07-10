@@ -245,6 +245,11 @@ angular
           templateUrl: 'views/project/billing.html',
           controller: 'ProjectBilling'
         })
+        .state('project.stages', {
+          url: '/stages',
+          templateUrl: 'views/project/stages.html',
+          controller: 'ProjectStages'
+        })
         .state('project.env', {
           url: '/env',
           abstract: true,
