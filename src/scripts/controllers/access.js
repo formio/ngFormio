@@ -302,16 +302,27 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
     templateUrl: 'views/project/access/access/field-match-permission-editor.html',
     link: function($scope) {
       $scope.saveFieldPath = function(permission) {
-        let accessPermission;
-        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || {
-          read: { formFieldPath: '',  userFieldPath: '' },
-          create: { formFieldPath: '',  userFieldPath: '' },
-          write: { formFieldPath: '',  userFieldPath: '' },
-          admin: { formFieldPath: '',  userFieldPath: '' }
+        const { type } = permission;
+        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || { };
+        if (!$scope.form.fieldMatchAccess[type]) {
+          $scope.form.fieldMatchAccess[type] = { };
+        }
+
+        const {
+          formFieldPath,
+          valueOrPath,
+          operator,
+          roles,
+          valueType
+        } = permission;
+
+        $scope.form.fieldMatchAccess[type] = { 
+          formFieldPath,
+          valueOrPath,
+          operator,
+          roles,
+          valueType
         };
-        accessPermission = $scope.form.fieldMatchAccess[permission.type];
-        accessPermission.formFieldPath = permission.formFieldPath;
-        accessPermission.userFieldPath = permission.userFieldPath;
         $scope.onChange();
       };
 
@@ -359,18 +370,18 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
                   ...existingPerm,
                   formFieldPath,
                   valueOrPath,
-                  operator: operator?.value || '',
+                  operator,
                   roles,
-                  valueType: valueType?.value || ''
+                  valueType
                 };
               }
               else {
                 permissions.push({
                   type,
                   formFieldPath,
-                  valueType: valueType?.value || '',
+                  valueType,
                   valueOrPath,
-                  operator: operator?.value || '',
+                  operator,
                   roles
                 });
               }

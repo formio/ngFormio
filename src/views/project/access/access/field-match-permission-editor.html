@@ -52,7 +52,7 @@
           <ui-select-match class="ui-select-match" placeholder="Select Operator...">
             {{$select.selected.title }} ({{ $select.selected.value }})
           </ui-select-match>
-          <ui-select-choices class="ui-select-choices" repeat="operator in operators | filter: $select.search">
+          <ui-select-choices class="ui-select-choices" repeat="operator.value as operator in operators | filter: $select.search">
             <div>{{ operator.title }} ({{ operator.value }})</div>
           </ui-select-choices>
         </ui-select>
@@ -63,7 +63,7 @@
           id="{{permission.type}}_valueType"
         >
           <ui-select-match class="ui-select-match" placeholder="Select Value Type...">{{$select.selected.title}}</ui-select-match>
-          <ui-select-choices class="ui-select-choices" repeat="valueType in valueTypes | filter: $select.search">
+          <ui-select-choices class="ui-select-choices" repeat="valueType.value as valueType in valueTypes | filter: $select.search">
             <div>{{ valueType.title }}</div>
           </ui-select-choices>
         </ui-select>
