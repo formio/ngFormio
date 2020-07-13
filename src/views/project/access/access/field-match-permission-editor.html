@@ -2,29 +2,76 @@
   <ul class="list-group list-group-striped">
     <li class="list-group-item  list-group-heading">
       <div class="row">
-        <div class="col col-sm-3">
+        <div class="col col-xs-1">
           <strong>Permission</strong>
         </div>
-        <div class="col col-sm-3">
+        <div class="col col-xs-2">
+          <strong>Role</strong>
+        </div>
+        <div class="col col-xs-2">
           <strong>Form Field Path</strong>
         </div>
-        <div class="col col-sm-3">
-          <strong>User Field Path</strong>
+        <div class="col col-xs-2">
+          <strong>Operator</strong>
+        </div>
+        <div class="col col-xs-2">
+          <strong>Type</strong>
+        </div>
+        <div class="col col-xs-2">
+          <strong>User Field Path/ Value</strong>
+        </div>
+        <div class="col col-xs-1">
         </div>
       </div>
     </li>
+
     <li class="list-group-item" ng-repeat="permission in getPermissionsToShow()">
       <div class="row">
-        <div class="col col-sm-3">
+        <div class="col col-xs-1">
           <h4>{{getPermissionLabel(permission)}}</h4>
         </div>
-        <div class=" col col-sm-3">
+        <div class="col col-xs-2">
+          <ui-select multiple ng-model="permission.roles" theme="bootstrap" reset-search-input="true"
+            name="{{permission.type}}_roles"
+            id="{{permission.type}}_roles"
+          >
+            <ui-select-match class="ui-select-match" placeholder="Select Roles...">{{$item.title}}</ui-select-match>
+            <ui-select-choices class="ui-select-choices" repeat="role._id as role in roles | filter: $select.search">
+              <div>{{ role.title }}</div>
+            </ui-select-choices>
+          </ui-select>
+        </div>
+        <div class="col col-xs-2">
           <input class="form-control" type="text" ng-model="permission.formFieldPath"/>
         </div>
-        <div class=" col col-sm-3">
-          <input class="form-control" type="text" ng-model="permission.userFieldPath"/>
+        <div class="col col-xs-2">
+          <ui-select ng-model="permission.operator" theme="bootstrap" reset-search-input="true"
+          name="{{permission.type}}_operator"
+          id="{{permission.type}}_operator"
+        >
+          <ui-select-match class="ui-select-match" placeholder="Select Operator...">
+            {{$select.selected.title }} ({{ $select.selected.value }})
+          </ui-select-match>
+          <ui-select-choices class="ui-select-choices" repeat="operator in operators | filter: $select.search">
+            <div>{{ operator.title }} ({{ operator.value }})</div>
+          </ui-select-choices>
+        </ui-select>
         </div>
-        <div class=" col col-sm-3">
+        <div class="col col-xs-2">
+          <ui-select ng-model="permission.valueType" theme="bootstrap" reset-search-input="true"
+          name="{{permission.type}}_valueType"
+          id="{{permission.type}}_valueType"
+        >
+          <ui-select-match class="ui-select-match" placeholder="Select Value Type...">{{$select.selected.title}}</ui-select-match>
+          <ui-select-choices class="ui-select-choices" repeat="valueType in valueTypes | filter: $select.search">
+            <div>{{ valueType.title }}</div>
+          </ui-select-choices>
+        </ui-select>
+        </div>
+        <div class="col col-xs-2">
+          <input class="form-control" type="text" ng-model="permission.valueOrPath"/>
+        </div>
+        <div class="col col-xs-1">
           <button ng-click="saveFieldPath(permission)" class="btn btn-primary">Save</button>
         </div>
       </div>

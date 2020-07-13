@@ -296,6 +296,7 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
       waitFor: '=',
       form: '=',
       labels: '=',
+      roles: '=',
     },
     restrict: 'E',
     templateUrl: 'views/project/access/access/field-match-permission-editor.html',
@@ -314,6 +315,35 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         $scope.onChange();
       };
 
+      $scope.operators = [
+        { title: 'equal', value: '$eq' },
+        { title: 'in', value: '$in' },
+        { title: 'greater', value: '$gt' },
+        { title: 'less', value: '$lt' },
+        { title: 'greater/equal', value: '$gte' },
+        { title: 'less/equal', value: '$lte' }
+      ];
+
+      const operatorsEnum = {
+        equal: $scope.operators[0],
+        in: $scope.operators[1],
+        greater: $scope.operators[2],
+        less: $scope.operators[3],
+        greaterOrEqual: $scope.operators[4],
+        lessOrEqual: $scope.operators[5]
+      };
+
+      $scope.valueTypes = [
+        { title: 'value', value: 'value' },
+        { title: 'user\'s field', value: 'userFieldPath' }
+      ];
+
+      
+      const valueTypesEnum = {
+        value: $scope.valueTypes[0],
+        userFieldPath: $scope.valueTypes[1],
+      };
+
       var permissions = [];
       // Fill in missing permissions / enforce order
       ($scope.waitFor || $q.when()).then(function() {
@@ -321,18 +351,27 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         if ($scope.form.fieldMatchAccess) {
           const fieldMatchAccess = $scope.form.fieldMatchAccess;
           _.each(PERMISSION_TYPES, function(type) {
-            if (fieldMatchAccess[type] && fieldMatchAccess[type].formFieldPath && fieldMatchAccess[type].userFieldPath) {
+            if (fieldMatchAccess[type]) {
               let existingPerm = _.find(permissions, {type: type});
-              const { formFieldPath, userFieldPath } = fieldMatchAccess[type];
+              const { formFieldPath, valueOrPath, operator, roles, valueType } = fieldMatchAccess[type];
               if (existingPerm) {
-                existingPerm.formFieldPath = formFieldPath;
-                existingPerm.userFieldPath = userFieldPath;
+                existingPerm = {
+                  ...existingPerm,
+                  formFieldPath,
+                  valueOrPath,
+                  operator: operator?.value || '',
+                  roles,
+                  valueType: valueType?.value || ''
+                };
               }
               else {
                 permissions.push({
                   type,
                   formFieldPath,
-                  userFieldPath
+                  valueType: valueType?.value || '',
+                  valueOrPath,
+                  operator: operator?.value || '',
+                  roles
                 });
               }
             }
@@ -345,7 +384,10 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
           var existingPerm = _.find(permissions, {type: type}) || {
             type,
             formFieldPath: '',
-            userFieldPath: ''
+            valueOrPath: '',
+            operator: '',
+            roles: [],
+            valueType: ''
           };
           tempPerms.push(existingPerm);
         });

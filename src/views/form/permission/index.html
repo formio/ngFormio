@@ -164,7 +164,11 @@
       </div>
       <div class="panel-body">
         <div ng-if="form._id">
-          <field-match-permission-editor labels="resourceAccessLabels"  wait-for="loadFormPromise" form="form"></field-match-permission-editor>
+          <field-match-permission-editor
+            labels="resourceAccessLabels"
+            wait-for="loadFormPromise"
+            form="form" roles="currentProjectRoles">
+          </field-match-permission-editor>
         </div>
       </div>
     </div>
