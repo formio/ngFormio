@@ -301,30 +301,7 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
     restrict: 'E',
     templateUrl: 'views/project/access/access/field-match-permission-editor.html',
     link: function($scope) {
-      $scope.saveFieldPath = function(permission) {
-        const { type } = permission;
-        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || { };
-        if (!$scope.form.fieldMatchAccess[type]) {
-          $scope.form.fieldMatchAccess[type] = { };
-        }
-
-        const {
-          formFieldPath,
-          valueOrPath,
-          operator,
-          roles,
-          valueType
-        } = permission;
-
-        $scope.form.fieldMatchAccess[type] = { 
-          formFieldPath,
-          valueOrPath,
-          operator,
-          roles,
-          valueType
-        };
-        $scope.onChange();
-      };
+      var permissions = [];
 
       $scope.operators = [
         { title: 'equal', value: '$eq' },
@@ -349,41 +326,59 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         { title: 'user\'s field', value: 'userFieldPath' }
       ];
 
-      
       const valueTypesEnum = {
         value: $scope.valueTypes[0],
         userFieldPath: $scope.valueTypes[1],
       };
+      
+      $scope.saveFieldPath = function(permission) {
+        const { type } = permission;
+        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || { };
+        if (!$scope.form.fieldMatchAccess[type]) {
+          $scope.form.fieldMatchAccess[type] = { };
+        }
 
-      var permissions = [];
-      // Fill in missing permissions / enforce order
+        const {
+          formFieldPath,
+          valueOrPath,
+          operator,
+          roles,
+          valueType
+        } = permission;
+
+        $scope.form.fieldMatchAccess[type] = { 
+          formFieldPath,
+          valueOrPath,
+          operator,
+          roles,
+          valueType
+        };
+        $scope.onChange();
+      };
+      
+      // Fill in missing permissions
       ($scope.waitFor || $q.when()).then(function() {
 
         if ($scope.form.fieldMatchAccess) {
           const fieldMatchAccess = $scope.form.fieldMatchAccess;
           _.each(PERMISSION_TYPES, function(type) {
             if (fieldMatchAccess[type]) {
-              let existingPerm = _.find(permissions, {type: type});
+              let existingPerm = _.find(permissions, {type});
               const { formFieldPath, valueOrPath, operator, roles, valueType } = fieldMatchAccess[type];
+              const permission = {
+                type,
+                formFieldPath,
+                valueType,
+                valueOrPath,
+                operator,
+                roles
+              };
+
               if (existingPerm) {
-                existingPerm = {
-                  ...existingPerm,
-                  formFieldPath,
-                  valueOrPath,
-                  operator,
-                  roles,
-                  valueType
-                };
+                existingPerm = permission;
               }
               else {
-                permissions.push({
-                  type,
-                  formFieldPath,
-                  valueType,
-                  valueOrPath,
-                  operator,
-                  roles
-                });
+                permissions.push(permission);
               }
             }
           })
@@ -392,13 +387,13 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         // Ensure all the permission fields are available.
         var tempPerms = [];
         _.each(PERMISSION_TYPES, function(type) {
-          var existingPerm = _.find(permissions, {type: type}) || {
+          var existingPerm = _.find(permissions, {type}) || {
             type,
             formFieldPath: '',
             valueOrPath: '',
-            operator: '',
+            operator: operatorsEnum.equal.value,
             roles: [],
-            valueType: ''
+            valueType: valueTypesEnum.userFieldPath.value
           };
           tempPerms.push(existingPerm);
         });
