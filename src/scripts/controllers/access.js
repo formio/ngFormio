@@ -330,29 +330,30 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         value: $scope.valueTypes[0],
         userFieldPath: $scope.valueTypes[1],
       };
+
+      $scope.addCondition = function(type) {
+        const permission = _.find(permissions, {type}) || {
+          type,
+          conditions: []
+        };
+
+        permission.conditions.push({
+          formFieldPath: '',
+          valueType: valueTypesEnum.userFieldPath.value,
+          valueOrPath: '',
+          operator: operatorsEnum.equal.value,
+          roles: []
+        });
+      }
       
-      $scope.saveFieldPath = function(permission) {
-        const { type } = permission;
+      $scope.saveConditions = function(permission) {
+        const { type, conditions } = permission;
         $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || { };
         if (!$scope.form.fieldMatchAccess[type]) {
-          $scope.form.fieldMatchAccess[type] = { };
+          $scope.form.fieldMatchAccess[type] = [];
         }
 
-        const {
-          formFieldPath,
-          valueOrPath,
-          operator,
-          roles,
-          valueType
-        } = permission;
-
-        $scope.form.fieldMatchAccess[type] = { 
-          formFieldPath,
-          valueOrPath,
-          operator,
-          roles,
-          valueType
-        };
+        $scope.form.fieldMatchAccess[type] = _.cloneDeep(conditions);
         $scope.onChange();
       };
       
@@ -364,21 +365,16 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
           _.each(PERMISSION_TYPES, function(type) {
             if (fieldMatchAccess[type]) {
               let existingPerm = _.find(permissions, {type});
-              const { formFieldPath, valueOrPath, operator, roles, valueType } = fieldMatchAccess[type];
-              const permission = {
-                type,
-                formFieldPath,
-                valueType,
-                valueOrPath,
-                operator,
-                roles
-              };
+              const conditions = _.cloneDeep(fieldMatchAccess[type]);
 
               if (existingPerm) {
-                existingPerm = permission;
+                existingPerm.conditions = conditions;
               }
               else {
-                permissions.push(permission);
+                permissions.push({
+                  type,
+                  conditions
+                });
               }
             }
           })
@@ -389,11 +385,7 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         _.each(PERMISSION_TYPES, function(type) {
           var existingPerm = _.find(permissions, {type}) || {
             type,
-            formFieldPath: '',
-            valueOrPath: '',
-            operator: operatorsEnum.equal.value,
-            roles: [],
-            valueType: valueTypesEnum.userFieldPath.value
+            conditions: []
           };
           tempPerms.push(existingPerm);
         });
