@@ -98,11 +98,13 @@ if (Formio) {
 }
 
 // Check the health of the server.
-fetch(apiBase + '/health', {
-  headers: {
-    Origin: window.location.origin
-  }
-});
+if (fetch) {
+  fetch(apiBase + '/health', {
+    headers: {
+      Origin: window.location.origin
+    }
+  });
+}
 
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',

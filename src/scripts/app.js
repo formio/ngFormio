@@ -1165,6 +1165,7 @@ angular
       $templateCache.put('views/project/access/teams.html', require('../views/project/access/teams.html'));
       $templateCache.put('views/project/settings/menu.html', require('../views/project/settings/menu.html'));
       $templateCache.put('views/project/settings.html', require('../views/project/settings.html'));
+      $templateCache.put('views/project/stages.html', require('../views/project/stages.html'));
       $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
       $templateCache.put('views/project/env/menu.html', require('../views/project/env/menu.html'));
       $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
