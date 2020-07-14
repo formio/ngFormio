@@ -331,19 +331,30 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         userFieldPath: $scope.valueTypes[1],
       };
 
+      const getNewCondition = () => {
+        return {
+          formFieldPath: '',
+          valueType: valueTypesEnum.userFieldPath.value,
+          valueOrPath: '',
+          operator: operatorsEnum.equal.value,
+          roles: []
+        };
+      }
+
+      $scope.deleteCondition = function(type, condition) {
+        const permission = _.find(permissions, {type});
+        if (permission) {
+          permission.conditions = permission.conditions.filter((cond) => cond !== condition);
+        }
+      }
+
       $scope.addCondition = function(type) {
         const permission = _.find(permissions, {type}) || {
           type,
           conditions: []
         };
 
-        permission.conditions.push({
-          formFieldPath: '',
-          valueType: valueTypesEnum.userFieldPath.value,
-          valueOrPath: '',
-          operator: operatorsEnum.equal.value,
-          roles: []
-        });
+        permission.conditions.push(getNewCondition());
       }
       
       $scope.saveConditions = function(permission) {
@@ -385,7 +396,7 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         _.each(PERMISSION_TYPES, function(type) {
           var existingPerm = _.find(permissions, {type}) || {
             type,
-            conditions: []
+            conditions: [getNewCondition()]
           };
           tempPerms.push(existingPerm);
         });

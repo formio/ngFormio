@@ -2291,3 +2291,11 @@ formio-header-wrapper>formio-header.fixed.absolute {
   box-sizing: border-box;
   padding: 3px 5px 6px 3px;
 }
+
+.field-match-access-editor .controls {
+  text-align: right;
+}
+
+.field-match-access-editor .delete-condition {
+  display: flex; justify-content: flex-end;
+}

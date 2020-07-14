@@ -1,10 +1,7 @@
-<div>
+<div class="field-match-access-editor">
   <ul class="list-group list-group-striped">
     <li class="list-group-item  list-group-heading">
       <div class="row">
-        <div class="col col-xs-1">
-          <strong>Permission</strong>
-        </div>
         <div class="col col-xs-2">
           <strong>Role</strong>
         </div>
@@ -20,72 +17,74 @@
         <div class="col col-xs-2">
           <strong>User Field Path/ Value</strong>
         </div>
-        <div class="col col-xs-1">
+        <div class="col col-xs-2">
         </div>
       </div>
     </li>
 
     <li class="list-group-item" ng-repeat="permission in getPermissionsToShow()">
       <div class="row">
-        <div class="col col-xs-1">
+        <div class="col col-xs-12">
           <h4>{{getPermissionLabel(permission)}}</h4>
+
+          <div class="row" ng-repeat="condition in permission.conditions">
+            <div class="col col-8 col-xs-2">
+              <ui-select multiple ng-model="condition.roles" theme="bootstrap" reset-search-input="true"
+                name="{{permission.type}}[{{$index}}]_roles"
+                id="{{permission.type}}[{{$index}}]_roles"
+              >
+                <ui-select-match class="ui-select-match" placeholder="Select Roles...">{{$item.title}}</ui-select-match>
+                <ui-select-choices class="ui-select-choices" repeat="role._id as role in roles | filter: $select.search">
+                  <div>{{ role.title }}</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <input class="form-control" type="text" ng-model="condition.formFieldPath"/>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <ui-select ng-model="condition.operator" theme="bootstrap" reset-search-input="true"
+              name="{{permission.type}}[{{$index}}]_operator"
+              id="{{permission.type}}[{{$index}}]_operator">
+                <ui-select-match class="ui-select-match" placeholder="Select Operator...">
+                  {{$select.selected.title }} ({{ $select.selected.value }})
+                </ui-select-match>
+                <ui-select-choices class="ui-select-choices" repeat="operator.value as operator in operators | filter: $select.search">
+                  <div>{{ operator.title }} ({{ operator.value }})</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <ui-select ng-model="condition.valueType" theme="bootstrap" reset-search-input="true"
+              name="{{permission.type}}[{{$index}}]_valueType"
+              id="{{permission.type}}[{{$index}}]_valueType">
+                <ui-select-match class="ui-select-match" placeholder="Select Value Type...">{{$select.selected.title}}</ui-select-match>
+                <ui-select-choices class="ui-select-choices" repeat="valueType.value as valueType in valueTypes | filter: $select.search">
+                  <div>{{ valueType.title }}</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <input class="form-control" type="text" ng-model="condition.valueOrPath"/>
+            </div>
+  
+            <div class="delete-condition col col-8 col-xs-2">
+              <button ng-click="deleteCondition(permission.type, condition)" class="btn btn-danger">Delete</button>
+            </div>
+          </div>
         </div>
-        <div class="row" ng-repeat="condition in permission.conditions">
-          <div class="col col-xs-2">
-            <ui-select multiple ng-model="condition.roles" theme="bootstrap" reset-search-input="true"
-              name="{{permission.type}}[{{$index}}]_roles"
-              id="{{permission.type}}[{{$index}}]_roles"
-            >
-              <ui-select-match class="ui-select-match" placeholder="Select Roles...">{{$item.title}}</ui-select-match>
-              <ui-select-choices class="ui-select-choices" repeat="role._id as role in roles | filter: $select.search">
-                <div>{{ role.title }}</div>
-              </ui-select-choices>
-            </ui-select>
-          </div>
-
-          <div class="col col-xs-2">
-            <input class="form-control" type="text" ng-model="condition.formFieldPath"/>
-          </div>
-
-          <div class="col col-xs-2">
-            <ui-select ng-model="condition.operator" theme="bootstrap" reset-search-input="true"
-            name="{{permission.type}}[{{$index}}]_operator"
-            id="{{permission.type}}[{{$index}}]_operator">
-              <ui-select-match class="ui-select-match" placeholder="Select Operator...">
-                {{$select.selected.title }} ({{ $select.selected.value }})
-              </ui-select-match>
-              <ui-select-choices class="ui-select-choices" repeat="operator.value as operator in operators | filter: $select.search">
-                <div>{{ operator.title }} ({{ operator.value }})</div>
-              </ui-select-choices>
-            </ui-select>
-          </div>
-
-          <div class="col col-xs-2">
-            <ui-select ng-model="condition.valueType" theme="bootstrap" reset-search-input="true"
-            name="{{permission.type}}[{{$index}}]_valueType"
-            id="{{permission.type}}[{{$index}}]_valueType">
-              <ui-select-match class="ui-select-match" placeholder="Select Value Type...">{{$select.selected.title}}</ui-select-match>
-              <ui-select-choices class="ui-select-choices" repeat="valueType.value as valueType in valueTypes | filter: $select.search">
-                <div>{{ valueType.title }}</div>
-              </ui-select-choices>
-            </ui-select>
-          </div>
-
-          <div class="col col-xs-2">
-            <input class="form-control" type="text" ng-model="condition.valueOrPath"/>
-          </div>
-
-          <div class="col col-xs-1">
-            <button ng-click="" class="btn btn-primary">Delete</button>
-          </div>
         </div>
-      </div>
+        
 
       <div class="row" style="margin-top: 10px;">
         <div class="col col-xs-12">
-          <div>
-            <button ng-click="addCondition(permission.type)" class="btn btn-primary">Add condition</button>
-            <button ng-click="saveConditions(permission)" class="btn btn-primary">Save</button>
+          <div class="controls"> 
+              <button ng-click="addCondition(permission.type)" class="btn btn-primary">Add condition</button>
+              <button ng-click="saveConditions(permission)" class="btn btn-success">Save</button>
           </div>
           <div class="text-muted">
             {{getPermissionTooltip(permission)}}
