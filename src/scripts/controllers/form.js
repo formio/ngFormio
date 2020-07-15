@@ -2349,8 +2349,12 @@ app.controller('FormSubmissionsController', [
                   .value()
               },
               total: function(result) {
-                var match = result.headers('content-range').match(/\d+-\d+\/(\d+)/);
-                return (match && match[1]) || 0;
+                const contentRange = result.headers('content-range');
+                if (contentRange) {
+                  const match = contentRange.match(/\d+-\d+\/(\d+)/);
+                  return (match && match[1]) || 0;
+                }
+                return 0;
               },
               data: 'data'
             },
