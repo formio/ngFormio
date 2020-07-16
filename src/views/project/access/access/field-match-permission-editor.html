@@ -2,7 +2,7 @@
   <ul class="list-group list-group-striped">
     <li class="list-group-item  list-group-heading">
       <div class="row">
-        <div class="col col-xs-2">
+        <div class="col col-xs-3">
           <strong>Role</strong>
         </div>
         <div class="col col-xs-2">
@@ -17,7 +17,7 @@
         <div class="col col-xs-2">
           <strong>User Field Path/ Value</strong>
         </div>
-        <div class="col col-xs-2">
+        <div class="col col-xs-1">
         </div>
       </div>
     </li>
@@ -28,7 +28,7 @@
           <h4>{{getPermissionLabel(permission)}}</h4>
 
           <div class="row" ng-repeat="condition in permission.conditions">
-            <div class="col col-8 col-xs-2">
+            <div class="col col-8 col-xs-3">
               <ui-select multiple ng-model="condition.roles" theme="bootstrap" reset-search-input="true"
                 name="{{permission.type}}[{{$index}}]_roles"
                 id="{{permission.type}}[{{$index}}]_roles"
@@ -72,8 +72,8 @@
               <input class="form-control" type="text" ng-model="condition.valueOrPath"/>
             </div>
   
-            <div class="delete-condition col col-8 col-xs-2">
-              <button ng-click="deleteCondition(permission.type, condition)" class="btn btn-danger">Delete</button>
+            <div class="delete-condition col col-8 col-xs-1">
+              <button ng-click="deleteCondition(permission.type, condition)" class="btn btn-secondary"><i class="fa fa-trash"></i></button>
             </div>
           </div>
         </div>
@@ -83,8 +83,8 @@
       <div class="row" style="margin-top: 10px;">
         <div class="col col-xs-12">
           <div class="controls"> 
-              <button ng-click="addCondition(permission.type)" class="btn btn-primary">Add condition</button>
-              <button ng-click="saveConditions(permission)" class="btn btn-success">Save</button>
+            <button ng-click="addCondition(permission.type)" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp Add condition</button>
+            <button ng-click="saveConditions(permission)" class="btn btn-success">Save</button>
           </div>
           <div class="text-muted">
             {{getPermissionTooltip(permission)}}

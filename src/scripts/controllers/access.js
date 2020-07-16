@@ -398,6 +398,9 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
             type,
             conditions: [getNewCondition()]
           };
+          if (!existingPerm.conditions.length) {
+            existingPerm.conditions.push(getNewCondition());
+          }
           tempPerms.push(existingPerm);
         });
 

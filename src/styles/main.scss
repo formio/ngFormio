@@ -2299,3 +2299,11 @@ formio-header-wrapper>formio-header.fixed.absolute {
 .field-match-access-editor .delete-condition {
   display: flex; justify-content: flex-end;
 }
+
+.field-match-access-editor .ui-select-toggle.btn-default {
+  background-color: white;
+}
+
+.field-match-access-editor .ui-select-multiple.ui-select-bootstrap {
+  padding: 5px 3px 5px 3px;
+}
