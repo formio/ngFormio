@@ -1,0 +1,6 @@
+del package-lock.json
+one
+two
+three
+four
+five

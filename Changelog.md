@@ -4,6 +4,92 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## 4.15.1-rc.2
+### Changed
+ - Upgrade formiojs@4.11.1-rc.3
+
+## 4.15.1-rc.1
+### Changed
+ - Upgrade formiojs@4.11.1-rc.1
+
+## 4.15.0
+### Changed
+ - Upgrade formiojs@4.11.0
+
+## 4.14.5
+### Changed
+ - Pin core-js version to 3.5.0
+ - Upgrade formiojs@4.10.5
+
+## 4.14.5-rc.5
+### Changed
+ - Upgrade formiojs@4.10.5-rc.5
+
+## 4.14.5-rc.4
+### Changed
+ - Upgrade formiojs@4.10.5-rc.4
+
+## 4.14.5-rc.3
+### Changed
+ - Upgrade formiojs@4.10.5-rc.3
+
+## 4.14.5-rc.2
+### Changed
+ - Upgrade formiojs@4.10.5-rc.2
+
+## 4.14.4
+### Changed
+ - No changes.
+
+## 4.14.4-rc.6
+### Changed
+  - Upgrade formiojs@4.10.3-rc.6
+  
+## 4.14.4-rc.5
+### Changed
+  - Upgrade formiojs@4.10.3-rc.5
+  
+## 4.14.4-rc.4
+### Changed
+  - Upgrade formiojs@4.10.3-rc.4
+  
+## 4.14.4-rc.3
+### Changed
+  - Upgrade formiojs@4.10.3-rc.3
+
+## 4.14.4-rc.2
+### Changed
+  - Upgrade formiojs@4.10.3-rc.2
+
+## 4.14.4-rc.1
+### Changed
+  - Upgrade formiojs@4.10.3-rc.1
+
+## 4.14.2
+### Changed
+  - Upgrade formiojs@4.10.2
+  
+## 4.14.1
+### Changed
+  - Upgrade formiojs@4.10.1
+  
+## 4.14.0
+### Changed
+  - Upgrade formiojs@4.10.0
+  
+## 4.14.0-rc.6
+### Changed
+  - Upgrade formiojs@4.10.0-rc.13
+
+## 4.14.0-rc.5
+### Changed
+  - Upgrade formiojs@4.10.0-rc.12
+
+## 4.14.0-rc.4
+### Changed
+  - Upgrade formiojs@4.10.0-rc.11
+
 ## 4.14.0-rc.3, 4.14.0-rc.2
 ### Changed
   - Upgrade formiojs@4.10.0-rc.9
