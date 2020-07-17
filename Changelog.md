@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.12
+### Fixed
+ - Crash related to fetch not being available.
+ - Crash if going to stages settings page.
+
+## 7.1.11
+### Added
+ - License management page for stages.
+ - Ability to have authoring and live stages.
+
+### Changed
+ - Formio library version to latest stable.
+
+## 7.1.10
+### Fixed
+ - Fix old currentProject taking over.
+ - Don't allow adding form manager to Independent or Basic plans.
+ - Add premium components.
+
 ## 7.1.9
 ### Changed 
  - Form/Resource modified filter sometimes sent incorrectly.
@@ -38,6 +57,70 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Licensing UI
 
+## 7.0.33
+### Changed
+ - Upgrade "formio-tenant": "^1.13.13-rc.4"
+
+## 7.0.32
+### Changed
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.4-rc.4"
+
+## 7.0.31
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.5-rc.7",
+ - Upgrade "formiojs": "^4.10.5-rc.5"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.4-rc.3"
+ - Upgrade "ng-formio": "^4.14.5-rc.5"
+ - Upgrade "formio-tenant": "^1.13.13-rc.3"
+
+## 7.0.30
+### Fixed
+ - IE11 fix in config.js
+
+## 7.0.29
+### Fixed
+ - IE11 fix in config.js
+
+## 7.0.28
+### Fixed
+ - FOR-2696: Fixes an issue where team admins couldn't delete a project.
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.5-rc.6",
+ - Upgrade "formiojs": "^4.10.5-rc.4"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.4-rc.2"
+ - Upgrade "ng-formio": "^4.14.5-rc.4"
+ - Upgrade "formio-tenant": "^1.13.13-rc.2"
+ 
+
+## 7.0.27
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.5-rc.5",
+ - Upgrade "formiojs": "^4.10.5-rc.3"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.4-rc.1"
+ - Upgrade "ng-formio": "^4.14.5-rc.3"
+ - Upgrade "formio-tenant": "^1.13.13-rc.1"
+
+## 7.0.26
+### Fixed
+ - Version issue where formmanager was not updating renderer versions.
+
+## 7.0.25
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3",
+ - Upgrade "formiojs": "^4.10.3"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3"
+ - Upgrade "ng-formio": "^4.14.3"
+ - Upgrade "formio-tenant": "^1.13.12"
+ 
+## 7.0.24
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.7",
+ - Upgrade "formiojs": "^4.10.3-rc.6"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.3-rc.6"
+ - Upgrade "ng-formio": "^4.14.3-rc.6"
+ - Upgrade "formio-tenant": "^1.13.11"
+ 
+>>>>>>> 7.0.x
 ## 7.0.23
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.13.3-rc.6",

@@ -96,6 +96,16 @@ if (Formio) {
     Formio.loadModules();
   }
 }
+
+// Check the health of the server.
+if (fetch) {
+  fetch(apiBase + '/health', {
+    headers: {
+      Origin: window.location.origin
+    }
+  });
+}
+
 angular.module('formioApp').constant('AppConfig', {
   appVersion: 'APP_VERSION',
   copyrightYear: (new Date()).getFullYear().toString(),

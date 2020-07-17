@@ -1,0 +1,85 @@
+<div class="project-section-inner-content">
+  <div class="row">
+    <div class="col-sm-4">
+      <ng-include src="'views/project/settings/menu.html'" />
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">Managing Project Stages</h3>
+        </div>
+        <div class="panel-body">
+          <p>Stages allows creatinga  Dev->Test->Prod migration process of your forms and resources. They allow creating and deploying tag versions between stages in a repeatable and reversible way.</p>
+          <p> There are two types of stages. The first are "Live" stages. These are fully functional stages and can be used anywhere. Projects have a limited number of live stages that are designed to be Production, Pre-production and similar stages. </p>
+          <p>The second kind of stages are "Authoring" stages. These are designed for building forms and testing out during development. Authoring stages are limited to submitting data in the forms in the portal and on localhost. They will not allow submitting data on the web.</p>
+          <ul>
+            <li><strong>Live Stage</strong> - Full functionality stage for Prod, Pre-Prod and QA.</li>
+            <li><strong>Authoring Stage</strong> - Stage for creating and testing forms in development. Will not allow submitting forms on the internet.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8" style="padding: 0 20px 40px 0;">
+      <div>
+        <div class="panel panel-default">
+          <div class="panel-heading clearfix">
+            <div class="btn-group pull-right" ng-if="enabledStages.length < primaryProject.apiCalls.limit.stages">
+              <a ui-sref="project.environment" class="btn btn-default">Create a New Stage</a>
+            </div>
+            <h3 class="panel-titles">Stages</h3>
+          </div>
+          <div class="panel-bodys">
+          </div>
+          <ul class="list-group">
+            <li class="list-group-heading list-group-item">
+              <div class="row">
+                <div class="col-sm-5">
+                  <h4 class="list-group-item-heading">Name</h4>
+                </div>
+                <div class="col-sm-2">
+                  <h4 class="list-group-item-heading">Status</h4>
+                </div>
+                <div class="col-sm-2">
+                  <h4 class="list-group-item-heading">Type</h4>
+                </div>
+              </div>
+            </li>
+            <li ng-if="license && stages.length" class="list-group-item" ng-repeat="stage in stages">
+              <div class="row">
+                <div class="col-sm-5 ellipsis">
+                  <h4>{{ stage.title }}</h4>
+                </div>
+                <div class="col-sm-2">
+                  <span class="btn btn-danger" ng-if="stage.status === '0'" ng-click="onAction(stage, 'stage', 'enable')">Disabled</span>
+                  <span class="btn btn-info" ng-if="stage.status === '1'" ng-click="onAction(stage, 'stage', 'disable')">Enabled</span>
+                </div>
+                <div class="col-sm-2">
+                  <span class="btn btn-danger" ng-if="!livestages[stage.stageId]" ng-click="onAction(stage, 'livestage', 'enable')">Authoring</span>
+                  <span class="btn btn-info" ng-if="livestages[stage.stageId]" ng-click="onAction(stage, 'livestage', 'disable')">Live</span>
+                </div>
+              </div>
+            </li>
+            <li ng-if="license && !stages.length" class="list-group-item">
+              <div>
+                No Stages Added
+              </div>
+            </li>
+            <li ng-if="!license" class="list-group-item">
+              <div>
+                You do not have access to manage stages. Only License Managers can modify stage license usage.
+              </div>
+            </li>
+          </ul>
+          <div class="panel-footer">
+            <div class="row">
+              <div class="col col-sm-8">
+                Refresh your page to see changes in tabs.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div ng-if="!projectTeamsLoading && !minPlan('team')">
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,8 +1,10 @@
 'use strict';
 const packageJSON = require('../../package.json');
 import { Templates, Formio } from 'ng-formio/lib/modules';
+import premium from '@formio/premium';
 Templates.framework = 'bootstrap3';
 Formio.icons = 'fa';
+Formio.use(premium);
 
 /**
  * @ngdoc overview
@@ -242,6 +244,11 @@ angular
           url: '/billing',
           templateUrl: 'views/project/billing.html',
           controller: 'ProjectBilling'
+        })
+        .state('project.stages', {
+          url: '/stages',
+          templateUrl: 'views/project/stages.html',
+          controller: 'ProjectStages'
         })
         .state('project.env', {
           url: '/env',
@@ -1191,6 +1198,7 @@ angular
       $templateCache.put('views/project/access/teams.html', require('../views/project/access/teams.html'));
       $templateCache.put('views/project/settings/menu.html', require('../views/project/settings/menu.html'));
       $templateCache.put('views/project/settings.html', require('../views/project/settings.html'));
+      $templateCache.put('views/project/stages.html', require('../views/project/stages.html'));
       $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
       $templateCache.put('views/project/env/menu.html', require('../views/project/env/menu.html'));
       $templateCache.put('views/project/env/settings.html', require('../views/project/env/settings.html'));
