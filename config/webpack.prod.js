@@ -1,5 +1,5 @@
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const merge = require('webpack-merge').merge;
 const packageJSON = require('../package.json');
 module.exports = merge(require('./webpack.dev'), {
   mode: 'production',

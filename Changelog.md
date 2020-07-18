@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.15.1-rc.3
+### Changed
+ - Upgrade formiojs@4.11.1-rc.5
+
+### Fixed
+ - Issue where angular.merge was messing up datagrid and editgrid rows.
 
 ## 4.15.1-rc.2
 ### Changed
