@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.38-rc.3
+### Changed
+ - Upgrade formiojs@4.11.1-rc.5
+ - Upgrade formmanager@1.94.7-rc.3
+ - Upgrade ng-formio@4.15.1-rc.3
+
+### Fixed
+ - FJS-1068: Fix WWU Error when viewing submission data in portal
+ - FOR-2670(HealthSplash): Fixes an issue where existed teams for stages were being deleted after the page refresh. 
+
 ## 7.0.38-rc.2
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.14.1-rc.2",
