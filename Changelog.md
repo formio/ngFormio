@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.13
+### Changed
+ - Merge changes from 7.0.x
+ 
+### Fixed'
+ - Crash in IE11 on config
+
 ## 7.1.12
 ### Fixed
  - Crash related to fetch not being available.
@@ -56,6 +63,75 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 7.1.0-7.1.4
 ### Changed
  - Licensing UI
+
+## 7.0.38-rc.6
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.1-rc.3",
+ - Upgrade "formiojs": "^4.11.1-rc.6"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.7-rc.4"
+ - Upgrade "ng-formio": "^4.15.1-rc.4"
+ - Upgrade "formio-tenant": "^1.13.16-rc.3"
+ 
+## 7.0.38-rc.5
+### Fixed
+ - Build problem where latest formmanager was not getting pulled in.
+
+## 7.0.38-rc.3
+### Changed
+ - Upgrade formiojs@4.11.1-rc.5
+ - Upgrade formmanager@1.94.7-rc.3
+ - Upgrade ng-formio@4.15.1-rc.3
+
+### Fixed
+ - FJS-1068: Fix WWU Error when viewing submission data in portal
+ - FOR-2670(HealthSplash): Fixes an issue where existed teams for stages were being deleted after the page refresh. 
+
+## 7.0.38-rc.2
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.1-rc.2",
+ - Upgrade "formiojs": "^4.11.1-rc.3"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.7-rc.2"
+ - Upgrade "ng-formio": "^4.15.1-rc.2"
+ - Upgrade "formio-tenant": "^1.13.16-rc.2"
+
+## 7.0.38-rc.1
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.1-rc.1",
+ - Upgrade "formiojs": "^4.11.1-rc.1"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.7-rc.1"
+ - Upgrade "ng-formio": "^4.15.1-rc.1"
+ - Upgrade "formio-tenant": "^1.13.16-rc.1"
+
+## 7.0.37
+### Changed
+ - Upgrade formiojs@4.11.0
+ - Upgrade formmanager@1.94.6
+
+## 7.0.36-rc.2
+### Changed
+ - Upgrade formiojs@4.11.0-rc.2
+ - Upgrade formmanager@1.94.6-rc.2
+
+### Fixed
+ - Removed the duplicate Kickbox settings.
+
+## 7.0.36-rc.1
+### Changed
+ - Upgrade formiojs@4.11.0-rc.2
+ - Upgrade formmanager@1.94.6-rc.1
+
+## 7.0.35
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.5"
+ - Upgrade "formio-tenant": "^1.13.14"
+
+## 7.0.34
+ - Upgrade "@formio/premium": "github:formio/premium#v1.13.5",
+ - Upgrade "formiojs": "^4.10.5"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.4"
+ - Upgrade "ng-formio": "^4.14.5"
+ - Upgrade "formio-tenant": "^1.13.13"
+ - Pin core-js@3.5.0 to resolve IE11 issues.
+>>>>>>> origin/7.0.x
 
 ## 7.0.33
 ### Changed
