@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.38-rc.5
+### Fixed
+ - Build problem where latest formmanager was not getting pulled in.
+
 ## 7.0.38-rc.3
 ### Changed
  - Upgrade formiojs@4.11.1-rc.5
