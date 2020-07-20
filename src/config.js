@@ -98,7 +98,7 @@ if (Formio) {
 }
 
 // Check the health of the server.
-if (fetch) {
+if ('fetch' in window) {
   fetch(apiBase + '/health', {
     headers: {
       Origin: window.location.origin
