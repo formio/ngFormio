@@ -322,20 +322,26 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
       };
 
       $scope.valueTypes = [
-        { title: 'value', value: 'value' },
-        { title: 'user\'s field', value: 'userFieldPath' }
+        { title: 'string', value: 'string' },
+        { title: 'number', value: 'number' },
+        { title: 'boolean', value: 'boolean' },
+        { title: 'array of strings', value: '[string]' },
+        { title: 'array of numbers', value: '[number]' },
       ];
 
       const valueTypesEnum = {
-        value: $scope.valueTypes[0],
-        userFieldPath: $scope.valueTypes[1],
+        string: $scope.valueTypes[0],
+        number: $scope.valueTypes[1],
+        boolean: $scope.valueTypes[2],
+        stringsArray: $scope.valueTypes[3],
+        numbersArray: $scope.valueTypes[4],
       };
 
       const getNewCondition = () => {
         return {
           formFieldPath: '',
-          valueType: valueTypesEnum.userFieldPath.value,
-          valueOrPath: '',
+          valueType: valueTypesEnum.string.value,
+          value: '',
           operator: operatorsEnum.equal.value,
           roles: []
         };
