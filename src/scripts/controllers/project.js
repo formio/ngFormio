@@ -427,6 +427,25 @@ app.controller('ProjectController', [
     };
 
     $scope.loadProjectPromise = $scope.formio.loadProject(null, {ignoreCache: true}).then(function(result) {
+      const PERMISSION_TYPES = [
+        'create_own',
+        'create_all',
+        'read_own',
+        'read_all',
+        'update_own',
+        'update_all',
+        'delete_own',
+        'delete_all',
+        'team_read',
+        'team_write',
+        'team_admin'
+      ];
+
+      result.access = _.map(
+        PERMISSION_TYPES,
+        type => _.find(result.access, { type }) || { type, roles: [] }
+      );
+      
       $scope.localProject = result;
       setTenant($scope.localProject);
       $scope.localProjectUrl = $rootScope.projectPath(result);

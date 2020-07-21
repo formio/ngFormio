@@ -93,20 +93,6 @@ app.directive('permissionEditor', ['$q', function($q) {
     restrict: 'E',
     templateUrl: 'views/project/access/access/permission-editor.html',
     link: function($scope) {
-      // Fill in missing permissions / enforce order
-      ($scope.waitFor || $q.when()).then(function() {
-        var tempPerms = [];
-        _.each(PERMISSION_TYPES, function(type) {
-          var existingPerm = _.find($scope.permissions, {type: type});
-          tempPerms.push(existingPerm || {
-              type: type,
-              roles: []
-            });
-        });
-        // Replace permissions with complete set of permissions
-        $scope.permissions.splice.apply($scope.permissions, [0, $scope.permissions.length].concat(tempPerms));
-      });
-
       $scope.getPermissionsToShow = function() {
         return $scope.permissions.filter($scope.shouldShowPermission);
       };
