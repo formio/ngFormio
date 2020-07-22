@@ -351,6 +351,9 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
 
       $scope.deleteCondition = function(type, condition) {
         const permission = _.find(permissions, {type});
+        condition.roles.forEach((role) => {
+          $scope.removeRole(role, type);
+        });
         if (permission) {
           permission.conditions = permission.conditions.filter((cond) => cond !== condition);
         }
@@ -369,7 +372,7 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         $scope.levelsRoles[accessLevel] = [...$scope.levelsRoles[accessLevel], roleId];
       };
 
-      $scope.deleteRole = function(roleId, accessLevel) {
+      $scope.removeRole = function(roleId, accessLevel) {
         const index = $scope.levelsRoles[accessLevel].indexOf(roleId);
         if (index !== -1) {
           $scope.levelsRoles[accessLevel].splice(index, 1);
@@ -427,6 +430,10 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         // Replace permissions with complete set of permissions
         permissions.splice.apply(permissions, [0, permissions.length].concat(tempPerms));
       });
+
+      $scope.isFieldMatchAccessSaved = function() {
+        return permissions.every(({ type, conditions }) => _.isEqual(_.map(conditions, (c) => _.omit(c, ['$$hashKey'])), $scope.form.fieldMatchAccess[type]));
+      };
 
       $scope.getAvailableRolesForTheLevel = function(accessLevel) {
         const otherLevelsRoles = [];
