@@ -193,19 +193,6 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
 
         $scope.onChange();
       };
-      $scope.addFieldPath = function(permission) {
-        let accessPermission;
-        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || {
-          read: { formFieldPath: '',  userFieldPath: '' },
-          create: { formFieldPath: '',  userFieldPath: '' },
-          write: { formFieldPath: '',  userFieldPath: '' },
-          admin: { formFieldPath: '',  userFieldPath: '' }
-        };
-        accessPermission = $scope.form.fieldMatchAccess[permission.type];
-        accessPermission.formFieldPath = permission.formFieldPath;
-        accessPermission.userFieldPath = permission.userFieldPath;
-        $scope.onChange();
-      };
 
       var permissions = [];
       // Fill in missing permissions / enforce order
@@ -227,38 +214,14 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
           }
         });
 
-        if ($scope.form.fieldMatchAccess) {
-          const fieldMatchAccess = $scope.form.fieldMatchAccess;
-          _.each(PERMISSION_TYPES, function(type) {
-            if (fieldMatchAccess[type] && fieldMatchAccess[type].formFieldPath && fieldMatchAccess[type].userFieldPath) {
-              let existingPerm = _.find(permissions, {type: type});
-              const { formFieldPath, userFieldPath } = fieldMatchAccess[type];
-              if (existingPerm) {
-                existingPerm.formFieldPath = formFieldPath;
-                existingPerm.userFieldPath = userFieldPath;
-              }
-              else {
-                permissions.push({
-                  type,
-                  resources: [],
-                  formFieldPath,
-                  userFieldPath
-                });
-              }
-            }
-          })
-        }
-
         // Ensure all the permission fields are available.
         var tempPerms = [];
         _.each(PERMISSION_TYPES, function(type) {
-          var existingPerm = _.find(permissions, {type: type}) || {
-            type,
-            resources: [],
-            formFieldPath: '',
-            userFieldPath: ''
-          };
-          tempPerms.push(existingPerm);
+          var existingPerm = _.find(permissions, {type: type});
+          tempPerms.push(existingPerm || {
+              type: type,
+              resources: []
+            });
         });
 
         // Replace permissions with complete set of permissions
