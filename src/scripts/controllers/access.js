@@ -376,14 +376,11 @@ app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, F
         }
       };
       
-      $scope.saveConditions = function(permission) {
-        const { type, conditions } = permission;
-        $scope.form.fieldMatchAccess = $scope.form.fieldMatchAccess || { };
-        if (!$scope.form.fieldMatchAccess[type]) {
-          $scope.form.fieldMatchAccess[type] = [];
-        }
-
-        $scope.form.fieldMatchAccess[type] = _.cloneDeep(conditions);
+      $scope.saveFieldMatchAccess = function() {
+        $scope.form.fieldMatchAccess = {};
+        permissions.forEach(({ type, conditions }) => {
+          $scope.form.fieldMatchAccess[type] = _.cloneDeep(conditions);
+        });
         $scope.onChange();
       };
       

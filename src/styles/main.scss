@@ -2307,3 +2307,20 @@ formio-header-wrapper>formio-header.fixed.absolute {
 .field-match-access-editor .ui-select-multiple.ui-select-bootstrap {
   padding: 5px 3px 5px 3px;
 }
+
+.field-match-access-editor .save-btn {
+  margin-left: auto;
+  display: block;
+}
+
+.field-match-access-editor .form-control {
+  border-radius: 3px;
+  color: #333333;
+  text-overflow: ellipsis;
+  font-weight: normal;
+}
+
+.field-match-access-editor .ui-select-bootstrap .ui-select-match-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
