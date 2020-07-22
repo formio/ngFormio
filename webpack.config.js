@@ -124,13 +124,9 @@ module.exports = {
   mode: 'development',
   // devtool: 'source-map',
   devServer: {
-    disableHostCheck: true
+    disableHostCheck: true,
   },
   resolve: {
     symlinks: false
-  },
-   watch: true,
-    watchOptions: {
-      aggregateTimeout: 1200
-    }
+  }
 };

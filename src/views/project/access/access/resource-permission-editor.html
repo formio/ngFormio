@@ -5,7 +5,7 @@
         <div class="col col-sm-3">
           <strong>Permission</strong>
         </div>
-        <div class="col col-sm-3">
+        <div class="col col-sm-9">
           <strong>Resources</strong>
         </div>
       </div>
@@ -15,7 +15,7 @@
         <div class="col col-sm-3">
           <h4>{{getPermissionLabel(permission)}}</h4>
         </div>
-        <div class="col col-sm-3">
+        <div class="col col-sm-9">
           <ui-select multiple ng-model="permission.resources" theme="bootstrap" reset-search-input="true" on-remove="removeSelected($item, '')" on-select="addSelected($item, permission.type)" name="{{permission.type}}_role" id="{{permission.type}}_role">
             <ui-select-match class="ui-select-match" placeholder="Select Resources...">{{$item.label}} ({{$item.key}})</ui-select-match>
             <ui-select-choices class="ui-select-choices" ui-disable-choice="uniqueResources.indexOf(resource.key) === -1" repeat="resource.key as resource in resources | filter: $select.search">
