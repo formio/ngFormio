@@ -32,9 +32,10 @@
               <ui-select multiple ng-model="condition.roles" theme="bootstrap" reset-search-input="true"
                 name="{{permission.type}}[{{$index}}]_roles"
                 id="{{permission.type}}[{{$index}}]_roles"
+                on-remove="deleteRole($item._id, permission.type)" on-select="addRole($item._id, permission.type)"
               >
                 <ui-select-match class="ui-select-match" placeholder="Select Roles...">{{$item.title}}</ui-select-match>
-                <ui-select-choices class="ui-select-choices" repeat="role._id as role in roles | filter: $select.search">
+                <ui-select-choices class="ui-select-choices" repeat="role._id as role in getAvailableRolesForTheLevel(permission.type) | filter: $select.search">
                   <div>{{ role.title }}</div>
                 </ui-select-choices>
               </ui-select>
