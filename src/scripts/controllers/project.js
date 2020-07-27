@@ -181,6 +181,7 @@ app.controller('ProjectCreateController', [
         return;
       }
       $scope.isBusy = true;
+      $scope.project.stageTitle = 'Live';
       FormioProject.createProject($scope.project).then(function(project) {
         $scope.isBusy = false;
         // Reset tour and go directly to it.
@@ -190,19 +191,25 @@ app.controller('ProjectCreateController', [
 
         const stageProject = {
           title: 'Stage',
+          stageTitle: 'Stage',
           type: 'stage',
           project: project._id,
           name: `stage-${project.name}`,
-          defaultStage: 'stage',
+          config: {
+            defaultStageName: 'stage'
+          },
         };
 
         const prodProject = {
           title: 'Prod',
+          stageTitle: 'Prod',
           type: 'stage',
           project: project._id,
           name: `prod-${project.name}`,
           protect: true,
-          defaultStage: 'prod',
+          config: {
+            defaultStageName: 'prod'
+          },
         };
         $scope.isBusy = true;
         FormioProject.createEnvironment(stageProject).then(function(stage) {
@@ -263,6 +270,9 @@ app.controller('ProjectCreateEnvironmentController', [
         $scope.currentProject.name = newTitle.replace(/\W/g, '').toLowerCase() + '-' + parentProject.name;
       });
     });
+    if (!$scope.currentProject.stageTitle) {
+      $scope.currentProject.stageTitle =  $scope.currentProject.title
+    }
 
     $scope.isBusy = false;
 
@@ -271,6 +281,7 @@ app.controller('ProjectCreateEnvironmentController', [
       if ($scope.isBusy) {
         return;
       }
+      $scope.currentProject.stageTitle = $scope.currentProject.title
       $scope.isBusy = true;
       FormioProject.createEnvironment($scope.currentProject)
         .then(function(project) {
@@ -382,6 +393,9 @@ app.controller('ProjectController', [
         return;
       }
 
+      if (project.type === 'stage' && (!project.stageTitle || project.stageTitle !== project.title)) {
+        project.stageTitle = project.title;
+      }
       // If the remote project name or title changes, be sure to update the link as well.
       if(($scope.localProject.hasOwnProperty('remote') &&
           $scope.localProject.remote &&
@@ -529,12 +543,17 @@ app.controller('ProjectController', [
         $scope.loadRoles();
       }
 
-      if ($scope.currentProject.type === 'project') {
-        $scope.currentProject.liveTitle = $scope.currentProject.liveTitle || 'Live';
+      if (!$scope.currentProject.stageTitle) {
+        $scope.currentProject.stageTitle = $scope.currentProject.type === 'stage'
+          ? $scope.currentProject.title
+          : 'Live';
       }
 
       $scope.projectType = 'Stage';
-      $scope.environmentName = ($scope.localProject.project) ? result.title : 'Live';
+      $scope.environmentName = result.stageTitle
+        ? result.stageTitle
+        : ($scope.localProject.project)
+          ? result.title : 'Live';
       $scope.projectsLoaded = true;
 
       // Load the users teams.
@@ -2692,10 +2711,6 @@ app.controller('ProjectSettingsController', [
       // Need to strip hyphens at the end before submitting
       if($scope.currentProject.name) {
         $scope.currentProject.name = $scope.currentProject.name.toLowerCase().replace(/[^0-9a-z\-]|^\-+|\-+$/g, '');
-      }
-
-      if ($scope.currentProject.liveTitle === 'Live') {
-        delete $scope.currentProject.liveTitle;
       }
 
       $scope._saveProject($scope.currentProject, $scope.formio).then(function(project) {

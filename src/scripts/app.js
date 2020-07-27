@@ -1042,7 +1042,8 @@ angular
 
               if (environments) {
                 const stageEnv = _.find(environments, function(env) {
-                  return env.defaultStage === 'stage';
+                  const stageName = _.get(env, 'config.defaultStageName', '')
+                  return stageName === 'stage';
                 });
 
                 if (stageEnv) {
