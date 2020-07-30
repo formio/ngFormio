@@ -28,7 +28,10 @@
           </div>
           <div class="panel-bodys">
           </div>
-          <ul class="list-group">
+          <div ng-if="onPremise" style="margin: 20px;">
+            Go to https://portal.form.io to manage your stage usage under License Management.
+          </div>
+          <ul class="list-group" ng-if="!onPremise">
             <li class="list-group-heading list-group-item">
               <div class="row">
                 <div class="col-sm-5">
