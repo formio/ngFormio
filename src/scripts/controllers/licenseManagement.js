@@ -156,7 +156,17 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
         $scope.open[$index] = false;
       };
 
-      $scope.licenses = await LicenseServerHelper.getLicenses();
+      const licenses = await LicenseServerHelper.getLicenses();
+      $scope.licenses = licenses.reverse().sort((licenseA, licenseB) => {
+        if (licenseA.data.location === licenseB.data.location) {
+          return 0;
+        }
+        return licenseA.data.location > licenseB.data.location ? -1 : 1;
+      });
+      $scope.onPremiseCount = $scope.licenses.reduce((count, license) => license.data.location === 'onPremise' ? count + 1 : count, 0);
+      $scope.toggleHosted = function() {
+        $scope.showHosted = !$scope.showHosted;
+      }
       $scope.$apply();
     }
   ])
