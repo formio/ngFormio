@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## 4.15.1-rc.6
+### Changed
+ - Upgrade formiojs@4.11.1-rc.9
+
 ## 4.15.1-rc.5
 ### Changed
  - Upgrade formiojs@4.11.1-rc.8
