@@ -333,17 +333,22 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
       <span class="usage-max">{{licenseAdminInfo.terms[scope.prop].toLocaleString() || '∞'}}</span>
     </div>&nbsp;
   </div>
-  <table class="table" ng-if="currentScope">
+  <table class="table" ng-if="currentScope" ng-style="{marginTop: '10px'}">
     <thead>
       <th ng-repeat="column in currentScope.columns track by $index">{{column.title}}</th>
       <th>Status</th>
     </thead>
     <tbody>
-      <tr ng-repeat="utilization in utilizations track by $index">
+      <tr ng-repeat-start="utilization in utilizations track by $index">
         <td ng-repeat="column in currentScope.columns track by $index">{{utilization[column.field] | scopeValue : column.type}}</td>
         <td>
           <span class="btn btn-danger" ng-if="utilization.status === '0'" ng-click="onAction(utilization, 'enable', column.field)">Disabled</span>
           <span class="btn btn-info" ng-if="utilization.status === '1'" ng-click="onAction(utilization, 'disable', column.field)">Enabled</span>
+        </td>
+      </tr>
+      <tr ng-repeat-end ng-if="currentScope.prop === 'projects'">
+        <td colspan="5" style="padding: 20px">
+          <license-project-stages license="license" project-id="utilization.projectId" />
         </td>
       </tr>
       <tr ng-if="utilizations.length === 0">
@@ -353,5 +358,74 @@ angular.module('formioApp.controllers.licenseManagement', ['ngDialog'])
   </table>
 </div>
 `
+    }
+  })
+  .directive('licenseProjectStages', function() {
+    return {
+      restrict: 'E',
+      scope: {
+        license: '=',
+        projectId: '=',
+      },
+      controller: ['LicenseServerHelper', '$scope', async function LicenseInfoController(LicenseServerHelper, $scope) {
+        console.log($scope.projectId);
+        $scope.refresh = async () => {
+          $scope.stages = await LicenseServerHelper.getLicenseUtilizations($scope.license._id, 'stages', `projectId=${$scope.projectId}`);
+          $scope.enabledStages = $scope.stages.filter((stage) => stage.status === "1");
+          $scope.livestages = await LicenseServerHelper.getLicenseUtilizations($scope.license._id, 'livestages', `projectId=${$scope.projectId}`);
+          $scope.livestages = $scope.livestages.reduce((prev, stage) => {
+            prev[stage.stageId] = stage.status === '1';
+            return prev;
+          }, {});
+          $scope.$apply();
+        };
+
+        $scope.refresh();
+
+        $scope.onAction = async (stage, utilization, action) => {
+          const {id, status, lastCheck, ...data} = stage;
+          data.licenseId = $scope.license._id;
+          data.type = utilization;
+          await LicenseServerHelper.utilizationAction(data, action);
+          $scope.refresh();
+        }
+      }],
+      template: `
+<ul class="list-group">
+  <li class="list-group-heading list-group-item">
+    <div class="row">
+      <div class="col-sm-5">
+        <h4 class="list-group-item-heading">Stages</h4>
+      </div>
+      <div class="col-sm-2">
+        <h4 class="list-group-item-heading">Status</h4>
+      </div>
+      <div class="col-sm-2">
+        <h4 class="list-group-item-heading">Type</h4>
+      </div>
+    </div>
+  </li>
+  <li ng-if="license && stages.length" class="list-group-item" ng-repeat="stage in stages">
+    <div class="row">
+      <div class="col-sm-5 ellipsis">
+        <h4>{{ stage.title }}</h4>
+      </div>
+      <div class="col-sm-2">
+        <span class="btn btn-danger" ng-if="stage.status === '0'" ng-click="onAction(stage, 'stage', 'enable')">Disabled</span>
+        <span class="btn btn-info" ng-if="stage.status === '1'" ng-click="onAction(stage, 'stage', 'disable')">Enabled</span>
+      </div>
+      <div class="col-sm-2">
+        <span class="btn btn-danger" ng-if="!livestages[stage.stageId]" ng-click="onAction(stage, 'livestage', 'enable')">Authoring</span>
+        <span class="btn btn-info" ng-if="livestages[stage.stageId]" ng-click="onAction(stage, 'livestage', 'disable')">Live</span>
+      </div>
+    </div>
+  </li>
+  <li ng-if="license && !stages.length" class="list-group-item">
+    <div>
+      No Stages Added
+    </div>
+  </li>
+</ul>
+  `
     }
   });
