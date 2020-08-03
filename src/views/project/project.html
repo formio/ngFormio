@@ -45,7 +45,7 @@
       <li ng-class="{active: isActive('project.actions')}" ng-if="projectPermissions.admin">
         <a ui-sref="project.actions"><i class="fa fa-play-circle-o"></i><br/><span>Actions</span></a>
       </li>
-      <li ng-if="currentProject._id === '553db92f72f702e714dd9778' || true" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
+      <li ng-if="currentProject._id === '553db92f72f702e714dd9778'" ng-class="{active: isActive('project.formio')}"><a ui-sref="project.formio"><i class="glyphicon glyphicon-globe"></i><br/><span>Form.io</span></a></li>
       <!--<li ng-class="{active: isActive('project.launch')}"><a ui-sref="project.launch.form" id="nav-bar-launch-link"><i class="fa fa-rocket"></i><br/><span>Launch</span></a></li>-->
       <li ng-class="{active: isActive('project.env')}" ng-if="projectPermissions.admin">
         <a ui-sref="project.env.settings.info"><i class="fa fa-gear"></i><br /><span>Settings</span></a>
