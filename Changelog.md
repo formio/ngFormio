@@ -68,6 +68,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Licensing UI
 
+## 7.0.38
+### Changed
+ - Upgrade dependencies to include formiojs@4.11.1
+
+## 7.0.38-rc.9
+### Changed
+ - Upgrade dependencies to include formiojs@4.11.1-rc.9
+
 ## 7.0.38-rc.8
 ###
   -Change to build process, deleting node-modules
