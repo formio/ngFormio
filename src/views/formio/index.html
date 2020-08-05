@@ -184,24 +184,24 @@
                     <div class="col-md-12">
                       <table class="table table-striped">
                         <thead>
-                          <tr>
-                            <td ng-if="showIds">User _id</td>
-                            <td>Full Name</td>
-                            <td>Username</td>
-                            <td>Email</td>
-                            <td ng-if="showCreated">Created Date</td>
-                            <td>Deleted</td>
-                          </tr>
+                        <tr>
+                          <td ng-if="showIds">User _id</td>
+                          <td>Full Name</td>
+                          <td>Username</td>
+                          <td>Email</td>
+                          <td ng-if="showCreated">Created Date</td>
+                          <td>Deleted</td>
+                        </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td ng-if="showIds">{{searchUser.data._id}}</td>
-                            <td>{{searchUser.data.data.fullName}}</td>
-                            <td>{{searchUser.data.data.name}}</td>
-                            <td>{{searchUser.data.data.email}}</td>
-                            <td ng-if="showCreated">{{searchUser.data.created}}</td>
-                            <td>{{searchUser.data.deleted._id}}</td>
-                          </tr>
+                        <tr>
+                          <td ng-if="showIds">{{searchUser.data._id}}</td>
+                          <td>{{searchUser.data.data.fullName}}</td>
+                          <td>{{searchUser.data.data.name}}</td>
+                          <td>{{searchUser.data.data.email}}</td>
+                          <td ng-if="showCreated">{{searchUser.data.created}}</td>
+                          <td>{{searchUser.data.deleted._id}}</td>
+                        </tr>
                         </tbody>
                       </table>
                     </div>

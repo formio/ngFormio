@@ -2021,24 +2021,24 @@ app.controller('ProjectFormioController', [
         project: $scope.input.project,
         plan: $scope.input.plan
       })
-      .then(function(data) {
-        FormioAlerts.addAlert({
-          type: 'success',
-          message: data
+        .then(function(data) {
+          FormioAlerts.addAlert({
+            type: 'success',
+            message: data
+          });
+          if (data === 'OK') {
+            $scope.input.project = '';
+            $scope.input.plan = $scope.plans[0];
+            $scope.getTotalProjects();
+            $scope.status.save = 'saved';
+          }
+        })
+        .catch(function(err) {
+          FormioAlerts.addAlert({
+            type: 'danger',
+            message: err.message || err
+          });
         });
-        if (data === 'OK') {
-          $scope.input.project = '';
-          $scope.input.plan = $scope.plans[0];
-          $scope.getTotalProjects();
-          $scope.status.save = 'saved';
-        }
-      })
-      .catch(function(err) {
-        FormioAlerts.addAlert({
-          type: 'danger',
-          message: err.message || err
-        });
-      });
     };
 
     $scope.getLicense = function() {
