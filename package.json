@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "4.15.1-rc.6",
+  "version": "4.15.1",
   "description": "The form redering engine behind Form.IO.",
   "main": "dist/ng-formio.js",
   "scripts": {
@@ -14,7 +14,7 @@
   "license": "ISC",
   "peerDependencies": {
     "angular": "^1.7.8",
-    "formiojs": "^4.11.1-rc.9"
+    "formiojs": "^4.11.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.5",
