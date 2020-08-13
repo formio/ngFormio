@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.15-rc.1
+### Changed
+ - Adding Group permission levels.
+ - Upgrade formiojs@4.11.2-rc.5
+
 ## 7.1.14
 ### Fixed 
  - Couple of tweaks to fix on premise remote stages.
