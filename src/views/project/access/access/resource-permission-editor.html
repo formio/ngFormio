@@ -16,7 +16,12 @@
           <h4>{{getPermissionLabel(permission)}}</h4>
         </div>
         <div class="col col-sm-9">
-          <formio form="template" submission="submissions[permission]"></formio>
+          <ui-select multiple ng-model="permission.resources" theme="bootstrap" reset-search-input="true" on-remove="removeSelected($item, '')" on-select="addSelected($item, permission.type)" name="{{permission.type}}_role" id="{{permission.type}}_role">
+            <ui-select-match class="ui-select-match" placeholder="Select Resources...">{{$item.label}} ({{$item.key}})</ui-select-match>
+            <ui-select-choices class="ui-select-choices" ui-disable-choice="uniqueResources.indexOf(resource.key) === -1" repeat="resource.key as resource in resources | filter: $select.search">
+              <div>{{ resource.label }} ({{resource.key}})</div>
+            </ui-select-choices>
+          </ui-select>
         </div>
       </div>
       <div class="row" style="margin-top: 10px;">

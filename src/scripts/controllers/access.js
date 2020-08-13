@@ -159,158 +159,94 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
     restrict: 'E',
     templateUrl: 'views/project/access/access/resource-permission-editor.html',
     link: function($scope) {
-      var resource = {
-        input: true,
-        label: 'Resource',
-        key: 'resource',
-        defaultValue: '',
-        data: {
-          values: [],
-        },
-        dataSrc: 'values',
-        type: 'select',
+      // Maintain a list of unique resources.
+      $scope.uniqueResources = _($scope.resources)
+        .filter({defaultPermission: ''})
+        .map('key')
+        .uniq()
+        .value();
+      $scope.addSelected = function(change, val) {
+        _.map(FormioUtils.flattenComponents($scope.form.components), function(component) {
+          if (component.key === change.key) {
+            component.defaultPermission = val;
+          }
+        });
+
+        $scope.uniqueResources = _($scope.uniqueResources)
+          .without(change.key)
+          .uniq()
+          .value();
+
+        $scope.onChange();
+      };
+      $scope.removeSelected = function(change, val) {
+        _.map(FormioUtils.flattenComponents($scope.form.components), function(component) {
+          if (component.key === change.key) {
+            component.defaultPermission = val;
+          }
+        });
+
+        $scope.uniqueResources.push(change.key);
+        $scope.uniqueResources = _($scope.uniqueResources)
+          .uniq()
+          .value();
+
+        $scope.onChange();
       };
 
-      $scope.template = {
-        components: [
-          {
-            label: 'Resources',
-            key: 'resources',
-            type: 'datagrid',
-            input: true,
-            components: [
-              resource,
-              {
-                input: true,
-                label: 'Role (optional)',
-                key: 'role',
-                defaultValue: '',
-                type: 'textfield',
-              },
-            ],
-          },
-        ],
-      };
-
-      $scope.submissions = {};
-
+      var permissions = [];
+      // Fill in missing permissions / enforce order
       ($scope.waitFor || $q.when()).then(function() {
         // Iterate the current resources and populate the known permissions.
-        $scope.resources.forEach(function(component) {
-          resource.data.values.push({
-            value: component.key,
-            label: component.label || component.placeholder || component.key,
-          });
+        _.forEach($scope.resources, function(component) {
+          if (component.defaultPermission && component.key) {
+            var perm = _.find(permissions, {type: component.defaultPermission});
 
-          if ((component.submissionAccess || component.defaultPermission) && component.key) {
-            if (!component.submissionAccess) {
-              component.submissionAccess = [
-                {
-                  type: component.defaultPermission,
-                  roles: [],
-                },
-              ];
+            if (perm && _.has(perm, 'resources')) {
+              perm.resources.push(component.key);
             }
-            delete component.defaultPermission;
-
-            component.submissionAccess.map(function(access) {
-              var submission = $scope.submissions[access.type];
-
-              if (!submission) {
-                submission = {
-                  data: {
-                    resources: [],
-                  }
-                };
-                $scope.submissions[access.type] = submission;
-              }
-
-              access.roles = _.compact(access.roles || []);
-
-              submission.data.resources = submission.data.resources.concat(
-                access.roles.length
-                  ? access.roles.map(function(role) {
-                    return {
-                      resource: component.key,
-                      role: role,
-                    };
-                  })
-                  : {
-                    resource: component.key,
-                    role: '',
-                  }
-              );
-            });
-          }
-        });
-
-        PERMISSION_TYPES.forEach(function(permission) {
-          $scope.submissions[permission] = $scope.submissions[permission] || {
-            data: {
-              resources: [
-                {
-                  resource: '',
-                  role: '',
-                },
-              ],
-            },
-          };
-        });
-
-        $scope.$watch('submissions', function(newVal, oldVal) {
-          if (!_.isEqual(newVal, oldVal)) {
-            $scope.resources.forEach(function(component) {
-              component.submissionAccess = [];
-
-              _.forEach(newVal, function(submission, type) {
-                var access = _.find(component.submissionAccess, {type: type});
-
-                (submission.data.resources || []).forEach(function(resource) {
-                  if (resource.resource === component.key) {
-                    if (!access) {
-                      access = {
-                        type: type,
-                        roles: [],
-                      };
-                      component.submissionAccess.push(access);
-                    }
-
-                    if (resource.role) {
-                      access.roles.push(resource.role);
-                    }
-                  }
-                });
+            else {
+              permissions.push({
+                type: component.defaultPermission,
+                resources: [component.key]
               });
-
-              if (!component.submissionAccess.length) {
-                delete component.submissionAccess;
-              }
-            });
-
-            $scope.onChange();
+            }
           }
-        }, true);
+        });
+
+        // Ensure all the permission fields are available.
+        var tempPerms = [];
+        _.each(PERMISSION_TYPES, function(type) {
+          var existingPerm = _.find(permissions, {type: type});
+          tempPerms.push(existingPerm || {
+              type: type,
+              resources: []
+            });
+        });
+
+        // Replace permissions with complete set of permissions
+        permissions.splice.apply(permissions, [0, permissions.length].concat(tempPerms));
       });
 
       $scope.getPermissionsToShow = function() {
-        return PERMISSION_TYPES.filter($scope.shouldShowPermission);
+        return permissions.filter($scope.shouldShowPermission);
       };
 
       $scope.shouldShowPermission = function(permission) {
-        return !!$scope.labels[permission];
+        return !!$scope.labels[permission.type];
       };
 
       $scope.getPermissionLabel = function(permission) {
-        return $scope.labels[permission].label;
+        return $scope.labels[permission.type].label;
       };
 
       $scope.getPermissionTooltip = function(permission) {
-        return $scope.labels[permission].tooltip;
+        return $scope.labels[permission.type].tooltip;
       };
 
-      $scope.onChange = _.debounce(function() {
+      $scope.onChange = function() {
         $scope.$emit('permissionsChange');
-      }, 300);
+      };
     }
   };
 }]);

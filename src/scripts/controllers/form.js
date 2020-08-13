@@ -776,16 +776,25 @@ app.controller('FormController', [
 
     $scope.updateCurrentFormResources = function(form) {
       // Build the list of selectable resources for the submission resource access ui.
-      $scope.currentFormResources = _.filter(FormioUtils.flattenComponents(form.components), function(component) {
-        if (component.type === 'resource') {
-          return true;
-        }
-        if (component.type === 'select' && ['resource', 'url'].indexOf(component.dataSrc) !== -1) {
-          return true;
-        }
+      $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
+        .filter(function(component) {
+          if (component.type === 'resource') {
+            return true;
+          }
+          if (component.type === 'select' && ['resource', 'url'].indexOf(component.dataSrc) !== -1) {
+            return true;
+          }
 
-        return false;
-      });
+          return false;
+        })
+        .map(function(component) {
+          return {
+            label: component.label || '',
+            key: component.key || '',
+            defaultPermission: component.defaultPermission || ''
+          };
+        })
+        .value();
     };
     var loadFormQ = $q.defer();
     $scope.loadFormPromise = loadFormQ.promise;
