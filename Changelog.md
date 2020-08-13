@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.39-rc.5
+### Changed
+ - Reverted group permissions since that is in the 7.1.x build of portal.
+
 ## 7.0.39-rc.4
 ### Changed
  - Adding group permission levels.
