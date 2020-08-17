@@ -4,6 +4,50 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.39
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.2",
+ - Upgrade "formiojs": "^4.11.2"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.8"
+ - Upgrade "ng-formio": "^4.15.2"
+ - Upgrade "formio-tenant": "^1.13.17"
+
+## 7.0.39-rc.5
+### Changed
+ - Reverted group permissions since that is in the 7.1.x build of portal.
+
+## 7.0.39-rc.4
+### Changed
+ - Adding group permission levels.
+
+## 7.0.39-rc.3
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.2-rc.7",
+ - Upgrade "formiojs": "^4.11.2-rc.4"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.8-rc.3"
+ - Upgrade "ng-formio": "^4.15.2-rc.3"
+ - Upgrade "formio-tenant": "^1.13.17-rc.3"
+
+## 7.0.39-rc.2
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.2-rc.5",
+ - Upgrade "formiojs": "^4.11.2-rc.2"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.8-rc.2"
+ - Upgrade "ng-formio": "^4.15.2-rc.2"
+ - Upgrade "formio-tenant": "^1.13.17-rc.2"
+
+## 7.0.39-rc.1
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.2-rc.4",
+ - Upgrade "formiojs": "^4.11.2-rc.1"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.8-rc.1"
+ - Upgrade "ng-formio": "^4.15.2-rc.1"
+ - Upgrade "formio-tenant": "^1.13.17-rc.1"
+
+## 7.0.38
+### Changed
+ - Upgrade dependencies to include formiojs@4.11.1
+
 ## 7.0.38-rc.9
 ### Changed
  - Upgrade dependencies to include formiojs@4.11.1-rc.9
