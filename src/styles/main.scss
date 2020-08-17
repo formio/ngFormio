@@ -2285,3 +2285,48 @@ formio-header-wrapper>formio-header.fixed.absolute {
 .input-group .form-control {
   z-index: auto;
 }
+
+#form-field-path, #user-field-path {
+  height: auto;
+  box-sizing: border-box;
+  padding: 3px 5px 6px 3px;
+}
+
+.field-match-access-editor {
+  .controls {
+    text-align: right;
+  }
+
+  .delete-condition {
+    display: flex; justify-content: flex-end;
+  }
+
+  .ui-select-toggle.btn-default {
+    background-color: white;
+  }
+
+  .ui-select-multiple.ui-select-bootstrap {
+    padding: 5px 3px 5px 3px;
+  }
+
+  .save-btn {
+    margin-left: auto;
+    display: block;
+  }
+  
+  .form-control {
+    border-radius: 3px;
+    color: #333333;
+    text-overflow: ellipsis;
+    font-weight: normal;
+  }
+  
+  .ui-select-bootstrap .ui-select-match-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .permission-tooltip {
+    padding-top: 12px;
+  }
+}

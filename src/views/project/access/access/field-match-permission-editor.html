@@ -1,0 +1,99 @@
+<div class="field-match-access-editor">
+  <div class="alert alert-danger" ng-if="!isFieldMatchAccessSaved()">You have unsaved changes</div>
+  <ul class="list-group list-group-striped">
+    <li class="list-group-item  list-group-heading">
+      <div class="row">
+        <div class="col col-xs-3">
+          <strong>Role</strong>
+        </div>
+        <div class="col col-xs-2">
+          <strong>Form Field Path</strong>
+        </div>
+        <div class="col col-xs-2">
+          <strong>Operator</strong>
+        </div>
+        <div class="col col-xs-2">
+          <strong>Type</strong>
+        </div>
+        <div class="col col-xs-2">
+          <strong>Value</strong>
+        </div>
+        <div class="col col-xs-1">
+        </div>
+      </div>
+    </li>
+    
+    <li class="list-group-item" ng-repeat="permission in getPermissionsToShow()">
+      <div class="row">
+        <div class="col col-xs-12">
+          <h4>{{getPermissionLabel(permission)}}</h4>
+
+          <div class="row text-center" ng-if="!permission.conditions.length">Add some conditions...</div>
+          <div class="row" ng-repeat="condition in permission.conditions">
+            <div class="col col-8 col-xs-3">
+              <ui-select multiple ng-model="condition.roles" theme="bootstrap" reset-search-input="true"
+                name="{{permission.type}}[{{$index}}]_roles"
+                id="{{permission.type}}[{{$index}}]_roles"
+                on-remove="removeRole($item._id, permission.type)" on-select="addRole($item._id, permission.type)"
+              >
+                <ui-select-match class="ui-select-match" placeholder="Select Roles...">{{$item.title}}</ui-select-match>
+                <ui-select-choices class="ui-select-choices" repeat="role._id as role in getAvailableRolesForTheLevel(permission.type) | filter: $select.search">
+                  <div>{{ role.title }}</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <input class="form-control" type="text" placeholder="Form field's path" ng-model="condition.formFieldPath"/>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <ui-select ng-model="condition.operator" theme="bootstrap" reset-search-input="true"
+              name="{{permission.type}}[{{$index}}]_operator"
+              id="{{permission.type}}[{{$index}}]_operator">
+                <ui-select-match class="ui-select-match" placeholder="Select Operator...">
+                  {{$select.selected.title }} ({{ $select.selected.value }})
+                </ui-select-match>
+                <ui-select-choices class="ui-select-choices" repeat="operator.value as operator in operators | filter: $select.search">
+                  <div>{{ operator.title }} ({{ operator.value }})</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <ui-select ng-model="condition.valueType" theme="bootstrap" reset-search-input="true"
+              name="{{permission.type}}[{{$index}}]_valueType"
+              id="{{permission.type}}[{{$index}}]_valueType">
+                <ui-select-match class="ui-select-match" placeholder="Select Value Type...">{{$select.selected.title}}</ui-select-match>
+                <ui-select-choices class="ui-select-choices" repeat="valueType.value as valueType in valueTypes | filter: $select.search">
+                  <div>{{ valueType.title }}</div>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+  
+            <div class="col col-8 col-xs-2">
+              <input class="form-control" type="text" placeholder="Value" ng-model="condition.value"/>
+            </div>
+  
+            <div class="delete-condition col col-8 col-xs-1">
+              <button ng-click="deleteCondition(permission.type, condition)" class="btn btn-danger btn-light"><i class="fa fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+        </div>
+        
+
+      <div class="row" style="margin-top: 10px;">
+        <div class="col col-xs-12">
+          <div class="controls"> 
+            <button ng-click="addCondition(permission.type)" class="btn btn-primary"><i class="fa fa-plus"></i>&nbsp Add condition</button>
+          </div>
+          <div class="text-muted permission-tooltip">
+            {{getPermissionTooltip(permission)}}
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <button ng-click="saveFieldMatchAccess()" class="btn btn-success save-btn">Save</button>
+</div>

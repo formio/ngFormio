@@ -42,6 +42,7 @@
     "chartist": "^0.11.4",
     "chartist-plugin-tooltip": "0.0.11",
     "ckeditor": "^4.12.1",
+    "compare-versions": "^3.6.0",
     "copy-webpack-plugin": "^5.1.1",
     "core-js": "3.5.0",
     "css-loader": "^3.6.0",

@@ -119,6 +119,7 @@
     </div>
   </div>
 </div>
+
 <div class="row">
   <div class="col-md-8">
     <div class="panel panel-success">
@@ -146,6 +147,43 @@
         <p>For example, if you have multiple contractors and want to assign a job to a contractor by selecting them in a field on the job form.</p>
         <p>To use Field Based Resource Access, Add a Resource or Select Resource field to a form and then assign the field with the permission for the selected Resource.</p>
         <p>In the example above the Job form would have Contractor field of type Resource on it that points to the Contractor Resource. Then the Contractor Field would be selected in the appropriated Field Based Resource Access permission depending on the level of access required to that Job Submission Data. When creating a Job and assigning it to a specific contractor, that contractor would then get the appropriate permission for just that job.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Field Match Based Access
+          <a class="pull-right" href="#" target="_blank">
+            <i class="glyphicon glyphicon-question-sign"></i>
+          </a>
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div ng-if="form._id">
+          <field-match-permission-editor
+            labels="resourceAccessLabels"
+            wait-for="loadFormPromise"
+            form="form" roles="currentProjectRoles">
+          </field-match-permission-editor>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">About Field Match Access</h3>
+      </div>
+      <div class="panel-body">
+        <p>Field Match Access is useful if you want to assign an access to some submissions based not only on the user's role, but also on the value of the specified submissions's or form's field.</p>
+        <p>For example, you have a 'privacy' field on the form which can be "public" or "privat" and you want to give an access to read all the "public" submissions for authenticated users.</p>
+        <p>To use Field Match Access, specify a form's or a submission's field's path (e.g. "data.privacy" for the "privacy" field within the form, "state" for the "state" field of the submission) and also a value which it should be compared with. You can select one of the available operators for comparison and specify a type of the value. If you add multiple conditions for a single role, the access will be given if at least one of them passed.
+        </p>
+        <p>Values of arrays should be separated by "," without spaces. Strings should NOT be wrapped in the brackets.</p>
       </div>
     </div>
   </div>

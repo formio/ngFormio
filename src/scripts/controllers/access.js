@@ -314,3 +314,184 @@ app.directive('resourcePermissionEditor', ['$q', 'FormioUtils', function($q, For
     }
   };
 }]);
+
+app.directive('fieldMatchPermissionEditor', ['$q', 'FormioUtils', function($q, FormioUtils) {
+  var PERMISSION_TYPES = ['read', 'create', 'write', 'admin'];
+
+  return {
+    scope: {
+      waitFor: '=',
+      form: '=',
+      labels: '=',
+      roles: '=',
+    },
+    restrict: 'E',
+    templateUrl: 'views/project/access/access/field-match-permission-editor.html',
+    link: function($scope) {
+      var permissions = [];
+
+      $scope.levelsRoles = {};
+
+      $scope.operators = [
+        { title: 'equal', value: '$eq' },
+        { title: 'in', value: '$in' },
+        { title: 'greater', value: '$gt' },
+        { title: 'less', value: '$lt' },
+        { title: 'greater/equal', value: '$gte' },
+        { title: 'less/equal', value: '$lte' }
+      ];
+
+      const operatorsEnum = {
+        equal: $scope.operators[0],
+        in: $scope.operators[1],
+        greater: $scope.operators[2],
+        less: $scope.operators[3],
+        greaterOrEqual: $scope.operators[4],
+        lessOrEqual: $scope.operators[5]
+      };
+
+      $scope.valueTypes = [
+        { title: 'string', value: 'string' },
+        { title: 'number', value: 'number' },
+        { title: 'boolean', value: 'boolean' },
+        { title: 'array of strings', value: '[string]' },
+        { title: 'array of numbers', value: '[number]' },
+      ];
+
+      const valueTypesEnum = {
+        string: $scope.valueTypes[0],
+        number: $scope.valueTypes[1],
+        boolean: $scope.valueTypes[2],
+        stringsArray: $scope.valueTypes[3],
+        numbersArray: $scope.valueTypes[4],
+      };
+
+      const getNewCondition = () => {
+        return {
+          formFieldPath: '',
+          valueType: valueTypesEnum.string.value,
+          value: '',
+          operator: operatorsEnum.equal.value,
+          roles: []
+        };
+      }
+
+      $scope.deleteCondition = function(type, condition) {
+        const permission = _.find(permissions, {type});
+        condition.roles.forEach((role) => {
+          $scope.removeRole(role, type);
+        });
+        if (permission) {
+          permission.conditions = permission.conditions.filter((cond) => cond !== condition);
+        }
+      }
+
+      $scope.addCondition = function(type) {
+        const permission = _.find(permissions, {type}) || {
+          type,
+          conditions: []
+        };
+
+        permission.conditions.push(getNewCondition());
+      }
+
+      $scope.addRole = function(roleId, accessLevel) {
+        $scope.levelsRoles[accessLevel] = [...$scope.levelsRoles[accessLevel], roleId];
+      };
+
+      $scope.removeRole = function(roleId, accessLevel) {
+        const index = $scope.levelsRoles[accessLevel].indexOf(roleId);
+        if (index !== -1) {
+          $scope.levelsRoles[accessLevel].splice(index, 1);
+        }
+      };
+      
+      $scope.saveFieldMatchAccess = function() {
+        $scope.form.fieldMatchAccess = {};
+        permissions.forEach(({ type, conditions }) => {
+          $scope.form.fieldMatchAccess[type] = _.cloneDeep(conditions);
+        });
+        $scope.onChange();
+      };
+      
+      // Fill in missing permissions
+      ($scope.waitFor || $q.when()).then(function() {
+
+        if ($scope.form.fieldMatchAccess) {
+          const fieldMatchAccess = $scope.form.fieldMatchAccess;
+          _.each(PERMISSION_TYPES, function(type) {
+            $scope.levelsRoles[type] = [];
+            if (fieldMatchAccess[type]) {
+              let existingPerm = _.find(permissions, {type});
+              const conditions = _.cloneDeep(fieldMatchAccess[type]);
+              $scope.levelsRoles[type] = [
+                ...$scope.levelsRoles[type],
+                ...conditions.flatMap((cond) => cond.roles)
+              ];
+              if (existingPerm) {
+                existingPerm.conditions = conditions;
+              }
+              else {
+                permissions.push({
+                  type,
+                  conditions
+                });
+              }
+            }
+          })
+        }
+
+        // Ensure all the permission fields are available.
+        var tempPerms = [];
+        _.each(PERMISSION_TYPES, function(type) {
+          var existingPerm = _.find(permissions, {type}) || {
+            type,
+            conditions: [getNewCondition()]
+          };
+          if (!existingPerm.conditions.length) {
+            existingPerm.conditions.push(getNewCondition());
+          }
+          tempPerms.push(existingPerm);
+        });
+
+        // Replace permissions with complete set of permissions
+        permissions.splice.apply(permissions, [0, permissions.length].concat(tempPerms));
+      });
+
+      $scope.isFieldMatchAccessSaved = function() {
+        return permissions.every(({ type, conditions }) => _.isEqual(_.map(conditions, (c) => _.omit(c, ['$$hashKey'])), $scope.form.fieldMatchAccess[type]));
+      };
+
+      $scope.getAvailableRolesForTheLevel = function(accessLevel) {
+        const otherLevelsRoles = [];
+        Object.entries($scope.levelsRoles).forEach(([type, roles]) => {
+          if (type !== accessLevel) {
+            otherLevelsRoles.push(...roles);
+          }
+        });
+        const availableRoles = $scope.roles.filter((role) => !otherLevelsRoles.includes(role._id));
+        return availableRoles;
+      };
+
+      $scope.getPermissionsToShow = function() {
+        return permissions.filter($scope.shouldShowPermission);
+      };
+
+      $scope.shouldShowPermission = function(permission) {
+        return !!$scope.labels[permission.type];
+      };
+
+      $scope.getPermissionLabel = function(permission) {
+        return $scope.labels[permission.type].label;
+      };
+
+      $scope.getPermissionTooltip = function(permission) {
+        return $scope.labels[permission.type].tooltip;
+      };
+
+      $scope.onChange = function() {
+        $scope.$emit('permissionsChange');
+      };
+    }
+  };
+}]);
