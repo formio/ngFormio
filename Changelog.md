@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+ - Field match access
+ - Feature Email Verification
+ 
+### Changed
+ - FJS-1078: deleted repeated word in access tab description
+ - FOR-2719: Made actions disabled to uncheck in the export template
+ - FJS-1069: Data Submission table does not show the amount of submissions
+ - Remove kickbox settings
+ - Work on stages: Enable to rename Live stage, Added 2 default stages
+
+### Fixed
+ - FJS-1071: Set initial access
+
 ## 7.1.15-rc.1
 ### Changed
  - Adding Group permission levels.
