@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.39
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.2",
+ - Upgrade "formiojs": "^4.11.2"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.8"
+ - Upgrade "ng-formio": "^4.15.2"
+ - Upgrade "formio-tenant": "^1.13.17"
+
 ## 7.0.39-rc.5
 ### Changed
  - Reverted group permissions since that is in the 7.1.x build of portal.
