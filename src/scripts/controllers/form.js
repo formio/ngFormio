@@ -806,6 +806,30 @@ app.controller('FormController', [
             // FOR-362 - Fix pass by reference issue with the internal cache.
             form = _.cloneDeep(form);
 
+            const PERMISSION_TYPES = [
+              'create_own',
+              'create_all',
+              'read_own',
+              'read_all',
+              'update_own',
+              'update_all',
+              'delete_own',
+              'delete_all',
+              'team_read',
+              'team_write',
+              'team_admin'
+            ];
+
+            form.submissionAccess = _.map(
+              PERMISSION_TYPES,
+              type => _.find(form.submissionAccess, { type }) || { type, roles: [] }
+            );
+
+            form.access = _.map(
+              PERMISSION_TYPES,
+              type => _.find(form.access, { type }) || { type, roles: [] }
+            );
+
             // Ensure the display is form.
             if (!form.display) {
               form.display = 'form';
