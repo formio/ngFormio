@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Upgrade formiojs@4.11.2-rc.1
 
+## 4.20.2-rc1
+### Changed
+ - Upgrade formiojs@4.11.2-rc.1
+
 ## 4.15.2
 ### Changed
  - Upgrade formojs@4.11.2
