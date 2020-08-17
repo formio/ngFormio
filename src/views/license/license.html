@@ -11,7 +11,10 @@
       <h3 class="panel-title">Licenses</h3>
     </div>
     <div class="panel-body">
-      <table class="table">
+      <div ng-if="onPremiseCount === 0 && !showHosted">
+        You do not have any on premise licenses associated with your account.
+      </div>
+      <table class="table" ng-if="onPremiseCount !== 0 || showHosted">
         <thead>
         <tr>
           <th></th>
@@ -24,7 +27,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat-start="license in licenses track by $index">
+        <tr ng-repeat-start="license in licenses track by $index" ng-if="(license.data.location === 'onPremise') || showHosted">
           <td><a href ng-if="!open[$index]" ng-click="openLicense($index)">view</a><a href ng-if="open[$index]" ng-click="closeLicense($index)">hide</a></td>
           <td>{{license.data.licenseName}}</td>
           <td>{{license.data.location | planType}}</td>
@@ -40,6 +43,10 @@
         </tr>
         </tbody>
       </table>
+      <a ng-click="toggleHosted()">
+        <span ng-if="showHosted">Hide Hosted</span>
+        <span ng-if="!showHosted">Show Hosted</span>
+      </a>
     </div>
   </div>
 </div>
