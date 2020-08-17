@@ -1028,11 +1028,45 @@ angular
         }
       });
 
-      $rootScope.goToProject = function(project) {
-        $state.go('project.overview', {
-          projectId: project._id
+      $rootScope.goToProject = function($event, path, project) {
+        $event.stopPropagation();
+        let projectId = project._id;
+
+        if (path === 'overview') {
+          const $scope = {};
+          const loadedStages = PrimaryProject.loadStages(project, $scope);
+
+          if (typeof loadedStages.then === 'function') {
+            return loadedStages.then(function() {
+              const environments = $scope.environments;
+
+              if (environments) {
+                const stageEnv = _.find(environments, function(env) {
+                  const stageName = _.get(env, 'config.defaultStageName', '')
+                  return stageName === 'stage';
+                });
+
+                if (stageEnv) {
+                  projectId = stageEnv._id
+                }
+              }
+              PrimaryProject.clear();
+              $state.go(`project.${path}`, {
+                projectId: projectId,
+              });
+            })
+            .catch(function() {
+              PrimaryProject.clear();
+              $state.go(`project.${path}`, {
+                projectId: projectId,
+              });
+            });
+          }
+        }
+        $state.go(`project.${path}`, {
+          projectId: projectId,
         });
-      };
+      }
 
       $rootScope.getPreviewURL = function(project) {
         if (!project.settings || !project.settings.preview) { return ''; }
