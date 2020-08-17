@@ -2103,6 +2103,8 @@ app.controller('FormSubmissionsController', [
       $scope.$on('$destroy', function() {
         angular.element($window).unbind('resize', resizeGrid);
       });
+      // FJS-1069: Data Submission table does not show the amount of submissions
+      window.dispatchEvent(new Event('resize'));
     });
 
     $scope.selected = function() {
