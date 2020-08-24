@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Add more license management to current production.
 
-## 7.1.0-rc.1
+## 7.0.40-rc.2
 ### Changed
  - Upgrade "@formio/premium": "github:formio/premium#v1.14.3-rc.1",
  - Upgrade "formiojs": "^4.11.3-rc.2"
