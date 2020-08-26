@@ -763,25 +763,16 @@ app.controller('FormController', [
 
     $scope.updateCurrentFormResources = function(form) {
       // Build the list of selectable resources for the submission resource access ui.
-      $scope.currentFormResources = _(FormioUtils.flattenComponents(form.components))
-        .filter(function(component) {
-          if (component.type === 'resource') {
-            return true;
-          }
-          if (component.type === 'select' && ['resource', 'url'].indexOf(component.dataSrc) !== -1) {
-            return true;
-          }
+      $scope.currentFormResources = _.filter(FormioUtils.flattenComponents(form.components), function(component) {
+        if (component.type === 'resource') {
+          return true;
+        }
+        if (component.type === 'select' && ['resource', 'url'].indexOf(component.dataSrc) !== -1) {
+          return true;
+        }
 
-          return false;
-        })
-        .map(function(component) {
-          return {
-            label: component.label || '',
-            key: component.key || '',
-            defaultPermission: component.defaultPermission || ''
-          };
-        })
-        .value();
+        return false;
+      });
     };
     var loadFormQ = $q.defer();
     $scope.loadFormPromise = loadFormQ.promise;
@@ -814,6 +805,30 @@ app.controller('FormController', [
           .then(function(form) {
             // FOR-362 - Fix pass by reference issue with the internal cache.
             form = _.cloneDeep(form);
+
+            const PERMISSION_TYPES = [
+              'create_own',
+              'create_all',
+              'read_own',
+              'read_all',
+              'update_own',
+              'update_all',
+              'delete_own',
+              'delete_all',
+              'team_read',
+              'team_write',
+              'team_admin'
+            ];
+
+            form.submissionAccess = _.map(
+              PERMISSION_TYPES,
+              type => _.find(form.submissionAccess, { type }) || { type, roles: [] }
+            );
+
+            form.access = _.map(
+              PERMISSION_TYPES,
+              type => _.find(form.access, { type }) || { type, roles: [] }
+            );
 
             // Ensure the display is form.
             if (!form.display) {
@@ -2112,6 +2127,8 @@ app.controller('FormSubmissionsController', [
       $scope.$on('$destroy', function() {
         angular.element($window).unbind('resize', resizeGrid);
       });
+      // FJS-1069: Data Submission table does not show the amount of submissions
+      window.dispatchEvent(new Event('resize'));
     });
 
     $scope.selected = function() {

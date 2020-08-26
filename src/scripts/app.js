@@ -115,6 +115,15 @@ angular
           templateUrl: 'views/user/resetpass/resetsend.html',
           controller: 'ResetPasswordSendController'
         })
+        .state('auth-verify', {
+          url: '/verify',
+          templateUrl: 'views/user/verify/verify.html',
+          controller: 'VerifyController',
+        })
+        .state('auth-sent', {
+          url: '/sent',
+          templateUrl: 'views/user/sent/sent.html',
+        })
         .state('auth-resetpass-send-done', {
           url: '/resetsend/done',
           templateUrl: 'views/user/resetpass/resetsend-done.html'
@@ -921,7 +930,9 @@ angular
         }
         if (!$rootScope.authenticated) {
           event.preventDefault();
-          $state.go('auth');
+          if ($state.is('auth-verify')) {
+            $state.go('auth');
+          }
         }
       });
 
@@ -943,6 +954,7 @@ angular
       $rootScope.userForm = AppConfig.userForm;
       $rootScope.userLoginForm = AppConfig.userLoginForm;
       $rootScope.userRegisterForm = AppConfig.userRegisterForm;
+      $rootScope.verifyAccount = AppConfig.verifyAccount;
       $rootScope.userLinkGithubForm = AppConfig.userLinkGithubForm;
       $rootScope.teamForm = AppConfig.teamForm;
       $rootScope.feedbackForm = AppConfig.feedbackForm;
@@ -1000,7 +1012,9 @@ angular
           $rootScope.user = user;
           if (!$rootScope.user) {
             // Always redirect to login if they are not authenticated.
-            $state.go('home');
+            if (!$state.is('auth-verify')) {
+              $state.go('auth');
+            }
           }
         });
       }
@@ -1028,11 +1042,45 @@ angular
         }
       });
 
-      $rootScope.goToProject = function(project) {
-        $state.go('project.overview', {
-          projectId: project._id
+      $rootScope.goToProject = function($event, path, project) {
+        $event.stopPropagation();
+        let projectId = project._id;
+
+        if (path === 'overview') {
+          const $scope = {};
+          const loadedStages = PrimaryProject.loadStages(project, $scope);
+
+          if (typeof loadedStages.then === 'function') {
+            return loadedStages.then(function() {
+              const environments = $scope.environments;
+
+              if (environments) {
+                const stageEnv = _.find(environments, function(env) {
+                  const stageName = _.get(env, 'config.defaultStageName', '')
+                  return stageName === 'stage';
+                });
+
+                if (stageEnv) {
+                  projectId = stageEnv._id
+                }
+              }
+              PrimaryProject.clear();
+              $state.go(`project.${path}`, {
+                projectId: projectId,
+              });
+            })
+            .catch(function() {
+              PrimaryProject.clear();
+              $state.go(`project.${path}`, {
+                projectId: projectId,
+              });
+            });
+          }
+        }
+        $state.go(`project.${path}`, {
+          projectId: projectId,
         });
-      };
+      }
 
       $rootScope.getPreviewURL = function(project) {
         if (!project.settings || !project.settings.preview) { return ''; }
@@ -1095,7 +1143,9 @@ angular
         } else {
           // Clear reloads and attempt to reload the page.
           localStorage.removeItem('reloads');
-          $state.go('auth');
+          if ($state.is('auth-verify')) {
+            $state.go('auth');
+          }
         }
         FormioAlerts.addAlert({
           type: 'danger',

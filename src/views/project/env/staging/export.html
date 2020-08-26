@@ -33,6 +33,7 @@
                       value="{{item}}"
                       ng-checked="export[section.key].hasOwnProperty(key)"
                       ng-click="toggleItem(section, key, item)"
+                      ng-disabled="section.key === 'actions'"
                     >
                     {{item.title}} ({{key}})
                   </label>
