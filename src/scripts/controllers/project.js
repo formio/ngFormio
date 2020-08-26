@@ -3129,7 +3129,7 @@ app.controller('ProjectStages', [
         $scope.enabledStages = $scope.stages.filter((stage) => stage.status === "1");
         $scope.livestages = await LicenseServerHelper.getLicenseUtilizations($scope.license._id, 'livestages', `projectId=${$scope.primaryProject._id}`);
         $scope.livestages = $scope.livestages.reduce((prev, stage) => {
-          prev[stage.stageId] = stage.status === '1';
+          prev[stage.stageId || stage.id] = stage.status === '1';
           return prev;
         }, {});
         $scope.$apply();
