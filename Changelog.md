@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## 7.0.40
 ### Changed
  - Add more license management to current production.
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.3",
+ - Upgrade "formiojs": "^4.11.3"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.9"
+ - Upgrade "ng-formio": "^4.15.3"
+ - Upgrade "formio-tenant": "^1.13.18"
 
 ## 7.0.40-rc.3
 ### Changed
