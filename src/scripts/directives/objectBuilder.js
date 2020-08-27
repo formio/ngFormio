@@ -25,8 +25,8 @@ angular
                     '</thead>' +
                     '<tbody>' +
                       '<tr ng-repeat="v in dataArray track by $index">' +
-                        '<td class="col-xs-6"><input type="text" class="form-control" ng-model="v.key" placeholder="{{ \'Key\' | formioTranslate }}"/></td>' +
-                        '<td class="col-xs-4"><input type="text" class="form-control" ng-model="v.value" placeholder="{{ \'Value\' | formioTranslate }}"/></td>' +
+                        '<td class="col-xs-6"><input type="text" class="form-control" ng-model="v.key" ng-blur="setKey(v)" placeholder="{{ \'Key\' | formioTranslate }}"/></td>' +
+                        '<td class="col-xs-4"><input type="text" class="form-control" ng-model="v.value" ng-blur="setValue(v)" placeholder="{{ \'Value\' | formioTranslate }}"/></td>' +
                         '<td class="col-xs-2"><button type="button" class="btn btn-danger btn-xs" ng-click="removeValue($index)" tabindex="-1"><span class="glyphicon glyphicon-remove-circle"></span></button></td>' +
                       '</tr>' +
                     '</tbody>' +
@@ -51,13 +51,27 @@ angular
 
         $scope.$watch('data', init);
 
-        $scope.$watch('dataArray', function(newValue) {
+        $scope.setKey = function(newItem) {
+          const isKeyExist = $scope.data.hasOwnProperty(newItem.key);
+          if (isKeyExist && !confirm(`Key "${newItem.key}" is already exists with value "${$scope.data[newItem.key]}". Replace it with "${newItem.value}"?`)) {
+            init();
+            return;
+          }
+          updateData();
+        };
+
+        $scope.setValue = function() {
+          updateData();
+        }
+
+        function updateData() {
+          const newValue = $scope.dataArray;
           $scope.data = {};
           for (var i in newValue) {
             var item = newValue[i];
             $scope.data[item.key] = item.value;
           }
-        }, true);
+        }
 
         function init() {
           $scope.data = $scope.data || {};
