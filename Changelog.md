@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.17-rc.2
+### Fixed
+ - FJS-1161: Cannot create new key with same first word as existing key
+ - Added PDF Server settings back into portal.
+
 ## 7.1.17-rc.1
 ### Added
  - Field match access
