@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.0.41-rc.1
+### Fixed
+ - FJS-1071: Set initial access
+### Changed
+ - Add more license management to current production.
+ - Upgrade "@formio/premium": "github:formio/premium#v1.14.4-rc.1",
+ - Upgrade "formiojs": "^4.11.4-rc.2"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.94.10-rc.1"
+ - Upgrade "ng-formio": "^4.15.4-rc.1"
+ - Upgrade "formio-tenant": "^1.13.19-rc.1"
+
 ## [Unreleased]
 ### Changed
  - Add more license management to current production.
