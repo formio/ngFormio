@@ -306,6 +306,12 @@ angular
           templateUrl: 'views/project/env/settings/customjscss/index.html',
           controller: 'ProjectSettingsScriptController'
         })
+        .state('project.env.settings.pdf', {
+          url: '/settings/pdf',
+          parent: 'project.env',
+          templateUrl: 'views/project/env/settings/pdf/index.html',
+          controller: 'ProjectSettingsScriptController'
+        })
         .state('project.env.settings.cors', {
           url: '/settings/cors',
           parent: 'project.env',
