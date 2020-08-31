@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 7.1.17-rc.3
+### Changed
+ - Upgrade "@formio/premium": "github:formio/premium#v1.15.0-rc.5",
+ - Upgrade "formiojs": "^4.12.0-rc.11"
+ - Upgrade "formmanager": "github:formio/formmanager#v1.95.0-rc.3"
+ - Upgrade "ng-formio": "^4.16.0-rc.4"
+ - Upgrade "formio-tenant": "^1.14.0-rc.3"
+
 ## 7.1.17-rc.2
 ### Fixed
  - FJS-1161: Cannot create new key with same first word as existing key
