@@ -828,6 +828,7 @@ var _modules = __webpack_require__(/*! ./modules */ "./lib/modules.js");
 
 Object.keys(_modules).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _modules[key]) return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
@@ -887,6 +888,7 @@ var _formiojs = __webpack_require__(/*! formiojs */ "formiojs");
 
 Object.keys(_formiojs).forEach(function (key) {
   if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _formiojs[key]) return;
   Object.defineProperty(exports, key, {
     enumerable: true,
     get: function get() {
