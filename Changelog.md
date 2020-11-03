@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.17.1-rc.13
+### Fixed
+ - FJS-1344: Fixed old form schema being provided after component adding
+
+### Changed
+ - Upgrade formiojs@4.12.1-rc.24
+
 ## 4.17.1-rc.12
 ### Changed
  - Upgrade formiojs@4.12.1-rc.23

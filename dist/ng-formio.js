@@ -141,7 +141,7 @@ var _default = angular.module('formio').directive('formBuilder', function () {
           builder.instance.on('change', function (event) {
             // Do not emit form change events if this is from submission data.
             if (!event.data) {
-              $scope.$emit('formChange', builder.instance.schema);
+              $scope.$emit('formChange', event);
             }
           });
           builder.instance.onAny(function (event) {
