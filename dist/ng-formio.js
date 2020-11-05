@@ -957,6 +957,7 @@ var _default = app.provider('Formio', function () {
     providers: _formiojs.Formio.providers,
     setDomain: function setDomain() {// Remove this?
     },
+    setPathType: _formiojs.Formio.setPathType,
     $get: ['$rootScope', '$q', function ($rootScope, $q) {
       var wrapQPromise = function wrapQPromise(promise) {
         return $q.when(promise).catch(function (error) {
