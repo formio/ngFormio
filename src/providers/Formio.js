@@ -48,6 +48,7 @@ export default app.provider('Formio', function() {
     setDomain: function() {
       // Remove this?
     },
+    setPathType: Formio.setPathType,
 
     $get: [
       '$rootScope',
