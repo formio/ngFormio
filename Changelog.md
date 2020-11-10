@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.17.1-rc.15
+### Fixed
+ - Upgrade formiojs@4.12.1-rc.27
+
 ## 4.17.1-rc.14
 ### Fixed
  - FOR-2838/2839/2843: Adds a setPathType method in Formio.js
