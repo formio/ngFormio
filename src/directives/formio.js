@@ -167,7 +167,7 @@ export default app.directive('formio', function() {
           else {
             $scope.onFormio.then(() => ($scope.formio.form = form));
           }
-        });
+        }, true);
 
         $scope.$watch('submission', submission => {
           if (!submission || $scope.nowatch) {
