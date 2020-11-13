@@ -400,7 +400,7 @@ var _default = app.directive('formio', function () {
             return $scope.formio.form = form;
           });
         }
-      });
+      }, true);
       $scope.$watch('submission', function (submission) {
         if (!submission || $scope.nowatch) {
           $scope.nowatch = false;
