@@ -17,6 +17,7 @@ export default angular.module('formio').directive('formBuilder', function() {
         let builder = null;
         let builderReady = null;
         let builderElement = null;
+        let formIsInvalid = null;
         $scope.options = $scope.options || {};
 
         // Initialize the builder.
@@ -31,13 +32,20 @@ export default angular.module('formio').directive('formBuilder', function() {
                 $scope.$emit('formChange', builder.instance.schema);
               }
             });
+            builder.instance.on('error', (isFormSchemaInvalid) => {
+              if (formIsInvalid !== isFormSchemaInvalid) {
+                formIsInvalid = isFormSchemaInvalid;
+
+                $scope.$emit('formValidityChange', formIsInvalid);
+              }
+            });
             builder.instance.onAny((event, ...args) => {
               if (event === 'formio.render') {
                 $scope.$emit(event, builder.instance.schema);
-              } 
+              }
               else {
                 $scope.$emit(event, ...args);
-              } 
+              }
             });
           });
 
