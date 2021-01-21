@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const postcssPresetEnv = require('postcss-preset-env');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   performance: { hints: false },
   entry: './lib/index.js',
@@ -24,22 +23,28 @@ module.exports = {
       },
       {
         test: /\.(css|scss)$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            'css-loader',
-            'sass-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                ident: 'postcss',
-                plugins: () => [
-                  postcssPresetEnv()
-                ]
-              }
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: ''
             }
-          ]
-        })
+          },
+          'css-loader',
+          'sass-loader',
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    "postcss-preset-env"
+                  ],
+                ],
+              },
+            },
+          },
+        ]
       },
       {
         test: /\.(woff2?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
@@ -75,8 +80,9 @@ module.exports = {
       'window.jQuery': 'jquery',
       'moment': 'moment'
     }),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new ExtractTextPlugin('formio.css')
+    new MiniCssExtractPlugin({
+      filename: 'formio.css'
+    })
   ],
   externals: {
     jquery: 'jquery',
