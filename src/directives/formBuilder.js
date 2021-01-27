@@ -32,7 +32,7 @@ export default angular.module('formio').directive('formBuilder', function() {
                 $scope.$emit('formChange', builder.instance.schema);
               }
             });
-            builder.instance.on('builderError', (isFormSchemaInvalid) => {
+            builder.instance.on('builderFormValidityChange', (isFormSchemaInvalid) => {
               if (formIsInvalid !== isFormSchemaInvalid) {
                 formIsInvalid = isFormSchemaInvalid;
 
