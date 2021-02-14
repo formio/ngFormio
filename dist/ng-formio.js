@@ -59,7 +59,7 @@ var _default = angular.module('formio').directive('formBuilder', function () {
               $scope.$emit('formChange', builder.instance.schema);
             }
           });
-          builder.instance.on('error', function (isFormSchemaInvalid) {
+          builder.instance.on('builderFormValidityChange', function (isFormSchemaInvalid) {
             if (formIsInvalid !== isFormSchemaInvalid) {
               formIsInvalid = isFormSchemaInvalid;
               $scope.$emit('formValidityChange', formIsInvalid);
