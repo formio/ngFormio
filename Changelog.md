@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 4.17.5-rc.1
 ### Changed
+ - Upgrade formiojs@4.12.7-patch2
+
+## 4.17.5-rc.1
+### Changed
  - Upgrade formiojs@4.12.7
  - FIO-1213: Fixes an issue where a full form's schema is saved
 
