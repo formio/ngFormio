@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 4.17.5-rc.4
 ### Changed
- - Upgrade formiojs@4.12.8-rc.4
+ - Upgrade formiojs@4.13.0-rc.19
 
 ## 4.17.5-rc.3
 ### Changed
