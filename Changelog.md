@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 4.18.2
+### Changed
+ - Upgrade formiojs@4.13.2
+ - Upgrade other dependencies.
+
 ## 4.18.1
 ### Changed
  - Removed unnecessary import and dependency injections.
