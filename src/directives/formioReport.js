@@ -6,7 +6,7 @@ export default app.directive('formioReport', function() {
     replace: true,
     scope: {
       src: '=?',
-      apiUrl: '=?',
+      projectEndpoint: '=?',
       report: '=?',
       readOnly: '=?',
       noSubmit: '=?',
@@ -44,8 +44,8 @@ export default app.directive('formioReport', function() {
           if ($scope.src || $scope.report) {
             $scope.initialized = true;
 
-            if ($scope.apiUrl) {
-              $scope.options.apiUrl = $scope.apiUrl;
+            if ($scope.projectEndpoint) {
+              $scope.options.projectEndpoint = $scope.projectEndpoint;
             }
 
             const formioReport = Formio.Report;
@@ -62,7 +62,7 @@ export default app.directive('formioReport', function() {
         };
 
         $scope.setupReport = function() {
-          if ($scope.apiUrl) {
+          if ($scope.projectEndpoint) {
             $scope.formio.nosubmit = $scope.noSubmit || false;
           }
           $scope.formio.events.onAny(function() {
@@ -111,7 +111,7 @@ export default app.directive('formioReport', function() {
           $scope.initializeReport();
         });
 
-        $scope.$watch('apiUrl', url => {
+        $scope.$watch('projectEndpoint', url => {
           if (!url) {
             return;
           }
