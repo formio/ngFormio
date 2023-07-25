@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased: 4.19.0-rc.1]
 ### Changed
  - Increment minor version.
+ - Bump moment-timezone from 0.5.33 to 0.5.43
+ - Bump node-fetch from 2.6.1 to 2.6.12
+ - Bump webpack from 5.38.1 to 5.76.0
+ - Bump json-schema and jsprim
+ - Bump nanoid from 3.1.23 to 3.3.6
+ - Bump json-logic-js from 2.0.0 to 2.0.1
+ - Bump tar from 6.1.0 to 6.1.15
+ - Bump qs from 6.5.2 to 6.5.3
+ - Bump async from 2.6.3 to 2.6.4
+ - Bump moment from 2.29.1 to 2.29.4
+ - Bump loader-utils from 1.4.0 to 1.4.2
+ - Bump minimist from 1.2.5 to 1.2.8
+ - Bump decode-uri-component from 0.2.0 to 0.2.2
+ - Bump json5 from 1.0.1 to 1.0.2
 
 ## 4.18.2
 ### Changed
