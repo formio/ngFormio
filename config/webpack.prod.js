@@ -7,7 +7,10 @@ module.exports = merge(require('./webpack.dev'), {
     filename: 'ng-formio.min.js'
   },
   plugins: [
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/, 
+      contextRegExp: /moment$/
+    }),
     new webpack.BannerPlugin(`ng-formio v${packageJSON.version} | https://unpkg.com/ngFormio@${packageJSON.version}/LICENSE.txt`)
   ]
 });
