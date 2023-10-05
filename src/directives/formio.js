@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs';
+import { Formio } from '@formio/js/embed';
 const app = angular.module('formio');
 export default app.directive('formio', function() {
   return {

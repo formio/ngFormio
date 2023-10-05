@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs';
+import { Formio } from '@formio/js/embed';
 export default angular.module('formio').directive('formBuilder', function() {
   return {
     restrict: 'E',
@@ -75,7 +75,7 @@ export default angular.module('formio').directive('formBuilder', function() {
               if ($scope.url) {
                 builder.instance.url = $scope.url;
               }
-              builder.setForm(form);
+              builder.instance.setForm(form);
             });
           }
         });

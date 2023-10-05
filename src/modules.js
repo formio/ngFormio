@@ -3,4 +3,4 @@ import './filters';
 import './providers';
 import './directives';
 import './factories';
-export * from 'formiojs';
+export * from '@formio/js/embed';
