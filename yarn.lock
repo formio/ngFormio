@@ -1008,7 +1008,7 @@
     fetch-ponyfill "^7.1.0"
     json-logic-js "^2.0.2"
 
-"@formio/js@^5.0.0-rc.28":
+"@formio/js@^5.0.0-rc.30":
   version "5.0.0-rc.30"
   resolved "https://registry.npmjs.org/@formio/js/-/js-5.0.0-rc.30.tgz#dff76f784e2297be4e20b88325cb54779fe2c527"
   integrity sha512-DNBONprFYNHSjl/I5cvH9XjIQVUq3uT+hDoh9wO9XbpT/OZnpX8MKIMMZ0T1VXov1qNkUNxwEOUtJSIKK5eAgA==

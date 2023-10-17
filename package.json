@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "@formio/js": "^5.0.0-rc.28",
+    "@formio/js": "^5.0.0-rc.30",
     "angular": "^1.7.8"
   },
   "files": [
@@ -27,7 +27,7 @@
     "@babel/plugin-proposal-export-default-from": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.14.2",
     "@babel/preset-env": "^7.14.4",
-    "@formio/js": "^5.0.0-rc.28",
+    "@formio/js": "^5.0.0-rc.30",
     "core-js": "^3.13.1",
     "eslint-loader": "^4.0.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
