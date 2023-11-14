@@ -1,6 +1,6 @@
 {
   "name": "ng-formio",
-  "version": "5.0.0-rc.2",
+  "version": "5.0.0-rc.3",
   "description": "The form redering engine behind Form.IO.",
   "main": "lib/index.js",
   "style": "dist/formio.css",
@@ -27,7 +27,7 @@
     "@babel/plugin-proposal-export-default-from": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.14.2",
     "@babel/preset-env": "^7.14.4",
-    "@formio/js": "^5.0.0-rc.30",
+    "@formio/js": "^5.0.0-rc.31",
     "core-js": "^3.13.1",
     "eslint-loader": "^4.0.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
