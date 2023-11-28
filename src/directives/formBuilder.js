@@ -75,7 +75,7 @@ export default angular.module('formio').directive('formBuilder', function() {
               if ($scope.url) {
                 builder.instance.url = $scope.url;
               }
-              builder.instance.setForm(form);
+              builder.setForm(form);
             });
           }
         });
