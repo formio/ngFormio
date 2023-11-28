@@ -1,6 +1,6 @@
 const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
   performance: { hints: false },
   entry: './lib/index.js',
@@ -10,93 +10,16 @@ module.exports = {
     libraryTarget: 'umd',
     library: 'ngformio'
   },
-  module: {
-    rules: [
-      {
-        test: /\.(html)$/,
-        use: {
-          loader: 'html-loader',
-          options: {
-            attrs: [':data-src']
-          }
-        }
-      },
-      {
-        test: /\.(css|scss)$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: ''
-            }
-          },
-          'css-loader',
-          'sass-loader',
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    "postcss-preset-env"
-                  ],
-                ],
-              },
-            },
-          },
-        ]
-      },
-      {
-        test: /\.(woff2?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        exclude: /icons?\/|images?\/|imgs?\//,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            outputPath: 'fonts/',
-          }
-        }]
-      },
-      {
-        test: /icons?\/.*\.(gif|png|jpe?g|svg)$/i,
-        exclude: /fonts?\//,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'icons/',
-            }
-          }
-        ]
-      }
-    ]
-  },
+  module: {},
   plugins: [
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/, 
       contextRegExp: /moment$/
-    }),
-    new webpack.ProvidePlugin({
-      '$': 'jquery',
-      'jQuery': 'jquery',
-      'window.jQuery': 'jquery',
-      'moment': 'moment'
-    }),
-    new MiniCssExtractPlugin({
-      filename: 'formio.css'
     })
   ],
-  externals: {
-    jquery: 'jquery',
-    angular: 'angular',
-    formiojs: 'Formio',
-  },
-  devtool: 'source-map',
+  target: 'node',
+  externals: [nodeExternals()],
   resolve: {
     symlinks: false
-  },
-  devServer: {
-    historyApiFallback: true
   }
 };

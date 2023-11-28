@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs';
+import { Formio } from '@formio/js/sdk';
 
 const app = angular.module('formio');
 
@@ -90,8 +90,8 @@ export default app.provider('Formio', function() {
           }
         };
 
-        // Broadcast offline events from $rootScope
-        Formio.events.onAny(function() {
+        // Broadcast offline even@fts from $rootScope
+        Formio.events.on('*', function() {
           var event = 'formio.' + this.event;
           var args = [].splice.call(arguments, 0);
           args.unshift(event);

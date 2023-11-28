@@ -1,3 +1,5 @@
+dist
+lib
 .DS_Store
 .bower.json
 node_modules
