@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased: 4.19.1-rc.1]
+ - Bump postcss from 8.3.0 to 8.4.31
+ - Bump @babel/traverse from 7.14.2 to 7.23.2
+   
 ## 4.19.0
 ### Changed
  - Official Release
@@ -11,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 4.19.0-rc.1
 ### Added
  - FIO-6493: added angularJS wrapper for formio reports
+ - FIO-7324: fixed build process where webpack5 throw an error because of wrong arguments
 
 ### Changed
  - Increment minor version.
