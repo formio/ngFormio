@@ -27,7 +27,7 @@
     "@babel/plugin-proposal-export-default-from": "^7.24.1",
     "@babel/plugin-proposal-optional-chaining": "^7.14.2",
     "@babel/preset-env": "^7.24.5",
-    "@formio/js": "^5.0.0-rc.55",
+    "@formio/js": "5.0.0-dev.5641.3b5157b",
     "core-js": "^3.37.1",
     "eslint-loader": "^4.0.2",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
