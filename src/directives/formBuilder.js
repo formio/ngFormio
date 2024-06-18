@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs';
+import { Formio } from '@formio/js/sdk';
 export default angular.module('formio').directive('formBuilder', function() {
   return {
     restrict: 'E',

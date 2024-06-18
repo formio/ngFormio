@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs';
+import { Formio } from '@formio/js/sdk';
 const app = angular.module('formio');
 export default app.directive('formioReport', function() {
   return {
