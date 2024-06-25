@@ -42,7 +42,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: Install dependencies (This triggers a build step)
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Cache node modules
