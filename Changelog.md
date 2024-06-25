@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 5.0.0-rc.7
+### Changed
+ - Update renderer 5x
+ - FIO-8504: GH Action To Publish ngFormio Dev Tag
+   
 ## 4.19.1-rc.1
  - Bump postcss from 8.3.0 to 8.4.31
  - Bump @babel/traverse from 7.14.2 to 7.23.2
