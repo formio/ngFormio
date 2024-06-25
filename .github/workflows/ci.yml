@@ -53,13 +53,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-    ####################################
-    ## Currently no test folder
-    ####################################
-    #   - name: Test
-    #     uses: borales/actions-yarn@v4
-    #     with:
-    #         cmd: test
+      - name: Build
+        uses: borales/actions-yarn@v4
+        with:
+            cmd: build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v3
