@@ -83,43 +83,43 @@ jobs:
       - name: View downloaded build output
         run: ls -a
 
-    #   - name: Restore node modules from cache
-    #     uses: actions/cache@v3
-    #     with:
-    #       path: node_modules
-    #       key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-    #       restore-keys: |
-    #         ${{ runner.os }}-node-
+      - name: Restore node modules from cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-    #   - name: Add npm token to .npmrc
-    #     run: |
-    #       echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+      - name: Add npm token to .npmrc
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
 
-    #   - name: Prepare version for publish
-    #     id: prep
-    #     run: |
-    #       # Extract the pull request number and the short SHA of the commit
-    #       PR_NUMBER=$(echo ${{ github.event.number }})
-    #       COMMIT_SHORT_SHA=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-7)
+      - name: Prepare version for publish
+        id: prep
+        run: |
+          # Extract the pull request number and the short SHA of the commit
+          PR_NUMBER=$(echo ${{ github.event.number }})
+          COMMIT_SHORT_SHA=$(echo "${{ github.event.pull_request.head.sha }}" | cut -c1-7)
 
-    #       # Extract the current version from package.json
-    #       CURRENT_VERSION=$(node -p "require('./package.json').version")
+          # Extract the current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
 
-    #       # If the current version includes '-rc.', remove it and everything after
-    #       # This step ensures that we start with a base version like '3.0.0' even if it was a release candidate
-    #       BASE_VERSION=$(echo "$CURRENT_VERSION" | cut -d'-' -f1)
+          # If the current version includes '-rc.', remove it and everything after
+          # This step ensures that we start with a base version like '3.0.0' even if it was a release candidate
+          BASE_VERSION=$(echo "$CURRENT_VERSION" | cut -d'-' -f1)
 
-    #       # Construct the new version string
-    #       NEW_VERSION="${BASE_VERSION}-dev.${PR_NUMBER}.${COMMIT_SHORT_SHA}"
+          # Construct the new version string
+          NEW_VERSION="${BASE_VERSION}-dev.${PR_NUMBER}.${COMMIT_SHORT_SHA}"
           
-    #       # Output the new version for use in subsequent GitHub Actions steps
-    #       echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          # Output the new version for use in subsequent GitHub Actions steps
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-    #   - name: Echo version to publish
-    #     run: |
-    #       echo "Version to publish: $NEW_VERSION"
+      - name: Echo version to publish
+        run: |
+          echo "Version to publish: $NEW_VERSION"
 
     #   - name: Publish to npm
     #     run: |
     #       npm version $NEW_VERSION
-    #       yarn publish --ignore-scripts --tag dev
+    #       yarn publish --tag dev
