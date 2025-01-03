@@ -50,10 +50,12 @@ export default app.directive('formio', function() {
             $scope.src += ($scope.src.indexOf('?') === -1) ? '?' : '&';
             $scope.src += 'live=1';
           }
+          const optionsForm = _.cloneDeep($scope.options);
+          optionsForm.project = Formio.projectUrl || ""
 
           if ($scope.src || $scope.form) {
             $scope.initialized = true;
-            Formio.createForm($scope.element, $scope.src || $scope.form, _.cloneDeep($scope.options)).then(formio => {
+            Formio.createForm($scope.element, $scope.src || $scope.form, optionsForm).then(formio => {
               formio.nosubmit = $scope.noSubmit;
               $scope.$emit('formLoad', formio.wizard ? formio.wizard : formio.form);
               $scope.formio = formio;
