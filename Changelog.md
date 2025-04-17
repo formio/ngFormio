@@ -4,11 +4,13 @@ All notable changes to this project will be documented in this file
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased: 5.0.0-rc.8]
- - FIO-8631/FIO-8634: Fixes an issue where premium components show "Unknown template" on 5.x renderer
-   
-## 5.0.0-rc.7
+## [Unreleased: 5.0.1-rc.1]
+ - Update build
+
+## 5.0.0
 ### Changed
+ - Official Release
+ - FIO-8631/FIO-8634: Fixes an issue where premium components show "Unknown template" on 5.x renderer
  - Update renderer 5x
  - FIO-8504: GH Action To Publish ngFormio Dev Tag
    
